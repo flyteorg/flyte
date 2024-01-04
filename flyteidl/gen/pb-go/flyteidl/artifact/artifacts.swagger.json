@@ -674,6 +674,32 @@
           "ArtifactRegistry"
         ]
       }
+    },
+    "/artifacts/api/v1/trigger/deactivate": {
+      "post": {
+        "operationId": "DeactivateTrigger",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactDeactivateTriggerResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artifactDeactivateTriggerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
     }
   },
   "definitions": {
@@ -1190,7 +1216,15 @@
     "artifactCreateTriggerResponse": {
       "type": "object"
     },
-    "artifactDeleteTriggerResponse": {
+    "artifactDeactivateTriggerRequest": {
+      "type": "object",
+      "properties": {
+        "trigger_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        }
+      }
+    },
+    "artifactDeactivateTriggerResponse": {
       "type": "object"
     },
     "artifactExecutionInputsResponse": {

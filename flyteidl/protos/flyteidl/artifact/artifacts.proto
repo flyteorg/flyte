@@ -144,11 +144,11 @@ message CreateTriggerRequest {
 
 message CreateTriggerResponse {}
 
-message DeleteTriggerRequest {
+message DeactivateTriggerRequest {
   core.Identifier trigger_id = 1;
 }
 
-message DeleteTriggerResponse {}
+message DeactivateTriggerResponse {}
 
 message ArtifactProducer {
   // These can be tasks, and workflows. Keeping track of the launch plans that a given workflow has is purely in
@@ -205,7 +205,12 @@ service ArtifactRegistry {
 
   rpc CreateTrigger (CreateTriggerRequest) returns (CreateTriggerResponse) {}
 
-  rpc DeleteTrigger (DeleteTriggerRequest) returns (DeleteTriggerResponse) {}
+  rpc DeactivateTrigger (DeactivateTriggerRequest) returns (DeactivateTriggerResponse) {
+    option (google.api.http) = {
+      post: "/artifacts/api/v1/trigger/deactivate"
+      body: "*"
+    };
+  }
 
   rpc AddTag(AddTagRequest) returns (AddTagResponse) {}
 

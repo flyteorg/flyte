@@ -101,14 +101,14 @@ class CreateTriggerResponseDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<CreateTriggerResponse> _instance;
 } _CreateTriggerResponse_default_instance_;
-class DeleteTriggerRequestDefaultTypeInternal {
+class DeactivateTriggerRequestDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<DeleteTriggerRequest> _instance;
-} _DeleteTriggerRequest_default_instance_;
-class DeleteTriggerResponseDefaultTypeInternal {
+  ::google::protobuf::internal::ExplicitlyConstructed<DeactivateTriggerRequest> _instance;
+} _DeactivateTriggerRequest_default_instance_;
+class DeactivateTriggerResponseDefaultTypeInternal {
  public:
-  ::google::protobuf::internal::ExplicitlyConstructed<DeleteTriggerResponse> _instance;
-} _DeleteTriggerResponse_default_instance_;
+  ::google::protobuf::internal::ExplicitlyConstructed<DeactivateTriggerResponse> _instance;
+} _DeactivateTriggerResponse_default_instance_;
 class ArtifactProducerDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<ArtifactProducer> _instance;
@@ -384,34 +384,34 @@ static void InitDefaultsCreateTriggerResponse_flyteidl_2fartifact_2fartifacts_2e
 ::google::protobuf::internal::SCCInfo<0> scc_info_CreateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto =
     {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCreateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto}, {}};
 
-static void InitDefaultsDeleteTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto() {
+static void InitDefaultsDeactivateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::flyteidl::artifact::_DeleteTriggerRequest_default_instance_;
-    new (ptr) ::flyteidl::artifact::DeleteTriggerRequest();
+    void* ptr = &::flyteidl::artifact::_DeactivateTriggerRequest_default_instance_;
+    new (ptr) ::flyteidl::artifact::DeactivateTriggerRequest();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::flyteidl::artifact::DeleteTriggerRequest::InitAsDefaultInstance();
+  ::flyteidl::artifact::DeactivateTriggerRequest::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_DeleteTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsDeleteTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto}, {
+::google::protobuf::internal::SCCInfo<1> scc_info_DeactivateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsDeactivateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto}, {
       &scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto.base,}};
 
-static void InitDefaultsDeleteTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto() {
+static void InitDefaultsDeactivateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::flyteidl::artifact::_DeleteTriggerResponse_default_instance_;
-    new (ptr) ::flyteidl::artifact::DeleteTriggerResponse();
+    void* ptr = &::flyteidl::artifact::_DeactivateTriggerResponse_default_instance_;
+    new (ptr) ::flyteidl::artifact::DeactivateTriggerResponse();
     ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::flyteidl::artifact::DeleteTriggerResponse::InitAsDefaultInstance();
+  ::flyteidl::artifact::DeactivateTriggerResponse::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<0> scc_info_DeleteTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsDeleteTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto}, {}};
+::google::protobuf::internal::SCCInfo<0> scc_info_DeactivateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsDeactivateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto}, {}};
 
 static void InitDefaultsArtifactProducer_flyteidl_2fartifact_2fartifacts_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -536,8 +536,8 @@ void InitDefaults_flyteidl_2fartifact_2fartifacts_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_AddTagResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CreateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CreateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_DeleteTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_DeleteTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_DeactivateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_DeactivateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ArtifactProducer_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_RegisterProducerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ArtifactConsumer_flyteidl_2fartifact_2fartifacts_2eproto.base);
@@ -678,13 +678,13 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fartifact_2fartifacts_2ep
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::DeleteTriggerRequest, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::DeactivateTriggerRequest, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::DeleteTriggerRequest, trigger_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::DeactivateTriggerRequest, trigger_id_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::DeleteTriggerResponse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::artifact::DeactivateTriggerResponse, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
@@ -749,8 +749,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 109, -1, sizeof(::flyteidl::artifact::AddTagResponse)},
   { 114, -1, sizeof(::flyteidl::artifact::CreateTriggerRequest)},
   { 120, -1, sizeof(::flyteidl::artifact::CreateTriggerResponse)},
-  { 125, -1, sizeof(::flyteidl::artifact::DeleteTriggerRequest)},
-  { 131, -1, sizeof(::flyteidl::artifact::DeleteTriggerResponse)},
+  { 125, -1, sizeof(::flyteidl::artifact::DeactivateTriggerRequest)},
+  { 131, -1, sizeof(::flyteidl::artifact::DeactivateTriggerResponse)},
   { 136, -1, sizeof(::flyteidl::artifact::ArtifactProducer)},
   { 143, -1, sizeof(::flyteidl::artifact::RegisterProducerRequest)},
   { 149, -1, sizeof(::flyteidl::artifact::ArtifactConsumer)},
@@ -777,8 +777,8 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_AddTagResponse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_CreateTriggerRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_CreateTriggerResponse_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_DeleteTriggerRequest_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_DeleteTriggerResponse_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_DeactivateTriggerRequest_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_DeactivateTriggerResponse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_ArtifactProducer_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_RegisterProducerRequest_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::artifact::_ArtifactConsumer_default_instance_),
@@ -851,77 +851,79 @@ const char descriptor_table_protodef_flyteidl_2fartifact_2fartifacts_2eproto[] =
   "\r\n\005value\030\002 \001(\t\022\021\n\toverwrite\030\003 \001(\010\"\020\n\016Add"
   "TagResponse\"O\n\024CreateTriggerRequest\0227\n\023t"
   "rigger_launch_plan\030\001 \001(\0132\032.flyteidl.admi"
-  "n.LaunchPlan\"\027\n\025CreateTriggerResponse\"E\n"
-  "\024DeleteTriggerRequest\022-\n\ntrigger_id\030\001 \001("
-  "\0132\031.flyteidl.core.Identifier\"\027\n\025DeleteTr"
-  "iggerResponse\"m\n\020ArtifactProducer\022,\n\tent"
-  "ity_id\030\001 \001(\0132\031.flyteidl.core.Identifier\022"
-  "+\n\007outputs\030\002 \001(\0132\032.flyteidl.core.Variabl"
-  "eMap\"Q\n\027RegisterProducerRequest\0226\n\tprodu"
-  "cers\030\001 \003(\0132#.flyteidl.artifact.ArtifactP"
-  "roducer\"m\n\020ArtifactConsumer\022,\n\tentity_id"
-  "\030\001 \001(\0132\031.flyteidl.core.Identifier\022+\n\006inp"
-  "uts\030\002 \001(\0132\033.flyteidl.core.ParameterMap\"Q"
-  "\n\027RegisterConsumerRequest\0226\n\tconsumers\030\001"
-  " \003(\0132#.flyteidl.artifact.ArtifactConsume"
-  "r\"\022\n\020RegisterResponse\"\205\001\n\026ExecutionInput"
-  "sRequest\022@\n\014execution_id\030\001 \001(\0132*.flyteid"
-  "l.core.WorkflowExecutionIdentifier\022)\n\006in"
-  "puts\030\002 \003(\0132\031.flyteidl.core.ArtifactID\"\031\n"
-  "\027ExecutionInputsResponse2\275\016\n\020ArtifactReg"
-  "istry\022g\n\016CreateArtifact\022(.flyteidl.artif"
-  "act.CreateArtifactRequest\032).flyteidl.art"
-  "ifact.CreateArtifactResponse\"\000\022\361\004\n\013GetAr"
-  "tifact\022%.flyteidl.artifact.GetArtifactRe"
-  "quest\032&.flyteidl.artifact.GetArtifactRes"
-  "ponse\"\222\004\202\323\344\223\002\213\004\022\033/artifacts/api/v1/artif"
-  "actsZ\263\001\022\260\001/artifacts/api/v1/artifact/id/"
-  "{query.artifact_id.artifact_key.project}"
-  "/{query.artifact_id.artifact_key.domain}"
-  "/{query.artifact_id.artifact_key.name}/{"
-  "query.artifact_id.version}Z\227\001\022\224\001/artifac"
-  "ts/api/v1/artifact/id/{query.artifact_id"
-  ".artifact_key.project}/{query.artifact_i"
-  "d.artifact_key.domain}/{query.artifact_i"
-  "d.artifact_key.name}Z\233\001\022\230\001/artifacts/api"
-  "/v1/artifact/tag/{query.artifact_tag.art"
-  "ifact_key.project}/{query.artifact_tag.a"
-  "rtifact_key.domain}/{query.artifact_tag."
-  "artifact_key.name}\022\226\002\n\017SearchArtifacts\022)"
-  ".flyteidl.artifact.SearchArtifactsReques"
-  "t\032*.flyteidl.artifact.SearchArtifactsRes"
-  "ponse\"\253\001\202\323\344\223\002\244\001\022Y/artifacts/api/v1/searc"
-  "h/{artifact_key.project}/{artifact_key.d"
-  "omain}/{artifact_key.name}ZG\022E/artifacts"
-  "/api/v1/search/{artifact_key.project}/{a"
-  "rtifact_key.domain}\022d\n\rCreateTrigger\022\'.f"
-  "lyteidl.artifact.CreateTriggerRequest\032(."
-  "flyteidl.artifact.CreateTriggerResponse\""
-  "\000\022d\n\rDeleteTrigger\022\'.flyteidl.artifact.D"
-  "eleteTriggerRequest\032(.flyteidl.artifact."
-  "DeleteTriggerResponse\"\000\022O\n\006AddTag\022 .flyt"
-  "eidl.artifact.AddTagRequest\032!.flyteidl.a"
-  "rtifact.AddTagResponse\"\000\022e\n\020RegisterProd"
-  "ucer\022*.flyteidl.artifact.RegisterProduce"
-  "rRequest\032#.flyteidl.artifact.RegisterRes"
-  "ponse\"\000\022e\n\020RegisterConsumer\022*.flyteidl.a"
-  "rtifact.RegisterConsumerRequest\032#.flytei"
-  "dl.artifact.RegisterResponse\"\000\022m\n\022SetExe"
-  "cutionInputs\022).flyteidl.artifact.Executi"
-  "onInputsRequest\032*.flyteidl.artifact.Exec"
-  "utionInputsResponse\"\000\022\330\001\n\022FindByWorkflow"
-  "Exec\022,.flyteidl.artifact.FindByWorkflowE"
-  "xecRequest\032*.flyteidl.artifact.SearchArt"
-  "ifactsResponse\"h\202\323\344\223\002b\022`/artifacts/api/v"
-  "1/search/execution/{exec_id.project}/{ex"
-  "ec_id.domain}/{exec_id.name}/{direction}"
-  "B@Z>github.com/flyteorg/flyte/flyteidl/g"
-  "en/pb-go/flyteidl/artifactb\006proto3"
+  "n.LaunchPlan\"\027\n\025CreateTriggerResponse\"I\n"
+  "\030DeactivateTriggerRequest\022-\n\ntrigger_id\030"
+  "\001 \001(\0132\031.flyteidl.core.Identifier\"\033\n\031Deac"
+  "tivateTriggerResponse\"m\n\020ArtifactProduce"
+  "r\022,\n\tentity_id\030\001 \001(\0132\031.flyteidl.core.Ide"
+  "ntifier\022+\n\007outputs\030\002 \001(\0132\032.flyteidl.core"
+  ".VariableMap\"Q\n\027RegisterProducerRequest\022"
+  "6\n\tproducers\030\001 \003(\0132#.flyteidl.artifact.A"
+  "rtifactProducer\"m\n\020ArtifactConsumer\022,\n\te"
+  "ntity_id\030\001 \001(\0132\031.flyteidl.core.Identifie"
+  "r\022+\n\006inputs\030\002 \001(\0132\033.flyteidl.core.Parame"
+  "terMap\"Q\n\027RegisterConsumerRequest\0226\n\tcon"
+  "sumers\030\001 \003(\0132#.flyteidl.artifact.Artifac"
+  "tConsumer\"\022\n\020RegisterResponse\"\205\001\n\026Execut"
+  "ionInputsRequest\022@\n\014execution_id\030\001 \001(\0132*"
+  ".flyteidl.core.WorkflowExecutionIdentifi"
+  "er\022)\n\006inputs\030\002 \003(\0132\031.flyteidl.core.Artif"
+  "actID\"\031\n\027ExecutionInputsResponse2\371\016\n\020Art"
+  "ifactRegistry\022g\n\016CreateArtifact\022(.flytei"
+  "dl.artifact.CreateArtifactRequest\032).flyt"
+  "eidl.artifact.CreateArtifactResponse\"\000\022\361"
+  "\004\n\013GetArtifact\022%.flyteidl.artifact.GetAr"
+  "tifactRequest\032&.flyteidl.artifact.GetArt"
+  "ifactResponse\"\222\004\202\323\344\223\002\213\004\022\033/artifacts/api/"
+  "v1/artifactsZ\263\001\022\260\001/artifacts/api/v1/arti"
+  "fact/id/{query.artifact_id.artifact_key."
+  "project}/{query.artifact_id.artifact_key"
+  ".domain}/{query.artifact_id.artifact_key"
+  ".name}/{query.artifact_id.version}Z\227\001\022\224\001"
+  "/artifacts/api/v1/artifact/id/{query.art"
+  "ifact_id.artifact_key.project}/{query.ar"
+  "tifact_id.artifact_key.domain}/{query.ar"
+  "tifact_id.artifact_key.name}Z\233\001\022\230\001/artif"
+  "acts/api/v1/artifact/tag/{query.artifact"
+  "_tag.artifact_key.project}/{query.artifa"
+  "ct_tag.artifact_key.domain}/{query.artif"
+  "act_tag.artifact_key.name}\022\226\002\n\017SearchArt"
+  "ifacts\022).flyteidl.artifact.SearchArtifac"
+  "tsRequest\032*.flyteidl.artifact.SearchArti"
+  "factsResponse\"\253\001\202\323\344\223\002\244\001\022Y/artifacts/api/"
+  "v1/search/{artifact_key.project}/{artifa"
+  "ct_key.domain}/{artifact_key.name}ZG\022E/a"
+  "rtifacts/api/v1/search/{artifact_key.pro"
+  "ject}/{artifact_key.domain}\022d\n\rCreateTri"
+  "gger\022\'.flyteidl.artifact.CreateTriggerRe"
+  "quest\032(.flyteidl.artifact.CreateTriggerR"
+  "esponse\"\000\022\237\001\n\021DeactivateTrigger\022+.flytei"
+  "dl.artifact.DeactivateTriggerRequest\032,.f"
+  "lyteidl.artifact.DeactivateTriggerRespon"
+  "se\"/\202\323\344\223\002)\"$/artifacts/api/v1/trigger/de"
+  "activate:\001*\022O\n\006AddTag\022 .flyteidl.artifac"
+  "t.AddTagRequest\032!.flyteidl.artifact.AddT"
+  "agResponse\"\000\022e\n\020RegisterProducer\022*.flyte"
+  "idl.artifact.RegisterProducerRequest\032#.f"
+  "lyteidl.artifact.RegisterResponse\"\000\022e\n\020R"
+  "egisterConsumer\022*.flyteidl.artifact.Regi"
+  "sterConsumerRequest\032#.flyteidl.artifact."
+  "RegisterResponse\"\000\022m\n\022SetExecutionInputs"
+  "\022).flyteidl.artifact.ExecutionInputsRequ"
+  "est\032*.flyteidl.artifact.ExecutionInputsR"
+  "esponse\"\000\022\330\001\n\022FindByWorkflowExec\022,.flyte"
+  "idl.artifact.FindByWorkflowExecRequest\032*"
+  ".flyteidl.artifact.SearchArtifactsRespon"
+  "se\"h\202\323\344\223\002b\022`/artifacts/api/v1/search/exe"
+  "cution/{exec_id.project}/{exec_id.domain"
+  "}/{exec_id.name}/{direction}B@Z>github.c"
+  "om/flyteorg/flyte/flyteidl/gen/pb-go/fly"
+  "teidl/artifactb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fartifact_2fartifacts_2eproto = {
   false, InitDefaults_flyteidl_2fartifact_2fartifacts_2eproto, 
   descriptor_table_protodef_flyteidl_2fartifact_2fartifacts_2eproto,
-  "flyteidl/artifact/artifacts.proto", &assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto, 4874,
+  "flyteidl/artifact/artifacts.proto", &assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto, 4942,
 };
 
 void AddDescriptors_flyteidl_2fartifact_2fartifacts_2eproto() {
@@ -7136,35 +7138,35 @@ void CreateTriggerResponse::InternalSwap(CreateTriggerResponse* other) {
 
 // ===================================================================
 
-void DeleteTriggerRequest::InitAsDefaultInstance() {
-  ::flyteidl::artifact::_DeleteTriggerRequest_default_instance_._instance.get_mutable()->trigger_id_ = const_cast< ::flyteidl::core::Identifier*>(
+void DeactivateTriggerRequest::InitAsDefaultInstance() {
+  ::flyteidl::artifact::_DeactivateTriggerRequest_default_instance_._instance.get_mutable()->trigger_id_ = const_cast< ::flyteidl::core::Identifier*>(
       ::flyteidl::core::Identifier::internal_default_instance());
 }
-class DeleteTriggerRequest::HasBitSetters {
+class DeactivateTriggerRequest::HasBitSetters {
  public:
-  static const ::flyteidl::core::Identifier& trigger_id(const DeleteTriggerRequest* msg);
+  static const ::flyteidl::core::Identifier& trigger_id(const DeactivateTriggerRequest* msg);
 };
 
 const ::flyteidl::core::Identifier&
-DeleteTriggerRequest::HasBitSetters::trigger_id(const DeleteTriggerRequest* msg) {
+DeactivateTriggerRequest::HasBitSetters::trigger_id(const DeactivateTriggerRequest* msg) {
   return *msg->trigger_id_;
 }
-void DeleteTriggerRequest::clear_trigger_id() {
+void DeactivateTriggerRequest::clear_trigger_id() {
   if (GetArenaNoVirtual() == nullptr && trigger_id_ != nullptr) {
     delete trigger_id_;
   }
   trigger_id_ = nullptr;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int DeleteTriggerRequest::kTriggerIdFieldNumber;
+const int DeactivateTriggerRequest::kTriggerIdFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-DeleteTriggerRequest::DeleteTriggerRequest()
+DeactivateTriggerRequest::DeactivateTriggerRequest()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(constructor:flyteidl.artifact.DeactivateTriggerRequest)
 }
-DeleteTriggerRequest::DeleteTriggerRequest(const DeleteTriggerRequest& from)
+DeactivateTriggerRequest::DeactivateTriggerRequest(const DeactivateTriggerRequest& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
@@ -7173,35 +7175,35 @@ DeleteTriggerRequest::DeleteTriggerRequest(const DeleteTriggerRequest& from)
   } else {
     trigger_id_ = nullptr;
   }
-  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.DeactivateTriggerRequest)
 }
 
-void DeleteTriggerRequest::SharedCtor() {
+void DeactivateTriggerRequest::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
-      &scc_info_DeleteTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
+      &scc_info_DeactivateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
   trigger_id_ = nullptr;
 }
 
-DeleteTriggerRequest::~DeleteTriggerRequest() {
-  // @@protoc_insertion_point(destructor:flyteidl.artifact.DeleteTriggerRequest)
+DeactivateTriggerRequest::~DeactivateTriggerRequest() {
+  // @@protoc_insertion_point(destructor:flyteidl.artifact.DeactivateTriggerRequest)
   SharedDtor();
 }
 
-void DeleteTriggerRequest::SharedDtor() {
+void DeactivateTriggerRequest::SharedDtor() {
   if (this != internal_default_instance()) delete trigger_id_;
 }
 
-void DeleteTriggerRequest::SetCachedSize(int size) const {
+void DeactivateTriggerRequest::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const DeleteTriggerRequest& DeleteTriggerRequest::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_DeleteTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
+const DeactivateTriggerRequest& DeactivateTriggerRequest::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_DeactivateTriggerRequest_flyteidl_2fartifact_2fartifacts_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void DeleteTriggerRequest::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.DeleteTriggerRequest)
+void DeactivateTriggerRequest::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.DeactivateTriggerRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -7214,9 +7216,9 @@ void DeleteTriggerRequest::Clear() {
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* DeleteTriggerRequest::_InternalParse(const char* begin, const char* end, void* object,
+const char* DeactivateTriggerRequest::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<DeleteTriggerRequest*>(object);
+  auto msg = static_cast<DeactivateTriggerRequest*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -7259,11 +7261,11 @@ len_delim_till_end:
                                {parser_till_end, object}, size);
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool DeleteTriggerRequest::MergePartialFromCodedStream(
+bool DeactivateTriggerRequest::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(parse_start:flyteidl.artifact.DeactivateTriggerRequest)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -7292,18 +7294,18 @@ bool DeleteTriggerRequest::MergePartialFromCodedStream(
     }
   }
 success:
-  // @@protoc_insertion_point(parse_success:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(parse_success:flyteidl.artifact.DeactivateTriggerRequest)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.DeactivateTriggerRequest)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void DeleteTriggerRequest::SerializeWithCachedSizes(
+void DeactivateTriggerRequest::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.DeactivateTriggerRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -7317,12 +7319,12 @@ void DeleteTriggerRequest::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.DeactivateTriggerRequest)
 }
 
-::google::protobuf::uint8* DeleteTriggerRequest::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* DeactivateTriggerRequest::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.DeactivateTriggerRequest)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -7337,12 +7339,12 @@ void DeleteTriggerRequest::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.DeactivateTriggerRequest)
   return target;
 }
 
-size_t DeleteTriggerRequest::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.DeleteTriggerRequest)
+size_t DeactivateTriggerRequest::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.DeactivateTriggerRequest)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -7366,23 +7368,23 @@ size_t DeleteTriggerRequest::ByteSizeLong() const {
   return total_size;
 }
 
-void DeleteTriggerRequest::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.DeleteTriggerRequest)
+void DeactivateTriggerRequest::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.DeactivateTriggerRequest)
   GOOGLE_DCHECK_NE(&from, this);
-  const DeleteTriggerRequest* source =
-      ::google::protobuf::DynamicCastToGenerated<DeleteTriggerRequest>(
+  const DeactivateTriggerRequest* source =
+      ::google::protobuf::DynamicCastToGenerated<DeactivateTriggerRequest>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.DeactivateTriggerRequest)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.DeactivateTriggerRequest)
     MergeFrom(*source);
   }
 }
 
-void DeleteTriggerRequest::MergeFrom(const DeleteTriggerRequest& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.DeleteTriggerRequest)
+void DeactivateTriggerRequest::MergeFrom(const DeactivateTriggerRequest& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.DeactivateTriggerRequest)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -7393,35 +7395,35 @@ void DeleteTriggerRequest::MergeFrom(const DeleteTriggerRequest& from) {
   }
 }
 
-void DeleteTriggerRequest::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.DeleteTriggerRequest)
+void DeactivateTriggerRequest::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.DeactivateTriggerRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void DeleteTriggerRequest::CopyFrom(const DeleteTriggerRequest& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.DeleteTriggerRequest)
+void DeactivateTriggerRequest::CopyFrom(const DeactivateTriggerRequest& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.DeactivateTriggerRequest)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool DeleteTriggerRequest::IsInitialized() const {
+bool DeactivateTriggerRequest::IsInitialized() const {
   return true;
 }
 
-void DeleteTriggerRequest::Swap(DeleteTriggerRequest* other) {
+void DeactivateTriggerRequest::Swap(DeactivateTriggerRequest* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void DeleteTriggerRequest::InternalSwap(DeleteTriggerRequest* other) {
+void DeactivateTriggerRequest::InternalSwap(DeactivateTriggerRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(trigger_id_, other->trigger_id_);
 }
 
-::google::protobuf::Metadata DeleteTriggerRequest::GetMetadata() const {
+::google::protobuf::Metadata DeactivateTriggerRequest::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto);
   return ::file_level_metadata_flyteidl_2fartifact_2fartifacts_2eproto[kIndexInFileMessages];
 }
@@ -7429,49 +7431,49 @@ void DeleteTriggerRequest::InternalSwap(DeleteTriggerRequest* other) {
 
 // ===================================================================
 
-void DeleteTriggerResponse::InitAsDefaultInstance() {
+void DeactivateTriggerResponse::InitAsDefaultInstance() {
 }
-class DeleteTriggerResponse::HasBitSetters {
+class DeactivateTriggerResponse::HasBitSetters {
  public:
 };
 
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
-DeleteTriggerResponse::DeleteTriggerResponse()
+DeactivateTriggerResponse::DeactivateTriggerResponse()
   : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
   SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(constructor:flyteidl.artifact.DeactivateTriggerResponse)
 }
-DeleteTriggerResponse::DeleteTriggerResponse(const DeleteTriggerResponse& from)
+DeactivateTriggerResponse::DeactivateTriggerResponse(const DeactivateTriggerResponse& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
-  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(copy_constructor:flyteidl.artifact.DeactivateTriggerResponse)
 }
 
-void DeleteTriggerResponse::SharedCtor() {
+void DeactivateTriggerResponse::SharedCtor() {
 }
 
-DeleteTriggerResponse::~DeleteTriggerResponse() {
-  // @@protoc_insertion_point(destructor:flyteidl.artifact.DeleteTriggerResponse)
+DeactivateTriggerResponse::~DeactivateTriggerResponse() {
+  // @@protoc_insertion_point(destructor:flyteidl.artifact.DeactivateTriggerResponse)
   SharedDtor();
 }
 
-void DeleteTriggerResponse::SharedDtor() {
+void DeactivateTriggerResponse::SharedDtor() {
 }
 
-void DeleteTriggerResponse::SetCachedSize(int size) const {
+void DeactivateTriggerResponse::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const DeleteTriggerResponse& DeleteTriggerResponse::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_DeleteTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
+const DeactivateTriggerResponse& DeactivateTriggerResponse::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_DeactivateTriggerResponse_flyteidl_2fartifact_2fartifacts_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void DeleteTriggerResponse::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.DeleteTriggerResponse)
+void DeactivateTriggerResponse::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.artifact.DeactivateTriggerResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
@@ -7480,9 +7482,9 @@ void DeleteTriggerResponse::Clear() {
 }
 
 #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* DeleteTriggerResponse::_InternalParse(const char* begin, const char* end, void* object,
+const char* DeactivateTriggerResponse::_InternalParse(const char* begin, const char* end, void* object,
                   ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<DeleteTriggerResponse*>(object);
+  auto msg = static_cast<DeactivateTriggerResponse*>(object);
   ::google::protobuf::int32 size; (void)size;
   int depth; (void)depth;
   ::google::protobuf::uint32 tag;
@@ -7508,11 +7510,11 @@ const char* DeleteTriggerResponse::_InternalParse(const char* begin, const char*
   return ptr;
 }
 #else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool DeleteTriggerResponse::MergePartialFromCodedStream(
+bool DeactivateTriggerResponse::MergePartialFromCodedStream(
     ::google::protobuf::io::CodedInputStream* input) {
 #define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
   ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(parse_start:flyteidl.artifact.DeactivateTriggerResponse)
   for (;;) {
     ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
     tag = p.first;
@@ -7525,18 +7527,18 @@ bool DeleteTriggerResponse::MergePartialFromCodedStream(
           input, tag, _internal_metadata_.mutable_unknown_fields()));
   }
 success:
-  // @@protoc_insertion_point(parse_success:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(parse_success:flyteidl.artifact.DeactivateTriggerResponse)
   return true;
 failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(parse_failure:flyteidl.artifact.DeactivateTriggerResponse)
   return false;
 #undef DO_
 }
 #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
 
-void DeleteTriggerResponse::SerializeWithCachedSizes(
+void DeactivateTriggerResponse::SerializeWithCachedSizes(
     ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(serialize_start:flyteidl.artifact.DeactivateTriggerResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -7544,12 +7546,12 @@ void DeleteTriggerResponse::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
   }
-  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(serialize_end:flyteidl.artifact.DeactivateTriggerResponse)
 }
 
-::google::protobuf::uint8* DeleteTriggerResponse::InternalSerializeWithCachedSizesToArray(
+::google::protobuf::uint8* DeactivateTriggerResponse::InternalSerializeWithCachedSizesToArray(
     ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.artifact.DeactivateTriggerResponse)
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
@@ -7557,12 +7559,12 @@ void DeleteTriggerResponse::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.artifact.DeactivateTriggerResponse)
   return target;
 }
 
-size_t DeleteTriggerResponse::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.DeleteTriggerResponse)
+size_t DeactivateTriggerResponse::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.artifact.DeactivateTriggerResponse)
   size_t total_size = 0;
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -7579,23 +7581,23 @@ size_t DeleteTriggerResponse::ByteSizeLong() const {
   return total_size;
 }
 
-void DeleteTriggerResponse::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.DeleteTriggerResponse)
+void DeactivateTriggerResponse::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.artifact.DeactivateTriggerResponse)
   GOOGLE_DCHECK_NE(&from, this);
-  const DeleteTriggerResponse* source =
-      ::google::protobuf::DynamicCastToGenerated<DeleteTriggerResponse>(
+  const DeactivateTriggerResponse* source =
+      ::google::protobuf::DynamicCastToGenerated<DeactivateTriggerResponse>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.artifact.DeactivateTriggerResponse)
     ::google::protobuf::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.artifact.DeactivateTriggerResponse)
     MergeFrom(*source);
   }
 }
 
-void DeleteTriggerResponse::MergeFrom(const DeleteTriggerResponse& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.DeleteTriggerResponse)
+void DeactivateTriggerResponse::MergeFrom(const DeactivateTriggerResponse& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.artifact.DeactivateTriggerResponse)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   ::google::protobuf::uint32 cached_has_bits = 0;
@@ -7603,34 +7605,34 @@ void DeleteTriggerResponse::MergeFrom(const DeleteTriggerResponse& from) {
 
 }
 
-void DeleteTriggerResponse::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.DeleteTriggerResponse)
+void DeactivateTriggerResponse::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.artifact.DeactivateTriggerResponse)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void DeleteTriggerResponse::CopyFrom(const DeleteTriggerResponse& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.DeleteTriggerResponse)
+void DeactivateTriggerResponse::CopyFrom(const DeactivateTriggerResponse& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.artifact.DeactivateTriggerResponse)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool DeleteTriggerResponse::IsInitialized() const {
+bool DeactivateTriggerResponse::IsInitialized() const {
   return true;
 }
 
-void DeleteTriggerResponse::Swap(DeleteTriggerResponse* other) {
+void DeactivateTriggerResponse::Swap(DeactivateTriggerResponse* other) {
   if (other == this) return;
   InternalSwap(other);
 }
-void DeleteTriggerResponse::InternalSwap(DeleteTriggerResponse* other) {
+void DeactivateTriggerResponse::InternalSwap(DeactivateTriggerResponse* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
 }
 
-::google::protobuf::Metadata DeleteTriggerResponse::GetMetadata() const {
+::google::protobuf::Metadata DeactivateTriggerResponse::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fartifact_2fartifacts_2eproto);
   return ::file_level_metadata_flyteidl_2fartifact_2fartifacts_2eproto[kIndexInFileMessages];
 }
@@ -9757,11 +9759,11 @@ template<> PROTOBUF_NOINLINE ::flyteidl::artifact::CreateTriggerRequest* Arena::
 template<> PROTOBUF_NOINLINE ::flyteidl::artifact::CreateTriggerResponse* Arena::CreateMaybeMessage< ::flyteidl::artifact::CreateTriggerResponse >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::artifact::CreateTriggerResponse >(arena);
 }
-template<> PROTOBUF_NOINLINE ::flyteidl::artifact::DeleteTriggerRequest* Arena::CreateMaybeMessage< ::flyteidl::artifact::DeleteTriggerRequest >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::artifact::DeleteTriggerRequest >(arena);
+template<> PROTOBUF_NOINLINE ::flyteidl::artifact::DeactivateTriggerRequest* Arena::CreateMaybeMessage< ::flyteidl::artifact::DeactivateTriggerRequest >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::artifact::DeactivateTriggerRequest >(arena);
 }
-template<> PROTOBUF_NOINLINE ::flyteidl::artifact::DeleteTriggerResponse* Arena::CreateMaybeMessage< ::flyteidl::artifact::DeleteTriggerResponse >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::artifact::DeleteTriggerResponse >(arena);
+template<> PROTOBUF_NOINLINE ::flyteidl::artifact::DeactivateTriggerResponse* Arena::CreateMaybeMessage< ::flyteidl::artifact::DeactivateTriggerResponse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::artifact::DeactivateTriggerResponse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::artifact::ArtifactProducer* Arena::CreateMaybeMessage< ::flyteidl::artifact::ArtifactProducer >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::artifact::ArtifactProducer >(arena);
