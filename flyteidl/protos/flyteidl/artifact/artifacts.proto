@@ -189,17 +189,17 @@ service ArtifactRegistry {
 
   rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/data/artifacts"
-      additional_bindings {get: "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
-      additional_bindings {get: "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
-      additional_bindings {get: "/artifacts/api/v1/data/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
+      get: "/artifacts/api/v1/artifacts"
+      additional_bindings {get: "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
+      additional_bindings {get: "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
+      additional_bindings {get: "/artifacts/api/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
     };
   }
 
   rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/data/query/s/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
-      additional_bindings {get: "/artifacts/api/v1/data/query/{artifact_key.project}/{artifact_key.domain}"}
+      get: "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
+      additional_bindings {get: "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}"}
     };
   }
 
@@ -217,7 +217,7 @@ service ArtifactRegistry {
 
   rpc FindByWorkflowExec (FindByWorkflowExecRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/data/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
+      get: "/artifacts/api/v1/search/execution/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
     };
   }
 
