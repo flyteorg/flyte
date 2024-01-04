@@ -199,9 +199,6 @@ type K8sPluginConfig struct {
 
 	// SendObjectEvents indicates whether to send k8s object events in TaskExecutionEvent updates (similar to kubectl get events).
 	SendObjectEvents bool `json:"send-object-events" pflag:",If true, will send k8s object events in TaskExecutionEvent updates."`
-
-	// InjectExecutionIdentity indicates whether to inject the execution identity (if set in the workflow) into the pod as a label.
-	InjectExecutionIdentity bool `json:"inject-execution-identity" pflag:",If true, will inject execution identity into the pod as a label."`
 }
 
 // FlyteCoPilotConfig specifies configuration for the Flyte CoPilot system. FlyteCoPilot, allows running flytekit-less containers
