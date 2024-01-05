@@ -45,6 +45,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.cloudEvents.cloudEventVersion | string | `"v2"` |  |
 | flyte-binary.configuration.inline.cloudEvents.enable | bool | `true` |  |
 | flyte-binary.configuration.inline.cloudEvents.type | string | `"sandbox"` |  |
+| flyte-binary.configuration.inline.flyteadmin.featureGates.enableArtifacts | bool | `true` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[0].FLYTE_AWS_ENDPOINT | string | `"http://{{ printf \"%s-minio\" .Release.Name | trunc 63 | trimSuffix \"-\" }}.{{ .Release.Namespace }}:9000"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[1].FLYTE_AWS_ACCESS_KEY_ID | string | `"minio"` |  |
 | flyte-binary.configuration.inline.plugins.k8s.default-env-vars[2].FLYTE_AWS_SECRET_ACCESS_KEY | string | `"miniostorage"` |  |
