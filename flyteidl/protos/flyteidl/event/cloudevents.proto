@@ -63,11 +63,11 @@ message CloudEventExecutionStart {
 
   core.Identifier workflow_id = 3;
 
-  // Artifact IDs found
+  // Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
   repeated core.ArtifactID artifact_ids = 4;
 
-  // Artifact keys found.
-  repeated string artifact_keys = 5;
+  // Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
+  repeated string artifact_trackers = 5;
 
   string principal = 6;
 }

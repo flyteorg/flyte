@@ -449,12 +449,12 @@ pub struct CloudEventExecutionStart {
     pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
     #[prost(message, optional, tag="3")]
     pub workflow_id: ::core::option::Option<super::core::Identifier>,
-    /// Artifact IDs found
+    /// Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
     #[prost(message, repeated, tag="4")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
-    /// Artifact keys found.
+    /// Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
     #[prost(string, repeated, tag="5")]
-    pub artifact_keys: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    pub artifact_trackers: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     #[prost(string, tag="6")]
     pub principal: ::prost::alloc::string::String,
 }

@@ -107,17 +107,12 @@ func withDB(ctx context.Context, databaseConfig *DbConfig, do func(db *gorm.DB) 
 }
 
 // Migrate runs all configured migrations
-func Migrate(ctx context.Context, databaseConfig *DbConfig, migrations []*gormigrate.Migration, initializationSQL string) error {
+func Migrate(ctx context.Context, databaseConfig *DbConfig, migrations []*gormigrate.Migration) error {
 	if len(migrations) == 0 {
 		logger.Infof(ctx, "No migrations to run")
 		return nil
 	}
 	return withDB(ctx, databaseConfig, func(db *gorm.DB) error {
-		tx := db.Exec(initializationSQL)
-		if tx.Error != nil {
-			return tx.Error
-		}
-
 		m := gormigrate.New(db, gormigrate.DefaultOptions, migrations)
 		if err := m.Migrate(); err != nil {
 			return fmt.Errorf("database migration failed: %v", err)

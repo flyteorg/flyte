@@ -651,27 +651,27 @@ class CloudEventExecutionStart final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
       artifact_ids() const;
 
-  // repeated string artifact_keys = 5;
-  int artifact_keys_size() const;
-  void clear_artifact_keys();
-  static const int kArtifactKeysFieldNumber = 5;
-  const ::std::string& artifact_keys(int index) const;
-  ::std::string* mutable_artifact_keys(int index);
-  void set_artifact_keys(int index, const ::std::string& value);
+  // repeated string artifact_trackers = 5;
+  int artifact_trackers_size() const;
+  void clear_artifact_trackers();
+  static const int kArtifactTrackersFieldNumber = 5;
+  const ::std::string& artifact_trackers(int index) const;
+  ::std::string* mutable_artifact_trackers(int index);
+  void set_artifact_trackers(int index, const ::std::string& value);
   #if LANG_CXX11
-  void set_artifact_keys(int index, ::std::string&& value);
+  void set_artifact_trackers(int index, ::std::string&& value);
   #endif
-  void set_artifact_keys(int index, const char* value);
-  void set_artifact_keys(int index, const char* value, size_t size);
-  ::std::string* add_artifact_keys();
-  void add_artifact_keys(const ::std::string& value);
+  void set_artifact_trackers(int index, const char* value);
+  void set_artifact_trackers(int index, const char* value, size_t size);
+  ::std::string* add_artifact_trackers();
+  void add_artifact_trackers(const ::std::string& value);
   #if LANG_CXX11
-  void add_artifact_keys(::std::string&& value);
+  void add_artifact_trackers(::std::string&& value);
   #endif
-  void add_artifact_keys(const char* value);
-  void add_artifact_keys(const char* value, size_t size);
-  const ::google::protobuf::RepeatedPtrField<::std::string>& artifact_keys() const;
-  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_artifact_keys();
+  void add_artifact_trackers(const char* value);
+  void add_artifact_trackers(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& artifact_trackers() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_artifact_trackers();
 
   // string principal = 6;
   void clear_principal();
@@ -720,7 +720,7 @@ class CloudEventExecutionStart final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > artifact_ids_;
-  ::google::protobuf::RepeatedPtrField<::std::string> artifact_keys_;
+  ::google::protobuf::RepeatedPtrField<::std::string> artifact_trackers_;
   ::google::protobuf::internal::ArenaStringPtr principal_;
   ::flyteidl::core::WorkflowExecutionIdentifier* execution_id_;
   ::flyteidl::core::Identifier* launch_plan_id_;
@@ -1478,73 +1478,73 @@ CloudEventExecutionStart::artifact_ids() const {
   return artifact_ids_;
 }
 
-// repeated string artifact_keys = 5;
-inline int CloudEventExecutionStart::artifact_keys_size() const {
-  return artifact_keys_.size();
+// repeated string artifact_trackers = 5;
+inline int CloudEventExecutionStart::artifact_trackers_size() const {
+  return artifact_trackers_.size();
 }
-inline void CloudEventExecutionStart::clear_artifact_keys() {
-  artifact_keys_.Clear();
+inline void CloudEventExecutionStart::clear_artifact_trackers() {
+  artifact_trackers_.Clear();
 }
-inline const ::std::string& CloudEventExecutionStart::artifact_keys(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  return artifact_keys_.Get(index);
+inline const ::std::string& CloudEventExecutionStart::artifact_trackers(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  return artifact_trackers_.Get(index);
 }
-inline ::std::string* CloudEventExecutionStart::mutable_artifact_keys(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  return artifact_keys_.Mutable(index);
+inline ::std::string* CloudEventExecutionStart::mutable_artifact_trackers(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  return artifact_trackers_.Mutable(index);
 }
-inline void CloudEventExecutionStart::set_artifact_keys(int index, const ::std::string& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  artifact_keys_.Mutable(index)->assign(value);
+inline void CloudEventExecutionStart::set_artifact_trackers(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  artifact_trackers_.Mutable(index)->assign(value);
 }
 #if LANG_CXX11
-inline void CloudEventExecutionStart::set_artifact_keys(int index, ::std::string&& value) {
-  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  artifact_keys_.Mutable(index)->assign(std::move(value));
+inline void CloudEventExecutionStart::set_artifact_trackers(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  artifact_trackers_.Mutable(index)->assign(std::move(value));
 }
 #endif
-inline void CloudEventExecutionStart::set_artifact_keys(int index, const char* value) {
+inline void CloudEventExecutionStart::set_artifact_trackers(int index, const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  artifact_keys_.Mutable(index)->assign(value);
-  // @@protoc_insertion_point(field_set_char:flyteidl.event.CloudEventExecutionStart.artifact_keys)
+  artifact_trackers_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
 }
-inline void CloudEventExecutionStart::set_artifact_keys(int index, const char* value, size_t size) {
-  artifact_keys_.Mutable(index)->assign(
+inline void CloudEventExecutionStart::set_artifact_trackers(int index, const char* value, size_t size) {
+  artifact_trackers_.Mutable(index)->assign(
     reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.CloudEventExecutionStart.artifact_keys)
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
 }
-inline ::std::string* CloudEventExecutionStart::add_artifact_keys() {
-  // @@protoc_insertion_point(field_add_mutable:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  return artifact_keys_.Add();
+inline ::std::string* CloudEventExecutionStart::add_artifact_trackers() {
+  // @@protoc_insertion_point(field_add_mutable:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  return artifact_trackers_.Add();
 }
-inline void CloudEventExecutionStart::add_artifact_keys(const ::std::string& value) {
-  artifact_keys_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add:flyteidl.event.CloudEventExecutionStart.artifact_keys)
+inline void CloudEventExecutionStart::add_artifact_trackers(const ::std::string& value) {
+  artifact_trackers_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
 }
 #if LANG_CXX11
-inline void CloudEventExecutionStart::add_artifact_keys(::std::string&& value) {
-  artifact_keys_.Add(std::move(value));
-  // @@protoc_insertion_point(field_add:flyteidl.event.CloudEventExecutionStart.artifact_keys)
+inline void CloudEventExecutionStart::add_artifact_trackers(::std::string&& value) {
+  artifact_trackers_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
 }
 #endif
-inline void CloudEventExecutionStart::add_artifact_keys(const char* value) {
+inline void CloudEventExecutionStart::add_artifact_trackers(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  artifact_keys_.Add()->assign(value);
-  // @@protoc_insertion_point(field_add_char:flyteidl.event.CloudEventExecutionStart.artifact_keys)
+  artifact_trackers_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
 }
-inline void CloudEventExecutionStart::add_artifact_keys(const char* value, size_t size) {
-  artifact_keys_.Add()->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_add_pointer:flyteidl.event.CloudEventExecutionStart.artifact_keys)
+inline void CloudEventExecutionStart::add_artifact_trackers(const char* value, size_t size) {
+  artifact_trackers_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
 }
 inline const ::google::protobuf::RepeatedPtrField<::std::string>&
-CloudEventExecutionStart::artifact_keys() const {
-  // @@protoc_insertion_point(field_list:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  return artifact_keys_;
+CloudEventExecutionStart::artifact_trackers() const {
+  // @@protoc_insertion_point(field_list:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  return artifact_trackers_;
 }
 inline ::google::protobuf::RepeatedPtrField<::std::string>*
-CloudEventExecutionStart::mutable_artifact_keys() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.event.CloudEventExecutionStart.artifact_keys)
-  return &artifact_keys_;
+CloudEventExecutionStart::mutable_artifact_trackers() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.event.CloudEventExecutionStart.artifact_trackers)
+  return &artifact_trackers_;
 }
 
 // string principal = 6;

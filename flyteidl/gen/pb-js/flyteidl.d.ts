@@ -7645,8 +7645,8 @@ export namespace flyteidl {
             /** CloudEventExecutionStart artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
 
-            /** CloudEventExecutionStart artifactKeys */
-            artifactKeys?: (string[]|null);
+            /** CloudEventExecutionStart artifactTrackers */
+            artifactTrackers?: (string[]|null);
 
             /** CloudEventExecutionStart principal */
             principal?: (string|null);
@@ -7673,8 +7673,8 @@ export namespace flyteidl {
             /** CloudEventExecutionStart artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
 
-            /** CloudEventExecutionStart artifactKeys. */
-            public artifactKeys: string[];
+            /** CloudEventExecutionStart artifactTrackers. */
+            public artifactTrackers: string[];
 
             /** CloudEventExecutionStart principal. */
             public principal: string;
