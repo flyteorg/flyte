@@ -102,3 +102,5 @@ Upgrade the Flyte Helm release
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
+
+For bigquery plugin on the Flyte cluster, please refer to `Bigquery Plugin Example <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/bigquery_plugin/bigquery.html>`_

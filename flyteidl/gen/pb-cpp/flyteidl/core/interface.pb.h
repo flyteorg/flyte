@@ -36,6 +36,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/types.pb.h"
 #include "flyteidl/core/literals.pb.h"
+#include "flyteidl/core/artifact_id.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto
@@ -212,6 +213,24 @@ class Variable final :
   ::flyteidl::core::LiteralType* mutable_type();
   void set_allocated_type(::flyteidl::core::LiteralType* type);
 
+  // .flyteidl.core.ArtifactID artifact_partial_id = 3;
+  bool has_artifact_partial_id() const;
+  void clear_artifact_partial_id();
+  static const int kArtifactPartialIdFieldNumber = 3;
+  const ::flyteidl::core::ArtifactID& artifact_partial_id() const;
+  ::flyteidl::core::ArtifactID* release_artifact_partial_id();
+  ::flyteidl::core::ArtifactID* mutable_artifact_partial_id();
+  void set_allocated_artifact_partial_id(::flyteidl::core::ArtifactID* artifact_partial_id);
+
+  // .flyteidl.core.ArtifactTag artifact_tag = 4;
+  bool has_artifact_tag() const;
+  void clear_artifact_tag();
+  static const int kArtifactTagFieldNumber = 4;
+  const ::flyteidl::core::ArtifactTag& artifact_tag() const;
+  ::flyteidl::core::ArtifactTag* release_artifact_tag();
+  ::flyteidl::core::ArtifactTag* mutable_artifact_tag();
+  void set_allocated_artifact_tag(::flyteidl::core::ArtifactTag* artifact_tag);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.Variable)
  private:
   class HasBitSetters;
@@ -219,6 +238,8 @@ class Variable final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr description_;
   ::flyteidl::core::LiteralType* type_;
+  ::flyteidl::core::ArtifactID* artifact_partial_id_;
+  ::flyteidl::core::ArtifactTag* artifact_tag_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2finterface_2eproto;
 };
@@ -529,6 +550,8 @@ class Parameter final :
   enum BehaviorCase {
     kDefault = 2,
     kRequired = 3,
+    kArtifactQuery = 4,
+    kArtifactId = 5,
     BEHAVIOR_NOT_SET = 0,
   };
 
@@ -622,6 +645,24 @@ class Parameter final :
   bool required() const;
   void set_required(bool value);
 
+  // .flyteidl.core.ArtifactQuery artifact_query = 4;
+  bool has_artifact_query() const;
+  void clear_artifact_query();
+  static const int kArtifactQueryFieldNumber = 4;
+  const ::flyteidl::core::ArtifactQuery& artifact_query() const;
+  ::flyteidl::core::ArtifactQuery* release_artifact_query();
+  ::flyteidl::core::ArtifactQuery* mutable_artifact_query();
+  void set_allocated_artifact_query(::flyteidl::core::ArtifactQuery* artifact_query);
+
+  // .flyteidl.core.ArtifactID artifact_id = 5;
+  bool has_artifact_id() const;
+  void clear_artifact_id();
+  static const int kArtifactIdFieldNumber = 5;
+  const ::flyteidl::core::ArtifactID& artifact_id() const;
+  ::flyteidl::core::ArtifactID* release_artifact_id();
+  ::flyteidl::core::ArtifactID* mutable_artifact_id();
+  void set_allocated_artifact_id(::flyteidl::core::ArtifactID* artifact_id);
+
   void clear_behavior();
   BehaviorCase behavior_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.Parameter)
@@ -629,6 +670,8 @@ class Parameter final :
   class HasBitSetters;
   void set_has_default_();
   void set_has_required();
+  void set_has_artifact_query();
+  void set_has_artifact_id();
 
   inline bool has_behavior() const;
   inline void clear_has_behavior();
@@ -639,6 +682,8 @@ class Parameter final :
     BehaviorUnion() {}
     ::flyteidl::core::Literal* default__;
     bool required_;
+    ::flyteidl::core::ArtifactQuery* artifact_query_;
+    ::flyteidl::core::ArtifactID* artifact_id_;
   } behavior_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
@@ -899,6 +944,96 @@ inline void Variable::set_allocated_description(::std::string* description) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Variable.description)
 }
 
+// .flyteidl.core.ArtifactID artifact_partial_id = 3;
+inline bool Variable::has_artifact_partial_id() const {
+  return this != internal_default_instance() && artifact_partial_id_ != nullptr;
+}
+inline const ::flyteidl::core::ArtifactID& Variable::artifact_partial_id() const {
+  const ::flyteidl::core::ArtifactID* p = artifact_partial_id_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.Variable.artifact_partial_id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::ArtifactID*>(
+      &::flyteidl::core::_ArtifactID_default_instance_);
+}
+inline ::flyteidl::core::ArtifactID* Variable::release_artifact_partial_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Variable.artifact_partial_id)
+  
+  ::flyteidl::core::ArtifactID* temp = artifact_partial_id_;
+  artifact_partial_id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::ArtifactID* Variable::mutable_artifact_partial_id() {
+  
+  if (artifact_partial_id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::ArtifactID>(GetArenaNoVirtual());
+    artifact_partial_id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Variable.artifact_partial_id)
+  return artifact_partial_id_;
+}
+inline void Variable::set_allocated_artifact_partial_id(::flyteidl::core::ArtifactID* artifact_partial_id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(artifact_partial_id_);
+  }
+  if (artifact_partial_id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      artifact_partial_id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, artifact_partial_id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  artifact_partial_id_ = artifact_partial_id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Variable.artifact_partial_id)
+}
+
+// .flyteidl.core.ArtifactTag artifact_tag = 4;
+inline bool Variable::has_artifact_tag() const {
+  return this != internal_default_instance() && artifact_tag_ != nullptr;
+}
+inline const ::flyteidl::core::ArtifactTag& Variable::artifact_tag() const {
+  const ::flyteidl::core::ArtifactTag* p = artifact_tag_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.Variable.artifact_tag)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::ArtifactTag*>(
+      &::flyteidl::core::_ArtifactTag_default_instance_);
+}
+inline ::flyteidl::core::ArtifactTag* Variable::release_artifact_tag() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Variable.artifact_tag)
+  
+  ::flyteidl::core::ArtifactTag* temp = artifact_tag_;
+  artifact_tag_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::ArtifactTag* Variable::mutable_artifact_tag() {
+  
+  if (artifact_tag_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::ArtifactTag>(GetArenaNoVirtual());
+    artifact_tag_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Variable.artifact_tag)
+  return artifact_tag_;
+}
+inline void Variable::set_allocated_artifact_tag(::flyteidl::core::ArtifactTag* artifact_tag) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(artifact_tag_);
+  }
+  if (artifact_tag) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      artifact_tag = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, artifact_tag, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  artifact_tag_ = artifact_tag;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Variable.artifact_tag)
+}
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -1146,6 +1281,76 @@ inline void Parameter::set_required(bool value) {
   }
   behavior_.required_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.core.Parameter.required)
+}
+
+// .flyteidl.core.ArtifactQuery artifact_query = 4;
+inline bool Parameter::has_artifact_query() const {
+  return behavior_case() == kArtifactQuery;
+}
+inline void Parameter::set_has_artifact_query() {
+  _oneof_case_[0] = kArtifactQuery;
+}
+inline ::flyteidl::core::ArtifactQuery* Parameter::release_artifact_query() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Parameter.artifact_query)
+  if (has_artifact_query()) {
+    clear_has_behavior();
+      ::flyteidl::core::ArtifactQuery* temp = behavior_.artifact_query_;
+    behavior_.artifact_query_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::ArtifactQuery& Parameter::artifact_query() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Parameter.artifact_query)
+  return has_artifact_query()
+      ? *behavior_.artifact_query_
+      : *reinterpret_cast< ::flyteidl::core::ArtifactQuery*>(&::flyteidl::core::_ArtifactQuery_default_instance_);
+}
+inline ::flyteidl::core::ArtifactQuery* Parameter::mutable_artifact_query() {
+  if (!has_artifact_query()) {
+    clear_behavior();
+    set_has_artifact_query();
+    behavior_.artifact_query_ = CreateMaybeMessage< ::flyteidl::core::ArtifactQuery >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Parameter.artifact_query)
+  return behavior_.artifact_query_;
+}
+
+// .flyteidl.core.ArtifactID artifact_id = 5;
+inline bool Parameter::has_artifact_id() const {
+  return behavior_case() == kArtifactId;
+}
+inline void Parameter::set_has_artifact_id() {
+  _oneof_case_[0] = kArtifactId;
+}
+inline ::flyteidl::core::ArtifactID* Parameter::release_artifact_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Parameter.artifact_id)
+  if (has_artifact_id()) {
+    clear_has_behavior();
+      ::flyteidl::core::ArtifactID* temp = behavior_.artifact_id_;
+    behavior_.artifact_id_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::ArtifactID& Parameter::artifact_id() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Parameter.artifact_id)
+  return has_artifact_id()
+      ? *behavior_.artifact_id_
+      : *reinterpret_cast< ::flyteidl::core::ArtifactID*>(&::flyteidl::core::_ArtifactID_default_instance_);
+}
+inline ::flyteidl::core::ArtifactID* Parameter::mutable_artifact_id() {
+  if (!has_artifact_id()) {
+    clear_behavior();
+    set_has_artifact_id();
+    behavior_.artifact_id_ = CreateMaybeMessage< ::flyteidl::core::ArtifactID >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Parameter.artifact_id)
+  return behavior_.artifact_id_;
 }
 
 inline bool Parameter::has_behavior() const {

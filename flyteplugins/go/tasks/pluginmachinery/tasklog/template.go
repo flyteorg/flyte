@@ -35,6 +35,7 @@ type templateRegexes struct {
 	ExecutionProject     *regexp.Regexp
 	ExecutionDomain      *regexp.Regexp
 	GeneratedName        *regexp.Regexp
+	Port                 *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -60,6 +61,7 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionProject"),
 		MustCreateRegex("executionDomain"),
 		MustCreateRegex("generatedName"),
+		MustCreateRegex("port"),
 	}
 }
 
@@ -85,6 +87,16 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 	}
 
 	switch scheme {
+	case TemplateSchemeFlyin:
+		port := input.TaskTemplate.GetConfig()["port"]
+		if port == "" {
+			port = "8080"
+		}
+		vars = append(
+			vars,
+			TemplateVar{defaultRegexes.Port, port},
+		)
+		fallthrough
 	case TemplateSchemePod:
 		// Container IDs are prefixed with docker://, cri-o://, etc. which is stripped by fluentd before pushing to a log
 		// stream. Therefore, we must also strip the prefix.
@@ -185,7 +197,22 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	templateVars := input.templateVarsForScheme(p.Scheme)
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
+
+	// Grab metadata from task template and check if key "link_type" is set to "vscode".
+	// If so, add a vscode link to the task logs.
+	isFlyin := false
+	if input.TaskTemplate != nil && input.TaskTemplate.GetConfig() != nil {
+		config := input.TaskTemplate.GetConfig()
+		if config != nil && config["link_type"] == "vscode" {
+			isFlyin = true
+		}
+	}
 	for _, templateURI := range p.TemplateURIs {
+		// Skip Flyin logs if plugin is enabled but no metadata is defined in input's task template.
+		// This is to prevent Flyin logs from being generated for tasks that don't have a Flyin metadata section.
+		if p.DisplayName == "Flyin Logs" && !isFlyin {
+			continue
+		}
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:           replaceAll(templateURI, templateVars),
 			Name:          p.DisplayName + input.LogName,
