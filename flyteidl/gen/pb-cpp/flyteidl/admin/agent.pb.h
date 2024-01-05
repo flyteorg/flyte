@@ -2412,6 +2412,20 @@ class GetTaskLogsRequest final :
   ::std::string* release_resource_meta();
   void set_allocated_resource_meta(::std::string* resource_meta);
 
+  // string token = 4;
+  void clear_token();
+  static const int kTokenFieldNumber = 4;
+  const ::std::string& token() const;
+  void set_token(const ::std::string& value);
+  #if LANG_CXX11
+  void set_token(::std::string&& value);
+  #endif
+  void set_token(const char* value);
+  void set_token(const char* value, size_t size);
+  ::std::string* mutable_token();
+  ::std::string* release_token();
+  void set_allocated_token(::std::string* token);
+
   // uint64 lines = 3;
   void clear_lines();
   static const int kLinesFieldNumber = 3;
@@ -2425,6 +2439,7 @@ class GetTaskLogsRequest final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr task_type_;
   ::google::protobuf::internal::ArenaStringPtr resource_meta_;
+  ::google::protobuf::internal::ArenaStringPtr token_;
   ::google::protobuf::uint64 lines_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
@@ -4294,6 +4309,59 @@ inline void GetTaskLogsRequest::set_lines(::google::protobuf::uint64 value) {
   
   lines_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.GetTaskLogsRequest.lines)
+}
+
+// string token = 4;
+inline void GetTaskLogsRequest::clear_token() {
+  token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& GetTaskLogsRequest::token() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskLogsRequest.token)
+  return token_.GetNoArena();
+}
+inline void GetTaskLogsRequest::set_token(const ::std::string& value) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.GetTaskLogsRequest.token)
+}
+#if LANG_CXX11
+inline void GetTaskLogsRequest::set_token(::std::string&& value) {
+  
+  token_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.GetTaskLogsRequest.token)
+}
+#endif
+inline void GetTaskLogsRequest::set_token(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.GetTaskLogsRequest.token)
+}
+inline void GetTaskLogsRequest::set_token(const char* value, size_t size) {
+  
+  token_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.GetTaskLogsRequest.token)
+}
+inline ::std::string* GetTaskLogsRequest::mutable_token() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskLogsRequest.token)
+  return token_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* GetTaskLogsRequest::release_token() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.GetTaskLogsRequest.token)
+  
+  return token_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void GetTaskLogsRequest::set_allocated_token(::std::string* token) {
+  if (token != nullptr) {
+    
+  } else {
+    
+  }
+  token_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), token);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskLogsRequest.token)
 }
 
 // -------------------------------------------------------------------

@@ -14752,6 +14752,26 @@ public final class AgentOuterClass {
      * <code>uint64 lines = 3;</code>
      */
     long getLines();
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
   }
   /**
    * <pre>
@@ -14772,6 +14792,7 @@ public final class AgentOuterClass {
     private GetTaskLogsRequest() {
       taskType_ = "";
       resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+      token_ = "";
     }
 
     @java.lang.Override
@@ -14812,6 +14833,12 @@ public final class AgentOuterClass {
             case 24: {
 
               lines_ = input.readUInt64();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
               break;
             }
             default: {
@@ -14914,6 +14941,50 @@ public final class AgentOuterClass {
       return lines_;
     }
 
+    public static final int TOKEN_FIELD_NUMBER = 4;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -14937,6 +15008,9 @@ public final class AgentOuterClass {
       if (lines_ != 0L) {
         output.writeUInt64(3, lines_);
       }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, token_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -14956,6 +15030,9 @@ public final class AgentOuterClass {
       if (lines_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
           .computeUInt64Size(3, lines_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, token_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -14978,6 +15055,8 @@ public final class AgentOuterClass {
           .equals(other.getResourceMeta())) return false;
       if (getLines()
           != other.getLines()) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -14996,6 +15075,8 @@ public final class AgentOuterClass {
       hash = (37 * hash) + LINES_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getLines());
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -15139,6 +15220,8 @@ public final class AgentOuterClass {
 
         lines_ = 0L;
 
+        token_ = "";
+
         return this;
       }
 
@@ -15168,6 +15251,7 @@ public final class AgentOuterClass {
         result.taskType_ = taskType_;
         result.resourceMeta_ = resourceMeta_;
         result.lines_ = lines_;
+        result.token_ = token_;
         onBuilt();
         return result;
       }
@@ -15225,6 +15309,10 @@ public final class AgentOuterClass {
         }
         if (other.getLines() != 0L) {
           setLines(other.getLines());
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -15419,6 +15507,100 @@ public final class AgentOuterClass {
       public Builder clearLines() {
         
         lines_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
         onChanged();
         return this;
       }
@@ -16499,15 +16681,15 @@ public final class AgentOuterClass {
       "\0132\032.google.protobuf.Timestamp\022\'\n\004step\030\006 " +
       "\001(\0132\031.google.protobuf.Duration\"O\n\026GetTas" +
       "kMetricsResponse\0225\n\007results\030\001 \003(\0132$.flyt" +
-      "eidl.core.ExecutionMetricResult\"M\n\022GetTa" +
+      "eidl.core.ExecutionMetricResult\"\\\n\022GetTa" +
       "skLogsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rreso" +
-      "urce_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\"5\n\023GetTas" +
-      "kLogsResponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030" +
-      "\002 \001(\t*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n" +
-      "\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUN" +
-      "NING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyt" +
-      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/a" +
-      "dminb\006proto3"
+      "urce_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r\n\005token\030" +
+      "\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007results\030" +
+      "\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n\021RETRYAB" +
+      "LE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007P" +
+      "ENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;" +
+      "github.com/flyteorg/flyte/flyteidl/gen/p" +
+      "b-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16641,7 +16823,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_GetTaskLogsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor,
-        new java.lang.String[] { "TaskType", "ResourceMeta", "Lines", });
+        new java.lang.String[] { "TaskType", "ResourceMeta", "Lines", "Token", });
     internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor =
       getDescriptor().getMessageTypes().get(16);
     internal_static_flyteidl_admin_GetTaskLogsResponse_fieldAccessorTable = new

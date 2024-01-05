@@ -159,6 +159,9 @@ message GetTaskLogsRequest {
   bytes resource_meta = 2;
   // Number of lines to return.
   uint64 lines = 3;
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query. If there are no more results, this value will be empty.
+  string token = 4;
 }
 
 // A response containing the logs for a task execution.
