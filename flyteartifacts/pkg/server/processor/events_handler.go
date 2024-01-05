@@ -46,11 +46,25 @@ func (s *ServiceCallHandler) HandleEvent(ctx context.Context, cloudEvent *event2
 
 func (s *ServiceCallHandler) HandleEventExecStart(ctx context.Context, evt *event.CloudEventExecutionStart) error {
 
-	if len(evt.ArtifactIds) > 0 {
+	var inputsUsed []*core.ArtifactID
+
+	inputsUsed = append(inputsUsed, evt.ArtifactIds...)
+	for _, x := range evt.ArtifactTrackers {
+
+		dummyURI := fmt.Sprintf("flyte://av0.1/%s", x)
+		idWithVersion, err := lib.ParseFlyteURL(dummyURI)
+		if err != nil {
+			logger.Errorf(ctx, "Error parsing input %s for execution start: %v", x, err)
+			return err
+		}
+		inputsUsed = append(inputsUsed, &idWithVersion)
+	}
+
+	if len(inputsUsed) > 0 {
 		// metric
 		req := &artifact.ExecutionInputsRequest{
 			ExecutionId: evt.ExecutionId,
-			Inputs:      evt.ArtifactIds,
+			Inputs:      inputsUsed,
 		}
 		_, err := s.service.SetExecutionInputs(ctx, req)
 		if err != nil {
@@ -172,8 +186,6 @@ func getPartitionsAndTag(ctx context.Context, partialID core.ArtifactID, variabl
 	}
 
 	var partitions map[string]string
-	// todo: consider updating idl to make CreateArtifactRequest just take a full Partitions
-	// object rather than a mapstrstr @eapolinario @enghabu
 	if partialID.GetPartitions().GetValue() != nil && len(partialID.GetPartitions().GetValue()) > 0 {
 		partitions = make(map[string]string, len(partialID.GetPartitions().GetValue()))
 		for k, lv := range partialID.GetPartitions().GetValue() {
