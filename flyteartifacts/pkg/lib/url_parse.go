@@ -24,11 +24,7 @@ func ParseFlyteURL(urlStr string) (core.ArtifactID, error) {
 	if err != nil {
 		return core.ArtifactID{}, err
 	}
-	//projectDomainName := strings.Split(strings.Trim(parsed.Path, "/"), "/")
-	//if len(projectDomainName) < 3 {
-	//	return core.ArtifactID{}, errors.New("invalid URL format")
-	//}
-	//project, domain, name := projectDomainName[0], projectDomainName[1], strings.Join(projectDomainName[2:], "/")
+
 	var project, domain, name, version string
 	queryDict := make(map[string]string)
 

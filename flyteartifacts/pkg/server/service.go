@@ -18,7 +18,7 @@ type CoreService struct {
 }
 
 // This string is a tracker basically that will be installed in the metadata of the literal. See the ArtifactKey constant for more information.
-func (c *CoreService) getTrackingString(request artifact.CreateArtifactRequest) string {
+func (c *CoreService) getTrackingString(request *artifact.CreateArtifactRequest) string {
 	ak := request.ArtifactKey
 	t := fmt.Sprintf("%s/%s/%s@%s", ak.Project, ak.Domain, ak.Name, request.Version)
 
@@ -36,7 +36,7 @@ func (c *CoreService) CreateArtifact(ctx context.Context, request *artifact.Crea
 	if request.GetSpec().GetValue().Metadata == nil {
 		request.GetSpec().GetValue().Metadata = make(map[string]string, 1)
 	}
-	trackingStr := c.getTrackingString(*request)
+	trackingStr := c.getTrackingString(request)
 	request.GetSpec().GetValue().Metadata[lib.ArtifactKey] = trackingStr
 
 	artifactObj, err := models.CreateArtifactModelFromRequest(ctx, request.ArtifactKey, request.Spec, request.Version, request.Partitions, request.Tag, request.Source)
