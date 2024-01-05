@@ -20049,7 +20049,7 @@ public final class Artifacts {
       "esponse\"\000\022\237\001\n\021DeactivateTrigger\022+.flytei" +
       "dl.artifact.DeactivateTriggerRequest\032,.f" +
       "lyteidl.artifact.DeactivateTriggerRespon" +
-      "se\"/\202\323\344\223\002)\032$/artifacts/api/v1/trigger/de" +
+      "se\"/\202\323\344\223\002)2$/artifacts/api/v1/trigger/de" +
       "activate:\001*\022O\n\006AddTag\022 .flyteidl.artifac" +
       "t.AddTagRequest\032!.flyteidl.artifact.AddT" +
       "agResponse\"\000\022e\n\020RegisterProducer\022*.flyte" +
