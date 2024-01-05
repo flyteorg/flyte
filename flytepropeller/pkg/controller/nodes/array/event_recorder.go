@@ -114,6 +114,17 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		return err
 	}
 
+	var taskID *idlcore.Identifier
+	subNode := nCtx.Node().GetArrayNode().GetSubNodeSpec()
+	if subNode != nil && subNode.Kind == v1alpha1.NodeKindTask {
+		executableTask, err := nCtx.ExecutionContext().GetTask(*subNode.GetTaskID())
+		if err != nil {
+			return err
+		}
+
+		taskID = executableTask.CoreTask().GetId()
+	}
+
 	nodeExecutionID := *nCtx.NodeExecutionMetadata().GetNodeExecutionID()
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
@@ -123,16 +134,8 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		nodeExecutionID.NodeId = currentNodeUniqueID
 	}
 
-	workflowExecutionID := nodeExecutionID.ExecutionId
-
 	taskExecutionEvent := &event.TaskExecutionEvent{
-		TaskId: &idlcore.Identifier{
-			ResourceType: idlcore.ResourceType_TASK,
-			Project:      workflowExecutionID.Project,
-			Domain:       workflowExecutionID.Domain,
-			Name:         nCtx.NodeID(),
-			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
-		},
+		TaskId:                taskID,
 		ParentNodeExecutionId: &nodeExecutionID,
 		RetryAttempt:          0, // ArrayNode will never retry
 		Phase:                 taskPhase,
@@ -140,9 +143,9 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		OccurredAt:            occurredAt,
 		Metadata: &event.TaskExecutionMetadata{
 			ExternalResources: e.externalResources,
-			PluginIdentifier:  "container",
+			PluginIdentifier:  "k8s-array",
 		},
-		TaskType:     "k8s-array",
+		TaskType:     "container_array",
 		EventVersion: 1,
 	}
 
