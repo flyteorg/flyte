@@ -9,6 +9,7 @@ import (
 
 type CreateNodeExecutionFunc func(ctx context.Context, input *models.NodeExecution) error
 type UpdateNodeExecutionFunc func(ctx context.Context, nodeExecution *models.NodeExecution) error
+type UpdateSelectedNodeExecutionFunc func(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error
 type GetNodeExecutionFunc func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error)
 type ListNodeExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.NodeExecutionCollectionOutput, error)
@@ -18,6 +19,7 @@ type CountNodeExecutionFunc func(ctx context.Context, input interfaces.CountReso
 type MockNodeExecutionRepo struct {
 	createFunction          CreateNodeExecutionFunc
 	updateFunction          UpdateNodeExecutionFunc
+	updateSelectedFunction  UpdateSelectedNodeExecutionFunc
 	getFunction             GetNodeExecutionFunc
 	getWithChildrenFunction GetNodeExecutionFunc
 	listFunction            ListNodeExecutionFunc
@@ -45,6 +47,17 @@ func (r *MockNodeExecutionRepo) Update(ctx context.Context, nodeExecution *model
 
 func (r *MockNodeExecutionRepo) SetUpdateCallback(updateFunction UpdateNodeExecutionFunc) {
 	r.updateFunction = updateFunction
+}
+
+func (r *MockNodeExecutionRepo) UpdateSelected(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error {
+	if r.updateSelectedFunction != nil {
+		return r.updateSelectedFunction(ctx, nodeExecution, selectedFields)
+	}
+	return nil
+}
+
+func (r *MockNodeExecutionRepo) SetUpdateSelectedCallback(updateSelectedFunction UpdateSelectedNodeExecutionFunc) {
+	r.updateSelectedFunction = updateSelectedFunction
 }
 
 func (r *MockNodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
