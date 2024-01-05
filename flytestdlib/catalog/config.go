@@ -37,7 +37,7 @@ type Config struct {
 	DefaultServiceConfig string `json:"default-service-config" pflag:"\"\", Set the default service config for the catalog gRPC client"`
 }
 
-// GetConfig gets loaded config for Discovery
+// GetConfig returns the parsed Catalog configuration
 func GetConfig() *Config {
 	return configSection.GetConfig().(*Config)
 }

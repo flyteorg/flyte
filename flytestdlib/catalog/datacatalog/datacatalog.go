@@ -387,21 +387,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 		return nil, err
 	}
 
-	reservationQuery := &datacatalog.GetOrExtendReservationRequest{
-		ReservationId: &datacatalog.ReservationID{
-			DatasetId: datasetID,
-			TagName:   tag,
-		},
-		OwnerId:           ownerID,
-		HeartbeatInterval: ptypes.DurationProto(heartbeatInterval),
-	}
-
-	response, err := m.client.GetOrExtendReservation(ctx, reservationQuery)
-	if err != nil {
-		return nil, err
-	}
-
-	return response.Reservation, nil
+	return m.GetOrExtendReservationByArtifactTag(ctx, datasetID, tag, ownerID, heartbeatInterval)
 }
 
 // GetOrExtendReservationByArtifactTag attempts to get a reservation for the cacheable task identified by the provided
@@ -449,20 +435,7 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 		return err
 	}
 
-	reservationQuery := &datacatalog.ReleaseReservationRequest{
-		ReservationId: &datacatalog.ReservationID{
-			DatasetId: datasetID,
-			TagName:   tag,
-		},
-		OwnerId: ownerID,
-	}
-
-	_, err = m.client.ReleaseReservation(ctx, reservationQuery)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return m.ReleaseReservationByArtifactTag(ctx, datasetID, tag, ownerID)
 }
 
 // ReleaseReservationByArtifactTag attempts to release a reservation by the given owner ID for a cacheable task
