@@ -40,7 +40,7 @@ A Helm chart for the Flyte local sandbox
 | flyte-binary.configuration.inline.task_resources.limits.gpu | int | `0` |  |
 | flyte-binary.configuration.inline.task_resources.limits.memory | int | `0` |  |
 | flyte-binary.configuration.inlineConfigMap | string | `"{{ include \"flyte-sandbox.configuration.inlineConfigMap\" . }}"` |  |
-| flyte-binary.configuration.logging.level | int | `6` |  |
+| flyte-binary.configuration.logging.level | int | `5` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.enabled | bool | `true` |  |
 | flyte-binary.configuration.logging.plugins.kubernetes.templateUri | string | `"http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}"` |  |
 | flyte-binary.configuration.storage.metadataContainer | string | `"my-s3-bucket"` |  |

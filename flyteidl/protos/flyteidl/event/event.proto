@@ -12,6 +12,7 @@ import "flyteidl/core/catalog.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
 
+
 message WorkflowExecutionEvent {
     // Workflow execution id
     core.WorkflowExecutionIdentifier execution_id = 1;
