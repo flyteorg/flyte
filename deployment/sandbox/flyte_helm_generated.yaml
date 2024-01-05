@@ -7130,7 +7130,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "e7929ed61c9c1a4af66f64529a657fd7b7a69b4914b39fc8821528beb8186eb"
+        configChecksum: "9c18e732adcc35cea4cbd052b6b84e952cc2b20217460cefbf23634ce687c1f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7204,7 +7204,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.10.6
       annotations:
-        configChecksum: "e7929ed61c9c1a4af66f64529a657fd7b7a69b4914b39fc8821528beb8186eb"
+        configChecksum: "9c18e732adcc35cea4cbd052b6b84e952cc2b20217460cefbf23634ce687c1f"
     spec:
       securityContext:
         fsGroup: 65534

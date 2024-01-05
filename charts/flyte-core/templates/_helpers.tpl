@@ -12,7 +12,6 @@
 {{- default .Release.Namespace .Values.forceNamespace | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-
 {{- define "flyteadmin.name" -}}
 flyteadmin
 {{- end -}}
