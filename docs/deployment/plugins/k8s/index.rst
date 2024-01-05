@@ -864,4 +864,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
 .. code-block:: bash
 
-  kubectl get pods -n --all-namespaces
+  kubectl get pods -n -A
