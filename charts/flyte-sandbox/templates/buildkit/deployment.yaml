@@ -13,6 +13,7 @@ spec:
     metadata:
       labels: {{- include "flyte-sandbox.buildkitSelectorLabels" . | nindent 8 }}
     spec:
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       containers:
         - name: buildkit
