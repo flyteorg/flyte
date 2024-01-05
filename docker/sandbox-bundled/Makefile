@@ -18,8 +18,9 @@ flyte:
 .PHONY: manifests
 manifests:
 	mkdir -p manifests
-	helm dependency update ../../charts/flyte-sandbox
 	helm dependency update ../../charts/flyteagent
+	helm dependency update ../../charts/flyte-binary
+	helm dependency update ../../charts/flyte-sandbox
 	kustomize build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
