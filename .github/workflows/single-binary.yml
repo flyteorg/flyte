@@ -52,7 +52,7 @@ jobs:
         id: set_version
         run: |
           # TODO: Find a better way to determine the flyteconsole version
-          echo "FLYTECONSOLE_VERSION=$(yq eval '.flyteconsole.image.tag' charts/flyte-core/values.yaml)" >> $GITHUB_ENV
+          echo "FLYTECONSOLE_VERSION=c82e7556250582d315d3f6cb3edafb7ab2a16fdf" >> $GITHUB_ENV
           echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
       - name: Prepare Image Names
         id: image-names
