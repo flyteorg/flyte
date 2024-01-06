@@ -3,13 +3,14 @@ package mocks
 import (
 	"context"
 	"fmt"
-	protoV2 "google.golang.org/protobuf/proto"
 	"io"
 	"net/url"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
+	protoV2 "google.golang.org/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type NopCloser struct {

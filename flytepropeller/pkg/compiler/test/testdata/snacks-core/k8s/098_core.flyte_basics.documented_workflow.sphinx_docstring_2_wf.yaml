@@ -20,6 +20,18 @@ executionConfig:
       Memory: "0"
       Storage: "0"
 executionId: {}
+inputData:
+  inputs:
+    literals:
+      data:
+        scalar:
+          generic: {}
+      df:
+        scalar:
+          structuredDataset:
+            metadata:
+              structuredDatasetType:
+                format: parquet
 inputs:
   literals:
     data:

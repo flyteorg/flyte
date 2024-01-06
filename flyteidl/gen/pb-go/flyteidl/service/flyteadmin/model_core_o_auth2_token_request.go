@@ -11,9 +11,9 @@ package flyteadmin
 
 // OAuth2TokenRequest encapsulates information needed to request an OAuth2 token. FLYTE_TOKENS_ENV_PREFIX will be passed to indicate the prefix of the environment variables that will be present if tokens are passed through environment variables. FLYTE_TOKENS_PATH_PREFIX will be passed to indicate the prefix of the path where secrets will be mounted if tokens are passed through file mounts.
 type CoreOAuth2TokenRequest struct {
-	Name string `json:"name,omitempty"`
-	Type_ *CoreOAuth2TokenRequestType `json:"type,omitempty"`
-	Client *CoreOAuth2Client `json:"client,omitempty"`
-	IdpDiscoveryEndpoint string `json:"idp_discovery_endpoint,omitempty"`
-	TokenEndpoint string `json:"token_endpoint,omitempty"`
+	Name                 string                      `json:"name,omitempty"`
+	Type_                *CoreOAuth2TokenRequestType `json:"type,omitempty"`
+	Client               *CoreOAuth2Client           `json:"client,omitempty"`
+	IdpDiscoveryEndpoint string                      `json:"idp_discovery_endpoint,omitempty"`
+	TokenEndpoint        string                      `json:"token_endpoint,omitempty"`
 }

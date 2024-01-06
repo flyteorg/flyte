@@ -25,7 +25,7 @@ type AdminExecutionClosure struct {
 	// Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// Raw output data produced by this execution. DEPRECATED. Use GetExecutionData to fetch output data instead.
-	FullOutputs *CoreOutputData `json:"full_outputs,omitempty"`
+	FullOutputs    *CoreOutputData `json:"full_outputs,omitempty"`
 	ComputedInputs *CoreLiteralMap `json:"computed_inputs,omitempty"`
 	// Most recent recorded phase for the execution.
 	Phase *CoreWorkflowExecutionPhase `json:"phase,omitempty"`
@@ -40,6 +40,6 @@ type AdminExecutionClosure struct {
 	// The notification settings to use after merging the CreateExecutionRequest and the launch plan notification settings. An execution launched with notifications will always prefer that definition to notifications defined statically in a launch plan.
 	Notifications []AdminNotification `json:"notifications,omitempty"`
 	// Identifies the workflow definition for this execution.
-	WorkflowId *CoreIdentifier `json:"workflow_id,omitempty"`
+	WorkflowId         *CoreIdentifier                   `json:"workflow_id,omitempty"`
 	StateChangeDetails *AdminExecutionStateChangeDetails `json:"state_change_details,omitempty"`
 }

@@ -99,8 +99,15 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	}
 	w.GetExecutionStatus().SetDataDir(ref)
 	var inputs *core.InputData
-	if w.Inputs != nil {
+	if w.InputData != nil {
 		inputs = w.InputData.InputData
+		if inputs == nil && w.Inputs.LiteralMap != nil {
+			inputs = &core.InputData{
+				Inputs: w.Inputs.LiteralMap,
+			}
+		}
+	} else if w.Inputs != nil {
+		inputs = &core.InputData{Inputs: w.Inputs.LiteralMap}
 		if inputs == nil && w.Inputs.LiteralMap != nil {
 			inputs = &core.InputData{
 				Inputs: w.Inputs.LiteralMap,

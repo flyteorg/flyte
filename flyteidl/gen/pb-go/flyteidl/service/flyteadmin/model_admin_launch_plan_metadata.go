@@ -11,6 +11,6 @@ package flyteadmin
 
 // Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch the reference workflow.
 type AdminLaunchPlanMetadata struct {
-	Schedule *AdminSchedule `json:"schedule,omitempty"`
+	Schedule      *AdminSchedule      `json:"schedule,omitempty"`
 	Notifications []AdminNotification `json:"notifications,omitempty"`
 }

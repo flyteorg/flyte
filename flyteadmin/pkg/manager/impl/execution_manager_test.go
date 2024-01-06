@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	protoV2 "google.golang.org/protobuf/proto"
 	"strings"
 	"testing"
 	"time"
+
+	protoV2 "google.golang.org/protobuf/proto"
 
 	"github.com/benbjohnson/clock"
 	"github.com/gogo/protobuf/jsonpb"

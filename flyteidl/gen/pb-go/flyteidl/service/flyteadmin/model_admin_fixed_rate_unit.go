@@ -8,12 +8,13 @@
  */
 
 package flyteadmin
+
 // AdminFixedRateUnit : Represents a frequency at which to run a schedule.
 type AdminFixedRateUnit string
 
 // List of adminFixedRateUnit
 const (
 	AdminFixedRateUnitMINUTE AdminFixedRateUnit = "MINUTE"
-	AdminFixedRateUnitHOUR AdminFixedRateUnit = "HOUR"
-	AdminFixedRateUnitDAY AdminFixedRateUnit = "DAY"
+	AdminFixedRateUnitHOUR   AdminFixedRateUnit = "HOUR"
+	AdminFixedRateUnitDAY    AdminFixedRateUnit = "DAY"
 )

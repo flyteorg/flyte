@@ -12,8 +12,8 @@ package flyteadmin
 // Metadata associated with the GPU accelerator to allocate to a task. Contains information about device type, and for multi-instance GPUs, the partition size to use.
 type CoreGpuAccelerator struct {
 	// This can be any arbitrary string, and should be informed by the labels or taints associated with the nodes in question. Default cloud provider labels typically use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
-	Device string `json:"device,omitempty"`
-	Unpartitioned bool `json:"unpartitioned,omitempty"`
+	Device        string `json:"device,omitempty"`
+	Unpartitioned bool   `json:"unpartitioned,omitempty"`
 	// Like `device`, this can be any arbitrary string, and should be informed by the labels or taints associated with the nodes in question. Default cloud provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
 	PartitionSize string `json:"partition_size,omitempty"`
 }

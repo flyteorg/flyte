@@ -2,11 +2,11 @@ package ioutils
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
@@ -14,8 +14,8 @@ import (
 func TestInMemoryOutputReader(t *testing.T) {
 	deckPath := storage.DataReference("s3://bucket/key")
 	lt := &flyteIdlCore.OutputData{
-		Outputs: coreutils.MustMakeLiteral(map[string]*flyteIdlCore.Literal{
-			"results": {
+		Outputs: coreutils.MustMakeLiteral(map[string]any{
+			"results": &flyteIdlCore.Literal{
 				Value: &flyteIdlCore.Literal_Scalar{
 					Scalar: &flyteIdlCore.Scalar{
 						Value: &flyteIdlCore.Scalar_Primitive{

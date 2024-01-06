@@ -20,6 +20,21 @@ executionConfig:
       Memory: "0"
       Storage: "0"
 executionId: {}
+inputData:
+  inputs:
+    literals:
+      am:
+        scalar:
+          primitive:
+            boolean: false
+      day_of_week:
+        scalar:
+          primitive:
+            stringValue: ""
+      number:
+        scalar:
+          primitive:
+            integer: "0"
 inputs:
   literals:
     am:

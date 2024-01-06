@@ -58,7 +58,7 @@ func ValidateNodeExecutionEventRequest(request *admin.NodeExecutionEventRequest,
 		}
 	}
 
-	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
+	if err := ValidateOutputData(outputData, maxOutputSizeInBytes); err != nil {
 		return err
 	}
 	return nil

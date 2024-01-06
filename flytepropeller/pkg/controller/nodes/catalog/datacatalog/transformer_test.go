@@ -102,10 +102,9 @@ func TestVariableMapOrder(t *testing.T) {
 
 // Ensure correct format of ArtifactTagName
 func TestGenerateArtifactTagName(t *testing.T) {
-	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
-	assert.NoError(t, err)
+	literalMap := coreutils.MustMakeLiteral(map[string]interface{}{"1": 1, "2": 2})
 
-	tag, err := GenerateArtifactTagName(context.TODO(), literalMap)
+	tag, err := GenerateArtifactTagName(context.TODO(), &core.InputData{Inputs: literalMap.GetMap()})
 	assert.NoError(t, err)
 	assert.Equal(t, "flyte_cached-GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", tag)
 }

@@ -11,21 +11,21 @@ package flyteadmin
 
 // User-provided launch plan definition and configuration values.
 type AdminLaunchPlanSpec struct {
-	WorkflowId *CoreIdentifier `json:"workflow_id,omitempty"`
+	WorkflowId     *CoreIdentifier          `json:"workflow_id,omitempty"`
 	EntityMetadata *AdminLaunchPlanMetadata `json:"entity_metadata,omitempty"`
 	// Input values to be passed for the execution. These can be overridden when an execution is created with this launch plan.
 	DefaultInputs *CoreParameterMap `json:"default_inputs,omitempty"`
-	FixedInputs *CoreLiteralMap `json:"fixed_inputs,omitempty"`
+	FixedInputs   *CoreLiteralMap   `json:"fixed_inputs,omitempty"`
 	// Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.
 	FixedInputData *CoreInputData `json:"fixed_input_data,omitempty"`
-	Role string `json:"role,omitempty"`
+	Role           string         `json:"role,omitempty"`
 	// Custom labels to be applied to the execution resource.
 	Labels *AdminLabels `json:"labels,omitempty"`
 	// Custom annotations to be applied to the execution resource.
 	Annotations *AdminAnnotations `json:"annotations,omitempty"`
 	// Indicates the permission associated with workflow executions triggered with this launch plan.
-	Auth *AdminAuth `json:"auth,omitempty"`
-	AuthRole *AdminAuthRole `json:"auth_role,omitempty"`
+	Auth            *AdminAuth           `json:"auth,omitempty"`
+	AuthRole        *AdminAuthRole       `json:"auth_role,omitempty"`
 	SecurityContext *CoreSecurityContext `json:"security_context,omitempty"`
 	// Indicates the runtime priority of the execution.
 	QualityOfService *CoreQualityOfService `json:"quality_of_service,omitempty"`

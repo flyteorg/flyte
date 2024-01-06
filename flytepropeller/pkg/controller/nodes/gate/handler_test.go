@@ -102,7 +102,7 @@ func createNodeExecutionContext(gateNode *v1alpha1.GateNodeSpec) *nodeMocks.Node
 	ns.OnGetLastAttemptStartedAt().Return(&t)
 
 	inputReader := &ioMocks.InputReader{}
-	inputReader.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+	inputReader.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 	dataStore, _ := storage.NewDataStore(&storage.Config{Type: storage.TypeMemory}, promutils.NewTestScope())
 
 	eCtx := &executormocks.ExecutionContext{}

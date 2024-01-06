@@ -2,15 +2,15 @@ package util
 
 import (
 	"context"
-	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
-	protoV2 "google.golang.org/protobuf/proto"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	protoV2 "google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	urlMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"

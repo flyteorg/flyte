@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
-	protoV2 "google.golang.org/protobuf/proto"
 	"testing"
 	"time"
+
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
+	protoV2 "google.golang.org/protobuf/proto"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -956,8 +957,8 @@ func TestGetTaskExecutionData(t *testing.T) {
 			Bytes: 200,
 		},
 		FullInputs:  fullInputs,
+		InputData:   migrateInputData(nil, fullInputs),
 		FullOutputs: fullOutputs,
-		InputData:   migrateInputData(nil, fullOutputs),
 		OutputData: &core.OutputData{
 			Outputs: fullOutputs,
 		},

@@ -1,10 +1,12 @@
 package testutils
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"testing"
+
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
-	"testing"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // Convenience method to wrap verbose boilerplate for initializing a PluginOverrides MatchingAttributes.
@@ -26,7 +28,6 @@ func GetPluginOverridesAttributes(vals map[string][]string) *admin.MatchingAttri
 }
 
 func AssertProtoEqual(t testing.TB, expected, actual proto.Message, msgAndArgs ...any) bool {
-	t.Helper()
 	if assert.True(t, proto.Equal(expected, actual), msgAndArgs...) {
 		return true
 	}

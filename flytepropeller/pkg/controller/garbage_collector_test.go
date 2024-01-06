@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	testing2 "k8s.io/utils/clock/testing"
 	"strings"
 	"sync"
 	"testing"

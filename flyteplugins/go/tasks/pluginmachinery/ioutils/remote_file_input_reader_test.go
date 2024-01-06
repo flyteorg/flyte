@@ -1,11 +1,11 @@
 package ioutils
 
 import (
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 

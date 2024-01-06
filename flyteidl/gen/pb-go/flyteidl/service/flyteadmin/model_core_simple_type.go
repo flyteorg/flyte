@@ -8,19 +8,20 @@
  */
 
 package flyteadmin
+
 // CoreSimpleType : Define a set of simple types.
 type CoreSimpleType string
 
 // List of coreSimpleType
 const (
-	CoreSimpleTypeNONE CoreSimpleType = "NONE"
-	CoreSimpleTypeINTEGER CoreSimpleType = "INTEGER"
-	CoreSimpleTypeFLOAT CoreSimpleType = "FLOAT"
-	CoreSimpleTypeSTRING_ CoreSimpleType = "STRING"
-	CoreSimpleTypeBOOLEAN CoreSimpleType = "BOOLEAN"
+	CoreSimpleTypeNONE     CoreSimpleType = "NONE"
+	CoreSimpleTypeINTEGER  CoreSimpleType = "INTEGER"
+	CoreSimpleTypeFLOAT    CoreSimpleType = "FLOAT"
+	CoreSimpleTypeSTRING_  CoreSimpleType = "STRING"
+	CoreSimpleTypeBOOLEAN  CoreSimpleType = "BOOLEAN"
 	CoreSimpleTypeDATETIME CoreSimpleType = "DATETIME"
 	CoreSimpleTypeDURATION CoreSimpleType = "DURATION"
-	CoreSimpleTypeBINARY CoreSimpleType = "BINARY"
-	CoreSimpleTypeERROR_ CoreSimpleType = "ERROR"
-	CoreSimpleTypeSTRUCT_ CoreSimpleType = "STRUCT"
+	CoreSimpleTypeBINARY   CoreSimpleType = "BINARY"
+	CoreSimpleTypeERROR_   CoreSimpleType = "ERROR"
+	CoreSimpleTypeSTRUCT_  CoreSimpleType = "STRUCT"
 )

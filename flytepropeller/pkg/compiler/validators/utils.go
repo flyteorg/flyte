@@ -2,12 +2,13 @@ package validators
 
 import (
 	"fmt"
-	"golang.org/x/exp/slices"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"golang.org/x/exp/maps"
+	"golang.org/x/exp/slices"
 	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func containsBindingByVariableName(bindings []*core.Binding, name string) (found bool) {

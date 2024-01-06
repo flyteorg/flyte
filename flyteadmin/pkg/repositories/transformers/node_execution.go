@@ -76,11 +76,11 @@ func addTerminalState(
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			closure.OutputResult = &admin.NodeExecutionClosure_FullOutputs{
-				FullOutputs: request.Event.GetOutputData(),
+				FullOutputs: outputData,
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadData(ctx, storageClient, request.Event.GetOutputData(),
+			uri, err := common.OffloadData(ctx, storageClient, outputData,
 				request.Event.Id.ExecutionId.Project, request.Event.Id.ExecutionId.Domain, request.Event.Id.ExecutionId.Name,
 				request.Event.Id.NodeId, OutputsObjectSuffix)
 			if err != nil {

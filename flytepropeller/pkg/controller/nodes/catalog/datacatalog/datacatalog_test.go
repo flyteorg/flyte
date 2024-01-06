@@ -45,8 +45,14 @@ func newStringLiteral(value string) *core.Literal {
 	}
 }
 
-var sampleParameters = &core.OutputData{
+var sampleOutputParameters = &core.OutputData{
 	Outputs: &core.LiteralMap{Literals: map[string]*core.Literal{
+		"out1": newStringLiteral("output1-stringval"),
+	}},
+}
+
+var sampleInputParameters = &core.InputData{
+	Inputs: &core.LiteralMap{Literals: map[string]*core.Literal{
 		"out1": newStringLiteral("output1-stringval"),
 	}},
 }
@@ -125,7 +131,7 @@ func TestCatalog_Get(t *testing.T) {
 
 	t.Run("No results, no Artifact", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.On("Get", mock.Anything).Return(sampleInputParameters, nil, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -159,7 +165,7 @@ func TestCatalog_Get(t *testing.T) {
 
 	t.Run("Found w/ tag", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.On("Get", mock.Anything).Return(sampleInputParameters, nil, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -246,7 +252,7 @@ func TestCatalog_Get(t *testing.T) {
 
 	t.Run("Found expired artifact", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.On("Get", mock.Anything).Return(sampleInputParameters, nil, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -296,7 +302,7 @@ func TestCatalog_Get(t *testing.T) {
 
 	t.Run("Found non-expired artifact", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.On("Get", mock.Anything).Return(sampleInputParameters, nil, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -396,7 +402,7 @@ func TestCatalog_Put(t *testing.T) {
 
 	t.Run("Create new cached execution", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		discovery := &CatalogClient{
@@ -432,7 +438,7 @@ func TestCatalog_Put(t *testing.T) {
 		).Return(&datacatalog.AddTagResponse{}, nil)
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleOutputParameters, nil, nil)
 		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",
@@ -482,7 +488,7 @@ func TestCatalog_Put(t *testing.T) {
 
 	t.Run("Create new cached execution with existing dataset", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		discovery := &CatalogClient{
@@ -523,7 +529,7 @@ func TestCatalog_Put(t *testing.T) {
 		).Return(&datacatalog.AddTagResponse{}, nil)
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleOutputParameters, nil, nil)
 		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",
@@ -544,7 +550,7 @@ func TestCatalog_Update(t *testing.T) {
 
 	t.Run("Overwrite existing cached execution", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		discovery := &CatalogClient{
@@ -590,7 +596,7 @@ func TestCatalog_Update(t *testing.T) {
 
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleOutputParameters, nil, nil)
 		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name:    taskID.NodeExecutionId.ExecutionId.Name,
@@ -615,7 +621,7 @@ func TestCatalog_Update(t *testing.T) {
 
 	t.Run("Overwrite non-existing execution", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		discovery := &CatalogClient{
@@ -680,7 +686,7 @@ func TestCatalog_Update(t *testing.T) {
 
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleOutputParameters, nil, nil)
 		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name:    taskID.NodeExecutionId.ExecutionId.Name,
@@ -706,7 +712,7 @@ func TestCatalog_Update(t *testing.T) {
 
 	t.Run("Error while overwriting execution", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		discovery := &CatalogClient{
@@ -726,7 +732,7 @@ func TestCatalog_Update(t *testing.T) {
 
 		newKey := sampleKey
 		newKey.InputReader = ir
-		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		or := ioutils.NewInMemoryOutputReader(sampleOutputParameters, nil, nil)
 		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
 			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
 				Name: "test",
@@ -764,7 +770,7 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 
 	t.Run("CreateOrUpdateReservation", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -790,7 +796,7 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 
 	t.Run("ExistingReservation", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -820,7 +826,7 @@ func TestCatalog_ReleaseReservation(t *testing.T) {
 
 	t.Run("ReleaseReservation", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -845,7 +851,7 @@ func TestCatalog_ReleaseReservation(t *testing.T) {
 
 	t.Run("ReleaseReservationFailure", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+		ir.OnGetMatch(mock.Anything).Return(sampleInputParameters, nil)
 
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{

@@ -7,10 +7,9 @@ import (
 	"time"
 
 	protoV1 "github.com/golang/protobuf/proto"
-	"google.golang.org/protobuf/proto"
-
 	errs "github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flytestdlib/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

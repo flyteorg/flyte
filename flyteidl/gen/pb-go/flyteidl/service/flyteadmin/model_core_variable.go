@@ -12,6 +12,6 @@ package flyteadmin
 // Defines a strongly typed variable.
 type CoreVariable struct {
 	// Variable literal type.
-	Type_ *CoreLiteralType `json:"type,omitempty"`
-	Description string `json:"description,omitempty"`
+	Type_       *CoreLiteralType `json:"type,omitempty"`
+	Description string           `json:"description,omitempty"`
 }

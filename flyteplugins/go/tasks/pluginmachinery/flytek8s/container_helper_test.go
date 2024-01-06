@@ -465,6 +465,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
 	mockInputReader.OnGetInputDataPath().Return(mockInputPath)
+	mockInputReader.OnGetInputPathMatch(mock.Anything).Return(mockInputPath, nil)
 	mockInputReader.OnGetInputPrefixPath().Return(mockInputPath)
 	mockInputReader.On("Get", mock.Anything).Return(nil, nil)
 
@@ -479,6 +480,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 		TaskExecMetadata: &mockTaskExecMetadata,
 		Inputs:           &mockInputReader,
 		OutputPath:       &mockOutputPath,
+		Runtime:          &core.RuntimeMetadata{},
 	}
 }
 
@@ -493,7 +495,7 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	}, nil)
 	container := &v1.Container{
 		Command: []string{
-			"{{ .InputData }}",
+			"{{ .Input }}",
 		},
 		Args: []string{
 			"{{ .OutputPrefix }}",
@@ -501,8 +503,8 @@ func TestAddFlyteCustomizationsToContainer(t *testing.T) {
 	}
 	err := AddFlyteCustomizationsToContainer(context.TODO(), templateParameters, ResourceCustomizationModeAssignResources, container)
 	assert.NoError(t, err)
-	assert.EqualValues(t, container.Args, []string{"s3://output/path"})
-	assert.EqualValues(t, container.Command, []string{"s3://input/path"})
+	assert.EqualValues(t, []string{"s3://output/path"}, container.Args)
+	assert.EqualValues(t, []string{"s3://input/path"}, container.Command)
 	assert.Len(t, container.Resources.Limits, 3)
 	assert.Len(t, container.Resources.Requests, 3)
 	assert.Len(t, container.Env, 12)

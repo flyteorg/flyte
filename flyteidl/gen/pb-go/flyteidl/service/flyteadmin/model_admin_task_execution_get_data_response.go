@@ -23,5 +23,5 @@ type AdminTaskExecutionGetDataResponse struct {
 	InputData *CoreInputData `json:"input_data,omitempty"`
 	// OutputData will only be populated if they are under a configured size threshold.
 	OutputData *CoreOutputData `json:"output_data,omitempty"`
-	FlyteUrls *AdminFlyteUrLs `json:"flyte_urls,omitempty"`
+	FlyteUrls  *AdminFlyteUrLs `json:"flyte_urls,omitempty"`
 }

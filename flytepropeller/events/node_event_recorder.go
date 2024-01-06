@@ -2,14 +2,15 @@ package events
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"strings"
 
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -58,6 +59,7 @@ func (r *nodeEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeE
 			logger.Warnf(ctx, "failed to fetch outputs by ref [%s] to send inline with err: %v", ev.GetOutputUri(), err)
 			rawOutputPolicy = config.RawOutputPolicyReference
 		} else if ev.GetEventVersion() < int32(v1alpha1.EventVersion3) {
+			origEvent = proto.Clone(ev).(*event.NodeExecutionEvent)
 			// Admin is not updated yet, send the old format. Set literal maps.
 
 			if msgIndex == 0 { // OutputData
@@ -68,6 +70,7 @@ func (r *nodeEventRecorder) RecordNodeEvent(ctx context.Context, ev *event.NodeE
 				DeprecatedOutputData: outputLit,
 			}
 		} else {
+			origEvent = proto.Clone(ev).(*event.NodeExecutionEvent)
 			// Use OutputData
 			if msgIndex == 1 { // LiteralMap
 				outputs = &core.OutputData{

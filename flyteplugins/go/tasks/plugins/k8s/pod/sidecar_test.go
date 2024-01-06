@@ -101,6 +101,7 @@ func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.R
 	inputReader := &pluginsIOMock.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
 	inputReader.OnGetInputDataPath().Return("test-data-reference")
+	inputReader.OnGetInputPathMatch(mock.Anything).Return("test-data-reference", nil)
 	inputReader.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 	taskCtx.OnInputReader().Return(inputReader)
 
@@ -207,6 +208,12 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 		TaskTypeVersion: 2,
 		Config: map[string]string{
 			flytek8s.PrimaryContainerKey: "primary container",
+		},
+		Metadata: &core.TaskMetadata{
+			Runtime: &core.RuntimeMetadata{
+				Type:    core.RuntimeMetadata_FLYTE_SDK,
+				Version: "1.12.0",
+			},
 		},
 		Target: &core.TaskTemplate_K8SPod{
 			K8SPod: &core.K8SPod{

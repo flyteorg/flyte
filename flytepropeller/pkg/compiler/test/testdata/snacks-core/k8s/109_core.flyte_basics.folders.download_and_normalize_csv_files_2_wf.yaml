@@ -20,6 +20,31 @@ executionConfig:
       Memory: "0"
       Storage: "0"
 executionId: {}
+inputData:
+  inputs:
+    literals:
+      columns_metadata:
+        collection:
+          literals:
+          - collection:
+              literals:
+              - scalar:
+                  primitive:
+                    stringValue: ""
+      columns_to_normalize_metadata:
+        collection:
+          literals:
+          - collection:
+              literals:
+              - scalar:
+                  primitive:
+                    stringValue: ""
+      csv_urls:
+        collection:
+          literals:
+          - scalar:
+              primitive:
+                stringValue: ""
 inputs:
   literals:
     columns_metadata:

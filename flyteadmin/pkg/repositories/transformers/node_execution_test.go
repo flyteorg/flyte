@@ -2,7 +2,6 @@ package transformers
 
 import (
 	"context"
-	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	"testing"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	genModel "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gen/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"

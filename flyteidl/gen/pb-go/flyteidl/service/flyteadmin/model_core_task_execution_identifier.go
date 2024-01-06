@@ -11,7 +11,7 @@ package flyteadmin
 
 // Encapsulation of fields that identify a Flyte task execution entity.
 type CoreTaskExecutionIdentifier struct {
-	TaskId *CoreIdentifier `json:"task_id,omitempty"`
+	TaskId          *CoreIdentifier              `json:"task_id,omitempty"`
 	NodeExecutionId *CoreNodeExecutionIdentifier `json:"node_execution_id,omitempty"`
-	RetryAttempt int64 `json:"retry_attempt,omitempty"`
+	RetryAttempt    int64                        `json:"retry_attempt,omitempty"`
 }

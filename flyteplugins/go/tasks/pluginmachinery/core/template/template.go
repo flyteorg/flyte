@@ -21,13 +21,13 @@ package template
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/util/version"
 	"reflect"
 	"regexp"
 	"strings"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
+	"k8s.io/apimachinery/pkg/util/version"
 
 	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -130,7 +130,7 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	// itself will upload the input (can be expensive) to the remote location
 	if inputFileRegex.MatchString(val) {
 		useNewFormat := true
-		if params.Runtime.GetType() == idlCore.RuntimeMetadata_FLYTE_SDK {
+		if params.Runtime != nil && params.Runtime.GetType() == idlCore.RuntimeMetadata_FLYTE_SDK {
 			v, err := version.ParseSemantic(params.Runtime.GetVersion())
 			if err != nil {
 				logger.Warnf(ctx, "Failed to parse version [%v] to determine the input path behavior. Proceeding with InputDataWrapper format.", params.Runtime.GetVersion())

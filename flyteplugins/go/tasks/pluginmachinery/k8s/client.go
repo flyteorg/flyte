@@ -3,16 +3,15 @@
 package k8s
 
 import (
-	"context"
 	"net/http"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 type kubeClient struct {
@@ -30,30 +29,6 @@ func (k *kubeClient) GetCache() cache.Cache {
 
 func newKubeClient(c client.Client, cache cache.Cache) core.KubeClient {
 	return &kubeClient{client: c, cache: cache}
-}
-
-type fallbackClientReader struct {
-	orderedClients []client.Reader
-}
-
-func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.Get(ctx, key, out); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
-func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.List(ctx, list, opts...); err == nil {
-			return nil
-		}
-	}
-
-	return
 }
 
 // ClientBuilder builder is the interface for the client builder.

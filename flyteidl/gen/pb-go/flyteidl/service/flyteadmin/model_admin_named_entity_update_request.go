@@ -11,7 +11,7 @@ package flyteadmin
 
 // Request to set the referenced named entity state to the configured value.
 type AdminNamedEntityUpdateRequest struct {
-	ResourceType *CoreResourceType `json:"resource_type,omitempty"`
-	Id *AdminNamedEntityIdentifier `json:"id,omitempty"`
-	Metadata *AdminNamedEntityMetadata `json:"metadata,omitempty"`
+	ResourceType *CoreResourceType           `json:"resource_type,omitempty"`
+	Id           *AdminNamedEntityIdentifier `json:"id,omitempty"`
+	Metadata     *AdminNamedEntityMetadata   `json:"metadata,omitempty"`
 }

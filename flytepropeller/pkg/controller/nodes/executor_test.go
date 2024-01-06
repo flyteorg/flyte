@@ -71,10 +71,12 @@ func TestSetInputsForStartNode(t *testing.T) {
 	exec, err := NewExecutor(ctx, config.GetConfig().NodeConfig, mockStorage, enQWf, eventMocks.NewMockEventSink(), adminClient,
 		adminClient, 10, "s3://bucket/", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 	assert.NoError(t, err)
-	inputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"x": coreutils.MustMakePrimitiveLiteral("hello"),
-			"y": coreutils.MustMakePrimitiveLiteral("blah"),
+	inputs := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"x": coreutils.MustMakePrimitiveLiteral("hello"),
+				"y": coreutils.MustMakePrimitiveLiteral("blah"),
+			},
 		},
 	}
 
@@ -98,9 +100,9 @@ func TestSetInputsForStartNode(t *testing.T) {
 		s, err := exec.SetInputsForStartNode(ctx, w, w, w, inputs)
 		assert.NoError(t, err)
 		assert.Equal(t, interfaces.NodeStatusComplete, s)
-		actual := &core.LiteralMap{}
+		actual := &core.OutputData{}
 		if assert.NoError(t, mockStorage.ReadProtobuf(ctx, "s3://test-bucket/exec/start-node/data/0/outputs.pb", actual)) {
-			flyteassert.EqualLiteralMap(t, inputs, actual)
+			flyteassert.EqualLiteralMap(t, inputs.GetInputs(), actual.GetOutputs())
 		}
 	})
 
@@ -725,7 +727,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			}, true, false, true, core.NodeExecution_RUNNING},
 
 			{"queued->queued", v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, func() (handler.Transition, error) {
-				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoQueued("reason", &core.LiteralMap{})), nil
+				return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoQueued("reason", &core.InputData{})), nil
 			}, true, false, false, core.NodeExecution_QUEUED},
 
 			{"queued->failing", v1alpha1.NodePhaseQueued, v1alpha1.NodePhaseFailing, interfaces.NodePhasePending, func() (handler.Transition, error) {
@@ -1757,7 +1759,7 @@ func TestNodeExecutionEventV0(t *testing.T) {
 	tID := &core.TaskExecutionIdentifier{
 		NodeExecutionId: nID,
 	}
-	p := handler.PhaseInfoQueued("r", &core.LiteralMap{})
+	p := handler.PhaseInfoQueued("r", &core.InputData{})
 	parentInfo := &mocks4.ImmutableParentInfo{}
 	parentInfo.OnGetUniqueID().Return("np1")
 	parentInfo.OnCurrentAttempt().Return(uint32(2))
@@ -1798,9 +1800,11 @@ func TestNodeExecutionEventV1(t *testing.T) {
 	tID := &core.TaskExecutionIdentifier{
 		NodeExecutionId: nID,
 	}
-	inputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": coreutils.MustMakeLiteral("bar"),
+	inputs := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": coreutils.MustMakeLiteral("bar"),
+			},
 		},
 	}
 	p := handler.PhaseInfoQueued("r", inputs)
@@ -2376,7 +2380,7 @@ func TestRecover(t *testing.T) {
 
 	t.Run("Fetch inputs", func(t *testing.T) {
 		recoveryClient := &recoveryMocks.Client{}
-		recoveryClient.On("RecoverNodeExecution", mock.Anything, recoveryID, nodeID).Return(
+		recoveryClient.OnRecoverNodeExecutionMatch(mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecution{
 				InputUri: "inputuri",
 				Closure: &admin.NodeExecutionClosure{
@@ -2388,7 +2392,7 @@ func TestRecover(t *testing.T) {
 				},
 			}, nil)
 
-		recoveryClient.On("RecoverNodeExecutionData", mock.Anything, recoveryID, nodeID).Return(
+		recoveryClient.OnRecoverNodeExecutionDataMatch(mock.Anything, recoveryID, nodeID).Return(
 			&admin.NodeExecutionGetDataResponse{
 				FullOutputs: fullOutputs,
 			}, nil)
@@ -2398,11 +2402,12 @@ func TestRecover(t *testing.T) {
 		mockPBStore.OnHeadMatch(mock.MatchedBy(func(ctx context.Context) bool { return true }), storage.DataReference(deckPath)).
 			Return(&metadata, nil)
 
-		mockPBStore.On("WriteProtobuf", mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
+		mockPBStore.OnWriteProtobufMatch(mock.Anything, mock.MatchedBy(func(reference storage.DataReference) bool {
 			return reference.String() == inputsPath || reference.String() == outputsPath
 		}), mock.Anything,
 			mock.Anything).Return(nil)
-		mockPBStore.On("ReadProtobuf", mock.Anything, storage.DataReference("inputuri"), &core.LiteralMap{}).Return(nil)
+		mockPBStore.OnReadProtobufAnyMatch(mock.Anything, storage.DataReference("inputuri"), &core.InputData{},
+			mock.Anything).Return(0, nil)
 
 		storageClient := &storage.DataStore{
 			ComposedProtobufStore: mockPBStore,
@@ -2419,7 +2424,7 @@ func TestRecover(t *testing.T) {
 		phaseInfo, err := executor.attemptRecovery(context.TODO(), nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, phaseInfo.GetPhase(), handler.EPhaseRecovered)
-		mockPBStore.AssertNumberOfCalls(t, "ReadProtobuf", 1)
+		mockPBStore.AssertNumberOfCalls(t, "ReadProtobufAny", 1)
 	})
 	t.Run("Fetch outputs", func(t *testing.T) {
 		recoveryClient := &recoveryMocks.Client{}

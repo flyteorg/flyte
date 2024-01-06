@@ -20,6 +20,13 @@ executionConfig:
       Memory: "0"
       Storage: "0"
 executionId: {}
+inputData:
+  inputs:
+    literals:
+      seed:
+        scalar:
+          primitive:
+            integer: "0"
 inputs:
   literals:
     seed:

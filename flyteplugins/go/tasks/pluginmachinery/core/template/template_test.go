@@ -98,6 +98,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 		Inputs:           in,
 		OutputPath:       out,
 		Task:             nil,
+		Runtime:          &core.RuntimeMetadata{},
 	}
 	t.Run("nothing to substitute", func(t *testing.T) {
 		actual, err := Render(context.TODO(), []string{
@@ -134,6 +135,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			Inputs:           in,
 			OutputPath:       out,
 			Task:             nil,
+			Runtime:          &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -214,6 +216,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			Inputs:           in,
 			OutputPath:       out,
 			Task:             nil,
+			Runtime:          &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -470,6 +473,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
 				checkpointPath:      "s3://new-checkpoint/prefix",
 			},
+			Runtime: &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -496,6 +500,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				prevCheckpointPath:  "",
 				checkpointPath:      "s3://new-checkpoint/prefix",
 			},
+			Runtime: &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -526,6 +531,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
 				checkpointPath:      "s3://new-checkpoint/prefix",
 			},
+			Runtime: &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",

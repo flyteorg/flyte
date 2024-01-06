@@ -3,12 +3,10 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"k8s.io/client-go/tools/cache"
 	"sort"
 	"sync"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	eventsv1 "k8s.io/api/events/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
@@ -17,6 +15,9 @@ import (
 	"k8s.io/client-go/informers"
 	informerEventsv1 "k8s.io/client-go/informers/events/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/cache"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type EventWatcher interface {

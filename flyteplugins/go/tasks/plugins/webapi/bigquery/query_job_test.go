@@ -1,13 +1,13 @@
 package bigquery
 
 import (
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/api/bigquery/v2"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestGetQueryParameter(t *testing.T) {

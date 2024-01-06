@@ -8,6 +8,7 @@
  */
 
 package flyteadmin
+
 // CoreOAuth2TokenRequestType : Type of the token requested.   - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials.
 type CoreOAuth2TokenRequestType string
 

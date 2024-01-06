@@ -8,12 +8,13 @@
  */
 
 package flyteadmin
+
 // AdminNamedEntityState : The status of the named entity is used to control its visibility in the UI.   - NAMED_ENTITY_ACTIVE: By default, all named entities are considered active and under development.  - NAMED_ENTITY_ARCHIVED: Archived named entities are no longer visible in the UI.  - SYSTEM_GENERATED: System generated entities that aren't explicitly created or managed by a user.
 type AdminNamedEntityState string
 
 // List of adminNamedEntityState
 const (
-	AdminNamedEntityStateNAMED_ENTITY_ACTIVE AdminNamedEntityState = "NAMED_ENTITY_ACTIVE"
+	AdminNamedEntityStateNAMED_ENTITY_ACTIVE   AdminNamedEntityState = "NAMED_ENTITY_ACTIVE"
 	AdminNamedEntityStateNAMED_ENTITY_ARCHIVED AdminNamedEntityState = "NAMED_ENTITY_ARCHIVED"
-	AdminNamedEntityStateSYSTEM_GENERATED AdminNamedEntityState = "SYSTEM_GENERATED"
+	AdminNamedEntityStateSYSTEM_GENERATED      AdminNamedEntityState = "SYSTEM_GENERATED"
 )

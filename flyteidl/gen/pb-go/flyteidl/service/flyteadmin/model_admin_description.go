@@ -11,8 +11,8 @@ package flyteadmin
 
 // Full user description with formatting preserved. This can be rendered by clients, such as the console or command line tools with in-tact formatting.
 type AdminDescription struct {
-	Value string `json:"value,omitempty"`
-	Uri string `json:"uri,omitempty"`
-	Format *AdminDescriptionFormat `json:"format,omitempty"`
-	IconLink string `json:"icon_link,omitempty"`
+	Value    string                  `json:"value,omitempty"`
+	Uri      string                  `json:"uri,omitempty"`
+	Format   *AdminDescriptionFormat `json:"format,omitempty"`
+	IconLink string                  `json:"icon_link,omitempty"`
 }

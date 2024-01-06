@@ -1138,7 +1138,7 @@ func Test_task_Finalize(t *testing.T) {
 		n.OnGetResources().Return(res)
 
 		ir := &ioMocks.InputReader{}
-		ir.OnGetMatch(mock.Anything).Return(&core.LiteralMap{}, nil)
+		ir.OnGetMatch(mock.Anything).Return(&core.InputData{}, nil)
 		nCtx := &nodeMocks.NodeExecutionContext{}
 		nCtx.OnNodeExecutionMetadata().Return(nm)
 		nCtx.OnNode().Return(n)

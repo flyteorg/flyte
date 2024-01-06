@@ -68,26 +68,30 @@ func TestEndHandler_Handle(t *testing.T) {
 	e := New()
 	ctx := context.Background()
 
-	inputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"x": coreutils.MustMakePrimitiveLiteral("hello"),
-			"y": coreutils.MustMakePrimitiveLiteral("blah"),
+	inputs := &core.InputData{
+		Inputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"x": coreutils.MustMakePrimitiveLiteral("hello"),
+				"y": coreutils.MustMakePrimitiveLiteral("blah"),
+			},
 		},
 	}
 
 	outputRef := v1alpha1.DataReference("testRef")
 
-	createNodeCtx := func(inputs *core.LiteralMap, store *storage.DataStore) *mocks.NodeExecutionContext {
+	createNodeCtx := func(inputs *core.InputData, store *storage.DataStore) *mocks.NodeExecutionContext {
 		ir := &mocks2.InputReader{}
-		ir.On("Get", mock.Anything).Return(inputs, nil)
+		ir.OnGetMatch(mock.Anything).Return(inputs, nil)
+
 		nCtx := &mocks.NodeExecutionContext{}
-		nCtx.On("InputReader").Return(ir)
-		nCtx.On("DataStore").Return(store)
+		nCtx.OnInputReader().Return(ir)
+		nCtx.OnDataStore().Return(store)
+
 		ns := &mocks3.ExecutableNodeStatus{}
-		ns.On("GetDataDir").Return(outputRef)
-		ns.On("GetOutputDir").Return(outputRef)
-		nCtx.On("NodeStatus").Return(ns)
-		nCtx.On("NodeID").Return("end-node")
+		ns.OnGetDataDir().Return(outputRef)
+		ns.OnGetOutputDir().Return(outputRef)
+		nCtx.OnNodeStatus().Return(ns)
+		nCtx.OnNodeID().Return("end-node")
 		return nCtx
 	}
 
@@ -114,9 +118,9 @@ func TestEndHandler_Handle(t *testing.T) {
 		s, err := e.Handle(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
-		actual := &core.LiteralMap{}
+		actual := &core.OutputData{}
 		if assert.NoError(t, inMem.ReadProtobuf(ctx, outputLoc, actual)) {
-			flyteassert.EqualLiteralMap(t, inputs, actual)
+			flyteassert.EqualLiteralMap(t, inputs.GetInputs(), actual.GetOutputs())
 		}
 	})
 

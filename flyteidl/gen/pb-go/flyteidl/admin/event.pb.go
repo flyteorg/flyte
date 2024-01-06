@@ -5,9 +5,10 @@ package admin
 
 import (
 	fmt "fmt"
+	math "math"
+
 	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	proto "github.com/golang/protobuf/proto"
-	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

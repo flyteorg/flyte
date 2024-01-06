@@ -84,11 +84,11 @@ func addTaskTerminalState(
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			closure.OutputResult = &admin.TaskExecutionClosure_FullOutputs{
-				FullOutputs: request.Event.GetOutputData(),
+				FullOutputs: outputData,
 			}
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadData(ctx, storageClient, request.Event.GetOutputData(),
+			uri, err := common.OffloadData(ctx, storageClient, outputData,
 				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
 				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
 				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,

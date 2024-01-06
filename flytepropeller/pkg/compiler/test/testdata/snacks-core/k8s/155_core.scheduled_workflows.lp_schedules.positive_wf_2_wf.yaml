@@ -20,6 +20,13 @@ executionConfig:
       Memory: "0"
       Storage: "0"
 executionId: {}
+inputData:
+  inputs:
+    literals:
+      name:
+        scalar:
+          primitive:
+            stringValue: ""
 inputs:
   literals:
     name:

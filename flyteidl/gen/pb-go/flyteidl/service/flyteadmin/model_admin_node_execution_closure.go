@@ -16,8 +16,8 @@ import (
 // Container for node execution details and results.
 type AdminNodeExecutionClosure struct {
 	// Links to a remotely stored, serialized core.LiteralMap of node execution outputs. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
-	OutputUri string `json:"output_uri,omitempty"`
-	Error_ *CoreExecutionError `json:"error,omitempty"`
+	OutputUri string              `json:"output_uri,omitempty"`
+	Error_    *CoreExecutionError `json:"error,omitempty"`
 	// Raw output data produced by this node execution. DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// Raw output data produced by this node execution.
@@ -31,10 +31,10 @@ type AdminNodeExecutionClosure struct {
 	// Time at which the node execution was created.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// Time at which the node execution was last updated.
-	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	UpdatedAt            time.Time                          `json:"updated_at,omitempty"`
 	WorkflowNodeMetadata *FlyteidladminWorkflowNodeMetadata `json:"workflow_node_metadata,omitempty"`
-	TaskNodeMetadata *FlyteidladminTaskNodeMetadata `json:"task_node_metadata,omitempty"`
-	DeckUri string `json:"deck_uri,omitempty"`
+	TaskNodeMetadata     *FlyteidladminTaskNodeMetadata     `json:"task_node_metadata,omitempty"`
+	DeckUri              string                             `json:"deck_uri,omitempty"`
 	// dynamic_job_spec_uri is the location of the DynamicJobSpec proto message for a DynamicWorkflow. This is required to correctly recover partially completed executions where the subworkflow has already been compiled.
 	DynamicJobSpecUri string `json:"dynamic_job_spec_uri,omitempty"`
 }
