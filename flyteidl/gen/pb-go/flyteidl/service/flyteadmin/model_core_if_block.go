@@ -12,5 +12,5 @@ package flyteadmin
 // Defines a condition and the execution unit that should be executed if the condition is satisfied.
 type CoreIfBlock struct {
 	Condition *CoreBooleanExpression `json:"condition,omitempty"`
-	ThenNode  *CoreNode              `json:"then_node,omitempty"`
+	ThenNode *CoreNode `json:"then_node,omitempty"`
 }

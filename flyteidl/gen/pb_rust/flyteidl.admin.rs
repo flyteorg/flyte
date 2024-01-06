@@ -53,8 +53,22 @@ pub struct CreateTaskRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTaskResponse {
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-    #[prost(bytes="vec", tag="1")]
-    pub resource_meta: ::prost::alloc::vec::Vec<u8>,
+    /// Resource is for synchronous task execution.
+    #[prost(oneof="create_task_response::Res", tags="1, 2")]
+    pub res: ::core::option::Option<create_task_response::Res>,
+}
+/// Nested message and enum types in `CreateTaskResponse`.
+pub mod create_task_response {
+    /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+    /// Resource is for synchronous task execution.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Res {
+        #[prost(bytes, tag="1")]
+        ResourceMeta(::prost::alloc::vec::Vec<u8>),
+        #[prost(message, tag="2")]
+        Resource(super::Resource),
+    }
 }
 /// A message used to fetch a job resource from flyte agent server.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -73,7 +87,7 @@ pub struct GetTaskRequest {
 pub struct GetTaskResponse {
     #[prost(message, optional, tag="1")]
     pub resource: ::core::option::Option<Resource>,
-    /// log information for the task execution.
+    /// log information for the task execution
     #[prost(message, repeated, tag="2")]
     pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
@@ -93,11 +107,14 @@ pub struct Resource {
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a
     /// Structured dataset pointing to the query result table.
     /// +optional
-    #[prost(message, optional, tag="4")]
+    #[prost(message, optional, tag="5")]
     pub outputs: ::core::option::Option<super::core::OutputData>,
     /// A descriptive message for the current state. e.g. waiting for cluster.
     #[prost(string, tag="3")]
     pub message: ::prost::alloc::string::String,
+    /// log information for the task execution.
+    #[prost(message, repeated, tag="4")]
+    pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -114,6 +131,44 @@ pub struct DeleteTaskRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeleteTaskResponse {
+}
+/// A message containing the agent metadata.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Agent {
+    /// Name is the developer-assigned name of the agent.
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+    /// SupportedTaskTypes are the types of the tasks that the agent can handle.
+    #[prost(string, repeated, tag="2")]
+    pub supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+}
+/// A request to get an agent.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetAgentRequest {
+    /// The name of the agent.
+    #[prost(string, tag="1")]
+    pub name: ::prost::alloc::string::String,
+}
+/// A response containing an agent.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetAgentResponse {
+    #[prost(message, optional, tag="1")]
+    pub agent: ::core::option::Option<Agent>,
+}
+/// A request to list all agents.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListAgentsRequest {
+}
+/// A response containing a list of agents.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListAgentsResponse {
+    #[prost(message, repeated, tag="1")]
+    pub agents: ::prost::alloc::vec::Vec<Agent>,
 }
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
@@ -1057,6 +1112,10 @@ pub struct ExecutionMetadata {
     /// In this the future this may be gated behind an ACL or some sort of authorization.
     #[prost(message, optional, tag="17")]
     pub system_metadata: ::core::option::Option<SystemMetadata>,
+    /// Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+    /// since we don't have a structure to handle nested ones anyways.
+    #[prost(message, repeated, tag="18")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
 }
 /// Nested message and enum types in `ExecutionMetadata`.
 pub mod execution_metadata {
@@ -1567,6 +1626,9 @@ pub struct LaunchPlanMetadata {
     /// List of notifications based on Execution status transitions
     #[prost(message, repeated, tag="2")]
     pub notifications: ::prost::alloc::vec::Vec<Notification>,
+    /// Additional metadata for how to launch the launch plan
+    #[prost(message, optional, tag="3")]
+    pub launch_conditions: ::core::option::Option<::prost_types::Any>,
 }
 /// Request to set the referenced launch plan state to the configured value.
 /// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details

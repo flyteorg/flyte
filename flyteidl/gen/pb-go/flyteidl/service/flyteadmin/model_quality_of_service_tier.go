@@ -8,14 +8,13 @@
  */
 
 package flyteadmin
-
 // QualityOfServiceTier :  - UNDEFINED: Default: no quality of service specified.
 type QualityOfServiceTier string
 
 // List of QualityOfServiceTier
 const (
 	QualityOfServiceTierUNDEFINED QualityOfServiceTier = "UNDEFINED"
-	QualityOfServiceTierHIGH      QualityOfServiceTier = "HIGH"
-	QualityOfServiceTierMEDIUM    QualityOfServiceTier = "MEDIUM"
-	QualityOfServiceTierLOW       QualityOfServiceTier = "LOW"
+	QualityOfServiceTierHIGH QualityOfServiceTier = "HIGH"
+	QualityOfServiceTierMEDIUM QualityOfServiceTier = "MEDIUM"
+	QualityOfServiceTierLOW QualityOfServiceTier = "LOW"
 )

@@ -11,5 +11,5 @@ package flyteadmin
 
 type CoreCatalogArtifactTag struct {
 	ArtifactId string `json:"artifact_id,omitempty"`
-	Name       string `json:"name,omitempty"`
+	Name string `json:"name,omitempty"`
 }

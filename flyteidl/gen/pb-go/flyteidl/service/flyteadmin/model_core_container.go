@@ -20,8 +20,8 @@ type CoreContainer struct {
 	// Environment variables will be set as the container is starting up.
 	Env []CoreKeyValuePair `json:"env,omitempty"`
 	// Allows extra configs to be available for the container. TODO: elaborate on how configs will become available. Deprecated, please use TaskTemplate.config instead.
-	Config       []CoreKeyValuePair     `json:"config,omitempty"`
-	Ports        []CoreContainerPort    `json:"ports,omitempty"`
-	DataConfig   *CoreDataLoadingConfig `json:"data_config,omitempty"`
+	Config []CoreKeyValuePair `json:"config,omitempty"`
+	Ports []CoreContainerPort `json:"ports,omitempty"`
+	DataConfig *CoreDataLoadingConfig `json:"data_config,omitempty"`
 	Architecture *ContainerArchitecture `json:"architecture,omitempty"`
 }

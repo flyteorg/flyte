@@ -10,8 +10,10 @@ import "flyteidl/core/interface.proto";
 import "flyteidl/core/security.proto";
 import "flyteidl/admin/schedule.proto";
 import "flyteidl/admin/common.proto";
+import "google/protobuf/any.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/wrappers.proto";
+
 
 // Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required
 // to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to
@@ -167,6 +169,9 @@ message LaunchPlanMetadata {
 
     // List of notifications based on Execution status transitions
     repeated Notification notifications = 2;
+
+    // Additional metadata for how to launch the launch plan
+    google.protobuf.Any launch_conditions = 3;
 }
 
 // Request to set the referenced launch plan state to the configured value.

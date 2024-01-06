@@ -11,9 +11,9 @@ package flyteadmin
 
 // Defines a set of overridable task resource attributes set during task registration.
 type AdminTaskResourceSpec struct {
-	Cpu              string `json:"cpu,omitempty"`
-	Gpu              string `json:"gpu,omitempty"`
-	Memory           string `json:"memory,omitempty"`
-	Storage          string `json:"storage,omitempty"`
+	Cpu string `json:"cpu,omitempty"`
+	Gpu string `json:"gpu,omitempty"`
+	Memory string `json:"memory,omitempty"`
+	Storage string `json:"storage,omitempty"`
 	EphemeralStorage string `json:"ephemeral_storage,omitempty"`
 }

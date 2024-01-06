@@ -13,14 +13,14 @@ type CoreWorkflowExecutionPhase string
 
 // List of coreWorkflowExecutionPhase
 const (
-	CoreWorkflowExecutionPhaseUNDEFINED  CoreWorkflowExecutionPhase = "UNDEFINED"
-	CoreWorkflowExecutionPhaseQUEUED     CoreWorkflowExecutionPhase = "QUEUED"
-	CoreWorkflowExecutionPhaseRUNNING    CoreWorkflowExecutionPhase = "RUNNING"
+	CoreWorkflowExecutionPhaseUNDEFINED CoreWorkflowExecutionPhase = "UNDEFINED"
+	CoreWorkflowExecutionPhaseQUEUED CoreWorkflowExecutionPhase = "QUEUED"
+	CoreWorkflowExecutionPhaseRUNNING CoreWorkflowExecutionPhase = "RUNNING"
 	CoreWorkflowExecutionPhaseSUCCEEDING CoreWorkflowExecutionPhase = "SUCCEEDING"
-	CoreWorkflowExecutionPhaseSUCCEEDED  CoreWorkflowExecutionPhase = "SUCCEEDED"
-	CoreWorkflowExecutionPhaseFAILING    CoreWorkflowExecutionPhase = "FAILING"
-	CoreWorkflowExecutionPhaseFAILED     CoreWorkflowExecutionPhase = "FAILED"
-	CoreWorkflowExecutionPhaseABORTED    CoreWorkflowExecutionPhase = "ABORTED"
-	CoreWorkflowExecutionPhaseTIMED_OUT  CoreWorkflowExecutionPhase = "TIMED_OUT"
-	CoreWorkflowExecutionPhaseABORTING   CoreWorkflowExecutionPhase = "ABORTING"
+	CoreWorkflowExecutionPhaseSUCCEEDED CoreWorkflowExecutionPhase = "SUCCEEDED"
+	CoreWorkflowExecutionPhaseFAILING CoreWorkflowExecutionPhase = "FAILING"
+	CoreWorkflowExecutionPhaseFAILED CoreWorkflowExecutionPhase = "FAILED"
+	CoreWorkflowExecutionPhaseABORTED CoreWorkflowExecutionPhase = "ABORTED"
+	CoreWorkflowExecutionPhaseTIMED_OUT CoreWorkflowExecutionPhase = "TIMED_OUT"
+	CoreWorkflowExecutionPhaseABORTING CoreWorkflowExecutionPhase = "ABORTING"
 )

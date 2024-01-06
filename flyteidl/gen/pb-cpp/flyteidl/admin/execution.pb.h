@@ -36,6 +36,7 @@
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/execution.pb.h"
+#include "flyteidl/core/artifact_id.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/metrics.pb.h"
 #include "flyteidl/core/security.pb.h"
@@ -2004,6 +2005,18 @@ class ExecutionMetadata final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.ArtifactID artifact_ids = 18;
+  int artifact_ids_size() const;
+  void clear_artifact_ids();
+  static const int kArtifactIdsFieldNumber = 18;
+  ::flyteidl::core::ArtifactID* mutable_artifact_ids(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
+      mutable_artifact_ids();
+  const ::flyteidl::core::ArtifactID& artifact_ids(int index) const;
+  ::flyteidl::core::ArtifactID* add_artifact_ids();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
+      artifact_ids() const;
+
   // string principal = 2;
   void clear_principal();
   static const int kPrincipalFieldNumber = 2;
@@ -2071,6 +2084,7 @@ class ExecutionMetadata final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > artifact_ids_;
   ::google::protobuf::internal::ArenaStringPtr principal_;
   ::google::protobuf::Timestamp* scheduled_at_;
   ::flyteidl::core::NodeExecutionIdentifier* parent_node_execution_;
@@ -5819,6 +5833,33 @@ inline void ExecutionMetadata::set_allocated_system_metadata(::flyteidl::admin::
   }
   system_metadata_ = system_metadata;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionMetadata.system_metadata)
+}
+
+// repeated .flyteidl.core.ArtifactID artifact_ids = 18;
+inline int ExecutionMetadata::artifact_ids_size() const {
+  return artifact_ids_.size();
+}
+inline ::flyteidl::core::ArtifactID* ExecutionMetadata::mutable_artifact_ids(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
+ExecutionMetadata::mutable_artifact_ids() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return &artifact_ids_;
+}
+inline const ::flyteidl::core::ArtifactID& ExecutionMetadata::artifact_ids(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_.Get(index);
+}
+inline ::flyteidl::core::ArtifactID* ExecutionMetadata::add_artifact_ids() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
+ExecutionMetadata::artifact_ids() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_;
 }
 
 // -------------------------------------------------------------------

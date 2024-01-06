@@ -11,6 +11,6 @@ package flyteadmin
 
 // Specifies sort ordering in a list request.
 type AdminSort struct {
-	Key       string         `json:"key,omitempty"`
+	Key string `json:"key,omitempty"`
 	Direction *SortDirection `json:"direction,omitempty"`
 }

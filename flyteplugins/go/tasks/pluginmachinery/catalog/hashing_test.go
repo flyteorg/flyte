@@ -619,7 +619,7 @@ func TestHashLiteralMap_LiteralsWithHashSet(t *testing.T) {
 			literalMap := &core.InputData{
 				Inputs: &core.LiteralMap{Literals: map[string]*core.Literal{"o0": tt.literal}},
 			}
-			hash, err := HashInputData(context.TODO(), literalMap)
+			hash, err := HashInputData(context.TODO(), literalMap, nil)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, hash)
 		})
@@ -634,7 +634,7 @@ func TestInputValueSorted(t *testing.T) {
 	inputData := &core.InputData{
 		Inputs: literalMap,
 	}
-	hash, err := HashInputData(context.TODO(), inputData)
+	hash, err := HashInputData(context.TODO(), inputData, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", hash)
 
@@ -644,19 +644,38 @@ func TestInputValueSorted(t *testing.T) {
 	inputData = &core.InputData{
 		Inputs: literalMap,
 	}
-	hashDupe, err := HashInputData(context.TODO(), inputData)
+	hashDupe, err := HashInputData(context.TODO(), inputData, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, hashDupe, hash)
 }
 
 // Ensure that empty inputs are hashed the same way
 func TestNoInputValues(t *testing.T) {
-	hash, err := HashInputData(context.TODO(), nil)
+	hash, err := HashInputData(context.TODO(), nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", hash)
 
-	hashDupe, err := HashInputData(context.TODO(), &core.InputData{Inputs: &core.LiteralMap{Literals: nil}})
+	hashDupe, err := HashInputData(context.TODO(), &core.InputData{Inputs: &core.LiteralMap{Literals: nil}}, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", hashDupe)
+	assert.Equal(t, hashDupe, hash)
+}
+
+// Ensure that empty inputs are hashed the same way
+func TestCacheIgnoreInputVars(t *testing.T) {
+	inputData := &core.InputData{
+		Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"1": 1, "2": 2}).GetMap(),
+	}
+
+	hash, err := HashInputData(context.TODO(), inputData, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", hash)
+
+	inputData = &core.InputData{
+		Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"2": 2, "1": 1, "3": 3}).GetMap(),
+	}
+
+	hashDupe, err := HashInputData(context.TODO(), inputData, []string{"3"})
+	assert.NoError(t, err)
 	assert.Equal(t, hashDupe, hash)
 }

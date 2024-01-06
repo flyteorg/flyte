@@ -6,20 +6,26 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class RayJob(_message.Message):
-    __slots__ = ["ray_cluster", "runtime_env"]
+    __slots__ = ["ray_cluster", "runtime_env", "shutdown_after_job_finishes", "ttl_seconds_after_finished"]
     RAY_CLUSTER_FIELD_NUMBER: _ClassVar[int]
     RUNTIME_ENV_FIELD_NUMBER: _ClassVar[int]
+    SHUTDOWN_AFTER_JOB_FINISHES_FIELD_NUMBER: _ClassVar[int]
+    TTL_SECONDS_AFTER_FINISHED_FIELD_NUMBER: _ClassVar[int]
     ray_cluster: RayCluster
     runtime_env: str
-    def __init__(self, ray_cluster: _Optional[_Union[RayCluster, _Mapping]] = ..., runtime_env: _Optional[str] = ...) -> None: ...
+    shutdown_after_job_finishes: bool
+    ttl_seconds_after_finished: int
+    def __init__(self, ray_cluster: _Optional[_Union[RayCluster, _Mapping]] = ..., runtime_env: _Optional[str] = ..., shutdown_after_job_finishes: bool = ..., ttl_seconds_after_finished: _Optional[int] = ...) -> None: ...
 
 class RayCluster(_message.Message):
-    __slots__ = ["head_group_spec", "worker_group_spec"]
+    __slots__ = ["head_group_spec", "worker_group_spec", "enable_autoscaling"]
     HEAD_GROUP_SPEC_FIELD_NUMBER: _ClassVar[int]
     WORKER_GROUP_SPEC_FIELD_NUMBER: _ClassVar[int]
+    ENABLE_AUTOSCALING_FIELD_NUMBER: _ClassVar[int]
     head_group_spec: HeadGroupSpec
     worker_group_spec: _containers.RepeatedCompositeFieldContainer[WorkerGroupSpec]
-    def __init__(self, head_group_spec: _Optional[_Union[HeadGroupSpec, _Mapping]] = ..., worker_group_spec: _Optional[_Iterable[_Union[WorkerGroupSpec, _Mapping]]] = ...) -> None: ...
+    enable_autoscaling: bool
+    def __init__(self, head_group_spec: _Optional[_Union[HeadGroupSpec, _Mapping]] = ..., worker_group_spec: _Optional[_Iterable[_Union[WorkerGroupSpec, _Mapping]]] = ..., enable_autoscaling: bool = ...) -> None: ...
 
 class HeadGroupSpec(_message.Message):
     __slots__ = ["ray_start_params"]

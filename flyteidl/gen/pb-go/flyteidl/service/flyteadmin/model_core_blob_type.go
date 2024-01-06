@@ -10,6 +10,6 @@
 package flyteadmin
 
 type CoreBlobType struct {
-	Format         string                      `json:"format,omitempty"`
+	Format string `json:"format,omitempty"`
 	Dimensionality *BlobTypeBlobDimensionality `json:"dimensionality,omitempty"`
 }

@@ -686,7 +686,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
-									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
 								}
@@ -700,7 +700,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 							case "CreateContainerConfigError":
 								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
 								if time.Since(t) >= gracePeriod {
-									return pluginsCore.PhaseInfoFailure(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
 									}), t
 								}
@@ -712,7 +712,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								), t
 
 							case "InvalidImageName":
-								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), t
 
@@ -737,7 +737,7 @@ func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Ti
 								// by K8s and we get elusive 'pod not found' errors
 								// So be default if the container is not waiting with the PodInitializing/ContainerCreating
 								// reasons, then we will assume a failure reason, and fail instantly
-								return pluginsCore.PhaseInfoSystemRetryableFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
 								}), t
 							}

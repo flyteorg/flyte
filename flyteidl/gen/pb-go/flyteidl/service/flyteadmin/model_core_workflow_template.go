@@ -22,6 +22,6 @@ type CoreWorkflowTemplate struct {
 	// A list of output bindings that specify how to construct workflow outputs. Bindings can pull node outputs or specify literals. All workflow outputs specified in the interface field must be bound in order for the workflow to be validated. A workflow has an implicit dependency on all of its nodes to execute successfully in order to bind final outputs. Most of these outputs will be Binding's with a BindingData of type OutputReference.  That is, your workflow can just have an output of some constant (`Output(5)`), but usually, the workflow will be pulling outputs from the output of a task.
 	Outputs []CoreBinding `json:"outputs,omitempty"`
 	// +optional A catch-all node. This node is executed whenever the execution engine determines the workflow has failed. The interface of this node must match the Workflow interface with an additional input named 'error' of type pb.lyft.flyte.core.Error.
-	FailureNode      *CoreNode                     `json:"failure_node,omitempty"`
+	FailureNode *CoreNode `json:"failure_node,omitempty"`
 	MetadataDefaults *CoreWorkflowMetadataDefaults `json:"metadata_defaults,omitempty"`
 }

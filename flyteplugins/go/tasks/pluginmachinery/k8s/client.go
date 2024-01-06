@@ -3,8 +3,6 @@
 package k8s
 
 import (
-	"net/http"
-
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
@@ -69,9 +67,14 @@ type Options struct {
 // NewKubeClient creates a new KubeClient that caches reads and falls back to
 // make API calls on failure. Write calls are not cached.
 func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error) {
+	httpClient, err := rest.HTTPClientFor(config)
+	if err != nil {
+		return nil, err
+	}
+
 	if options.MapperProvider == nil {
 		options.MapperProvider = func(c *rest.Config) (meta.RESTMapper, error) {
-			return apiutil.NewDynamicRESTMapper(config, http.DefaultClient)
+			return apiutil.NewDynamicRESTMapper(config, httpClient)
 		}
 	}
 
@@ -82,7 +85,7 @@ func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error
 
 	if options.CacheOptions == nil {
 		options.CacheOptions = &cache.Options{
-			HTTPClient: http.DefaultClient,
+			HTTPClient: httpClient,
 			Mapper:     mapper,
 		}
 	}
@@ -93,7 +96,10 @@ func NewKubeClient(config *rest.Config, options Options) (core.KubeClient, error
 	}
 
 	if options.ClientOptions == nil {
-		options.ClientOptions = &client.Options{Mapper: mapper}
+		options.ClientOptions = &client.Options{
+			HTTPClient: httpClient,
+			Mapper: mapper,
+		}
 	}
 
 	client, err := client.New(config, *options.ClientOptions)

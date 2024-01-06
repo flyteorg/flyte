@@ -8,16 +8,15 @@
  */
 
 package flyteadmin
-
 // ComparisonExpressionOperator : - GT: Greater Than  - LT: Less Than
 type ComparisonExpressionOperator string
 
 // List of ComparisonExpressionOperator
 const (
-	ComparisonExpressionOperatorEQ  ComparisonExpressionOperator = "EQ"
+	ComparisonExpressionOperatorEQ ComparisonExpressionOperator = "EQ"
 	ComparisonExpressionOperatorNEQ ComparisonExpressionOperator = "NEQ"
-	ComparisonExpressionOperatorGT  ComparisonExpressionOperator = "GT"
+	ComparisonExpressionOperatorGT ComparisonExpressionOperator = "GT"
 	ComparisonExpressionOperatorGTE ComparisonExpressionOperator = "GTE"
-	ComparisonExpressionOperatorLT  ComparisonExpressionOperator = "LT"
+	ComparisonExpressionOperatorLT ComparisonExpressionOperator = "LT"
 	ComparisonExpressionOperatorLTE ComparisonExpressionOperator = "LTE"
 )

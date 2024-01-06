@@ -68,11 +68,6 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 			return err
 		}
 	}
-	// TODO: Remove redundant validation with the rest of the method.
-	// This final call to validating the request ensures the notification types are expected.
-	if err := request.Validate(); err != nil {
-		return err
-	}
 	return nil
 }
 

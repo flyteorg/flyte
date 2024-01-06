@@ -14,6 +14,6 @@ import (
 )
 
 type EventEventReason struct {
-	Reason     string    `json:"reason,omitempty"`
+	Reason string `json:"reason,omitempty"`
 	OccurredAt time.Time `json:"occurred_at,omitempty"`
 }

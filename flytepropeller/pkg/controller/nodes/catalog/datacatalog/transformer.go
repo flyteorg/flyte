@@ -115,9 +115,9 @@ func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInte
 	return fmt.Sprintf("%v-%v", inputHashString, outputHashString), nil
 }
 
-// Generate a tag by hashing the input values
-func GenerateArtifactTagName(ctx context.Context, inputs *core.InputData) (string, error) {
-	hashString, err := catalog.HashInputData(ctx, inputs)
+// Generate a tag by hashing the input values which are not in cacheIgnoreInputVars
+func GenerateArtifactTagName(ctx context.Context, inputs *core.InputData, cacheIgnoreInputVars []string) (string, error) {
+	hashString, err := catalog.HashInputData(ctx, inputs, cacheIgnoreInputVars)
 	if err != nil {
 		return "", err
 	}

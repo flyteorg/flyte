@@ -10,7 +10,7 @@
 package flyteadmin
 
 type CoreCatalogMetadata struct {
-	DatasetId           *CoreIdentifier              `json:"dataset_id,omitempty"`
-	ArtifactTag         *CoreCatalogArtifactTag      `json:"artifact_tag,omitempty"`
+	DatasetId *CoreIdentifier `json:"dataset_id,omitempty"`
+	ArtifactTag *CoreCatalogArtifactTag `json:"artifact_tag,omitempty"`
 	SourceTaskExecution *CoreTaskExecutionIdentifier `json:"source_task_execution,omitempty"`
 }

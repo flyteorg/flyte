@@ -14745,6 +14745,55 @@ public final class ExecutionOuterClass {
      * <code>.flyteidl.admin.SystemMetadata system_metadata = 17;</code>
      */
     flyteidl.admin.ExecutionOuterClass.SystemMetadataOrBuilder getSystemMetadataOrBuilder();
+
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    java.util.List<flyteidl.core.ArtifactId.ArtifactID> 
+        getArtifactIdsList();
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index);
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    int getArtifactIdsCount();
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
+        getArtifactIdsOrBuilderList();
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
+        int index);
   }
   /**
    * <pre>
@@ -14766,6 +14815,7 @@ public final class ExecutionOuterClass {
     private ExecutionMetadata() {
       mode_ = 0;
       principal_ = "";
+      artifactIds_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -14861,6 +14911,15 @@ public final class ExecutionOuterClass {
 
               break;
             }
+            case 146: {
+              if (!((mutable_bitField0_ & 0x00000080) != 0)) {
+                artifactIds_ = new java.util.ArrayList<flyteidl.core.ArtifactId.ArtifactID>();
+                mutable_bitField0_ |= 0x00000080;
+              }
+              artifactIds_.add(
+                  input.readMessage(flyteidl.core.ArtifactId.ArtifactID.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -14876,6 +14935,9 @@ public final class ExecutionOuterClass {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000080) != 0)) {
+          artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -15079,6 +15141,7 @@ public final class ExecutionOuterClass {
       // @@protoc_insertion_point(enum_scope:flyteidl.admin.ExecutionMetadata.ExecutionMode)
     }
 
+    private int bitField0_;
     public static final int MODE_FIELD_NUMBER = 1;
     private int mode_;
     /**
@@ -15297,6 +15360,66 @@ public final class ExecutionOuterClass {
       return getSystemMetadata();
     }
 
+    public static final int ARTIFACT_IDS_FIELD_NUMBER = 18;
+    private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_;
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    public java.util.List<flyteidl.core.ArtifactId.ArtifactID> getArtifactIdsList() {
+      return artifactIds_;
+    }
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    public java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
+        getArtifactIdsOrBuilderList() {
+      return artifactIds_;
+    }
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    public int getArtifactIdsCount() {
+      return artifactIds_.size();
+    }
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    public flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index) {
+      return artifactIds_.get(index);
+    }
+    /**
+     * <pre>
+     * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+     * since we don't have a structure to handle nested ones anyways.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+     */
+    public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
+        int index) {
+      return artifactIds_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -15331,6 +15454,9 @@ public final class ExecutionOuterClass {
       }
       if (systemMetadata_ != null) {
         output.writeMessage(17, getSystemMetadata());
+      }
+      for (int i = 0; i < artifactIds_.size(); i++) {
+        output.writeMessage(18, artifactIds_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -15367,6 +15493,10 @@ public final class ExecutionOuterClass {
       if (systemMetadata_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(17, getSystemMetadata());
+      }
+      for (int i = 0; i < artifactIds_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(18, artifactIds_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -15408,6 +15538,8 @@ public final class ExecutionOuterClass {
         if (!getSystemMetadata()
             .equals(other.getSystemMetadata())) return false;
       }
+      if (!getArtifactIdsList()
+          .equals(other.getArtifactIdsList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -15440,6 +15572,10 @@ public final class ExecutionOuterClass {
       if (hasSystemMetadata()) {
         hash = (37 * hash) + SYSTEM_METADATA_FIELD_NUMBER;
         hash = (53 * hash) + getSystemMetadata().hashCode();
+      }
+      if (getArtifactIdsCount() > 0) {
+        hash = (37 * hash) + ARTIFACT_IDS_FIELD_NUMBER;
+        hash = (53 * hash) + getArtifactIdsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -15574,6 +15710,7 @@ public final class ExecutionOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getArtifactIdsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -15609,6 +15746,12 @@ public final class ExecutionOuterClass {
           systemMetadata_ = null;
           systemMetadataBuilder_ = null;
         }
+        if (artifactIdsBuilder_ == null) {
+          artifactIds_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000080);
+        } else {
+          artifactIdsBuilder_.clear();
+        }
         return this;
       }
 
@@ -15635,6 +15778,8 @@ public final class ExecutionOuterClass {
       @java.lang.Override
       public flyteidl.admin.ExecutionOuterClass.ExecutionMetadata buildPartial() {
         flyteidl.admin.ExecutionOuterClass.ExecutionMetadata result = new flyteidl.admin.ExecutionOuterClass.ExecutionMetadata(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.mode_ = mode_;
         result.principal_ = principal_;
         result.nesting_ = nesting_;
@@ -15658,6 +15803,16 @@ public final class ExecutionOuterClass {
         } else {
           result.systemMetadata_ = systemMetadataBuilder_.build();
         }
+        if (artifactIdsBuilder_ == null) {
+          if (((bitField0_ & 0x00000080) != 0)) {
+            artifactIds_ = java.util.Collections.unmodifiableList(artifactIds_);
+            bitField0_ = (bitField0_ & ~0x00000080);
+          }
+          result.artifactIds_ = artifactIds_;
+        } else {
+          result.artifactIds_ = artifactIdsBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -15728,6 +15883,32 @@ public final class ExecutionOuterClass {
         if (other.hasSystemMetadata()) {
           mergeSystemMetadata(other.getSystemMetadata());
         }
+        if (artifactIdsBuilder_ == null) {
+          if (!other.artifactIds_.isEmpty()) {
+            if (artifactIds_.isEmpty()) {
+              artifactIds_ = other.artifactIds_;
+              bitField0_ = (bitField0_ & ~0x00000080);
+            } else {
+              ensureArtifactIdsIsMutable();
+              artifactIds_.addAll(other.artifactIds_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.artifactIds_.isEmpty()) {
+            if (artifactIdsBuilder_.isEmpty()) {
+              artifactIdsBuilder_.dispose();
+              artifactIdsBuilder_ = null;
+              artifactIds_ = other.artifactIds_;
+              bitField0_ = (bitField0_ & ~0x00000080);
+              artifactIdsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getArtifactIdsFieldBuilder() : null;
+            } else {
+              artifactIdsBuilder_.addAllMessages(other.artifactIds_);
+            }
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -15756,6 +15937,7 @@ public final class ExecutionOuterClass {
         }
         return this;
       }
+      private int bitField0_;
 
       private int mode_ = 0;
       /**
@@ -16579,6 +16761,336 @@ public final class ExecutionOuterClass {
           systemMetadata_ = null;
         }
         return systemMetadataBuilder_;
+      }
+
+      private java.util.List<flyteidl.core.ArtifactId.ArtifactID> artifactIds_ =
+        java.util.Collections.emptyList();
+      private void ensureArtifactIdsIsMutable() {
+        if (!((bitField0_ & 0x00000080) != 0)) {
+          artifactIds_ = new java.util.ArrayList<flyteidl.core.ArtifactId.ArtifactID>(artifactIds_);
+          bitField0_ |= 0x00000080;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder> artifactIdsBuilder_;
+
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public java.util.List<flyteidl.core.ArtifactId.ArtifactID> getArtifactIdsList() {
+        if (artifactIdsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(artifactIds_);
+        } else {
+          return artifactIdsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public int getArtifactIdsCount() {
+        if (artifactIdsBuilder_ == null) {
+          return artifactIds_.size();
+        } else {
+          return artifactIdsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public flyteidl.core.ArtifactId.ArtifactID getArtifactIds(int index) {
+        if (artifactIdsBuilder_ == null) {
+          return artifactIds_.get(index);
+        } else {
+          return artifactIdsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder setArtifactIds(
+          int index, flyteidl.core.ArtifactId.ArtifactID value) {
+        if (artifactIdsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureArtifactIdsIsMutable();
+          artifactIds_.set(index, value);
+          onChanged();
+        } else {
+          artifactIdsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder setArtifactIds(
+          int index, flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
+        if (artifactIdsBuilder_ == null) {
+          ensureArtifactIdsIsMutable();
+          artifactIds_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          artifactIdsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder addArtifactIds(flyteidl.core.ArtifactId.ArtifactID value) {
+        if (artifactIdsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureArtifactIdsIsMutable();
+          artifactIds_.add(value);
+          onChanged();
+        } else {
+          artifactIdsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder addArtifactIds(
+          int index, flyteidl.core.ArtifactId.ArtifactID value) {
+        if (artifactIdsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureArtifactIdsIsMutable();
+          artifactIds_.add(index, value);
+          onChanged();
+        } else {
+          artifactIdsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder addArtifactIds(
+          flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
+        if (artifactIdsBuilder_ == null) {
+          ensureArtifactIdsIsMutable();
+          artifactIds_.add(builderForValue.build());
+          onChanged();
+        } else {
+          artifactIdsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder addArtifactIds(
+          int index, flyteidl.core.ArtifactId.ArtifactID.Builder builderForValue) {
+        if (artifactIdsBuilder_ == null) {
+          ensureArtifactIdsIsMutable();
+          artifactIds_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          artifactIdsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder addAllArtifactIds(
+          java.lang.Iterable<? extends flyteidl.core.ArtifactId.ArtifactID> values) {
+        if (artifactIdsBuilder_ == null) {
+          ensureArtifactIdsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, artifactIds_);
+          onChanged();
+        } else {
+          artifactIdsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder clearArtifactIds() {
+        if (artifactIdsBuilder_ == null) {
+          artifactIds_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000080);
+          onChanged();
+        } else {
+          artifactIdsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public Builder removeArtifactIds(int index) {
+        if (artifactIdsBuilder_ == null) {
+          ensureArtifactIdsIsMutable();
+          artifactIds_.remove(index);
+          onChanged();
+        } else {
+          artifactIdsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public flyteidl.core.ArtifactId.ArtifactID.Builder getArtifactIdsBuilder(
+          int index) {
+        return getArtifactIdsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public flyteidl.core.ArtifactId.ArtifactIDOrBuilder getArtifactIdsOrBuilder(
+          int index) {
+        if (artifactIdsBuilder_ == null) {
+          return artifactIds_.get(index);  } else {
+          return artifactIdsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public java.util.List<? extends flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
+           getArtifactIdsOrBuilderList() {
+        if (artifactIdsBuilder_ != null) {
+          return artifactIdsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(artifactIds_);
+        }
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public flyteidl.core.ArtifactId.ArtifactID.Builder addArtifactIdsBuilder() {
+        return getArtifactIdsFieldBuilder().addBuilder(
+            flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public flyteidl.core.ArtifactId.ArtifactID.Builder addArtifactIdsBuilder(
+          int index) {
+        return getArtifactIdsFieldBuilder().addBuilder(
+            index, flyteidl.core.ArtifactId.ArtifactID.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+       * since we don't have a structure to handle nested ones anyways.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ArtifactID artifact_ids = 18;</code>
+       */
+      public java.util.List<flyteidl.core.ArtifactId.ArtifactID.Builder> 
+           getArtifactIdsBuilderList() {
+        return getArtifactIdsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder> 
+          getArtifactIdsFieldBuilder() {
+        if (artifactIdsBuilder_ == null) {
+          artifactIdsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.ArtifactId.ArtifactID, flyteidl.core.ArtifactId.ArtifactID.Builder, flyteidl.core.ArtifactId.ArtifactIDOrBuilder>(
+                  artifactIds_,
+                  ((bitField0_ & 0x00000080) != 0),
+                  getParentForChildren(),
+                  isClean());
+          artifactIds_ = null;
+        }
+        return artifactIdsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -29567,123 +30079,125 @@ public final class ExecutionOuterClass {
       "dl.admin\032\'flyteidl/admin/cluster_assignm" +
       "ent.proto\032\033flyteidl/admin/common.proto\032\034" +
       "flyteidl/core/literals.proto\032\035flyteidl/c" +
-      "ore/execution.proto\032\036flyteidl/core/ident" +
-      "ifier.proto\032\033flyteidl/core/metrics.proto" +
-      "\032\034flyteidl/core/security.proto\032\036google/p" +
-      "rotobuf/duration.proto\032\037google/protobuf/" +
-      "timestamp.proto\032\036google/protobuf/wrapper" +
-      "s.proto\"\321\001\n\026ExecutionCreateRequest\022\017\n\007pr" +
-      "oject\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(" +
-      "\t\022+\n\004spec\030\004 \001(\0132\035.flyteidl.admin.Executi" +
-      "onSpec\022-\n\006inputs\030\005 \001(\0132\031.flyteidl.core.L" +
-      "iteralMapB\002\030\001\022,\n\ninput_data\030\006 \001(\0132\030.flyt" +
-      "eidl.core.InputData\"\177\n\030ExecutionRelaunch" +
+      "ore/execution.proto\032\037flyteidl/core/artif" +
+      "act_id.proto\032\036flyteidl/core/identifier.p" +
+      "roto\032\033flyteidl/core/metrics.proto\032\034flyte" +
+      "idl/core/security.proto\032\036google/protobuf" +
+      "/duration.proto\032\037google/protobuf/timesta" +
+      "mp.proto\032\036google/protobuf/wrappers.proto" +
+      "\"\321\001\n\026ExecutionCreateRequest\022\017\n\007project\030\001" +
+      " \001(\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004sp" +
+      "ec\030\004 \001(\0132\035.flyteidl.admin.ExecutionSpec\022" +
+      "-\n\006inputs\030\005 \001(\0132\031.flyteidl.core.LiteralM" +
+      "apB\002\030\001\022,\n\ninput_data\030\006 \001(\0132\030.flyteidl.co" +
+      "re.InputData\"\177\n\030ExecutionRelaunchRequest" +
+      "\0226\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExe" +
+      "cutionIdentifier\022\014\n\004name\030\003 \001(\t\022\027\n\017overwr" +
+      "ite_cache\030\004 \001(\010J\004\010\002\020\003\"\224\001\n\027ExecutionRecov" +
+      "erRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo" +
+      "rkflowExecutionIdentifier\022\014\n\004name\030\002 \001(\t\022" +
+      "3\n\010metadata\030\003 \001(\0132!.flyteidl.admin.Execu" +
+      "tionMetadata\"Q\n\027ExecutionCreateResponse\022" +
+      "6\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExec" +
+      "utionIdentifier\"U\n\033WorkflowExecutionGetR" +
+      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\"\243\001\n\tExecution\0226\n\002" +
+      "id\030\001 \001(\0132*.flyteidl.core.WorkflowExecuti" +
+      "onIdentifier\022+\n\004spec\030\002 \001(\0132\035.flyteidl.ad" +
+      "min.ExecutionSpec\0221\n\007closure\030\003 \001(\0132 .fly" +
+      "teidl.admin.ExecutionClosure\"M\n\rExecutio" +
+      "nList\022-\n\nexecutions\030\001 \003(\0132\031.flyteidl.adm" +
+      "in.Execution\022\r\n\005token\030\002 \001(\t\"X\n\016LiteralMa" +
+      "pBlob\022/\n\006values\030\001 \001(\0132\031.flyteidl.core.Li" +
+      "teralMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n" +
+      "\rAbortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n\tprincip" +
+      "al\030\002 \001(\t\"\243\006\n\020ExecutionClosure\0225\n\007outputs" +
+      "\030\001 \001(\0132\036.flyteidl.admin.LiteralMapBlobB\002" +
+      "\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyteidl.core.Exec" +
+      "utionErrorH\000\022\031\n\013abort_cause\030\n \001(\tB\002\030\001H\000\022" +
+      "7\n\016abort_metadata\030\014 \001(\0132\035.flyteidl.admin" +
+      ".AbortMetadataH\000\0224\n\013output_data\030\r \001(\0132\031." +
+      "flyteidl.core.LiteralMapB\002\030\001H\000\0221\n\014full_o" +
+      "utputs\030\017 \001(\0132\031.flyteidl.core.OutputDataH" +
+      "\000\0226\n\017computed_inputs\030\003 \001(\0132\031.flyteidl.co" +
+      "re.LiteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162&.flyte" +
+      "idl.core.WorkflowExecution.Phase\022.\n\nstar" +
+      "ted_at\030\005 \001(\0132\032.google.protobuf.Timestamp" +
+      "\022+\n\010duration\030\006 \001(\0132\031.google.protobuf.Dur" +
+      "ation\022.\n\ncreated_at\030\007 \001(\0132\032.google.proto" +
+      "buf.Timestamp\022.\n\nupdated_at\030\010 \001(\0132\032.goog" +
+      "le.protobuf.Timestamp\0223\n\rnotifications\030\t" +
+      " \003(\0132\034.flyteidl.admin.Notification\022.\n\013wo" +
+      "rkflow_id\030\013 \001(\0132\031.flyteidl.core.Identifi" +
+      "er\022I\n\024state_change_details\030\016 \001(\0132+.flyte" +
+      "idl.admin.ExecutionStateChangeDetailsB\017\n" +
+      "\routput_result\">\n\016SystemMetadata\022\031\n\021exec" +
+      "ution_cluster\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\213" +
+      "\004\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(\0162/.fly" +
+      "teidl.admin.ExecutionMetadata.ExecutionM" +
+      "ode\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting\030\003 \001(\r\022" +
+      "0\n\014scheduled_at\030\004 \001(\0132\032.google.protobuf." +
+      "Timestamp\022E\n\025parent_node_execution\030\005 \001(\013" +
+      "2&.flyteidl.core.NodeExecutionIdentifier" +
+      "\022G\n\023reference_execution\030\020 \001(\0132*.flyteidl" +
+      ".core.WorkflowExecutionIdentifier\0227\n\017sys" +
+      "tem_metadata\030\021 \001(\0132\036.flyteidl.admin.Syst" +
+      "emMetadata\022/\n\014artifact_ids\030\022 \003(\0132\031.flyte" +
+      "idl.core.ArtifactID\"g\n\rExecutionMode\022\n\n\006" +
+      "MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010R" +
+      "ELAUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r\n\tRECOVER" +
+      "ED\020\005\"G\n\020NotificationList\0223\n\rnotification" +
+      "s\030\001 \003(\0132\034.flyteidl.admin.Notification\"\262\006" +
+      "\n\rExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.f" +
+      "lyteidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132" +
+      "\031.flyteidl.core.LiteralMapB\002\030\001\0223\n\010metada" +
+      "ta\030\003 \001(\0132!.flyteidl.admin.ExecutionMetad" +
+      "ata\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.ad" +
+      "min.NotificationListH\000\022\025\n\013disable_all\030\006 " +
+      "\001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.L" +
+      "abels\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.ad" +
+      "min.Annotations\0228\n\020security_context\030\n \001(" +
+      "\0132\036.flyteidl.core.SecurityContext\022/\n\taut" +
+      "h_role\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\002" +
+      "\030\001\022;\n\022quality_of_service\030\021 \001(\0132\037.flyteid" +
+      "l.core.QualityOfService\022\027\n\017max_paralleli" +
+      "sm\030\022 \001(\005\022C\n\026raw_output_data_config\030\023 \001(\013" +
+      "2#.flyteidl.admin.RawOutputDataConfig\022=\n" +
+      "\022cluster_assignment\030\024 \001(\0132!.flyteidl.adm" +
+      "in.ClusterAssignment\0221\n\rinterruptible\030\025 " +
+      "\001(\0132\032.google.protobuf.BoolValue\022\027\n\017overw" +
+      "rite_cache\030\026 \001(\010\022\"\n\004envs\030\027 \001(\0132\024.flyteid" +
+      "l.admin.Envs\022\014\n\004tags\030\030 \003(\tB\030\n\026notificati" +
+      "on_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminate" +
       "Request\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Work" +
-      "flowExecutionIdentifier\022\014\n\004name\030\003 \001(\t\022\027\n" +
-      "\017overwrite_cache\030\004 \001(\010J\004\010\002\020\003\"\224\001\n\027Executi" +
-      "onRecoverRequest\0226\n\002id\030\001 \001(\0132*.flyteidl." +
-      "core.WorkflowExecutionIdentifier\022\014\n\004name" +
-      "\030\002 \001(\t\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admi" +
-      "n.ExecutionMetadata\"Q\n\027ExecutionCreateRe" +
-      "sponse\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
-      "lowExecutionIdentifier\"U\n\033WorkflowExecut" +
-      "ionGetRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.cor" +
-      "e.WorkflowExecutionIdentifier\"\243\001\n\tExecut" +
-      "ion\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflow" +
-      "ExecutionIdentifier\022+\n\004spec\030\002 \001(\0132\035.flyt" +
-      "eidl.admin.ExecutionSpec\0221\n\007closure\030\003 \001(" +
-      "\0132 .flyteidl.admin.ExecutionClosure\"M\n\rE" +
-      "xecutionList\022-\n\nexecutions\030\001 \003(\0132\031.flyte" +
-      "idl.admin.Execution\022\r\n\005token\030\002 \001(\t\"X\n\016Li" +
-      "teralMapBlob\022/\n\006values\030\001 \001(\0132\031.flyteidl." +
-      "core.LiteralMapB\002\030\001H\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004" +
-      "data\"1\n\rAbortMetadata\022\r\n\005cause\030\001 \001(\t\022\021\n\t" +
-      "principal\030\002 \001(\t\"\243\006\n\020ExecutionClosure\0225\n\007" +
-      "outputs\030\001 \001(\0132\036.flyteidl.admin.LiteralMa" +
-      "pBlobB\002\030\001H\000\022.\n\005error\030\002 \001(\0132\035.flyteidl.co" +
-      "re.ExecutionErrorH\000\022\031\n\013abort_cause\030\n \001(\t" +
-      "B\002\030\001H\000\0227\n\016abort_metadata\030\014 \001(\0132\035.flyteid" +
-      "l.admin.AbortMetadataH\000\0224\n\013output_data\030\r" +
-      " \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000\0221\n" +
-      "\014full_outputs\030\017 \001(\0132\031.flyteidl.core.Outp" +
-      "utDataH\000\0226\n\017computed_inputs\030\003 \001(\0132\031.flyt" +
-      "eidl.core.LiteralMapB\002\030\001\0225\n\005phase\030\004 \001(\0162" +
-      "&.flyteidl.core.WorkflowExecution.Phase\022" +
-      ".\n\nstarted_at\030\005 \001(\0132\032.google.protobuf.Ti" +
-      "mestamp\022+\n\010duration\030\006 \001(\0132\031.google.proto" +
-      "buf.Duration\022.\n\ncreated_at\030\007 \001(\0132\032.googl" +
-      "e.protobuf.Timestamp\022.\n\nupdated_at\030\010 \001(\013" +
-      "2\032.google.protobuf.Timestamp\0223\n\rnotifica" +
-      "tions\030\t \003(\0132\034.flyteidl.admin.Notificatio" +
-      "n\022.\n\013workflow_id\030\013 \001(\0132\031.flyteidl.core.I" +
-      "dentifier\022I\n\024state_change_details\030\016 \001(\0132" +
-      "+.flyteidl.admin.ExecutionStateChangeDet" +
-      "ailsB\017\n\routput_result\">\n\016SystemMetadata\022" +
-      "\031\n\021execution_cluster\030\001 \001(\t\022\021\n\tnamespace\030" +
-      "\002 \001(\t\"\332\003\n\021ExecutionMetadata\022=\n\004mode\030\001 \001(" +
-      "\0162/.flyteidl.admin.ExecutionMetadata.Exe" +
-      "cutionMode\022\021\n\tprincipal\030\002 \001(\t\022\017\n\007nesting" +
-      "\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132\032.google.pr" +
-      "otobuf.Timestamp\022E\n\025parent_node_executio" +
-      "n\030\005 \001(\0132&.flyteidl.core.NodeExecutionIde" +
-      "ntifier\022G\n\023reference_execution\030\020 \001(\0132*.f" +
-      "lyteidl.core.WorkflowExecutionIdentifier" +
-      "\0227\n\017system_metadata\030\021 \001(\0132\036.flyteidl.adm" +
-      "in.SystemMetadata\"g\n\rExecutionMode\022\n\n\006MA" +
-      "NUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n\n\006SYSTEM\020\002\022\014\n\010REL" +
-      "AUNCH\020\003\022\022\n\016CHILD_WORKFLOW\020\004\022\r\n\tRECOVERED" +
-      "\020\005\"G\n\020NotificationList\0223\n\rnotifications\030" +
-      "\001 \003(\0132\034.flyteidl.admin.Notification\"\262\006\n\r" +
-      "ExecutionSpec\022.\n\013launch_plan\030\001 \001(\0132\031.fly" +
-      "teidl.core.Identifier\022-\n\006inputs\030\002 \001(\0132\031." +
-      "flyteidl.core.LiteralMapB\002\030\001\0223\n\010metadata" +
-      "\030\003 \001(\0132!.flyteidl.admin.ExecutionMetadat" +
-      "a\0229\n\rnotifications\030\005 \001(\0132 .flyteidl.admi" +
-      "n.NotificationListH\000\022\025\n\013disable_all\030\006 \001(" +
-      "\010H\000\022&\n\006labels\030\007 \001(\0132\026.flyteidl.admin.Lab" +
-      "els\0220\n\013annotations\030\010 \001(\0132\033.flyteidl.admi" +
-      "n.Annotations\0228\n\020security_context\030\n \001(\0132" +
-      "\036.flyteidl.core.SecurityContext\022/\n\tauth_" +
-      "role\030\020 \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001" +
-      "\022;\n\022quality_of_service\030\021 \001(\0132\037.flyteidl." +
-      "core.QualityOfService\022\027\n\017max_parallelism" +
-      "\030\022 \001(\005\022C\n\026raw_output_data_config\030\023 \001(\0132#" +
-      ".flyteidl.admin.RawOutputDataConfig\022=\n\022c" +
-      "luster_assignment\030\024 \001(\0132!.flyteidl.admin" +
-      ".ClusterAssignment\0221\n\rinterruptible\030\025 \001(" +
-      "\0132\032.google.protobuf.BoolValue\022\027\n\017overwri" +
-      "te_cache\030\026 \001(\010\022\"\n\004envs\030\027 \001(\0132\024.flyteidl." +
-      "admin.Envs\022\014\n\004tags\030\030 \003(\tB\030\n\026notification" +
-      "_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateRe" +
-      "quest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workfl" +
-      "owExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n\032" +
-      "ExecutionTerminateResponse\"Y\n\037WorkflowEx" +
-      "ecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.flyt" +
-      "eidl.core.WorkflowExecutionIdentifier\"\304\002" +
-      "\n WorkflowExecutionGetDataResponse\022,\n\007ou" +
-      "tputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030\001" +
-      "\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBlo" +
-      "bB\002\030\001\0222\n\013full_inputs\030\003 \001(\0132\031.flyteidl.co" +
-      "re.LiteralMapB\002\030\001\0223\n\014full_outputs\030\004 \001(\0132" +
-      "\031.flyteidl.core.LiteralMapB\002\030\001\022,\n\ninput_" +
-      "data\030\005 \001(\0132\030.flyteidl.core.InputData\022.\n\013" +
-      "output_data\030\006 \001(\0132\031.flyteidl.core.Output" +
-      "Data\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001 \001" +
-      "(\0132*.flyteidl.core.WorkflowExecutionIden" +
-      "tifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin.E" +
-      "xecutionState\"\220\001\n\033ExecutionStateChangeDe" +
-      "tails\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin.Ex" +
-      "ecutionState\022/\n\013occurred_at\030\002 \001(\0132\032.goog" +
-      "le.protobuf.Timestamp\022\021\n\tprincipal\030\003 \001(\t" +
-      "\"\031\n\027ExecutionUpdateResponse\"k\n\"WorkflowE" +
-      "xecutionGetMetricsRequest\0226\n\002id\030\001 \001(\0132*." +
-      "flyteidl.core.WorkflowExecutionIdentifie" +
-      "r\022\r\n\005depth\030\002 \001(\005\"H\n#WorkflowExecutionGet" +
-      "MetricsResponse\022!\n\004span\030\001 \001(\0132\023.flyteidl" +
-      ".core.Span*>\n\016ExecutionState\022\024\n\020EXECUTIO" +
-      "N_ACTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B=Z;gi" +
-      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
-      "go/flyteidl/adminb\006proto3"
+      "flowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034" +
+      "\n\032ExecutionTerminateResponse\"Y\n\037Workflow" +
+      "ExecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.fl" +
+      "yteidl.core.WorkflowExecutionIdentifier\"" +
+      "\304\002\n WorkflowExecutionGetDataResponse\022,\n\007" +
+      "outputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002" +
+      "\030\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlB" +
+      "lobB\002\030\001\0222\n\013full_inputs\030\003 \001(\0132\031.flyteidl." +
+      "core.LiteralMapB\002\030\001\0223\n\014full_outputs\030\004 \001(" +
+      "\0132\031.flyteidl.core.LiteralMapB\002\030\001\022,\n\ninpu" +
+      "t_data\030\005 \001(\0132\030.flyteidl.core.InputData\022." +
+      "\n\013output_data\030\006 \001(\0132\031.flyteidl.core.Outp" +
+      "utData\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001" +
+      " \001(\0132*.flyteidl.core.WorkflowExecutionId" +
+      "entifier\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin" +
+      ".ExecutionState\"\220\001\n\033ExecutionStateChange" +
+      "Details\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin." +
+      "ExecutionState\022/\n\013occurred_at\030\002 \001(\0132\032.go" +
+      "ogle.protobuf.Timestamp\022\021\n\tprincipal\030\003 \001" +
+      "(\t\"\031\n\027ExecutionUpdateResponse\"k\n\"Workflo" +
+      "wExecutionGetMetricsRequest\0226\n\002id\030\001 \001(\0132" +
+      "*.flyteidl.core.WorkflowExecutionIdentif" +
+      "ier\022\r\n\005depth\030\002 \001(\005\"H\n#WorkflowExecutionG" +
+      "etMetricsResponse\022!\n\004span\030\001 \001(\0132\023.flytei" +
+      "dl.core.Span*>\n\016ExecutionState\022\024\n\020EXECUT" +
+      "ION_ACTIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B=Z;" +
+      "github.com/flyteorg/flyte/flyteidl/gen/p" +
+      "b-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -29700,6 +30214,7 @@ public final class ExecutionOuterClass {
           flyteidl.admin.Common.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
+          flyteidl.core.ArtifactId.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Metrics.getDescriptor(),
           flyteidl.core.Security.getDescriptor(),
@@ -29778,7 +30293,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionMetadata_descriptor,
-        new java.lang.String[] { "Mode", "Principal", "Nesting", "ScheduledAt", "ParentNodeExecution", "ReferenceExecution", "SystemMetadata", });
+        new java.lang.String[] { "Mode", "Principal", "Nesting", "ScheduledAt", "ParentNodeExecution", "ReferenceExecution", "SystemMetadata", "ArtifactIds", });
     internal_static_flyteidl_admin_NotificationList_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_flyteidl_admin_NotificationList_fieldAccessorTable = new
@@ -29849,6 +30364,7 @@ public final class ExecutionOuterClass {
     flyteidl.admin.Common.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
+    flyteidl.core.ArtifactId.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Metrics.getDescriptor();
     flyteidl.core.Security.getDescriptor();

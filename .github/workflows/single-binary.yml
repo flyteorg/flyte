@@ -6,14 +6,6 @@ concurrency:
 
 on:
   pull_request:
-    paths:
-      - .github/workflows/single-binary.yml
-      - charts/flyte-binary/**
-      - charts/flyte-sandbox/**
-      - cmd/**
-      - docker/sandbox-bundled/**
-      - Dockerfile
-      - go.*
   push:
     branches:
       - master
@@ -131,7 +123,7 @@ jobs:
     env:
       FLYTESNACKS_PRIORITIES: "P0"
       FLYTESNACKS_VERSION: ""
-    timeout-minutes: 20
+    timeout-minutes: 60
     needs: [build-and-push-single-binary-image]
     steps:
       - name: Set latest Flytesnacks release

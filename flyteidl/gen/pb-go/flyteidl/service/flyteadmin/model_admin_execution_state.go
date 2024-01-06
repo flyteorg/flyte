@@ -8,12 +8,11 @@
  */
 
 package flyteadmin
-
 // AdminExecutionState : The state of the execution is used to control its visibility in the UI/CLI.   - EXECUTION_ACTIVE: By default, all executions are considered active.  - EXECUTION_ARCHIVED: Archived executions are no longer visible in the UI.
 type AdminExecutionState string
 
 // List of adminExecutionState
 const (
-	AdminExecutionStateACTIVE   AdminExecutionState = "EXECUTION_ACTIVE"
+	AdminExecutionStateACTIVE AdminExecutionState = "EXECUTION_ACTIVE"
 	AdminExecutionStateARCHIVED AdminExecutionState = "EXECUTION_ARCHIVED"
 )

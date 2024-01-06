@@ -14,6 +14,6 @@ type ExecutionErrorErrorKind string
 // List of ExecutionErrorErrorKind
 const (
 	ExecutionErrorErrorKindUNKNOWN ExecutionErrorErrorKind = "UNKNOWN"
-	ExecutionErrorErrorKindUSER    ExecutionErrorErrorKind = "USER"
-	ExecutionErrorErrorKindSYSTEM  ExecutionErrorErrorKind = "SYSTEM"
+	ExecutionErrorErrorKindUSER ExecutionErrorErrorKind = "USER"
+	ExecutionErrorErrorKindSYSTEM ExecutionErrorErrorKind = "SYSTEM"
 )

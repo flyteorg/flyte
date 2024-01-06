@@ -189,6 +189,9 @@ message UpdateArtifactRequest {
     // List of data to overwrite stored artifact data with. Must contain ALL data for updated Artifact as any missing
     // ArtifactData entries will be removed from the underlying blob storage and database.
     repeated ArtifactData data = 4;
+
+    // Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+    Metadata metadata = 5;
 }
 
 /*

@@ -12,6 +12,6 @@ package flyteadmin
 // Encapsulates a resource name and value.
 type ResourcesResourceEntry struct {
 	// Resource name.
-	Name  *ResourcesResourceName `json:"name,omitempty"`
-	Value string                 `json:"value,omitempty"`
+	Name *ResourcesResourceName `json:"name,omitempty"`
+	Value string `json:"value,omitempty"`
 }

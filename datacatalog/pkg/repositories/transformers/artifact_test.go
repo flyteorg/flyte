@@ -12,6 +12,12 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
+func TestSerializedMetadata(t *testing.T) {
+	serializedMetadata, err := SerializedMetadata(metadata)
+	assert.IsType(t, []byte{}, serializedMetadata)
+	assert.NoError(t, err)
+}
+
 func getTestArtifactData() []*datacatalog.ArtifactData {
 	testInteger := &core.Literal{
 		Value: &core.Literal_Scalar{

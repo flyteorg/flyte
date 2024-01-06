@@ -10,6 +10,6 @@
 package flyteadmin
 
 type AdminExecutionUpdateRequest struct {
-	Id    *CoreWorkflowExecutionIdentifier `json:"id,omitempty"`
-	State *AdminExecutionState             `json:"state,omitempty"`
+	Id *CoreWorkflowExecutionIdentifier `json:"id,omitempty"`
+	State *AdminExecutionState `json:"state,omitempty"`
 }

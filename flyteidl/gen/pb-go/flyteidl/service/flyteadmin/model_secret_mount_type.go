@@ -8,13 +8,12 @@
  */
 
 package flyteadmin
-
 // SecretMountType :  - ANY: Default case, indicates the client can tolerate either mounting options.  - ENV_VAR: ENV_VAR indicates the secret needs to be mounted as an environment variable.  - FILE: FILE indicates the secret needs to be mounted as a file.
 type SecretMountType string
 
 // List of SecretMountType
 const (
-	SecretMountTypeANY     SecretMountType = "ANY"
+	SecretMountTypeANY SecretMountType = "ANY"
 	SecretMountTypeENV_VAR SecretMountType = "ENV_VAR"
-	SecretMountTypeFILE    SecretMountType = "FILE"
+	SecretMountTypeFILE SecretMountType = "FILE"
 )

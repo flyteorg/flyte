@@ -22,7 +22,7 @@ type CoreLiteralType struct {
 	// A blob might have specialized implementation details depending on associated metadata.
 	Blob *CoreBlobType `json:"blob,omitempty"`
 	// Defines an enum with pre-defined string values.
-	EnumType              *CoreEnumType              `json:"enum_type,omitempty"`
+	EnumType *CoreEnumType `json:"enum_type,omitempty"`
 	StructuredDatasetType *CoreStructuredDatasetType `json:"structured_dataset_type,omitempty"`
 	// Defines an union type with pre-defined LiteralTypes.
 	UnionType *CoreUnionType `json:"union_type,omitempty"`

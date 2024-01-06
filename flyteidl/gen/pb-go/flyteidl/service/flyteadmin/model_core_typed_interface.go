@@ -11,6 +11,6 @@ package flyteadmin
 
 // Defines strongly typed inputs and outputs.
 type CoreTypedInterface struct {
-	Inputs  *CoreVariableMap `json:"inputs,omitempty"`
+	Inputs *CoreVariableMap `json:"inputs,omitempty"`
 	Outputs *CoreVariableMap `json:"outputs,omitempty"`
 }

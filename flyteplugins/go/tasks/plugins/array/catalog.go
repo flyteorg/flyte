@@ -269,7 +269,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 	// Create catalog put items, but only put the ones that were not originally cached (as read from the catalog results bitset)
 	catalogWriterItems, err := ConstructCatalogUploadRequests(*tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID().TaskId,
 		tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID(), taskTemplate.Metadata.DiscoveryVersion,
-		iface, &tasksToCache, inputReaders, outputReaders)
+		taskTemplate.Metadata.CacheIgnoreInputVars, iface, &tasksToCache, inputReaders, outputReaders)
 
 	if err != nil {
 		return nil, externalResources, err
@@ -338,7 +338,7 @@ func WriteToCatalog(ctx context.Context, ownerSignal core.SignalAsync, catalogCl
 }
 
 func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore.TaskExecutionIdentifier,
-	cacheVersion string, taskInterface idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
+	cacheVersion string, cacheIgnoreInputVars []string, taskInterface idlCore.TypedInterface, whichTasksToCache *bitarray.BitSet,
 	inputReaders []io.InputReader, outputReaders []io.OutputReader) ([]catalog.UploadRequest, error) {
 
 	writerWorkItems := make([]catalog.UploadRequest, 0, len(inputReaders))
@@ -355,10 +355,11 @@ func ConstructCatalogUploadRequests(keyID idlCore.Identifier, taskExecID idlCore
 
 		wi := catalog.UploadRequest{
 			Key: catalog.Key{
-				Identifier:     keyID,
-				InputReader:    input,
-				CacheVersion:   cacheVersion,
-				TypedInterface: taskInterface,
+				Identifier:           keyID,
+				InputReader:          input,
+				CacheVersion:         cacheVersion,
+				CacheIgnoreInputVars: cacheIgnoreInputVars,
+				TypedInterface:       taskInterface,
 			},
 			ArtifactData: outputReaders[idx],
 			ArtifactMetadata: catalog.Metadata{

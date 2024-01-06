@@ -17,5 +17,7 @@ type CoreLiteral struct {
 	Collection *CoreLiteralCollection `json:"collection,omitempty"`
 	// A map of strings to literals.
 	Map_ *CoreLiteralMap `json:"map,omitempty"`
-	Hash string          `json:"hash,omitempty"`
+	Hash string `json:"hash,omitempty"`
+	// Additional metadata for literals.
+	Metadata map[string]string `json:"metadata,omitempty"`
 }

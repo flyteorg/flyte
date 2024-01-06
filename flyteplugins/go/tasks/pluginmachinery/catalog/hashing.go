@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/base64"
 
+	"k8s.io/utils/strings/slices"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 )
@@ -55,7 +57,7 @@ func hashify(literal *core.Literal) *core.Literal {
 	return literal
 }
 
-func HashInputData(ctx context.Context, inputData *core.InputData) (string, error) {
+func HashInputData(ctx context.Context, inputData *core.InputData, cacheIgnoreInputVars []string) (string, error) {
 	// TODO (haytham): We should hash everything in the inputData proto.
 	literalMap := inputData.GetInputs()
 	if literalMap == nil || len(literalMap.GetLiterals()) == 0 {
@@ -66,7 +68,9 @@ func HashInputData(ctx context.Context, inputData *core.InputData) (string, erro
 	// in case the corresponding hash is set.
 	hashifiedLiteralMap := make(map[string]*core.Literal, len(literalMap.Literals))
 	for name, literal := range literalMap.Literals {
-		hashifiedLiteralMap[name] = hashify(literal)
+		if !slices.Contains(cacheIgnoreInputVars, name) {
+			hashifiedLiteralMap[name] = hashify(literal)
+		}
 	}
 
 	hashifiedInputs := &core.LiteralMap{

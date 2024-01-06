@@ -10,6 +10,6 @@
 package flyteadmin
 
 type AdminWorkflowCreateRequest struct {
-	Id   *CoreIdentifier    `json:"id,omitempty"`
+	Id *CoreIdentifier `json:"id,omitempty"`
 	Spec *AdminWorkflowSpec `json:"spec,omitempty"`
 }

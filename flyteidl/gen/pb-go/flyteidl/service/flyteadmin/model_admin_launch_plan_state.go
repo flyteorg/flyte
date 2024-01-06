@@ -8,12 +8,11 @@
  */
 
 package flyteadmin
-
 // AdminLaunchPlanState : By default any launch plan regardless of state can be used to launch a workflow execution. However, at most one version of a launch plan (e.g. a NamedEntityIdentifier set of shared project, domain and name values) can be active at a time in regards to *schedules*. That is, at most one schedule in a NamedEntityIdentifier group will be observed and trigger executions at a defined cadence.
 type AdminLaunchPlanState string
 
 // List of adminLaunchPlanState
 const (
 	AdminLaunchPlanStateINACTIVE AdminLaunchPlanState = "INACTIVE"
-	AdminLaunchPlanStateACTIVE   AdminLaunchPlanState = "ACTIVE"
+	AdminLaunchPlanStateACTIVE AdminLaunchPlanState = "ACTIVE"
 )

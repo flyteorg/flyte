@@ -37,18 +37,24 @@ type MockPlugin struct {
 	Plugin
 }
 
-type MockClient struct {
+type MockAsyncTask struct {
 }
 
-func (m *MockClient) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+type MockSyncTask struct {
+}
+
+func (m *MockAsyncTask) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
 	expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "fake://bucket/prefix/nhv"}
 	if slices.Equal(createTaskRequest.Template.GetContainer().Args, expectedArgs) {
 		return nil, fmt.Errorf("args not as expected")
 	}
-	return &admin.CreateTaskResponse{ResourceMeta: []byte{1, 2, 3, 4}}, nil
+	return &admin.CreateTaskResponse{
+		Res: &admin.CreateTaskResponse_ResourceMeta{
+			ResourceMeta: []byte{1, 2, 3, 4},
+		}}, nil
 }
 
-func (m *MockClient) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+func (m *MockAsyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
 	if req.GetTaskType() == "bigquery_query_job_task" {
 		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.OutputData{
 			Outputs: &flyteIdlCore.LiteralMap{
@@ -61,15 +67,50 @@ func (m *MockClient) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...
 	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
 }
 
-func (m *MockClient) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+func (m *MockAsyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
 	return &admin.DeleteTaskResponse{}, nil
 }
 
-func mockGetClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return &MockClient{}, nil
+func (m *MockSyncTask) CreateTask(_ context.Context, createTaskRequest *admin.CreateTaskRequest, _ ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
+	return &admin.CreateTaskResponse{
+		Res: &admin.CreateTaskResponse_Resource{
+			Resource: &admin.Resource{
+				State: admin.State_SUCCEEDED,
+				Outputs: &flyteIdlCore.LiteralMap{
+					Literals: map[string]*flyteIdlCore.Literal{},
+				},
+				Message:  "Sync task finished",
+				LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+			},
+		},
+	}, nil
+
 }
 
-func mockGetBadClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+func (m *MockSyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
+	if req.GetTaskType() == "fake_task" {
+		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
+			Literals: map[string]*flyteIdlCore.Literal{
+				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+			},
+		}}}, nil
+	}
+	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
+}
+
+func (m *MockSyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest, _ ...grpc.CallOption) (*admin.DeleteTaskResponse, error) {
+	return &admin.DeleteTaskResponse{}, nil
+}
+
+func mockAsyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	return &MockAsyncTask{}, nil
+}
+
+func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+	return &MockSyncTask{}, nil
+}
+
+func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 	return nil, fmt.Errorf("error")
 }
 
@@ -134,7 +175,7 @@ func TestEndToEnd(t *testing.T) {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					getClient:   mockGetBadClientFunc,
+					getClient:   mockGetBadAsyncClientFunc,
 				},
 			}, nil
 		}
@@ -165,7 +206,7 @@ func TestEndToEnd(t *testing.T) {
 		tr.OnRead(context.Background()).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnTaskReader().Return(tr)
 
-		agentPlugin := newAgentPlugin()
+		agentPlugin := newMockAgentPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test3"))
 		assert.NoError(t, err)
@@ -238,6 +279,11 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	})
 	tMeta := &pluginCoreMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
+	tMeta.OnGetNamespace().Return("test-namespace")
+	tMeta.OnGetLabels().Return(map[string]string{"foo": "bar"})
+	tMeta.OnGetAnnotations().Return(map[string]string{"foo": "bar"})
+	tMeta.OnGetK8sServiceAccount().Return("k8s-account")
+	tMeta.OnGetEnvironmentVariables().Return(map[string]string{"foo": "bar"})
 	resourceManager := &pluginCoreMocks.ResourceManager{}
 	resourceManager.OnAllocateResourceMatch(mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(pluginCore.AllocationStatusGranted, nil)
 	resourceManager.OnReleaseResourceMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
@@ -263,13 +309,29 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 func newMockAgentPlugin() webapi.PluginEntry {
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
-		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job"},
+		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &MockPlugin{
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					getClient:   mockGetClientFunc,
+					getClient:   mockAsyncTaskClientFunc,
+				},
+			}, nil
+		},
+	}
+}
+
+func newMockSyncAgentPlugin() webapi.PluginEntry {
+	return webapi.PluginEntry{
+		ID:                 "agent-service",
+		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			return &MockPlugin{
+				Plugin{
+					metricScope: iCtx.MetricsScope(),
+					cfg:         GetConfig(),
+					getClient:   mockSyncTaskClientFunc,
 				},
 			}, nil
 		},

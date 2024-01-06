@@ -5,11 +5,10 @@ package admin
 
 import (
 	fmt "fmt"
-	math "math"
-
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	proto "github.com/golang/protobuf/proto"
 	timestamp "github.com/golang/protobuf/ptypes/timestamp"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

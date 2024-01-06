@@ -5,6 +5,7 @@ from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.core import security_pb2 as _security_pb2
 from flyteidl.admin import schedule_pb2 as _schedule_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
+from google.protobuf import any_pb2 as _any_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import wrappers_pb2 as _wrappers_pb2
 from google.protobuf.internal import containers as _containers
@@ -113,12 +114,14 @@ class LaunchPlanClosure(_message.Message):
     def __init__(self, state: _Optional[_Union[LaunchPlanState, str]] = ..., expected_inputs: _Optional[_Union[_interface_pb2.ParameterMap, _Mapping]] = ..., expected_outputs: _Optional[_Union[_interface_pb2.VariableMap, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
 
 class LaunchPlanMetadata(_message.Message):
-    __slots__ = ["schedule", "notifications"]
+    __slots__ = ["schedule", "notifications", "launch_conditions"]
     SCHEDULE_FIELD_NUMBER: _ClassVar[int]
     NOTIFICATIONS_FIELD_NUMBER: _ClassVar[int]
+    LAUNCH_CONDITIONS_FIELD_NUMBER: _ClassVar[int]
     schedule: _schedule_pb2.Schedule
     notifications: _containers.RepeatedCompositeFieldContainer[_common_pb2.Notification]
-    def __init__(self, schedule: _Optional[_Union[_schedule_pb2.Schedule, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ...) -> None: ...
+    launch_conditions: _any_pb2.Any
+    def __init__(self, schedule: _Optional[_Union[_schedule_pb2.Schedule, _Mapping]] = ..., notifications: _Optional[_Iterable[_Union[_common_pb2.Notification, _Mapping]]] = ..., launch_conditions: _Optional[_Union[_any_pb2.Any, _Mapping]] = ...) -> None: ...
 
 class LaunchPlanUpdateRequest(_message.Message):
     __slots__ = ["id", "state"]

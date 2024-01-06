@@ -485,6 +485,9 @@ pub struct Literal {
     /// (<https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md>)
     #[prost(string, tag="4")]
     pub hash: ::prost::alloc::string::String,
+    /// Additional metadata for literals.
+    #[prost(map="string, string", tag="5")]
+    pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     #[prost(oneof="literal::Value", tags="1, 2, 3")]
     pub value: ::core::option::Option<literal::Value>,
 }
@@ -722,6 +725,138 @@ impl ResourceType {
         }
     }
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactKey {
+    /// Project and domain and suffix needs to be unique across a given artifact store.
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub name: ::prost::alloc::string::String,
+}
+/// Only valid for triggers
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactBindingData {
+    #[prost(uint32, tag="1")]
+    pub index: u32,
+    /// These two fields are only relevant in the partition value case
+    #[prost(string, tag="2")]
+    pub partition_key: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub transform: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InputBindingData {
+    #[prost(string, tag="1")]
+    pub var: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LabelValue {
+    #[prost(oneof="label_value::Value", tags="1, 2, 3")]
+    pub value: ::core::option::Option<label_value::Value>,
+}
+/// Nested message and enum types in `LabelValue`.
+pub mod label_value {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Value {
+        #[prost(string, tag="1")]
+        StaticValue(::prost::alloc::string::String),
+        #[prost(message, tag="2")]
+        TriggeredBinding(super::ArtifactBindingData),
+        #[prost(message, tag="3")]
+        InputBinding(super::InputBindingData),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Partitions {
+    #[prost(map="string, message", tag="1")]
+    pub value: ::std::collections::HashMap<::prost::alloc::string::String, LabelValue>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactId {
+    #[prost(message, optional, tag="1")]
+    pub artifact_key: ::core::option::Option<ArtifactKey>,
+    #[prost(string, tag="2")]
+    pub version: ::prost::alloc::string::String,
+    /// Think of a partition as a tag on an Artifact, except it's a key-value pair.
+    /// Different partitions naturally have different versions (execution ids).
+    /// This is a oneof because of partition querying... we need a way to distinguish between
+    /// a user not-specifying partitions when searching, and specifically searching for an Artifact
+    /// that is not partitioned (this can happen if an Artifact goes from partitioned to non-
+    /// partitioned across executions).
+    #[prost(oneof="artifact_id::Dimensions", tags="3")]
+    pub dimensions: ::core::option::Option<artifact_id::Dimensions>,
+}
+/// Nested message and enum types in `ArtifactID`.
+pub mod artifact_id {
+    /// Think of a partition as a tag on an Artifact, except it's a key-value pair.
+    /// Different partitions naturally have different versions (execution ids).
+    /// This is a oneof because of partition querying... we need a way to distinguish between
+    /// a user not-specifying partitions when searching, and specifically searching for an Artifact
+    /// that is not partitioned (this can happen if an Artifact goes from partitioned to non-
+    /// partitioned across executions).
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Dimensions {
+        #[prost(message, tag="3")]
+        Partitions(super::Partitions),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactTag {
+    #[prost(message, optional, tag="1")]
+    pub artifact_key: ::core::option::Option<ArtifactKey>,
+    #[prost(message, optional, tag="2")]
+    pub value: ::core::option::Option<LabelValue>,
+}
+/// Uniqueness constraints for Artifacts
+///   - project, domain, name, version, partitions
+/// Option 2 (tags are standalone, point to an individual artifact id):
+///   - project, domain, name, alias (points to one partition if partitioned)
+///   - project, domain, name, partition key, partition value
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactQuery {
+    #[prost(oneof="artifact_query::Identifier", tags="1, 2, 3, 4")]
+    pub identifier: ::core::option::Option<artifact_query::Identifier>,
+}
+/// Nested message and enum types in `ArtifactQuery`.
+pub mod artifact_query {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Identifier {
+        #[prost(message, tag="1")]
+        ArtifactId(super::ArtifactId),
+        #[prost(message, tag="2")]
+        ArtifactTag(super::ArtifactTag),
+        #[prost(string, tag="3")]
+        Uri(::prost::alloc::string::String),
+        /// This is used in the trigger case, where a user specifies a value for an input that is one of the triggering
+        /// artifacts, or a partition value derived from a triggering artifact.
+        #[prost(message, tag="4")]
+        Binding(super::ArtifactBindingData),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Trigger {
+    /// This will be set to a launch plan type, but note that this is different than the actual launch plan type.
+    #[prost(message, optional, tag="1")]
+    pub trigger_id: ::core::option::Option<Identifier>,
+    /// These are partial artifact IDs that will be triggered on
+    /// Consider making these ArtifactQuery instead.
+    #[prost(message, repeated, tag="2")]
+    pub triggers: ::prost::alloc::vec::Vec<ArtifactId>,
+}
 /// Defines a strongly typed variable.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -732,6 +867,12 @@ pub struct Variable {
     /// +optional string describing input variable
     #[prost(string, tag="2")]
     pub description: ::prost::alloc::string::String,
+    /// +optional This object allows the user to specify how Artifacts are created.
+    /// name, tag, partitions can be specified. The other fields (version and project/domain) are ignored.
+    #[prost(message, optional, tag="3")]
+    pub artifact_partial_id: ::core::option::Option<ArtifactId>,
+    #[prost(message, optional, tag="4")]
+    pub artifact_tag: ::core::option::Option<ArtifactTag>,
 }
 /// A map of Variables
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -759,7 +900,7 @@ pub struct Parameter {
     #[prost(message, optional, tag="1")]
     pub var: ::core::option::Option<Variable>,
     /// +optional
-    #[prost(oneof="parameter::Behavior", tags="2, 3")]
+    #[prost(oneof="parameter::Behavior", tags="2, 3, 4, 5")]
     pub behavior: ::core::option::Option<parameter::Behavior>,
 }
 /// Nested message and enum types in `Parameter`.
@@ -774,6 +915,12 @@ pub mod parameter {
         /// +optional, is this value required to be filled.
         #[prost(bool, tag="3")]
         Required(bool),
+        /// This is an execution time search basically that should result in exactly one Artifact with a Type that
+        /// matches the type of the variable.
+        #[prost(message, tag="4")]
+        ArtifactQuery(super::ArtifactQuery),
+        #[prost(message, tag="5")]
+        ArtifactId(super::ArtifactId),
     }
 }
 /// A map of Parameters.
@@ -1152,6 +1299,9 @@ pub struct TaskMetadata {
     /// identically as, the default PodTemplate configured in FlytePropeller.
     #[prost(string, tag="12")]
     pub pod_template_name: ::prost::alloc::string::String,
+    /// cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+    #[prost(string, repeated, tag="13")]
+    pub cache_ignore_input_vars: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being

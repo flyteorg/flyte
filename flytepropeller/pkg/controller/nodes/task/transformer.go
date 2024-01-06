@@ -44,6 +44,8 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 		return core.TaskExecution_FAILED
 	case pluginCore.PhaseRetryableFailure:
 		return core.TaskExecution_FAILED
+	case pluginCore.PhaseAborted:
+		return core.TaskExecution_ABORTED
 	case pluginCore.PhaseNotReady:
 		fallthrough
 	case pluginCore.PhaseUndefined:
@@ -117,13 +119,14 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 
 		metadata.ExternalResources = make([]*event.ExternalResourceInfo, len(externalResources))
 		for idx, e := range input.Info.Info().ExternalResources {
+			phase := ToTaskEventPhase(e.Phase)
 			metadata.ExternalResources[idx] = &event.ExternalResourceInfo{
 				ExternalId:   e.ExternalID,
 				CacheStatus:  e.CacheStatus,
 				Index:        e.Index,
 				Logs:         e.Logs,
 				RetryAttempt: e.RetryAttempt,
-				Phase:        ToTaskEventPhase(e.Phase),
+				Phase:        phase,
 			}
 		}
 	}
