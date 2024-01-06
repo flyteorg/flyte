@@ -425,7 +425,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			gatherOutputsRequest := &gatherOutputsRequest{
 				ctx: ctx,
 				responseChannel: make(chan struct {
-					literalMap map[string]*idlcore.Literal
+					outputData *idlcore.OutputData
 					error
 				}, 1),
 			}
@@ -437,7 +437,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				if err != nil {
 					// Should never happen
 					gatherOutputsRequest.responseChannel <- struct {
-						literalMap map[string]*idlcore.Literal
+						outputData *idlcore.OutputData
 						error
 					}{nil, err}
 					continue
@@ -450,9 +450,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				}
 
 				gatherOutputsRequest.responseChannel <- struct {
-					literalMap map[string]*idlcore.Literal
+					outputData *idlcore.OutputData
 					error
-				}{outputLiterals, nil}
+				}{&idlcore.OutputData{Outputs: &idlcore.LiteralMap{Literals: outputLiterals}}, nil}
 			} else {
 				// initialize subNode reader
 				currentAttempt := int(arrayNodeState.SubNodeRetryAttempts.GetItem(i))
@@ -460,7 +460,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					strconv.Itoa(i), strconv.Itoa(currentAttempt))
 				if err != nil {
 					gatherOutputsRequest.responseChannel <- struct {
-						literalMap map[string]*idlcore.Literal
+						outputData *idlcore.OutputData
 						error
 					}{nil, err}
 					continue
@@ -488,7 +488,7 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 			}
 
 			// append literal for all output variables
-			for name, literal := range outputResponse.literalMap {
+			for name, literal := range outputResponse.outputData.GetOutputs().GetLiterals() {
 				appendLiteral(name, literal, outputLiterals, len(arrayNodeState.SubNodePhases.GetItems()))
 			}
 		}
