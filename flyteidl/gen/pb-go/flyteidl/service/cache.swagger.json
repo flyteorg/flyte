@@ -15,46 +15,6 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/cache/executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
-      "delete": {
-        "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.",
-        "operationId": "EvictExecutionCache",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/serviceEvictCacheResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "workflow_execution_id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "workflow_execution_id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "workflow_execution_id.name",
-            "description": "User or system provided value for the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "CacheService"
-        ]
-      }
-    },
     "/api/v1/cache/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "delete": {
         "summary": "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.",

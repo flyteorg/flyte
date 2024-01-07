@@ -12,25 +12,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-func (s *CacheService) EvictExecutionCache(ctx context.Context, req *service.EvictExecutionCacheRequest) (*service.EvictCacheResponse, error) {
-	defer s.interceptPanic(ctx, req)
-	if req == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
-
-	var resp *service.EvictCacheResponse
-	var err error
-	s.Metrics.cacheEndpointMetrics.evictExecution.Time(func() {
-		resp, err = s.CacheManager.EvictExecutionCache(ctx, *req)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &s.Metrics.cacheEndpointMetrics.evictExecution)
-	}
-	s.Metrics.cacheEndpointMetrics.evictExecution.Success()
-
-	return resp, nil
-}
-
 func (s *CacheService) EvictTaskExecutionCache(ctx context.Context, req *service.EvictTaskExecutionCacheRequest) (*service.EvictCacheResponse, error) {
 	defer s.interceptPanic(ctx, req)
 	if req == nil {

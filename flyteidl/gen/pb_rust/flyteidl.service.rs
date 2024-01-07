@@ -75,13 +75,6 @@ pub struct PublicClientAuthConfigResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct EvictExecutionCacheRequest {
-    /// Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for.
-    #[prost(message, optional, tag="1")]
-    pub workflow_execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct EvictTaskExecutionCacheRequest {
     /// Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for.
     #[prost(message, optional, tag="1")]

@@ -15,11 +15,6 @@ class CacheServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.EvictExecutionCache = channel.unary_unary(
-                '/flyteidl.service.CacheService/EvictExecutionCache',
-                request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
-                )
         self.EvictTaskExecutionCache = channel.unary_unary(
                 '/flyteidl.service.CacheService/EvictTaskExecutionCache',
                 request_serializer=flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.SerializeToString,
@@ -31,13 +26,6 @@ class CacheServiceServicer(object):
     """CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
     """
 
-    def EvictExecutionCache(self, request, context):
-        """Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
     def EvictTaskExecutionCache(self, request, context):
         """Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`.
         """
@@ -48,11 +36,6 @@ class CacheServiceServicer(object):
 
 def add_CacheServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'EvictExecutionCache': grpc.unary_unary_rpc_method_handler(
-                    servicer.EvictExecutionCache,
-                    request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.FromString,
-                    response_serializer=flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.SerializeToString,
-            ),
             'EvictTaskExecutionCache': grpc.unary_unary_rpc_method_handler(
                     servicer.EvictTaskExecutionCache,
                     request_deserializer=flyteidl_dot_service_dot_cache__pb2.EvictTaskExecutionCacheRequest.FromString,
@@ -68,23 +51,6 @@ def add_CacheServiceServicer_to_server(servicer, server):
 class CacheService(object):
     """CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
     """
-
-    @staticmethod
-    def EvictExecutionCache(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.CacheService/EvictExecutionCache',
-            flyteidl_dot_service_dot_cache__pb2.EvictExecutionCacheRequest.SerializeToString,
-            flyteidl_dot_service_dot_cache__pb2.EvictCacheResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
     def EvictTaskExecutionCache(request,

@@ -52,39 +52,6 @@ type CacheManager struct {
 	metrics       cacheMetrics
 }
 
-func (m *CacheManager) EvictExecutionCache(ctx context.Context, req service.EvictExecutionCacheRequest) (*service.EvictCacheResponse, error) {
-	if err := validation.ValidateWorkflowExecutionIdentifier(req.GetWorkflowExecutionId()); err != nil {
-		logger.Debugf(ctx, "EvictExecutionCache request [%+v] failed validation with err: %v", req, err)
-		return nil, err
-	}
-
-	ctx = getExecutionContext(ctx, req.WorkflowExecutionId)
-
-	executionModel, err := util.GetExecutionModel(ctx, m.db, *req.WorkflowExecutionId)
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow execution model for workflow execution ID %+v: %v", req.WorkflowExecutionId, err)
-		return nil, err
-	}
-
-	logger.Debugf(ctx, "Starting to evict cache for execution %d of workflow %+v", executionModel.ID, req.WorkflowExecutionId)
-
-	nodeExecutions, err := m.listAllNodeExecutionsForWorkflow(ctx, req.WorkflowExecutionId, "")
-	if err != nil {
-		logger.Debugf(ctx, "Failed to list all node executions for execution %d of workflow %+v: %v", executionModel.ID, req.WorkflowExecutionId, err)
-		return nil, err
-	}
-
-	var evictionErrors []*core.CacheEvictionError
-	for _, nodeExecution := range nodeExecutions {
-		evictionErrors = m.evictNodeExecutionCache(ctx, nodeExecution, evictionErrors)
-	}
-
-	logger.Debugf(ctx, "Finished evicting cache for execution %d of workflow %+v", executionModel.ID, req.WorkflowExecutionId)
-	return &service.EvictCacheResponse{
-		Errors: &core.CacheEvictionErrorList{Errors: evictionErrors},
-	}, nil
-}
-
 func (m *CacheManager) EvictTaskExecutionCache(ctx context.Context, req service.EvictTaskExecutionCacheRequest) (*service.EvictCacheResponse, error) {
 	if err := validation.ValidateTaskExecutionIdentifier(req.GetTaskExecutionId()); err != nil {
 		logger.Debugf(ctx, "EvictTaskExecutionCache request [%+v] failed validation with err: %v", req, err)
