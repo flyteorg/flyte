@@ -667,7 +667,7 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	response, err := execManager.CreateExecution(ctx, request, requestedAt)
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionDatabaseFailure(t *testing.T) {
