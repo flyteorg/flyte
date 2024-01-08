@@ -3,7 +3,7 @@ name: Publish flyteidl Buf Package
 on:
   push:
     branches:
-      - artifacts-shell-2
+      - artifacts-shell-3
       - artifacts
       - master
     paths:
