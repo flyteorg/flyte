@@ -87,8 +87,8 @@ func NewArtifactRegistry(ctx context.Context, connCfg *admin2.Config, _ ...grpc.
 			client: nil,
 		}
 	}
-	var cfg = connCfg
-	clients, err := admin2.NewClientsetBuilder().WithConfig(cfg).Build(ctx)
+
+	clients, err := admin2.NewClientsetBuilder().WithConfig(connCfg).Build(ctx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create Artifact client")
 		// too many calls to this function to update, just panic for now.
