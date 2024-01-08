@@ -54,12 +54,16 @@ func TestTrackingBitExtract(t *testing.T) {
 		},
 	}
 
-	trackers := execManager.ExtractArtifactKeys(&lit)
+	var trackers = make(map[string]string)
+	execManager.ExtractArtifactTrackers(trackers, &lit)
 	assert.Equal(t, 1, len(trackers))
 
-	trackers = execManager.ExtractArtifactKeys(&core.Literal{Value: &core.Literal_Map{Map: &inputMap}})
+	trackers = make(map[string]string)
+	execManager.ExtractArtifactTrackers(trackers, &core.Literal{Value: &core.Literal_Map{Map: &inputMap}})
 	assert.Equal(t, 1, len(trackers))
-	trackers = execManager.ExtractArtifactKeys(&core.Literal{Value: &core.Literal_Collection{Collection: &inputColl}})
+
+	trackers = make(map[string]string)
+	execManager.ExtractArtifactTrackers(trackers, &core.Literal{Value: &core.Literal_Collection{Collection: &inputColl}})
 	assert.Equal(t, 1, len(trackers))
-	assert.Equal(t, "proj/domain/name@version", trackers[0])
+	assert.Equal(t, "", trackers["proj/domain/name@version"])
 }
