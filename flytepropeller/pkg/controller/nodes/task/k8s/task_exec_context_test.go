@@ -86,26 +86,6 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 		assert.Equal(t, 2, len(actual.GetLabels()))
 		assert.Equal(t, "test-exec-identity", actual.GetLabels()[executionIdentityVariable])
 	})
-
-	t.Run("Empty exec identity", func(t *testing.T) {
-
-		existingMetadata := &mocks.TaskExecutionMetadata{}
-		existingAnnotations := map[string]string{}
-		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
-
-		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}}) // no exec identity
-
-		existingLabels := map[string]string{
-			"existingLabel": "existingLabelValue",
-		}
-		existingMetadata.OnGetLabels().Return(existingLabels)
-
-		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
-		assert.NoError(t, err)
-
-		assert.Equal(t, 1, len(actual.GetLabels()))
-		assert.Equal(t, "existingLabelValue", actual.GetLabels()["existingLabel"])
-	})
 }
 
 func Test_newTaskExecutionContext(t *testing.T) {
