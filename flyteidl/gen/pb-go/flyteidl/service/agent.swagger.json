@@ -568,13 +568,14 @@
       "properties": {
         "metric": {
           "type": "string",
-          "title": "The metric this data represents"
+          "description": "The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG."
         },
         "data": {
           "$ref": "#/definitions/protobufStruct",
           "title": "The result data in prometheus range query result format\nhttps://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.\nThis may include multiple time series, differentiated by their metric labels.\nStart time is greater of (execution attempt start, 48h ago)\nEnd time is lesser of (execution attempt end, now)"
         }
-      }
+      },
+      "description": "ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task."
     },
     "coreExtendedResources": {
       "type": "object",

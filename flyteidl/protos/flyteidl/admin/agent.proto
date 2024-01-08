@@ -136,6 +136,7 @@ message GetTaskMetricsRequest {
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 2;
   // The metrics to query. If empty, will return a default set of metrics.
+  // e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
   repeated string queries = 3;
   // Start timestamp, inclusive.
   google.protobuf.Timestamp start_time = 4;

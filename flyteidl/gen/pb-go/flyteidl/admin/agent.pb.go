@@ -758,6 +758,7 @@ type GetTaskMetricsRequest struct {
 	// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
 	ResourceMeta []byte `protobuf:"bytes,2,opt,name=resource_meta,json=resourceMeta,proto3" json:"resource_meta,omitempty"`
 	// The metrics to query. If empty, will return a default set of metrics.
+	// e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
 	Queries []string `protobuf:"bytes,3,rep,name=queries,proto3" json:"queries,omitempty"`
 	// Start timestamp, inclusive.
 	StartTime *timestamp.Timestamp `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`

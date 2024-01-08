@@ -2065,10 +2065,11 @@ pub mod span {
         OperationId(::prost::alloc::string::String),
     }
 }
+/// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionMetricResult {
-    /// The metric this data represents
+    /// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
     #[prost(string, tag="1")]
     pub metric: ::prost::alloc::string::String,
     /// The result data in prometheus range query result format

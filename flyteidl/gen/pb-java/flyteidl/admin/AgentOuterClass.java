@@ -12057,6 +12057,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12066,6 +12067,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12074,6 +12076,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12082,6 +12085,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12365,6 +12369,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12376,6 +12381,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12386,6 +12392,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -12396,6 +12403,7 @@ public final class AgentOuterClass {
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
      * </pre>
      *
      * <code>repeated string queries = 3;</code>
@@ -13095,6 +13103,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13106,6 +13115,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13116,6 +13126,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13126,6 +13137,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13137,6 +13149,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13154,6 +13167,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13171,6 +13185,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13186,6 +13201,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>
@@ -13199,6 +13215,7 @@ public final class AgentOuterClass {
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
        * </pre>
        *
        * <code>repeated string queries = 3;</code>

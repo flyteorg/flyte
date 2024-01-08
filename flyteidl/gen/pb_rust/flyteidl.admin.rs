@@ -167,6 +167,7 @@ pub struct GetTaskMetricsRequest {
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// The metrics to query. If empty, will return a default set of metrics.
+    /// e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
     #[prost(string, repeated, tag="3")]
     pub queries: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// Start timestamp, inclusive.

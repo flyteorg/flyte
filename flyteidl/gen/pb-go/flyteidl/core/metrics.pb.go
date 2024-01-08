@@ -162,8 +162,9 @@ func (*Span) XXX_OneofWrappers() []interface{} {
 	}
 }
 
+// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
 type ExecutionMetricResult struct {
-	// The metric this data represents
+	// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
 	Metric string `protobuf:"bytes,1,opt,name=metric,proto3" json:"metric,omitempty"`
 	// The result data in prometheus range query result format
 	// https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.

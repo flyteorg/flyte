@@ -2535,7 +2535,7 @@ public final class Metrics {
 
     /**
      * <pre>
-     * The metric this data represents
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
      * </pre>
      *
      * <code>string metric = 1;</code>
@@ -2543,7 +2543,7 @@ public final class Metrics {
     java.lang.String getMetric();
     /**
      * <pre>
-     * The metric this data represents
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
      * </pre>
      *
      * <code>string metric = 1;</code>
@@ -2589,6 +2589,10 @@ public final class Metrics {
     com.google.protobuf.StructOrBuilder getDataOrBuilder();
   }
   /**
+   * <pre>
+   * ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+   * </pre>
+   *
    * Protobuf type {@code flyteidl.core.ExecutionMetricResult}
    */
   public  static final class ExecutionMetricResult extends
@@ -2683,7 +2687,7 @@ public final class Metrics {
     private volatile java.lang.Object metric_;
     /**
      * <pre>
-     * The metric this data represents
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
      * </pre>
      *
      * <code>string metric = 1;</code>
@@ -2702,7 +2706,7 @@ public final class Metrics {
     }
     /**
      * <pre>
-     * The metric this data represents
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
      * </pre>
      *
      * <code>string metric = 1;</code>
@@ -2937,6 +2941,10 @@ public final class Metrics {
       return builder;
     }
     /**
+     * <pre>
+     * ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+     * </pre>
+     *
      * Protobuf type {@code flyteidl.core.ExecutionMetricResult}
      */
     public static final class Builder extends
@@ -3101,7 +3109,7 @@ public final class Metrics {
       private java.lang.Object metric_ = "";
       /**
        * <pre>
-       * The metric this data represents
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
        * </pre>
        *
        * <code>string metric = 1;</code>
@@ -3120,7 +3128,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * The metric this data represents
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
        * </pre>
        *
        * <code>string metric = 1;</code>
@@ -3140,7 +3148,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * The metric this data represents
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
        * </pre>
        *
        * <code>string metric = 1;</code>
@@ -3157,7 +3165,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * The metric this data represents
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
        * </pre>
        *
        * <code>string metric = 1;</code>
@@ -3170,7 +3178,7 @@ public final class Metrics {
       }
       /**
        * <pre>
-       * The metric this data represents
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
        * </pre>
        *
        * <code>string metric = 1;</code>
