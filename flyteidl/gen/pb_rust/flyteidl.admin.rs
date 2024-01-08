@@ -2961,6 +2961,18 @@ pub mod create_workflow_failure_reason {
         ExistsIdenticalStructure(super::WorkflowErrorExistsIdenticalStructure),
     }
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDynamicNodeWorkflowRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DynamicNodeWorkflowResponse {
+    #[prost(message, optional, tag="1")]
+    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
+}
 /// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
 #[allow(clippy::derive_partial_eq_without_eq)]

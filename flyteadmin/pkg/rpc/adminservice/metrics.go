@@ -92,10 +92,11 @@ type taskExecutionEndpointMetrics struct {
 type workflowEndpointMetrics struct {
 	scope promutils.Scope
 
-	create  util.RequestMetrics
-	get     util.RequestMetrics
-	list    util.RequestMetrics
-	listIds util.RequestMetrics
+	create                 util.RequestMetrics
+	get                    util.RequestMetrics
+	list                   util.RequestMetrics
+	listIds                util.RequestMetrics
+	getDynamicNodeWorkflow util.RequestMetrics
 }
 
 type descriptionEntityEndpointMetrics struct {
@@ -212,11 +213,12 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			list:        util.NewRequestMetrics(adminScope, "list_task_execution"),
 		},
 		workflowEndpointMetrics: workflowEndpointMetrics{
-			scope:   adminScope,
-			create:  util.NewRequestMetrics(adminScope, "create_workflow"),
-			get:     util.NewRequestMetrics(adminScope, "get_workflow"),
-			list:    util.NewRequestMetrics(adminScope, "list_workflow"),
-			listIds: util.NewRequestMetrics(adminScope, "list_workflow_ids"),
+			scope:                  adminScope,
+			create:                 util.NewRequestMetrics(adminScope, "create_workflow"),
+			get:                    util.NewRequestMetrics(adminScope, "get_workflow"),
+			list:                   util.NewRequestMetrics(adminScope, "list_workflow"),
+			listIds:                util.NewRequestMetrics(adminScope, "list_workflow_ids"),
+			getDynamicNodeWorkflow: util.NewRequestMetrics(adminScope, "get_dynamic_node_workflow"),
 		},
 
 		descriptionEntityMetrics: descriptionEntityEndpointMetrics{

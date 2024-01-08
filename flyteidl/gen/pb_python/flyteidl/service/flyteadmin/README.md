@@ -82,6 +82,7 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**delete_workflow_attributes**](docs/AdminServiceApi.md#delete_workflow_attributes) | **DELETE** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
 *AdminServiceApi* | [**get_active_launch_plan**](docs/AdminServiceApi.md#get_active_launch_plan) | **GET** /api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
 *AdminServiceApi* | [**get_description_entity**](docs/AdminServiceApi.md#get_description_entity) | **GET** /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+*AdminServiceApi* | [**get_dynamic_node_workflow**](docs/AdminServiceApi.md#get_dynamic_node_workflow) | **GET** /api/v1/dynamic_node_workflow/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
 *AdminServiceApi* | [**get_execution**](docs/AdminServiceApi.md#get_execution) | **GET** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**get_execution_data**](docs/AdminServiceApi.md#get_execution_data) | **GET** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**get_execution_metrics**](docs/AdminServiceApi.md#get_execution_metrics) | **GET** /api/v1/metrics/executions/{id.project}/{id.domain}/{id.name} | Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
@@ -143,6 +144,7 @@ Class | Method | HTTP request | Description
  - [AdminDescriptionEntityList](docs/AdminDescriptionEntityList.md)
  - [AdminDescriptionFormat](docs/AdminDescriptionFormat.md)
  - [AdminDomain](docs/AdminDomain.md)
+ - [AdminDynamicNodeWorkflowResponse](docs/AdminDynamicNodeWorkflowResponse.md)
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
  - [AdminEnvs](docs/AdminEnvs.md)
  - [AdminExecution](docs/AdminExecution.md)

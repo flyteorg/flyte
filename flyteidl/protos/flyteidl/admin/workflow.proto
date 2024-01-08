@@ -90,3 +90,11 @@ message CreateWorkflowFailureReason {
         WorkflowErrorExistsIdenticalStructure exists_identical_structure = 2;
     }
 }
+
+message GetDynamicNodeWorkflowRequest {
+    core.NodeExecutionIdentifier id = 1;
+}
+
+message DynamicNodeWorkflowResponse {
+    core.CompiledWorkflowClosure compiled_workflow = 1;
+}

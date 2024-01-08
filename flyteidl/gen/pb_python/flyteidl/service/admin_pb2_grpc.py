@@ -60,6 +60,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.Workflow.FromString,
                 )
+        self.GetDynamicNodeWorkflow = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetDynamicNodeWorkflow',
+                request_serializer=flyteidl_dot_admin_dot_workflow__pb2.GetDynamicNodeWorkflowRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.DynamicNodeWorkflowResponse.FromString,
+                )
         self.ListWorkflowIds = channel.unary_unary(
                 '/flyteidl.service.AdminService/ListWorkflowIds',
                 request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
@@ -339,6 +344,13 @@ class AdminServiceServicer(object):
 
     def GetWorkflow(self, request, context):
         """Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetDynamicNodeWorkflow(self, request, context):
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -711,6 +723,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_workflow__pb2.Workflow.SerializeToString,
             ),
+            'GetDynamicNodeWorkflow': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDynamicNodeWorkflow,
+                    request_deserializer=flyteidl_dot_admin_dot_workflow__pb2.GetDynamicNodeWorkflowRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_workflow__pb2.DynamicNodeWorkflowResponse.SerializeToString,
+            ),
             'ListWorkflowIds': grpc.unary_unary_rpc_method_handler(
                     servicer.ListWorkflowIds,
                     request_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.FromString,
@@ -1057,6 +1074,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetWorkflow',
             flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.SerializeToString,
             flyteidl_dot_admin_dot_workflow__pb2.Workflow.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDynamicNodeWorkflow(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetDynamicNodeWorkflow',
+            flyteidl_dot_admin_dot_workflow__pb2.GetDynamicNodeWorkflowRequest.SerializeToString,
+            flyteidl_dot_admin_dot_workflow__pb2.DynamicNodeWorkflowResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

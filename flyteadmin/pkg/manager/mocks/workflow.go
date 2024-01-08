@@ -48,3 +48,7 @@ func (r *MockWorkflowManager) ListWorkflowIdentifiers(ctx context.Context, reque
 	*admin.NamedEntityIdentifierList, error) {
 	return nil, nil
 }
+
+func (r *MockWorkflowManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	return nil, nil
+}

@@ -8,6 +8,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -368,6 +369,69 @@ func TestGetWorkflow_TransformerError(t *testing.T) {
 	})
 	assert.Nil(t, workflow)
 	assert.Equal(t, codes.Internal, err.(adminErrors.FlyteAdminError).Code())
+}
+
+func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: remoteClosureIdentifier}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	expectedClosure := testutils.GetWorkflowClosure().CompiledWorkflow
+	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		assert.Equal(t, remoteClosureIdentifier, reference.String())
+		bytes, err := proto.Marshal(expectedClosure)
+		require.NoError(t, err)
+		return proto.Unmarshal(bytes, msg)
+	}
+	ctx := context.TODO()
+	workflowManager := NewWorkflowManager(repo, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(),
+		mockStorageClient, storagePrefix, mockScope.NewTestScope(),
+		artifacts.NewArtifactRegistry(ctx, nil))
+	expected := &admin.DynamicNodeWorkflowResponse{
+		CompiledWorkflow: expectedClosure,
+	}
+
+	resp, err := workflowManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+
+	assert.NoError(t, err)
+	assert.True(t, proto.Equal(expected, resp))
+}
+
+func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: ""}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	ctx := context.TODO()
+	workflowManager := NewWorkflowManager(repo, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(),
+		mockStorageClient, storagePrefix, mockScope.NewTestScope(),
+		artifacts.NewArtifactRegistry(ctx, nil))
+	expected := &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: nil}
+
+	resp, err := workflowManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+
+	assert.NoError(t, err)
+	assert.True(t, proto.Equal(expected, resp))
 }
 
 func TestListWorkflows(t *testing.T) {

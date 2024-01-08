@@ -113,6 +113,16 @@ service AdminService {
     // };
   }
 
+  // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
+  rpc GetDynamicNodeWorkflow (flyteidl.admin.GetDynamicNodeWorkflowRequest) returns (flyteidl.admin.DynamicNodeWorkflowResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/dynamic_node_workflow/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Retrieve a workflow closure from a dynamic node execution."
+    // };
+  }
+
   // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
   rpc ListWorkflowIds (flyteidl.admin.NamedEntityIdentifierListRequest) returns (flyteidl.admin.NamedEntityIdentifierList) {
     option (google.api.http) = {

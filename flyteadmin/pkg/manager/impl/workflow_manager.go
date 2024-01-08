@@ -361,6 +361,33 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 
 }
 
+func (w *WorkflowManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
+		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
+	}
+
+	ctx = getNodeExecutionContext(ctx, request.Id)
+	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, w.db, request.Id)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get node execution with id [%+v] with err %v",
+			request.Id, err)
+		return nil, err
+	}
+
+	if nodeExecutionModel.DynamicWorkflowRemoteClosureReference == "" {
+		return &admin.DynamicNodeWorkflowResponse{}, nil
+	}
+
+	closure := &core.CompiledWorkflowClosure{}
+	err = w.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecutionModel.DynamicWorkflowRemoteClosureReference), closure)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+			"Unable to read WorkflowClosure from location %s : %v", nodeExecutionModel.DynamicWorkflowRemoteClosureReference, err)
+	}
+
+	return &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: closure}, nil
+}
+
 func NewWorkflowManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration,

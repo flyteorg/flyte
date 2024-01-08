@@ -692,6 +692,52 @@
         ]
       }
     },
+    "/api/v1/dynamic_node_workflow/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.",
+        "operationId": "GetDynamicNodeWorkflow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDynamicNodeWorkflowResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/events/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
@@ -3695,6 +3741,14 @@
         }
       },
       "description": "Namespace within a project commonly used to differentiate between different service instances.\ne.g. \"production\", \"development\", etc."
+    },
+    "adminDynamicNodeWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "compiled_workflow": {
+          "$ref": "#/definitions/coreCompiledWorkflowClosure"
+        }
+      }
     },
     "adminEmailNotification": {
       "type": "object",
