@@ -15,7 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}": {
+    "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}": {
       "get": {
         "operationId": "GetArtifact3",
         "responses": {
@@ -124,7 +124,7 @@
         ]
       }
     },
-    "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}": {
+    "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}": {
       "get": {
         "operationId": "GetArtifact2",
         "responses": {
@@ -233,7 +233,7 @@
         ]
       }
     },
-    "/artifacts/api/v1/data/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}": {
+    "/artifacts/api/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}": {
       "get": {
         "operationId": "GetArtifact4",
         "responses": {
@@ -342,7 +342,7 @@
         ]
       }
     },
-    "/artifacts/api/v1/data/artifacts": {
+    "/artifacts/api/v1/artifacts": {
       "get": {
         "operationId": "GetArtifact",
         "responses": {
@@ -470,7 +470,7 @@
         ]
       }
     },
-    "/artifacts/api/v1/data/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}": {
+    "/artifacts/api/v1/search/execution/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}": {
       "get": {
         "operationId": "FindByWorkflowExec",
         "responses": {
@@ -519,7 +519,85 @@
         ]
       }
     },
-    "/artifacts/api/v1/data/query/s/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}": {
+    "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}": {
+      "get": {
+        "operationId": "SearchArtifacts2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactSearchArtifactsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "artifact_key.project",
+            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_key.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_key.name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "principal",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "options.strict_partitions",
+            "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition.",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "options.latest_by_key",
+            "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
+            "in": "query",
+            "required": false,
+            "type": "boolean",
+            "format": "boolean"
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
+    "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}": {
       "get": {
         "operationId": "SearchArtifacts",
         "responses": {
@@ -597,77 +675,25 @@
         ]
       }
     },
-    "/artifacts/api/v1/data/query/{artifact_key.project}/{artifact_key.domain}": {
-      "get": {
-        "operationId": "SearchArtifacts2",
+    "/artifacts/api/v1/trigger/deactivate": {
+      "patch": {
+        "operationId": "DeactivateTrigger",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/artifactSearchArtifactsResponse"
+              "$ref": "#/definitions/artifactDeactivateTriggerResponse"
             }
           }
         },
         "parameters": [
           {
-            "name": "artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
+            "name": "body",
+            "in": "body",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "artifact_key.name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "principal",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "options.strict_partitions",
-            "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "options.latest_by_key",
-            "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
+            "schema": {
+              "$ref": "#/definitions/artifactDeactivateTriggerRequest"
+            }
           }
         ],
         "tags": [
@@ -1190,7 +1216,15 @@
     "artifactCreateTriggerResponse": {
       "type": "object"
     },
-    "artifactDeleteTriggerResponse": {
+    "artifactDeactivateTriggerRequest": {
+      "type": "object",
+      "properties": {
+        "trigger_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        }
+      }
+    },
+    "artifactDeactivateTriggerResponse": {
       "type": "object"
     },
     "artifactExecutionInputsResponse": {
