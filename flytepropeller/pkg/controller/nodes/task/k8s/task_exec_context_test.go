@@ -21,6 +21,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 			"existingLabel": "existingLabelValue",
 		}
 		existingMetadata.OnGetLabels().Return(existingLabels)
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
 		assert.NoError(t, err)
@@ -40,6 +41,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 			"existingLabel": "existingLabelValue",
 		}
 		existingMetadata.OnGetLabels().Return(existingLabels)
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{
 			SecurityContext: &core.SecurityContext{
