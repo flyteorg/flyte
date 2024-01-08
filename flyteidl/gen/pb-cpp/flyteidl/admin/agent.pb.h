@@ -2089,15 +2089,27 @@ class GetTaskMetricsRequest final :
 
   // accessors -------------------------------------------------------
 
-  // repeated .flyteidl.core.ExecutionMetric metrics = 3;
-  int metrics_size() const;
-  void clear_metrics();
-  static const int kMetricsFieldNumber = 3;
-  ::flyteidl::core::ExecutionMetric metrics(int index) const;
-  void set_metrics(int index, ::flyteidl::core::ExecutionMetric value);
-  void add_metrics(::flyteidl::core::ExecutionMetric value);
-  const ::google::protobuf::RepeatedField<int>& metrics() const;
-  ::google::protobuf::RepeatedField<int>* mutable_metrics();
+  // repeated string queries = 3;
+  int queries_size() const;
+  void clear_queries();
+  static const int kQueriesFieldNumber = 3;
+  const ::std::string& queries(int index) const;
+  ::std::string* mutable_queries(int index);
+  void set_queries(int index, const ::std::string& value);
+  #if LANG_CXX11
+  void set_queries(int index, ::std::string&& value);
+  #endif
+  void set_queries(int index, const char* value);
+  void set_queries(int index, const char* value, size_t size);
+  ::std::string* add_queries();
+  void add_queries(const ::std::string& value);
+  #if LANG_CXX11
+  void add_queries(::std::string&& value);
+  #endif
+  void add_queries(const char* value);
+  void add_queries(const char* value, size_t size);
+  const ::google::protobuf::RepeatedPtrField<::std::string>& queries() const;
+  ::google::protobuf::RepeatedPtrField<::std::string>* mutable_queries();
 
   // string task_type = 1;
   void clear_task_type();
@@ -2159,8 +2171,7 @@ class GetTaskMetricsRequest final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedField<int> metrics_;
-  mutable std::atomic<int> _metrics_cached_byte_size_;
+  ::google::protobuf::RepeatedPtrField<::std::string> queries_;
   ::google::protobuf::internal::ArenaStringPtr task_type_;
   ::google::protobuf::internal::ArenaStringPtr resource_meta_;
   ::google::protobuf::Timestamp* start_time_;
@@ -3988,34 +3999,73 @@ inline void GetTaskMetricsRequest::set_allocated_resource_meta(::std::string* re
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.GetTaskMetricsRequest.resource_meta)
 }
 
-// repeated .flyteidl.core.ExecutionMetric metrics = 3;
-inline int GetTaskMetricsRequest::metrics_size() const {
-  return metrics_.size();
+// repeated string queries = 3;
+inline int GetTaskMetricsRequest::queries_size() const {
+  return queries_.size();
 }
-inline void GetTaskMetricsRequest::clear_metrics() {
-  metrics_.Clear();
+inline void GetTaskMetricsRequest::clear_queries() {
+  queries_.Clear();
 }
-inline ::flyteidl::core::ExecutionMetric GetTaskMetricsRequest::metrics(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskMetricsRequest.metrics)
-  return static_cast< ::flyteidl::core::ExecutionMetric >(metrics_.Get(index));
+inline const ::std::string& GetTaskMetricsRequest::queries(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.GetTaskMetricsRequest.queries)
+  return queries_.Get(index);
 }
-inline void GetTaskMetricsRequest::set_metrics(int index, ::flyteidl::core::ExecutionMetric value) {
-  metrics_.Set(index, value);
-  // @@protoc_insertion_point(field_set:flyteidl.admin.GetTaskMetricsRequest.metrics)
+inline ::std::string* GetTaskMetricsRequest::mutable_queries(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.GetTaskMetricsRequest.queries)
+  return queries_.Mutable(index);
 }
-inline void GetTaskMetricsRequest::add_metrics(::flyteidl::core::ExecutionMetric value) {
-  metrics_.Add(value);
-  // @@protoc_insertion_point(field_add:flyteidl.admin.GetTaskMetricsRequest.metrics)
+inline void GetTaskMetricsRequest::set_queries(int index, const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.admin.GetTaskMetricsRequest.queries)
+  queries_.Mutable(index)->assign(value);
 }
-inline const ::google::protobuf::RepeatedField<int>&
-GetTaskMetricsRequest::metrics() const {
-  // @@protoc_insertion_point(field_list:flyteidl.admin.GetTaskMetricsRequest.metrics)
-  return metrics_;
+#if LANG_CXX11
+inline void GetTaskMetricsRequest::set_queries(int index, ::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.admin.GetTaskMetricsRequest.queries)
+  queries_.Mutable(index)->assign(std::move(value));
 }
-inline ::google::protobuf::RepeatedField<int>*
-GetTaskMetricsRequest::mutable_metrics() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.GetTaskMetricsRequest.metrics)
-  return &metrics_;
+#endif
+inline void GetTaskMetricsRequest::set_queries(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  queries_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.GetTaskMetricsRequest.queries)
+}
+inline void GetTaskMetricsRequest::set_queries(int index, const char* value, size_t size) {
+  queries_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.GetTaskMetricsRequest.queries)
+}
+inline ::std::string* GetTaskMetricsRequest::add_queries() {
+  // @@protoc_insertion_point(field_add_mutable:flyteidl.admin.GetTaskMetricsRequest.queries)
+  return queries_.Add();
+}
+inline void GetTaskMetricsRequest::add_queries(const ::std::string& value) {
+  queries_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:flyteidl.admin.GetTaskMetricsRequest.queries)
+}
+#if LANG_CXX11
+inline void GetTaskMetricsRequest::add_queries(::std::string&& value) {
+  queries_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:flyteidl.admin.GetTaskMetricsRequest.queries)
+}
+#endif
+inline void GetTaskMetricsRequest::add_queries(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  queries_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:flyteidl.admin.GetTaskMetricsRequest.queries)
+}
+inline void GetTaskMetricsRequest::add_queries(const char* value, size_t size) {
+  queries_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:flyteidl.admin.GetTaskMetricsRequest.queries)
+}
+inline const ::google::protobuf::RepeatedPtrField<::std::string>&
+GetTaskMetricsRequest::queries() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.GetTaskMetricsRequest.queries)
+  return queries_;
+}
+inline ::google::protobuf::RepeatedPtrField<::std::string>*
+GetTaskMetricsRequest::mutable_queries() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.GetTaskMetricsRequest.queries)
+  return &queries_;
 }
 
 // .google.protobuf.Timestamp start_time = 4;

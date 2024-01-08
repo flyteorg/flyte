@@ -563,23 +563,11 @@
       },
       "description": "Represents an error thrown from a node."
     },
-    "coreExecutionMetric": {
-      "type": "string",
-      "enum": [
-        "EXECUTION_METRIC_UNDEFINED",
-        "EXECUTION_METRIC_USED_MEMORY_BYTES_AVG",
-        "EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG",
-        "EXECUTION_METRIC_USED_CPU_AVG",
-        "EXECUTION_METRIC_ALLOCATED_CPU_AVG"
-      ],
-      "default": "EXECUTION_METRIC_UNDEFINED",
-      "title": "- EXECUTION_METRIC_USED_MEMORY_BYTES_AVG: Average memory usage, measured in bytes\n - EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG: Average memory allocation, measured in bytes\n - EXECUTION_METRIC_USED_CPU_AVG: CPU metrics\nAverage CPU usage, measured in CPU cores\n - EXECUTION_METRIC_ALLOCATED_CPU_AVG: Average CPU allocation, measured in CPU cores"
-    },
     "coreExecutionMetricResult": {
       "type": "object",
       "properties": {
         "metric": {
-          "$ref": "#/definitions/coreExecutionMetric",
+          "type": "string",
           "title": "The metric this data represents"
         },
         "data": {

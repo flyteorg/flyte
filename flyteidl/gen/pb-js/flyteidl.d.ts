@@ -7352,20 +7352,11 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** ExecutionMetric enum. */
-        enum ExecutionMetric {
-            EXECUTION_METRIC_UNDEFINED = 0,
-            EXECUTION_METRIC_USED_MEMORY_BYTES_AVG = 1,
-            EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG = 2,
-            EXECUTION_METRIC_USED_CPU_AVG = 20,
-            EXECUTION_METRIC_ALLOCATED_CPU_AVG = 21
-        }
-
         /** Properties of an ExecutionMetricResult. */
         interface IExecutionMetricResult {
 
             /** ExecutionMetricResult metric */
-            metric?: (flyteidl.core.ExecutionMetric|null);
+            metric?: (string|null);
 
             /** ExecutionMetricResult data */
             data?: (google.protobuf.IStruct|null);
@@ -7381,7 +7372,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.core.IExecutionMetricResult);
 
             /** ExecutionMetricResult metric. */
-            public metric: flyteidl.core.ExecutionMetric;
+            public metric: string;
 
             /** ExecutionMetricResult data. */
             public data?: (google.protobuf.IStruct|null);
@@ -9617,8 +9608,8 @@ export namespace flyteidl {
             /** GetTaskMetricsRequest resourceMeta */
             resourceMeta?: (Uint8Array|null);
 
-            /** GetTaskMetricsRequest metrics */
-            metrics?: (flyteidl.core.ExecutionMetric[]|null);
+            /** GetTaskMetricsRequest queries */
+            queries?: (string[]|null);
 
             /** GetTaskMetricsRequest startTime */
             startTime?: (google.protobuf.ITimestamp|null);
@@ -9645,8 +9636,8 @@ export namespace flyteidl {
             /** GetTaskMetricsRequest resourceMeta. */
             public resourceMeta: Uint8Array;
 
-            /** GetTaskMetricsRequest metrics. */
-            public metrics: flyteidl.core.ExecutionMetric[];
+            /** GetTaskMetricsRequest queries. */
+            public queries: string[];
 
             /** GetTaskMetricsRequest startTime. */
             public startTime?: (google.protobuf.ITimestamp|null);

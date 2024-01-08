@@ -2069,8 +2069,8 @@ pub mod span {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionMetricResult {
     /// The metric this data represents
-    #[prost(enumeration="ExecutionMetric", tag="1")]
-    pub metric: i32,
+    #[prost(string, tag="1")]
+    pub metric: ::prost::alloc::string::String,
     /// The result data in prometheus range query result format
     /// <https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.>
     /// This may include multiple time series, differentiated by their metric labels.
@@ -2078,48 +2078,6 @@ pub struct ExecutionMetricResult {
     /// End time is lesser of (execution attempt end, now)
     #[prost(message, optional, tag="2")]
     pub data: ::core::option::Option<::prost_types::Struct>,
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum ExecutionMetric {
-    Undefined = 0,
-    // Memory metrics
-
-    /// Average memory usage, measured in bytes
-    UsedMemoryBytesAvg = 1,
-    /// Average memory allocation, measured in bytes
-    AllocatedMemoryBytesAvg = 2,
-    /// CPU metrics
-    /// Average CPU usage, measured in CPU cores
-    UsedCpuAvg = 20,
-    /// Average CPU allocation, measured in CPU cores
-    AllocatedCpuAvg = 21,
-}
-impl ExecutionMetric {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            ExecutionMetric::Undefined => "EXECUTION_METRIC_UNDEFINED",
-            ExecutionMetric::UsedMemoryBytesAvg => "EXECUTION_METRIC_USED_MEMORY_BYTES_AVG",
-            ExecutionMetric::AllocatedMemoryBytesAvg => "EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG",
-            ExecutionMetric::UsedCpuAvg => "EXECUTION_METRIC_USED_CPU_AVG",
-            ExecutionMetric::AllocatedCpuAvg => "EXECUTION_METRIC_ALLOCATED_CPU_AVG",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "EXECUTION_METRIC_UNDEFINED" => Some(Self::Undefined),
-            "EXECUTION_METRIC_USED_MEMORY_BYTES_AVG" => Some(Self::UsedMemoryBytesAvg),
-            "EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG" => Some(Self::AllocatedMemoryBytesAvg),
-            "EXECUTION_METRIC_USED_CPU_AVG" => Some(Self::UsedCpuAvg),
-            "EXECUTION_METRIC_ALLOCATED_CPU_AVG" => Some(Self::AllocatedCpuAvg),
-            _ => None,
-        }
-    }
 }
 /// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
 /// Each expression results in a boolean result.

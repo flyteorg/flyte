@@ -2,25 +2,11 @@ from flyteidl.core import identifier_pb2 as _identifier_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf import struct_pb2 as _struct_pb2
 from google.protobuf.internal import containers as _containers
-from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
-
-class ExecutionMetric(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
-    __slots__ = []
-    EXECUTION_METRIC_UNDEFINED: _ClassVar[ExecutionMetric]
-    EXECUTION_METRIC_USED_MEMORY_BYTES_AVG: _ClassVar[ExecutionMetric]
-    EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG: _ClassVar[ExecutionMetric]
-    EXECUTION_METRIC_USED_CPU_AVG: _ClassVar[ExecutionMetric]
-    EXECUTION_METRIC_ALLOCATED_CPU_AVG: _ClassVar[ExecutionMetric]
-EXECUTION_METRIC_UNDEFINED: ExecutionMetric
-EXECUTION_METRIC_USED_MEMORY_BYTES_AVG: ExecutionMetric
-EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG: ExecutionMetric
-EXECUTION_METRIC_USED_CPU_AVG: ExecutionMetric
-EXECUTION_METRIC_ALLOCATED_CPU_AVG: ExecutionMetric
 
 class Span(_message.Message):
     __slots__ = ["start_time", "end_time", "workflow_id", "node_id", "task_id", "operation_id", "spans"]
@@ -44,6 +30,6 @@ class ExecutionMetricResult(_message.Message):
     __slots__ = ["metric", "data"]
     METRIC_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
-    metric: ExecutionMetric
+    metric: str
     data: _struct_pb2.Struct
-    def __init__(self, metric: _Optional[_Union[ExecutionMetric, str]] = ..., data: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    def __init__(self, metric: _Optional[str] = ..., data: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...

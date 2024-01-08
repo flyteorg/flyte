@@ -30,7 +30,6 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
-#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/identifier.pb.h"
 #include <google/protobuf/timestamp.pb.h>
@@ -71,30 +70,6 @@ template<> ::flyteidl::core::Span* Arena::CreateMaybeMessage<::flyteidl::core::S
 namespace flyteidl {
 namespace core {
 
-enum ExecutionMetric {
-  EXECUTION_METRIC_UNDEFINED = 0,
-  EXECUTION_METRIC_USED_MEMORY_BYTES_AVG = 1,
-  EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG = 2,
-  EXECUTION_METRIC_USED_CPU_AVG = 20,
-  EXECUTION_METRIC_ALLOCATED_CPU_AVG = 21,
-  ExecutionMetric_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::min(),
-  ExecutionMetric_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::google::protobuf::int32>::max()
-};
-bool ExecutionMetric_IsValid(int value);
-const ExecutionMetric ExecutionMetric_MIN = EXECUTION_METRIC_UNDEFINED;
-const ExecutionMetric ExecutionMetric_MAX = EXECUTION_METRIC_ALLOCATED_CPU_AVG;
-const int ExecutionMetric_ARRAYSIZE = ExecutionMetric_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* ExecutionMetric_descriptor();
-inline const ::std::string& ExecutionMetric_Name(ExecutionMetric value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    ExecutionMetric_descriptor(), value);
-}
-inline bool ExecutionMetric_Parse(
-    const ::std::string& name, ExecutionMetric* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<ExecutionMetric>(
-    ExecutionMetric_descriptor(), name, value);
-}
 // ===================================================================
 
 class Span final :
@@ -400,6 +375,20 @@ class ExecutionMetricResult final :
 
   // accessors -------------------------------------------------------
 
+  // string metric = 1;
+  void clear_metric();
+  static const int kMetricFieldNumber = 1;
+  const ::std::string& metric() const;
+  void set_metric(const ::std::string& value);
+  #if LANG_CXX11
+  void set_metric(::std::string&& value);
+  #endif
+  void set_metric(const char* value);
+  void set_metric(const char* value, size_t size);
+  ::std::string* mutable_metric();
+  ::std::string* release_metric();
+  void set_allocated_metric(::std::string* metric);
+
   // .google.protobuf.Struct data = 2;
   bool has_data() const;
   void clear_data();
@@ -409,19 +398,13 @@ class ExecutionMetricResult final :
   ::google::protobuf::Struct* mutable_data();
   void set_allocated_data(::google::protobuf::Struct* data);
 
-  // .flyteidl.core.ExecutionMetric metric = 1;
-  void clear_metric();
-  static const int kMetricFieldNumber = 1;
-  ::flyteidl::core::ExecutionMetric metric() const;
-  void set_metric(::flyteidl::core::ExecutionMetric value);
-
   // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionMetricResult)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr metric_;
   ::google::protobuf::Struct* data_;
-  int metric_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fmetrics_2eproto;
 };
@@ -768,18 +751,57 @@ inline Span::IdCase Span::id_case() const {
 
 // ExecutionMetricResult
 
-// .flyteidl.core.ExecutionMetric metric = 1;
+// string metric = 1;
 inline void ExecutionMetricResult::clear_metric() {
-  metric_ = 0;
+  metric_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
-inline ::flyteidl::core::ExecutionMetric ExecutionMetricResult::metric() const {
+inline const ::std::string& ExecutionMetricResult::metric() const {
   // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionMetricResult.metric)
-  return static_cast< ::flyteidl::core::ExecutionMetric >(metric_);
+  return metric_.GetNoArena();
 }
-inline void ExecutionMetricResult::set_metric(::flyteidl::core::ExecutionMetric value) {
+inline void ExecutionMetricResult::set_metric(const ::std::string& value) {
   
-  metric_ = value;
+  metric_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:flyteidl.core.ExecutionMetricResult.metric)
+}
+#if LANG_CXX11
+inline void ExecutionMetricResult::set_metric(::std::string&& value) {
+  
+  metric_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.ExecutionMetricResult.metric)
+}
+#endif
+inline void ExecutionMetricResult::set_metric(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  metric_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.ExecutionMetricResult.metric)
+}
+inline void ExecutionMetricResult::set_metric(const char* value, size_t size) {
+  
+  metric_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.ExecutionMetricResult.metric)
+}
+inline ::std::string* ExecutionMetricResult::mutable_metric() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.ExecutionMetricResult.metric)
+  return metric_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ExecutionMetricResult::release_metric() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.ExecutionMetricResult.metric)
+  
+  return metric_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ExecutionMetricResult::set_allocated_metric(::std::string* metric) {
+  if (metric != nullptr) {
+    
+  } else {
+    
+  }
+  metric_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), metric);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ExecutionMetricResult.metric)
 }
 
 // .google.protobuf.Struct data = 2;
@@ -838,18 +860,6 @@ inline void ExecutionMetricResult::set_allocated_data(::google::protobuf::Struct
 
 }  // namespace core
 }  // namespace flyteidl
-
-namespace google {
-namespace protobuf {
-
-template <> struct is_proto_enum< ::flyteidl::core::ExecutionMetric> : ::std::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::flyteidl::core::ExecutionMetric>() {
-  return ::flyteidl::core::ExecutionMetric_descriptor();
-}
-
-}  // namespace protobuf
-}  // namespace google
 
 // @@protoc_insertion_point(global_scope)
 

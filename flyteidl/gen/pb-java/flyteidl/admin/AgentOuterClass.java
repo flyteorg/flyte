@@ -12059,42 +12059,35 @@ public final class AgentOuterClass {
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    java.util.List<flyteidl.core.Metrics.ExecutionMetric> getMetricsList();
+    java.util.List<java.lang.String>
+        getQueriesList();
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    int getMetricsCount();
+    int getQueriesCount();
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    flyteidl.core.Metrics.ExecutionMetric getMetrics(int index);
+    java.lang.String getQueries(int index);
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    java.util.List<java.lang.Integer>
-    getMetricsValueList();
-    /**
-     * <pre>
-     * The metrics to query. If empty, will return a default set of metrics.
-     * </pre>
-     *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
-     */
-    int getMetricsValue(int index);
+    com.google.protobuf.ByteString
+        getQueriesBytes(int index);
 
     /**
      * <pre>
@@ -12190,7 +12183,7 @@ public final class AgentOuterClass {
     private GetTaskMetricsRequest() {
       taskType_ = "";
       resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
-      metrics_ = java.util.Collections.emptyList();
+      queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -12228,27 +12221,13 @@ public final class AgentOuterClass {
               resourceMeta_ = input.readBytes();
               break;
             }
-            case 24: {
-              int rawValue = input.readEnum();
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
               if (!((mutable_bitField0_ & 0x00000004) != 0)) {
-                metrics_ = new java.util.ArrayList<java.lang.Integer>();
+                queries_ = new com.google.protobuf.LazyStringArrayList();
                 mutable_bitField0_ |= 0x00000004;
               }
-              metrics_.add(rawValue);
-              break;
-            }
-            case 26: {
-              int length = input.readRawVarint32();
-              int oldLimit = input.pushLimit(length);
-              while(input.getBytesUntilLimit() > 0) {
-                int rawValue = input.readEnum();
-                if (!((mutable_bitField0_ & 0x00000004) != 0)) {
-                  metrics_ = new java.util.ArrayList<java.lang.Integer>();
-                  mutable_bitField0_ |= 0x00000004;
-                }
-                metrics_.add(rawValue);
-              }
-              input.popLimit(oldLimit);
+              queries_.add(s);
               break;
             }
             case 34: {
@@ -12306,7 +12285,7 @@ public final class AgentOuterClass {
             e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00000004) != 0)) {
-          metrics_ = java.util.Collections.unmodifiableList(metrics_);
+          queries_ = queries_.getUnmodifiableView();
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -12381,71 +12360,50 @@ public final class AgentOuterClass {
       return resourceMeta_;
     }
 
-    public static final int METRICS_FIELD_NUMBER = 3;
-    private java.util.List<java.lang.Integer> metrics_;
-    private static final com.google.protobuf.Internal.ListAdapter.Converter<
-        java.lang.Integer, flyteidl.core.Metrics.ExecutionMetric> metrics_converter_ =
-            new com.google.protobuf.Internal.ListAdapter.Converter<
-                java.lang.Integer, flyteidl.core.Metrics.ExecutionMetric>() {
-              public flyteidl.core.Metrics.ExecutionMetric convert(java.lang.Integer from) {
-                @SuppressWarnings("deprecation")
-                flyteidl.core.Metrics.ExecutionMetric result = flyteidl.core.Metrics.ExecutionMetric.valueOf(from);
-                return result == null ? flyteidl.core.Metrics.ExecutionMetric.UNRECOGNIZED : result;
-              }
-            };
+    public static final int QUERIES_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList queries_;
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    public java.util.List<flyteidl.core.Metrics.ExecutionMetric> getMetricsList() {
-      return new com.google.protobuf.Internal.ListAdapter<
-          java.lang.Integer, flyteidl.core.Metrics.ExecutionMetric>(metrics_, metrics_converter_);
+    public com.google.protobuf.ProtocolStringList
+        getQueriesList() {
+      return queries_;
     }
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    public int getMetricsCount() {
-      return metrics_.size();
+    public int getQueriesCount() {
+      return queries_.size();
     }
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    public flyteidl.core.Metrics.ExecutionMetric getMetrics(int index) {
-      return metrics_converter_.convert(metrics_.get(index));
+    public java.lang.String getQueries(int index) {
+      return queries_.get(index);
     }
     /**
      * <pre>
      * The metrics to query. If empty, will return a default set of metrics.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+     * <code>repeated string queries = 3;</code>
      */
-    public java.util.List<java.lang.Integer>
-    getMetricsValueList() {
-      return metrics_;
+    public com.google.protobuf.ByteString
+        getQueriesBytes(int index) {
+      return queries_.getByteString(index);
     }
-    /**
-     * <pre>
-     * The metrics to query. If empty, will return a default set of metrics.
-     * </pre>
-     *
-     * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
-     */
-    public int getMetricsValue(int index) {
-      return metrics_.get(index);
-    }
-    private int metricsMemoizedSerializedSize;
 
     public static final int START_TIME_FIELD_NUMBER = 4;
     private com.google.protobuf.Timestamp startTime_;
@@ -12560,19 +12518,14 @@ public final class AgentOuterClass {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      getSerializedSize();
       if (!getTaskTypeBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 1, taskType_);
       }
       if (!resourceMeta_.isEmpty()) {
         output.writeBytes(2, resourceMeta_);
       }
-      if (getMetricsList().size() > 0) {
-        output.writeUInt32NoTag(26);
-        output.writeUInt32NoTag(metricsMemoizedSerializedSize);
-      }
-      for (int i = 0; i < metrics_.size(); i++) {
-        output.writeEnumNoTag(metrics_.get(i));
+      for (int i = 0; i < queries_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, queries_.getRaw(i));
       }
       if (startTime_ != null) {
         output.writeMessage(4, getStartTime());
@@ -12601,15 +12554,11 @@ public final class AgentOuterClass {
       }
       {
         int dataSize = 0;
-        for (int i = 0; i < metrics_.size(); i++) {
-          dataSize += com.google.protobuf.CodedOutputStream
-            .computeEnumSizeNoTag(metrics_.get(i));
+        for (int i = 0; i < queries_.size(); i++) {
+          dataSize += computeStringSizeNoTag(queries_.getRaw(i));
         }
         size += dataSize;
-        if (!getMetricsList().isEmpty()) {  size += 1;
-          size += com.google.protobuf.CodedOutputStream
-            .computeUInt32SizeNoTag(dataSize);
-        }metricsMemoizedSerializedSize = dataSize;
+        size += 1 * getQueriesList().size();
       }
       if (startTime_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -12642,7 +12591,8 @@ public final class AgentOuterClass {
           .equals(other.getTaskType())) return false;
       if (!getResourceMeta()
           .equals(other.getResourceMeta())) return false;
-      if (!metrics_.equals(other.metrics_)) return false;
+      if (!getQueriesList()
+          .equals(other.getQueriesList())) return false;
       if (hasStartTime() != other.hasStartTime()) return false;
       if (hasStartTime()) {
         if (!getStartTime()
@@ -12673,9 +12623,9 @@ public final class AgentOuterClass {
       hash = (53 * hash) + getTaskType().hashCode();
       hash = (37 * hash) + RESOURCE_META_FIELD_NUMBER;
       hash = (53 * hash) + getResourceMeta().hashCode();
-      if (getMetricsCount() > 0) {
-        hash = (37 * hash) + METRICS_FIELD_NUMBER;
-        hash = (53 * hash) + metrics_.hashCode();
+      if (getQueriesCount() > 0) {
+        hash = (37 * hash) + QUERIES_FIELD_NUMBER;
+        hash = (53 * hash) + getQueriesList().hashCode();
       }
       if (hasStartTime()) {
         hash = (37 * hash) + START_TIME_FIELD_NUMBER;
@@ -12830,7 +12780,7 @@ public final class AgentOuterClass {
 
         resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
 
-        metrics_ = java.util.Collections.emptyList();
+        queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
         if (startTimeBuilder_ == null) {
           startTime_ = null;
@@ -12881,10 +12831,10 @@ public final class AgentOuterClass {
         result.taskType_ = taskType_;
         result.resourceMeta_ = resourceMeta_;
         if (((bitField0_ & 0x00000004) != 0)) {
-          metrics_ = java.util.Collections.unmodifiableList(metrics_);
+          queries_ = queries_.getUnmodifiableView();
           bitField0_ = (bitField0_ & ~0x00000004);
         }
-        result.metrics_ = metrics_;
+        result.queries_ = queries_;
         if (startTimeBuilder_ == null) {
           result.startTime_ = startTime_;
         } else {
@@ -12956,13 +12906,13 @@ public final class AgentOuterClass {
         if (other.getResourceMeta() != com.google.protobuf.ByteString.EMPTY) {
           setResourceMeta(other.getResourceMeta());
         }
-        if (!other.metrics_.isEmpty()) {
-          if (metrics_.isEmpty()) {
-            metrics_ = other.metrics_;
+        if (!other.queries_.isEmpty()) {
+          if (queries_.isEmpty()) {
+            queries_ = other.queries_;
             bitField0_ = (bitField0_ & ~0x00000004);
           } else {
-            ensureMetricsIsMutable();
-            metrics_.addAll(other.metrics_);
+            ensureQueriesIsMutable();
+            queries_.addAll(other.queries_);
           }
           onChanged();
         }
@@ -13135,59 +13085,69 @@ public final class AgentOuterClass {
         return this;
       }
 
-      private java.util.List<java.lang.Integer> metrics_ =
-        java.util.Collections.emptyList();
-      private void ensureMetricsIsMutable() {
+      private com.google.protobuf.LazyStringList queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureQueriesIsMutable() {
         if (!((bitField0_ & 0x00000004) != 0)) {
-          metrics_ = new java.util.ArrayList<java.lang.Integer>(metrics_);
+          queries_ = new com.google.protobuf.LazyStringArrayList(queries_);
           bitField0_ |= 0x00000004;
-        }
+         }
       }
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public java.util.List<flyteidl.core.Metrics.ExecutionMetric> getMetricsList() {
-        return new com.google.protobuf.Internal.ListAdapter<
-            java.lang.Integer, flyteidl.core.Metrics.ExecutionMetric>(metrics_, metrics_converter_);
+      public com.google.protobuf.ProtocolStringList
+          getQueriesList() {
+        return queries_.getUnmodifiableView();
       }
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public int getMetricsCount() {
-        return metrics_.size();
+      public int getQueriesCount() {
+        return queries_.size();
       }
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public flyteidl.core.Metrics.ExecutionMetric getMetrics(int index) {
-        return metrics_converter_.convert(metrics_.get(index));
+      public java.lang.String getQueries(int index) {
+        return queries_.get(index);
       }
       /**
        * <pre>
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public Builder setMetrics(
-          int index, flyteidl.core.Metrics.ExecutionMetric value) {
+      public com.google.protobuf.ByteString
+          getQueriesBytes(int index) {
+        return queries_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public Builder setQueries(
+          int index, java.lang.String value) {
         if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureMetricsIsMutable();
-        metrics_.set(index, value.getNumber());
+    throw new NullPointerException();
+  }
+  ensureQueriesIsMutable();
+        queries_.set(index, value);
         onChanged();
         return this;
       }
@@ -13196,14 +13156,15 @@ public final class AgentOuterClass {
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public Builder addMetrics(flyteidl.core.Metrics.ExecutionMetric value) {
+      public Builder addQueries(
+          java.lang.String value) {
         if (value == null) {
-          throw new NullPointerException();
-        }
-        ensureMetricsIsMutable();
-        metrics_.add(value.getNumber());
+    throw new NullPointerException();
+  }
+  ensureQueriesIsMutable();
+        queries_.add(value);
         onChanged();
         return this;
       }
@@ -13212,14 +13173,13 @@ public final class AgentOuterClass {
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public Builder addAllMetrics(
-          java.lang.Iterable<? extends flyteidl.core.Metrics.ExecutionMetric> values) {
-        ensureMetricsIsMutable();
-        for (flyteidl.core.Metrics.ExecutionMetric value : values) {
-          metrics_.add(value.getNumber());
-        }
+      public Builder addAllQueries(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureQueriesIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, queries_);
         onChanged();
         return this;
       }
@@ -13228,10 +13188,10 @@ public final class AgentOuterClass {
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public Builder clearMetrics() {
-        metrics_ = java.util.Collections.emptyList();
+      public Builder clearQueries() {
+        queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000004);
         onChanged();
         return this;
@@ -13241,62 +13201,16 @@ public final class AgentOuterClass {
        * The metrics to query. If empty, will return a default set of metrics.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
+       * <code>repeated string queries = 3;</code>
        */
-      public java.util.List<java.lang.Integer>
-      getMetricsValueList() {
-        return java.util.Collections.unmodifiableList(metrics_);
-      }
-      /**
-       * <pre>
-       * The metrics to query. If empty, will return a default set of metrics.
-       * </pre>
-       *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
-       */
-      public int getMetricsValue(int index) {
-        return metrics_.get(index);
-      }
-      /**
-       * <pre>
-       * The metrics to query. If empty, will return a default set of metrics.
-       * </pre>
-       *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
-       */
-      public Builder setMetricsValue(
-          int index, int value) {
-        ensureMetricsIsMutable();
-        metrics_.set(index, value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * The metrics to query. If empty, will return a default set of metrics.
-       * </pre>
-       *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
-       */
-      public Builder addMetricsValue(int value) {
-        ensureMetricsIsMutable();
-        metrics_.add(value);
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * The metrics to query. If empty, will return a default set of metrics.
-       * </pre>
-       *
-       * <code>repeated .flyteidl.core.ExecutionMetric metrics = 3;</code>
-       */
-      public Builder addAllMetricsValue(
-          java.lang.Iterable<java.lang.Integer> values) {
-        ensureMetricsIsMutable();
-        for (int value : values) {
-          metrics_.add(value);
-        }
+      public Builder addQueriesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureQueriesIsMutable();
+        queries_.add(value);
         onChanged();
         return this;
       }
@@ -16673,23 +16587,22 @@ public final class AgentOuterClass {
       "\n\020GetAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flyt" +
       "eidl.admin.Agent\"\023\n\021ListAgentsRequest\";\n" +
       "\022ListAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.fl" +
-      "yteidl.admin.Agent\"\371\001\n\025GetTaskMetricsReq" +
+      "yteidl.admin.Agent\"\331\001\n\025GetTaskMetricsReq" +
       "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta" +
-      "\030\002 \001(\014\022/\n\007metrics\030\003 \003(\0162\036.flyteidl.core." +
-      "ExecutionMetric\022.\n\nstart_time\030\004 \001(\0132\032.go" +
-      "ogle.protobuf.Timestamp\022,\n\010end_time\030\005 \001(" +
-      "\0132\032.google.protobuf.Timestamp\022\'\n\004step\030\006 " +
-      "\001(\0132\031.google.protobuf.Duration\"O\n\026GetTas" +
-      "kMetricsResponse\0225\n\007results\030\001 \003(\0132$.flyt" +
-      "eidl.core.ExecutionMetricResult\"\\\n\022GetTa" +
-      "skLogsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rreso" +
-      "urce_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r\n\005token\030" +
-      "\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007results\030" +
-      "\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n\021RETRYAB" +
-      "LE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007P" +
-      "ENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;" +
-      "github.com/flyteorg/flyte/flyteidl/gen/p" +
-      "b-go/flyteidl/adminb\006proto3"
+      "\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nstart_time\030\004 " +
+      "\001(\0132\032.google.protobuf.Timestamp\022,\n\010end_t" +
+      "ime\030\005 \001(\0132\032.google.protobuf.Timestamp\022\'\n" +
+      "\004step\030\006 \001(\0132\031.google.protobuf.Duration\"O" +
+      "\n\026GetTaskMetricsResponse\0225\n\007results\030\001 \003(" +
+      "\0132$.flyteidl.core.ExecutionMetricResult\"" +
+      "\\\n\022GetTaskLogsRequest\022\021\n\ttask_type\030\001 \001(\t" +
+      "\022\025\n\rresource_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r" +
+      "\n\005token\030\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007" +
+      "results\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n" +
+      "\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILUR" +
+      "E\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEED" +
+      "ED\020\004B=Z;github.com/flyteorg/flyte/flytei" +
+      "dl/gen/pb-go/flyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -16811,7 +16724,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_GetTaskMetricsRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor,
-        new java.lang.String[] { "TaskType", "ResourceMeta", "Metrics", "StartTime", "EndTime", "Step", });
+        new java.lang.String[] { "TaskType", "ResourceMeta", "Queries", "StartTime", "EndTime", "Step", });
     internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_GetTaskMetricsResponse_fieldAccessorTable = new

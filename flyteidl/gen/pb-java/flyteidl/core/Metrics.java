@@ -14,165 +14,6 @@ public final class Metrics {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  /**
-   * Protobuf enum {@code flyteidl.core.ExecutionMetric}
-   */
-  public enum ExecutionMetric
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>EXECUTION_METRIC_UNDEFINED = 0;</code>
-     */
-    EXECUTION_METRIC_UNDEFINED(0),
-    /**
-     * <pre>
-     * Average memory usage, measured in bytes
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_USED_MEMORY_BYTES_AVG = 1;</code>
-     */
-    EXECUTION_METRIC_USED_MEMORY_BYTES_AVG(1),
-    /**
-     * <pre>
-     * Average memory allocation, measured in bytes
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG = 2;</code>
-     */
-    EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG(2),
-    /**
-     * <pre>
-     * CPU metrics
-     * Average CPU usage, measured in CPU cores
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_USED_CPU_AVG = 20;</code>
-     */
-    EXECUTION_METRIC_USED_CPU_AVG(20),
-    /**
-     * <pre>
-     * Average CPU allocation, measured in CPU cores
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_ALLOCATED_CPU_AVG = 21;</code>
-     */
-    EXECUTION_METRIC_ALLOCATED_CPU_AVG(21),
-    UNRECOGNIZED(-1),
-    ;
-
-    /**
-     * <code>EXECUTION_METRIC_UNDEFINED = 0;</code>
-     */
-    public static final int EXECUTION_METRIC_UNDEFINED_VALUE = 0;
-    /**
-     * <pre>
-     * Average memory usage, measured in bytes
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_USED_MEMORY_BYTES_AVG = 1;</code>
-     */
-    public static final int EXECUTION_METRIC_USED_MEMORY_BYTES_AVG_VALUE = 1;
-    /**
-     * <pre>
-     * Average memory allocation, measured in bytes
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG = 2;</code>
-     */
-    public static final int EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG_VALUE = 2;
-    /**
-     * <pre>
-     * CPU metrics
-     * Average CPU usage, measured in CPU cores
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_USED_CPU_AVG = 20;</code>
-     */
-    public static final int EXECUTION_METRIC_USED_CPU_AVG_VALUE = 20;
-    /**
-     * <pre>
-     * Average CPU allocation, measured in CPU cores
-     * </pre>
-     *
-     * <code>EXECUTION_METRIC_ALLOCATED_CPU_AVG = 21;</code>
-     */
-    public static final int EXECUTION_METRIC_ALLOCATED_CPU_AVG_VALUE = 21;
-
-
-    public final int getNumber() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
-      }
-      return value;
-    }
-
-    /**
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static ExecutionMetric valueOf(int value) {
-      return forNumber(value);
-    }
-
-    public static ExecutionMetric forNumber(int value) {
-      switch (value) {
-        case 0: return EXECUTION_METRIC_UNDEFINED;
-        case 1: return EXECUTION_METRIC_USED_MEMORY_BYTES_AVG;
-        case 2: return EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG;
-        case 20: return EXECUTION_METRIC_USED_CPU_AVG;
-        case 21: return EXECUTION_METRIC_ALLOCATED_CPU_AVG;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<ExecutionMetric>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        ExecutionMetric> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<ExecutionMetric>() {
-            public ExecutionMetric findValueByNumber(int number) {
-              return ExecutionMetric.forNumber(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      return getDescriptor().getValues().get(ordinal());
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return flyteidl.core.Metrics.getDescriptor().getEnumTypes().get(0);
-    }
-
-    private static final ExecutionMetric[] VALUES = values();
-
-    public static ExecutionMetric valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      if (desc.getIndex() == -1) {
-        return UNRECOGNIZED;
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int value;
-
-    private ExecutionMetric(int value) {
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:flyteidl.core.ExecutionMetric)
-  }
-
   public interface SpanOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.Span)
       com.google.protobuf.MessageOrBuilder {
@@ -2697,17 +2538,18 @@ public final class Metrics {
      * The metric this data represents
      * </pre>
      *
-     * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+     * <code>string metric = 1;</code>
      */
-    int getMetricValue();
+    java.lang.String getMetric();
     /**
      * <pre>
      * The metric this data represents
      * </pre>
      *
-     * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+     * <code>string metric = 1;</code>
      */
-    flyteidl.core.Metrics.ExecutionMetric getMetric();
+    com.google.protobuf.ByteString
+        getMetricBytes();
 
     /**
      * <pre>
@@ -2759,7 +2601,7 @@ public final class Metrics {
       super(builder);
     }
     private ExecutionMetricResult() {
-      metric_ = 0;
+      metric_ = "";
     }
 
     @java.lang.Override
@@ -2786,10 +2628,10 @@ public final class Metrics {
             case 0:
               done = true;
               break;
-            case 8: {
-              int rawValue = input.readEnum();
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
 
-              metric_ = rawValue;
+              metric_ = s;
               break;
             }
             case 18: {
@@ -2838,28 +2680,45 @@ public final class Metrics {
     }
 
     public static final int METRIC_FIELD_NUMBER = 1;
-    private int metric_;
+    private volatile java.lang.Object metric_;
     /**
      * <pre>
      * The metric this data represents
      * </pre>
      *
-     * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+     * <code>string metric = 1;</code>
      */
-    public int getMetricValue() {
-      return metric_;
+    public java.lang.String getMetric() {
+      java.lang.Object ref = metric_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        metric_ = s;
+        return s;
+      }
     }
     /**
      * <pre>
      * The metric this data represents
      * </pre>
      *
-     * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+     * <code>string metric = 1;</code>
      */
-    public flyteidl.core.Metrics.ExecutionMetric getMetric() {
-      @SuppressWarnings("deprecation")
-      flyteidl.core.Metrics.ExecutionMetric result = flyteidl.core.Metrics.ExecutionMetric.valueOf(metric_);
-      return result == null ? flyteidl.core.Metrics.ExecutionMetric.UNRECOGNIZED : result;
+    public com.google.protobuf.ByteString
+        getMetricBytes() {
+      java.lang.Object ref = metric_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        metric_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
     }
 
     public static final int DATA_FIELD_NUMBER = 2;
@@ -2921,8 +2780,8 @@ public final class Metrics {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (metric_ != flyteidl.core.Metrics.ExecutionMetric.EXECUTION_METRIC_UNDEFINED.getNumber()) {
-        output.writeEnum(1, metric_);
+      if (!getMetricBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, metric_);
       }
       if (data_ != null) {
         output.writeMessage(2, getData());
@@ -2936,9 +2795,8 @@ public final class Metrics {
       if (size != -1) return size;
 
       size = 0;
-      if (metric_ != flyteidl.core.Metrics.ExecutionMetric.EXECUTION_METRIC_UNDEFINED.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, metric_);
+      if (!getMetricBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, metric_);
       }
       if (data_ != null) {
         size += com.google.protobuf.CodedOutputStream
@@ -2959,7 +2817,8 @@ public final class Metrics {
       }
       flyteidl.core.Metrics.ExecutionMetricResult other = (flyteidl.core.Metrics.ExecutionMetricResult) obj;
 
-      if (metric_ != other.metric_) return false;
+      if (!getMetric()
+          .equals(other.getMetric())) return false;
       if (hasData() != other.hasData()) return false;
       if (hasData()) {
         if (!getData()
@@ -2977,7 +2836,7 @@ public final class Metrics {
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
       hash = (37 * hash) + METRIC_FIELD_NUMBER;
-      hash = (53 * hash) + metric_;
+      hash = (53 * hash) + getMetric().hashCode();
       if (hasData()) {
         hash = (37 * hash) + DATA_FIELD_NUMBER;
         hash = (53 * hash) + getData().hashCode();
@@ -3115,7 +2974,7 @@ public final class Metrics {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        metric_ = 0;
+        metric_ = "";
 
         if (dataBuilder_ == null) {
           data_ = null;
@@ -3203,8 +3062,9 @@ public final class Metrics {
 
       public Builder mergeFrom(flyteidl.core.Metrics.ExecutionMetricResult other) {
         if (other == flyteidl.core.Metrics.ExecutionMetricResult.getDefaultInstance()) return this;
-        if (other.metric_ != 0) {
-          setMetricValue(other.getMetricValue());
+        if (!other.getMetric().isEmpty()) {
+          metric_ = other.metric_;
+          onChanged();
         }
         if (other.hasData()) {
           mergeData(other.getData());
@@ -3238,25 +3098,59 @@ public final class Metrics {
         return this;
       }
 
-      private int metric_ = 0;
+      private java.lang.Object metric_ = "";
       /**
        * <pre>
        * The metric this data represents
        * </pre>
        *
-       * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+       * <code>string metric = 1;</code>
        */
-      public int getMetricValue() {
-        return metric_;
+      public java.lang.String getMetric() {
+        java.lang.Object ref = metric_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          metric_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
       }
       /**
        * <pre>
        * The metric this data represents
        * </pre>
        *
-       * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+       * <code>string metric = 1;</code>
        */
-      public Builder setMetricValue(int value) {
+      public com.google.protobuf.ByteString
+          getMetricBytes() {
+        java.lang.Object ref = metric_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          metric_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The metric this data represents
+       * </pre>
+       *
+       * <code>string metric = 1;</code>
+       */
+      public Builder setMetric(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
         metric_ = value;
         onChanged();
         return this;
@@ -3266,26 +3160,11 @@ public final class Metrics {
        * The metric this data represents
        * </pre>
        *
-       * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+       * <code>string metric = 1;</code>
        */
-      public flyteidl.core.Metrics.ExecutionMetric getMetric() {
-        @SuppressWarnings("deprecation")
-        flyteidl.core.Metrics.ExecutionMetric result = flyteidl.core.Metrics.ExecutionMetric.valueOf(metric_);
-        return result == null ? flyteidl.core.Metrics.ExecutionMetric.UNRECOGNIZED : result;
-      }
-      /**
-       * <pre>
-       * The metric this data represents
-       * </pre>
-       *
-       * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
-       */
-      public Builder setMetric(flyteidl.core.Metrics.ExecutionMetric value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
+      public Builder clearMetric() {
         
-        metric_ = value.getNumber();
+        metric_ = getDefaultInstance().getMetric();
         onChanged();
         return this;
       }
@@ -3294,11 +3173,16 @@ public final class Metrics {
        * The metric this data represents
        * </pre>
        *
-       * <code>.flyteidl.core.ExecutionMetric metric = 1;</code>
+       * <code>string metric = 1;</code>
        */
-      public Builder clearMetric() {
+      public Builder setMetricBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
         
-        metric_ = 0;
+        metric_ = value;
         onChanged();
         return this;
       }
@@ -3575,17 +3459,11 @@ public final class Metrics {
       "tifierH\000\0229\n\007task_id\030\005 \001(\0132&.flyteidl.cor" +
       "e.TaskExecutionIdentifierH\000\022\026\n\014operation" +
       "_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.flyteidl.co" +
-      "re.SpanB\004\n\002id\"n\n\025ExecutionMetricResult\022." +
-      "\n\006metric\030\001 \001(\0162\036.flyteidl.core.Execution" +
-      "Metric\022%\n\004data\030\002 \001(\0132\027.google.protobuf.S" +
-      "truct*\331\001\n\017ExecutionMetric\022\036\n\032EXECUTION_M" +
-      "ETRIC_UNDEFINED\020\000\022*\n&EXECUTION_METRIC_US" +
-      "ED_MEMORY_BYTES_AVG\020\001\022/\n+EXECUTION_METRI" +
-      "C_ALLOCATED_MEMORY_BYTES_AVG\020\002\022!\n\035EXECUT" +
-      "ION_METRIC_USED_CPU_AVG\020\024\022&\n\"EXECUTION_M" +
-      "ETRIC_ALLOCATED_CPU_AVG\020\025B<Z:github.com/" +
-      "flyteorg/flyte/flyteidl/gen/pb-go/flytei" +
-      "dl/coreb\006proto3"
+      "re.SpanB\004\n\002id\"N\n\025ExecutionMetricResult\022\016" +
+      "\n\006metric\030\001 \001(\t\022%\n\004data\030\002 \001(\0132\027.google.pr" +
+      "otobuf.StructB<Z:github.com/flyteorg/fly" +
+      "te/flyteidl/gen/pb-go/flyteidl/coreb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -564,7 +564,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, task_type_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, resource_meta_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, metrics_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, queries_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, start_time_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, end_time_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::GetTaskMetricsRequest, step_),
@@ -687,28 +687,27 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\n\020GetAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flyt"
   "eidl.admin.Agent\"\023\n\021ListAgentsRequest\";\n"
   "\022ListAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.fl"
-  "yteidl.admin.Agent\"\371\001\n\025GetTaskMetricsReq"
+  "yteidl.admin.Agent\"\331\001\n\025GetTaskMetricsReq"
   "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta"
-  "\030\002 \001(\014\022/\n\007metrics\030\003 \003(\0162\036.flyteidl.core."
-  "ExecutionMetric\022.\n\nstart_time\030\004 \001(\0132\032.go"
-  "ogle.protobuf.Timestamp\022,\n\010end_time\030\005 \001("
-  "\0132\032.google.protobuf.Timestamp\022\'\n\004step\030\006 "
-  "\001(\0132\031.google.protobuf.Duration\"O\n\026GetTas"
-  "kMetricsResponse\0225\n\007results\030\001 \003(\0132$.flyt"
-  "eidl.core.ExecutionMetricResult\"\\\n\022GetTa"
-  "skLogsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rreso"
-  "urce_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r\n\005token\030"
-  "\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007results\030"
-  "\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n\021RETRYAB"
-  "LE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022\013\n\007P"
-  "ENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;"
-  "github.com/flyteorg/flyte/flyteidl/gen/p"
-  "b-go/flyteidl/adminb\006proto3"
+  "\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nstart_time\030\004 "
+  "\001(\0132\032.google.protobuf.Timestamp\022,\n\010end_t"
+  "ime\030\005 \001(\0132\032.google.protobuf.Timestamp\022\'\n"
+  "\004step\030\006 \001(\0132\031.google.protobuf.Duration\"O"
+  "\n\026GetTaskMetricsResponse\0225\n\007results\030\001 \003("
+  "\0132$.flyteidl.core.ExecutionMetricResult\""
+  "\\\n\022GetTaskLogsRequest\022\021\n\ttask_type\030\001 \001(\t"
+  "\022\025\n\rresource_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r"
+  "\n\005token\030\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007"
+  "results\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n"
+  "\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILUR"
+  "E\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEED"
+  "ED\020\004B=Z;github.com/flyteorg/flyte/flytei"
+  "dl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 2387,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 2355,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -5949,7 +5948,7 @@ void GetTaskMetricsRequest::clear_step() {
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int GetTaskMetricsRequest::kTaskTypeFieldNumber;
 const int GetTaskMetricsRequest::kResourceMetaFieldNumber;
-const int GetTaskMetricsRequest::kMetricsFieldNumber;
+const int GetTaskMetricsRequest::kQueriesFieldNumber;
 const int GetTaskMetricsRequest::kStartTimeFieldNumber;
 const int GetTaskMetricsRequest::kEndTimeFieldNumber;
 const int GetTaskMetricsRequest::kStepFieldNumber;
@@ -5963,7 +5962,7 @@ GetTaskMetricsRequest::GetTaskMetricsRequest()
 GetTaskMetricsRequest::GetTaskMetricsRequest(const GetTaskMetricsRequest& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      metrics_(from.metrics_) {
+      queries_(from.queries_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   task_type_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.task_type().size() > 0) {
@@ -6029,7 +6028,7 @@ void GetTaskMetricsRequest::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  metrics_.Clear();
+  queries_.Clear();
   task_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   resource_meta_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && start_time_ != nullptr) {
@@ -6091,25 +6090,23 @@ const char* GetTaskMetricsRequest::_InternalParse(const char* begin, const char*
         ptr += size;
         break;
       }
-      // repeated .flyteidl.core.ExecutionMetric metrics = 3;
+      // repeated string queries = 3;
       case 3: {
-        if (static_cast<::google::protobuf::uint8>(tag) == 26) {
+        if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
+        do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::google::protobuf::internal::PackedEnumParser;
-          object = msg->mutable_metrics();
-          if (size > end - ptr) goto len_delim_till_end;
-          auto newend = ptr + size;
-          if (size) ptr = parser_till_end(ptr, newend, object, ctx);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr == newend);
-          break;
-        } else if (static_cast<::google::protobuf::uint8>(tag) != 24) goto handle_unusual;
-        do {
-          ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-          msg->add_metrics(static_cast<::flyteidl::core::ExecutionMetric>(val));
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          ctx->extra_parse_data().SetFieldName("flyteidl.admin.GetTaskMetricsRequest.queries");
+          object = msg->add_queries();
+          if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+            parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+            goto string_till_end;
+          }
+          GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+          ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+          ptr += size;
           if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 24 && (ptr += 1));
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
         break;
       }
       // .google.protobuf.Timestamp start_time = 4;
@@ -6211,26 +6208,16 @@ bool GetTaskMetricsRequest::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated .flyteidl.core.ExecutionMetric metrics = 3;
+      // repeated string queries = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
-          ::google::protobuf::uint32 length;
-          DO_(input->ReadVarint32(&length));
-          ::google::protobuf::io::CodedInputStream::Limit limit = input->PushLimit(static_cast<int>(length));
-          while (input->BytesUntilLimit() > 0) {
-            int value = 0;
-            DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-            add_metrics(static_cast< ::flyteidl::core::ExecutionMetric >(value));
-          }
-          input->PopLimit(limit);
-        } else if (static_cast< ::google::protobuf::uint8>(tag) == (24 & 0xFF)) {
-          int value = 0;
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          add_metrics(static_cast< ::flyteidl::core::ExecutionMetric >(value));
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->add_queries()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->queries(this->queries_size() - 1).data(),
+            static_cast<int>(this->queries(this->queries_size() - 1).length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.GetTaskMetricsRequest.queries"));
         } else {
           goto handle_unusual;
         }
@@ -6313,18 +6300,14 @@ void GetTaskMetricsRequest::SerializeWithCachedSizes(
       2, this->resource_meta(), output);
   }
 
-  // repeated .flyteidl.core.ExecutionMetric metrics = 3;
-  if (this->metrics_size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteTag(
-      3,
-      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
-      output);
-    output->WriteVarint32(_metrics_cached_byte_size_.load(
-        std::memory_order_relaxed));
-  }
-  for (int i = 0, n = this->metrics_size(); i < n; i++) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnumNoTag(
-      this->metrics(i), output);
+  // repeated string queries = 3;
+  for (int i = 0, n = this->queries_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->queries(i).data(), static_cast<int>(this->queries(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.GetTaskMetricsRequest.queries");
+    ::google::protobuf::internal::WireFormatLite::WriteString(
+      3, this->queries(i), output);
   }
 
   // .google.protobuf.Timestamp start_time = 4;
@@ -6376,16 +6359,14 @@ void GetTaskMetricsRequest::SerializeWithCachedSizes(
         2, this->resource_meta(), target);
   }
 
-  // repeated .flyteidl.core.ExecutionMetric metrics = 3;
-  if (this->metrics_size() > 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteTagToArray(
-      3,
-      ::google::protobuf::internal::WireFormatLite::WIRETYPE_LENGTH_DELIMITED,
-      target);
-    target = ::google::protobuf::io::CodedOutputStream::WriteVarint32ToArray(      _metrics_cached_byte_size_.load(std::memory_order_relaxed),
-        target);
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumNoTagToArray(
-      this->metrics_, target);
+  // repeated string queries = 3;
+  for (int i = 0, n = this->queries_size(); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->queries(i).data(), static_cast<int>(this->queries(i).length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.GetTaskMetricsRequest.queries");
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteStringToArray(3, this->queries(i), target);
   }
 
   // .google.protobuf.Timestamp start_time = 4;
@@ -6430,22 +6411,12 @@ size_t GetTaskMetricsRequest::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // repeated .flyteidl.core.ExecutionMetric metrics = 3;
-  {
-    size_t data_size = 0;
-    unsigned int count = static_cast<unsigned int>(this->metrics_size());for (unsigned int i = 0; i < count; i++) {
-      data_size += ::google::protobuf::internal::WireFormatLite::EnumSize(
-        this->metrics(static_cast<int>(i)));
-    }
-    if (data_size > 0) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::Int32Size(
-            static_cast<::google::protobuf::int32>(data_size));
-    }
-    int cached_size = ::google::protobuf::internal::ToCachedSize(data_size);
-    _metrics_cached_byte_size_.store(cached_size,
-                                    std::memory_order_relaxed);
-    total_size += data_size;
+  // repeated string queries = 3;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->queries_size());
+  for (int i = 0, n = this->queries_size(); i < n; i++) {
+    total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
+      this->queries(i));
   }
 
   // string task_type = 1;
@@ -6510,7 +6481,7 @@ void GetTaskMetricsRequest::MergeFrom(const GetTaskMetricsRequest& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  metrics_.MergeFrom(from.metrics_);
+  queries_.MergeFrom(from.queries_);
   if (from.task_type().size() > 0) {
 
     task_type_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.task_type_);
@@ -6555,7 +6526,7 @@ void GetTaskMetricsRequest::Swap(GetTaskMetricsRequest* other) {
 void GetTaskMetricsRequest::InternalSwap(GetTaskMetricsRequest* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
-  metrics_.InternalSwap(&other->metrics_);
+  queries_.InternalSwap(CastToBase(&other->queries_));
   task_type_.Swap(&other->task_type_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   resource_meta_.Swap(&other->resource_meta_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),

@@ -154,20 +154,20 @@ class ListAgentsResponse(_message.Message):
     def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...
 
 class GetTaskMetricsRequest(_message.Message):
-    __slots__ = ["task_type", "resource_meta", "metrics", "start_time", "end_time", "step"]
+    __slots__ = ["task_type", "resource_meta", "queries", "start_time", "end_time", "step"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
-    METRICS_FIELD_NUMBER: _ClassVar[int]
+    QUERIES_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
     STEP_FIELD_NUMBER: _ClassVar[int]
     task_type: str
     resource_meta: bytes
-    metrics: _containers.RepeatedScalarFieldContainer[_metrics_pb2.ExecutionMetric]
+    queries: _containers.RepeatedScalarFieldContainer[str]
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
     step: _duration_pb2.Duration
-    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., metrics: _Optional[_Iterable[_Union[_metrics_pb2.ExecutionMetric, str]]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., step: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., queries: _Optional[_Iterable[str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., step: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
 
 class GetTaskMetricsResponse(_message.Message):
     __slots__ = ["results"]

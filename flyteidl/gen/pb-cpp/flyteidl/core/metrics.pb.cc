@@ -77,7 +77,7 @@ void InitDefaults_flyteidl_2fcore_2fmetrics_2eproto() {
 }
 
 ::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fmetrics_2eproto[2];
-const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fmetrics_2eproto[1];
+constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fcore_2fmetrics_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fmetrics_2eproto = nullptr;
 
 const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fmetrics_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -131,22 +131,16 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fmetrics_2eproto[] =
   "tifierH\000\0229\n\007task_id\030\005 \001(\0132&.flyteidl.cor"
   "e.TaskExecutionIdentifierH\000\022\026\n\014operation"
   "_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.flyteidl.co"
-  "re.SpanB\004\n\002id\"n\n\025ExecutionMetricResult\022."
-  "\n\006metric\030\001 \001(\0162\036.flyteidl.core.Execution"
-  "Metric\022%\n\004data\030\002 \001(\0132\027.google.protobuf.S"
-  "truct*\331\001\n\017ExecutionMetric\022\036\n\032EXECUTION_M"
-  "ETRIC_UNDEFINED\020\000\022*\n&EXECUTION_METRIC_US"
-  "ED_MEMORY_BYTES_AVG\020\001\022/\n+EXECUTION_METRI"
-  "C_ALLOCATED_MEMORY_BYTES_AVG\020\002\022!\n\035EXECUT"
-  "ION_METRIC_USED_CPU_AVG\020\024\022&\n\"EXECUTION_M"
-  "ETRIC_ALLOCATED_CPU_AVG\020\025B<Z:github.com/"
-  "flyteorg/flyte/flyteidl/gen/pb-go/flytei"
-  "dl/coreb\006proto3"
+  "re.SpanB\004\n\002id\"N\n\025ExecutionMetricResult\022\016"
+  "\n\006metric\030\001 \001(\t\022%\n\004data\030\002 \001(\0132\027.google.pr"
+  "otobuf.StructB<Z:github.com/flyteorg/fly"
+  "te/flyteidl/gen/pb-go/flyteidl/coreb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fmetrics_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fmetrics_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fmetrics_2eproto,
-  "flyteidl/core/metrics.proto", &assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto, 895,
+  "flyteidl/core/metrics.proto", &assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto, 643,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto() {
@@ -163,23 +157,6 @@ void AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto() {
 static bool dynamic_init_dummy_flyteidl_2fcore_2fmetrics_2eproto = []() { AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto(); return true; }();
 namespace flyteidl {
 namespace core {
-const ::google::protobuf::EnumDescriptor* ExecutionMetric_descriptor() {
-  ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto);
-  return file_level_enum_descriptors_flyteidl_2fcore_2fmetrics_2eproto[0];
-}
-bool ExecutionMetric_IsValid(int value) {
-  switch (value) {
-    case 0:
-    case 1:
-    case 2:
-    case 20:
-    case 21:
-      return true;
-    default:
-      return false;
-  }
-}
-
 
 // ===================================================================
 
@@ -1007,21 +984,23 @@ ExecutionMetricResult::ExecutionMetricResult(const ExecutionMetricResult& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  metric_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.metric().size() > 0) {
+    metric_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.metric_);
+  }
   if (from.has_data()) {
     data_ = new ::google::protobuf::Struct(*from.data_);
   } else {
     data_ = nullptr;
   }
-  metric_ = from.metric_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.ExecutionMetricResult)
 }
 
 void ExecutionMetricResult::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_ExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto.base);
-  ::memset(&data_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&metric_) -
-      reinterpret_cast<char*>(&data_)) + sizeof(metric_));
+  metric_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  data_ = nullptr;
 }
 
 ExecutionMetricResult::~ExecutionMetricResult() {
@@ -1030,6 +1009,7 @@ ExecutionMetricResult::~ExecutionMetricResult() {
 }
 
 void ExecutionMetricResult::SharedDtor() {
+  metric_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete data_;
 }
 
@@ -1048,11 +1028,11 @@ void ExecutionMetricResult::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  metric_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
     delete data_;
   }
   data_ = nullptr;
-  metric_ = 0;
   _internal_metadata_.Clear();
 }
 
@@ -1069,12 +1049,20 @@ const char* ExecutionMetricResult::_InternalParse(const char* begin, const char*
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.core.ExecutionMetric metric = 1;
+      // string metric = 1;
       case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
-        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-        msg->set_metric(static_cast<::flyteidl::core::ExecutionMetric>(val));
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.core.ExecutionMetricResult.metric");
+        object = msg->mutable_metric();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       // .google.protobuf.Struct data = 2;
@@ -1105,6 +1093,10 @@ const char* ExecutionMetricResult::_InternalParse(const char* begin, const char*
     }  // switch
   }  // while
   return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
 len_delim_till_end:
   return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
                                {parser_till_end, object}, size);
@@ -1120,14 +1112,15 @@ bool ExecutionMetricResult::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.core.ExecutionMetric metric = 1;
+      // string metric = 1;
       case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
-          int value = 0;
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_metric(static_cast< ::flyteidl::core::ExecutionMetric >(value));
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_metric()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->metric().data(), static_cast<int>(this->metric().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.core.ExecutionMetricResult.metric"));
         } else {
           goto handle_unusual;
         }
@@ -1172,9 +1165,13 @@ void ExecutionMetricResult::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.ExecutionMetric metric = 1;
-  if (this->metric() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+  // string metric = 1;
+  if (this->metric().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->metric().data(), static_cast<int>(this->metric().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.ExecutionMetricResult.metric");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
       1, this->metric(), output);
   }
 
@@ -1197,10 +1194,15 @@ void ExecutionMetricResult::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.ExecutionMetric metric = 1;
-  if (this->metric() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      1, this->metric(), target);
+  // string metric = 1;
+  if (this->metric().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->metric().data(), static_cast<int>(this->metric().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.ExecutionMetricResult.metric");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->metric(), target);
   }
 
   // .google.protobuf.Struct data = 2;
@@ -1231,17 +1233,18 @@ size_t ExecutionMetricResult::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  // string metric = 1;
+  if (this->metric().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->metric());
+  }
+
   // .google.protobuf.Struct data = 2;
   if (this->has_data()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *data_);
-  }
-
-  // .flyteidl.core.ExecutionMetric metric = 1;
-  if (this->metric() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->metric());
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -1271,11 +1274,12 @@ void ExecutionMetricResult::MergeFrom(const ExecutionMetricResult& from) {
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.metric().size() > 0) {
+
+    metric_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.metric_);
+  }
   if (from.has_data()) {
     mutable_data()->::google::protobuf::Struct::MergeFrom(from.data());
-  }
-  if (from.metric() != 0) {
-    set_metric(from.metric());
   }
 }
 
@@ -1304,8 +1308,9 @@ void ExecutionMetricResult::Swap(ExecutionMetricResult* other) {
 void ExecutionMetricResult::InternalSwap(ExecutionMetricResult* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  metric_.Swap(&other->metric_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
   swap(data_, other->data_);
-  swap(metric_, other->metric_);
 }
 
 ::google::protobuf::Metadata ExecutionMetricResult::GetMetadata() const {

@@ -17789,33 +17789,13 @@
                 return Span;
             })();
     
-            /**
-             * ExecutionMetric enum.
-             * @name flyteidl.core.ExecutionMetric
-             * @enum {string}
-             * @property {number} EXECUTION_METRIC_UNDEFINED=0 EXECUTION_METRIC_UNDEFINED value
-             * @property {number} EXECUTION_METRIC_USED_MEMORY_BYTES_AVG=1 EXECUTION_METRIC_USED_MEMORY_BYTES_AVG value
-             * @property {number} EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG=2 EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG value
-             * @property {number} EXECUTION_METRIC_USED_CPU_AVG=20 EXECUTION_METRIC_USED_CPU_AVG value
-             * @property {number} EXECUTION_METRIC_ALLOCATED_CPU_AVG=21 EXECUTION_METRIC_ALLOCATED_CPU_AVG value
-             */
-            core.ExecutionMetric = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "EXECUTION_METRIC_UNDEFINED"] = 0;
-                values[valuesById[1] = "EXECUTION_METRIC_USED_MEMORY_BYTES_AVG"] = 1;
-                values[valuesById[2] = "EXECUTION_METRIC_ALLOCATED_MEMORY_BYTES_AVG"] = 2;
-                values[valuesById[20] = "EXECUTION_METRIC_USED_CPU_AVG"] = 20;
-                values[valuesById[21] = "EXECUTION_METRIC_ALLOCATED_CPU_AVG"] = 21;
-                return values;
-            })();
-    
             core.ExecutionMetricResult = (function() {
     
                 /**
                  * Properties of an ExecutionMetricResult.
                  * @memberof flyteidl.core
                  * @interface IExecutionMetricResult
-                 * @property {flyteidl.core.ExecutionMetric|null} [metric] ExecutionMetricResult metric
+                 * @property {string|null} [metric] ExecutionMetricResult metric
                  * @property {google.protobuf.IStruct|null} [data] ExecutionMetricResult data
                  */
     
@@ -17836,11 +17816,11 @@
     
                 /**
                  * ExecutionMetricResult metric.
-                 * @member {flyteidl.core.ExecutionMetric} metric
+                 * @member {string} metric
                  * @memberof flyteidl.core.ExecutionMetricResult
                  * @instance
                  */
-                ExecutionMetricResult.prototype.metric = 0;
+                ExecutionMetricResult.prototype.metric = "";
     
                 /**
                  * ExecutionMetricResult data.
@@ -17875,7 +17855,7 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.metric != null && message.hasOwnProperty("metric"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.metric);
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.metric);
                     if (message.data != null && message.hasOwnProperty("data"))
                         $root.google.protobuf.Struct.encode(message.data, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
@@ -17900,7 +17880,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.metric = reader.int32();
+                            message.metric = reader.string();
                             break;
                         case 2:
                             message.data = $root.google.protobuf.Struct.decode(reader, reader.uint32());
@@ -17925,16 +17905,8 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     if (message.metric != null && message.hasOwnProperty("metric"))
-                        switch (message.metric) {
-                        default:
-                            return "metric: enum value expected";
-                        case 0:
-                        case 1:
-                        case 2:
-                        case 20:
-                        case 21:
-                            break;
-                        }
+                        if (!$util.isString(message.metric))
+                            return "metric: string expected";
                     if (message.data != null && message.hasOwnProperty("data")) {
                         var error = $root.google.protobuf.Struct.verify(message.data);
                         if (error)
@@ -23491,7 +23463,7 @@
                  * @interface IGetTaskMetricsRequest
                  * @property {string|null} [taskType] GetTaskMetricsRequest taskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskMetricsRequest resourceMeta
-                 * @property {Array.<flyteidl.core.ExecutionMetric>|null} [metrics] GetTaskMetricsRequest metrics
+                 * @property {Array.<string>|null} [queries] GetTaskMetricsRequest queries
                  * @property {google.protobuf.ITimestamp|null} [startTime] GetTaskMetricsRequest startTime
                  * @property {google.protobuf.ITimestamp|null} [endTime] GetTaskMetricsRequest endTime
                  * @property {google.protobuf.IDuration|null} [step] GetTaskMetricsRequest step
@@ -23506,7 +23478,7 @@
                  * @param {flyteidl.admin.IGetTaskMetricsRequest=} [properties] Properties to set
                  */
                 function GetTaskMetricsRequest(properties) {
-                    this.metrics = [];
+                    this.queries = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -23530,12 +23502,12 @@
                 GetTaskMetricsRequest.prototype.resourceMeta = $util.newBuffer([]);
     
                 /**
-                 * GetTaskMetricsRequest metrics.
-                 * @member {Array.<flyteidl.core.ExecutionMetric>} metrics
+                 * GetTaskMetricsRequest queries.
+                 * @member {Array.<string>} queries
                  * @memberof flyteidl.admin.GetTaskMetricsRequest
                  * @instance
                  */
-                GetTaskMetricsRequest.prototype.metrics = $util.emptyArray;
+                GetTaskMetricsRequest.prototype.queries = $util.emptyArray;
     
                 /**
                  * GetTaskMetricsRequest startTime.
@@ -23589,12 +23561,9 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.taskType);
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
-                    if (message.metrics != null && message.metrics.length) {
-                        writer.uint32(/* id 3, wireType 2 =*/26).fork();
-                        for (var i = 0; i < message.metrics.length; ++i)
-                            writer.int32(message.metrics[i]);
-                        writer.ldelim();
-                    }
+                    if (message.queries != null && message.queries.length)
+                        for (var i = 0; i < message.queries.length; ++i)
+                            writer.uint32(/* id 3, wireType 2 =*/26).string(message.queries[i]);
                     if (message.startTime != null && message.hasOwnProperty("startTime"))
                         $root.google.protobuf.Timestamp.encode(message.startTime, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.endTime != null && message.hasOwnProperty("endTime"))
@@ -23629,14 +23598,9 @@
                             message.resourceMeta = reader.bytes();
                             break;
                         case 3:
-                            if (!(message.metrics && message.metrics.length))
-                                message.metrics = [];
-                            if ((tag & 7) === 2) {
-                                var end2 = reader.uint32() + reader.pos;
-                                while (reader.pos < end2)
-                                    message.metrics.push(reader.int32());
-                            } else
-                                message.metrics.push(reader.int32());
+                            if (!(message.queries && message.queries.length))
+                                message.queries = [];
+                            message.queries.push(reader.string());
                             break;
                         case 4:
                             message.startTime = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
@@ -23672,20 +23636,12 @@
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
                             return "resourceMeta: buffer expected";
-                    if (message.metrics != null && message.hasOwnProperty("metrics")) {
-                        if (!Array.isArray(message.metrics))
-                            return "metrics: array expected";
-                        for (var i = 0; i < message.metrics.length; ++i)
-                            switch (message.metrics[i]) {
-                            default:
-                                return "metrics: enum value[] expected";
-                            case 0:
-                            case 1:
-                            case 2:
-                            case 20:
-                            case 21:
-                                break;
-                            }
+                    if (message.queries != null && message.hasOwnProperty("queries")) {
+                        if (!Array.isArray(message.queries))
+                            return "queries: array expected";
+                        for (var i = 0; i < message.queries.length; ++i)
+                            if (!$util.isString(message.queries[i]))
+                                return "queries: string[] expected";
                     }
                     if (message.startTime != null && message.hasOwnProperty("startTime")) {
                         var error = $root.google.protobuf.Timestamp.verify(message.startTime);
