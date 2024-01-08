@@ -39,6 +39,7 @@
 #include "flyteidl/core/artifact_id.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/metrics.pb.h"
+#include "flyteidl/core/persistent_envs.pb.h"
 #include "flyteidl/core/security.pb.h"
 #include <google/protobuf/duration.pb.h>
 #include <google/protobuf/timestamp.pb.h>

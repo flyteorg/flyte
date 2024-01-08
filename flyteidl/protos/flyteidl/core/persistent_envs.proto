@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/identifier.proto";
+
+message EnvironmentAssignment {
+  string id = 1;
+
+  repeated string node_ids = 2;
+  repeated SubworkflowEnvironments subworkflow_environments = 3;
+
+  EnvironmentType type = 4;
+  FastTaskEnvironment fasttask_environment = 5;
+}
+
+enum EnvironmentType {
+  FASTTASK = 0;
+}
+
+message SubworkflowEnvironments {
+  core.Identifier workflow_id = 1;
+  string environment_id = 2;
+}
+
+message Environment {
+  EnvironmentType type = 1;
+  FastTaskEnvironment fasttask_environment = 2;
+}
+
+message FastTaskEnvironment {
+  string queue_id = 1;
+  string namespace = 2;
+  string pod_id = 3;
+}

@@ -5,6 +5,7 @@ from flyteidl.core import execution_pb2 as _execution_pb2
 from flyteidl.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import metrics_pb2 as _metrics_pb2
+from flyteidl.core import persistent_envs_pb2 as _persistent_envs_pb2
 from flyteidl.core import security_pb2 as _security_pb2
 from google.protobuf import duration_pb2 as _duration_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2

@@ -10,6 +10,7 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/metrics.proto";
+import "flyteidl/core/persistent_envs.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";

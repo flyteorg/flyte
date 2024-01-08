@@ -17789,6 +17789,626 @@
                 return Span;
             })();
     
+            core.EnvironmentAssignment = (function() {
+    
+                /**
+                 * Properties of an EnvironmentAssignment.
+                 * @memberof flyteidl.core
+                 * @interface IEnvironmentAssignment
+                 * @property {string|null} [id] EnvironmentAssignment id
+                 * @property {Array.<string>|null} [nodeIds] EnvironmentAssignment nodeIds
+                 * @property {Array.<flyteidl.core.ISubworkflowEnvironments>|null} [subworkflowEnvironments] EnvironmentAssignment subworkflowEnvironments
+                 * @property {flyteidl.core.EnvironmentType|null} [type] EnvironmentAssignment type
+                 * @property {flyteidl.core.IFastTaskEnvironment|null} [fasttaskEnvironment] EnvironmentAssignment fasttaskEnvironment
+                 */
+    
+                /**
+                 * Constructs a new EnvironmentAssignment.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an EnvironmentAssignment.
+                 * @implements IEnvironmentAssignment
+                 * @constructor
+                 * @param {flyteidl.core.IEnvironmentAssignment=} [properties] Properties to set
+                 */
+                function EnvironmentAssignment(properties) {
+                    this.nodeIds = [];
+                    this.subworkflowEnvironments = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * EnvironmentAssignment id.
+                 * @member {string} id
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @instance
+                 */
+                EnvironmentAssignment.prototype.id = "";
+    
+                /**
+                 * EnvironmentAssignment nodeIds.
+                 * @member {Array.<string>} nodeIds
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @instance
+                 */
+                EnvironmentAssignment.prototype.nodeIds = $util.emptyArray;
+    
+                /**
+                 * EnvironmentAssignment subworkflowEnvironments.
+                 * @member {Array.<flyteidl.core.ISubworkflowEnvironments>} subworkflowEnvironments
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @instance
+                 */
+                EnvironmentAssignment.prototype.subworkflowEnvironments = $util.emptyArray;
+    
+                /**
+                 * EnvironmentAssignment type.
+                 * @member {flyteidl.core.EnvironmentType} type
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @instance
+                 */
+                EnvironmentAssignment.prototype.type = 0;
+    
+                /**
+                 * EnvironmentAssignment fasttaskEnvironment.
+                 * @member {flyteidl.core.IFastTaskEnvironment|null|undefined} fasttaskEnvironment
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @instance
+                 */
+                EnvironmentAssignment.prototype.fasttaskEnvironment = null;
+    
+                /**
+                 * Creates a new EnvironmentAssignment instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @static
+                 * @param {flyteidl.core.IEnvironmentAssignment=} [properties] Properties to set
+                 * @returns {flyteidl.core.EnvironmentAssignment} EnvironmentAssignment instance
+                 */
+                EnvironmentAssignment.create = function create(properties) {
+                    return new EnvironmentAssignment(properties);
+                };
+    
+                /**
+                 * Encodes the specified EnvironmentAssignment message. Does not implicitly {@link flyteidl.core.EnvironmentAssignment.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @static
+                 * @param {flyteidl.core.IEnvironmentAssignment} message EnvironmentAssignment message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                EnvironmentAssignment.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
+                    if (message.nodeIds != null && message.nodeIds.length)
+                        for (var i = 0; i < message.nodeIds.length; ++i)
+                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.nodeIds[i]);
+                    if (message.subworkflowEnvironments != null && message.subworkflowEnvironments.length)
+                        for (var i = 0; i < message.subworkflowEnvironments.length; ++i)
+                            $root.flyteidl.core.SubworkflowEnvironments.encode(message.subworkflowEnvironments[i], writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        writer.uint32(/* id 4, wireType 0 =*/32).int32(message.type);
+                    if (message.fasttaskEnvironment != null && message.hasOwnProperty("fasttaskEnvironment"))
+                        $root.flyteidl.core.FastTaskEnvironment.encode(message.fasttaskEnvironment, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an EnvironmentAssignment message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.EnvironmentAssignment} EnvironmentAssignment
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                EnvironmentAssignment.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.EnvironmentAssignment();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = reader.string();
+                            break;
+                        case 2:
+                            if (!(message.nodeIds && message.nodeIds.length))
+                                message.nodeIds = [];
+                            message.nodeIds.push(reader.string());
+                            break;
+                        case 3:
+                            if (!(message.subworkflowEnvironments && message.subworkflowEnvironments.length))
+                                message.subworkflowEnvironments = [];
+                            message.subworkflowEnvironments.push($root.flyteidl.core.SubworkflowEnvironments.decode(reader, reader.uint32()));
+                            break;
+                        case 4:
+                            message.type = reader.int32();
+                            break;
+                        case 5:
+                            message.fasttaskEnvironment = $root.flyteidl.core.FastTaskEnvironment.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an EnvironmentAssignment message.
+                 * @function verify
+                 * @memberof flyteidl.core.EnvironmentAssignment
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                EnvironmentAssignment.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        if (!$util.isString(message.id))
+                            return "id: string expected";
+                    if (message.nodeIds != null && message.hasOwnProperty("nodeIds")) {
+                        if (!Array.isArray(message.nodeIds))
+                            return "nodeIds: array expected";
+                        for (var i = 0; i < message.nodeIds.length; ++i)
+                            if (!$util.isString(message.nodeIds[i]))
+                                return "nodeIds: string[] expected";
+                    }
+                    if (message.subworkflowEnvironments != null && message.hasOwnProperty("subworkflowEnvironments")) {
+                        if (!Array.isArray(message.subworkflowEnvironments))
+                            return "subworkflowEnvironments: array expected";
+                        for (var i = 0; i < message.subworkflowEnvironments.length; ++i) {
+                            var error = $root.flyteidl.core.SubworkflowEnvironments.verify(message.subworkflowEnvironments[i]);
+                            if (error)
+                                return "subworkflowEnvironments." + error;
+                        }
+                    }
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        switch (message.type) {
+                        default:
+                            return "type: enum value expected";
+                        case 0:
+                            break;
+                        }
+                    if (message.fasttaskEnvironment != null && message.hasOwnProperty("fasttaskEnvironment")) {
+                        var error = $root.flyteidl.core.FastTaskEnvironment.verify(message.fasttaskEnvironment);
+                        if (error)
+                            return "fasttaskEnvironment." + error;
+                    }
+                    return null;
+                };
+    
+                return EnvironmentAssignment;
+            })();
+    
+            /**
+             * EnvironmentType enum.
+             * @name flyteidl.core.EnvironmentType
+             * @enum {string}
+             * @property {number} FASTTASK=0 FASTTASK value
+             */
+            core.EnvironmentType = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "FASTTASK"] = 0;
+                return values;
+            })();
+    
+            core.SubworkflowEnvironments = (function() {
+    
+                /**
+                 * Properties of a SubworkflowEnvironments.
+                 * @memberof flyteidl.core
+                 * @interface ISubworkflowEnvironments
+                 * @property {flyteidl.core.IIdentifier|null} [workflowId] SubworkflowEnvironments workflowId
+                 * @property {string|null} [environmentId] SubworkflowEnvironments environmentId
+                 */
+    
+                /**
+                 * Constructs a new SubworkflowEnvironments.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a SubworkflowEnvironments.
+                 * @implements ISubworkflowEnvironments
+                 * @constructor
+                 * @param {flyteidl.core.ISubworkflowEnvironments=} [properties] Properties to set
+                 */
+                function SubworkflowEnvironments(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * SubworkflowEnvironments workflowId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} workflowId
+                 * @memberof flyteidl.core.SubworkflowEnvironments
+                 * @instance
+                 */
+                SubworkflowEnvironments.prototype.workflowId = null;
+    
+                /**
+                 * SubworkflowEnvironments environmentId.
+                 * @member {string} environmentId
+                 * @memberof flyteidl.core.SubworkflowEnvironments
+                 * @instance
+                 */
+                SubworkflowEnvironments.prototype.environmentId = "";
+    
+                /**
+                 * Creates a new SubworkflowEnvironments instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.SubworkflowEnvironments
+                 * @static
+                 * @param {flyteidl.core.ISubworkflowEnvironments=} [properties] Properties to set
+                 * @returns {flyteidl.core.SubworkflowEnvironments} SubworkflowEnvironments instance
+                 */
+                SubworkflowEnvironments.create = function create(properties) {
+                    return new SubworkflowEnvironments(properties);
+                };
+    
+                /**
+                 * Encodes the specified SubworkflowEnvironments message. Does not implicitly {@link flyteidl.core.SubworkflowEnvironments.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.SubworkflowEnvironments
+                 * @static
+                 * @param {flyteidl.core.ISubworkflowEnvironments} message SubworkflowEnvironments message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                SubworkflowEnvironments.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId"))
+                        $root.flyteidl.core.Identifier.encode(message.workflowId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.environmentId != null && message.hasOwnProperty("environmentId"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.environmentId);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a SubworkflowEnvironments message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.SubworkflowEnvironments
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.SubworkflowEnvironments} SubworkflowEnvironments
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                SubworkflowEnvironments.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.SubworkflowEnvironments();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.workflowId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.environmentId = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a SubworkflowEnvironments message.
+                 * @function verify
+                 * @memberof flyteidl.core.SubworkflowEnvironments
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                SubworkflowEnvironments.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.workflowId != null && message.hasOwnProperty("workflowId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.workflowId);
+                        if (error)
+                            return "workflowId." + error;
+                    }
+                    if (message.environmentId != null && message.hasOwnProperty("environmentId"))
+                        if (!$util.isString(message.environmentId))
+                            return "environmentId: string expected";
+                    return null;
+                };
+    
+                return SubworkflowEnvironments;
+            })();
+    
+            core.Environment = (function() {
+    
+                /**
+                 * Properties of an Environment.
+                 * @memberof flyteidl.core
+                 * @interface IEnvironment
+                 * @property {flyteidl.core.EnvironmentType|null} [type] Environment type
+                 * @property {flyteidl.core.IFastTaskEnvironment|null} [fasttaskEnvironment] Environment fasttaskEnvironment
+                 */
+    
+                /**
+                 * Constructs a new Environment.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents an Environment.
+                 * @implements IEnvironment
+                 * @constructor
+                 * @param {flyteidl.core.IEnvironment=} [properties] Properties to set
+                 */
+                function Environment(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Environment type.
+                 * @member {flyteidl.core.EnvironmentType} type
+                 * @memberof flyteidl.core.Environment
+                 * @instance
+                 */
+                Environment.prototype.type = 0;
+    
+                /**
+                 * Environment fasttaskEnvironment.
+                 * @member {flyteidl.core.IFastTaskEnvironment|null|undefined} fasttaskEnvironment
+                 * @memberof flyteidl.core.Environment
+                 * @instance
+                 */
+                Environment.prototype.fasttaskEnvironment = null;
+    
+                /**
+                 * Creates a new Environment instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Environment
+                 * @static
+                 * @param {flyteidl.core.IEnvironment=} [properties] Properties to set
+                 * @returns {flyteidl.core.Environment} Environment instance
+                 */
+                Environment.create = function create(properties) {
+                    return new Environment(properties);
+                };
+    
+                /**
+                 * Encodes the specified Environment message. Does not implicitly {@link flyteidl.core.Environment.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Environment
+                 * @static
+                 * @param {flyteidl.core.IEnvironment} message Environment message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Environment.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
+                    if (message.fasttaskEnvironment != null && message.hasOwnProperty("fasttaskEnvironment"))
+                        $root.flyteidl.core.FastTaskEnvironment.encode(message.fasttaskEnvironment, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an Environment message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Environment
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Environment} Environment
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Environment.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Environment();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.type = reader.int32();
+                            break;
+                        case 2:
+                            message.fasttaskEnvironment = $root.flyteidl.core.FastTaskEnvironment.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an Environment message.
+                 * @function verify
+                 * @memberof flyteidl.core.Environment
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Environment.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        switch (message.type) {
+                        default:
+                            return "type: enum value expected";
+                        case 0:
+                            break;
+                        }
+                    if (message.fasttaskEnvironment != null && message.hasOwnProperty("fasttaskEnvironment")) {
+                        var error = $root.flyteidl.core.FastTaskEnvironment.verify(message.fasttaskEnvironment);
+                        if (error)
+                            return "fasttaskEnvironment." + error;
+                    }
+                    return null;
+                };
+    
+                return Environment;
+            })();
+    
+            core.FastTaskEnvironment = (function() {
+    
+                /**
+                 * Properties of a FastTaskEnvironment.
+                 * @memberof flyteidl.core
+                 * @interface IFastTaskEnvironment
+                 * @property {string|null} [queueId] FastTaskEnvironment queueId
+                 * @property {string|null} [namespace] FastTaskEnvironment namespace
+                 * @property {string|null} [podId] FastTaskEnvironment podId
+                 */
+    
+                /**
+                 * Constructs a new FastTaskEnvironment.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a FastTaskEnvironment.
+                 * @implements IFastTaskEnvironment
+                 * @constructor
+                 * @param {flyteidl.core.IFastTaskEnvironment=} [properties] Properties to set
+                 */
+                function FastTaskEnvironment(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * FastTaskEnvironment queueId.
+                 * @member {string} queueId
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @instance
+                 */
+                FastTaskEnvironment.prototype.queueId = "";
+    
+                /**
+                 * FastTaskEnvironment namespace.
+                 * @member {string} namespace
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @instance
+                 */
+                FastTaskEnvironment.prototype.namespace = "";
+    
+                /**
+                 * FastTaskEnvironment podId.
+                 * @member {string} podId
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @instance
+                 */
+                FastTaskEnvironment.prototype.podId = "";
+    
+                /**
+                 * Creates a new FastTaskEnvironment instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @static
+                 * @param {flyteidl.core.IFastTaskEnvironment=} [properties] Properties to set
+                 * @returns {flyteidl.core.FastTaskEnvironment} FastTaskEnvironment instance
+                 */
+                FastTaskEnvironment.create = function create(properties) {
+                    return new FastTaskEnvironment(properties);
+                };
+    
+                /**
+                 * Encodes the specified FastTaskEnvironment message. Does not implicitly {@link flyteidl.core.FastTaskEnvironment.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @static
+                 * @param {flyteidl.core.IFastTaskEnvironment} message FastTaskEnvironment message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                FastTaskEnvironment.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.queueId != null && message.hasOwnProperty("queueId"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.queueId);
+                    if (message.namespace != null && message.hasOwnProperty("namespace"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.namespace);
+                    if (message.podId != null && message.hasOwnProperty("podId"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.podId);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a FastTaskEnvironment message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.FastTaskEnvironment} FastTaskEnvironment
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                FastTaskEnvironment.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.FastTaskEnvironment();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.queueId = reader.string();
+                            break;
+                        case 2:
+                            message.namespace = reader.string();
+                            break;
+                        case 3:
+                            message.podId = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a FastTaskEnvironment message.
+                 * @function verify
+                 * @memberof flyteidl.core.FastTaskEnvironment
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                FastTaskEnvironment.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.queueId != null && message.hasOwnProperty("queueId"))
+                        if (!$util.isString(message.queueId))
+                            return "queueId: string expected";
+                    if (message.namespace != null && message.hasOwnProperty("namespace"))
+                        if (!$util.isString(message.namespace))
+                            return "namespace: string expected";
+                    if (message.podId != null && message.hasOwnProperty("podId"))
+                        if (!$util.isString(message.podId))
+                            return "podId: string expected";
+                    return null;
+                };
+    
+                return FastTaskEnvironment;
+            })();
+    
             core.WorkflowClosure = (function() {
     
                 /**
