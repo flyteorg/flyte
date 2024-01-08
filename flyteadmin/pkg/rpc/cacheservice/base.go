@@ -3,7 +3,6 @@ package cacheservice
 import (
 	"context"
 	"fmt"
-
 	"runtime/debug"
 
 	"github.com/golang/protobuf/proto"

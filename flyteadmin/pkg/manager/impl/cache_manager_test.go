@@ -52,17 +52,8 @@ func ptr[T any](val T) *T {
 	return &val
 }
 
-func setupCacheEvictionMockRepositories(t *testing.T, repository interfaces.Repository, executionModel *models.Execution,
-	nodeExecutionModels []models.NodeExecution, taskExecutionModels map[string][]models.TaskExecution) map[string]int {
-	if executionModel != nil {
-		repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
-			func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
-				assert.Equal(t, executionIdentifier.Domain, input.Domain)
-				assert.Equal(t, executionIdentifier.Name, input.Name)
-				assert.Equal(t, executionIdentifier.Project, input.Project)
-				return *executionModel, nil
-			})
-	}
+func setupCacheEvictionMockRepositories(t *testing.T, repository interfaces.Repository, nodeExecutionModels []models.NodeExecution,
+	taskExecutionModels map[string][]models.TaskExecution) map[string]int {
 
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
@@ -265,8 +256,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			},
 		}
 
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
+		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 		deletedArtifactIDs := setupCacheEvictionCatalogClient(t, catalogClient, artifactTags, taskExecutionModels)
 
 		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
@@ -386,8 +376,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			},
 		}
 
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
+		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
 		request := service.EvictTaskExecutionCacheRequest{
@@ -583,8 +572,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			},
 		}
 
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
+		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
 		request := service.EvictTaskExecutionCacheRequest{
@@ -609,395 +597,6 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 		assert.Empty(t, resp.GetErrors().GetErrors())
 
 		assert.Empty(t, updatedNodeExecutions)
-	})
-
-	t.Run("subtask with partially cached results", func(t *testing.T) {
-		repository := repositoryMocks.NewMockRepository()
-		catalogClient := &mocks.Client{}
-		mockConfig := getMockExecutionsConfigProvider()
-
-		artifactTags := []*core.CatalogArtifactTag{
-			{
-				ArtifactId: "0285ddb9-ddfb-4835-bc22-80e1bdf7f560",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYM",
-			},
-			{
-				ArtifactId: "4074be3e-7cee-4a7b-8c45-56577fa32f24",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYN",
-			},
-			{
-				ArtifactId: "a8bd60d5-b2bb-4b06-a2ac-240d183a4ca8",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYO",
-			},
-		}
-
-		nodeExecutionModels := []models.NodeExecution{
-			{
-				BaseModel: models.BaseModel{
-					ID: 1,
-				},
-				NodeExecutionKey: models.NodeExecutionKey{
-					ExecutionKey: models.ExecutionKey{
-						Project: executionIdentifier.Project,
-						Domain:  executionIdentifier.Domain,
-						Name:    executionIdentifier.Name,
-					},
-					NodeID: "n0",
-				},
-				Phase: core.NodeExecution_SUCCEEDED.String(),
-				NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-					IsParentNode: true,
-					IsDynamic:    false,
-					SpecNodeId:   "n0",
-				}),
-				Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-					TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-						TaskNodeMetadata: &admin.TaskNodeMetadata{
-							CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-							CatalogKey: &core.CatalogMetadata{
-								DatasetId: &core.Identifier{
-									ResourceType: core.ResourceType_DATASET,
-									Project:      executionIdentifier.Project,
-									Domain:       executionIdentifier.Domain,
-									Name:         "flyte_task-test.evict.execution_cache_single_task",
-									Version:      "version",
-								},
-								ArtifactTag: artifactTags[0],
-							},
-						},
-					},
-				}),
-				ChildNodeExecutions: []models.NodeExecution{
-					{
-						BaseModel: models.BaseModel{
-							ID: 2,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-start-node",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "start-node",
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 3,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n0",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n0",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_sub",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[1],
-										SourceExecution: &core.CatalogMetadata_SourceTaskExecution{
-											SourceTaskExecution: &core.TaskExecutionIdentifier{
-												TaskId: &core.Identifier{
-													ResourceType: core.ResourceType_TASK,
-													Project:      executionIdentifier.Project,
-													Domain:       executionIdentifier.Domain,
-													Name:         "flyte_task-test.evict.execution_cache",
-													Version:      "version",
-												},
-												NodeExecutionId: &core.NodeExecutionIdentifier{
-													NodeId:      "dn0",
-													ExecutionId: &executionIdentifier,
-												},
-												RetryAttempt: 0,
-											},
-										},
-									},
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 4,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n1",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n1",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_DISABLED,
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 5,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n2",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n2",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_sub",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[2],
-										SourceExecution: &core.CatalogMetadata_SourceTaskExecution{
-											SourceTaskExecution: &core.TaskExecutionIdentifier{
-												TaskId: &core.Identifier{
-													ResourceType: core.ResourceType_TASK,
-													Project:      executionIdentifier.Project,
-													Domain:       executionIdentifier.Domain,
-													Name:         "flyte_task-test.evict.execution_cache",
-													Version:      "version",
-												},
-												NodeExecutionId: &core.NodeExecutionIdentifier{
-													NodeId:      "dn2",
-													ExecutionId: &executionIdentifier,
-												},
-												RetryAttempt: 0,
-											},
-										},
-									},
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 6,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-end-node",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "end-node",
-						}),
-					},
-				},
-			},
-		}
-
-		taskExecutionModels := map[string][]models.TaskExecution{
-			"n0": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 1,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache_single_task",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n0-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n0": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 2,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n0",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n0-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n1": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 2,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n1",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n1-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n2": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 2,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n2",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n2-0",
-						},
-					}),
-				},
-			},
-		}
-
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
-		deletedArtifactIDs := setupCacheEvictionCatalogClient(t, catalogClient, artifactTags, taskExecutionModels)
-
-		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
-		request := service.EvictTaskExecutionCacheRequest{
-			TaskExecutionId: &core.TaskExecutionIdentifier{
-				TaskId: &core.Identifier{
-					ResourceType: core.ResourceType_TASK,
-					Project:      executionIdentifier.Project,
-					Domain:       executionIdentifier.Domain,
-					Name:         executionIdentifier.Name,
-					Version:      version,
-				},
-				NodeExecutionId: &core.NodeExecutionIdentifier{
-					ExecutionId: &executionIdentifier,
-					NodeId:      "n0",
-				},
-				RetryAttempt: uint32(0),
-			},
-		}
-		resp, err := cacheManager.EvictTaskExecutionCache(context.Background(), request)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-		assert.Empty(t, resp.GetErrors().GetErrors())
-
-		assert.Contains(t, updatedNodeExecutions, "n0")
-		assert.Contains(t, updatedNodeExecutions, "n0-0-n0")
-		assert.Contains(t, updatedNodeExecutions, "n0-0-n2")
-		assert.Len(t, updatedNodeExecutions, 3)
-
-		for _, artifactTag := range artifactTags {
-			assert.Equal(t, 1, deletedArtifactIDs[artifactTag.GetArtifactId()])
-		}
-		assert.Len(t, deletedArtifactIDs, len(artifactTags))
 	})
 
 	t.Run("idempotency", func(t *testing.T) {
@@ -1084,8 +683,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			},
 		}
 
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
+		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 		deletedArtifactIDs := setupCacheEvictionCatalogClient(t, catalogClient, artifactTags, taskExecutionModels)
 
 		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
@@ -1205,8 +803,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			},
 		}
 
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
+		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 		catalogClient.On("GetOrExtendReservationByArtifactTag", mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(&datacatalog.Reservation{OwnerId: "otherOwnerID"}, nil)
@@ -1326,8 +923,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			},
 		}
 
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
+		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 		for nodeID := range taskExecutionModels {
 			for _, taskExecution := range taskExecutionModels[nodeID] {
@@ -1458,8 +1054,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 				},
 			}
 
-			updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-				taskExecutionModels)
+			updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 			catalogClient.On("GetOrExtendReservationByArtifactTag", mock.Anything, mock.Anything,
 				mock.Anything, mock.Anything, mock.Anything).Return(nil, status.Error(codes.Internal, "error"))
@@ -1579,8 +1174,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 				},
 			}
 
-			updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-				taskExecutionModels)
+			updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 			for nodeID := range taskExecutionModels {
 				for _, taskExecution := range taskExecutionModels[nodeID] {
@@ -1714,8 +1308,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 				},
 			}
 
-			updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-				taskExecutionModels)
+			updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 			for nodeID := range taskExecutionModels {
 				for _, taskExecution := range taskExecutionModels[nodeID] {
@@ -1861,8 +1454,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 					},
 				}
 
-				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-					taskExecutionModels)
+				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 				repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetGetCallback(
 					func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
@@ -1980,8 +1572,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 					},
 				}
 
-				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-					taskExecutionModels)
+				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 				repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetUpdateSelectedCallback(
 					func(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error {
@@ -2024,129 +1615,6 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 		})
 
 		t.Run("TaskExecutionRepo", func(t *testing.T) {
-			t.Run("List", func(t *testing.T) {
-				repository := repositoryMocks.NewMockRepository()
-				catalogClient := &mocks.Client{}
-				mockConfig := getMockExecutionsConfigProvider()
-
-				artifactTags := []*core.CatalogArtifactTag{
-					{
-						ArtifactId: "0285ddb9-ddfb-4835-bc22-80e1bdf7f560",
-						Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYM",
-					},
-				}
-
-				nodeExecutionModels := []models.NodeExecution{
-					{
-						BaseModel: models.BaseModel{
-							ID: 1,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n0",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_single_task",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[0],
-									},
-								},
-							},
-						}),
-					},
-				}
-
-				taskExecutionModels := map[string][]models.TaskExecution{
-					"n0": {
-						{
-							BaseModel: models.BaseModel{
-								ID: 1,
-							},
-							TaskExecutionKey: models.TaskExecutionKey{
-								TaskKey: models.TaskKey{
-									Project: executionIdentifier.Project,
-									Domain:  executionIdentifier.Domain,
-									Name:    "flyte_task-test.evict.execution_cache",
-									Version: "version",
-								},
-								NodeExecutionKey: models.NodeExecutionKey{
-									ExecutionKey: models.ExecutionKey{
-										Project: executionIdentifier.Project,
-										Domain:  executionIdentifier.Domain,
-										Name:    executionIdentifier.Name,
-									},
-									NodeID: "n0",
-								},
-								RetryAttempt: ptr[uint32](0),
-							},
-							Phase: core.NodeExecution_SUCCEEDED.String(),
-							Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-								Metadata: &event.TaskExecutionMetadata{
-									GeneratedName: "name-n0-0",
-								},
-							}),
-						},
-					},
-				}
-
-				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-					taskExecutionModels)
-
-				repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetListCallback(
-					func(ctx context.Context, input interfaces.ListResourceInput) (interfaces.TaskExecutionCollectionOutput, error) {
-						return interfaces.TaskExecutionCollectionOutput{}, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "error")
-					})
-
-				cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
-				request := service.EvictTaskExecutionCacheRequest{
-					TaskExecutionId: &core.TaskExecutionIdentifier{
-						TaskId: &core.Identifier{
-							ResourceType: core.ResourceType_TASK,
-							Project:      executionIdentifier.Project,
-							Domain:       executionIdentifier.Domain,
-							Name:         executionIdentifier.Name,
-							Version:      version,
-						},
-						NodeExecutionId: &core.NodeExecutionIdentifier{
-							ExecutionId: &executionIdentifier,
-							NodeId:      "n0",
-						},
-						RetryAttempt: uint32(0),
-					},
-				}
-				resp, err := cacheManager.EvictTaskExecutionCache(context.Background(), request)
-				require.NoError(t, err)
-				require.NotNil(t, resp)
-				assert.Len(t, resp.GetErrors().GetErrors(), len(artifactTags))
-				eErr := resp.GetErrors().GetErrors()[0]
-				assert.Equal(t, core.CacheEvictionError_INTERNAL, eErr.Code)
-				assert.Equal(t, "n0", eErr.NodeExecutionId.NodeId)
-				assert.True(t, proto.Equal(&executionIdentifier, eErr.NodeExecutionId.ExecutionId))
-				require.NotNil(t, eErr.Source)
-				assert.IsType(t, &core.CacheEvictionError_WorkflowExecutionId{}, eErr.Source)
-
-				assert.Empty(t, updatedNodeExecutions)
-			})
-
 			t.Run("Get", func(t *testing.T) {
 				repository := repositoryMocks.NewMockRepository()
 				catalogClient := &mocks.Client{}
@@ -2231,8 +1699,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 					},
 				}
 
-				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-					taskExecutionModels)
+				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
 				repository.TaskExecutionRepo().(*repositoryMocks.MockTaskExecutionRepo).SetGetCallback(
 					func(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
@@ -2266,510 +1733,5 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 				assert.Empty(t, updatedNodeExecutions)
 			})
 		})
-	})
-
-	t.Run("subtask with identical artifact tags", func(t *testing.T) {
-		repository := repositoryMocks.NewMockRepository()
-		catalogClient := &mocks.Client{}
-		mockConfig := getMockExecutionsConfigProvider()
-
-		artifactTags := []*core.CatalogArtifactTag{
-			{
-				ArtifactId: "0285ddb9-ddfb-4835-bc22-80e1bdf7f560",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYM",
-			},
-			{
-				ArtifactId: "4074be3e-7cee-4a7b-8c45-56577fa32f24",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYN",
-			},
-			{
-				ArtifactId: "a8bd60d5-b2bb-4b06-a2ac-240d183a4ca8",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYN",
-			},
-			{
-				ArtifactId: "8a47c342-ff71-481e-9c7b-0e6ecb57e742",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYN",
-			},
-			{
-				ArtifactId: "dafdef15-0aba-4f7c-a4aa-deba89568277",
-				Name:       "flyte_cached-G3ACyxqY0U3sEf99tLMta5vuLCOk7j9O7MStxubzxYN",
-			},
-		}
-
-		nodeExecutionModels := []models.NodeExecution{
-			{
-				BaseModel: models.BaseModel{
-					ID: 1,
-				},
-				NodeExecutionKey: models.NodeExecutionKey{
-					ExecutionKey: models.ExecutionKey{
-						Project: executionIdentifier.Project,
-						Domain:  executionIdentifier.Domain,
-						Name:    executionIdentifier.Name,
-					},
-					NodeID: "n0",
-				},
-				Phase: core.NodeExecution_SUCCEEDED.String(),
-				NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-					IsParentNode: true,
-					IsDynamic:    false,
-					SpecNodeId:   "n0",
-				}),
-				Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-					TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-						TaskNodeMetadata: &admin.TaskNodeMetadata{
-							CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-							CatalogKey: &core.CatalogMetadata{
-								DatasetId: &core.Identifier{
-									ResourceType: core.ResourceType_DATASET,
-									Project:      executionIdentifier.Project,
-									Domain:       executionIdentifier.Domain,
-									Name:         "flyte_task-test.evict.execution_cache_single_task",
-									Version:      "version",
-								},
-								ArtifactTag: artifactTags[0],
-							},
-						},
-					},
-				}),
-				ChildNodeExecutions: []models.NodeExecution{
-					{
-						BaseModel: models.BaseModel{
-							ID: 2,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-start-node",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "start-node",
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 3,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n0",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n0",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_sub",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[1],
-										SourceExecution: &core.CatalogMetadata_SourceTaskExecution{
-											SourceTaskExecution: &core.TaskExecutionIdentifier{
-												TaskId: &core.Identifier{
-													ResourceType: core.ResourceType_TASK,
-													Project:      executionIdentifier.Project,
-													Domain:       executionIdentifier.Domain,
-													Name:         "flyte_task-test.evict.execution_cache",
-													Version:      "version",
-												},
-												NodeExecutionId: &core.NodeExecutionIdentifier{
-													NodeId:      "dn0",
-													ExecutionId: &executionIdentifier,
-												},
-												RetryAttempt: 0,
-											},
-										},
-									},
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 4,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n1",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n1",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_sub",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[2],
-										SourceExecution: &core.CatalogMetadata_SourceTaskExecution{
-											SourceTaskExecution: &core.TaskExecutionIdentifier{
-												TaskId: &core.Identifier{
-													ResourceType: core.ResourceType_TASK,
-													Project:      executionIdentifier.Project,
-													Domain:       executionIdentifier.Domain,
-													Name:         "flyte_task-test.evict.execution_cache",
-													Version:      "version",
-												},
-												NodeExecutionId: &core.NodeExecutionIdentifier{
-													NodeId:      "dn0",
-													ExecutionId: &executionIdentifier,
-												},
-												RetryAttempt: 0,
-											},
-										},
-									},
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 5,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n2",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n2",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_sub",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[3],
-										SourceExecution: &core.CatalogMetadata_SourceTaskExecution{
-											SourceTaskExecution: &core.TaskExecutionIdentifier{
-												TaskId: &core.Identifier{
-													ResourceType: core.ResourceType_TASK,
-													Project:      executionIdentifier.Project,
-													Domain:       executionIdentifier.Domain,
-													Name:         "flyte_task-test.evict.execution_cache",
-													Version:      "version",
-												},
-												NodeExecutionId: &core.NodeExecutionIdentifier{
-													NodeId:      "dn2",
-													ExecutionId: &executionIdentifier,
-												},
-												RetryAttempt: 0,
-											},
-										},
-									},
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 6,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n3",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "n3",
-						}),
-						Closure: serializeNodeExecutionClosure(t, &admin.NodeExecutionClosure{
-							TargetMetadata: &admin.NodeExecutionClosure_TaskNodeMetadata{
-								TaskNodeMetadata: &admin.TaskNodeMetadata{
-									CacheStatus: core.CatalogCacheStatus_CACHE_POPULATED,
-									CatalogKey: &core.CatalogMetadata{
-										DatasetId: &core.Identifier{
-											ResourceType: core.ResourceType_DATASET,
-											Project:      executionIdentifier.Project,
-											Domain:       executionIdentifier.Domain,
-											Name:         "flyte_task-test.evict.execution_cache_sub",
-											Version:      "version",
-										},
-										ArtifactTag: artifactTags[4],
-										SourceExecution: &core.CatalogMetadata_SourceTaskExecution{
-											SourceTaskExecution: &core.TaskExecutionIdentifier{
-												TaskId: &core.Identifier{
-													ResourceType: core.ResourceType_TASK,
-													Project:      executionIdentifier.Project,
-													Domain:       executionIdentifier.Domain,
-													Name:         "flyte_task-test.evict.execution_cache",
-													Version:      "version",
-												},
-												NodeExecutionId: &core.NodeExecutionIdentifier{
-													NodeId:      "dn3",
-													ExecutionId: &executionIdentifier,
-												},
-												RetryAttempt: 0,
-											},
-										},
-									},
-								},
-							},
-						}),
-					},
-					{
-						BaseModel: models.BaseModel{
-							ID: 7,
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-end-node",
-						},
-						Phase: core.NodeExecution_SUCCEEDED.String(),
-						NodeExecutionMetadata: serializeNodeExecutionMetadata(t, &admin.NodeExecutionMetaData{
-							IsParentNode: false,
-							IsDynamic:    false,
-							SpecNodeId:   "end-node",
-						}),
-					},
-				},
-			},
-		}
-
-		taskExecutionModels := map[string][]models.TaskExecution{
-			"n0": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 1,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache_single_task",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n0-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n0": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 2,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n0",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n0-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n1": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 2,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n1",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n1-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n2": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 3,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n2",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n2-0",
-						},
-					}),
-				},
-			},
-			"n0-0-n3": {
-				{
-					BaseModel: models.BaseModel{
-						ID: 4,
-					},
-					TaskExecutionKey: models.TaskExecutionKey{
-						TaskKey: models.TaskKey{
-							Project: executionIdentifier.Project,
-							Domain:  executionIdentifier.Domain,
-							Name:    "flyte_task-test.evict.execution_cache",
-							Version: "version",
-						},
-						NodeExecutionKey: models.NodeExecutionKey{
-							ExecutionKey: models.ExecutionKey{
-								Project: executionIdentifier.Project,
-								Domain:  executionIdentifier.Domain,
-								Name:    executionIdentifier.Name,
-							},
-							NodeID: "n0-0-n3",
-						},
-						RetryAttempt: ptr[uint32](0),
-					},
-					Phase: core.NodeExecution_SUCCEEDED.String(),
-					Closure: serializeTaskExecutionClosure(t, &admin.TaskExecutionClosure{
-						Metadata: &event.TaskExecutionMetadata{
-							GeneratedName: "name-n0-0-n3-0",
-						},
-					}),
-				},
-			},
-		}
-
-		updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nil, nodeExecutionModels,
-			taskExecutionModels)
-		deletedArtifactIDs := setupCacheEvictionCatalogClient(t, catalogClient, artifactTags, taskExecutionModels)
-
-		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
-		request := service.EvictTaskExecutionCacheRequest{
-			TaskExecutionId: &core.TaskExecutionIdentifier{
-				TaskId: &core.Identifier{
-					ResourceType: core.ResourceType_TASK,
-					Project:      executionIdentifier.Project,
-					Domain:       executionIdentifier.Domain,
-					Name:         executionIdentifier.Name,
-					Version:      version,
-				},
-				NodeExecutionId: &core.NodeExecutionIdentifier{
-					ExecutionId: &executionIdentifier,
-					NodeId:      "n0",
-				},
-				RetryAttempt: uint32(0),
-			},
-		}
-		resp, err := cacheManager.EvictTaskExecutionCache(context.Background(), request)
-		require.NoError(t, err)
-		require.NotNil(t, resp)
-		assert.Empty(t, resp.GetErrors().GetErrors())
-
-		for nodeID := range taskExecutionModels {
-			assert.Contains(t, updatedNodeExecutions, nodeID)
-		}
-		assert.Len(t, updatedNodeExecutions, len(taskExecutionModels))
-
-		for _, artifactTag := range artifactTags {
-			assert.Equal(t, 1, deletedArtifactIDs[artifactTag.GetArtifactId()])
-		}
-		assert.Len(t, deletedArtifactIDs, len(artifactTags))
 	})
 }
