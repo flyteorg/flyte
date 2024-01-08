@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 import "flyteidl/core/types.proto";
 import "flyteidl/core/literals.proto";
+import "flyteidl/core/artifact_id.proto";
 
 // Defines a strongly typed variable.
 message Variable {
@@ -14,6 +15,12 @@ message Variable {
 
     //+optional string describing input variable
     string description = 2;
+
+    //+optional This object allows the user to specify how Artifacts are created.
+    // name, tag, partitions can be specified. The other fields (version and project/domain) are ignored.
+    core.ArtifactID artifact_partial_id = 3;
+
+    core.ArtifactTag artifact_tag = 4;
 }
 
 // A map of Variables
@@ -41,6 +48,12 @@ message Parameter {
 
         //+optional, is this value required to be filled.
         bool required = 3;
+
+        // This is an execution time search basically that should result in exactly one Artifact with a Type that
+        // matches the type of the variable.
+        core.ArtifactQuery artifact_query = 4;
+
+        core.ArtifactID artifact_id = 5;
     }
 }
 
