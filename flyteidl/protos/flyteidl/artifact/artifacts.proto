@@ -236,7 +236,7 @@ service ArtifactRegistry {
 
   rpc ListUsage (ListUsageRequest) returns (ListUsageResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/usage/{artifact_id.project}/{artifact_id.domain}/{artifact_id.name}/{artifact_id.version}"
+      get: "/artifacts/api/v1/usage/{artifact_id.artifact_key.project}/{artifact_id.artifact_key.domain}/{artifact_id.artifact_key.name}/{artifact_id.version}"
     };
   }
 }

@@ -64,6 +64,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
                 )
+        self.ListUsage = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/ListUsage',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageResponse.FromString,
+                )
 
 
 class ArtifactRegistryServicer(object):
@@ -129,6 +134,12 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListUsage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactRegistryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -181,6 +192,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.FindByWorkflowExec,
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.SerializeToString,
+            ),
+            'ListUsage': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListUsage,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -359,5 +375,22 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec',
             flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
             flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListUsage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/ListUsage',
+            flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
