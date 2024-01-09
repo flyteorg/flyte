@@ -255,27 +255,6 @@ EvictCacheResponse
 
 
 
-.. _ref_flyteidl.service.EvictExecutionCacheRequest:
-
-EvictExecutionCacheRequest
-------------------------------------------------------------------
-
-
-
-
-
-.. csv-table:: EvictExecutionCacheRequest type fields
-   :header: "Field", "Type", "Label", "Description"
-   :widths: auto
-
-   "workflow_execution_id", ":ref:`ref_flyteidl.core.WorkflowExecutionIdentifier`", "", "Identifier of :ref:`ref_flyteidl.admin.Execution` to evict cache for."
-
-
-
-
-
-
-
 .. _ref_flyteidl.service.EvictTaskExecutionCacheRequest:
 
 EvictTaskExecutionCacheRequest
@@ -320,7 +299,6 @@ CacheService defines an RPC Service for interacting with cached data in Flyte on
    :header: "Method Name", "Request Type", "Response Type", "Description"
    :widths: auto
 
-   "EvictExecutionCache", ":ref:`ref_flyteidl.service.EvictExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.Execution`."
    "EvictTaskExecutionCache", ":ref:`ref_flyteidl.service.EvictTaskExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`."
 
 ..
