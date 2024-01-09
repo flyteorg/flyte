@@ -1206,6 +1206,9 @@ pub struct ExecutionSpec {
     /// Tags to be set for the execution.
     #[prost(string, repeated, tag="24")]
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// TODO @hamersaw
+    #[prost(message, repeated, tag="25")]
+    pub persistent_envs: ::prost::alloc::vec::Vec<super::core::EnvironmentAssignment>,
     #[prost(oneof="execution_spec::NotificationOverrides", tags="5, 6")]
     pub notification_overrides: ::core::option::Option<execution_spec::NotificationOverrides>,
 }

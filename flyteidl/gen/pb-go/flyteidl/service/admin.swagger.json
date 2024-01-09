@@ -4036,6 +4036,13 @@
             "type": "string"
           },
           "description": "Tags to be set for the execution."
+        },
+        "persistent_envs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreEnvironmentAssignment"
+          },
+          "title": "TODO @hamersaw"
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -6083,6 +6090,39 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "coreEnvironmentAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "subworkflow_environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreSubworkflowEnvironments"
+          }
+        },
+        "type": {
+          "$ref": "#/definitions/coreEnvironmentType"
+        },
+        "fasttask_environment": {
+          "$ref": "#/definitions/coreFastTaskEnvironment"
+        }
+      }
+    },
+    "coreEnvironmentType": {
+      "type": "string",
+      "enum": [
+        "FASTTASK"
+      ],
+      "default": "FASTTASK"
+    },
     "coreError": {
       "type": "object",
       "properties": {
@@ -6127,6 +6167,20 @@
         }
       },
       "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
+    },
+    "coreFastTaskEnvironment": {
+      "type": "object",
+      "properties": {
+        "queue_id": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "pod_id": {
+          "type": "string"
+        }
+      }
     },
     "coreGPUAccelerator": {
       "type": "object",
@@ -7048,6 +7102,17 @@
           "type": "string",
           "format": "byte",
           "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
+        }
+      }
+    },
+    "coreSubworkflowEnvironments": {
+      "type": "object",
+      "properties": {
+        "workflow_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        },
+        "environment_id": {
+          "type": "string"
         }
       }
     },

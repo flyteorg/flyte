@@ -267,6 +267,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.mixed.flyin-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.mixed.flyin-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.mixed.flyin-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.Mixed.IsFlyinEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.mixed.flyin-template-uri", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.mixed.flyin-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("logs.mixed.flyin-template-uri"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.Mixed.FlyinTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_logs.user.cloudwatch-enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -415,6 +443,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.user.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.user.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.User.StackDriverTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.user.flyin-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.user.flyin-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.user.flyin-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.User.IsFlyinEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.user.flyin-template-uri", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.user.flyin-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("logs.user.flyin-template-uri"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.User.FlyinTemplateURI)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -575,6 +631,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.system.flyin-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.system.flyin-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.system.flyin-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.System.IsFlyinEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.system.flyin-template-uri", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.system.flyin-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("logs.system.flyin-template-uri"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.System.FlyinTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_logs.all-user.cloudwatch-enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -723,6 +807,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.all-user.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.all-user.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.AllUser.StackDriverTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.all-user.flyin-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.all-user.flyin-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.all-user.flyin-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.AllUser.IsFlyinEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.all-user.flyin-template-uri", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.all-user.flyin-template-uri", testValue)
+			if vString, err := cmdFlags.GetString("logs.all-user.flyin-template-uri"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.AllUser.FlyinTemplateURI)
 
 			} else {
 				assert.FailNow(t, err.Error())

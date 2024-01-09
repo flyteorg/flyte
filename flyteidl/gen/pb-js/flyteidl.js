@@ -31517,6 +31517,7 @@
                  * @property {boolean|null} [overwriteCache] ExecutionSpec overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] ExecutionSpec envs
                  * @property {Array.<string>|null} [tags] ExecutionSpec tags
+                 * @property {Array.<flyteidl.core.IEnvironmentAssignment>|null} [persistentEnvs] ExecutionSpec persistentEnvs
                  */
     
                 /**
@@ -31529,6 +31530,7 @@
                  */
                 function ExecutionSpec(properties) {
                     this.tags = [];
+                    this.persistentEnvs = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -31671,6 +31673,14 @@
                  */
                 ExecutionSpec.prototype.tags = $util.emptyArray;
     
+                /**
+                 * ExecutionSpec persistentEnvs.
+                 * @member {Array.<flyteidl.core.IEnvironmentAssignment>} persistentEnvs
+                 * @memberof flyteidl.admin.ExecutionSpec
+                 * @instance
+                 */
+                ExecutionSpec.prototype.persistentEnvs = $util.emptyArray;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -31744,6 +31754,9 @@
                     if (message.tags != null && message.tags.length)
                         for (var i = 0; i < message.tags.length; ++i)
                             writer.uint32(/* id 24, wireType 2 =*/194).string(message.tags[i]);
+                    if (message.persistentEnvs != null && message.persistentEnvs.length)
+                        for (var i = 0; i < message.persistentEnvs.length; ++i)
+                            $root.flyteidl.core.EnvironmentAssignment.encode(message.persistentEnvs[i], writer.uint32(/* id 25, wireType 2 =*/202).fork()).ldelim();
                     return writer;
                 };
     
@@ -31817,6 +31830,11 @@
                             if (!(message.tags && message.tags.length))
                                 message.tags = [];
                             message.tags.push(reader.string());
+                            break;
+                        case 25:
+                            if (!(message.persistentEnvs && message.persistentEnvs.length))
+                                message.persistentEnvs = [];
+                            message.persistentEnvs.push($root.flyteidl.core.EnvironmentAssignment.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -31925,6 +31943,15 @@
                         for (var i = 0; i < message.tags.length; ++i)
                             if (!$util.isString(message.tags[i]))
                                 return "tags: string[] expected";
+                    }
+                    if (message.persistentEnvs != null && message.hasOwnProperty("persistentEnvs")) {
+                        if (!Array.isArray(message.persistentEnvs))
+                            return "persistentEnvs: array expected";
+                        for (var i = 0; i < message.persistentEnvs.length; ++i) {
+                            var error = $root.flyteidl.core.EnvironmentAssignment.verify(message.persistentEnvs[i]);
+                            if (error)
+                                return "persistentEnvs." + error;
+                        }
                     }
                     return null;
                 };

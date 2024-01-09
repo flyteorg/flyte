@@ -17748,6 +17748,50 @@ public final class ExecutionOuterClass {
     com.google.protobuf.ByteString
         getTagsBytes(int index);
 
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> 
+        getPersistentEnvsList();
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    flyteidl.core.PersistentEnvs.EnvironmentAssignment getPersistentEnvs(int index);
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    int getPersistentEnvsCount();
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    java.util.List<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
+        getPersistentEnvsOrBuilderList();
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder getPersistentEnvsOrBuilder(
+        int index);
+
     public flyteidl.admin.ExecutionOuterClass.ExecutionSpec.NotificationOverridesCase getNotificationOverridesCase();
   }
   /**
@@ -17769,6 +17813,7 @@ public final class ExecutionOuterClass {
     }
     private ExecutionSpec() {
       tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      persistentEnvs_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -17989,6 +18034,15 @@ public final class ExecutionOuterClass {
               tags_.add(s);
               break;
             }
+            case 202: {
+              if (!((mutable_bitField0_ & 0x00020000) != 0)) {
+                persistentEnvs_ = new java.util.ArrayList<flyteidl.core.PersistentEnvs.EnvironmentAssignment>();
+                mutable_bitField0_ |= 0x00020000;
+              }
+              persistentEnvs_.add(
+                  input.readMessage(flyteidl.core.PersistentEnvs.EnvironmentAssignment.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -18006,6 +18060,9 @@ public final class ExecutionOuterClass {
       } finally {
         if (((mutable_bitField0_ & 0x00010000) != 0)) {
           tags_ = tags_.getUnmodifiableView();
+        }
+        if (((mutable_bitField0_ & 0x00020000) != 0)) {
+          persistentEnvs_ = java.util.Collections.unmodifiableList(persistentEnvs_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -18605,6 +18662,61 @@ public final class ExecutionOuterClass {
       return tags_.getByteString(index);
     }
 
+    public static final int PERSISTENT_ENVS_FIELD_NUMBER = 25;
+    private java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> persistentEnvs_;
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    public java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> getPersistentEnvsList() {
+      return persistentEnvs_;
+    }
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    public java.util.List<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
+        getPersistentEnvsOrBuilderList() {
+      return persistentEnvs_;
+    }
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    public int getPersistentEnvsCount() {
+      return persistentEnvs_.size();
+    }
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    public flyteidl.core.PersistentEnvs.EnvironmentAssignment getPersistentEnvs(int index) {
+      return persistentEnvs_.get(index);
+    }
+    /**
+     * <pre>
+     * TODO &#64;hamersaw
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+     */
+    public flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder getPersistentEnvsOrBuilder(
+        int index) {
+      return persistentEnvs_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -18670,6 +18782,9 @@ public final class ExecutionOuterClass {
       }
       for (int i = 0; i < tags_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 24, tags_.getRaw(i));
+      }
+      for (int i = 0; i < persistentEnvs_.size(); i++) {
+        output.writeMessage(25, persistentEnvs_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -18753,6 +18868,10 @@ public final class ExecutionOuterClass {
         size += dataSize;
         size += 2 * getTagsList().size();
       }
+      for (int i = 0; i < persistentEnvs_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(25, persistentEnvs_.get(i));
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -18834,6 +18953,8 @@ public final class ExecutionOuterClass {
       }
       if (!getTagsList()
           .equals(other.getTagsList())) return false;
+      if (!getPersistentEnvsList()
+          .equals(other.getPersistentEnvsList())) return false;
       if (!getNotificationOverridesCase().equals(other.getNotificationOverridesCase())) return false;
       switch (notificationOverridesCase_) {
         case 5:
@@ -18914,6 +19035,10 @@ public final class ExecutionOuterClass {
       if (getTagsCount() > 0) {
         hash = (37 * hash) + TAGS_FIELD_NUMBER;
         hash = (53 * hash) + getTagsList().hashCode();
+      }
+      if (getPersistentEnvsCount() > 0) {
+        hash = (37 * hash) + PERSISTENT_ENVS_FIELD_NUMBER;
+        hash = (53 * hash) + getPersistentEnvsList().hashCode();
       }
       switch (notificationOverridesCase_) {
         case 5:
@@ -19061,6 +19186,7 @@ public final class ExecutionOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
+          getPersistentEnvsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -19144,6 +19270,12 @@ public final class ExecutionOuterClass {
         }
         tags_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00010000);
+        if (persistentEnvsBuilder_ == null) {
+          persistentEnvs_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00020000);
+        } else {
+          persistentEnvsBuilder_.clear();
+        }
         notificationOverridesCase_ = 0;
         notificationOverrides_ = null;
         return this;
@@ -19251,6 +19383,15 @@ public final class ExecutionOuterClass {
           bitField0_ = (bitField0_ & ~0x00010000);
         }
         result.tags_ = tags_;
+        if (persistentEnvsBuilder_ == null) {
+          if (((bitField0_ & 0x00020000) != 0)) {
+            persistentEnvs_ = java.util.Collections.unmodifiableList(persistentEnvs_);
+            bitField0_ = (bitField0_ & ~0x00020000);
+          }
+          result.persistentEnvs_ = persistentEnvs_;
+        } else {
+          result.persistentEnvs_ = persistentEnvsBuilder_.build();
+        }
         result.bitField0_ = to_bitField0_;
         result.notificationOverridesCase_ = notificationOverridesCase_;
         onBuilt();
@@ -19352,6 +19493,32 @@ public final class ExecutionOuterClass {
             tags_.addAll(other.tags_);
           }
           onChanged();
+        }
+        if (persistentEnvsBuilder_ == null) {
+          if (!other.persistentEnvs_.isEmpty()) {
+            if (persistentEnvs_.isEmpty()) {
+              persistentEnvs_ = other.persistentEnvs_;
+              bitField0_ = (bitField0_ & ~0x00020000);
+            } else {
+              ensurePersistentEnvsIsMutable();
+              persistentEnvs_.addAll(other.persistentEnvs_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.persistentEnvs_.isEmpty()) {
+            if (persistentEnvsBuilder_.isEmpty()) {
+              persistentEnvsBuilder_.dispose();
+              persistentEnvsBuilder_ = null;
+              persistentEnvs_ = other.persistentEnvs_;
+              bitField0_ = (bitField0_ & ~0x00020000);
+              persistentEnvsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getPersistentEnvsFieldBuilder() : null;
+            } else {
+              persistentEnvsBuilder_.addAllMessages(other.persistentEnvs_);
+            }
+          }
         }
         switch (other.getNotificationOverridesCase()) {
           case NOTIFICATIONS: {
@@ -21731,6 +21898,318 @@ public final class ExecutionOuterClass {
         tags_.add(value);
         onChanged();
         return this;
+      }
+
+      private java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> persistentEnvs_ =
+        java.util.Collections.emptyList();
+      private void ensurePersistentEnvsIsMutable() {
+        if (!((bitField0_ & 0x00020000) != 0)) {
+          persistentEnvs_ = new java.util.ArrayList<flyteidl.core.PersistentEnvs.EnvironmentAssignment>(persistentEnvs_);
+          bitField0_ |= 0x00020000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.PersistentEnvs.EnvironmentAssignment, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder, flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> persistentEnvsBuilder_;
+
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> getPersistentEnvsList() {
+        if (persistentEnvsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(persistentEnvs_);
+        } else {
+          return persistentEnvsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public int getPersistentEnvsCount() {
+        if (persistentEnvsBuilder_ == null) {
+          return persistentEnvs_.size();
+        } else {
+          return persistentEnvsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public flyteidl.core.PersistentEnvs.EnvironmentAssignment getPersistentEnvs(int index) {
+        if (persistentEnvsBuilder_ == null) {
+          return persistentEnvs_.get(index);
+        } else {
+          return persistentEnvsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder setPersistentEnvs(
+          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment value) {
+        if (persistentEnvsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.set(index, value);
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder setPersistentEnvs(
+          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder builderForValue) {
+        if (persistentEnvsBuilder_ == null) {
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder addPersistentEnvs(flyteidl.core.PersistentEnvs.EnvironmentAssignment value) {
+        if (persistentEnvsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.add(value);
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder addPersistentEnvs(
+          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment value) {
+        if (persistentEnvsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.add(index, value);
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder addPersistentEnvs(
+          flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder builderForValue) {
+        if (persistentEnvsBuilder_ == null) {
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.add(builderForValue.build());
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder addPersistentEnvs(
+          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder builderForValue) {
+        if (persistentEnvsBuilder_ == null) {
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder addAllPersistentEnvs(
+          java.lang.Iterable<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignment> values) {
+        if (persistentEnvsBuilder_ == null) {
+          ensurePersistentEnvsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, persistentEnvs_);
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder clearPersistentEnvs() {
+        if (persistentEnvsBuilder_ == null) {
+          persistentEnvs_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00020000);
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public Builder removePersistentEnvs(int index) {
+        if (persistentEnvsBuilder_ == null) {
+          ensurePersistentEnvsIsMutable();
+          persistentEnvs_.remove(index);
+          onChanged();
+        } else {
+          persistentEnvsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder getPersistentEnvsBuilder(
+          int index) {
+        return getPersistentEnvsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder getPersistentEnvsOrBuilder(
+          int index) {
+        if (persistentEnvsBuilder_ == null) {
+          return persistentEnvs_.get(index);  } else {
+          return persistentEnvsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public java.util.List<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
+           getPersistentEnvsOrBuilderList() {
+        if (persistentEnvsBuilder_ != null) {
+          return persistentEnvsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(persistentEnvs_);
+        }
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder addPersistentEnvsBuilder() {
+        return getPersistentEnvsFieldBuilder().addBuilder(
+            flyteidl.core.PersistentEnvs.EnvironmentAssignment.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder addPersistentEnvsBuilder(
+          int index) {
+        return getPersistentEnvsFieldBuilder().addBuilder(
+            index, flyteidl.core.PersistentEnvs.EnvironmentAssignment.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * TODO &#64;hamersaw
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;</code>
+       */
+      public java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder> 
+           getPersistentEnvsBuilderList() {
+        return getPersistentEnvsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.PersistentEnvs.EnvironmentAssignment, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder, flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
+          getPersistentEnvsFieldBuilder() {
+        if (persistentEnvsBuilder_ == null) {
+          persistentEnvsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.PersistentEnvs.EnvironmentAssignment, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder, flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder>(
+                  persistentEnvs_,
+                  ((bitField0_ & 0x00020000) != 0),
+                  getParentForChildren(),
+                  isClean());
+          persistentEnvs_ = null;
+        }
+        return persistentEnvsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -29017,7 +29496,7 @@ public final class ExecutionOuterClass {
       "\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKF" +
       "LOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020NotificationList" +
       "\0223\n\rnotifications\030\001 \003(\0132\034.flyteidl.admin" +
-      ".Notification\"\262\006\n\rExecutionSpec\022.\n\013launc" +
+      ".Notification\"\361\006\n\rExecutionSpec\022.\n\013launc" +
       "h_plan\030\001 \001(\0132\031.flyteidl.core.Identifier\022" +
       "-\n\006inputs\030\002 \001(\0132\031.flyteidl.core.LiteralM" +
       "apB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admi" +
@@ -29037,34 +29516,36 @@ public final class ExecutionOuterClass {
       "interruptible\030\025 \001(\0132\032.google.protobuf.Bo" +
       "olValue\022\027\n\017overwrite_cache\030\026 \001(\010\022\"\n\004envs" +
       "\030\027 \001(\0132\024.flyteidl.admin.Envs\022\014\n\004tags\030\030 \003" +
-      "(\tB\030\n\026notification_overridesJ\004\010\004\020\005\"b\n\031Ex" +
-      "ecutionTerminateRequest\0226\n\002id\030\001 \001(\0132*.fl" +
-      "yteidl.core.WorkflowExecutionIdentifier\022" +
-      "\r\n\005cause\030\002 \001(\t\"\034\n\032ExecutionTerminateResp" +
-      "onse\"Y\n\037WorkflowExecutionGetDataRequest\022" +
-      "6\n\002id\030\001 \001(\0132*.flyteidl.core.WorkflowExec" +
-      "utionIdentifier\"\336\001\n WorkflowExecutionGet" +
-      "DataResponse\022,\n\007outputs\030\001 \001(\0132\027.flyteidl" +
-      ".admin.UrlBlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027.fly" +
-      "teidl.admin.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003" +
-      " \001(\0132\031.flyteidl.core.LiteralMap\022/\n\014full_" +
-      "outputs\030\004 \001(\0132\031.flyteidl.core.LiteralMap" +
-      "\"\177\n\026ExecutionUpdateRequest\0226\n\002id\030\001 \001(\0132*" +
-      ".flyteidl.core.WorkflowExecutionIdentifi" +
-      "er\022-\n\005state\030\002 \001(\0162\036.flyteidl.admin.Execu" +
-      "tionState\"\220\001\n\033ExecutionStateChangeDetail" +
-      "s\022-\n\005state\030\001 \001(\0162\036.flyteidl.admin.Execut" +
-      "ionState\022/\n\013occurred_at\030\002 \001(\0132\032.google.p" +
-      "rotobuf.Timestamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027" +
-      "ExecutionUpdateResponse\"k\n\"WorkflowExecu" +
-      "tionGetMetricsRequest\0226\n\002id\030\001 \001(\0132*.flyt" +
-      "eidl.core.WorkflowExecutionIdentifier\022\r\n" +
-      "\005depth\030\002 \001(\005\"H\n#WorkflowExecutionGetMetr" +
-      "icsResponse\022!\n\004span\030\001 \001(\0132\023.flyteidl.cor" +
-      "e.Span*>\n\016ExecutionState\022\024\n\020EXECUTION_AC" +
-      "TIVE\020\000\022\026\n\022EXECUTION_ARCHIVED\020\001B=Z;github" +
-      ".com/flyteorg/flyte/flyteidl/gen/pb-go/f" +
-      "lyteidl/adminb\006proto3"
+      "(\t\022=\n\017persistent_envs\030\031 \003(\0132$.flyteidl.c" +
+      "ore.EnvironmentAssignmentB\030\n\026notificatio" +
+      "n_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateR" +
+      "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf" +
+      "lowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n" +
+      "\032ExecutionTerminateResponse\"Y\n\037WorkflowE" +
+      "xecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.fly" +
+      "teidl.core.WorkflowExecutionIdentifier\"\336" +
+      "\001\n WorkflowExecutionGetDataResponse\022,\n\007o" +
+      "utputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030" +
+      "\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBl" +
+      "obB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.c" +
+      "ore.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.f" +
+      "lyteidl.core.LiteralMap\"\177\n\026ExecutionUpda" +
+      "teRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo" +
+      "rkflowExecutionIdentifier\022-\n\005state\030\002 \001(\016" +
+      "2\036.flyteidl.admin.ExecutionState\"\220\001\n\033Exe" +
+      "cutionStateChangeDetails\022-\n\005state\030\001 \001(\0162" +
+      "\036.flyteidl.admin.ExecutionState\022/\n\013occur" +
+      "red_at\030\002 \001(\0132\032.google.protobuf.Timestamp" +
+      "\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRe" +
+      "sponse\"k\n\"WorkflowExecutionGetMetricsReq" +
+      "uest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflo" +
+      "wExecutionIdentifier\022\r\n\005depth\030\002 \001(\005\"H\n#W" +
+      "orkflowExecutionGetMetricsResponse\022!\n\004sp" +
+      "an\030\001 \001(\0132\023.flyteidl.core.Span*>\n\016Executi" +
+      "onState\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022EXECUTI" +
+      "ON_ARCHIVED\020\001B=Z;github.com/flyteorg/fly" +
+      "te/flyteidl/gen/pb-go/flyteidl/adminb\006pr" +
+      "oto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -29173,7 +29654,7 @@ public final class ExecutionOuterClass {
     internal_static_flyteidl_admin_ExecutionSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ExecutionSpec_descriptor,
-        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "Interruptible", "OverwriteCache", "Envs", "Tags", "NotificationOverrides", });
+        new java.lang.String[] { "LaunchPlan", "Inputs", "Metadata", "Notifications", "DisableAll", "Labels", "Annotations", "SecurityContext", "AuthRole", "QualityOfService", "MaxParallelism", "RawOutputDataConfig", "ClusterAssignment", "Interruptible", "OverwriteCache", "Envs", "Tags", "PersistentEnvs", "NotificationOverrides", });
     internal_static_flyteidl_admin_ExecutionTerminateRequest_descriptor =
       getDescriptor().getMessageTypes().get(14);
     internal_static_flyteidl_admin_ExecutionTerminateRequest_fieldAccessorTable = new

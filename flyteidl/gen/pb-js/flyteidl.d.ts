@@ -13067,6 +13067,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec tags */
             tags?: (string[]|null);
+
+            /** ExecutionSpec persistentEnvs */
+            persistentEnvs?: (flyteidl.core.IEnvironmentAssignment[]|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -13128,6 +13131,9 @@ export namespace flyteidl {
 
             /** ExecutionSpec tags. */
             public tags: string[];
+
+            /** ExecutionSpec persistentEnvs. */
+            public persistentEnvs: flyteidl.core.IEnvironmentAssignment[];
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");

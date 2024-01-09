@@ -18,4 +18,5 @@ import (
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/bigquery"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/databricks"
 	_ "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/snowflake"
+	_ "github.com/unionai/fasttask/plugin"
 )

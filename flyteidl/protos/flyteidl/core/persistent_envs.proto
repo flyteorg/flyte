@@ -6,6 +6,10 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 import "flyteidl/core/identifier.proto";
 
+message PersistentEnvs {
+  repeated EnvironmentAssignment environments = 1;
+}
+
 message EnvironmentAssignment {
   string id = 1;
 

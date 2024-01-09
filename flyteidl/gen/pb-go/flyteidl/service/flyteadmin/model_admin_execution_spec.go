@@ -41,4 +41,5 @@ type AdminExecutionSpec struct {
 	Envs *AdminEnvs `json:"envs,omitempty"`
 	// Tags to be set for the execution.
 	Tags []string `json:"tags,omitempty"`
+	PersistentEnvs []CoreEnvironmentAssignment `json:"persistent_envs,omitempty"`
 }

@@ -204,8 +204,22 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 }
 
 func (e nodeExecContext) GetPersistentEnv(core.EnvironmentType) *core.Environment {
+	/*config := e.ExecutionContext().GetExecutionConfig()
+	for _, persistentEnv := config.PersistentEnvs {
+		if slices.StringSliceContains(persistentEnv.NodeIDs, e.NodeID().String()) {
+			return persistentEnv.Environment
+		}
+	}*/
+
 	// TODO @hamersaw - fill out
-	return nil
+
+	return &core.Environment{
+		Type: core.EnvironmentType_FASTTASK,
+		FasttaskEnvironment: &core.FastTaskEnvironment{
+			QueueId: "foo",
+		},
+	}
+	//return nil
 }
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,

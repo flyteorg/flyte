@@ -183,9 +183,12 @@ from flyteadmin.models.core_container import CoreContainer
 from flyteadmin.models.core_container_port import CoreContainerPort
 from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig
 from flyteadmin.models.core_enum_type import CoreEnumType
+from flyteadmin.models.core_environment_assignment import CoreEnvironmentAssignment
+from flyteadmin.models.core_environment_type import CoreEnvironmentType
 from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_error import CoreExecutionError
 from flyteadmin.models.core_extended_resources import CoreExtendedResources
+from flyteadmin.models.core_fast_task_environment import CoreFastTaskEnvironment
 from flyteadmin.models.core_gpu_accelerator import CoreGPUAccelerator
 from flyteadmin.models.core_gate_node import CoreGateNode
 from flyteadmin.models.core_io_strategy import CoreIOStrategy
@@ -235,6 +238,7 @@ from flyteadmin.models.core_sql import CoreSql
 from flyteadmin.models.core_structured_dataset import CoreStructuredDataset
 from flyteadmin.models.core_structured_dataset_metadata import CoreStructuredDatasetMetadata
 from flyteadmin.models.core_structured_dataset_type import CoreStructuredDatasetType
+from flyteadmin.models.core_subworkflow_environments import CoreSubworkflowEnvironments
 from flyteadmin.models.core_task_execution_identifier import CoreTaskExecutionIdentifier
 from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase
 from flyteadmin.models.core_task_log import CoreTaskLog

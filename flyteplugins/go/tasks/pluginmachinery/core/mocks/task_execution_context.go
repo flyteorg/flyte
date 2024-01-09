@@ -6,6 +6,8 @@ import (
 	catalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+
 	io "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 
 	mock "github.com/stretchr/testify/mock"
@@ -114,6 +116,40 @@ func (_m *TaskExecutionContext) EventsRecorder() core.EventsRecorder {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(core.EventsRecorder)
+		}
+	}
+
+	return r0
+}
+
+type TaskExecutionContext_GetPersistentEnv struct {
+	*mock.Call
+}
+
+func (_m TaskExecutionContext_GetPersistentEnv) Return(_a0 *flyteidlcore.Environment) *TaskExecutionContext_GetPersistentEnv {
+	return &TaskExecutionContext_GetPersistentEnv{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *TaskExecutionContext) OnGetPersistentEnv(_a0 flyteidlcore.EnvironmentType) *TaskExecutionContext_GetPersistentEnv {
+	c_call := _m.On("GetPersistentEnv", _a0)
+	return &TaskExecutionContext_GetPersistentEnv{Call: c_call}
+}
+
+func (_m *TaskExecutionContext) OnGetPersistentEnvMatch(matchers ...interface{}) *TaskExecutionContext_GetPersistentEnv {
+	c_call := _m.On("GetPersistentEnv", matchers...)
+	return &TaskExecutionContext_GetPersistentEnv{Call: c_call}
+}
+
+// GetPersistentEnv provides a mock function with given fields: _a0
+func (_m *TaskExecutionContext) GetPersistentEnv(_a0 flyteidlcore.EnvironmentType) *flyteidlcore.Environment {
+	ret := _m.Called(_a0)
+
+	var r0 *flyteidlcore.Environment
+	if rf, ok := ret.Get(0).(func(flyteidlcore.EnvironmentType) *flyteidlcore.Environment); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*flyteidlcore.Environment)
 		}
 	}
 

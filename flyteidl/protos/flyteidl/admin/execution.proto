@@ -325,6 +325,9 @@ message ExecutionSpec {
 
     // Tags to be set for the execution.
     repeated string tags = 24;
+
+    // TODO @hamersaw
+    repeated core.EnvironmentAssignment persistent_envs = 25;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.
