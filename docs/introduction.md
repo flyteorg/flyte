@@ -27,8 +27,8 @@ For a full list of feature, see the [Flyte features page](https://flyte.org/feat
 ## Basic Flyte components
 
 Flyte is made up of a user plane, control plane, and data plane.
-* The **user plane** contains the elements you need to develop the code that will implement your application's directed acyclic graph (DAG). These elements are FlyteKit, the FlyteConsole, and Flytectl. Data scientists and machine learning engineers primarily work in the user plane.
-* The **control plane** is part of the Flyte backend that is configured by platform engineers or others tasked with setting up computing infrastructure. It consists of FlyteAdmin, which serves as the main Flyte API to process requests from clients in the user plane. The control plane sends workflow execution requests to the data plane for execution, and stores information such as current and past running workflows, and provides that information upon request.
+* The **user plane** contains the elements you need to develop the code that will implement your application's directed acyclic graph (DAG). These elements are FlyteKit and Flytectl. Data scientists and machine learning engineers primarily work in the user plane.
+* The **control plane** is part of the Flyte backend that is configured by platform engineers or others tasked with setting up computing infrastructure. It consists of FlyteConsole and FlyteAdmin, which serves as the main Flyte API to process requests from clients in the user plane. The control plane sends workflow execution requests to the data plane for execution, and stores information such as current and past running workflows, and provides that information upon request.
 * The **data plane** is another part of the Flyte backend that contains FlytePropeller, the core engine of Flyte that executes workflows. FlytePropeller is designed as a [Kubernetes Controller](https://kubernetes.io/docs/concepts/architecture/controller/). The data plane sends status events back to the control plane so that information can be stored and surfaced to end users.
 
 ## Next steps
@@ -109,6 +109,7 @@ auto_examples/databricks_plugin/index
 auto_examples/dbt_plugin/index
 auto_examples/dolt_plugin/index
 auto_examples/duckdb_plugin/index
+auto_examples/flyin_plugin/index
 auto_examples/greatexpectations_plugin/index
 auto_examples/hive_plugin/index
 auto_examples/k8s_pod_plugin/index
