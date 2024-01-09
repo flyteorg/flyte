@@ -213,6 +213,17 @@ func (h *artifactRepo) Delete(ctx context.Context, artifact models.Artifact) err
 		return h.errorTransformer.ToDataCatalogError(err)
 	}
 
+	if err := tx.Where(&models.Dataset{DatasetKey: models.DatasetKey{
+		Project: artifact.DatasetProject,
+		Domain:  artifact.DatasetDomain,
+		Name:    artifact.DatasetName,
+		Version: artifact.DatasetVersion,
+		UUID:    artifact.DatasetUUID,
+	}}).Delete(&models.Dataset{}).Error; err != nil {
+		tx.Rollback()
+		return h.errorTransformer.ToDataCatalogError(err)
+	}
+
 	// delete actual artifact from database
 	if res := tx.Delete(&artifact); res.Error != nil {
 		tx.Rollback()
