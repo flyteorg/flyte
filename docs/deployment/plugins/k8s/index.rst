@@ -172,7 +172,7 @@ Specify plugin configuration
            
       .. group-tab:: Flyte binary
 
-         Add the following contents to your Helm values file:
+         Add the following config to your Helm values file:
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
