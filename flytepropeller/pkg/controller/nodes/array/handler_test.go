@@ -748,7 +748,9 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			arrayNodeState := &handler.ArrayNodeState{
 				Phase: v1alpha1.ArrayNodePhaseNone,
 			}
-			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState)
+			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{
+				Inputs: literalMap,
+			}, &arrayNodeSpec, arrayNodeState)
 
 			// initialize ArrayNodeHandler
 			nodeHandler := &mocks.NodeHandler{}
@@ -776,7 +778,9 @@ func TestHandleArrayNodePhaseExecutingSubNodeFailures(t *testing.T) {
 			// evaluate node until failure
 			attempts := 1
 			for {
-				nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState)
+				nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, &idlcore.InputData{
+					Inputs: literalMap,
+				}, &arrayNodeSpec, arrayNodeState)
 				_, err = arrayNodeHandler.Handle(ctx, nCtx)
 				assert.NoError(t, err)
 

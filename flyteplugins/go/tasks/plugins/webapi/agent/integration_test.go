@@ -76,8 +76,10 @@ func (m *MockSyncTask) CreateTask(_ context.Context, createTaskRequest *admin.Cr
 		Res: &admin.CreateTaskResponse_Resource{
 			Resource: &admin.Resource{
 				State: admin.State_SUCCEEDED,
-				Outputs: &flyteIdlCore.LiteralMap{
-					Literals: map[string]*flyteIdlCore.Literal{},
+				Outputs: &flyteIdlCore.OutputData{
+					Outputs: &flyteIdlCore.LiteralMap{
+						Literals: map[string]*flyteIdlCore.Literal{},
+					},
 				},
 				Message:  "Sync task finished",
 				LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
@@ -89,11 +91,14 @@ func (m *MockSyncTask) CreateTask(_ context.Context, createTaskRequest *admin.Cr
 
 func (m *MockSyncTask) GetTask(_ context.Context, req *admin.GetTaskRequest, _ ...grpc.CallOption) (*admin.GetTaskResponse, error) {
 	if req.GetTaskType() == "fake_task" {
-		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED, Outputs: &flyteIdlCore.LiteralMap{
-			Literals: map[string]*flyteIdlCore.Literal{
-				"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
-			},
-		}}}, nil
+		return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED,
+			Outputs: &flyteIdlCore.OutputData{
+				Outputs: &flyteIdlCore.LiteralMap{
+					Literals: map[string]*flyteIdlCore.Literal{
+						"arr": coreutils.MustMakeLiteral([]interface{}{[]interface{}{"a", "b"}, []interface{}{1, 2}}),
+					},
+				},
+			}}}, nil
 	}
 	return &admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil
 }
