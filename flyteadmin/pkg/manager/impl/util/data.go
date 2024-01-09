@@ -64,6 +64,42 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	return &fullInputs, &inputsURLBlob, nil
 }
 
+// GetOutputData returns an output URL blob and if config settings permit, inline outputs data for an execution.
+func GetOutputData(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
+	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, outputURI string) (
+	*core.OutputData, *admin.UrlBlob, error) {
+	var outputsURLBlob admin.UrlBlob
+	var fullOutputs core.OutputData
+
+	if len(outputURI) == 0 {
+		return &fullOutputs, &outputsURLBlob, nil
+	}
+
+	var err error
+	if remoteDataConfig.SignedURL.Enabled {
+		outputsURLBlob, err = urlData.Get(ctx, outputURI)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	if shouldFetchData(remoteDataConfig, outputsURLBlob) {
+		oldOutputs := &core.LiteralMap{}
+		msgIndex, err := storageClient.ReadProtobufAny(ctx, storage.DataReference(outputURI), &fullOutputs, oldOutputs)
+		if err != nil {
+			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
+			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
+			logger.Warningf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputURI, err)
+		} else if msgIndex == 1 {
+			fullOutputs = core.OutputData{
+				Outputs: oldOutputs,
+			}
+		}
+	}
+
+	return &fullOutputs, &outputsURLBlob, nil
+}
+
 // ExecutionClosure defines common methods in NodeExecutionClosure and TaskExecutionClosure used to return output data.
 type ExecutionClosure interface {
 	GetOutputUri() string //nolint

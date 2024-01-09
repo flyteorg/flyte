@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	protoV2 "google.golang.org/protobuf/proto"
-
 	"github.com/benbjohnson/clock"
 	"github.com/gogo/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -19,6 +17,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	protoV2 "google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/sets"
@@ -1074,14 +1073,10 @@ func TestCreateExecutionInterruptible(t *testing.T) {
 			mockExecutor.OnID().Return("testMockExecutor")
 			r := plugins.NewRegistry()
 			r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-<<<<<<< HEAD
 			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(),
 				getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(),
 				&mockPublisher, mockExecutionRemoteURL, nil, nil, nil,
-				nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
-=======
-			execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
->>>>>>> 513c3e1b8dba948cb2443609b27aae04d5609af4
+				nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
 
 			_, err := execManager.CreateExecution(context.Background(), request, requestedAt)
 			if !assert.Nil(t, err) {

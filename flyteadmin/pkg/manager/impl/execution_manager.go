@@ -1316,13 +1316,13 @@ func (m *ExecutionManager) CreateExecution(
 	}, nil
 }
 
-func readInputsFromExecutionModel(ctx context.Context, inputsUri storage.DataReference, specBytes []byte, storageClient storage.ProtobufStore) (*core.InputData, error) {
+func readInputsFromExecutionModel(ctx context.Context, inputsURI storage.DataReference, specBytes []byte, storageClient storage.ProtobufStore) (*core.InputData, error) {
 	var inputData *core.InputData
-	if len(inputsUri) > 0 {
+	if len(inputsURI) > 0 {
 		inputData = &core.InputData{}
 		inputs := &core.LiteralMap{}
-		if msgIndex, err := storageClient.ReadProtobufAny(ctx, inputsUri, inputData, inputs); err != nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read inputs proto from [%v]. Error: %v", inputsUri, err)
+		if msgIndex, err := storageClient.ReadProtobufAny(ctx, inputsURI, inputData, inputs); err != nil {
+			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to read inputs proto from [%v]. Error: %v", inputsURI, err)
 		} else if msgIndex == 1 {
 			inputData = migrateInputData(inputData, inputs)
 		}

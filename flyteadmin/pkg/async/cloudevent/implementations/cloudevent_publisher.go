@@ -182,7 +182,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 	}
 
 	// Get inputs to the workflow execution
-	var inputs *core.LiteralMap
+	var inputs *core.InputData
 	inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
 		c.storageClient, executionModel.InputsURI.String())
 	if err != nil {
@@ -196,12 +196,12 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 	}
 
 	// Get outputs from the workflow execution
-	var outputs *core.LiteralMap
+	var outputs *core.OutputData
 	if rawEvent.GetOutputData() != nil {
 		outputs = rawEvent.GetOutputData()
 	} else if len(rawEvent.GetOutputUri()) > 0 {
 		// GetInputs actually fetches the data, even though this is an output
-		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig, c.storageClient, rawEvent.GetOutputUri())
+		outputs, _, err = util.GetOutputData(ctx, c.urlData, &c.remoteDataConfig, c.storageClient, rawEvent.GetOutputUri())
 		if err != nil {
 			// gatepr: metric this
 			logger.Warningf(ctx, "Error fetching output literal map %v", rawEvent)
@@ -211,9 +211,9 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 
 	return &event.CloudEventWorkflowExecution{
 		RawEvent:           rawEvent,
-		OutputData:         outputs,
+		OutputData:         outputs.GetOutputs(),
 		OutputInterface:    &workflowInterface,
-		InputData:          inputs,
+		InputData:          inputs.GetInputs(),
 		ArtifactIds:        spec.GetMetadata().GetArtifactIds(),
 		ReferenceExecution: spec.GetMetadata().GetReferenceExecution(),
 		Principal:          spec.GetMetadata().Principal,
@@ -306,7 +306,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	// Get inputs/outputs
 	// This will likely need to move to the artifact service side, given message size limits.
 	// Replace with call to GetNodeExecutionData
-	var inputs *core.LiteralMap
+	var inputs *core.InputData
 	logger.Debugf(ctx, "RawEvent id %v", rawEvent.Id)
 	if len(rawEvent.GetInputUri()) > 0 {
 		inputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
@@ -324,12 +324,12 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	}
 
 	// This will likely need to move to the artifact service side, given message size limits.
-	var outputs *core.LiteralMap
+	var outputs *core.OutputData
 	if rawEvent.GetOutputData() != nil {
 		outputs = rawEvent.GetOutputData()
 	} else if len(rawEvent.GetOutputUri()) > 0 {
 		// GetInputs actually fetches the data, even though this is an output
-		outputs, _, err = util.GetInputs(ctx, c.urlData, &c.remoteDataConfig,
+		outputs, _, err = util.GetOutputData(ctx, c.urlData, &c.remoteDataConfig,
 			c.storageClient, rawEvent.GetOutputUri())
 		if err != nil {
 			fmt.Printf("Error fetching output literal map %v", rawEvent)
@@ -373,9 +373,9 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	return &event.CloudEventNodeExecution{
 		RawEvent:        rawEvent,
 		TaskExecId:      taskExecID,
-		OutputData:      outputs,
+		OutputData:      outputs.GetOutputs(),
 		OutputInterface: typedInterface,
-		InputData:       inputs,
+		InputData:       inputs.GetInputs(),
 		ArtifactIds:     spec.GetMetadata().GetArtifactIds(),
 		Principal:       spec.GetMetadata().Principal,
 		LaunchPlanId:    spec.LaunchPlan,
