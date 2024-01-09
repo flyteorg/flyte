@@ -170,13 +170,13 @@ class CreateTriggerResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class DeleteTriggerRequest(_message.Message):
+class DeactivateTriggerRequest(_message.Message):
     __slots__ = ["trigger_id"]
     TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
     trigger_id: _identifier_pb2.Identifier
     def __init__(self, trigger_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
 
-class DeleteTriggerResponse(_message.Message):
+class DeactivateTriggerResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 

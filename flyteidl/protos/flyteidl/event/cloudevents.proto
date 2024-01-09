@@ -16,22 +16,18 @@ import "google/protobuf/timestamp.proto";
 message CloudEventWorkflowExecution {
   event.WorkflowExecutionEvent raw_event = 1;
 
-  core.LiteralMap output_data = 2;
-
-  core.TypedInterface output_interface = 3;
-
-  core.LiteralMap input_data = 4;
+  core.TypedInterface output_interface = 2;
 
   // The following are ExecutionMetadata fields
   // We can't have the ExecutionMetadata object directly because of import cycle
-  repeated core.ArtifactID artifact_ids = 5;
-  core.WorkflowExecutionIdentifier reference_execution = 6;
-  string principal = 7;
+  repeated core.ArtifactID artifact_ids = 3;
+  core.WorkflowExecutionIdentifier reference_execution = 4;
+  string principal = 5;
 
   // The ID of the LP that generated the execution that generated the Artifact.
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-  core.Identifier launch_plan_id = 8;
+  core.Identifier launch_plan_id = 6;
 }
 
 message CloudEventNodeExecution {
@@ -40,23 +36,18 @@ message CloudEventNodeExecution {
   // The relevant task execution if applicable
   core.TaskExecutionIdentifier task_exec_id = 2;
 
-  // Hydrated output
-  core.LiteralMap output_data = 3;
-
   // The typed interface for the task that produced the event.
-  core.TypedInterface output_interface = 4;
-
-  core.LiteralMap input_data = 5;
+  core.TypedInterface output_interface = 3;
 
   // The following are ExecutionMetadata fields
   // We can't have the ExecutionMetadata object directly because of import cycle
-  repeated core.ArtifactID artifact_ids = 6;
-  string principal = 7;
+  repeated core.ArtifactID artifact_ids = 4;
+  string principal = 5;
 
   // The ID of the LP that generated the execution that generated the Artifact.
   // Here for provenance information.
   // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
-  core.Identifier launch_plan_id = 8;
+  core.Identifier launch_plan_id = 6;
 }
 
 message CloudEventTaskExecution {
@@ -72,11 +63,11 @@ message CloudEventExecutionStart {
 
   core.Identifier workflow_id = 3;
 
-  // Artifact IDs found
+  // Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
   repeated core.ArtifactID artifact_ids = 4;
 
-  // Artifact keys found.
-  repeated string artifact_keys = 5;
+  // Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
+  repeated string artifact_trackers = 5;
 
   string principal = 6;
 }
