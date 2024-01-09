@@ -226,7 +226,6 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 	nodeExecutionModel.CacheStatus = nil
 
 	taskNodeMetadata.CacheStatus = core.CatalogCacheStatus_CACHE_DISABLED
-	taskNodeMetadata.CatalogKey = nil
 	nodeExecution.Closure.TargetMetadata = &admin.NodeExecutionClosure_TaskNodeMetadata{
 		TaskNodeMetadata: taskNodeMetadata,
 	}

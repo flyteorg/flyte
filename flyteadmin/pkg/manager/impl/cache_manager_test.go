@@ -100,7 +100,6 @@ func setupCacheEvictionMockRepositories(t *testing.T, repository interfaces.Repo
 			require.True(t, ok)
 			require.NotNil(t, md.TaskNodeMetadata)
 			assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, md.TaskNodeMetadata.CacheStatus)
-			assert.Nil(t, md.TaskNodeMetadata.CatalogKey)
 
 			updatedNodeExecutions[nodeExecution.NodeID]++
 
