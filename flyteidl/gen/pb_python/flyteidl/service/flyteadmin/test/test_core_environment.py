@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.core_environment_type import CoreEnvironmentType  # noqa: E501
+from flyteadmin.models.core_environment import CoreEnvironment  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestCoreEnvironmentType(unittest.TestCase):
-    """CoreEnvironmentType unit test stubs"""
+class TestCoreEnvironment(unittest.TestCase):
+    """CoreEnvironment unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestCoreEnvironmentType(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testCoreEnvironmentType(self):
-        """Test CoreEnvironmentType"""
+    def testCoreEnvironment(self):
+        """Test CoreEnvironment"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.core_environment_type.CoreEnvironmentType()  # noqa: E501
+        # model = flyteadmin.models.core_environment.CoreEnvironment()  # noqa: E501
         pass
 
 

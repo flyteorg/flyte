@@ -12,7 +12,5 @@ package flyteadmin
 type CoreEnvironmentAssignment struct {
 	Id string `json:"id,omitempty"`
 	NodeIds []string `json:"node_ids,omitempty"`
-	SubworkflowEnvironments []CoreSubworkflowEnvironments `json:"subworkflow_environments,omitempty"`
-	Type_ *CoreEnvironmentType `json:"type,omitempty"`
-	FasttaskEnvironment *CoreFastTaskEnvironment `json:"fasttask_environment,omitempty"`
+	Environment *CoreEnvironment `json:"environment,omitempty"`
 }

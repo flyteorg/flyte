@@ -2786,28 +2786,42 @@ pub struct EnvironmentAssignment {
     pub id: ::prost::alloc::string::String,
     #[prost(string, repeated, tag="2")]
     pub node_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    #[prost(message, repeated, tag="3")]
-    pub subworkflow_environments: ::prost::alloc::vec::Vec<SubworkflowEnvironments>,
-    #[prost(enumeration="EnvironmentType", tag="4")]
-    pub r#type: i32,
-    #[prost(message, optional, tag="5")]
-    pub fasttask_environment: ::core::option::Option<FastTaskEnvironment>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct SubworkflowEnvironments {
-    #[prost(message, optional, tag="1")]
-    pub workflow_id: ::core::option::Option<Identifier>,
-    #[prost(string, tag="2")]
-    pub environment_id: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub environment: ::core::option::Option<Environment>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Environment {
-    #[prost(enumeration="EnvironmentType", tag="1")]
+    #[prost(enumeration="environment::EnvironmentType", tag="1")]
     pub r#type: i32,
     #[prost(message, optional, tag="2")]
     pub fasttask_environment: ::core::option::Option<FastTaskEnvironment>,
+}
+/// Nested message and enum types in `Environment`.
+pub mod environment {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum EnvironmentType {
+        Fasttask = 0,
+    }
+    impl EnvironmentType {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                EnvironmentType::Fasttask => "FASTTASK",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "FASTTASK" => Some(Self::Fasttask),
+                _ => None,
+            }
+        }
+    }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2818,29 +2832,6 @@ pub struct FastTaskEnvironment {
     pub namespace: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub pod_id: ::prost::alloc::string::String,
-}
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-#[repr(i32)]
-pub enum EnvironmentType {
-    Fasttask = 0,
-}
-impl EnvironmentType {
-    /// String value of the enum field names used in the ProtoBuf definition.
-    ///
-    /// The values are not transformed in any way and thus are considered stable
-    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-    pub fn as_str_name(&self) -> &'static str {
-        match self {
-            EnvironmentType::Fasttask => "FASTTASK",
-        }
-    }
-    /// Creates an enum from field names used in the ProtoBuf definition.
-    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-        match value {
-            "FASTTASK" => Some(Self::Fasttask),
-            _ => None,
-        }
-    }
 }
 /// Describes a set of tasks to execute and how the final outputs are produced.
 #[allow(clippy::derive_partial_eq_without_eq)]

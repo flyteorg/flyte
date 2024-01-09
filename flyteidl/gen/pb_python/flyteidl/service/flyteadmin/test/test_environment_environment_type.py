@@ -16,12 +16,12 @@ from __future__ import absolute_import
 import unittest
 
 import flyteadmin
-from flyteadmin.models.core_subworkflow_environments import CoreSubworkflowEnvironments  # noqa: E501
+from flyteadmin.models.environment_environment_type import EnvironmentEnvironmentType  # noqa: E501
 from flyteadmin.rest import ApiException
 
 
-class TestCoreSubworkflowEnvironments(unittest.TestCase):
-    """CoreSubworkflowEnvironments unit test stubs"""
+class TestEnvironmentEnvironmentType(unittest.TestCase):
+    """EnvironmentEnvironmentType unit test stubs"""
 
     def setUp(self):
         pass
@@ -29,10 +29,10 @@ class TestCoreSubworkflowEnvironments(unittest.TestCase):
     def tearDown(self):
         pass
 
-    def testCoreSubworkflowEnvironments(self):
-        """Test CoreSubworkflowEnvironments"""
+    def testEnvironmentEnvironmentType(self):
+        """Test EnvironmentEnvironmentType"""
         # FIXME: construct object with mandatory attributes with example values
-        # model = flyteadmin.models.core_subworkflow_environments.CoreSubworkflowEnvironments()  # noqa: E501
+        # model = flyteadmin.models.environment_environment_type.EnvironmentEnvironmentType()  # noqa: E501
         pass
 
 

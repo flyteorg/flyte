@@ -7361,14 +7361,8 @@ export namespace flyteidl {
             /** EnvironmentAssignment nodeIds */
             nodeIds?: (string[]|null);
 
-            /** EnvironmentAssignment subworkflowEnvironments */
-            subworkflowEnvironments?: (flyteidl.core.ISubworkflowEnvironments[]|null);
-
-            /** EnvironmentAssignment type */
-            type?: (flyteidl.core.EnvironmentType|null);
-
-            /** EnvironmentAssignment fasttaskEnvironment */
-            fasttaskEnvironment?: (flyteidl.core.IFastTaskEnvironment|null);
+            /** EnvironmentAssignment environment */
+            environment?: (flyteidl.core.IEnvironment|null);
         }
 
         /** Represents an EnvironmentAssignment. */
@@ -7386,14 +7380,8 @@ export namespace flyteidl {
             /** EnvironmentAssignment nodeIds. */
             public nodeIds: string[];
 
-            /** EnvironmentAssignment subworkflowEnvironments. */
-            public subworkflowEnvironments: flyteidl.core.ISubworkflowEnvironments[];
-
-            /** EnvironmentAssignment type. */
-            public type: flyteidl.core.EnvironmentType;
-
-            /** EnvironmentAssignment fasttaskEnvironment. */
-            public fasttaskEnvironment?: (flyteidl.core.IFastTaskEnvironment|null);
+            /** EnvironmentAssignment environment. */
+            public environment?: (flyteidl.core.IEnvironment|null);
 
             /**
              * Creates a new EnvironmentAssignment instance using the specified properties.
@@ -7428,74 +7416,11 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** EnvironmentType enum. */
-        enum EnvironmentType {
-            FASTTASK = 0
-        }
-
-        /** Properties of a SubworkflowEnvironments. */
-        interface ISubworkflowEnvironments {
-
-            /** SubworkflowEnvironments workflowId */
-            workflowId?: (flyteidl.core.IIdentifier|null);
-
-            /** SubworkflowEnvironments environmentId */
-            environmentId?: (string|null);
-        }
-
-        /** Represents a SubworkflowEnvironments. */
-        class SubworkflowEnvironments implements ISubworkflowEnvironments {
-
-            /**
-             * Constructs a new SubworkflowEnvironments.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.ISubworkflowEnvironments);
-
-            /** SubworkflowEnvironments workflowId. */
-            public workflowId?: (flyteidl.core.IIdentifier|null);
-
-            /** SubworkflowEnvironments environmentId. */
-            public environmentId: string;
-
-            /**
-             * Creates a new SubworkflowEnvironments instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns SubworkflowEnvironments instance
-             */
-            public static create(properties?: flyteidl.core.ISubworkflowEnvironments): flyteidl.core.SubworkflowEnvironments;
-
-            /**
-             * Encodes the specified SubworkflowEnvironments message. Does not implicitly {@link flyteidl.core.SubworkflowEnvironments.verify|verify} messages.
-             * @param message SubworkflowEnvironments message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.ISubworkflowEnvironments, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a SubworkflowEnvironments message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns SubworkflowEnvironments
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.SubworkflowEnvironments;
-
-            /**
-             * Verifies a SubworkflowEnvironments message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** Properties of an Environment. */
         interface IEnvironment {
 
             /** Environment type */
-            type?: (flyteidl.core.EnvironmentType|null);
+            type?: (flyteidl.core.Environment.EnvironmentType|null);
 
             /** Environment fasttaskEnvironment */
             fasttaskEnvironment?: (flyteidl.core.IFastTaskEnvironment|null);
@@ -7511,7 +7436,7 @@ export namespace flyteidl {
             constructor(properties?: flyteidl.core.IEnvironment);
 
             /** Environment type. */
-            public type: flyteidl.core.EnvironmentType;
+            public type: flyteidl.core.Environment.EnvironmentType;
 
             /** Environment fasttaskEnvironment. */
             public fasttaskEnvironment?: (flyteidl.core.IFastTaskEnvironment|null);
@@ -7547,6 +7472,14 @@ export namespace flyteidl {
              * @returns `null` if valid, otherwise the reason why it is not
              */
             public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        namespace Environment {
+
+            /** EnvironmentType enum. */
+            enum EnvironmentType {
+                FASTTASK = 0
+            }
         }
 
         /** Properties of a FastTaskEnvironment. */

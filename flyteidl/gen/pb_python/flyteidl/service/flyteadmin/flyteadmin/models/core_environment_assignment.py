@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_environment_type import CoreEnvironmentType  # noqa: F401,E501
-from flyteadmin.models.core_fast_task_environment import CoreFastTaskEnvironment  # noqa: F401,E501
-from flyteadmin.models.core_subworkflow_environments import CoreSubworkflowEnvironments  # noqa: F401,E501
+from flyteadmin.models.core_environment import CoreEnvironment  # noqa: F401,E501
 
 
 class CoreEnvironmentAssignment(object):
@@ -37,39 +35,29 @@ class CoreEnvironmentAssignment(object):
     swagger_types = {
         'id': 'str',
         'node_ids': 'list[str]',
-        'subworkflow_environments': 'list[CoreSubworkflowEnvironments]',
-        'type': 'CoreEnvironmentType',
-        'fasttask_environment': 'CoreFastTaskEnvironment'
+        'environment': 'CoreEnvironment'
     }
 
     attribute_map = {
         'id': 'id',
         'node_ids': 'node_ids',
-        'subworkflow_environments': 'subworkflow_environments',
-        'type': 'type',
-        'fasttask_environment': 'fasttask_environment'
+        'environment': 'environment'
     }
 
-    def __init__(self, id=None, node_ids=None, subworkflow_environments=None, type=None, fasttask_environment=None):  # noqa: E501
+    def __init__(self, id=None, node_ids=None, environment=None):  # noqa: E501
         """CoreEnvironmentAssignment - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._node_ids = None
-        self._subworkflow_environments = None
-        self._type = None
-        self._fasttask_environment = None
+        self._environment = None
         self.discriminator = None
 
         if id is not None:
             self.id = id
         if node_ids is not None:
             self.node_ids = node_ids
-        if subworkflow_environments is not None:
-            self.subworkflow_environments = subworkflow_environments
-        if type is not None:
-            self.type = type
-        if fasttask_environment is not None:
-            self.fasttask_environment = fasttask_environment
+        if environment is not None:
+            self.environment = environment
 
     @property
     def id(self):
@@ -114,67 +102,25 @@ class CoreEnvironmentAssignment(object):
         self._node_ids = node_ids
 
     @property
-    def subworkflow_environments(self):
-        """Gets the subworkflow_environments of this CoreEnvironmentAssignment.  # noqa: E501
+    def environment(self):
+        """Gets the environment of this CoreEnvironmentAssignment.  # noqa: E501
 
 
-        :return: The subworkflow_environments of this CoreEnvironmentAssignment.  # noqa: E501
-        :rtype: list[CoreSubworkflowEnvironments]
+        :return: The environment of this CoreEnvironmentAssignment.  # noqa: E501
+        :rtype: CoreEnvironment
         """
-        return self._subworkflow_environments
+        return self._environment
 
-    @subworkflow_environments.setter
-    def subworkflow_environments(self, subworkflow_environments):
-        """Sets the subworkflow_environments of this CoreEnvironmentAssignment.
-
-
-        :param subworkflow_environments: The subworkflow_environments of this CoreEnvironmentAssignment.  # noqa: E501
-        :type: list[CoreSubworkflowEnvironments]
-        """
-
-        self._subworkflow_environments = subworkflow_environments
-
-    @property
-    def type(self):
-        """Gets the type of this CoreEnvironmentAssignment.  # noqa: E501
+    @environment.setter
+    def environment(self, environment):
+        """Sets the environment of this CoreEnvironmentAssignment.
 
 
-        :return: The type of this CoreEnvironmentAssignment.  # noqa: E501
-        :rtype: CoreEnvironmentType
-        """
-        return self._type
-
-    @type.setter
-    def type(self, type):
-        """Sets the type of this CoreEnvironmentAssignment.
-
-
-        :param type: The type of this CoreEnvironmentAssignment.  # noqa: E501
-        :type: CoreEnvironmentType
+        :param environment: The environment of this CoreEnvironmentAssignment.  # noqa: E501
+        :type: CoreEnvironment
         """
 
-        self._type = type
-
-    @property
-    def fasttask_environment(self):
-        """Gets the fasttask_environment of this CoreEnvironmentAssignment.  # noqa: E501
-
-
-        :return: The fasttask_environment of this CoreEnvironmentAssignment.  # noqa: E501
-        :rtype: CoreFastTaskEnvironment
-        """
-        return self._fasttask_environment
-
-    @fasttask_environment.setter
-    def fasttask_environment(self, fasttask_environment):
-        """Sets the fasttask_environment of this CoreEnvironmentAssignment.
-
-
-        :param fasttask_environment: The fasttask_environment of this CoreEnvironmentAssignment.  # noqa: E501
-        :type: CoreFastTaskEnvironment
-        """
-
-        self._fasttask_environment = fasttask_environment
+        self._environment = environment
 
     def to_dict(self):
         """Returns the model properties as a dict"""

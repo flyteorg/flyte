@@ -14,95 +14,6 @@ public final class PersistentEnvs {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  /**
-   * Protobuf enum {@code flyteidl.core.EnvironmentType}
-   */
-  public enum EnvironmentType
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>FASTTASK = 0;</code>
-     */
-    FASTTASK(0),
-    UNRECOGNIZED(-1),
-    ;
-
-    /**
-     * <code>FASTTASK = 0;</code>
-     */
-    public static final int FASTTASK_VALUE = 0;
-
-
-    public final int getNumber() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
-      }
-      return value;
-    }
-
-    /**
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static EnvironmentType valueOf(int value) {
-      return forNumber(value);
-    }
-
-    public static EnvironmentType forNumber(int value) {
-      switch (value) {
-        case 0: return FASTTASK;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<EnvironmentType>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        EnvironmentType> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<EnvironmentType>() {
-            public EnvironmentType findValueByNumber(int number) {
-              return EnvironmentType.forNumber(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      return getDescriptor().getValues().get(ordinal());
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return flyteidl.core.PersistentEnvs.getDescriptor().getEnumTypes().get(0);
-    }
-
-    private static final EnvironmentType[] VALUES = values();
-
-    public static EnvironmentType valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      if (desc.getIndex() == -1) {
-        return UNRECOGNIZED;
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int value;
-
-    private EnvironmentType(int value) {
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:flyteidl.core.EnvironmentType)
-  }
-
   public interface EnvironmentAssignmentOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.EnvironmentAssignment)
       com.google.protobuf.MessageOrBuilder {
@@ -137,50 +48,17 @@ public final class PersistentEnvs {
         getNodeIdsBytes(int index);
 
     /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
+     * <code>.flyteidl.core.Environment environment = 3;</code>
      */
-    java.util.List<flyteidl.core.PersistentEnvs.SubworkflowEnvironments> 
-        getSubworkflowEnvironmentsList();
+    boolean hasEnvironment();
     /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
+     * <code>.flyteidl.core.Environment environment = 3;</code>
      */
-    flyteidl.core.PersistentEnvs.SubworkflowEnvironments getSubworkflowEnvironments(int index);
+    flyteidl.core.PersistentEnvs.Environment getEnvironment();
     /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
+     * <code>.flyteidl.core.Environment environment = 3;</code>
      */
-    int getSubworkflowEnvironmentsCount();
-    /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-     */
-    java.util.List<? extends flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder> 
-        getSubworkflowEnvironmentsOrBuilderList();
-    /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-     */
-    flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder getSubworkflowEnvironmentsOrBuilder(
-        int index);
-
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-     */
-    int getTypeValue();
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-     */
-    flyteidl.core.PersistentEnvs.EnvironmentType getType();
-
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
-     */
-    boolean hasFasttaskEnvironment();
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
-     */
-    flyteidl.core.PersistentEnvs.FastTaskEnvironment getFasttaskEnvironment();
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
-     */
-    flyteidl.core.PersistentEnvs.FastTaskEnvironmentOrBuilder getFasttaskEnvironmentOrBuilder();
+    flyteidl.core.PersistentEnvs.EnvironmentOrBuilder getEnvironmentOrBuilder();
   }
   /**
    * Protobuf type {@code flyteidl.core.EnvironmentAssignment}
@@ -197,8 +75,6 @@ public final class PersistentEnvs {
     private EnvironmentAssignment() {
       id_ = "";
       nodeIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
-      subworkflowEnvironments_ = java.util.Collections.emptyList();
-      type_ = 0;
     }
 
     @java.lang.Override
@@ -241,29 +117,14 @@ public final class PersistentEnvs {
               break;
             }
             case 26: {
-              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
-                subworkflowEnvironments_ = new java.util.ArrayList<flyteidl.core.PersistentEnvs.SubworkflowEnvironments>();
-                mutable_bitField0_ |= 0x00000004;
+              flyteidl.core.PersistentEnvs.Environment.Builder subBuilder = null;
+              if (environment_ != null) {
+                subBuilder = environment_.toBuilder();
               }
-              subworkflowEnvironments_.add(
-                  input.readMessage(flyteidl.core.PersistentEnvs.SubworkflowEnvironments.parser(), extensionRegistry));
-              break;
-            }
-            case 32: {
-              int rawValue = input.readEnum();
-
-              type_ = rawValue;
-              break;
-            }
-            case 42: {
-              flyteidl.core.PersistentEnvs.FastTaskEnvironment.Builder subBuilder = null;
-              if (fasttaskEnvironment_ != null) {
-                subBuilder = fasttaskEnvironment_.toBuilder();
-              }
-              fasttaskEnvironment_ = input.readMessage(flyteidl.core.PersistentEnvs.FastTaskEnvironment.parser(), extensionRegistry);
+              environment_ = input.readMessage(flyteidl.core.PersistentEnvs.Environment.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(fasttaskEnvironment_);
-                fasttaskEnvironment_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(environment_);
+                environment_ = subBuilder.buildPartial();
               }
 
               break;
@@ -285,9 +146,6 @@ public final class PersistentEnvs {
       } finally {
         if (((mutable_bitField0_ & 0x00000002) != 0)) {
           nodeIds_ = nodeIds_.getUnmodifiableView();
-        }
-        if (((mutable_bitField0_ & 0x00000004) != 0)) {
-          subworkflowEnvironments_ = java.util.Collections.unmodifiableList(subworkflowEnvironments_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -370,77 +228,25 @@ public final class PersistentEnvs {
       return nodeIds_.getByteString(index);
     }
 
-    public static final int SUBWORKFLOW_ENVIRONMENTS_FIELD_NUMBER = 3;
-    private java.util.List<flyteidl.core.PersistentEnvs.SubworkflowEnvironments> subworkflowEnvironments_;
+    public static final int ENVIRONMENT_FIELD_NUMBER = 3;
+    private flyteidl.core.PersistentEnvs.Environment environment_;
     /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
+     * <code>.flyteidl.core.Environment environment = 3;</code>
      */
-    public java.util.List<flyteidl.core.PersistentEnvs.SubworkflowEnvironments> getSubworkflowEnvironmentsList() {
-      return subworkflowEnvironments_;
+    public boolean hasEnvironment() {
+      return environment_ != null;
     }
     /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
+     * <code>.flyteidl.core.Environment environment = 3;</code>
      */
-    public java.util.List<? extends flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder> 
-        getSubworkflowEnvironmentsOrBuilderList() {
-      return subworkflowEnvironments_;
+    public flyteidl.core.PersistentEnvs.Environment getEnvironment() {
+      return environment_ == null ? flyteidl.core.PersistentEnvs.Environment.getDefaultInstance() : environment_;
     }
     /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
+     * <code>.flyteidl.core.Environment environment = 3;</code>
      */
-    public int getSubworkflowEnvironmentsCount() {
-      return subworkflowEnvironments_.size();
-    }
-    /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-     */
-    public flyteidl.core.PersistentEnvs.SubworkflowEnvironments getSubworkflowEnvironments(int index) {
-      return subworkflowEnvironments_.get(index);
-    }
-    /**
-     * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-     */
-    public flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder getSubworkflowEnvironmentsOrBuilder(
-        int index) {
-      return subworkflowEnvironments_.get(index);
-    }
-
-    public static final int TYPE_FIELD_NUMBER = 4;
-    private int type_;
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-     */
-    public int getTypeValue() {
-      return type_;
-    }
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-     */
-    public flyteidl.core.PersistentEnvs.EnvironmentType getType() {
-      @SuppressWarnings("deprecation")
-      flyteidl.core.PersistentEnvs.EnvironmentType result = flyteidl.core.PersistentEnvs.EnvironmentType.valueOf(type_);
-      return result == null ? flyteidl.core.PersistentEnvs.EnvironmentType.UNRECOGNIZED : result;
-    }
-
-    public static final int FASTTASK_ENVIRONMENT_FIELD_NUMBER = 5;
-    private flyteidl.core.PersistentEnvs.FastTaskEnvironment fasttaskEnvironment_;
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
-     */
-    public boolean hasFasttaskEnvironment() {
-      return fasttaskEnvironment_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
-     */
-    public flyteidl.core.PersistentEnvs.FastTaskEnvironment getFasttaskEnvironment() {
-      return fasttaskEnvironment_ == null ? flyteidl.core.PersistentEnvs.FastTaskEnvironment.getDefaultInstance() : fasttaskEnvironment_;
-    }
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
-     */
-    public flyteidl.core.PersistentEnvs.FastTaskEnvironmentOrBuilder getFasttaskEnvironmentOrBuilder() {
-      return getFasttaskEnvironment();
+    public flyteidl.core.PersistentEnvs.EnvironmentOrBuilder getEnvironmentOrBuilder() {
+      return getEnvironment();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -463,14 +269,8 @@ public final class PersistentEnvs {
       for (int i = 0; i < nodeIds_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, nodeIds_.getRaw(i));
       }
-      for (int i = 0; i < subworkflowEnvironments_.size(); i++) {
-        output.writeMessage(3, subworkflowEnvironments_.get(i));
-      }
-      if (type_ != flyteidl.core.PersistentEnvs.EnvironmentType.FASTTASK.getNumber()) {
-        output.writeEnum(4, type_);
-      }
-      if (fasttaskEnvironment_ != null) {
-        output.writeMessage(5, getFasttaskEnvironment());
+      if (environment_ != null) {
+        output.writeMessage(3, getEnvironment());
       }
       unknownFields.writeTo(output);
     }
@@ -492,17 +292,9 @@ public final class PersistentEnvs {
         size += dataSize;
         size += 1 * getNodeIdsList().size();
       }
-      for (int i = 0; i < subworkflowEnvironments_.size(); i++) {
+      if (environment_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, subworkflowEnvironments_.get(i));
-      }
-      if (type_ != flyteidl.core.PersistentEnvs.EnvironmentType.FASTTASK.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(4, type_);
-      }
-      if (fasttaskEnvironment_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getFasttaskEnvironment());
+          .computeMessageSize(3, getEnvironment());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -523,13 +315,10 @@ public final class PersistentEnvs {
           .equals(other.getId())) return false;
       if (!getNodeIdsList()
           .equals(other.getNodeIdsList())) return false;
-      if (!getSubworkflowEnvironmentsList()
-          .equals(other.getSubworkflowEnvironmentsList())) return false;
-      if (type_ != other.type_) return false;
-      if (hasFasttaskEnvironment() != other.hasFasttaskEnvironment()) return false;
-      if (hasFasttaskEnvironment()) {
-        if (!getFasttaskEnvironment()
-            .equals(other.getFasttaskEnvironment())) return false;
+      if (hasEnvironment() != other.hasEnvironment()) return false;
+      if (hasEnvironment()) {
+        if (!getEnvironment()
+            .equals(other.getEnvironment())) return false;
       }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
@@ -548,15 +337,9 @@ public final class PersistentEnvs {
         hash = (37 * hash) + NODE_IDS_FIELD_NUMBER;
         hash = (53 * hash) + getNodeIdsList().hashCode();
       }
-      if (getSubworkflowEnvironmentsCount() > 0) {
-        hash = (37 * hash) + SUBWORKFLOW_ENVIRONMENTS_FIELD_NUMBER;
-        hash = (53 * hash) + getSubworkflowEnvironmentsList().hashCode();
-      }
-      hash = (37 * hash) + TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + type_;
-      if (hasFasttaskEnvironment()) {
-        hash = (37 * hash) + FASTTASK_ENVIRONMENT_FIELD_NUMBER;
-        hash = (53 * hash) + getFasttaskEnvironment().hashCode();
+      if (hasEnvironment()) {
+        hash = (37 * hash) + ENVIRONMENT_FIELD_NUMBER;
+        hash = (53 * hash) + getEnvironment().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -686,7 +469,6 @@ public final class PersistentEnvs {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getSubworkflowEnvironmentsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -696,19 +478,11 @@ public final class PersistentEnvs {
 
         nodeIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          subworkflowEnvironments_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000004);
+        if (environmentBuilder_ == null) {
+          environment_ = null;
         } else {
-          subworkflowEnvironmentsBuilder_.clear();
-        }
-        type_ = 0;
-
-        if (fasttaskEnvironmentBuilder_ == null) {
-          fasttaskEnvironment_ = null;
-        } else {
-          fasttaskEnvironment_ = null;
-          fasttaskEnvironmentBuilder_ = null;
+          environment_ = null;
+          environmentBuilder_ = null;
         }
         return this;
       }
@@ -744,20 +518,10 @@ public final class PersistentEnvs {
           bitField0_ = (bitField0_ & ~0x00000002);
         }
         result.nodeIds_ = nodeIds_;
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          if (((bitField0_ & 0x00000004) != 0)) {
-            subworkflowEnvironments_ = java.util.Collections.unmodifiableList(subworkflowEnvironments_);
-            bitField0_ = (bitField0_ & ~0x00000004);
-          }
-          result.subworkflowEnvironments_ = subworkflowEnvironments_;
+        if (environmentBuilder_ == null) {
+          result.environment_ = environment_;
         } else {
-          result.subworkflowEnvironments_ = subworkflowEnvironmentsBuilder_.build();
-        }
-        result.type_ = type_;
-        if (fasttaskEnvironmentBuilder_ == null) {
-          result.fasttaskEnvironment_ = fasttaskEnvironment_;
-        } else {
-          result.fasttaskEnvironment_ = fasttaskEnvironmentBuilder_.build();
+          result.environment_ = environmentBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -822,37 +586,8 @@ public final class PersistentEnvs {
           }
           onChanged();
         }
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          if (!other.subworkflowEnvironments_.isEmpty()) {
-            if (subworkflowEnvironments_.isEmpty()) {
-              subworkflowEnvironments_ = other.subworkflowEnvironments_;
-              bitField0_ = (bitField0_ & ~0x00000004);
-            } else {
-              ensureSubworkflowEnvironmentsIsMutable();
-              subworkflowEnvironments_.addAll(other.subworkflowEnvironments_);
-            }
-            onChanged();
-          }
-        } else {
-          if (!other.subworkflowEnvironments_.isEmpty()) {
-            if (subworkflowEnvironmentsBuilder_.isEmpty()) {
-              subworkflowEnvironmentsBuilder_.dispose();
-              subworkflowEnvironmentsBuilder_ = null;
-              subworkflowEnvironments_ = other.subworkflowEnvironments_;
-              bitField0_ = (bitField0_ & ~0x00000004);
-              subworkflowEnvironmentsBuilder_ = 
-                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                   getSubworkflowEnvironmentsFieldBuilder() : null;
-            } else {
-              subworkflowEnvironmentsBuilder_.addAllMessages(other.subworkflowEnvironments_);
-            }
-          }
-        }
-        if (other.type_ != 0) {
-          setTypeValue(other.getTypeValue());
-        }
-        if (other.hasFasttaskEnvironment()) {
-          mergeFasttaskEnvironment(other.getFasttaskEnvironment());
+        if (other.hasEnvironment()) {
+          mergeEnvironment(other.getEnvironment());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -1047,406 +782,121 @@ public final class PersistentEnvs {
         return this;
       }
 
-      private java.util.List<flyteidl.core.PersistentEnvs.SubworkflowEnvironments> subworkflowEnvironments_ =
-        java.util.Collections.emptyList();
-      private void ensureSubworkflowEnvironmentsIsMutable() {
-        if (!((bitField0_ & 0x00000004) != 0)) {
-          subworkflowEnvironments_ = new java.util.ArrayList<flyteidl.core.PersistentEnvs.SubworkflowEnvironments>(subworkflowEnvironments_);
-          bitField0_ |= 0x00000004;
-         }
-      }
-
-      private com.google.protobuf.RepeatedFieldBuilderV3<
-          flyteidl.core.PersistentEnvs.SubworkflowEnvironments, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder, flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder> subworkflowEnvironmentsBuilder_;
-
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public java.util.List<flyteidl.core.PersistentEnvs.SubworkflowEnvironments> getSubworkflowEnvironmentsList() {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(subworkflowEnvironments_);
-        } else {
-          return subworkflowEnvironmentsBuilder_.getMessageList();
-        }
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public int getSubworkflowEnvironmentsCount() {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          return subworkflowEnvironments_.size();
-        } else {
-          return subworkflowEnvironmentsBuilder_.getCount();
-        }
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments getSubworkflowEnvironments(int index) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          return subworkflowEnvironments_.get(index);
-        } else {
-          return subworkflowEnvironmentsBuilder_.getMessage(index);
-        }
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder setSubworkflowEnvironments(
-          int index, flyteidl.core.PersistentEnvs.SubworkflowEnvironments value) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.set(index, value);
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.setMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder setSubworkflowEnvironments(
-          int index, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder builderForValue) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.set(index, builderForValue.build());
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.setMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder addSubworkflowEnvironments(flyteidl.core.PersistentEnvs.SubworkflowEnvironments value) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.add(value);
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.addMessage(value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder addSubworkflowEnvironments(
-          int index, flyteidl.core.PersistentEnvs.SubworkflowEnvironments value) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.add(index, value);
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.addMessage(index, value);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder addSubworkflowEnvironments(
-          flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder builderForValue) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.add(builderForValue.build());
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.addMessage(builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder addSubworkflowEnvironments(
-          int index, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder builderForValue) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.add(index, builderForValue.build());
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.addMessage(index, builderForValue.build());
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder addAllSubworkflowEnvironments(
-          java.lang.Iterable<? extends flyteidl.core.PersistentEnvs.SubworkflowEnvironments> values) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          ensureSubworkflowEnvironmentsIsMutable();
-          com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, subworkflowEnvironments_);
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.addAllMessages(values);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder clearSubworkflowEnvironments() {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          subworkflowEnvironments_ = java.util.Collections.emptyList();
-          bitField0_ = (bitField0_ & ~0x00000004);
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.clear();
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public Builder removeSubworkflowEnvironments(int index) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          ensureSubworkflowEnvironmentsIsMutable();
-          subworkflowEnvironments_.remove(index);
-          onChanged();
-        } else {
-          subworkflowEnvironmentsBuilder_.remove(index);
-        }
-        return this;
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder getSubworkflowEnvironmentsBuilder(
-          int index) {
-        return getSubworkflowEnvironmentsFieldBuilder().getBuilder(index);
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder getSubworkflowEnvironmentsOrBuilder(
-          int index) {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          return subworkflowEnvironments_.get(index);  } else {
-          return subworkflowEnvironmentsBuilder_.getMessageOrBuilder(index);
-        }
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public java.util.List<? extends flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder> 
-           getSubworkflowEnvironmentsOrBuilderList() {
-        if (subworkflowEnvironmentsBuilder_ != null) {
-          return subworkflowEnvironmentsBuilder_.getMessageOrBuilderList();
-        } else {
-          return java.util.Collections.unmodifiableList(subworkflowEnvironments_);
-        }
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder addSubworkflowEnvironmentsBuilder() {
-        return getSubworkflowEnvironmentsFieldBuilder().addBuilder(
-            flyteidl.core.PersistentEnvs.SubworkflowEnvironments.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder addSubworkflowEnvironmentsBuilder(
-          int index) {
-        return getSubworkflowEnvironmentsFieldBuilder().addBuilder(
-            index, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.getDefaultInstance());
-      }
-      /**
-       * <code>repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;</code>
-       */
-      public java.util.List<flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder> 
-           getSubworkflowEnvironmentsBuilderList() {
-        return getSubworkflowEnvironmentsFieldBuilder().getBuilderList();
-      }
-      private com.google.protobuf.RepeatedFieldBuilderV3<
-          flyteidl.core.PersistentEnvs.SubworkflowEnvironments, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder, flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder> 
-          getSubworkflowEnvironmentsFieldBuilder() {
-        if (subworkflowEnvironmentsBuilder_ == null) {
-          subworkflowEnvironmentsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-              flyteidl.core.PersistentEnvs.SubworkflowEnvironments, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder, flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder>(
-                  subworkflowEnvironments_,
-                  ((bitField0_ & 0x00000004) != 0),
-                  getParentForChildren(),
-                  isClean());
-          subworkflowEnvironments_ = null;
-        }
-        return subworkflowEnvironmentsBuilder_;
-      }
-
-      private int type_ = 0;
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-       */
-      public int getTypeValue() {
-        return type_;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-       */
-      public Builder setTypeValue(int value) {
-        type_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-       */
-      public flyteidl.core.PersistentEnvs.EnvironmentType getType() {
-        @SuppressWarnings("deprecation")
-        flyteidl.core.PersistentEnvs.EnvironmentType result = flyteidl.core.PersistentEnvs.EnvironmentType.valueOf(type_);
-        return result == null ? flyteidl.core.PersistentEnvs.EnvironmentType.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-       */
-      public Builder setType(flyteidl.core.PersistentEnvs.EnvironmentType value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        
-        type_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 4;</code>
-       */
-      public Builder clearType() {
-        
-        type_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private flyteidl.core.PersistentEnvs.FastTaskEnvironment fasttaskEnvironment_;
+      private flyteidl.core.PersistentEnvs.Environment environment_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.PersistentEnvs.FastTaskEnvironment, flyteidl.core.PersistentEnvs.FastTaskEnvironment.Builder, flyteidl.core.PersistentEnvs.FastTaskEnvironmentOrBuilder> fasttaskEnvironmentBuilder_;
+          flyteidl.core.PersistentEnvs.Environment, flyteidl.core.PersistentEnvs.Environment.Builder, flyteidl.core.PersistentEnvs.EnvironmentOrBuilder> environmentBuilder_;
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public boolean hasFasttaskEnvironment() {
-        return fasttaskEnvironmentBuilder_ != null || fasttaskEnvironment_ != null;
+      public boolean hasEnvironment() {
+        return environmentBuilder_ != null || environment_ != null;
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public flyteidl.core.PersistentEnvs.FastTaskEnvironment getFasttaskEnvironment() {
-        if (fasttaskEnvironmentBuilder_ == null) {
-          return fasttaskEnvironment_ == null ? flyteidl.core.PersistentEnvs.FastTaskEnvironment.getDefaultInstance() : fasttaskEnvironment_;
+      public flyteidl.core.PersistentEnvs.Environment getEnvironment() {
+        if (environmentBuilder_ == null) {
+          return environment_ == null ? flyteidl.core.PersistentEnvs.Environment.getDefaultInstance() : environment_;
         } else {
-          return fasttaskEnvironmentBuilder_.getMessage();
+          return environmentBuilder_.getMessage();
         }
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public Builder setFasttaskEnvironment(flyteidl.core.PersistentEnvs.FastTaskEnvironment value) {
-        if (fasttaskEnvironmentBuilder_ == null) {
+      public Builder setEnvironment(flyteidl.core.PersistentEnvs.Environment value) {
+        if (environmentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          fasttaskEnvironment_ = value;
+          environment_ = value;
           onChanged();
         } else {
-          fasttaskEnvironmentBuilder_.setMessage(value);
+          environmentBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public Builder setFasttaskEnvironment(
-          flyteidl.core.PersistentEnvs.FastTaskEnvironment.Builder builderForValue) {
-        if (fasttaskEnvironmentBuilder_ == null) {
-          fasttaskEnvironment_ = builderForValue.build();
+      public Builder setEnvironment(
+          flyteidl.core.PersistentEnvs.Environment.Builder builderForValue) {
+        if (environmentBuilder_ == null) {
+          environment_ = builderForValue.build();
           onChanged();
         } else {
-          fasttaskEnvironmentBuilder_.setMessage(builderForValue.build());
+          environmentBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public Builder mergeFasttaskEnvironment(flyteidl.core.PersistentEnvs.FastTaskEnvironment value) {
-        if (fasttaskEnvironmentBuilder_ == null) {
-          if (fasttaskEnvironment_ != null) {
-            fasttaskEnvironment_ =
-              flyteidl.core.PersistentEnvs.FastTaskEnvironment.newBuilder(fasttaskEnvironment_).mergeFrom(value).buildPartial();
+      public Builder mergeEnvironment(flyteidl.core.PersistentEnvs.Environment value) {
+        if (environmentBuilder_ == null) {
+          if (environment_ != null) {
+            environment_ =
+              flyteidl.core.PersistentEnvs.Environment.newBuilder(environment_).mergeFrom(value).buildPartial();
           } else {
-            fasttaskEnvironment_ = value;
+            environment_ = value;
           }
           onChanged();
         } else {
-          fasttaskEnvironmentBuilder_.mergeFrom(value);
+          environmentBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public Builder clearFasttaskEnvironment() {
-        if (fasttaskEnvironmentBuilder_ == null) {
-          fasttaskEnvironment_ = null;
+      public Builder clearEnvironment() {
+        if (environmentBuilder_ == null) {
+          environment_ = null;
           onChanged();
         } else {
-          fasttaskEnvironment_ = null;
-          fasttaskEnvironmentBuilder_ = null;
+          environment_ = null;
+          environmentBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public flyteidl.core.PersistentEnvs.FastTaskEnvironment.Builder getFasttaskEnvironmentBuilder() {
+      public flyteidl.core.PersistentEnvs.Environment.Builder getEnvironmentBuilder() {
         
         onChanged();
-        return getFasttaskEnvironmentFieldBuilder().getBuilder();
+        return getEnvironmentFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
-      public flyteidl.core.PersistentEnvs.FastTaskEnvironmentOrBuilder getFasttaskEnvironmentOrBuilder() {
-        if (fasttaskEnvironmentBuilder_ != null) {
-          return fasttaskEnvironmentBuilder_.getMessageOrBuilder();
+      public flyteidl.core.PersistentEnvs.EnvironmentOrBuilder getEnvironmentOrBuilder() {
+        if (environmentBuilder_ != null) {
+          return environmentBuilder_.getMessageOrBuilder();
         } else {
-          return fasttaskEnvironment_ == null ?
-              flyteidl.core.PersistentEnvs.FastTaskEnvironment.getDefaultInstance() : fasttaskEnvironment_;
+          return environment_ == null ?
+              flyteidl.core.PersistentEnvs.Environment.getDefaultInstance() : environment_;
         }
       }
       /**
-       * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 5;</code>
+       * <code>.flyteidl.core.Environment environment = 3;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.PersistentEnvs.FastTaskEnvironment, flyteidl.core.PersistentEnvs.FastTaskEnvironment.Builder, flyteidl.core.PersistentEnvs.FastTaskEnvironmentOrBuilder> 
-          getFasttaskEnvironmentFieldBuilder() {
-        if (fasttaskEnvironmentBuilder_ == null) {
-          fasttaskEnvironmentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.PersistentEnvs.FastTaskEnvironment, flyteidl.core.PersistentEnvs.FastTaskEnvironment.Builder, flyteidl.core.PersistentEnvs.FastTaskEnvironmentOrBuilder>(
-                  getFasttaskEnvironment(),
+          flyteidl.core.PersistentEnvs.Environment, flyteidl.core.PersistentEnvs.Environment.Builder, flyteidl.core.PersistentEnvs.EnvironmentOrBuilder> 
+          getEnvironmentFieldBuilder() {
+        if (environmentBuilder_ == null) {
+          environmentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.PersistentEnvs.Environment, flyteidl.core.PersistentEnvs.Environment.Builder, flyteidl.core.PersistentEnvs.EnvironmentOrBuilder>(
+                  getEnvironment(),
                   getParentForChildren(),
                   isClean());
-          fasttaskEnvironment_ = null;
+          environment_ = null;
         }
-        return fasttaskEnvironmentBuilder_;
+        return environmentBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -1501,761 +951,18 @@ public final class PersistentEnvs {
 
   }
 
-  public interface SubworkflowEnvironmentsOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.core.SubworkflowEnvironments)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-     */
-    boolean hasWorkflowId();
-    /**
-     * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-     */
-    flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId();
-    /**
-     * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-     */
-    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder();
-
-    /**
-     * <code>string environment_id = 2;</code>
-     */
-    java.lang.String getEnvironmentId();
-    /**
-     * <code>string environment_id = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getEnvironmentIdBytes();
-  }
-  /**
-   * Protobuf type {@code flyteidl.core.SubworkflowEnvironments}
-   */
-  public  static final class SubworkflowEnvironments extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.core.SubworkflowEnvironments)
-      SubworkflowEnvironmentsOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use SubworkflowEnvironments.newBuilder() to construct.
-    private SubworkflowEnvironments(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private SubworkflowEnvironments() {
-      environmentId_ = "";
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private SubworkflowEnvironments(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
-              if (workflowId_ != null) {
-                subBuilder = workflowId_.toBuilder();
-              }
-              workflowId_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(workflowId_);
-                workflowId_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              environmentId_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return flyteidl.core.PersistentEnvs.internal_static_flyteidl_core_SubworkflowEnvironments_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return flyteidl.core.PersistentEnvs.internal_static_flyteidl_core_SubworkflowEnvironments_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              flyteidl.core.PersistentEnvs.SubworkflowEnvironments.class, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder.class);
-    }
-
-    public static final int WORKFLOW_ID_FIELD_NUMBER = 1;
-    private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
-    /**
-     * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-     */
-    public boolean hasWorkflowId() {
-      return workflowId_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-     */
-    public flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId() {
-      return workflowId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
-    }
-    /**
-     * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-     */
-    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder() {
-      return getWorkflowId();
-    }
-
-    public static final int ENVIRONMENT_ID_FIELD_NUMBER = 2;
-    private volatile java.lang.Object environmentId_;
-    /**
-     * <code>string environment_id = 2;</code>
-     */
-    public java.lang.String getEnvironmentId() {
-      java.lang.Object ref = environmentId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        environmentId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string environment_id = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getEnvironmentIdBytes() {
-      java.lang.Object ref = environmentId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        environmentId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (workflowId_ != null) {
-        output.writeMessage(1, getWorkflowId());
-      }
-      if (!getEnvironmentIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, environmentId_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (workflowId_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getWorkflowId());
-      }
-      if (!getEnvironmentIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, environmentId_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof flyteidl.core.PersistentEnvs.SubworkflowEnvironments)) {
-        return super.equals(obj);
-      }
-      flyteidl.core.PersistentEnvs.SubworkflowEnvironments other = (flyteidl.core.PersistentEnvs.SubworkflowEnvironments) obj;
-
-      if (hasWorkflowId() != other.hasWorkflowId()) return false;
-      if (hasWorkflowId()) {
-        if (!getWorkflowId()
-            .equals(other.getWorkflowId())) return false;
-      }
-      if (!getEnvironmentId()
-          .equals(other.getEnvironmentId())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasWorkflowId()) {
-        hash = (37 * hash) + WORKFLOW_ID_FIELD_NUMBER;
-        hash = (53 * hash) + getWorkflowId().hashCode();
-      }
-      hash = (37 * hash) + ENVIRONMENT_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getEnvironmentId().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(flyteidl.core.PersistentEnvs.SubworkflowEnvironments prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code flyteidl.core.SubworkflowEnvironments}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.core.SubworkflowEnvironments)
-        flyteidl.core.PersistentEnvs.SubworkflowEnvironmentsOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return flyteidl.core.PersistentEnvs.internal_static_flyteidl_core_SubworkflowEnvironments_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return flyteidl.core.PersistentEnvs.internal_static_flyteidl_core_SubworkflowEnvironments_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                flyteidl.core.PersistentEnvs.SubworkflowEnvironments.class, flyteidl.core.PersistentEnvs.SubworkflowEnvironments.Builder.class);
-      }
-
-      // Construct using flyteidl.core.PersistentEnvs.SubworkflowEnvironments.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        if (workflowIdBuilder_ == null) {
-          workflowId_ = null;
-        } else {
-          workflowId_ = null;
-          workflowIdBuilder_ = null;
-        }
-        environmentId_ = "";
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return flyteidl.core.PersistentEnvs.internal_static_flyteidl_core_SubworkflowEnvironments_descriptor;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments getDefaultInstanceForType() {
-        return flyteidl.core.PersistentEnvs.SubworkflowEnvironments.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments build() {
-        flyteidl.core.PersistentEnvs.SubworkflowEnvironments result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.PersistentEnvs.SubworkflowEnvironments buildPartial() {
-        flyteidl.core.PersistentEnvs.SubworkflowEnvironments result = new flyteidl.core.PersistentEnvs.SubworkflowEnvironments(this);
-        if (workflowIdBuilder_ == null) {
-          result.workflowId_ = workflowId_;
-        } else {
-          result.workflowId_ = workflowIdBuilder_.build();
-        }
-        result.environmentId_ = environmentId_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.core.PersistentEnvs.SubworkflowEnvironments) {
-          return mergeFrom((flyteidl.core.PersistentEnvs.SubworkflowEnvironments)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(flyteidl.core.PersistentEnvs.SubworkflowEnvironments other) {
-        if (other == flyteidl.core.PersistentEnvs.SubworkflowEnvironments.getDefaultInstance()) return this;
-        if (other.hasWorkflowId()) {
-          mergeWorkflowId(other.getWorkflowId());
-        }
-        if (!other.getEnvironmentId().isEmpty()) {
-          environmentId_ = other.environmentId_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        flyteidl.core.PersistentEnvs.SubworkflowEnvironments parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.core.PersistentEnvs.SubworkflowEnvironments) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private flyteidl.core.IdentifierOuterClass.Identifier workflowId_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> workflowIdBuilder_;
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public boolean hasWorkflowId() {
-        return workflowIdBuilder_ != null || workflowId_ != null;
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public flyteidl.core.IdentifierOuterClass.Identifier getWorkflowId() {
-        if (workflowIdBuilder_ == null) {
-          return workflowId_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
-        } else {
-          return workflowIdBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public Builder setWorkflowId(flyteidl.core.IdentifierOuterClass.Identifier value) {
-        if (workflowIdBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          workflowId_ = value;
-          onChanged();
-        } else {
-          workflowIdBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public Builder setWorkflowId(
-          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
-        if (workflowIdBuilder_ == null) {
-          workflowId_ = builderForValue.build();
-          onChanged();
-        } else {
-          workflowIdBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public Builder mergeWorkflowId(flyteidl.core.IdentifierOuterClass.Identifier value) {
-        if (workflowIdBuilder_ == null) {
-          if (workflowId_ != null) {
-            workflowId_ =
-              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(workflowId_).mergeFrom(value).buildPartial();
-          } else {
-            workflowId_ = value;
-          }
-          onChanged();
-        } else {
-          workflowIdBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public Builder clearWorkflowId() {
-        if (workflowIdBuilder_ == null) {
-          workflowId_ = null;
-          onChanged();
-        } else {
-          workflowId_ = null;
-          workflowIdBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getWorkflowIdBuilder() {
-        
-        onChanged();
-        return getWorkflowIdFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getWorkflowIdOrBuilder() {
-        if (workflowIdBuilder_ != null) {
-          return workflowIdBuilder_.getMessageOrBuilder();
-        } else {
-          return workflowId_ == null ?
-              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : workflowId_;
-        }
-      }
-      /**
-       * <code>.flyteidl.core.Identifier workflow_id = 1;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
-          getWorkflowIdFieldBuilder() {
-        if (workflowIdBuilder_ == null) {
-          workflowIdBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
-                  getWorkflowId(),
-                  getParentForChildren(),
-                  isClean());
-          workflowId_ = null;
-        }
-        return workflowIdBuilder_;
-      }
-
-      private java.lang.Object environmentId_ = "";
-      /**
-       * <code>string environment_id = 2;</code>
-       */
-      public java.lang.String getEnvironmentId() {
-        java.lang.Object ref = environmentId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          environmentId_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string environment_id = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getEnvironmentIdBytes() {
-        java.lang.Object ref = environmentId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          environmentId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string environment_id = 2;</code>
-       */
-      public Builder setEnvironmentId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        environmentId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string environment_id = 2;</code>
-       */
-      public Builder clearEnvironmentId() {
-        
-        environmentId_ = getDefaultInstance().getEnvironmentId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string environment_id = 2;</code>
-       */
-      public Builder setEnvironmentIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        environmentId_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:flyteidl.core.SubworkflowEnvironments)
-    }
-
-    // @@protoc_insertion_point(class_scope:flyteidl.core.SubworkflowEnvironments)
-    private static final flyteidl.core.PersistentEnvs.SubworkflowEnvironments DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new flyteidl.core.PersistentEnvs.SubworkflowEnvironments();
-    }
-
-    public static flyteidl.core.PersistentEnvs.SubworkflowEnvironments getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<SubworkflowEnvironments>
-        PARSER = new com.google.protobuf.AbstractParser<SubworkflowEnvironments>() {
-      @java.lang.Override
-      public SubworkflowEnvironments parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new SubworkflowEnvironments(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<SubworkflowEnvironments> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<SubworkflowEnvironments> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public flyteidl.core.PersistentEnvs.SubworkflowEnvironments getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   public interface EnvironmentOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.Environment)
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+     * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
      */
     int getTypeValue();
     /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+     * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
      */
-    flyteidl.core.PersistentEnvs.EnvironmentType getType();
+    flyteidl.core.PersistentEnvs.Environment.EnvironmentType getType();
 
     /**
      * <code>.flyteidl.core.FastTaskEnvironment fasttask_environment = 2;</code>
@@ -2361,21 +1068,110 @@ public final class PersistentEnvs {
               flyteidl.core.PersistentEnvs.Environment.class, flyteidl.core.PersistentEnvs.Environment.Builder.class);
     }
 
+    /**
+     * Protobuf enum {@code flyteidl.core.Environment.EnvironmentType}
+     */
+    public enum EnvironmentType
+        implements com.google.protobuf.ProtocolMessageEnum {
+      /**
+       * <code>FASTTASK = 0;</code>
+       */
+      FASTTASK(0),
+      UNRECOGNIZED(-1),
+      ;
+
+      /**
+       * <code>FASTTASK = 0;</code>
+       */
+      public static final int FASTTASK_VALUE = 0;
+
+
+      public final int getNumber() {
+        if (this == UNRECOGNIZED) {
+          throw new java.lang.IllegalArgumentException(
+              "Can't get the number of an unknown enum value.");
+        }
+        return value;
+      }
+
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static EnvironmentType valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static EnvironmentType forNumber(int value) {
+        switch (value) {
+          case 0: return FASTTASK;
+          default: return null;
+        }
+      }
+
+      public static com.google.protobuf.Internal.EnumLiteMap<EnvironmentType>
+          internalGetValueMap() {
+        return internalValueMap;
+      }
+      private static final com.google.protobuf.Internal.EnumLiteMap<
+          EnvironmentType> internalValueMap =
+            new com.google.protobuf.Internal.EnumLiteMap<EnvironmentType>() {
+              public EnvironmentType findValueByNumber(int number) {
+                return EnvironmentType.forNumber(number);
+              }
+            };
+
+      public final com.google.protobuf.Descriptors.EnumValueDescriptor
+          getValueDescriptor() {
+        return getDescriptor().getValues().get(ordinal());
+      }
+      public final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptorForType() {
+        return getDescriptor();
+      }
+      public static final com.google.protobuf.Descriptors.EnumDescriptor
+          getDescriptor() {
+        return flyteidl.core.PersistentEnvs.Environment.getDescriptor().getEnumTypes().get(0);
+      }
+
+      private static final EnvironmentType[] VALUES = values();
+
+      public static EnvironmentType valueOf(
+          com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
+        if (desc.getType() != getDescriptor()) {
+          throw new java.lang.IllegalArgumentException(
+            "EnumValueDescriptor is not for this type.");
+        }
+        if (desc.getIndex() == -1) {
+          return UNRECOGNIZED;
+        }
+        return VALUES[desc.getIndex()];
+      }
+
+      private final int value;
+
+      private EnvironmentType(int value) {
+        this.value = value;
+      }
+
+      // @@protoc_insertion_point(enum_scope:flyteidl.core.Environment.EnvironmentType)
+    }
+
     public static final int TYPE_FIELD_NUMBER = 1;
     private int type_;
     /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+     * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
      */
     public int getTypeValue() {
       return type_;
     }
     /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+     * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
      */
-    public flyteidl.core.PersistentEnvs.EnvironmentType getType() {
+    public flyteidl.core.PersistentEnvs.Environment.EnvironmentType getType() {
       @SuppressWarnings("deprecation")
-      flyteidl.core.PersistentEnvs.EnvironmentType result = flyteidl.core.PersistentEnvs.EnvironmentType.valueOf(type_);
-      return result == null ? flyteidl.core.PersistentEnvs.EnvironmentType.UNRECOGNIZED : result;
+      flyteidl.core.PersistentEnvs.Environment.EnvironmentType result = flyteidl.core.PersistentEnvs.Environment.EnvironmentType.valueOf(type_);
+      return result == null ? flyteidl.core.PersistentEnvs.Environment.EnvironmentType.UNRECOGNIZED : result;
     }
 
     public static final int FASTTASK_ENVIRONMENT_FIELD_NUMBER = 2;
@@ -2413,7 +1209,7 @@ public final class PersistentEnvs {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (type_ != flyteidl.core.PersistentEnvs.EnvironmentType.FASTTASK.getNumber()) {
+      if (type_ != flyteidl.core.PersistentEnvs.Environment.EnvironmentType.FASTTASK.getNumber()) {
         output.writeEnum(1, type_);
       }
       if (fasttaskEnvironment_ != null) {
@@ -2428,7 +1224,7 @@ public final class PersistentEnvs {
       if (size != -1) return size;
 
       size = 0;
-      if (type_ != flyteidl.core.PersistentEnvs.EnvironmentType.FASTTASK.getNumber()) {
+      if (type_ != flyteidl.core.PersistentEnvs.Environment.EnvironmentType.FASTTASK.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(1, type_);
       }
@@ -2732,13 +1528,13 @@ public final class PersistentEnvs {
 
       private int type_ = 0;
       /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+       * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
        */
       public int getTypeValue() {
         return type_;
       }
       /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+       * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
        */
       public Builder setTypeValue(int value) {
         type_ = value;
@@ -2746,17 +1542,17 @@ public final class PersistentEnvs {
         return this;
       }
       /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+       * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
        */
-      public flyteidl.core.PersistentEnvs.EnvironmentType getType() {
+      public flyteidl.core.PersistentEnvs.Environment.EnvironmentType getType() {
         @SuppressWarnings("deprecation")
-        flyteidl.core.PersistentEnvs.EnvironmentType result = flyteidl.core.PersistentEnvs.EnvironmentType.valueOf(type_);
-        return result == null ? flyteidl.core.PersistentEnvs.EnvironmentType.UNRECOGNIZED : result;
+        flyteidl.core.PersistentEnvs.Environment.EnvironmentType result = flyteidl.core.PersistentEnvs.Environment.EnvironmentType.valueOf(type_);
+        return result == null ? flyteidl.core.PersistentEnvs.Environment.EnvironmentType.UNRECOGNIZED : result;
       }
       /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+       * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
        */
-      public Builder setType(flyteidl.core.PersistentEnvs.EnvironmentType value) {
+      public Builder setType(flyteidl.core.PersistentEnvs.Environment.EnvironmentType value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -2766,7 +1562,7 @@ public final class PersistentEnvs {
         return this;
       }
       /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
+       * <code>.flyteidl.core.Environment.EnvironmentType type = 1;</code>
        */
       public Builder clearType() {
         
@@ -3773,11 +2569,6 @@ public final class PersistentEnvs {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_EnvironmentAssignment_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_core_SubworkflowEnvironments_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_core_SubworkflowEnvironments_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Environment_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -3798,23 +2589,17 @@ public final class PersistentEnvs {
     java.lang.String[] descriptorData = {
       "\n#flyteidl/core/persistent_envs.proto\022\rf" +
       "lyteidl.core\032\036flyteidl/core/identifier.p" +
-      "roto\"\357\001\n\025EnvironmentAssignment\022\n\n\002id\030\001 \001" +
-      "(\t\022\020\n\010node_ids\030\002 \003(\t\022H\n\030subworkflow_envi" +
-      "ronments\030\003 \003(\0132&.flyteidl.core.Subworkfl" +
-      "owEnvironments\022,\n\004type\030\004 \001(\0162\036.flyteidl." +
-      "core.EnvironmentType\022@\n\024fasttask_environ" +
-      "ment\030\005 \001(\0132\".flyteidl.core.FastTaskEnvir" +
-      "onment\"a\n\027SubworkflowEnvironments\022.\n\013wor" +
-      "kflow_id\030\001 \001(\0132\031.flyteidl.core.Identifie" +
-      "r\022\026\n\016environment_id\030\002 \001(\t\"}\n\013Environment" +
-      "\022,\n\004type\030\001 \001(\0162\036.flyteidl.core.Environme" +
-      "ntType\022@\n\024fasttask_environment\030\002 \001(\0132\".f" +
-      "lyteidl.core.FastTaskEnvironment\"J\n\023Fast" +
-      "TaskEnvironment\022\020\n\010queue_id\030\001 \001(\t\022\021\n\tnam" +
-      "espace\030\002 \001(\t\022\016\n\006pod_id\030\003 \001(\t*\037\n\017Environm" +
-      "entType\022\014\n\010FASTTASK\020\000B<Z:github.com/flyt" +
-      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/c" +
-      "oreb\006proto3"
+      "roto\"f\n\025EnvironmentAssignment\022\n\n\002id\030\001 \001(" +
+      "\t\022\020\n\010node_ids\030\002 \003(\t\022/\n\013environment\030\003 \001(\013" +
+      "2\032.flyteidl.core.Environment\"\252\001\n\013Environ" +
+      "ment\0228\n\004type\030\001 \001(\0162*.flyteidl.core.Envir" +
+      "onment.EnvironmentType\022@\n\024fasttask_envir" +
+      "onment\030\002 \001(\0132\".flyteidl.core.FastTaskEnv" +
+      "ironment\"\037\n\017EnvironmentType\022\014\n\010FASTTASK\020" +
+      "\000\"J\n\023FastTaskEnvironment\022\020\n\010queue_id\030\001 \001" +
+      "(\t\022\021\n\tnamespace\030\002 \001(\t\022\016\n\006pod_id\030\003 \001(\tB<Z" +
+      ":github.com/flyteorg/flyte/flyteidl/gen/" +
+      "pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3834,21 +2619,15 @@ public final class PersistentEnvs {
     internal_static_flyteidl_core_EnvironmentAssignment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_EnvironmentAssignment_descriptor,
-        new java.lang.String[] { "Id", "NodeIds", "SubworkflowEnvironments", "Type", "FasttaskEnvironment", });
-    internal_static_flyteidl_core_SubworkflowEnvironments_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_flyteidl_core_SubworkflowEnvironments_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_core_SubworkflowEnvironments_descriptor,
-        new java.lang.String[] { "WorkflowId", "EnvironmentId", });
+        new java.lang.String[] { "Id", "NodeIds", "Environment", });
     internal_static_flyteidl_core_Environment_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_core_Environment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Environment_descriptor,
         new java.lang.String[] { "Type", "FasttaskEnvironment", });
     internal_static_flyteidl_core_FastTaskEnvironment_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_core_FastTaskEnvironment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_FastTaskEnvironment_descriptor,

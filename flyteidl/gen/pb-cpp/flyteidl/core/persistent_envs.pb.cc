@@ -16,19 +16,14 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fpersistent_5fenvs_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_FastTaskEnvironment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fpersistent_5fenvs_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_SubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fpersistent_5fenvs_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Environment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto;
 namespace flyteidl {
 namespace core {
 class EnvironmentAssignmentDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<EnvironmentAssignment> _instance;
 } _EnvironmentAssignment_default_instance_;
-class SubworkflowEnvironmentsDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<SubworkflowEnvironments> _instance;
-} _SubworkflowEnvironments_default_instance_;
 class EnvironmentDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<Environment> _instance;
@@ -50,25 +45,9 @@ static void InitDefaultsEnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenv
   ::flyteidl::core::EnvironmentAssignment::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<2> scc_info_EnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsEnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto}, {
-      &scc_info_SubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base,
-      &scc_info_FastTaskEnvironment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base,}};
-
-static void InitDefaultsSubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::flyteidl::core::_SubworkflowEnvironments_default_instance_;
-    new (ptr) ::flyteidl::core::SubworkflowEnvironments();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::flyteidl::core::SubworkflowEnvironments::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<1> scc_info_SubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsSubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto}, {
-      &scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<1> scc_info_EnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsEnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto}, {
+      &scc_info_Environment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base,}};
 
 static void InitDefaultsEnvironment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -101,12 +80,11 @@ static void InitDefaultsFastTaskEnvironment_flyteidl_2fcore_2fpersistent_5fenvs_
 
 void InitDefaults_flyteidl_2fcore_2fpersistent_5fenvs_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_EnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_SubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_Environment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_FastTaskEnvironment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[4];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[3];
 const ::google::protobuf::EnumDescriptor* file_level_enum_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[1];
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto = nullptr;
 
@@ -118,16 +96,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fpersistent_5fenvs
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::EnvironmentAssignment, id_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::EnvironmentAssignment, node_ids_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::EnvironmentAssignment, subworkflow_environments_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::EnvironmentAssignment, type_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::EnvironmentAssignment, fasttask_environment_),
-  ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::SubworkflowEnvironments, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::SubworkflowEnvironments, workflow_id_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::core::SubworkflowEnvironments, environment_id_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::EnvironmentAssignment, environment_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::Environment, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -146,14 +115,12 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fpersistent_5fenvs
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::EnvironmentAssignment)},
-  { 10, -1, sizeof(::flyteidl::core::SubworkflowEnvironments)},
-  { 17, -1, sizeof(::flyteidl::core::Environment)},
-  { 24, -1, sizeof(::flyteidl::core::FastTaskEnvironment)},
+  { 8, -1, sizeof(::flyteidl::core::Environment)},
+  { 15, -1, sizeof(::flyteidl::core::FastTaskEnvironment)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_EnvironmentAssignment_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_SubworkflowEnvironments_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_Environment_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_FastTaskEnvironment_default_instance_),
 };
@@ -161,34 +128,28 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto = {
   {}, AddDescriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, "flyteidl/core/persistent_envs.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fcore_2fpersistent_5fenvs_2eproto::offsets,
-  file_level_metadata_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, 4, file_level_enum_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto,
+  file_level_metadata_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, 3, file_level_enum_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[] =
   "\n#flyteidl/core/persistent_envs.proto\022\rf"
   "lyteidl.core\032\036flyteidl/core/identifier.p"
-  "roto\"\357\001\n\025EnvironmentAssignment\022\n\n\002id\030\001 \001"
-  "(\t\022\020\n\010node_ids\030\002 \003(\t\022H\n\030subworkflow_envi"
-  "ronments\030\003 \003(\0132&.flyteidl.core.Subworkfl"
-  "owEnvironments\022,\n\004type\030\004 \001(\0162\036.flyteidl."
-  "core.EnvironmentType\022@\n\024fasttask_environ"
-  "ment\030\005 \001(\0132\".flyteidl.core.FastTaskEnvir"
-  "onment\"a\n\027SubworkflowEnvironments\022.\n\013wor"
-  "kflow_id\030\001 \001(\0132\031.flyteidl.core.Identifie"
-  "r\022\026\n\016environment_id\030\002 \001(\t\"}\n\013Environment"
-  "\022,\n\004type\030\001 \001(\0162\036.flyteidl.core.Environme"
-  "ntType\022@\n\024fasttask_environment\030\002 \001(\0132\".f"
-  "lyteidl.core.FastTaskEnvironment\"J\n\023Fast"
-  "TaskEnvironment\022\020\n\010queue_id\030\001 \001(\t\022\021\n\tnam"
-  "espace\030\002 \001(\t\022\016\n\006pod_id\030\003 \001(\t*\037\n\017Environm"
-  "entType\022\014\n\010FASTTASK\020\000B<Z:github.com/flyt"
-  "eorg/flyte/flyteidl/gen/pb-go/flyteidl/c"
-  "oreb\006proto3"
+  "roto\"f\n\025EnvironmentAssignment\022\n\n\002id\030\001 \001("
+  "\t\022\020\n\010node_ids\030\002 \003(\t\022/\n\013environment\030\003 \001(\013"
+  "2\032.flyteidl.core.Environment\"\252\001\n\013Environ"
+  "ment\0228\n\004type\030\001 \001(\0162*.flyteidl.core.Envir"
+  "onment.EnvironmentType\022@\n\024fasttask_envir"
+  "onment\030\002 \001(\0132\".flyteidl.core.FastTaskEnv"
+  "ironment\"\037\n\017EnvironmentType\022\014\n\010FASTTASK\020"
+  "\000\"J\n\023FastTaskEnvironment\022\020\n\010queue_id\030\001 \001"
+  "(\t\022\021\n\tnamespace\030\002 \001(\t\022\016\n\006pod_id\030\003 \001(\tB<Z"
+  ":github.com/flyteorg/flyte/flyteidl/gen/"
+  "pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fpersistent_5fenvs_2eproto,
-  "flyteidl/core/persistent_envs.proto", &assign_descriptors_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, 731,
+  "flyteidl/core/persistent_envs.proto", &assign_descriptors_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto, 507,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto() {
@@ -203,11 +164,11 @@ void AddDescriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto() {
 static bool dynamic_init_dummy_flyteidl_2fcore_2fpersistent_5fenvs_2eproto = []() { AddDescriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto(); return true; }();
 namespace flyteidl {
 namespace core {
-const ::google::protobuf::EnumDescriptor* EnvironmentType_descriptor() {
+const ::google::protobuf::EnumDescriptor* Environment_EnvironmentType_descriptor() {
   ::google::protobuf::internal::AssignDescriptors(&assign_descriptors_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto);
   return file_level_enum_descriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[0];
 }
-bool EnvironmentType_IsValid(int value) {
+bool Environment_EnvironmentType_IsValid(int value) {
   switch (value) {
     case 0:
       return true;
@@ -216,28 +177,32 @@ bool EnvironmentType_IsValid(int value) {
   }
 }
 
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const Environment_EnvironmentType Environment::FASTTASK;
+const Environment_EnvironmentType Environment::EnvironmentType_MIN;
+const Environment_EnvironmentType Environment::EnvironmentType_MAX;
+const int Environment::EnvironmentType_ARRAYSIZE;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 // ===================================================================
 
 void EnvironmentAssignment::InitAsDefaultInstance() {
-  ::flyteidl::core::_EnvironmentAssignment_default_instance_._instance.get_mutable()->fasttask_environment_ = const_cast< ::flyteidl::core::FastTaskEnvironment*>(
-      ::flyteidl::core::FastTaskEnvironment::internal_default_instance());
+  ::flyteidl::core::_EnvironmentAssignment_default_instance_._instance.get_mutable()->environment_ = const_cast< ::flyteidl::core::Environment*>(
+      ::flyteidl::core::Environment::internal_default_instance());
 }
 class EnvironmentAssignment::HasBitSetters {
  public:
-  static const ::flyteidl::core::FastTaskEnvironment& fasttask_environment(const EnvironmentAssignment* msg);
+  static const ::flyteidl::core::Environment& environment(const EnvironmentAssignment* msg);
 };
 
-const ::flyteidl::core::FastTaskEnvironment&
-EnvironmentAssignment::HasBitSetters::fasttask_environment(const EnvironmentAssignment* msg) {
-  return *msg->fasttask_environment_;
+const ::flyteidl::core::Environment&
+EnvironmentAssignment::HasBitSetters::environment(const EnvironmentAssignment* msg) {
+  return *msg->environment_;
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int EnvironmentAssignment::kIdFieldNumber;
 const int EnvironmentAssignment::kNodeIdsFieldNumber;
-const int EnvironmentAssignment::kSubworkflowEnvironmentsFieldNumber;
-const int EnvironmentAssignment::kTypeFieldNumber;
-const int EnvironmentAssignment::kFasttaskEnvironmentFieldNumber;
+const int EnvironmentAssignment::kEnvironmentFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 EnvironmentAssignment::EnvironmentAssignment()
@@ -248,19 +213,17 @@ EnvironmentAssignment::EnvironmentAssignment()
 EnvironmentAssignment::EnvironmentAssignment(const EnvironmentAssignment& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
-      node_ids_(from.node_ids_),
-      subworkflow_environments_(from.subworkflow_environments_) {
+      node_ids_(from.node_ids_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.id().size() > 0) {
     id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.id_);
   }
-  if (from.has_fasttask_environment()) {
-    fasttask_environment_ = new ::flyteidl::core::FastTaskEnvironment(*from.fasttask_environment_);
+  if (from.has_environment()) {
+    environment_ = new ::flyteidl::core::Environment(*from.environment_);
   } else {
-    fasttask_environment_ = nullptr;
+    environment_ = nullptr;
   }
-  type_ = from.type_;
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.EnvironmentAssignment)
 }
 
@@ -268,9 +231,7 @@ void EnvironmentAssignment::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_EnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  ::memset(&fasttask_environment_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&type_) -
-      reinterpret_cast<char*>(&fasttask_environment_)) + sizeof(type_));
+  environment_ = nullptr;
 }
 
 EnvironmentAssignment::~EnvironmentAssignment() {
@@ -280,7 +241,7 @@ EnvironmentAssignment::~EnvironmentAssignment() {
 
 void EnvironmentAssignment::SharedDtor() {
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete fasttask_environment_;
+  if (this != internal_default_instance()) delete environment_;
 }
 
 void EnvironmentAssignment::SetCachedSize(int size) const {
@@ -299,13 +260,11 @@ void EnvironmentAssignment::Clear() {
   (void) cached_has_bits;
 
   node_ids_.Clear();
-  subworkflow_environments_.Clear();
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == nullptr && fasttask_environment_ != nullptr) {
-    delete fasttask_environment_;
+  if (GetArenaNoVirtual() == nullptr && environment_ != nullptr) {
+    delete environment_;
   }
-  fasttask_environment_ = nullptr;
-  type_ = 0;
+  environment_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -357,37 +316,13 @@ const char* EnvironmentAssignment::_InternalParse(const char* begin, const char*
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 18 && (ptr += 1));
         break;
       }
-      // repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;
+      // .flyteidl.core.Environment environment = 3;
       case 3: {
         if (static_cast<::google::protobuf::uint8>(tag) != 26) goto handle_unusual;
-        do {
-          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::flyteidl::core::SubworkflowEnvironments::_InternalParse;
-          object = msg->add_subworkflow_environments();
-          if (size > end - ptr) goto len_delim_till_end;
-          ptr += size;
-          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-              {parser_till_end, object}, ptr - size, ptr));
-          if (ptr >= end) break;
-        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
-        break;
-      }
-      // .flyteidl.core.EnvironmentType type = 4;
-      case 4: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 32) goto handle_unusual;
-        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-        msg->set_type(static_cast<::flyteidl::core::EnvironmentType>(val));
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        break;
-      }
-      // .flyteidl.core.FastTaskEnvironment fasttask_environment = 5;
-      case 5: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
         ptr = ::google::protobuf::io::ReadSize(ptr, &size);
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::core::FastTaskEnvironment::_InternalParse;
-        object = msg->mutable_fasttask_environment();
+        parser_till_end = ::flyteidl::core::Environment::_InternalParse;
+        object = msg->mutable_environment();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -459,36 +394,11 @@ bool EnvironmentAssignment::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;
+      // .flyteidl.core.Environment environment = 3;
       case 3: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (26 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_subworkflow_environments()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .flyteidl.core.EnvironmentType type = 4;
-      case 4: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (32 & 0xFF)) {
-          int value = 0;
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
-                 input, &value)));
-          set_type(static_cast< ::flyteidl::core::EnvironmentType >(value));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // .flyteidl.core.FastTaskEnvironment fasttask_environment = 5;
-      case 5: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_fasttask_environment()));
+               input, mutable_environment()));
         } else {
           goto handle_unusual;
         }
@@ -542,25 +452,10 @@ void EnvironmentAssignment::SerializeWithCachedSizes(
       2, this->node_ids(i), output);
   }
 
-  // repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->subworkflow_environments_size()); i < n; i++) {
+  // .flyteidl.core.Environment environment = 3;
+  if (this->has_environment()) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      3,
-      this->subworkflow_environments(static_cast<int>(i)),
-      output);
-  }
-
-  // .flyteidl.core.EnvironmentType type = 4;
-  if (this->type() != 0) {
-    ::google::protobuf::internal::WireFormatLite::WriteEnum(
-      4, this->type(), output);
-  }
-
-  // .flyteidl.core.FastTaskEnvironment fasttask_environment = 5;
-  if (this->has_fasttask_environment()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      5, HasBitSetters::fasttask_environment(this), output);
+      3, HasBitSetters::environment(this), output);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -597,25 +492,11 @@ void EnvironmentAssignment::SerializeWithCachedSizes(
       WriteStringToArray(2, this->node_ids(i), target);
   }
 
-  // repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;
-  for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->subworkflow_environments_size()); i < n; i++) {
+  // .flyteidl.core.Environment environment = 3;
+  if (this->has_environment()) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        3, this->subworkflow_environments(static_cast<int>(i)), target);
-  }
-
-  // .flyteidl.core.EnvironmentType type = 4;
-  if (this->type() != 0) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
-      4, this->type(), target);
-  }
-
-  // .flyteidl.core.FastTaskEnvironment fasttask_environment = 5;
-  if (this->has_fasttask_environment()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        5, HasBitSetters::fasttask_environment(this), target);
+        3, HasBitSetters::environment(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -647,17 +528,6 @@ size_t EnvironmentAssignment::ByteSizeLong() const {
       this->node_ids(i));
   }
 
-  // repeated .flyteidl.core.SubworkflowEnvironments subworkflow_environments = 3;
-  {
-    unsigned int count = static_cast<unsigned int>(this->subworkflow_environments_size());
-    total_size += 1UL * count;
-    for (unsigned int i = 0; i < count; i++) {
-      total_size +=
-        ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->subworkflow_environments(static_cast<int>(i)));
-    }
-  }
-
   // string id = 1;
   if (this->id().size() > 0) {
     total_size += 1 +
@@ -665,17 +535,11 @@ size_t EnvironmentAssignment::ByteSizeLong() const {
         this->id());
   }
 
-  // .flyteidl.core.FastTaskEnvironment fasttask_environment = 5;
-  if (this->has_fasttask_environment()) {
+  // .flyteidl.core.Environment environment = 3;
+  if (this->has_environment()) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *fasttask_environment_);
-  }
-
-  // .flyteidl.core.EnvironmentType type = 4;
-  if (this->type() != 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
+        *environment_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -706,16 +570,12 @@ void EnvironmentAssignment::MergeFrom(const EnvironmentAssignment& from) {
   (void) cached_has_bits;
 
   node_ids_.MergeFrom(from.node_ids_);
-  subworkflow_environments_.MergeFrom(from.subworkflow_environments_);
   if (from.id().size() > 0) {
 
     id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.id_);
   }
-  if (from.has_fasttask_environment()) {
-    mutable_fasttask_environment()->::flyteidl::core::FastTaskEnvironment::MergeFrom(from.fasttask_environment());
-  }
-  if (from.type() != 0) {
-    set_type(from.type());
+  if (from.has_environment()) {
+    mutable_environment()->::flyteidl::core::Environment::MergeFrom(from.environment());
   }
 }
 
@@ -745,384 +605,12 @@ void EnvironmentAssignment::InternalSwap(EnvironmentAssignment* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   node_ids_.InternalSwap(CastToBase(&other->node_ids_));
-  CastToBase(&subworkflow_environments_)->InternalSwap(CastToBase(&other->subworkflow_environments_));
   id_.Swap(&other->id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
-  swap(fasttask_environment_, other->fasttask_environment_);
-  swap(type_, other->type_);
+  swap(environment_, other->environment_);
 }
 
 ::google::protobuf::Metadata EnvironmentAssignment::GetMetadata() const {
-  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto);
-  return ::file_level_metadata_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[kIndexInFileMessages];
-}
-
-
-// ===================================================================
-
-void SubworkflowEnvironments::InitAsDefaultInstance() {
-  ::flyteidl::core::_SubworkflowEnvironments_default_instance_._instance.get_mutable()->workflow_id_ = const_cast< ::flyteidl::core::Identifier*>(
-      ::flyteidl::core::Identifier::internal_default_instance());
-}
-class SubworkflowEnvironments::HasBitSetters {
- public:
-  static const ::flyteidl::core::Identifier& workflow_id(const SubworkflowEnvironments* msg);
-};
-
-const ::flyteidl::core::Identifier&
-SubworkflowEnvironments::HasBitSetters::workflow_id(const SubworkflowEnvironments* msg) {
-  return *msg->workflow_id_;
-}
-void SubworkflowEnvironments::clear_workflow_id() {
-  if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
-    delete workflow_id_;
-  }
-  workflow_id_ = nullptr;
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int SubworkflowEnvironments::kWorkflowIdFieldNumber;
-const int SubworkflowEnvironments::kEnvironmentIdFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
-
-SubworkflowEnvironments::SubworkflowEnvironments()
-  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:flyteidl.core.SubworkflowEnvironments)
-}
-SubworkflowEnvironments::SubworkflowEnvironments(const SubworkflowEnvironments& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(nullptr) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  environment_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (from.environment_id().size() > 0) {
-    environment_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.environment_id_);
-  }
-  if (from.has_workflow_id()) {
-    workflow_id_ = new ::flyteidl::core::Identifier(*from.workflow_id_);
-  } else {
-    workflow_id_ = nullptr;
-  }
-  // @@protoc_insertion_point(copy_constructor:flyteidl.core.SubworkflowEnvironments)
-}
-
-void SubworkflowEnvironments::SharedCtor() {
-  ::google::protobuf::internal::InitSCC(
-      &scc_info_SubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
-  environment_id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  workflow_id_ = nullptr;
-}
-
-SubworkflowEnvironments::~SubworkflowEnvironments() {
-  // @@protoc_insertion_point(destructor:flyteidl.core.SubworkflowEnvironments)
-  SharedDtor();
-}
-
-void SubworkflowEnvironments::SharedDtor() {
-  environment_id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (this != internal_default_instance()) delete workflow_id_;
-}
-
-void SubworkflowEnvironments::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const SubworkflowEnvironments& SubworkflowEnvironments::default_instance() {
-  ::google::protobuf::internal::InitSCC(&::scc_info_SubworkflowEnvironments_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base);
-  return *internal_default_instance();
-}
-
-
-void SubworkflowEnvironments::Clear() {
-// @@protoc_insertion_point(message_clear_start:flyteidl.core.SubworkflowEnvironments)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  environment_id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  if (GetArenaNoVirtual() == nullptr && workflow_id_ != nullptr) {
-    delete workflow_id_;
-  }
-  workflow_id_ = nullptr;
-  _internal_metadata_.Clear();
-}
-
-#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-const char* SubworkflowEnvironments::_InternalParse(const char* begin, const char* end, void* object,
-                  ::google::protobuf::internal::ParseContext* ctx) {
-  auto msg = static_cast<SubworkflowEnvironments*>(object);
-  ::google::protobuf::int32 size; (void)size;
-  int depth; (void)depth;
-  ::google::protobuf::uint32 tag;
-  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
-  auto ptr = begin;
-  while (ptr < end) {
-    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
-    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-    switch (tag >> 3) {
-      // .flyteidl.core.Identifier workflow_id = 1;
-      case 1: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        parser_till_end = ::flyteidl::core::Identifier::_InternalParse;
-        object = msg->mutable_workflow_id();
-        if (size > end - ptr) goto len_delim_till_end;
-        ptr += size;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
-            {parser_till_end, object}, ptr - size, ptr));
-        break;
-      }
-      // string environment_id = 2;
-      case 2: {
-        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
-        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-        ctx->extra_parse_data().SetFieldName("flyteidl.core.SubworkflowEnvironments.environment_id");
-        object = msg->mutable_environment_id();
-        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
-          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
-          goto string_till_end;
-        }
-        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
-        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
-        ptr += size;
-        break;
-      }
-      default: {
-      handle_unusual:
-        if ((tag & 7) == 4 || tag == 0) {
-          ctx->EndGroup(tag);
-          return ptr;
-        }
-        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
-          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
-        ptr = res.first;
-        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
-        if (res.second) return ptr;
-      }
-    }  // switch
-  }  // while
-  return ptr;
-string_till_end:
-  static_cast<::std::string*>(object)->clear();
-  static_cast<::std::string*>(object)->reserve(size);
-  goto len_delim_till_end;
-len_delim_till_end:
-  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
-                               {parser_till_end, object}, size);
-}
-#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-bool SubworkflowEnvironments::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:flyteidl.core.SubworkflowEnvironments)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.core.Identifier workflow_id = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-               input, mutable_workflow_id()));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      // string environment_id = 2;
-      case 2: {
-        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_environment_id()));
-          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-            this->environment_id().data(), static_cast<int>(this->environment_id().length()),
-            ::google::protobuf::internal::WireFormatLite::PARSE,
-            "flyteidl.core.SubworkflowEnvironments.environment_id"));
-        } else {
-          goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
-    }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:flyteidl.core.SubworkflowEnvironments)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:flyteidl.core.SubworkflowEnvironments)
-  return false;
-#undef DO_
-}
-#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-
-void SubworkflowEnvironments::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:flyteidl.core.SubworkflowEnvironments)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // .flyteidl.core.Identifier workflow_id = 1;
-  if (this->has_workflow_id()) {
-    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
-      1, HasBitSetters::workflow_id(this), output);
-  }
-
-  // string environment_id = 2;
-  if (this->environment_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->environment_id().data(), static_cast<int>(this->environment_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.core.SubworkflowEnvironments.environment_id");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      2, this->environment_id(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:flyteidl.core.SubworkflowEnvironments)
-}
-
-::google::protobuf::uint8* SubworkflowEnvironments::InternalSerializeWithCachedSizesToArray(
-    ::google::protobuf::uint8* target) const {
-  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.SubworkflowEnvironments)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  // .flyteidl.core.Identifier workflow_id = 1;
-  if (this->has_workflow_id()) {
-    target = ::google::protobuf::internal::WireFormatLite::
-      InternalWriteMessageToArray(
-        1, HasBitSetters::workflow_id(this), target);
-  }
-
-  // string environment_id = 2;
-  if (this->environment_id().size() > 0) {
-    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
-      this->environment_id().data(), static_cast<int>(this->environment_id().length()),
-      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
-      "flyteidl.core.SubworkflowEnvironments.environment_id");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        2, this->environment_id(), target);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.SubworkflowEnvironments)
-  return target;
-}
-
-size_t SubworkflowEnvironments::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:flyteidl.core.SubworkflowEnvironments)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  // string environment_id = 2;
-  if (this->environment_id().size() > 0) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::StringSize(
-        this->environment_id());
-  }
-
-  // .flyteidl.core.Identifier workflow_id = 1;
-  if (this->has_workflow_id()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::MessageSize(
-        *workflow_id_);
-  }
-
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void SubworkflowEnvironments::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.SubworkflowEnvironments)
-  GOOGLE_DCHECK_NE(&from, this);
-  const SubworkflowEnvironments* source =
-      ::google::protobuf::DynamicCastToGenerated<SubworkflowEnvironments>(
-          &from);
-  if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.SubworkflowEnvironments)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.core.SubworkflowEnvironments)
-    MergeFrom(*source);
-  }
-}
-
-void SubworkflowEnvironments::MergeFrom(const SubworkflowEnvironments& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.core.SubworkflowEnvironments)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (from.environment_id().size() > 0) {
-
-    environment_id_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.environment_id_);
-  }
-  if (from.has_workflow_id()) {
-    mutable_workflow_id()->::flyteidl::core::Identifier::MergeFrom(from.workflow_id());
-  }
-}
-
-void SubworkflowEnvironments::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.core.SubworkflowEnvironments)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void SubworkflowEnvironments::CopyFrom(const SubworkflowEnvironments& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.core.SubworkflowEnvironments)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool SubworkflowEnvironments::IsInitialized() const {
-  return true;
-}
-
-void SubworkflowEnvironments::Swap(SubworkflowEnvironments* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void SubworkflowEnvironments::InternalSwap(SubworkflowEnvironments* other) {
-  using std::swap;
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-  environment_id_.Swap(&other->environment_id_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-    GetArenaNoVirtual());
-  swap(workflow_id_, other->workflow_id_);
-}
-
-::google::protobuf::Metadata SubworkflowEnvironments::GetMetadata() const {
   ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fpersistent_5fenvs_2eproto);
   return ::file_level_metadata_flyteidl_2fcore_2fpersistent_5fenvs_2eproto[kIndexInFileMessages];
 }
@@ -1219,11 +707,11 @@ const char* Environment::_InternalParse(const char* begin, const char* end, void
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.core.EnvironmentType type = 1;
+      // .flyteidl.core.Environment.EnvironmentType type = 1;
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
-        msg->set_type(static_cast<::flyteidl::core::EnvironmentType>(val));
+        msg->set_type(static_cast<::flyteidl::core::Environment_EnvironmentType>(val));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
@@ -1270,14 +758,14 @@ bool Environment::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.core.EnvironmentType type = 1;
+      // .flyteidl.core.Environment.EnvironmentType type = 1;
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
           int value = 0;
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
                  input, &value)));
-          set_type(static_cast< ::flyteidl::core::EnvironmentType >(value));
+          set_type(static_cast< ::flyteidl::core::Environment_EnvironmentType >(value));
         } else {
           goto handle_unusual;
         }
@@ -1322,7 +810,7 @@ void Environment::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.EnvironmentType type = 1;
+  // .flyteidl.core.Environment.EnvironmentType type = 1;
   if (this->type() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       1, this->type(), output);
@@ -1347,7 +835,7 @@ void Environment::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.core.EnvironmentType type = 1;
+  // .flyteidl.core.Environment.EnvironmentType type = 1;
   if (this->type() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       1, this->type(), target);
@@ -1388,7 +876,7 @@ size_t Environment::ByteSizeLong() const {
         *fasttask_environment_);
   }
 
-  // .flyteidl.core.EnvironmentType type = 1;
+  // .flyteidl.core.Environment.EnvironmentType type = 1;
   if (this->type() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
@@ -1914,9 +1402,6 @@ namespace google {
 namespace protobuf {
 template<> PROTOBUF_NOINLINE ::flyteidl::core::EnvironmentAssignment* Arena::CreateMaybeMessage< ::flyteidl::core::EnvironmentAssignment >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::EnvironmentAssignment >(arena);
-}
-template<> PROTOBUF_NOINLINE ::flyteidl::core::SubworkflowEnvironments* Arena::CreateMaybeMessage< ::flyteidl::core::SubworkflowEnvironments >(Arena* arena) {
-  return Arena::CreateInternal< ::flyteidl::core::SubworkflowEnvironments >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::core::Environment* Arena::CreateMaybeMessage< ::flyteidl::core::Environment >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::Environment >(arena);

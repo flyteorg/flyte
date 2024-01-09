@@ -9,7 +9,9 @@
 
 package flyteadmin
 
-type CoreSubworkflowEnvironments struct {
-	WorkflowId *CoreIdentifier `json:"workflow_id,omitempty"`
-	EnvironmentId string `json:"environment_id,omitempty"`
-}
+type EnvironmentEnvironmentType string
+
+// List of EnvironmentEnvironmentType
+const (
+	EnvironmentEnvironmentTypeFASTTASK EnvironmentEnvironmentType = "FASTTASK"
+)

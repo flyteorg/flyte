@@ -3306,6 +3306,13 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
+    "EnvironmentEnvironmentType": {
+      "type": "string",
+      "enum": [
+        "FASTTASK"
+      ],
+      "default": "FASTTASK"
+    },
     "ExecutionErrorErrorKind": {
       "type": "string",
       "enum": [
@@ -6090,6 +6097,17 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "coreEnvironment": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/EnvironmentEnvironmentType"
+        },
+        "fasttask_environment": {
+          "$ref": "#/definitions/coreFastTaskEnvironment"
+        }
+      }
+    },
     "coreEnvironmentAssignment": {
       "type": "object",
       "properties": {
@@ -6102,26 +6120,10 @@
             "type": "string"
           }
         },
-        "subworkflow_environments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/coreSubworkflowEnvironments"
-          }
-        },
-        "type": {
-          "$ref": "#/definitions/coreEnvironmentType"
-        },
-        "fasttask_environment": {
-          "$ref": "#/definitions/coreFastTaskEnvironment"
+        "environment": {
+          "$ref": "#/definitions/coreEnvironment"
         }
       }
-    },
-    "coreEnvironmentType": {
-      "type": "string",
-      "enum": [
-        "FASTTASK"
-      ],
-      "default": "FASTTASK"
     },
     "coreError": {
       "type": "object",
@@ -7102,17 +7104,6 @@
           "type": "string",
           "format": "byte",
           "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
-        }
-      }
-    },
-    "coreSubworkflowEnvironments": {
-      "type": "object",
-      "properties": {
-        "workflow_id": {
-          "$ref": "#/definitions/coreIdentifier"
-        },
-        "environment_id": {
-          "type": "string"
         }
       }
     },

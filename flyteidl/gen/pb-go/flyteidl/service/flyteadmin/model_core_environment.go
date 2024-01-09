@@ -9,9 +9,7 @@
 
 package flyteadmin
 
-type CoreEnvironmentType string
-
-// List of coreEnvironmentType
-const (
-	CoreEnvironmentTypeFASTTASK CoreEnvironmentType = "FASTTASK"
-)
+type CoreEnvironment struct {
+	Type_ *EnvironmentEnvironmentType `json:"type,omitempty"`
+	FasttaskEnvironment *CoreFastTaskEnvironment `json:"fasttask_environment,omitempty"`
+}
