@@ -1222,10 +1222,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 			require.NotNil(t, eErr.Source)
 			assert.IsType(t, &core.CacheEvictionError_TaskExecutionId{}, eErr.Source)
 
-			for nodeID := range taskExecutionModels {
-				assert.Contains(t, updatedNodeExecutions, nodeID)
-			}
-			assert.Len(t, updatedNodeExecutions, len(taskExecutionModels))
+			assert.Len(t, updatedNodeExecutions, 0)
 		})
 
 		t.Run("ReleaseReservationByArtifactTag", func(t *testing.T) {
@@ -1578,12 +1575,25 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 
 				updatedNodeExecutions := setupCacheEvictionMockRepositories(t, repository, nodeExecutionModels, taskExecutionModels)
 
+				for nodeID := range taskExecutionModels {
+					for _, taskExecution := range taskExecutionModels[nodeID] {
+						require.NotNil(t, taskExecution.RetryAttempt)
+						ownerID := fmt.Sprintf("%s-%s-%d", executionIdentifier.Name, nodeID, *taskExecution.RetryAttempt)
+						for _, artifactTag := range artifactTags {
+							catalogClient.On("GetOrExtendReservationByArtifactTag", mock.Anything, mock.Anything,
+								artifactTag.GetName(), ownerID, mock.Anything).Return(&datacatalog.Reservation{OwnerId: ownerID}, nil)
+							catalogClient.On("ReleaseReservationByArtifactTag", mock.Anything, mock.Anything,
+								artifactTag.GetName(), ownerID).Return(nil)
+							catalogClient.On("DeleteByArtifactID", mock.Anything, mock.Anything, artifactTag.GetArtifactId()).
+								Return(nil)
+						}
+					}
+				}
+
 				repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetUpdateSelectedCallback(
 					func(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error {
 						return flyteAdminErrors.NewFlyteAdminError(codes.Internal, "error")
 					})
-
-				deletedArtifactIDs := setupCacheEvictionCatalogClient(t, catalogClient, artifactTags, taskExecutionModels)
 
 				cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
 				request := service.EvictTaskExecutionCacheRequest{
@@ -1614,7 +1624,6 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 				assert.IsType(t, &core.CacheEvictionError_TaskExecutionId{}, eErr.Source)
 
 				assert.Empty(t, updatedNodeExecutions)
-				assert.Empty(t, deletedArtifactIDs)
 			})
 		})
 

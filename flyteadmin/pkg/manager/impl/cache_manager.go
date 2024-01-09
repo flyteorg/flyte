@@ -202,6 +202,26 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 		return evictionErrors
 	}
 
+	if err := m.catalogClient.DeleteByArtifactID(ctx, datasetID, artifactID); err != nil {
+		if catalog.IsNotFound(err) {
+			logger.Debugf(ctx, "Artifact with ID %s for dataset %+v of node execution %+v not found, assuming already deleted by previous eviction. Skipping...",
+				artifactID, datasetID, nodeExecution.Id)
+		} else {
+			logger.Warnf(ctx, "Failed to delete artifact with ID %s for dataset %+v of node execution %+v: %v",
+				artifactID, datasetID, nodeExecution.Id, err)
+			m.metrics.CacheEvictionFailures.Inc()
+			evictionErrors = append(evictionErrors, &core.CacheEvictionError{
+				NodeExecutionId: nodeExecution.Id,
+				Source: &core.CacheEvictionError_TaskExecutionId{
+					TaskExecutionId: taskExecution.Id,
+				},
+				Code:    core.CacheEvictionError_ARTIFACT_DELETE_FAILED,
+				Message: "Failed to delete artifact",
+			})
+			return evictionErrors
+		}
+	}
+
 	selectedFields := []string{shared.CreatedAt}
 	nodeExecutionModel.CacheStatus = nil
 
@@ -231,7 +251,7 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 	selectedFields = append(selectedFields, shared.Closure)
 
 	if err := m.db.NodeExecutionRepo().UpdateSelected(ctx, &nodeExecutionModel, selectedFields); err != nil {
-		logger.Warnf(ctx, "Failed to update node execution model %+v before deleting artifact: %v",
+		logger.Warnf(ctx, "Failed to update node execution model %+v before after artifact: %v",
 			nodeExecution.Id, err)
 		m.metrics.CacheEvictionFailures.Inc()
 		evictionErrors = append(evictionErrors, &core.CacheEvictionError{
@@ -243,26 +263,6 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 			Message: "Failed to update node execution",
 		})
 		return evictionErrors
-	}
-
-	if err := m.catalogClient.DeleteByArtifactID(ctx, datasetID, artifactID); err != nil {
-		if catalog.IsNotFound(err) {
-			logger.Debugf(ctx, "Artifact with ID %s for dataset %+v of node execution %+v not found, assuming already deleted by previous eviction. Skipping...",
-				artifactID, datasetID, nodeExecution.Id)
-		} else {
-			logger.Warnf(ctx, "Failed to delete artifact with ID %s for dataset %+v of node execution %+v: %v",
-				artifactID, datasetID, nodeExecution.Id, err)
-			m.metrics.CacheEvictionFailures.Inc()
-			evictionErrors = append(evictionErrors, &core.CacheEvictionError{
-				NodeExecutionId: nodeExecution.Id,
-				Source: &core.CacheEvictionError_TaskExecutionId{
-					TaskExecutionId: taskExecution.Id,
-				},
-				Code:    core.CacheEvictionError_ARTIFACT_DELETE_FAILED,
-				Message: "Failed to delete artifact",
-			})
-			return evictionErrors
-		}
 	}
 
 	logger.Debugf(ctx, "Successfully evicted cache for task node execution %+v", nodeExecution.Id)
