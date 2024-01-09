@@ -99,12 +99,12 @@ extern CreateTriggerRequestDefaultTypeInternal _CreateTriggerRequest_default_ins
 class CreateTriggerResponse;
 class CreateTriggerResponseDefaultTypeInternal;
 extern CreateTriggerResponseDefaultTypeInternal _CreateTriggerResponse_default_instance_;
-class DeleteTriggerRequest;
-class DeleteTriggerRequestDefaultTypeInternal;
-extern DeleteTriggerRequestDefaultTypeInternal _DeleteTriggerRequest_default_instance_;
-class DeleteTriggerResponse;
-class DeleteTriggerResponseDefaultTypeInternal;
-extern DeleteTriggerResponseDefaultTypeInternal _DeleteTriggerResponse_default_instance_;
+class DeactivateTriggerRequest;
+class DeactivateTriggerRequestDefaultTypeInternal;
+extern DeactivateTriggerRequestDefaultTypeInternal _DeactivateTriggerRequest_default_instance_;
+class DeactivateTriggerResponse;
+class DeactivateTriggerResponseDefaultTypeInternal;
+extern DeactivateTriggerResponseDefaultTypeInternal _DeactivateTriggerResponse_default_instance_;
 class ExecutionInputsRequest;
 class ExecutionInputsRequestDefaultTypeInternal;
 extern ExecutionInputsRequestDefaultTypeInternal _ExecutionInputsRequest_default_instance_;
@@ -154,8 +154,8 @@ template<> ::flyteidl::artifact::CreateArtifactRequest_PartitionsEntry_DoNotUse*
 template<> ::flyteidl::artifact::CreateArtifactResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateArtifactResponse>(Arena*);
 template<> ::flyteidl::artifact::CreateTriggerRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateTriggerRequest>(Arena*);
 template<> ::flyteidl::artifact::CreateTriggerResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::CreateTriggerResponse>(Arena*);
-template<> ::flyteidl::artifact::DeleteTriggerRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::DeleteTriggerRequest>(Arena*);
-template<> ::flyteidl::artifact::DeleteTriggerResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::DeleteTriggerResponse>(Arena*);
+template<> ::flyteidl::artifact::DeactivateTriggerRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::DeactivateTriggerRequest>(Arena*);
+template<> ::flyteidl::artifact::DeactivateTriggerResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::DeactivateTriggerResponse>(Arena*);
 template<> ::flyteidl::artifact::ExecutionInputsRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::ExecutionInputsRequest>(Arena*);
 template<> ::flyteidl::artifact::ExecutionInputsResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::ExecutionInputsResponse>(Arena*);
 template<> ::flyteidl::artifact::FindByWorkflowExecRequest* Arena::CreateMaybeMessage<::flyteidl::artifact::FindByWorkflowExecRequest>(Arena*);
@@ -2286,25 +2286,25 @@ class CreateTriggerResponse final :
 };
 // -------------------------------------------------------------------
 
-class DeleteTriggerRequest final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.DeleteTriggerRequest) */ {
+class DeactivateTriggerRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.DeactivateTriggerRequest) */ {
  public:
-  DeleteTriggerRequest();
-  virtual ~DeleteTriggerRequest();
+  DeactivateTriggerRequest();
+  virtual ~DeactivateTriggerRequest();
 
-  DeleteTriggerRequest(const DeleteTriggerRequest& from);
+  DeactivateTriggerRequest(const DeactivateTriggerRequest& from);
 
-  inline DeleteTriggerRequest& operator=(const DeleteTriggerRequest& from) {
+  inline DeactivateTriggerRequest& operator=(const DeactivateTriggerRequest& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  DeleteTriggerRequest(DeleteTriggerRequest&& from) noexcept
-    : DeleteTriggerRequest() {
+  DeactivateTriggerRequest(DeactivateTriggerRequest&& from) noexcept
+    : DeactivateTriggerRequest() {
     *this = ::std::move(from);
   }
 
-  inline DeleteTriggerRequest& operator=(DeleteTriggerRequest&& from) noexcept {
+  inline DeactivateTriggerRequest& operator=(DeactivateTriggerRequest&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -2316,34 +2316,34 @@ class DeleteTriggerRequest final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const DeleteTriggerRequest& default_instance();
+  static const DeactivateTriggerRequest& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const DeleteTriggerRequest* internal_default_instance() {
-    return reinterpret_cast<const DeleteTriggerRequest*>(
-               &_DeleteTriggerRequest_default_instance_);
+  static inline const DeactivateTriggerRequest* internal_default_instance() {
+    return reinterpret_cast<const DeactivateTriggerRequest*>(
+               &_DeactivateTriggerRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     16;
 
-  void Swap(DeleteTriggerRequest* other);
-  friend void swap(DeleteTriggerRequest& a, DeleteTriggerRequest& b) {
+  void Swap(DeactivateTriggerRequest* other);
+  friend void swap(DeactivateTriggerRequest& a, DeactivateTriggerRequest& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline DeleteTriggerRequest* New() const final {
-    return CreateMaybeMessage<DeleteTriggerRequest>(nullptr);
+  inline DeactivateTriggerRequest* New() const final {
+    return CreateMaybeMessage<DeactivateTriggerRequest>(nullptr);
   }
 
-  DeleteTriggerRequest* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<DeleteTriggerRequest>(arena);
+  DeactivateTriggerRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DeactivateTriggerRequest>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const DeleteTriggerRequest& from);
-  void MergeFrom(const DeleteTriggerRequest& from);
+  void CopyFrom(const DeactivateTriggerRequest& from);
+  void MergeFrom(const DeactivateTriggerRequest& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -2365,7 +2365,7 @@ class DeleteTriggerRequest final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(DeleteTriggerRequest* other);
+  void InternalSwap(DeactivateTriggerRequest* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -2390,7 +2390,7 @@ class DeleteTriggerRequest final :
   ::flyteidl::core::Identifier* mutable_trigger_id();
   void set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id);
 
-  // @@protoc_insertion_point(class_scope:flyteidl.artifact.DeleteTriggerRequest)
+  // @@protoc_insertion_point(class_scope:flyteidl.artifact.DeactivateTriggerRequest)
  private:
   class HasBitSetters;
 
@@ -2401,25 +2401,25 @@ class DeleteTriggerRequest final :
 };
 // -------------------------------------------------------------------
 
-class DeleteTriggerResponse final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.DeleteTriggerResponse) */ {
+class DeactivateTriggerResponse final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.DeactivateTriggerResponse) */ {
  public:
-  DeleteTriggerResponse();
-  virtual ~DeleteTriggerResponse();
+  DeactivateTriggerResponse();
+  virtual ~DeactivateTriggerResponse();
 
-  DeleteTriggerResponse(const DeleteTriggerResponse& from);
+  DeactivateTriggerResponse(const DeactivateTriggerResponse& from);
 
-  inline DeleteTriggerResponse& operator=(const DeleteTriggerResponse& from) {
+  inline DeactivateTriggerResponse& operator=(const DeactivateTriggerResponse& from) {
     CopyFrom(from);
     return *this;
   }
   #if LANG_CXX11
-  DeleteTriggerResponse(DeleteTriggerResponse&& from) noexcept
-    : DeleteTriggerResponse() {
+  DeactivateTriggerResponse(DeactivateTriggerResponse&& from) noexcept
+    : DeactivateTriggerResponse() {
     *this = ::std::move(from);
   }
 
-  inline DeleteTriggerResponse& operator=(DeleteTriggerResponse&& from) noexcept {
+  inline DeactivateTriggerResponse& operator=(DeactivateTriggerResponse&& from) noexcept {
     if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -2431,34 +2431,34 @@ class DeleteTriggerResponse final :
   static const ::google::protobuf::Descriptor* descriptor() {
     return default_instance().GetDescriptor();
   }
-  static const DeleteTriggerResponse& default_instance();
+  static const DeactivateTriggerResponse& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const DeleteTriggerResponse* internal_default_instance() {
-    return reinterpret_cast<const DeleteTriggerResponse*>(
-               &_DeleteTriggerResponse_default_instance_);
+  static inline const DeactivateTriggerResponse* internal_default_instance() {
+    return reinterpret_cast<const DeactivateTriggerResponse*>(
+               &_DeactivateTriggerResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     17;
 
-  void Swap(DeleteTriggerResponse* other);
-  friend void swap(DeleteTriggerResponse& a, DeleteTriggerResponse& b) {
+  void Swap(DeactivateTriggerResponse* other);
+  friend void swap(DeactivateTriggerResponse& a, DeactivateTriggerResponse& b) {
     a.Swap(&b);
   }
 
   // implements Message ----------------------------------------------
 
-  inline DeleteTriggerResponse* New() const final {
-    return CreateMaybeMessage<DeleteTriggerResponse>(nullptr);
+  inline DeactivateTriggerResponse* New() const final {
+    return CreateMaybeMessage<DeactivateTriggerResponse>(nullptr);
   }
 
-  DeleteTriggerResponse* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<DeleteTriggerResponse>(arena);
+  DeactivateTriggerResponse* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<DeactivateTriggerResponse>(arena);
   }
   void CopyFrom(const ::google::protobuf::Message& from) final;
   void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const DeleteTriggerResponse& from);
-  void MergeFrom(const DeleteTriggerResponse& from);
+  void CopyFrom(const DeactivateTriggerResponse& from);
+  void MergeFrom(const DeactivateTriggerResponse& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -2480,7 +2480,7 @@ class DeleteTriggerResponse final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(DeleteTriggerResponse* other);
+  void InternalSwap(DeactivateTriggerResponse* other);
   private:
   inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
     return nullptr;
@@ -2496,7 +2496,7 @@ class DeleteTriggerResponse final :
 
   // accessors -------------------------------------------------------
 
-  // @@protoc_insertion_point(class_scope:flyteidl.artifact.DeleteTriggerResponse)
+  // @@protoc_insertion_point(class_scope:flyteidl.artifact.DeactivateTriggerResponse)
  private:
   class HasBitSetters;
 
@@ -5139,35 +5139,35 @@ inline void CreateTriggerRequest::set_allocated_trigger_launch_plan(::flyteidl::
 
 // -------------------------------------------------------------------
 
-// DeleteTriggerRequest
+// DeactivateTriggerRequest
 
 // .flyteidl.core.Identifier trigger_id = 1;
-inline bool DeleteTriggerRequest::has_trigger_id() const {
+inline bool DeactivateTriggerRequest::has_trigger_id() const {
   return this != internal_default_instance() && trigger_id_ != nullptr;
 }
-inline const ::flyteidl::core::Identifier& DeleteTriggerRequest::trigger_id() const {
+inline const ::flyteidl::core::Identifier& DeactivateTriggerRequest::trigger_id() const {
   const ::flyteidl::core::Identifier* p = trigger_id_;
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.DeleteTriggerRequest.trigger_id)
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.DeactivateTriggerRequest.trigger_id)
   return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
       &::flyteidl::core::_Identifier_default_instance_);
 }
-inline ::flyteidl::core::Identifier* DeleteTriggerRequest::release_trigger_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.DeleteTriggerRequest.trigger_id)
+inline ::flyteidl::core::Identifier* DeactivateTriggerRequest::release_trigger_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.DeactivateTriggerRequest.trigger_id)
   
   ::flyteidl::core::Identifier* temp = trigger_id_;
   trigger_id_ = nullptr;
   return temp;
 }
-inline ::flyteidl::core::Identifier* DeleteTriggerRequest::mutable_trigger_id() {
+inline ::flyteidl::core::Identifier* DeactivateTriggerRequest::mutable_trigger_id() {
   
   if (trigger_id_ == nullptr) {
     auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
     trigger_id_ = p;
   }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.DeleteTriggerRequest.trigger_id)
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.DeactivateTriggerRequest.trigger_id)
   return trigger_id_;
 }
-inline void DeleteTriggerRequest::set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id) {
+inline void DeactivateTriggerRequest::set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::google::protobuf::MessageLite*>(trigger_id_);
@@ -5183,12 +5183,12 @@ inline void DeleteTriggerRequest::set_allocated_trigger_id(::flyteidl::core::Ide
     
   }
   trigger_id_ = trigger_id;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.DeleteTriggerRequest.trigger_id)
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.DeactivateTriggerRequest.trigger_id)
 }
 
 // -------------------------------------------------------------------
 
-// DeleteTriggerResponse
+// DeactivateTriggerResponse
 
 // -------------------------------------------------------------------
 
