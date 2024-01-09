@@ -807,6 +807,8 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 
 		catalogClient.On("GetOrExtendReservationByArtifactTag", mock.Anything, mock.Anything, mock.Anything,
 			mock.Anything, mock.Anything).Return(&datacatalog.Reservation{OwnerId: "otherOwnerID"}, nil)
+		catalogClient.On("ReleaseReservationByArtifactTag", mock.Anything, mock.Anything,
+			mock.Anything, mock.Anything).Return(nil)
 
 		cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
 		request := service.EvictTaskExecutionCacheRequest{
@@ -1189,6 +1191,8 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 
 			catalogClient.On("DeleteByArtifactID", mock.Anything, mock.Anything, mock.Anything).
 				Return(status.Error(codes.Internal, "error"))
+			catalogClient.On("ReleaseReservationByArtifactTag", mock.Anything, mock.Anything,
+				mock.Anything, mock.Anything).Return(nil)
 
 			cacheManager := NewCacheManager(repository, mockConfig, catalogClient, promutils.NewTestScope())
 			request := service.EvictTaskExecutionCacheRequest{

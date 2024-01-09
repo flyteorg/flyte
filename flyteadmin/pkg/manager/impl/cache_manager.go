@@ -127,7 +127,7 @@ func (m *CacheManager) EvictTaskExecutionCache(ctx context.Context, req service.
 		}, nil
 	}
 
-	evictionErrors = m.evictTaskNodeExecutionCache(ctx, *nodeExecutionModel, nodeExecution, taskExecution, metadata.TaskNodeMetadata, nil)
+	evictionErrors = m.evictTaskNodeExecutionCache(ctx, *nodeExecutionModel, nodeExecution, taskExecution, metadata.TaskNodeMetadata, evictionErrors)
 	logger.Debugf(ctx, "Finished evicting cache for execution %+v of task %+v", req.TaskExecutionId, req.TaskExecutionId.TaskId)
 	return &service.EvictCacheResponse{
 		Errors: &core.CacheEvictionErrorList{Errors: evictionErrors},
@@ -136,7 +136,8 @@ func (m *CacheManager) EvictTaskExecutionCache(ctx context.Context, req service.
 
 func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExecutionModel models.NodeExecution,
 	nodeExecution *admin.NodeExecution, taskExecution *admin.TaskExecution,
-	taskNodeMetadata *admin.TaskNodeMetadata, evictionErrors []*core.CacheEvictionError) []*core.CacheEvictionError {
+	taskNodeMetadata *admin.TaskNodeMetadata, errors []*core.CacheEvictionError) (evictionErrors []*core.CacheEvictionError) {
+	evictionErrors = errors
 	if taskNodeMetadata == nil || (taskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT &&
 		taskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_POPULATED) {
 		logger.Debugf(ctx, "Node execution %+v did not contain cached data, skipping cache eviction",
@@ -166,6 +167,21 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 		})
 		return evictionErrors
 	}
+
+	defer func() {
+		if err := m.catalogClient.ReleaseReservationByArtifactTag(ctx, datasetID, artifactTag, ownerID); err != nil {
+			logger.Warnf(ctx, "Failed to release reservation for artifact of node execution %+v",
+				nodeExecution.Id)
+			evictionErrors = append(evictionErrors, &core.CacheEvictionError{
+				NodeExecutionId: nodeExecution.Id,
+				Source: &core.CacheEvictionError_TaskExecutionId{
+					TaskExecutionId: taskExecution.Id,
+				},
+				Code:    core.CacheEvictionError_RESERVATION_NOT_RELEASED,
+				Message: "Failed to release reservation for artifact",
+			})
+		}
+	}()
 
 	if len(reservation.GetOwnerId()) == 0 {
 		logger.Debugf(ctx, "Received empty owner ID for artifact of node execution %+v, assuming NOOP catalog, skipping cache eviction",
@@ -247,21 +263,6 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 			})
 			return evictionErrors
 		}
-	}
-
-	if err := m.catalogClient.ReleaseReservationByArtifactTag(ctx, datasetID, artifactTag, ownerID); err != nil {
-		logger.Warnf(ctx, "Failed to release reservation for artifact of node execution %+v, cannot evict cache",
-			nodeExecution.Id)
-		m.metrics.CacheEvictionFailures.Inc()
-		evictionErrors = append(evictionErrors, &core.CacheEvictionError{
-			NodeExecutionId: nodeExecution.Id,
-			Source: &core.CacheEvictionError_TaskExecutionId{
-				TaskExecutionId: taskExecution.Id,
-			},
-			Code:    core.CacheEvictionError_RESERVATION_NOT_RELEASED,
-			Message: "Failed to release reservation for artifact",
-		})
-		return evictionErrors
 	}
 
 	logger.Debugf(ctx, "Successfully evicted cache for task node execution %+v", nodeExecution.Id)
