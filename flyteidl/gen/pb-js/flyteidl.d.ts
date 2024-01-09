@@ -7524,14 +7524,8 @@ export namespace flyteidl {
             /** CloudEventWorkflowExecution rawEvent */
             rawEvent?: (flyteidl.event.IWorkflowExecutionEvent|null);
 
-            /** CloudEventWorkflowExecution outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
-
             /** CloudEventWorkflowExecution outputInterface */
             outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventWorkflowExecution inputData */
-            inputData?: (flyteidl.core.ILiteralMap|null);
 
             /** CloudEventWorkflowExecution artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
@@ -7558,14 +7552,8 @@ export namespace flyteidl {
             /** CloudEventWorkflowExecution rawEvent. */
             public rawEvent?: (flyteidl.event.IWorkflowExecutionEvent|null);
 
-            /** CloudEventWorkflowExecution outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
-
             /** CloudEventWorkflowExecution outputInterface. */
             public outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventWorkflowExecution inputData. */
-            public inputData?: (flyteidl.core.ILiteralMap|null);
 
             /** CloudEventWorkflowExecution artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
@@ -7621,14 +7609,8 @@ export namespace flyteidl {
             /** CloudEventNodeExecution taskExecId */
             taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
 
-            /** CloudEventNodeExecution outputData */
-            outputData?: (flyteidl.core.ILiteralMap|null);
-
             /** CloudEventNodeExecution outputInterface */
             outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventNodeExecution inputData */
-            inputData?: (flyteidl.core.ILiteralMap|null);
 
             /** CloudEventNodeExecution artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
@@ -7655,14 +7637,8 @@ export namespace flyteidl {
             /** CloudEventNodeExecution taskExecId. */
             public taskExecId?: (flyteidl.core.ITaskExecutionIdentifier|null);
 
-            /** CloudEventNodeExecution outputData. */
-            public outputData?: (flyteidl.core.ILiteralMap|null);
-
             /** CloudEventNodeExecution outputInterface. */
             public outputInterface?: (flyteidl.core.ITypedInterface|null);
-
-            /** CloudEventNodeExecution inputData. */
-            public inputData?: (flyteidl.core.ILiteralMap|null);
 
             /** CloudEventNodeExecution artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
@@ -7773,8 +7749,8 @@ export namespace flyteidl {
             /** CloudEventExecutionStart artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
 
-            /** CloudEventExecutionStart artifactKeys */
-            artifactKeys?: (string[]|null);
+            /** CloudEventExecutionStart artifactTrackers */
+            artifactTrackers?: (string[]|null);
 
             /** CloudEventExecutionStart principal */
             principal?: (string|null);
@@ -7801,8 +7777,8 @@ export namespace flyteidl {
             /** CloudEventExecutionStart artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
 
-            /** CloudEventExecutionStart artifactKeys. */
-            public artifactKeys: string[];
+            /** CloudEventExecutionStart artifactTrackers. */
+            public artifactTrackers: string[];
 
             /** CloudEventExecutionStart principal. */
             public principal: string;

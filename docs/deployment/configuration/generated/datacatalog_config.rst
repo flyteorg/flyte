@@ -12,6 +12,8 @@ Flyte Datacatalog Configuration
 
 - `logger <#section-logger>`_
 
+- `otel <#section-otel>`_
+
 - `storage <#section-storage>`_
 
 Section: application
@@ -217,11 +219,11 @@ postgres (`database.PostgresConfig`_)
 
   dbname: postgres
   debug: false
-  host: postgres
+  host: localhost
   options: sslmode=disable
-  password: ""
+  password: postgres
   passwordPath: ""
-  port: 5432
+  port: 30001
   username: postgres
   
 
@@ -260,7 +262,7 @@ The host name of the database server
 
 .. code-block:: yaml
 
-  postgres
+  localhost
   
 
 port (int)
@@ -272,7 +274,7 @@ The port name of the database server
 
 .. code-block:: yaml
 
-  "5432"
+  "30001"
   
 
 dbname (string)
@@ -308,7 +310,7 @@ The database password.
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 passwordPath (string)
@@ -489,6 +491,75 @@ Sets logging format type.
 .. code-block:: yaml
 
   json
+  
+
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemtry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
   
 
 Section: storage

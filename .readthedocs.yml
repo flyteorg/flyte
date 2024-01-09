@@ -7,13 +7,17 @@ version: 2
 build:
   os: "ubuntu-22.04"
   tools:
-    python: "3.11"
+    python: "mambaforge-22.9"
+  jobs:
+    post_install:
+      - conda-lock install --name $READTHEDOCS_VERSION monodocs-environment.lock.yaml
+      - conda info
+      - conda env list
+      - conda list
 
 # Build documentation in the docs/ directory with Sphinx
 sphinx:
-  configuration: rsts/conf.py
+  configuration: docs/conf.py
 
-# Optionally set the version of Python and requirements required to build your docs
-python:
-  install:
-    - requirements: doc-requirements.in
+conda:
+  environment: docs/build-environment.yaml
