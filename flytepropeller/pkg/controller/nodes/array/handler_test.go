@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -144,6 +145,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 			Domain:  "domain",
 			Name:    "name",
 		},
+	})
+	nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+		Namespace: "wf-namespace",
+		Name:      "wf-name",
 	})
 	nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
 
@@ -506,6 +511,24 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
 			expectedTransitionPhase:        handler.EPhaseRunning,
 			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING},
+		},
+		{
+			name: "StartSubNodesNewAttempts",
+			subNodePhases: []v1alpha1.NodePhase{
+				v1alpha1.NodePhaseQueued,
+				v1alpha1.NodePhaseQueued,
+			},
+			subNodeTaskPhases: []core.Phase{
+				core.PhaseRetryableFailure,
+				core.PhaseWaitingForResources,
+			},
+			subNodeTransitions: []handler.Transition{
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+				handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(&handler.ExecutionInfo{})),
+			},
+			expectedArrayNodePhase:         v1alpha1.ArrayNodePhaseExecuting,
+			expectedTransitionPhase:        handler.EPhaseRunning,
+			expectedExternalResourcePhases: []idlcore.TaskExecution_Phase{idlcore.TaskExecution_RUNNING, idlcore.TaskExecution_RUNNING},
 		},
 		{
 			name: "AllSubNodesSuccedeed",
