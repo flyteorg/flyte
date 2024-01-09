@@ -3,6 +3,8 @@ package core
 import (
 	"context"
 	"fmt"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 //go:generate mockery -all -case=underscore
@@ -36,6 +38,8 @@ type PluginProperties struct {
 	DisableNodeLevelCaching bool
 	// Specifies the length of TaskExecutionID generated name. default: 50
 	GeneratedNameMaxLength *int
+	// TODO @hamersaw - docs
+	PersistentEnvType *core.EnvironmentType
 }
 
 // Interface for the core Flyte plugin

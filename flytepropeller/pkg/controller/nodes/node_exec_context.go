@@ -203,6 +203,11 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
+func (e nodeExecContext) GetPersistentEnv(core.EnvironmentType) *core.Environment {
+	// TODO @hamersaw - fill out
+	return nil
+}
+
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
 	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,

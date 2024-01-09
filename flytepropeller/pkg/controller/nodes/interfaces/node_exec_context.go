@@ -70,4 +70,6 @@ type NodeExecutionContext interface {
 	// TODO We should not need to pass NodeStatus, we probably only need it for DataDir, which should actually be sent using an OutputWriter interface
 	// Deprecated
 	NodeStatus() v1alpha1.ExecutableNodeStatus
+
+	GetPersistentEnv(core.EnvironmentType) *core.Environment
 }

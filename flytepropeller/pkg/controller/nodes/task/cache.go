@@ -38,7 +38,7 @@ func (t *Handler) IsCacheable(ctx context.Context, nCtx interfaces.NodeExecution
 	// check if plugin has caching disabled
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	p, err := t.ResolvePlugin(ctx, nCtx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
 	if err != nil {
 		return false, false, errors2.Wrapf(errors2.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}

@@ -310,7 +310,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 	return nil
 }
 
-func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfig v1alpha1.ExecutionConfig) (pluginCore.Plugin, error) {
+func (t Handler) ResolvePlugin(ctx context.Context, nCtx interfaces.NodeExecutionContext, ttype string, executionConfig v1alpha1.ExecutionConfig) (pluginCore.Plugin, error) {
 	// If the workflow specifies plugin overrides, check to see if any of the specified plugins for that type are
 	// registered in this deployment of flytepropeller.
 	if len(executionConfig.TaskPluginImpls[ttype].PluginIDs) > 0 {
@@ -329,6 +329,19 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		// task plugin overrides specify so.
 		if executionConfig.TaskPluginImpls[ttype].MissingPluginBehavior == admin.PluginOverride_FAIL {
 			return nil, fmt.Errorf("no matching plugin overrides defined for Handler type [%s]. Ignoring any defaultPlugins configured", ttype)
+		}
+	}
+
+	// TODO @hamersaw - check if cluster is available
+	//   what happens if the cluster was available, but no longer is?!?
+	//   or if there are two persistentEnv plugins for ttype and one is returned first and the other second?!
+	// we COULD only allow one persistentEnv plugin per ttype ... still need to figure out disappearing clusters
+	for _, plugin := range t.pluginsForType[ttype] {
+		if persistentEnvType := plugin.GetProperties().PersistentEnvType; persistentEnvType != nil {
+			persistentEnv := nCtx.GetPersistentEnv(*persistentEnvType)
+			if persistentEnv != nil {
+				return plugin, nil
+			}
 		}
 	}
 
@@ -522,7 +535,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	p, err := t.ResolvePlugin(ctx, nCtx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
 	if err != nil {
 		return handler.UnknownTransition, errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
@@ -762,7 +775,7 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 	}
 
 	ttype := nCtx.TaskReader().GetTaskType()
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	p, err := t.ResolvePlugin(ctx, nCtx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
 	if err != nil {
 		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
@@ -852,7 +865,7 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext) error {
 	logger.Debugf(ctx, "Finalize invoked.")
 	ttype := nCtx.TaskReader().GetTaskType()
-	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
+	p, err := t.ResolvePlugin(ctx, nCtx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
 	if err != nil {
 		return errors.Wrapf(errors.UnsupportedTaskTypeError, nCtx.NodeID(), err, "unable to resolve plugin")
 	}
