@@ -31,6 +31,9 @@ type ArtifactService struct {
 }
 
 func (a *ArtifactService) CreateArtifact(ctx context.Context, req *artifact.CreateArtifactRequest) (*artifact.CreateArtifactResponse, error) {
+
+	// todo: add a request validating section, check for nils, etc.
+
 	resp, err := a.Service.CreateArtifact(ctx, req)
 	if err != nil {
 		return resp, err

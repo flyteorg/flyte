@@ -99,14 +99,12 @@ func (r *RDSStorage) CreateArtifact(ctx context.Context, serviceModel models.Art
 }
 
 func (r *RDSStorage) handleUriGet(ctx context.Context, uri string) (models.Artifact, error) {
-	artifactID, tag, err := lib.ParseFlyteURL(uri)
+	artifactID, err := lib.ParseFlyteURL(uri)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to parse uri [%s]: %+v", uri, err)
 		return models.Artifact{}, err
 	}
-	if tag != "" {
-		return models.Artifact{}, fmt.Errorf("tag not implemented yet")
-	}
+
 	logger.Debugf(ctx, "Extracted artifact id [%v] from uri [%s], using id handler", artifactID, uri)
 	return r.handleArtifactIdGet(ctx, artifactID)
 }
