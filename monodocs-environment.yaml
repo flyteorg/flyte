@@ -1,3 +1,4 @@
+name: monodocs-env
 channels:
   - conda-forge
 dependencies:
@@ -57,6 +58,7 @@ dependencies:
   - vaex-core                   # vaex
 
   - pip:
+    - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
     - sphinx_markdown_tables
@@ -71,3 +73,7 @@ dependencies:
     - whylabs-client              # whylogs
     - ray==2.6.3
     - duckdb
+
+platforms:
+  - linux-64
+  - osx-arm64

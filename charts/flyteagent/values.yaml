@@ -23,7 +23,7 @@ image:
   # -- Docker image for flyteagent deployment
   repository: ghcr.io/flyteorg/flyteagent
   # -- Docker image tag
-  tag: 1.10.1 # FLYTEAGENT_TAG
+  tag: 1.10.2 # FLYTEAGENT_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
