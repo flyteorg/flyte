@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
@@ -14,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -62,6 +64,11 @@ const (
 	updateFailed
 	alreadyInTerminalStatus
 )
+
+var isParent = common.NewMapFilter(map[string]interface{}{
+	shared.ParentTaskExecutionID: nil,
+	shared.ParentID:              nil,
+})
 
 func getNodeExecutionContext(ctx context.Context, identifier *core.NodeExecutionIdentifier) context.Context {
 	ctx = contextutils.WithProjectDomain(ctx, identifier.ExecutionId.Project, identifier.ExecutionId.Domain)
@@ -354,6 +361,56 @@ func (m *NodeExecutionManager) GetNodeExecution(
 	return nodeExecution, nil
 }
 
+func (m *NodeExecutionManager) listNodeExecutions(
+	ctx context.Context, identifierFilters []common.InlineFilter,
+	requestFilters string, limit uint32, requestToken string, sortBy *admin.Sort, mapFilters []common.MapFilter) (
+	*admin.NodeExecutionList, error) {
+
+	filters, err := util.AddRequestFilters(requestFilters, common.NodeExecution, identifierFilters)
+	if err != nil {
+		return nil, err
+	}
+
+	sortParameter, err := common.NewSortParameter(sortBy, models.NodeExecutionColumns)
+	if err != nil {
+		return nil, err
+	}
+
+	offset, err := validation.ValidateToken(requestToken)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"invalid pagination token %s for ListNodeExecutions", requestToken)
+	}
+	listInput := repoInterfaces.ListResourceInput{
+		Limit:         int(limit),
+		Offset:        offset,
+		InlineFilters: filters,
+		SortParameter: sortParameter,
+	}
+
+	listInput.MapFilters = mapFilters
+	output, err := m.db.NodeExecutionRepo().List(ctx, listInput)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to list node executions for request with err %v", err)
+		return nil, err
+	}
+
+	var token string
+	if len(output.NodeExecutions) == int(limit) {
+		token = strconv.Itoa(offset + len(output.NodeExecutions))
+	}
+	nodeExecutionList, err := m.transformNodeExecutionModelList(ctx, output.NodeExecutions)
+	if err != nil {
+		logger.Debugf(ctx, "failed to transform node execution models for request with err: %v", err)
+		return nil, err
+	}
+
+	return &admin.NodeExecutionList{
+		NodeExecutions: nodeExecutionList,
+		Token:          token,
+	}, nil
+}
+
 func (m *NodeExecutionManager) ListNodeExecutions(
 	ctx context.Context, request admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 	// Check required fields
@@ -362,22 +419,32 @@ func (m *NodeExecutionManager) ListNodeExecutions(
 	}
 	ctx = getExecutionContext(ctx, request.WorkflowExecutionId)
 
-	nodeExecutions, token, err := util.ListNodeExecutionsForWorkflow(ctx, m.db, request.WorkflowExecutionId,
-		request.UniqueParentId, request.Filters, request.Limit, request.Token, request.SortBy)
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(ctx, *request.WorkflowExecutionId)
 	if err != nil {
 		return nil, err
 	}
-
-	nodeExecutionList, err := m.transformNodeExecutionModelList(ctx, nodeExecutions)
-	if err != nil {
-		logger.Debugf(ctx, "failed to transform node execution models for request [%+v] with err: %v", request, err)
-		return nil, err
+	var mapFilters []common.MapFilter
+	if request.UniqueParentId != "" {
+		parentNodeExecution, err := util.GetNodeExecutionModel(ctx, m.db, &core.NodeExecutionIdentifier{
+			ExecutionId: request.WorkflowExecutionId,
+			NodeId:      request.UniqueParentId,
+		})
+		if err != nil {
+			return nil, err
+		}
+		parentIDFilter, err := common.NewSingleValueFilter(
+			common.NodeExecution, common.Equal, shared.ParentID, parentNodeExecution.ID)
+		if err != nil {
+			return nil, err
+		}
+		identifierFilters = append(identifierFilters, parentIDFilter)
+	} else {
+		mapFilters = []common.MapFilter{
+			isParent,
+		}
 	}
-
-	return &admin.NodeExecutionList{
-		NodeExecutions: nodeExecutionList,
-		Token:          token,
-	}, nil
+	return m.listNodeExecutions(
+		ctx, identifierFilters, request.Filters, request.Limit, request.Token, request.SortBy, mapFilters)
 }
 
 // Filters on node executions matching the execution parameters (execution project, domain, and name) as well as the
@@ -389,23 +456,23 @@ func (m *NodeExecutionManager) ListNodeExecutionsForTask(
 		return nil, err
 	}
 	ctx = getTaskExecutionContext(ctx, request.TaskExecutionId)
-
-	nodeExecutions, token, err := util.ListNodeExecutionsForTask(ctx, m.db, request.TaskExecutionId,
-		request.TaskExecutionId.NodeExecutionId.ExecutionId, request.Filters, request.Limit, request.Token, request.SortBy)
+	identifierFilters, err := util.GetWorkflowExecutionIdentifierFilters(
+		ctx, *request.TaskExecutionId.NodeExecutionId.ExecutionId)
 	if err != nil {
 		return nil, err
 	}
-
-	nodeExecutionList, err := m.transformNodeExecutionModelList(ctx, nodeExecutions)
+	parentTaskExecutionModel, err := util.GetTaskExecutionModel(ctx, m.db, request.TaskExecutionId)
 	if err != nil {
-		logger.Debugf(ctx, "failed to transform node execution models for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-
-	return &admin.NodeExecutionList{
-		NodeExecutions: nodeExecutionList,
-		Token:          token,
-	}, nil
+	nodeIDFilter, err := common.NewSingleValueFilter(
+		common.NodeExecution, common.Equal, shared.ParentTaskExecutionID, parentTaskExecutionModel.ID)
+	if err != nil {
+		return nil, err
+	}
+	identifierFilters = append(identifierFilters, nodeIDFilter)
+	return m.listNodeExecutions(
+		ctx, identifierFilters, request.Filters, request.Limit, request.Token, request.SortBy, nil)
 }
 
 func (m *NodeExecutionManager) GetNodeExecutionData(

@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
@@ -245,18 +246,49 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	}
 	ctx = getNodeExecutionContext(ctx, request.NodeExecutionId)
 
-	taskExecutions, token, err := util.ListTaskExecutions(ctx, m.db, request.NodeExecutionId, request.Filters,
-		request.Limit, request.Token, request.SortBy)
+	identifierFilters, err := util.GetNodeExecutionIdentifierFilters(ctx, *request.NodeExecutionId)
 	if err != nil {
 		return nil, err
 	}
 
-	taskExecutionList, err := transformers.FromTaskExecutionModels(taskExecutions, transformers.DefaultExecutionTransformerOptions)
+	filters, err := util.AddRequestFilters(request.Filters, common.TaskExecution, identifierFilters)
+	if err != nil {
+		return nil, err
+	}
+
+	sortParameter, err := common.NewSortParameter(request.SortBy, models.TaskExecutionColumns)
+	if err != nil {
+		return nil, err
+	}
+
+	offset, err := validation.ValidateToken(request.Token)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+			"invalid pagination token %s for ListTaskExecutions", request.Token)
+	}
+
+	output, err := m.db.TaskExecutionRepo().List(ctx, repoInterfaces.ListResourceInput{
+		InlineFilters: filters,
+		Offset:        offset,
+		Limit:         int(request.Limit),
+		SortParameter: sortParameter,
+	})
+	if err != nil {
+		logger.Debugf(ctx, "Failed to list task executions with request [%+v] with err %v",
+			request, err)
+		return nil, err
+	}
+
+	// Use default transformer options so that error messages shown for task execution attempts in the console sidebar show the full error stack trace.
+	taskExecutionList, err := transformers.FromTaskExecutionModels(output.TaskExecutions, transformers.DefaultExecutionTransformerOptions)
 	if err != nil {
 		logger.Debugf(ctx, "failed to transform task execution models for request [%+v] with err: %v", request, err)
 		return nil, err
 	}
-
+	var token string
+	if len(taskExecutionList) == int(request.Limit) {
+		token = strconv.Itoa(offset + len(taskExecutionList))
+	}
 	return &admin.TaskExecutionList{
 		TaskExecutions: taskExecutionList,
 		Token:          token,
