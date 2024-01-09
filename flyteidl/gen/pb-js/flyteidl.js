@@ -33592,6 +33592,7 @@
                  * @property {google.protobuf.IBoolValue|null} [interruptible] LaunchPlanSpec interruptible
                  * @property {boolean|null} [overwriteCache] LaunchPlanSpec overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] LaunchPlanSpec envs
+                 * @property {Array.<flyteidl.core.IEnvironmentAssignment>|null} [persistentEnvs] LaunchPlanSpec persistentEnvs
                  */
     
                 /**
@@ -33603,6 +33604,7 @@
                  * @param {flyteidl.admin.ILaunchPlanSpec=} [properties] Properties to set
                  */
                 function LaunchPlanSpec(properties) {
+                    this.persistentEnvs = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -33738,6 +33740,14 @@
                 LaunchPlanSpec.prototype.envs = null;
     
                 /**
+                 * LaunchPlanSpec persistentEnvs.
+                 * @member {Array.<flyteidl.core.IEnvironmentAssignment>} persistentEnvs
+                 * @memberof flyteidl.admin.LaunchPlanSpec
+                 * @instance
+                 */
+                LaunchPlanSpec.prototype.persistentEnvs = $util.emptyArray;
+    
+                /**
                  * Creates a new LaunchPlanSpec instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.LaunchPlanSpec
@@ -33793,6 +33803,9 @@
                         writer.uint32(/* id 20, wireType 0 =*/160).bool(message.overwriteCache);
                     if (message.envs != null && message.hasOwnProperty("envs"))
                         $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 21, wireType 2 =*/170).fork()).ldelim();
+                    if (message.persistentEnvs != null && message.persistentEnvs.length)
+                        for (var i = 0; i < message.persistentEnvs.length; ++i)
+                            $root.flyteidl.core.EnvironmentAssignment.encode(message.persistentEnvs[i], writer.uint32(/* id 22, wireType 2 =*/178).fork()).ldelim();
                     return writer;
                 };
     
@@ -33861,6 +33874,11 @@
                             break;
                         case 21:
                             message.envs = $root.flyteidl.admin.Envs.decode(reader, reader.uint32());
+                            break;
+                        case 22:
+                            if (!(message.persistentEnvs && message.persistentEnvs.length))
+                                message.persistentEnvs = [];
+                            message.persistentEnvs.push($root.flyteidl.core.EnvironmentAssignment.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -33954,6 +33972,15 @@
                         var error = $root.flyteidl.admin.Envs.verify(message.envs);
                         if (error)
                             return "envs." + error;
+                    }
+                    if (message.persistentEnvs != null && message.hasOwnProperty("persistentEnvs")) {
+                        if (!Array.isArray(message.persistentEnvs))
+                            return "persistentEnvs: array expected";
+                        for (var i = 0; i < message.persistentEnvs.length; ++i) {
+                            var error = $root.flyteidl.core.EnvironmentAssignment.verify(message.persistentEnvs[i]);
+                            if (error)
+                                return "persistentEnvs." + error;
+                        }
                     }
                     return null;
                 };
@@ -36287,6 +36314,7 @@
                  * @property {google.protobuf.IBoolValue|null} [interruptible] WorkflowExecutionConfig interruptible
                  * @property {boolean|null} [overwriteCache] WorkflowExecutionConfig overwriteCache
                  * @property {flyteidl.admin.IEnvs|null} [envs] WorkflowExecutionConfig envs
+                 * @property {Array.<flyteidl.core.IEnvironmentAssignment>|null} [persistentEnvs] WorkflowExecutionConfig persistentEnvs
                  */
     
                 /**
@@ -36298,6 +36326,7 @@
                  * @param {flyteidl.admin.IWorkflowExecutionConfig=} [properties] Properties to set
                  */
                 function WorkflowExecutionConfig(properties) {
+                    this.persistentEnvs = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -36369,6 +36398,14 @@
                 WorkflowExecutionConfig.prototype.envs = null;
     
                 /**
+                 * WorkflowExecutionConfig persistentEnvs.
+                 * @member {Array.<flyteidl.core.IEnvironmentAssignment>} persistentEnvs
+                 * @memberof flyteidl.admin.WorkflowExecutionConfig
+                 * @instance
+                 */
+                WorkflowExecutionConfig.prototype.persistentEnvs = $util.emptyArray;
+    
+                /**
                  * Creates a new WorkflowExecutionConfig instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.WorkflowExecutionConfig
@@ -36408,6 +36445,9 @@
                         writer.uint32(/* id 7, wireType 0 =*/56).bool(message.overwriteCache);
                     if (message.envs != null && message.hasOwnProperty("envs"))
                         $root.flyteidl.admin.Envs.encode(message.envs, writer.uint32(/* id 8, wireType 2 =*/66).fork()).ldelim();
+                    if (message.persistentEnvs != null && message.persistentEnvs.length)
+                        for (var i = 0; i < message.persistentEnvs.length; ++i)
+                            $root.flyteidl.core.EnvironmentAssignment.encode(message.persistentEnvs[i], writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
                     return writer;
                 };
     
@@ -36452,6 +36492,11 @@
                             break;
                         case 8:
                             message.envs = $root.flyteidl.admin.Envs.decode(reader, reader.uint32());
+                            break;
+                        case 9:
+                            if (!(message.persistentEnvs && message.persistentEnvs.length))
+                                message.persistentEnvs = [];
+                            message.persistentEnvs.push($root.flyteidl.core.EnvironmentAssignment.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -36507,6 +36552,15 @@
                         var error = $root.flyteidl.admin.Envs.verify(message.envs);
                         if (error)
                             return "envs." + error;
+                    }
+                    if (message.persistentEnvs != null && message.hasOwnProperty("persistentEnvs")) {
+                        if (!Array.isArray(message.persistentEnvs))
+                            return "persistentEnvs: array expected";
+                        for (var i = 0; i < message.persistentEnvs.length; ++i) {
+                            var error = $root.flyteidl.core.EnvironmentAssignment.verify(message.persistentEnvs[i]);
+                            if (error)
+                                return "persistentEnvs." + error;
+                        }
                     }
                     return null;
                 };

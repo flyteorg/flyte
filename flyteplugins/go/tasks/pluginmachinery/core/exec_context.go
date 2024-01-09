@@ -66,7 +66,7 @@ type TaskExecutionContext interface {
 	EventsRecorder() EventsRecorder
 
 	// TODO @hamersaw - docs
-	GetPersistentEnv(core.EnvironmentType) *core.Environment
+	GetPersistentEnv(core.Environment_EnvironmentType) *core.Environment
 }
 
 // A simple fire-and-forget func

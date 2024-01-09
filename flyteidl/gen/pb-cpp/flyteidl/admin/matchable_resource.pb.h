@@ -38,6 +38,7 @@
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/admin/cluster_assignment.pb.h"
 #include "flyteidl/core/execution.pb.h"
+#include "flyteidl/core/persistent_envs.pb.h"
 #include "flyteidl/core/security.pb.h"
 #include <google/protobuf/wrappers.pb.h>
 // @@protoc_insertion_point(includes)
@@ -1257,6 +1258,18 @@ class WorkflowExecutionConfig final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 9;
+  int persistent_envs_size() const;
+  void clear_persistent_envs();
+  static const int kPersistentEnvsFieldNumber = 9;
+  ::flyteidl::core::EnvironmentAssignment* mutable_persistent_envs(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >*
+      mutable_persistent_envs();
+  const ::flyteidl::core::EnvironmentAssignment& persistent_envs(int index) const;
+  ::flyteidl::core::EnvironmentAssignment* add_persistent_envs();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >&
+      persistent_envs() const;
+
   // .flyteidl.core.SecurityContext security_context = 2;
   bool has_security_context() const;
   void clear_security_context();
@@ -1328,6 +1341,7 @@ class WorkflowExecutionConfig final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment > persistent_envs_;
   ::flyteidl::core::SecurityContext* security_context_;
   ::flyteidl::admin::RawOutputDataConfig* raw_output_data_config_;
   ::flyteidl::admin::Labels* labels_;
@@ -2970,6 +2984,33 @@ inline void WorkflowExecutionConfig::set_allocated_envs(::flyteidl::admin::Envs*
   }
   envs_ = envs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowExecutionConfig.envs)
+}
+
+// repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 9;
+inline int WorkflowExecutionConfig::persistent_envs_size() const {
+  return persistent_envs_.size();
+}
+inline ::flyteidl::core::EnvironmentAssignment* WorkflowExecutionConfig::mutable_persistent_envs(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowExecutionConfig.persistent_envs)
+  return persistent_envs_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >*
+WorkflowExecutionConfig::mutable_persistent_envs() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.WorkflowExecutionConfig.persistent_envs)
+  return &persistent_envs_;
+}
+inline const ::flyteidl::core::EnvironmentAssignment& WorkflowExecutionConfig::persistent_envs(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowExecutionConfig.persistent_envs)
+  return persistent_envs_.Get(index);
+}
+inline ::flyteidl::core::EnvironmentAssignment* WorkflowExecutionConfig::add_persistent_envs() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.WorkflowExecutionConfig.persistent_envs)
+  return persistent_envs_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >&
+WorkflowExecutionConfig::persistent_envs() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.WorkflowExecutionConfig.persistent_envs)
+  return persistent_envs_;
 }
 
 // -------------------------------------------------------------------

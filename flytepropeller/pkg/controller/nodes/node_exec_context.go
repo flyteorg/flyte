@@ -3,6 +3,7 @@ package nodes
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -203,23 +204,15 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
-func (e nodeExecContext) GetPersistentEnv(core.EnvironmentType) *core.Environment {
-	/*config := e.ExecutionContext().GetExecutionConfig()
-	for _, persistentEnv := config.PersistentEnvs {
-		if slices.StringSliceContains(persistentEnv.NodeIDs, e.NodeID().String()) {
+func (e nodeExecContext) GetPersistentEnv(core.Environment_EnvironmentType) *core.Environment {
+	config := e.ExecutionContext().GetExecutionConfig()
+	for _, persistentEnv := range config.PersistentEnvs {
+		if slices.Contains(persistentEnv.NodeIds, e.NodeID()) {
 			return persistentEnv.Environment
 		}
-	}*/
-
-	// TODO @hamersaw - fill out
-
-	return &core.Environment{
-		Type: core.EnvironmentType_FASTTASK,
-		FasttaskEnvironment: &core.FastTaskEnvironment{
-			QueueId: "foo",
-		},
 	}
-	//return nil
+
+	return nil
 }
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,

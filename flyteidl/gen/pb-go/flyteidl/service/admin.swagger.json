@@ -4343,6 +4343,13 @@
         "envs": {
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
+        },
+        "persistent_envs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreEnvironmentAssignment"
+          },
+          "title": "TODO @hamersaw - docs"
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -5501,6 +5508,13 @@
         "envs": {
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
+        },
+        "persistent_envs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreEnvironmentAssignment"
+          },
+          "title": "TODO @hamersaw - docs"
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."

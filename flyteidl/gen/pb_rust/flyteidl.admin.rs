@@ -1554,6 +1554,9 @@ pub struct LaunchPlanSpec {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="21")]
     pub envs: ::core::option::Option<Envs>,
+    /// TODO @hamersaw - docs
+    #[prost(message, repeated, tag="22")]
+    pub persistent_envs: ::prost::alloc::vec::Vec<super::core::EnvironmentAssignment>,
 }
 /// Values computed by the flyte platform after launch plan registration.
 /// These include expected_inputs required to be present in a CreateExecutionRequest
@@ -1811,6 +1814,9 @@ pub struct WorkflowExecutionConfig {
     /// Environment variables to be set for the execution.
     #[prost(message, optional, tag="8")]
     pub envs: ::core::option::Option<Envs>,
+    /// TODO @hamersaw - docs
+    #[prost(message, repeated, tag="9")]
+    pub persistent_envs: ::prost::alloc::vec::Vec<super::core::EnvironmentAssignment>,
 }
 /// Generic container for encapsulating all types of the above attributes messages.
 #[allow(clippy::derive_partial_eq_without_eq)]

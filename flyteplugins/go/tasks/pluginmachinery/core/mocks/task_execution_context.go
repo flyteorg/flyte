@@ -130,7 +130,7 @@ func (_m TaskExecutionContext_GetPersistentEnv) Return(_a0 *flyteidlcore.Environ
 	return &TaskExecutionContext_GetPersistentEnv{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TaskExecutionContext) OnGetPersistentEnv(_a0 flyteidlcore.EnvironmentType) *TaskExecutionContext_GetPersistentEnv {
+func (_m *TaskExecutionContext) OnGetPersistentEnv(_a0 flyteidlcore.Environment_EnvironmentType) *TaskExecutionContext_GetPersistentEnv {
 	c_call := _m.On("GetPersistentEnv", _a0)
 	return &TaskExecutionContext_GetPersistentEnv{Call: c_call}
 }
@@ -141,11 +141,11 @@ func (_m *TaskExecutionContext) OnGetPersistentEnvMatch(matchers ...interface{})
 }
 
 // GetPersistentEnv provides a mock function with given fields: _a0
-func (_m *TaskExecutionContext) GetPersistentEnv(_a0 flyteidlcore.EnvironmentType) *flyteidlcore.Environment {
+func (_m *TaskExecutionContext) GetPersistentEnv(_a0 flyteidlcore.Environment_EnvironmentType) *flyteidlcore.Environment {
 	ret := _m.Called(_a0)
 
 	var r0 *flyteidlcore.Environment
-	if rf, ok := ret.Get(0).(func(flyteidlcore.EnvironmentType) *flyteidlcore.Environment); ok {
+	if rf, ok := ret.Get(0).(func(flyteidlcore.Environment_EnvironmentType) *flyteidlcore.Environment); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {

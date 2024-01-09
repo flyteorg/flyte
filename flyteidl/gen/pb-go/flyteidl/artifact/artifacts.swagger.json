@@ -711,6 +711,13 @@
       ],
       "default": "SINGLE"
     },
+    "EnvironmentEnvironmentType": {
+      "type": "string",
+      "enum": [
+        "FASTTASK"
+      ],
+      "default": "FASTTASK"
+    },
     "QualityOfServiceTier": {
       "type": "string",
       "enum": [
@@ -1022,6 +1029,13 @@
         "envs": {
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
+        },
+        "persistent_envs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreEnvironmentAssignment"
+          },
+          "title": "TODO @hamersaw - docs"
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -1415,6 +1429,34 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
+    "coreEnvironment": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/EnvironmentEnvironmentType"
+        },
+        "fasttask_environment": {
+          "$ref": "#/definitions/coreFastTaskEnvironment"
+        }
+      }
+    },
+    "coreEnvironmentAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "$ref": "#/definitions/coreEnvironment"
+        }
+      }
+    },
     "coreError": {
       "type": "object",
       "properties": {
@@ -1428,6 +1470,20 @@
         }
       },
       "description": "Represents an error thrown from a node."
+    },
+    "coreFastTaskEnvironment": {
+      "type": "object",
+      "properties": {
+        "queue_id": {
+          "type": "string"
+        },
+        "namespace": {
+          "type": "string"
+        },
+        "pod_id": {
+          "type": "string"
+        }
+      }
     },
     "coreIdentifier": {
       "type": "object",

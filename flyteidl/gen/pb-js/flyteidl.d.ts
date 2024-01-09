@@ -13954,6 +13954,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec envs */
             envs?: (flyteidl.admin.IEnvs|null);
+
+            /** LaunchPlanSpec persistentEnvs */
+            persistentEnvs?: (flyteidl.core.IEnvironmentAssignment[]|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -14012,6 +14015,9 @@ export namespace flyteidl {
 
             /** LaunchPlanSpec envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
+
+            /** LaunchPlanSpec persistentEnvs. */
+            public persistentEnvs: flyteidl.core.IEnvironmentAssignment[];
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
@@ -15067,6 +15073,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig envs */
             envs?: (flyteidl.admin.IEnvs|null);
+
+            /** WorkflowExecutionConfig persistentEnvs */
+            persistentEnvs?: (flyteidl.core.IEnvironmentAssignment[]|null);
         }
 
         /** Represents a WorkflowExecutionConfig. */
@@ -15101,6 +15110,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionConfig envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
+
+            /** WorkflowExecutionConfig persistentEnvs. */
+            public persistentEnvs: flyteidl.core.IEnvironmentAssignment[];
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.

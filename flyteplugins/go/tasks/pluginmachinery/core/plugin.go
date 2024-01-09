@@ -39,7 +39,7 @@ type PluginProperties struct {
 	// Specifies the length of TaskExecutionID generated name. default: 50
 	GeneratedNameMaxLength *int
 	// TODO @hamersaw - docs
-	PersistentEnvType *core.EnvironmentType
+	PersistentEnvType *core.Environment_EnvironmentType
 }
 
 // Interface for the core Flyte plugin

@@ -27,4 +27,6 @@ type WorkflowExecutionConfigInterface interface {
 	GetOverwriteCache() bool
 	// GetEnvs defines environment variables to be set for the execution.
 	GetEnvs() *admin.Envs
+	// TODO @hamersaw docs
+	GetPersistentEnvs() []*core.EnvironmentAssignment
 }

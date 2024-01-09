@@ -4,6 +4,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form
@@ -35,6 +36,8 @@ type ExecutionConfig struct {
 	OverwriteCache bool
 	// Defines a map of environment variable name / value pairs that are applied to all tasks.
 	EnvironmentVariables map[string]string
+	// TODO @hamersaw - docs
+	PersistentEnvs []PersistentEnv
 }
 
 type TaskPluginOverride struct {
@@ -58,4 +61,9 @@ type TaskResources struct {
 	Requests TaskResourceSpec
 	// A hard limit, a task cannot consume resources greater than the limit specifies.
 	Limits TaskResourceSpec
+}
+
+// TODO @hamersaw - docs
+type PersistentEnv struct {
+	*core.EnvironmentAssignment
 }

@@ -188,6 +188,12 @@ func (a *ApplicationConfig) GetEnvs() *admin.Envs {
 	}
 }
 
+// TODO @hamersaw - docs
+func (a *ApplicationConfig) GetPersistentEnvs() []*core.EnvironmentAssignment {
+	// does not make sense to have this at the application level
+	return nil
+}
+
 // GetAsWorkflowExecutionConfig returns the WorkflowExecutionConfig as extracted from this object
 func (a *ApplicationConfig) GetAsWorkflowExecutionConfig() admin.WorkflowExecutionConfig {
 	// These values should always be set as their fallback values equals to their zero value or nil,
