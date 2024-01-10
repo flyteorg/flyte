@@ -53,6 +53,8 @@ TABLE_TEMPLATE = """
 ```
 """
 
+VERSION_PATTERN = r"^v[0-9]+.[0-9]+.[0-9]+$"
+
 
 class ListTableToc(SphinxDirective):
     """Custom directive to convert list-table into both list-table and toctree."""
@@ -146,7 +148,10 @@ def import_projects(app: Sphinx, config: Config):
         dest_docs_dir = srcdir / project.dest
 
         if repo:
-            tags = sorted(repo.tags, key=lambda t: t.commit.committed_datetime)
+            tags = sorted(
+                [t for t in repo.tags if re.match(VERSION_PATTERN, t.name)],
+                key=lambda t: t.commit.committed_datetime
+            )
             if not tags:
                 # If tags don't exist just use the current commit. This occurs
                 # when the git repo is a shallow clone.
