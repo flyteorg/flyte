@@ -43,6 +43,7 @@ h6 {
   width: 100% !important;
   margin: 0px !important;
   border-radius: 0 !important;
+  border-top: 1px solid var(--color-header-border) !important;
   border-bottom: 1px solid var(--color-header-border) !important;
   background: var(--color-sidebar-background) !important;
   padding: 0 15px !important;
@@ -51,6 +52,16 @@ h6 {
 .DocSearch-Button:hover, .DocSearch-Button:active {
   box-shadow: none !important;
   background: var(--docsearch-searchbox-background) !important;
+}
+
+.DocSearch-Button-Key {
+  border-radius: 3px !important;
+  box-shadow: var(--docsearch-key-shadow) !important;
+  color: var(--docsearch-muted-color) !important;
+  display: flex !important;
+  margin-right: 0.4em !important;
+  padding: 0 0 2px !important;
+  border: 0 !important;
 }
 
 .sidebar-search-container::before {
