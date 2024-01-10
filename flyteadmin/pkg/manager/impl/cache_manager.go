@@ -7,7 +7,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -139,7 +138,8 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 	taskNodeMetadata *admin.TaskNodeMetadata, errors []*core.CacheEvictionError) (evictionErrors []*core.CacheEvictionError) {
 	evictionErrors = errors
 	if taskNodeMetadata == nil || (taskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_HIT &&
-		taskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_POPULATED) {
+		taskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_POPULATED &&
+		taskNodeMetadata.GetCacheStatus() != core.CatalogCacheStatus_CACHE_EVICTED) {
 		logger.Debugf(ctx, "Node execution %+v did not contain cached data, skipping cache eviction",
 			nodeExecution.Id)
 		return evictionErrors
@@ -222,10 +222,10 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 		}
 	}
 
-	selectedFields := []string{shared.CreatedAt}
-	nodeExecutionModel.CacheStatus = nil
+	cacheEvictedStatus := core.CatalogCacheStatus_CACHE_EVICTED.String()
+	nodeExecutionModel.CacheStatus = &cacheEvictedStatus
 
-	taskNodeMetadata.CacheStatus = core.CatalogCacheStatus_CACHE_DISABLED
+	taskNodeMetadata.CacheStatus = core.CatalogCacheStatus_CACHE_EVICTED
 	nodeExecution.Closure.TargetMetadata = &admin.NodeExecutionClosure_TaskNodeMetadata{
 		TaskNodeMetadata: taskNodeMetadata,
 	}
@@ -247,10 +247,9 @@ func (m *CacheManager) evictTaskNodeExecutionCache(ctx context.Context, nodeExec
 	}
 
 	nodeExecutionModel.Closure = marshaledClosure
-	selectedFields = append(selectedFields, shared.Closure)
 
-	if err := m.db.NodeExecutionRepo().UpdateSelected(ctx, &nodeExecutionModel, selectedFields); err != nil {
-		logger.Warnf(ctx, "Failed to update node execution model %+v before after artifact: %v",
+	if err := m.db.NodeExecutionRepo().Update(ctx, &nodeExecutionModel); err != nil {
+		logger.Warnf(ctx, "Failed to update node execution model %+v after deleting artifact: %v",
 			nodeExecution.Id, err)
 		m.metrics.CacheEvictionFailures.Inc()
 		evictionErrors = append(evictionErrors, &core.CacheEvictionError{

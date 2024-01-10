@@ -89,9 +89,10 @@ func setupCacheEvictionMockRepositories(t *testing.T, repository interfaces.Repo
 		})
 
 	updatedNodeExecutions := make(map[string]int)
-	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetUpdateSelectedCallback(
-		func(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error {
-			assert.Nil(t, nodeExecution.CacheStatus)
+
+	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetUpdateCallback(
+		func(ctx context.Context, nodeExecution *models.NodeExecution) error {
+			assert.Equal(t, core.CatalogCacheStatus_CACHE_EVICTED.String(), *nodeExecution.CacheStatus)
 
 			var closure admin.NodeExecutionClosure
 			err := proto.Unmarshal(nodeExecution.Closure, &closure)
@@ -99,7 +100,7 @@ func setupCacheEvictionMockRepositories(t *testing.T, repository interfaces.Repo
 			md, ok := closure.TargetMetadata.(*admin.NodeExecutionClosure_TaskNodeMetadata)
 			require.True(t, ok)
 			require.NotNil(t, md.TaskNodeMetadata)
-			assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, md.TaskNodeMetadata.CacheStatus)
+			assert.Equal(t, core.CatalogCacheStatus_CACHE_EVICTED, md.TaskNodeMetadata.CacheStatus)
 
 			updatedNodeExecutions[nodeExecution.NodeID]++
 
@@ -1488,7 +1489,7 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 				assert.Empty(t, updatedNodeExecutions)
 			})
 
-			t.Run("UpdateSelected", func(t *testing.T) {
+			t.Run("Update", func(t *testing.T) {
 				repository := repositoryMocks.NewMockRepository()
 				catalogClient := &mocks.Client{}
 				mockConfig := getMockExecutionsConfigProvider()
@@ -1589,8 +1590,8 @@ func TestEvictTaskExecutionCache(t *testing.T) {
 					}
 				}
 
-				repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetUpdateSelectedCallback(
-					func(ctx context.Context, nodeExecution *models.NodeExecution, selectedFields []string) error {
+				repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetUpdateCallback(
+					func(ctx context.Context, nodeExecution *models.NodeExecution) error {
 						return flyteAdminErrors.NewFlyteAdminError(codes.Internal, "error")
 					})
 
