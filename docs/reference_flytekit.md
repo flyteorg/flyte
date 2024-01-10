@@ -9,6 +9,7 @@ api/flytekit/configuration
 api/flytekit/remote
 api/flytekit/clients
 api/flytekit/testing
+api/flytekit/extras.accelerators.rst
 api/flytekit/extend
 api/flytekit/deck
 api/flytekit/plugins/index
