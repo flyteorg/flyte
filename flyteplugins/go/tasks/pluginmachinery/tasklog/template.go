@@ -113,16 +113,6 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 			TemplateVar{defaultRegexes.ContainerName, input.ContainerName},
 			TemplateVar{defaultRegexes.ContainerID, containerID},
 			TemplateVar{defaultRegexes.Hostname, input.HostName},
-			TemplateVar{defaultRegexes.PodRFC3339StartTime, input.PodRFC3339StartTime},
-			TemplateVar{defaultRegexes.PodRFC3339FinishTime, input.PodRFC3339FinishTime},
-			TemplateVar{
-				defaultRegexes.PodUnixStartTime,
-				strconv.FormatInt(input.PodUnixStartTime, 10),
-			},
-			TemplateVar{
-				defaultRegexes.PodUnixFinishTime,
-				strconv.FormatInt(input.PodUnixFinishTime, 10),
-			},
 		)
 		if gotExtraTemplateVars {
 			vars = append(vars, input.ExtraTemplateVarsByScheme.Pod...)
@@ -186,6 +176,20 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 			vars = append(vars, input.ExtraTemplateVarsByScheme.TaskExecution...)
 		}
 	}
+
+	vars = append(
+		vars,
+		TemplateVar{defaultRegexes.PodRFC3339StartTime, input.PodRFC3339StartTime},
+		TemplateVar{defaultRegexes.PodRFC3339FinishTime, input.PodRFC3339FinishTime},
+		TemplateVar{
+			defaultRegexes.PodUnixStartTime,
+			strconv.FormatInt(input.PodUnixStartTime, 10),
+		},
+		TemplateVar{
+			defaultRegexes.PodUnixFinishTime,
+			strconv.FormatInt(input.PodUnixFinishTime, 10),
+		},
+	)
 
 	return vars
 }

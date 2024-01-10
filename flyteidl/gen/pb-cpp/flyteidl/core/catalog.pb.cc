@@ -145,18 +145,19 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fcatalog_2eproto[] =
   "ogReservation\"\207\001\n\006Status\022\030\n\024RESERVATION_"
   "DISABLED\020\000\022\030\n\024RESERVATION_ACQUIRED\020\001\022\026\n\022"
   "RESERVATION_EXISTS\020\002\022\030\n\024RESERVATION_RELE"
-  "ASED\020\003\022\027\n\023RESERVATION_FAILURE\020\004*\240\001\n\022Cata"
+  "ASED\020\003\022\027\n\023RESERVATION_FAILURE\020\004*\263\001\n\022Cata"
   "logCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCA"
   "CHE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPUL"
   "ATED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACH"
-  "E_PUT_FAILURE\020\005\022\021\n\rCACHE_SKIPPED\020\006B<Z:gi"
-  "thub.com/flyteorg/flyte/flyteidl/gen/pb-"
-  "go/flyteidl/coreb\006proto3"
+  "E_PUT_FAILURE\020\005\022\021\n\rCACHE_SKIPPED\020\006\022\021\n\rCA"
+  "CHE_EVICTED\020\007B<Z:github.com/flyteorg/fly"
+  "te/flyteidl/gen/pb-go/flyteidl/coreb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcatalog_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fcatalog_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fcatalog_2eproto,
-  "flyteidl/core/catalog.proto", &assign_descriptors_table_flyteidl_2fcore_2fcatalog_2eproto, 744,
+  "flyteidl/core/catalog.proto", &assign_descriptors_table_flyteidl_2fcore_2fcatalog_2eproto, 763,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fcatalog_2eproto() {
@@ -211,6 +212,7 @@ bool CatalogCacheStatus_IsValid(int value) {
     case 4:
     case 5:
     case 6:
+    case 7:
       return true;
     default:
       return false;

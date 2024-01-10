@@ -62,6 +62,7 @@ func CreatePostgresDbIfNotExists(ctx context.Context, gormConfig *gorm.Config, p
 		return gormDb, nil
 	}
 	if !IsPgErrorWithCode(err, PqInvalidDBCode) {
+		logger.Errorf(ctx, "Unhandled error connecting to postgres, pg [%v], gorm [%v]: %v", pgConfig, gormConfig, err)
 		return nil, err
 	}
 	logger.Warningf(ctx, "Database [%v] does not exist", pgConfig.DbName)
