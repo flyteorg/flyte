@@ -98,6 +98,12 @@ func (t *TaskManager) CreateTask(
 			return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
 				"identical task already exists with id %s", request.Id)
 		}
+		logger.Infof(ctx, "existing task digest: %+v, new task digest: %+v", existingTask.Digest, taskDigest)
+		existingTaskPb, err := transformers.FromTaskModel(*existingTask)
+		if err != nil {
+			logger.Errorf(ctx, "failed to transform existing task: %+v, :%v", existingTask, err)
+		}
+		logger.Infof(ctx, "existing task: %+v, new task: %+v & closure: %+v", existingTaskPb, request.GetId(), compiledTask)
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"task with different structure already exists with id %v", request.Id)
 	}
@@ -120,11 +126,14 @@ func (t *TaskManager) CreateTask(
 	if descriptionModel != nil {
 		taskModel.ShortDescription = descriptionModel.ShortDescription
 	}
+	logger.Infof(ctx, "about to create task with id [%+v] and model [%+v]", request.Id, taskModel)
 	err = t.db.TaskRepo().Create(ctx, taskModel, descriptionModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to create task model with id [%+v] with err %v", request.Id, err)
 		return nil, err
 	}
+
+	logger.Infof(ctx, "created task with id [%+v]", request.Id)
 	t.metrics.ClosureSizeBytes.Observe(float64(len(taskModel.Closure)))
 	if finalizedRequest.Spec.Template.Metadata != nil {
 		contextWithRuntimeMeta := context.WithValue(

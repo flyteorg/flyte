@@ -5,6 +5,7 @@ import (
 	"time"
 
 	errrs "github.com/pkg/errors"
+	"github.com/samber/lo"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/grpc/codes"
 
@@ -16,6 +17,9 @@ import (
 )
 
 func OffloadLiteralMap(ctx context.Context, storageClient *storage.DataStore, literalMap *core.LiteralMap, nestedKeys ...string) (storage.DataReference, error) {
+	nestedKeys = lo.Filter(nestedKeys, func(key string, _ int) bool {
+		return key != ""
+	})
 	return OffloadLiteralMapWithRetryDelayAndAttempts(ctx, storageClient, literalMap, async.RetryDelay, 5, nestedKeys...)
 }
 

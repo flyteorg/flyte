@@ -85,7 +85,18 @@ func TestToLaunchPlanModel(t *testing.T) {
 }
 
 func TestToLaunchPlanModelWithCronSchedule(t *testing.T) {
-	lpRequest := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
+
+	t.Run("deprecated cron schedule", func(t *testing.T) {
+		lpRequest := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * *")
+		testLaunchPlanWithCronInternal(t, lpRequest)
+	})
+	t.Run("cron schedule", func(t *testing.T) {
+		lpRequest := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * *")
+		testLaunchPlanWithCronInternal(t, lpRequest)
+	})
+}
+
+func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCreateRequest) {
 	lpRequest.Spec.DefaultInputs = expectedInputs
 	workflowID := uint(11)
 	launchPlanDigest := []byte("launch plan")

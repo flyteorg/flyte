@@ -9,6 +9,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
@@ -124,12 +125,16 @@ func (w *WorkflowManager) getCompiledWorkflow(
 func (w *WorkflowManager) createDataReference(
 	ctx context.Context, identifier *core.Identifier) (storage.DataReference, error) {
 	nestedSubKeys := []string{
+		identifier.Org,
 		identifier.Project,
 		identifier.Domain,
 		identifier.Name,
 		identifier.Version,
 	}
 	nestedKeys := append(w.storagePrefix, nestedSubKeys...)
+	nestedKeys = lo.Filter(nestedKeys, func(key string, _ int) bool {
+		return key != ""
+	})
 	return w.storageClient.ConstructReference(ctx, w.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
 }
 

@@ -70,13 +70,14 @@ type Execution struct {
 
 type AdminTag struct {
 	gorm.Model
+	Org  string
 	Name string `gorm:"index:,unique;size:255"`
 }
 
 func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
 	tx.Statement.AddClause(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "name"}},            // key column
-		DoUpdates: clause.AssignmentColumns([]string{"name"}), // column needed to be updated
+		Columns:   []clause.Column{{Name: "name"}, {Name: "org"}},    // key column
+		DoUpdates: clause.AssignmentColumns([]string{"name", "org"}), // column needed to be updated
 	})
 	return nil
 }

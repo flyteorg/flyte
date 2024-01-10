@@ -106,7 +106,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	projectRepo := m.db.ProjectRepo()
 
 	// Fetch the existing project if exists. If not, return err and do not update.
-	_, err := projectRepo.Get(ctx, projectUpdate.Id)
+	_, err := projectRepo.Get(ctx, projectUpdate.Id, projectUpdate.Org)
 	if err != nil {
 		return nil, err
 	}

@@ -27,7 +27,7 @@ func TestCreateProject(t *testing.T) {
 	query := GlobalMock.NewMock()
 	GlobalMock.Logging = true
 	query.WithQuery(
-		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","org","name","description","labels","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`)
+		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","org","name","description","labels","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "id"`)
 
 	activeState := int32(admin.Project_ACTIVE)
 	err := projectRepo.Create(context.Background(), models.Project{

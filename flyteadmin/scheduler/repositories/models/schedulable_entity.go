@@ -22,4 +22,5 @@ type SchedulableEntityKey struct {
 	Domain  string `gorm:"primary_key"`
 	Name    string `gorm:"primary_key"`
 	Version string `gorm:"primary_key"`
+	Org     string `gorm:"primary_key"`
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -178,6 +179,7 @@ func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 	ctx context.Context, nodeID *core.NodeExecutionIdentifier, workflowID *core.Identifier,
 	compiledWorkflowClosure *core.CompiledWorkflowClosure) (storage.DataReference, error) {
 	nestedSubKeys := []string{
+		nodeID.ExecutionId.Org,
 		nodeID.ExecutionId.Project,
 		nodeID.ExecutionId.Domain,
 		nodeID.ExecutionId.Name,
@@ -185,6 +187,9 @@ func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 		formatDynamicWorkflowID(workflowID),
 	}
 	nestedKeys := append(m.storagePrefix, nestedSubKeys...)
+	nestedKeys = lo.Filter(nestedKeys, func(key string, _ int) bool {
+		return key != ""
+	})
 	remoteClosureDataRef, err := m.storageClient.ConstructReference(ctx, m.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
 
 	if err != nil {

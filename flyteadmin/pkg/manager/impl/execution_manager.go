@@ -530,11 +530,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
 		return nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -548,7 +548,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		labels = executionConfig.Labels.Values
 	}
 
-	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, request.Project, request.Org, labels)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1089,11 +1089,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
 		return nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1110,7 +1110,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	if err != nil {
 		return nil, nil, err
 	}
-	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, request.Project, request.Org, labels)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1712,7 +1712,7 @@ func (m *ExecutionManager) GetExecutionData(
 		if err := proto.Unmarshal(executionModel.Closure, closure); err != nil {
 			return nil, err
 		}
-		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
+		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Org, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
 		if err != nil {
 			return nil, err
 		}
@@ -2007,8 +2007,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 }
 
 // Adds project labels with higher precedence to workflow labels. Project labels are ignored if a corresponding label is set on the workflow.
-func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName string, initialLabels map[string]string) (map[string]string, error) {
-	project, err := m.db.ProjectRepo().Get(ctx, projectName)
+func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName, org string, initialLabels map[string]string) (map[string]string, error) {
+	project, err := m.db.ProjectRepo().Get(ctx, projectName, org)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get project for [%+v] with error: %v", project, err)
 		return nil, err

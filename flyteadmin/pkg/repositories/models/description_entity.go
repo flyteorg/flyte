@@ -9,7 +9,7 @@ type DescriptionEntityKey struct {
 	Domain       string            `gorm:"primary_key;index:description_entity_project_domain_name_version_idx" valid:"length(0|255)"`
 	Name         string            `gorm:"primary_key;index:description_entity_project_domain_name_version_idx" valid:"length(0|255)"`
 	Version      string            `gorm:"primary_key;index:description_entity_project_domain_name_version_idx" valid:"length(0|255)"`
-	Org          string            `gorm:"primary_key:description_entity_project_domain_name_version_idx" valid:"length(0|255)"`
+	Org          string            `gorm:"primary_key;index:description_entity_project_domain_name_version_idx" valid:"length(0|255)"`
 }
 
 // SourceCode Database model to encapsulate a SourceCode.

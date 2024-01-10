@@ -118,7 +118,7 @@ func CreateExecutionModel(input CreateExecutionModelInput) (*models.Execution, e
 	activeExecution := int32(admin.ExecutionState_EXECUTION_ACTIVE)
 	tags := make([]models.AdminTag, len(input.RequestSpec.Tags))
 	for i, tag := range input.RequestSpec.Tags {
-		tags[i] = models.AdminTag{Name: tag}
+		tags[i] = models.AdminTag{Org: input.WorkflowExecutionID.Org, Name: tag}
 	}
 
 	executionModel := &models.Execution{

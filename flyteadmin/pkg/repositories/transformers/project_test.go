@@ -27,8 +27,7 @@ func TestCreateProjectModel(t *testing.T) {
 	}
 
 	projectBytes, _ := proto.Marshal(&project)
-	projectModel, err := CreateProjectModel(&project)
-	assert.NoError(t, err)
+	projectModel := CreateProjectModel(&project)
 
 	activeState := int32(admin.Project_ACTIVE)
 	assert.Equal(t, models.Project{

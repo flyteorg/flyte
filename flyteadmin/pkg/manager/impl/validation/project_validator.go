@@ -56,8 +56,8 @@ func ValidateProject(project admin.Project) error {
 
 // Validates that a specified project and domain combination has been registered and exists in the db.
 func ValidateProjectAndDomain(
-	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID string) error {
-	project, err := db.ProjectRepo().Get(ctx, projectID)
+	ctx context.Context, db repositoryInterfaces.Repository, config runtimeInterfaces.ApplicationConfiguration, projectID, domainID, org string) error {
+	project, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] and domain [%s] are registered, err: [%+v]",
@@ -82,9 +82,9 @@ func ValidateProjectAndDomain(
 }
 
 func ValidateProjectForUpdate(
-	ctx context.Context, db repositoryInterfaces.Repository, projectID string) error {
+	ctx context.Context, db repositoryInterfaces.Repository, projectID, org string) error {
 
-	project, err := db.ProjectRepo().Get(ctx, projectID)
+	project, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] is registered, err: [%+v]",
@@ -100,9 +100,9 @@ func ValidateProjectForUpdate(
 // ValidateProjectExists doesn't check that the project is active. This is used to get Project level attributes, which you should
 // be able to do even for inactive projects.
 func ValidateProjectExists(
-	ctx context.Context, db repositoryInterfaces.Repository, projectID string) error {
+	ctx context.Context, db repositoryInterfaces.Repository, projectID, org string) error {
 
-	_, err := db.ProjectRepo().Get(ctx, projectID)
+	_, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to validate that project [%s] exists, err: [%+v]",

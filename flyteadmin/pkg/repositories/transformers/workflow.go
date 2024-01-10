@@ -30,7 +30,7 @@ func CreateWorkflowModel(request admin.WorkflowCreateRequest, remoteClosureIdent
 			Domain:  request.Id.Domain,
 			Name:    request.Id.Name,
 			Version: request.Id.Version,
-			Org:     request.GetId().GetOrg(),
+			Org:     request.Id.Org,
 		},
 		TypedInterface:          typedInterface,
 		RemoteClosureIdentifier: remoteClosureIdentifier,

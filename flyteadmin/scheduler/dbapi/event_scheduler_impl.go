@@ -55,6 +55,7 @@ func (s *eventScheduler) AddSchedule(ctx context.Context, input interfaces.AddSc
 			Domain:  input.Identifier.Domain,
 			Name:    input.Identifier.Name,
 			Version: input.Identifier.Version,
+			Org:     input.Identifier.Org,
 		},
 	}
 	err := s.db.SchedulableEntityRepo().Activate(ctx, modelInput)
@@ -73,6 +74,7 @@ func (s *eventScheduler) RemoveSchedule(ctx context.Context, input interfaces.Re
 		Domain:  input.Identifier.Domain,
 		Name:    input.Identifier.Name,
 		Version: input.Identifier.Version,
+		Org:     input.Identifier.Org,
 	})
 
 	if err != nil {

@@ -113,7 +113,7 @@ func ValidateTask(
 	if err := ValidateIdentifier(request.Id, common.Task); err != nil {
 		return err
 	}
-	if err := ValidateProjectAndDomain(ctx, db, applicationConfig, request.Id.Project, request.Id.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, applicationConfig, request.Id.Project, request.Id.Domain, request.Id.Org); err != nil {
 		return err
 	}
 	if request.Spec == nil || request.Spec.Template == nil {

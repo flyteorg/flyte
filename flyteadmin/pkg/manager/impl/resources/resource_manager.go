@@ -174,7 +174,7 @@ func (m *ResourceManager) UpdateProjectAttributes(ctx context.Context, request a
 func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request admin.ProjectAttributesGetRequest) (
 	*admin.ProjectAttributesGetResponse, error) {
 
-	if err := validation.ValidateProjectExists(ctx, m.db, request.Project); err != nil {
+	if err := validation.ValidateProjectExists(ctx, m.db, request.Project, request.Org); err != nil {
 		return nil, err
 	}
 
@@ -250,7 +250,7 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 func (m *ResourceManager) DeleteProjectAttributes(ctx context.Context, request admin.ProjectAttributesDeleteRequest) (
 	*admin.ProjectAttributesDeleteResponse, error) {
 
-	if err := validation.ValidateProjectForUpdate(ctx, m.db, request.Project); err != nil {
+	if err := validation.ValidateProjectForUpdate(ctx, m.db, request.Project, request.Org); err != nil {
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(

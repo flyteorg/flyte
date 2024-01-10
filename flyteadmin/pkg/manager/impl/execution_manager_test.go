@@ -3803,6 +3803,7 @@ func TestGetExecutionData_LegacyModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     "org",
 			},
 			Spec:         getLegacySpecBytes(),
 			Phase:        phase,

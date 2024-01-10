@@ -1,9 +1,7 @@
 package transformers
 
 import (
-	flyteErrs "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/golang/protobuf/proto"
-	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -15,24 +13,29 @@ type CreateProjectModelInput struct {
 	Description string
 }
 
-func CreateProjectModel(project *admin.Project, org string) (models.Project, error) {
+func CreateProjectModel(project *admin.Project) models.Project {
 	stateInt := int32(project.State)
-	projectModel := models.Project{
+	if project.Labels == nil {
+		return models.Project{
+			Identifier:  project.Id,
+			Name:        project.Name,
+			Description: project.Description,
+			State:       &stateInt,
+			Org:         project.Org,
+		}
+	}
+	projectBytes, err := proto.Marshal(project)
+	if err != nil {
+		return models.Project{}
+	}
+	return models.Project{
 		Identifier:  project.Id,
 		Name:        project.Name,
 		Description: project.Description,
+		Labels:      projectBytes,
 		State:       &stateInt,
-		Org:         org,
+		Org:         project.Org,
 	}
-	if project.Labels != nil {
-		projectBytes, err := proto.Marshal(project)
-		if err != nil {
-			return models.Project{}, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "failed to marshal project: %v", err)
-		}
-		projectModel.Labels = projectBytes
-	}
-
-	return projectModel, nil
 }
 
 func FromProjectModel(projectModel models.Project, domains []*admin.Domain) admin.Project {
