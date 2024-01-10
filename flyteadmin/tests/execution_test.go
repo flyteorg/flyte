@@ -187,10 +187,10 @@ func populateWorkflowExecutionsForTestingOnly() {
 	// Insert dummy tags
 	db.Exec(`INSERT INTO admin_tags ("id", "name") ` + `VALUES (1, 'hello')`)
 	db.Exec(`INSERT INTO admin_tags ("id", "name") ` + `VALUES (2, 'flyte')`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name1', 1)`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name1', 2)`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name3', 2)`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name4', 1)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', project1', 'domain1', 'name1', 1)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name1', 2)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name3', 2)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name4', 1)`)
 
 	for _, statement := range insertExecutionStatements {
 		db.Exec(statement)

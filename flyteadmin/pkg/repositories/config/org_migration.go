@@ -397,7 +397,7 @@ func migrateSignals(tx *gorm.DB) error {
 		return err
 	}
 
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE signals drop constraint signals_pkey cascade, add primary key (execution_org, execution_project, execution_domain, execution_name, signal_id);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE signals drop constraint signals_pkey cascade, add primary key (execution_org, execution_project, execution_domain, execution_name, signal_id);").Error; err != nil {
 		return err
 	}
 
@@ -410,7 +410,7 @@ func migrateSchedules(tx *gorm.DB) error {
 		return err
 	}
 
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE schedulable_entities drop constraint schedulable_entities_pkey cascade, add primary key (org, project, domain, name, version);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE schedulable_entities drop constraint schedulable_entities_pkey cascade, add primary key (org, project, domain, name, version);").Error; err != nil {
 		return err
 	}
 
@@ -724,7 +724,7 @@ func rollbackDescriptionEntities(tx *gorm.DB) error {
 	}
 
 	// drop org from primary key
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE description_entities drop constraint description_entities_pkey cascade, add primary key (resource_type, project, domain, name, version);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE description_entities drop constraint description_entities_pkey cascade, add primary key (resource_type, project, domain, name, version);").Error; err != nil {
 		return err
 	}
 
@@ -747,7 +747,7 @@ func rollbackNamedEntities(tx *gorm.DB) error {
 	}
 
 	// drop org from primary key
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE named_entity_metadata drop constraint named_entity_metadata_pkey cascade, add primary key (resource_type, project, domain, name);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE named_entity_metadata drop constraint named_entity_metadata_pkey cascade, add primary key (resource_type, project, domain, name);").Error; err != nil {
 		return err
 	}
 
@@ -761,7 +761,7 @@ func rollbackNamedEntities(tx *gorm.DB) error {
 func rollbackProjects(tx *gorm.DB) error {
 
 	// drop org from primary key
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE projects drop constraint projects_pkey cascade, add primary key (identifier);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE projects drop constraint projects_pkey cascade, add primary key (identifier);").Error; err != nil {
 		return err
 	}
 
@@ -791,7 +791,7 @@ func rollbackResources(tx *gorm.DB) error {
 
 func rollbackSignals(tx *gorm.DB) error {
 	// drop org from primary key
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE signals drop constraint signals_pkey cascade, add primary key (execution_project, execution_domain, execution_name, signal_id);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE signals drop constraint signals_pkey cascade, add primary key (execution_project, execution_domain, execution_name, signal_id);").Error; err != nil {
 		return err
 	}
 
@@ -804,7 +804,7 @@ func rollbackSignals(tx *gorm.DB) error {
 
 func rollbackSchedules(tx *gorm.DB) error {
 	// drop org from primary key
-	if err := tx.Exec(fmt.Sprintf("ALTER TABLE schedulable_entities drop constraint schedulable_entities_pkey cascade, add primary key (project, domain, name, version);")).Error; err != nil {
+	if err := tx.Exec("ALTER TABLE schedulable_entities drop constraint schedulable_entities_pkey cascade, add primary key (project, domain, name, version);").Error; err != nil {
 		return err
 	}
 
