@@ -29,10 +29,10 @@ func TestAzureGet(t *testing.T) {
 		func(ctx context.Context, reference storage.DataReference) (storage.Metadata, error) {
 			return mockMetadata{}, nil
 		}
-	remoteUrl := AzureRemoteURL{
+	remoteURL := AzureRemoteURL{
 		remoteDataStoreClient: *mockStorage, presignDuration: 1,
 	}
 
-	result, _ := remoteUrl.Get(context.TODO(), inputUri)
+	result, _ := remoteURL.Get(context.TODO(), inputUri)
 	assert.Contains(t, inputUri, result.Url)
 }
