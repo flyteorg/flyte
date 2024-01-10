@@ -152,7 +152,7 @@ Specify plugin configuration
 
       .. group-tab:: Demo (sandbox) cluster
 
-         Enable the PyTorch plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+        Enable the PyTorch plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
 
         .. code-block:: yaml
           :emphasize-lines: 7,12    
@@ -218,7 +218,7 @@ Specify plugin configuration
       
       .. group-tab:: Demo (sandbox) cluster
 
-         Enable the TensorFlow plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+        Enable the TensorFlow plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
 
         .. code-block:: yaml
           :emphasize-lines: 7,12    
@@ -284,7 +284,7 @@ Specify plugin configuration
 
       .. group-tab:: Demo (sandbox) cluster
 
-         Enable the MPI plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+        Enable the MPI plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
 
         .. code-block:: yaml
           :emphasize-lines: 7,12    
@@ -350,7 +350,7 @@ Specify plugin configuration
 
       .. group-tab:: Demo (sandbox) cluster
 
-         Enable the Ray plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+        Enable the Ray plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
 
         .. code-block:: yaml
           :emphasize-lines: 7,12    
@@ -429,58 +429,63 @@ Specify plugin configuration
 
         .. group-tab:: Demo (sandbox) cluster
 
-           Enable the Spark plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
+          Enable the Spark plugin on the demo cluster by adding the following block to ~/.flyte/sandbox/config.yaml:
 
-        .. code-block:: yaml
+          .. code-block:: yaml
            
-           tasks:
-             task-plugins:
-               default-for-task-types:
-                 container: container
-                 container_array: k8s-array
-                 sidecar: sidecar
-                 spark: spark
-               enabled-plugins:
-                 - container
-                 - sidecar
-                 - k8s-array
-                 - spark
-           plugins:
-             spark:
-               spark-config-default:
-                 - spark.driver.cores: "1"
-                 - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
-                 - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte:9000"
-                 - spark.hadoop.fs.s3a.access.key: "minio"
-                 - spark.hadoop.fs.s3a.secret.key: "miniostorage"
-                 - spark.hadoop.fs.s3a.path.style.access: "true"
-                 - spark.kubernetes.allocation.batch.size: "50"
-                 - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                 - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                 - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                 - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                 - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                 - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                 - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-           cluster_resources:
-             refreshInterval: 5m
-             customData:
-               - production:
-                   - projectQuotaCpu:
-                       value: "5"
-                   - projectQuotaMemory:
-                       value: "4000Mi"
-               - staging:
-                   - projectQuotaCpu:
-                       value: "2"
-                   - projectQuotaMemory:
-                       value: "3000Mi"
-               - development:
-                   - projectQuotaCpu:
-                       value: "4"
-                   - projectQuotaMemory:
-                       value: "5000Mi"
-             refresh: 5m
+            tasks:
+              task-plugins:
+                default-for-task-types:
+                  container: container
+                  container_array: k8s-array
+                  sidecar: sidecar
+                  spark: spark
+                enabled-plugins:
+                  - container
+                  - sidecar
+                  - k8s-array
+                  - spark
+            plugins:
+              spark:
+                spark-config-default:
+                  - spark.driver.cores: "1"
+                  - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+                  - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte:9000"
+                  - spark.hadoop.fs.s3a.access.key: "minio"
+                  - spark.hadoop.fs.s3a.secret.key: "miniostorage"
+                  - spark.hadoop.fs.s3a.path.style.access: "true"
+                  - spark.kubernetes.allocation.batch.size: "50"
+                  - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                  - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                  - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                  - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                  - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                  - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                  - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+            #projectQuota configurations will render into K8s ResourceQuotas. Using them it's optional.
+            #Adjust the resource quotas to your particular environment.
+            #When using ResourceQuota, use resource Requests in your Task definitions, otherwise the K8s scheduler may
+            #fail with a 403 FORBIDDEN error. Read more: https://kubernetes.io/docs/concepts/policy/resource-quotas/
+            #How to customize Task resources: https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/customizing_resources.html#customizing-task-resources
+            cluster_resources:
+              refreshInterval: 5m
+              customData:
+                - production:
+                    - projectQuotaCpu:
+                        value: "5"
+                    - projectQuotaMemory:
+                        value: "4000Mi"
+                - staging:
+                    - projectQuotaCpu:
+                        value: "2"
+                    - projectQuotaMemory:
+                        value: "3000Mi"
+                - development:
+                    - projectQuotaCpu:
+                        value: "4"
+                    - projectQuotaMemory:
+                        value: "5000Mi"
+              refresh: 5m
 
         .. group-tab:: Flyte binary
 
