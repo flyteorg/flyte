@@ -33,6 +33,7 @@ class CoreCatalogCacheStatus(object):
     LOOKUP_FAILURE = "CACHE_LOOKUP_FAILURE"
     PUT_FAILURE = "CACHE_PUT_FAILURE"
     SKIPPED = "CACHE_SKIPPED"
+    EVICTED = "CACHE_EVICTED"
 
     """
     Attributes:

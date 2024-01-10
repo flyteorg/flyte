@@ -897,7 +897,8 @@ export namespace flyteidl {
             CACHE_POPULATED = 3,
             CACHE_LOOKUP_FAILURE = 4,
             CACHE_PUT_FAILURE = 5,
-            CACHE_SKIPPED = 6
+            CACHE_SKIPPED = 6,
+            CACHE_EVICTED = 7
         }
 
         /** Properties of a CatalogArtifactTag. */

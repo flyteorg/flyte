@@ -2135,6 +2135,7 @@
              * @property {number} CACHE_LOOKUP_FAILURE=4 CACHE_LOOKUP_FAILURE value
              * @property {number} CACHE_PUT_FAILURE=5 CACHE_PUT_FAILURE value
              * @property {number} CACHE_SKIPPED=6 CACHE_SKIPPED value
+             * @property {number} CACHE_EVICTED=7 CACHE_EVICTED value
              */
             core.CatalogCacheStatus = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
@@ -2145,6 +2146,7 @@
                 values[valuesById[4] = "CACHE_LOOKUP_FAILURE"] = 4;
                 values[valuesById[5] = "CACHE_PUT_FAILURE"] = 5;
                 values[valuesById[6] = "CACHE_SKIPPED"] = 6;
+                values[valuesById[7] = "CACHE_EVICTED"] = 7;
                 return values;
             })();
     
@@ -19931,6 +19933,7 @@
                         case 4:
                         case 5:
                         case 6:
+                        case 7:
                             break;
                         }
                     if (message.catalogKey != null && message.hasOwnProperty("catalogKey")) {
@@ -21198,6 +21201,7 @@
                         case 4:
                         case 5:
                         case 6:
+                        case 7:
                             break;
                         }
                     if (message.logs != null && message.hasOwnProperty("logs")) {
@@ -39117,6 +39121,7 @@
                         case 4:
                         case 5:
                         case 6:
+                        case 7:
                             break;
                         }
                     if (message.catalogKey != null && message.hasOwnProperty("catalogKey")) {
