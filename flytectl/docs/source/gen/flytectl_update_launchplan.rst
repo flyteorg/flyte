@@ -33,6 +33,7 @@ Options
 ::
 
       --activate         activate launchplan.
+      --archive          (Deprecated) disable the launch plan schedule (if it has an active schedule associated with it).
       --deactivate       disable the launch plan schedule (if it has an active schedule associated with it).
       --dryRun           execute command without making any modifications.
       --force            do not ask for an acknowledgement during updates.

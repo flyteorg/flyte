@@ -10,12 +10,11 @@ Synopsis
 
 
 
-Currently, this command only provides subcommands to update project.
-Take input project that needs to be archived or unarchived. Name of the project to be updated is a mandatory field.
-Update Flyte resources; if a project:
+Provides subcommands to update Flyte resources, such as tasks, workflows, launch plans, executions, and projects.
+Update Flyte resource; e.g., to activate a project:
 ::
 
- flytectl update project -p flytesnacks --activateProject
+ flytectl update project -p flytesnacks --activate
 
 
 Options
@@ -44,6 +43,7 @@ Options inherited from parent commands
       --admin.deviceFlowConfig.refreshTime string    grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.deviceFlowConfig.timeout string        amount of time the device flow should complete or else it will be cancelled. (default "10m0s")
       --admin.endpoint string                        For admin types,  specify where the uri of the service is located.
+      --admin.httpProxyURL string                    OPTIONAL: HTTP Proxy to be used for OAuth requests.
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")

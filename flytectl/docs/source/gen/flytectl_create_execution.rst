@@ -56,20 +56,39 @@ The generated spec file can be modified to change the input values, as shown bel
 	task: core.control_flow.merge_sort.merge
 	version: "v2"
 
-3. Run the execution by passing the generated YAML file.
+3. [Optional] Update the envs for the execution, if needed.
+The generated spec file can be modified to change the envs values, as shown below:
+
+.. code-block:: yaml
+
+    iamRoleARN: ""
+    inputs:
+    sorted_list1:
+    - 0
+    sorted_list2:
+    - 0
+    envs:
+      foo: bar
+    kubeServiceAcct: ""
+    targetDomain: ""
+    targetProject: ""
+    task: core.control_flow.merge_sort.merge
+    version: "v2"
+
+4. Run the execution by passing the generated YAML file.
 The file can then be passed through the command line.
 It is worth noting that the source's and target's project and domain can be different.
 ::
 
 	flytectl create execution --execFile execution_spec.yaml -p flytesnacks -d staging --targetProject flytesnacks
 
-4. To relaunch an execution, pass the current execution ID as follows:
+5. To relaunch an execution, pass the current execution ID as follows:
 
 ::
 
  flytectl create execution --relaunch ffb31066a0f8b4d52b77 -p flytesnacks -d development
 
-5. To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
+6. To recover an execution, i.e., recreate it from the last known failure point for previously-run workflow execution, run:
 
 ::
 
@@ -77,7 +96,7 @@ It is worth noting that the source's and target's project and domain can be diff
 
 See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.
 
-6. You can create executions idempotently by naming them. This is also a way to *name* an execution for discovery. Note,
+7. You can create executions idempotently by naming them. This is also a way to *name* an execution for discovery. Note,
 an execution id has to be unique within a project domain. So if the *name* matches an existing execution an already exists exceptioj
 will be raised.
 
@@ -85,7 +104,7 @@ will be raised.
 
    flytectl create execution --recover ffb31066a0f8b4d52b77 -p flytesnacks -d development custom_name
 
-7. Generic/Struct/Dataclass/JSON types are supported for execution in a similar manner.
+8. Generic/Struct/Dataclass/JSON types are supported for execution in a similar manner.
 The following is an example of how generic data can be specified while creating the execution.
 
 ::
@@ -105,7 +124,7 @@ The generated file would look similar to this. Here, empty values have been dump
     task: core.type_system.custom_objects.add
     version: v3
 
-8. Modified file with struct data populated for 'x' and 'y' parameters for the task "core.type_system.custom_objects.add":
+9. Modified file with struct data populated for 'x' and 'y' parameters for the task "core.type_system.custom_objects.add":
 
 ::
 
@@ -129,7 +148,7 @@ The generated file would look similar to this. Here, empty values have been dump
   task: core.type_system.custom_objects.add
   version: v3
 
-9. If you have configured a plugin that implements github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces/WorkflowExecutor 
+10. If you have configured a plugin that implements github.com/flyteorg/flyteadmin/pkg/workflowengine/interfaces/WorkflowExecutor 
    that supports cluster pools, then when creating a new execution, you can assign it to a specific cluster pool:
 
 ::
@@ -180,6 +199,7 @@ Options inherited from parent commands
       --admin.deviceFlowConfig.refreshTime string    grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.deviceFlowConfig.timeout string        amount of time the device flow should complete or else it will be cancelled. (default "10m0s")
       --admin.endpoint string                        For admin types,  specify where the uri of the service is located.
+      --admin.httpProxyURL string                    OPTIONAL: HTTP Proxy to be used for OAuth requests.
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")

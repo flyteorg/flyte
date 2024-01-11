@@ -13,17 +13,17 @@ Synopsis
 Update the description on the task:
 ::
 
- flytectl update  task -d development -p flytesnacks core.control_flow.merge_sort.merge --description "Merge sort example"
+ flytectl update task-meta  -d development -p flytesnacks core.control_flow.merge_sort.merge --description "Merge sort example"
 
 Archiving task named entity is not supported and would throw an error:
 ::
 
- flytectl update  task -d development -p flytesnacks core.control_flow.merge_sort.merge --archive
+ flytectl update task-meta -d development -p flytesnacks core.control_flow.merge_sort.merge --archive
 
 Activating task named entity would be a noop since archiving is not possible:
 ::
 
- flytectl update  task -d development -p flytesnacks core.control_flow.merge_sort.merge --activate
+ flytectl update task-meta -d development -p flytesnacks core.control_flow.merge_sort.merge --activate
 
 Usage
 
@@ -41,6 +41,7 @@ Options
       --archive              archive named entity.
       --description string   description of the named entity.
       --dryRun               execute command without making any modifications.
+      --force                do not ask for an acknowledgement during updates.
   -h, --help                 help for task-meta
 
 Options inherited from parent commands
@@ -62,6 +63,7 @@ Options inherited from parent commands
       --admin.deviceFlowConfig.refreshTime string    grace period from the token expiry after which it would refresh the token. (default "5m0s")
       --admin.deviceFlowConfig.timeout string        amount of time the device flow should complete or else it will be cancelled. (default "10m0s")
       --admin.endpoint string                        For admin types,  specify where the uri of the service is located.
+      --admin.httpProxyURL string                    OPTIONAL: HTTP Proxy to be used for OAuth requests.
       --admin.insecure                               Use insecure connection.
       --admin.insecureSkipVerify                     InsecureSkipVerify controls whether a client verifies the server's certificate chain and host name. Caution : shouldn't be use for production usecases'
       --admin.maxBackoffDelay string                 Max delay for grpc backoff (default "8s")

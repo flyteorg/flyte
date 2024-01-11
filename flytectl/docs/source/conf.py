@@ -44,6 +44,7 @@ extensions = [
     "sphinx_copybutton",
     "sphinx_fontawesome",
     "sphinxcontrib.youtube",
+    "sphinx_reredirects",
     "sphinx_panels",
 ]
 
@@ -201,3 +202,12 @@ intersphinx_mapping = {
     "flyteidl": ("https://docs.flyte.org/projects/flyteidl/en/latest", None),
     "flyte": ("https://docs.flyte.org/en/latest", None),
 }
+
+if int(os.environ.get("ENABLE_SPHINX_REDIRECTS", 0)):
+    # Redirects to the new docs site
+    redirects = {
+        "verbs.html": "https://docs.flyte.org/en/latest/flytectl/verbs.html",
+        "nouns.html": "https://docs.flyte.org/en/latest/flytectl/nouns.html",
+        "gen/*": "https://docs.flyte.org/en/latest/flytectl/$source.html",
+        "contribute.html": "https://docs.flyte.org/en/latest/flytectl/contribute.html",
+    }
