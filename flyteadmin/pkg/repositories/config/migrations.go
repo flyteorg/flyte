@@ -1182,16 +1182,6 @@ var NoopMigrations = []*gormigrate.Migration{
 	},
 }
 
-//var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-//
-//func RandStringRunes(n int) string {
-//	b := make([]rune, n)
-//	for i := range b {
-//		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-//	}
-//	return string(b)
-//}
-
 var UnionMigrations = []*gormigrate.Migration{
 
 	{
@@ -1206,8 +1196,6 @@ var UnionMigrations = []*gormigrate.Migration{
 }
 
 var Migrations = append(LegacyMigrations, append(NoopMigrations, UnionMigrations...)...)
-
-// var Migrations = UnionMigrations
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
 	var err error
