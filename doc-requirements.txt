@@ -19,7 +19,7 @@ furo @ git+https://github.com/flyteorg/furo@main  # via -r doc-requirements.in
 identify==2.5.32          # via pre-commit
 idna==3.6                 # via requests
 imagesize==1.4.1          # via sphinx
-jinja2==3.0.3             # via sphinx, sphinx-autoapi, sphinx-tabs
+jinja2==3.1.3             # via sphinx, sphinx-autoapi, sphinx-tabs
 markupsafe==2.1.3         # via jinja2
 nodeenv==1.8.0            # via pre-commit
 packaging==23.2           # via sphinx
