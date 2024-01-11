@@ -108,13 +108,15 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getClientFunc", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
+		cs := initializeClientFunc()
+		client, err := cs.getAgentClient(context.Background(), &Agent{Endpoint: "localhost:80"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})
 
 	t.Run("test getClientFunc more config", func(t *testing.T) {
-		client, err := getClientFunc(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
+		cs := initializeClientFunc()
+		client, err := cs.getAgentClient(context.Background(), &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}, map[*Agent]*grpc.ClientConn{})
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 	})
@@ -123,12 +125,13 @@ func TestPlugin(t *testing.T) {
 		connectionCache := make(map[*Agent]*grpc.ClientConn)
 		agent := &Agent{Endpoint: "localhost:80", Insecure: true, DefaultServiceConfig: "{\"loadBalancingConfig\": [{\"round_robin\":{}}]}"}
 
-		client, err := getClientFunc(context.Background(), agent, connectionCache)
+		cs := initializeClientFunc()
+		client, err := cs.getAgentClient(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, client)
 		assert.NotNil(t, client, connectionCache[agent])
 
-		cachedClient, err := getClientFunc(context.Background(), agent, connectionCache)
+		cachedClient, err := cs.getAgentClient(context.Background(), agent, connectionCache)
 		assert.NoError(t, err)
 		assert.NotNil(t, cachedClient)
 		assert.Equal(t, client, cachedClient)
@@ -238,11 +241,14 @@ func TestInitializeAgentRegistry(t *testing.T) {
 		return mockClient, nil
 	}
 
+	cs := initializeClientFunc()
+	cs.getAgentMetadataClient = getAgentMetadataClientFunc
+
 	cfg := defaultConfig
 	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, getAgentMetadataClientFunc)
+	agentRegistry, err := initializeAgentRegistry(&cfg, connectionCache, cs)
 	assert.NoError(t, err)
 
 	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.

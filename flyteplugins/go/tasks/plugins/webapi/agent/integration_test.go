@@ -171,7 +171,9 @@ func TestEndToEnd(t *testing.T) {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					getClient:   mockGetBadAsyncClientFunc,
+					cs: &ClientFuncSet{
+						getAgentClient: mockGetBadAsyncClientFunc,
+					},
 				},
 			}, nil
 		}
@@ -311,7 +313,9 @@ func newMockAgentPlugin() webapi.PluginEntry {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					getClient:   mockAsyncTaskClientFunc,
+					cs: &ClientFuncSet{
+						getAgentClient: mockAsyncTaskClientFunc,
+					},
 				},
 			}, nil
 		},
@@ -327,7 +331,9 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					getClient:   mockSyncTaskClientFunc,
+					cs: &ClientFuncSet{
+						getAgentClient: mockSyncTaskClientFunc,
+					},
 				},
 			}, nil
 		},

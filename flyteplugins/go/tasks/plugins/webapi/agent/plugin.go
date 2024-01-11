@@ -17,7 +17,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -30,13 +29,10 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
-type GetAgentMetadataClientFunc func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error)
-
 type Plugin struct {
 	metricScope     promutils.Scope
 	cfg             *Config
-	getClient       GetClientFunc
+	cs              *ClientFuncSet
 	connectionCache map[*Agent]*grpc.ClientConn
 	agentRegistry   map[string]*Agent // map[taskType] => Agent
 }
@@ -96,7 +92,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
 
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+	client, err := p.cs.getAgentClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -145,7 +141,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, fmt.Errorf("failed to find agent with error: %v", err)
 	}
 
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+	client, err := p.cs.getAgentClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -174,7 +170,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 
 	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
 
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+	client, err := p.cs.getAgentClient(ctx, agent, p.connectionCache)
 	if err != nil {
 		return fmt.Errorf("failed to connect to agent with error: %v", err)
 	}
@@ -287,24 +283,6 @@ func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*A
 	return conn, nil
 }
 
-func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	conn, err := getGrpcConnection(ctx, agent, connectionCache)
-	if err != nil {
-		return nil, err
-	}
-
-	return service.NewAsyncAgentServiceClient(conn), nil
-}
-
-func getAgentMetadataClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
-	conn, err := getGrpcConnection(ctx, agent, connectionCache)
-	if err != nil {
-		return nil, err
-	}
-
-	return service.NewAgentMetadataServiceClient(conn), nil
-}
-
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
 	taskExecutionID := taskExecutionMetadata.GetTaskExecutionID().GetID()
 	return admin.TaskExecutionMetadata{
@@ -334,7 +312,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]*Agent, error) {
+func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, cs *ClientFuncSet) (map[string]*Agent, error) {
 	agentRegistry := make(map[string]*Agent)
 	var agentDeployments []*Agent
 
@@ -348,7 +326,7 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
 	for _, agentDeployment := range agentDeployments {
-		client, err := getAgentMetadataClientFunc(context.Background(), agentDeployment, connectionCache)
+		client, err := cs.getAgentMetadataClient(context.Background(), agentDeployment, connectionCache)
 		if err != nil {
 			return nil, fmt.Errorf("failed to connect to agent [%v] with error: [%v]", agentDeployment, err)
 		}
@@ -385,9 +363,10 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 }
 
 func newAgentPlugin() webapi.PluginEntry {
+	cs := initializeClientFunc()
 	cfg := GetConfig()
 	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache, getAgentMetadataClientFunc)
+	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache, cs)
 	if err != nil {
 		// We should wait for all agents to be up and running before starting the server
 		panic(err)
@@ -403,7 +382,7 @@ func newAgentPlugin() webapi.PluginEntry {
 			return &Plugin{
 				metricScope:     iCtx.MetricsScope(),
 				cfg:             cfg,
-				getClient:       getClientFunc,
+				cs:              cs,
 				connectionCache: connectionCache,
 				agentRegistry:   agentRegistry,
 			}, nil
