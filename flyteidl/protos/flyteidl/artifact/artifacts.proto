@@ -197,17 +197,15 @@ service ArtifactRegistry {
 
   rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/artifacts"
-      additional_bindings {get: "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
-      additional_bindings {get: "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
-      additional_bindings {get: "/artifacts/api/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
+      post: "/artifacts/api/v1/artifacts"
+      body: "*"
     };
   }
 
   rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
-      additional_bindings {get: "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}"}
+      post: "/artifacts/api/v1/search"
+      body: "*"
     };
   }
 
