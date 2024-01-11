@@ -30,7 +30,6 @@ func ComputeHash(ctx context.Context, pb proto.Message) ([]byte, error) {
 	// We do not use protobuf marshalling because it does not guarantee stable output because of how it handles
 	// unknown fields and ordering of fields. https://github.com/protocolbuffers/protobuf/issues/2830
 	pbJSON, err := marshaller.MarshalToString(pb)
-	logger.Infof(ctx, "pbJSON: %+v", pbJSON)
 	if err != nil {
 		logger.Warning(ctx, "failed to marshal pb [%+v] to JSON with err %v", pb, err)
 		return nil, err
