@@ -21,7 +21,8 @@ func TestRegisterTracerProvider(t *testing.T) {
 	fullConfig := Config{
 		ExporterType: FileExporter,
 		FileConfig: FileConfig{
-			Filename: "/dev/null",
+			Filename:   "/dev/null",
+			SpanFormat: OtelSpanFormat,
 		},
 		JaegerConfig: JaegerConfig{},
 	}
