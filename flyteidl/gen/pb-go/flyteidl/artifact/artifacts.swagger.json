@@ -700,6 +700,49 @@
           "ArtifactRegistry"
         ]
       }
+    },
+    "/artifacts/api/v1/usage/{artifact_id.artifact_key.project}/{artifact_id.artifact_key.domain}/{artifact_id.artifact_key.name}/{artifact_id.version}": {
+      "get": {
+        "operationId": "ListUsage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactListUsageResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "artifact_id.artifact_key.project",
+            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_id.artifact_key.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_id.artifact_key.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_id.version",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
     }
   },
   "definitions": {
@@ -1247,6 +1290,17 @@
       "properties": {
         "artifact": {
           "$ref": "#/definitions/artifactArtifact"
+        }
+      }
+    },
+    "artifactListUsageResponse": {
+      "type": "object",
+      "properties": {
+        "executions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+          }
         }
       }
     },
