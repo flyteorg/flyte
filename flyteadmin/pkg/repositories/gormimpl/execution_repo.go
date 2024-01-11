@@ -92,8 +92,8 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}
 
 	if ok := input.JoinTableEntities[common.AdminTag]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
-			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
+			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
 		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
 			AdminTagsTableName, AdminTagsTableName, executionAdminTagsTableName))
 	}
