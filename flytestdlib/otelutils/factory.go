@@ -45,7 +45,7 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		return nil
 	case FileExporter:
 		if fileExporter == nil {
-			// initialie file exporter and reuse between all services
+			// initialize file exporter and reuse between all services
 			f, err := os.Create(config.FileConfig.Filename)
 			if err != nil {
 				return err
