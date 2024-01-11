@@ -760,7 +760,7 @@ type UpdateArtifactRequest struct {
 	// List of data to overwrite stored artifact data with. Must contain ALL data for updated Artifact as any missing
 	// ArtifactData entries will be removed from the underlying blob storage and database.
 	Data []*ArtifactData `protobuf:"bytes,4,rep,name=data,proto3" json:"data,omitempty"`
-	// Update task execution metadata when overwriting cache
+	// Update execution metadata(including execution domain, name, node, project data) when overwriting cache
 	Metadata             *Metadata `protobuf:"bytes,5,opt,name=metadata,proto3" json:"metadata,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`

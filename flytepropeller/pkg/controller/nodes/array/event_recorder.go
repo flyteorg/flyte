@@ -3,21 +3,24 @@ package array
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
 )
 
 type arrayEventRecorder interface {
 	interfaces.EventRecorder
-	process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32)
+	process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error
 	finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext, taskPhase idlcore.TaskExecution_Phase, taskPhaseVersion uint32, eventConfig *config.EventConfig) error
 	finalizeRequired(ctx context.Context) bool
 }
@@ -39,8 +42,23 @@ func (e *externalResourcesEventRecorder) RecordTaskEvent(ctx context.Context, ev
 	return nil
 }
 
-func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) {
-	externalResourceID := fmt.Sprintf("%s-%d", buildSubNodeID(nCtx, index), retryAttempt)
+func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
+	// generate externalResourceID
+	currentNodeUniqueID := nCtx.NodeID()
+	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
+		var err error
+		currentNodeUniqueID, err = common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nCtx.NodeID())
+		if err != nil {
+			return err
+		}
+	}
+
+	uniqueID, err := encoding.FixedLengthUniqueIDForParts(task.IDMaxLength, []string{nCtx.NodeExecutionMetadata().GetOwnerID().Name, currentNodeUniqueID, strconv.Itoa(int(retryAttempt))})
+	if err != nil {
+		return err
+	}
+
+	externalResourceID := fmt.Sprintf("%s-n%d-%d", uniqueID, index, retryAttempt)
 
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
@@ -83,6 +101,8 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 	// clear nodeEvents and taskEvents
 	e.nodeEvents = e.nodeEvents[:0]
 	e.taskEvents = e.taskEvents[:0]
+
+	return nil
 }
 
 func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,
@@ -94,6 +114,17 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		return err
 	}
 
+	var taskID *idlcore.Identifier
+	subNode := nCtx.Node().GetArrayNode().GetSubNodeSpec()
+	if subNode != nil && subNode.Kind == v1alpha1.NodeKindTask {
+		executableTask, err := nCtx.ExecutionContext().GetTask(*subNode.GetTaskID())
+		if err != nil {
+			return err
+		}
+
+		taskID = executableTask.CoreTask().GetId()
+	}
+
 	nodeExecutionID := *nCtx.NodeExecutionMetadata().GetNodeExecutionID()
 	if nCtx.ExecutionContext().GetEventVersion() != v1alpha1.EventVersion0 {
 		currentNodeUniqueID, err := common.GenerateUniqueID(nCtx.ExecutionContext().GetParentInfo(), nodeExecutionID.NodeId)
@@ -103,16 +134,8 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		nodeExecutionID.NodeId = currentNodeUniqueID
 	}
 
-	workflowExecutionID := nodeExecutionID.ExecutionId
-
 	taskExecutionEvent := &event.TaskExecutionEvent{
-		TaskId: &idlcore.Identifier{
-			ResourceType: idlcore.ResourceType_TASK,
-			Project:      workflowExecutionID.Project,
-			Domain:       workflowExecutionID.Domain,
-			Name:         nCtx.NodeID(),
-			Version:      "v1", // this value is irrelevant but necessary for the identifier to be valid
-		},
+		TaskId:                taskID,
 		ParentNodeExecutionId: &nodeExecutionID,
 		RetryAttempt:          0, // ArrayNode will never retry
 		Phase:                 taskPhase,
@@ -120,9 +143,9 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		OccurredAt:            occurredAt,
 		Metadata: &event.TaskExecutionMetadata{
 			ExternalResources: e.externalResources,
-			PluginIdentifier:  "container",
+			PluginIdentifier:  "k8s-array",
 		},
-		TaskType:     "k8s-array",
+		TaskType:     "container_array",
 		EventVersion: 1,
 	}
 
@@ -165,7 +188,8 @@ type passThroughEventRecorder struct {
 	interfaces.EventRecorder
 }
 
-func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) {
+func (*passThroughEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
+	return nil
 }
 
 func (*passThroughEventRecorder) finalize(ctx context.Context, nCtx interfaces.NodeExecutionContext,

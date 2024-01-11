@@ -3899,6 +3899,13 @@
         "system_metadata": {
           "$ref": "#/definitions/adminSystemMetadata",
           "description": "Optional, platform-specific metadata about the execution.\nIn this the future this may be gated behind an ACL or some sort of authorization."
+        },
+        "artifact_ids": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreArtifactID"
+          },
+          "description": "Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping\nsince we don't have a structure to handle nested ones anyways."
         }
       },
       "description": "Represents attributes about an execution which are not required to launch the execution but are useful to record.\nThese attributes are assigned at launch time and do not change."
@@ -4246,6 +4253,10 @@
             "$ref": "#/definitions/adminNotification"
           },
           "title": "List of notifications based on Execution status transitions"
+        },
+        "launch_conditions": {
+          "$ref": "#/definitions/protobufAny",
+          "title": "Additional metadata for how to launch the launch plan"
         }
       },
       "description": "Additional launch plan attributes included in the LaunchPlanSpec not strictly required to launch\nthe reference workflow."
@@ -5616,6 +5627,82 @@
       },
       "description": "ArrayNode is a Flyte node type that simplifies the execution of a sub-node over a list of input\nvalues. An ArrayNode can be executed with configurable parallelism (separate from the parent\nworkflow) and can be configured to succeed when a certain number of sub-nodes succeed."
     },
+    "coreArtifactBindingData": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "partition_key": {
+          "type": "string",
+          "title": "These two fields are only relevant in the partition value case"
+        },
+        "transform": {
+          "type": "string"
+        }
+      },
+      "title": "Only valid for triggers"
+    },
+    "coreArtifactID": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "version": {
+          "type": "string"
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions"
+        }
+      }
+    },
+    "coreArtifactKey": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "coreArtifactQuery": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "$ref": "#/definitions/coreArtifactID"
+        },
+        "artifact_tag": {
+          "$ref": "#/definitions/coreArtifactTag"
+        },
+        "uri": {
+          "type": "string"
+        },
+        "binding": {
+          "$ref": "#/definitions/coreArtifactBindingData",
+          "description": "This is used in the trigger case, where a user specifies a value for an input that is one of the triggering\nartifacts, or a partition value derived from a triggering artifact."
+        }
+      },
+      "title": "Uniqueness constraints for Artifacts\n - project, domain, name, version, partitions\nOption 2 (tags are standalone, point to an individual artifact id):\n - project, domain, name, alias (points to one partition if partitioned)\n - project, domain, name, partition key, partition value"
+    },
+    "coreArtifactTag": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
+    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -5769,10 +5856,11 @@
         "CACHE_POPULATED",
         "CACHE_LOOKUP_FAILURE",
         "CACHE_PUT_FAILURE",
-        "CACHE_SKIPPED"
+        "CACHE_SKIPPED",
+        "CACHE_EVICTED"
       ],
       "default": "CACHE_DISABLED",
-      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_SKIPPED: Used to indicate the cache lookup was skipped",
+      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_SKIPPED: Used to indicate the cache lookup was skipped\n - CACHE_EVICTED: Used to indicate that the cache was evicted",
       "title": "Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future"
     },
     "coreCatalogMetadata": {
@@ -6176,6 +6264,14 @@
       },
       "description": "Defines a series of if/else blocks. The first branch whose condition evaluates to true is the one to execute.\nIf no conditions were satisfied, the else_node or the error will execute."
     },
+    "coreInputBindingData": {
+      "type": "object",
+      "properties": {
+        "var": {
+          "type": "string"
+        }
+      }
+    },
     "coreK8sObjectMetadata": {
       "type": "object",
       "properties": {
@@ -6228,6 +6324,20 @@
       },
       "description": "A generic key value pair."
     },
+    "coreLabelValue": {
+      "type": "object",
+      "properties": {
+        "static_value": {
+          "type": "string"
+        },
+        "triggered_binding": {
+          "$ref": "#/definitions/coreArtifactBindingData"
+        },
+        "input_binding": {
+          "$ref": "#/definitions/coreInputBindingData"
+        }
+      }
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -6246,6 +6356,13 @@
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional metadata for literals."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -6531,6 +6648,13 @@
           "type": "boolean",
           "format": "boolean",
           "description": "+optional, is this value required to be filled."
+        },
+        "artifact_query": {
+          "$ref": "#/definitions/coreArtifactQuery",
+          "description": "This is an execution time search basically that should result in exactly one Artifact with a Type that\nmatches the type of the variable."
+        },
+        "artifact_id": {
+          "$ref": "#/definitions/coreArtifactID"
         }
       },
       "description": "A parameter is used as input to a launch plan and has\nthe special ability to have a default value or mark itself as required."
@@ -6547,6 +6671,17 @@
         }
       },
       "description": "A map of Parameters."
+    },
+    "corePartitions": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLabelValue"
+          }
+        }
+      }
     },
     "corePrimitive": {
       "type": "object",
@@ -7194,6 +7329,13 @@
         "description": {
           "type": "string",
           "title": "+optional string describing input variable"
+        },
+        "artifact_partial_id": {
+          "$ref": "#/definitions/coreArtifactID",
+          "description": "+optional This object allows the user to specify how Artifacts are created.\nname, tag, partitions can be specified. The other fields (version and project/domain) are ignored."
+        },
+        "artifact_tag": {
+          "$ref": "#/definitions/coreArtifactTag"
         }
       },
       "description": "Defines a strongly typed variable."
@@ -7830,6 +7972,21 @@
         }
       },
       "title": "For Workflow Nodes we need to send information about the workflow that's launched"
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
+        }
+      },
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufListValue": {
       "type": "object",

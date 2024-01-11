@@ -15,6 +15,7 @@ import (
 	"reflect"
 
 	"github.com/jackc/pgconn"
+	pgxPgconn "github.com/jackc/pgx/v5/pgconn"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
@@ -68,23 +69,29 @@ func (p *postgresErrorTransformer) ToFlyteAdminError(err error) flyteAdminErrors
 		err = unwrappedErr
 	}
 
-	pqError, ok := err.(*pgconn.PgError)
-	if !ok {
-		logger.Debugf(context.Background(), "Unable to cast to pgconn.PgError. Error type: [%v]",
-			reflect.TypeOf(err))
-		return p.fromGormError(err)
+	// Try things both ways, the two pgconns are different types.
+	if pqError, ok := err.(*pgconn.PgError); ok {
+		return p.flyteAdminErrorFromCode(pqError.Code, pqError.Message)
+	} else if pqError, ok := err.(*pgxPgconn.PgError); ok {
+		return p.flyteAdminErrorFromCode(pqError.Code, pqError.Message)
 	}
 
-	switch pqError.Code {
+	logger.Debugf(context.Background(), "Unable to cast to pgconn.PgError. Error type: [%v]",
+		reflect.TypeOf(err))
+	return p.fromGormError(err)
+}
+
+func (p *postgresErrorTransformer) flyteAdminErrorFromCode(pqErrorCode string, message string) flyteAdminErrors.FlyteAdminError {
+	switch pqErrorCode {
 	case uniqueConstraintViolationCode:
 		p.metrics.AlreadyExistsError.Inc()
-		return flyteAdminErrors.NewFlyteAdminErrorf(codes.AlreadyExists, uniqueConstraintViolation, pqError.Message)
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.AlreadyExists, uniqueConstraintViolation, message)
 	case undefinedTable:
 		p.metrics.UndefinedTable.Inc()
-		return flyteAdminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, unsupportedTableOperation, pqError.Message)
+		return flyteAdminErrors.NewFlyteAdminErrorf(codes.InvalidArgument, unsupportedTableOperation, message)
 	default:
 		p.metrics.PostgresError.Inc()
-		return flyteAdminErrors.NewFlyteAdminError(codes.Unknown, fmt.Sprintf(defaultPgError, pqError.Message))
+		return flyteAdminErrors.NewFlyteAdminError(codes.Unknown, fmt.Sprintf(defaultPgError, message))
 	}
 }
 
