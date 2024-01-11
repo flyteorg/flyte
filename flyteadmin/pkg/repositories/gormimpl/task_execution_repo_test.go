@@ -85,7 +85,7 @@ func TestUpdateTaskExecution(t *testing.T) {
 	GlobalMock.Logging = true
 
 	taskExecutionQuery := GlobalMock.NewMock()
-	taskExecutionQuery.WithQuery(`INSERT INTO "task_executions" ("created_at","updated_at","deleted_at","project","domain","name","version","org","execution_project","execution_domain","execution_name","execution_org","node_id","retry_attempt","phase","phase_version","input_uri","closure","started_at","task_execution_created_at","task_execution_updated_at","duration")`)
+	taskExecutionQuery.WithQuery(`UPDATE "task_executions" SET "updated_at"=$1,"phase"=$2,"input_uri"=$3,"closure"=$4,"started_at"=$5,"task_execution_created_at"=$6,"task_execution_updated_at"=$7,"duration"=$8 WHERE "project" = $9 AND "domain" = $10 AND "name" = $11 AND "version" = $12 AND "execution_project" = $13 AND "execution_domain" = $14 AND "execution_name" = $15 AND "node_id" = $16 AND "retry_attempt" = $17`)
 	err := taskExecutionRepo.Update(context.Background(), testTaskExecution)
 	assert.NoError(t, err)
 	assert.True(t, taskExecutionQuery.Triggered)

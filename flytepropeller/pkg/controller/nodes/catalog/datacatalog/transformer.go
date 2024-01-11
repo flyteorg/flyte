@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"reflect"
 	"strconv"
 	"strings"
@@ -213,11 +212,15 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 		return nil, fmt.Errorf("failed to parse [%v] to integer. Error: %w", val, err)
 	}
 
-	taskID := proto.Clone(&currentID).(*core.Identifier)
-	taskID.Version = GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown")
-
 	return &core.TaskExecutionIdentifier{
-		TaskId:       taskID,
+		TaskId: &core.Identifier{
+			ResourceType: currentID.ResourceType,
+			Project:      currentID.Project,
+			Domain:       currentID.Domain,
+			Name:         currentID.Name,
+			Version:      GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown"),
+			Org:          currentID.Org,
+		},
 		RetryAttempt: uint32(attempt),
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: GetOrDefault(artifactMd.KeyMap, execNodeIDKey, "unknown"),
