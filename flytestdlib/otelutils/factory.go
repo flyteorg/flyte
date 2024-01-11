@@ -7,7 +7,6 @@ import (
 
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/jaeger"
-	//"go.opentelemetry.io/otel/exporters/stdout/stdouttrace"
 	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.21.0"
@@ -29,11 +28,11 @@ const (
 	K8sClientTracer         = "k8s-client"
 )
 
-var tracerProviders = make(map[string]*trace.TracerProvider)
-var noopTracerProvider = rawtrace.NewNoopTracerProvider()
-
-//var fileExporter *stdouttrace.Exporter
-var fileExporter trace.SpanExporter
+var (
+	fileExporter       trace.SpanExporter
+	noopTracerProvider = rawtrace.NewNoopTracerProvider()
+	tracerProviders    = make(map[string]*trace.TracerProvider)
+)
 
 func RegisterTracerProvider(serviceName string, config *Config) error {
 	if config == nil {
@@ -46,21 +45,26 @@ func RegisterTracerProvider(serviceName string, config *Config) error {
 		return nil
 	case FileExporter:
 		if fileExporter == nil {
-			// configure file exporter
+			// initialie file exporter and reuse between all services
 			f, err := os.Create(config.FileConfig.Filename)
 			if err != nil {
 				return err
 			}
 
-			/*fileExporter, err = stdouttrace.New(
-				stdouttrace.WithWriter(f),
-				//stdouttrace.WithPrettyPrint(), // TODO @hamersaw - remove?
-			)
-			if err != nil {
-				return err
-			}*/
+			var spanFormatter spanFormatter
+			switch config.FileConfig.SpanFormat {
+			case OtelSpanFormat:
+				spanFormatter = NewOTELSpanFormatter()
+			case OtelCollectorSpanFormat:
+				spanFormatter, err = NewOTELCollectorSpanFormatter()
+				if err != nil {
+					return err
+				}
+			default:
+				return fmt.Errorf("unknown span format [%v]", config.FileConfig.SpanFormat)
+			}
 
-			fileExporter, err = NewExporter(f)
+			fileExporter, err = NewExporter(spanFormatter, f)
 			if err != nil {
 				return err
 			}

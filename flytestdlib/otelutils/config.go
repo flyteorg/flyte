@@ -12,11 +12,15 @@ import (
 const configSectionKey = "otel"
 
 type ExporterType = string
+type SpanFormat = string
 
 const (
 	NoopExporter   ExporterType = "noop"
 	FileExporter   ExporterType = "file"
 	JaegerExporter ExporterType = "jaeger"
+
+	OtelSpanFormat          SpanFormat = "otel"
+	OtelCollectorSpanFormat SpanFormat = "otel_collector"
 )
 
 var (
@@ -24,7 +28,8 @@ var (
 	defaultConfig = &Config{
 		ExporterType: NoopExporter,
 		FileConfig: FileConfig{
-			Filename: "/tmp/otel.json",
+			Filename:   "/tmp/otel.json",
+			SpanFormat: OtelSpanFormat,
 		},
 		JaegerConfig: JaegerConfig{
 			Endpoint: "http://localhost:14268/api/traces",
@@ -39,7 +44,8 @@ type Config struct {
 }
 
 type FileConfig struct {
-	Filename string `json:"filename" pflag:",Filename to store exported telemetry traces"`
+	Filename   string     `json:"filename" pflag:",Filename to store exported telemetry traces"`
+	SpanFormat SpanFormat `json:"spanFormat" pflag:",Format of the telemetry traces to export [otel/otel_collector]"`
 }
 
 type JaegerConfig struct {

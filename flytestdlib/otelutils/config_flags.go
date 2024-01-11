@@ -52,6 +52,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "type"), defaultConfig.ExporterType, "Sets the type of exporter to configure [noop/file/jaeger].")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "file.filename"), defaultConfig.FileConfig.Filename, "Filename to store exported telemetry traces")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "file.spanFormat"), defaultConfig.FileConfig.SpanFormat, "Format of the telemetry traces to export [otel/otel_collector]")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "jaeger.endpoint"), defaultConfig.JaegerConfig.Endpoint, "Endpoint for the jaeger telemtry trace ingestor")
 	return cmdFlags
 }

@@ -1,4 +1,4 @@
-
+// Copyright The OpenTelemetry Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,14 +18,12 @@ import (
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/sdk/instrumentation"
+	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/trace"
-	tracepb "go.opentelemetry.io/proto/otlp/trace/v1"
-
-	"go.opentelemetry.io/otel/sdk/resource"
-	resourcepb "go.opentelemetry.io/proto/otlp/resource/v1"
-
 	commonpb "go.opentelemetry.io/proto/otlp/common/v1"
+	resourcepb "go.opentelemetry.io/proto/otlp/resource/v1"
+	tracepb "go.opentelemetry.io/proto/otlp/trace/v1"
 )
 
 // Spans transforms a slice of OpenTelemetry spans into a slice of OTLP
@@ -208,10 +206,6 @@ func spanKind(kind trace.SpanKind) tracepb.Span_SpanKind {
 		return tracepb.Span_SPAN_KIND_UNSPECIFIED
 	}
 }
-
-
-
-
 
 // Resource transforms a Resource into an OTLP Resource.
 func Resource(r *resource.Resource) *resourcepb.Resource {

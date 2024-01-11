@@ -127,6 +127,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_file.spanFormat", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("file.spanFormat", testValue)
+			if vString, err := cmdFlags.GetString("file.spanFormat"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.FileConfig.SpanFormat)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_jaeger.endpoint", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

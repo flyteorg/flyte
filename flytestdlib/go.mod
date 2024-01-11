@@ -16,6 +16,7 @@ require (
 	github.com/go-test/deep v1.0.7
 	github.com/golang/protobuf v1.5.3
 	github.com/hashicorp/golang-lru v0.5.4
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jackc/pgconn v1.14.1
 	github.com/jackc/pgx/v5 v5.4.3
 	github.com/magiconair/properties v1.8.6
