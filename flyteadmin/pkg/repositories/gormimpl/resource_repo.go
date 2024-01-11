@@ -144,7 +144,7 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.Resour
 	var resources []models.Resource
 	timer := r.metrics.GetDuration.Start()
 
-	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = '' AND org = $3"
+	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = '' AND org = ?"
 
 	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, ID.Project, ID.Org)
 	tx.Order(priorityDescending).First(&resources)
