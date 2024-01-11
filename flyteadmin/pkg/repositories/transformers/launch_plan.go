@@ -42,7 +42,7 @@ func CreateLaunchPlanModel(
 
 	scheduleType := models.LaunchPlanScheduleTypeNONE
 	if launchPlan.Spec.EntityMetadata != nil && launchPlan.Spec.EntityMetadata.Schedule != nil {
-		if launchPlan.Spec.EntityMetadata.Schedule.GetCronExpression() != "" {
+		if launchPlan.Spec.EntityMetadata.Schedule.GetCronExpression() != "" || launchPlan.Spec.EntityMetadata.Schedule.GetCronSchedule() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeCRON
 		} else if launchPlan.Spec.EntityMetadata.Schedule.GetRate() != nil {
 			scheduleType = models.LaunchPlanScheduleTypeRATE

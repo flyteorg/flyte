@@ -2529,11 +2529,923 @@ public final class Metrics {
 
   }
 
+  public interface ExecutionMetricResultOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.ExecutionMetricResult)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+     * </pre>
+     *
+     * <code>string metric = 1;</code>
+     */
+    java.lang.String getMetric();
+    /**
+     * <pre>
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+     * </pre>
+     *
+     * <code>string metric = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getMetricBytes();
+
+    /**
+     * <pre>
+     * The result data in prometheus range query result format
+     * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+     * This may include multiple time series, differentiated by their metric labels.
+     * Start time is greater of (execution attempt start, 48h ago)
+     * End time is lesser of (execution attempt end, now)
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct data = 2;</code>
+     */
+    boolean hasData();
+    /**
+     * <pre>
+     * The result data in prometheus range query result format
+     * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+     * This may include multiple time series, differentiated by their metric labels.
+     * Start time is greater of (execution attempt start, 48h ago)
+     * End time is lesser of (execution attempt end, now)
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct data = 2;</code>
+     */
+    com.google.protobuf.Struct getData();
+    /**
+     * <pre>
+     * The result data in prometheus range query result format
+     * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+     * This may include multiple time series, differentiated by their metric labels.
+     * Start time is greater of (execution attempt start, 48h ago)
+     * End time is lesser of (execution attempt end, now)
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct data = 2;</code>
+     */
+    com.google.protobuf.StructOrBuilder getDataOrBuilder();
+  }
+  /**
+   * <pre>
+   * ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.ExecutionMetricResult}
+   */
+  public  static final class ExecutionMetricResult extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.ExecutionMetricResult)
+      ExecutionMetricResultOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ExecutionMetricResult.newBuilder() to construct.
+    private ExecutionMetricResult(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ExecutionMetricResult() {
+      metric_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExecutionMetricResult(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              metric_ = s;
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Struct.Builder subBuilder = null;
+              if (data_ != null) {
+                subBuilder = data_.toBuilder();
+              }
+              data_ = input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(data_);
+                data_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Metrics.internal_static_flyteidl_core_ExecutionMetricResult_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Metrics.internal_static_flyteidl_core_ExecutionMetricResult_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Metrics.ExecutionMetricResult.class, flyteidl.core.Metrics.ExecutionMetricResult.Builder.class);
+    }
+
+    public static final int METRIC_FIELD_NUMBER = 1;
+    private volatile java.lang.Object metric_;
+    /**
+     * <pre>
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+     * </pre>
+     *
+     * <code>string metric = 1;</code>
+     */
+    public java.lang.String getMetric() {
+      java.lang.Object ref = metric_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        metric_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+     * </pre>
+     *
+     * <code>string metric = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getMetricBytes() {
+      java.lang.Object ref = metric_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        metric_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DATA_FIELD_NUMBER = 2;
+    private com.google.protobuf.Struct data_;
+    /**
+     * <pre>
+     * The result data in prometheus range query result format
+     * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+     * This may include multiple time series, differentiated by their metric labels.
+     * Start time is greater of (execution attempt start, 48h ago)
+     * End time is lesser of (execution attempt end, now)
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct data = 2;</code>
+     */
+    public boolean hasData() {
+      return data_ != null;
+    }
+    /**
+     * <pre>
+     * The result data in prometheus range query result format
+     * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+     * This may include multiple time series, differentiated by their metric labels.
+     * Start time is greater of (execution attempt start, 48h ago)
+     * End time is lesser of (execution attempt end, now)
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct data = 2;</code>
+     */
+    public com.google.protobuf.Struct getData() {
+      return data_ == null ? com.google.protobuf.Struct.getDefaultInstance() : data_;
+    }
+    /**
+     * <pre>
+     * The result data in prometheus range query result format
+     * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+     * This may include multiple time series, differentiated by their metric labels.
+     * Start time is greater of (execution attempt start, 48h ago)
+     * End time is lesser of (execution attempt end, now)
+     * </pre>
+     *
+     * <code>.google.protobuf.Struct data = 2;</code>
+     */
+    public com.google.protobuf.StructOrBuilder getDataOrBuilder() {
+      return getData();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getMetricBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, metric_);
+      }
+      if (data_ != null) {
+        output.writeMessage(2, getData());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getMetricBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, metric_);
+      }
+      if (data_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getData());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Metrics.ExecutionMetricResult)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Metrics.ExecutionMetricResult other = (flyteidl.core.Metrics.ExecutionMetricResult) obj;
+
+      if (!getMetric()
+          .equals(other.getMetric())) return false;
+      if (hasData() != other.hasData()) return false;
+      if (hasData()) {
+        if (!getData()
+            .equals(other.getData())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + METRIC_FIELD_NUMBER;
+      hash = (53 * hash) + getMetric().hashCode();
+      if (hasData()) {
+        hash = (37 * hash) + DATA_FIELD_NUMBER;
+        hash = (53 * hash) + getData().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Metrics.ExecutionMetricResult parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Metrics.ExecutionMetricResult prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.ExecutionMetricResult}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.ExecutionMetricResult)
+        flyteidl.core.Metrics.ExecutionMetricResultOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Metrics.internal_static_flyteidl_core_ExecutionMetricResult_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Metrics.internal_static_flyteidl_core_ExecutionMetricResult_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Metrics.ExecutionMetricResult.class, flyteidl.core.Metrics.ExecutionMetricResult.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Metrics.ExecutionMetricResult.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        metric_ = "";
+
+        if (dataBuilder_ == null) {
+          data_ = null;
+        } else {
+          data_ = null;
+          dataBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Metrics.internal_static_flyteidl_core_ExecutionMetricResult_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Metrics.ExecutionMetricResult getDefaultInstanceForType() {
+        return flyteidl.core.Metrics.ExecutionMetricResult.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Metrics.ExecutionMetricResult build() {
+        flyteidl.core.Metrics.ExecutionMetricResult result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Metrics.ExecutionMetricResult buildPartial() {
+        flyteidl.core.Metrics.ExecutionMetricResult result = new flyteidl.core.Metrics.ExecutionMetricResult(this);
+        result.metric_ = metric_;
+        if (dataBuilder_ == null) {
+          result.data_ = data_;
+        } else {
+          result.data_ = dataBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Metrics.ExecutionMetricResult) {
+          return mergeFrom((flyteidl.core.Metrics.ExecutionMetricResult)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Metrics.ExecutionMetricResult other) {
+        if (other == flyteidl.core.Metrics.ExecutionMetricResult.getDefaultInstance()) return this;
+        if (!other.getMetric().isEmpty()) {
+          metric_ = other.metric_;
+          onChanged();
+        }
+        if (other.hasData()) {
+          mergeData(other.getData());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Metrics.ExecutionMetricResult parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Metrics.ExecutionMetricResult) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object metric_ = "";
+      /**
+       * <pre>
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+       * </pre>
+       *
+       * <code>string metric = 1;</code>
+       */
+      public java.lang.String getMetric() {
+        java.lang.Object ref = metric_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          metric_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+       * </pre>
+       *
+       * <code>string metric = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getMetricBytes() {
+        java.lang.Object ref = metric_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          metric_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+       * </pre>
+       *
+       * <code>string metric = 1;</code>
+       */
+      public Builder setMetric(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        metric_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+       * </pre>
+       *
+       * <code>string metric = 1;</code>
+       */
+      public Builder clearMetric() {
+        
+        metric_ = getDefaultInstance().getMetric();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+       * </pre>
+       *
+       * <code>string metric = 1;</code>
+       */
+      public Builder setMetricBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        metric_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Struct data_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> dataBuilder_;
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public boolean hasData() {
+        return dataBuilder_ != null || data_ != null;
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public com.google.protobuf.Struct getData() {
+        if (dataBuilder_ == null) {
+          return data_ == null ? com.google.protobuf.Struct.getDefaultInstance() : data_;
+        } else {
+          return dataBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public Builder setData(com.google.protobuf.Struct value) {
+        if (dataBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          data_ = value;
+          onChanged();
+        } else {
+          dataBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public Builder setData(
+          com.google.protobuf.Struct.Builder builderForValue) {
+        if (dataBuilder_ == null) {
+          data_ = builderForValue.build();
+          onChanged();
+        } else {
+          dataBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public Builder mergeData(com.google.protobuf.Struct value) {
+        if (dataBuilder_ == null) {
+          if (data_ != null) {
+            data_ =
+              com.google.protobuf.Struct.newBuilder(data_).mergeFrom(value).buildPartial();
+          } else {
+            data_ = value;
+          }
+          onChanged();
+        } else {
+          dataBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public Builder clearData() {
+        if (dataBuilder_ == null) {
+          data_ = null;
+          onChanged();
+        } else {
+          data_ = null;
+          dataBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public com.google.protobuf.Struct.Builder getDataBuilder() {
+        
+        onChanged();
+        return getDataFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      public com.google.protobuf.StructOrBuilder getDataOrBuilder() {
+        if (dataBuilder_ != null) {
+          return dataBuilder_.getMessageOrBuilder();
+        } else {
+          return data_ == null ?
+              com.google.protobuf.Struct.getDefaultInstance() : data_;
+        }
+      }
+      /**
+       * <pre>
+       * The result data in prometheus range query result format
+       * https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+       * This may include multiple time series, differentiated by their metric labels.
+       * Start time is greater of (execution attempt start, 48h ago)
+       * End time is lesser of (execution attempt end, now)
+       * </pre>
+       *
+       * <code>.google.protobuf.Struct data = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> 
+          getDataFieldBuilder() {
+        if (dataBuilder_ == null) {
+          dataBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder>(
+                  getData(),
+                  getParentForChildren(),
+                  isClean());
+          data_ = null;
+        }
+        return dataBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.ExecutionMetricResult)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionMetricResult)
+    private static final flyteidl.core.Metrics.ExecutionMetricResult DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Metrics.ExecutionMetricResult();
+    }
+
+    public static flyteidl.core.Metrics.ExecutionMetricResult getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ExecutionMetricResult>
+        PARSER = new com.google.protobuf.AbstractParser<ExecutionMetricResult>() {
+      @java.lang.Override
+      public ExecutionMetricResult parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExecutionMetricResult(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ExecutionMetricResult> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExecutionMetricResult> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Metrics.ExecutionMetricResult getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_Span_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_Span_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_ExecutionMetricResult_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_ExecutionMetricResult_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2545,18 +3457,21 @@ public final class Metrics {
     java.lang.String[] descriptorData = {
       "\n\033flyteidl/core/metrics.proto\022\rflyteidl." +
       "core\032\036flyteidl/core/identifier.proto\032\037go" +
-      "ogle/protobuf/timestamp.proto\"\337\002\n\004Span\022." +
-      "\n\nstart_time\030\001 \001(\0132\032.google.protobuf.Tim" +
-      "estamp\022,\n\010end_time\030\002 \001(\0132\032.google.protob" +
-      "uf.Timestamp\022A\n\013workflow_id\030\003 \001(\0132*.flyt" +
-      "eidl.core.WorkflowExecutionIdentifierH\000\022" +
-      "9\n\007node_id\030\004 \001(\0132&.flyteidl.core.NodeExe" +
-      "cutionIdentifierH\000\0229\n\007task_id\030\005 \001(\0132&.fl" +
-      "yteidl.core.TaskExecutionIdentifierH\000\022\026\n" +
-      "\014operation_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.f" +
-      "lyteidl.core.SpanB\004\n\002idB<Z:github.com/fl" +
-      "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
-      "/coreb\006proto3"
+      "ogle/protobuf/timestamp.proto\032\034google/pr" +
+      "otobuf/struct.proto\"\337\002\n\004Span\022.\n\nstart_ti" +
+      "me\030\001 \001(\0132\032.google.protobuf.Timestamp\022,\n\010" +
+      "end_time\030\002 \001(\0132\032.google.protobuf.Timesta" +
+      "mp\022A\n\013workflow_id\030\003 \001(\0132*.flyteidl.core." +
+      "WorkflowExecutionIdentifierH\000\0229\n\007node_id" +
+      "\030\004 \001(\0132&.flyteidl.core.NodeExecutionIden" +
+      "tifierH\000\0229\n\007task_id\030\005 \001(\0132&.flyteidl.cor" +
+      "e.TaskExecutionIdentifierH\000\022\026\n\014operation" +
+      "_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.flyteidl.co" +
+      "re.SpanB\004\n\002id\"N\n\025ExecutionMetricResult\022\016" +
+      "\n\006metric\030\001 \001(\t\022%\n\004data\030\002 \001(\0132\027.google.pr" +
+      "otobuf.StructB<Z:github.com/flyteorg/fly" +
+      "te/flyteidl/gen/pb-go/flyteidl/coreb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2571,6 +3486,7 @@ public final class Metrics {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
+          com.google.protobuf.StructProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_core_Span_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -2578,8 +3494,15 @@ public final class Metrics {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Span_descriptor,
         new java.lang.String[] { "StartTime", "EndTime", "WorkflowId", "NodeId", "TaskId", "OperationId", "Spans", "Id", });
+    internal_static_flyteidl_core_ExecutionMetricResult_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_flyteidl_core_ExecutionMetricResult_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_ExecutionMetricResult_descriptor,
+        new java.lang.String[] { "Metric", "Data", });
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
+    com.google.protobuf.StructProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

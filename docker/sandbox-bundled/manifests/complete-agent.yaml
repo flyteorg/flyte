@@ -45,7 +45,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   labels:
-    app.kubernetes.io/instance: flyteagent
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyteagent
     helm.sh/chart: flyteagent-v0.1.10
@@ -427,7 +427,7 @@ data:
       templatePath: /etc/flyte/cluster-resource-templates
     logger:
       show-source: true
-      level: 6
+      level: 5
     propeller:
       create-flyteworkflow-crd: true
     webhook:
@@ -468,7 +468,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b0"
       k8s-array:
         logs:
           config:
@@ -816,7 +816,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: ZnNFaHlpM01FZjRaQmNJSA==
+  haSharedSecret: c1BOWHU1Z0FjTDlFNHNlYg==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1125,7 +1125,7 @@ metadata:
   annotations:
     projectcontour.io/upstream-protocol.h2c: grpc
   labels:
-    app.kubernetes.io/instance: flyteagent
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyteagent
     helm.sh/chart: flyteagent-v0.1.10
@@ -1138,7 +1138,7 @@ spec:
     protocol: TCP
     targetPort: agent-grpc
   selector:
-    app.kubernetes.io/instance: flyteagent
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/name: flyteagent
   type: ClusterIP
 ---
@@ -1246,7 +1246,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: 6755bdc74789d7e2a80161a9f811e41ea3c0cf12bab5cb0820c7c8539b4b88fe
+        checksum/configuration: ee67efb3dde411e499256060b26900d37a8aa5940da6c62d909b91b7f8a3da89
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1388,6 +1388,7 @@ spec:
           periodSeconds: 30
         securityContext:
           privileged: true
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
 ---
 apiVersion: apps/v1
@@ -1411,7 +1412,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 727daf2e5024ea4e541b87b717e6f9a8706552e0ae461f82b2e5260ad564766c
+        checksum/secret: d732f4e97ff544b63fd075fe756e252a3eec17631aacf9a9ab157eeafbfff4e8
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1722,7 +1723,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app.kubernetes.io/instance: flyteagent
+    app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyteagent
     helm.sh/chart: flyteagent-v0.1.10
@@ -1732,12 +1733,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/instance: flyteagent
+      app.kubernetes.io/instance: flyte-sandbox
       app.kubernetes.io/name: flyteagent
   template:
     metadata:
       labels:
-        app.kubernetes.io/instance: flyteagent
+        app.kubernetes.io/instance: flyte-sandbox
         app.kubernetes.io/managed-by: Helm
         app.kubernetes.io/name: flyteagent
         helm.sh/chart: flyteagent-v0.1.10
@@ -1753,7 +1754,7 @@ spec:
           value: minio
         - name: FLYTE_AWS_SECRET_ACCESS_KEY
           value: miniostorage
-        image: ghcr.io/flyteorg/flyteagent:1.10.1
+        image: ghcr.io/flyteorg/flyteagent:1.10.2
         imagePullPolicy: IfNotPresent
         name: flyteagent
         ports:

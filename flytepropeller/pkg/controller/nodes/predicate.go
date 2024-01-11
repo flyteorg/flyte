@@ -51,7 +51,7 @@ func CanExecute(ctx context.Context, dag executors.DAGStructure, nl executors.No
 
 	upstreamNodes, err := dag.ToNode(nodeID)
 	if err != nil {
-		return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node")
+		return PredicatePhaseUndefined, errors.Errorf(errors.BadSpecificationError, nodeID, "Unable to find upstream nodes for Node {%v}", nodeID)
 	}
 
 	skipped := false

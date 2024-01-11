@@ -2,10 +2,8 @@ package repositories
 
 import (
 	"context"
-	"errors"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"reflect"
-
-	"github.com/jackc/pgconn"
 
 	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
@@ -18,8 +16,6 @@ var migrateScope = migrationsScope.NewSubScope("migrate")
 
 // all postgres servers come by default with a db name named postgres
 const defaultDB = "postgres"
-const pqInvalidDBCode = "3D000"
-const pqDbAlreadyExistsCode = "42P04"
 
 // Migrate This command will run all the migrations for the database
 func Migrate(ctx context.Context) error {
@@ -31,14 +27,14 @@ func Migrate(ctx context.Context) error {
 
 	if err != nil {
 		// if db does not exist, try creating it
-		cErr, ok := err.(errors2.ConnectError)
+		_, ok := err.(errors2.ConnectError)
 		if !ok {
 			logger.Errorf(ctx, "Failed to cast error of type: %v, err: %v", reflect.TypeOf(err),
 				err)
 			panic(err)
 		}
-		pqError := cErr.Unwrap().(*pgconn.PgError)
-		if pqError.Code == pqInvalidDBCode {
+
+		if database.IsPgErrorWithCode(err, database.PqInvalidDBCode) {
 			logger.Warningf(ctx, "Database [%v] does not exist, trying to create it now", dbName)
 
 			dbConfigValues.Postgres.DbName = defaultDB
@@ -77,15 +73,4 @@ func Migrate(ctx context.Context) error {
 	}
 	logger.Infof(ctx, "Ran DB migration successfully.")
 	return nil
-}
-
-func isPgErrorWithCode(err error, code string) bool {
-	pgErr := &pgconn.PgError{}
-	if !errors.As(err, &pgErr) {
-		// err chain does not contain a pgconn.PgError
-		return false
-	}
-
-	// pgconn.PgError found in chain and set to code specified
-	return pgErr.Code == code
 }

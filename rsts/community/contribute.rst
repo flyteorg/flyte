@@ -18,6 +18,11 @@ TL;DR: Find the repo-specific contribution guidelines in the `Component Referenc
 
 An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__ is the best place to start for first-time contributors.
 
+To assign an issue to yourself, comment ``#self-assign`` or ``#take``.
+
+.. figure:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/contribution_guide/self-assign.png
+    :alt: self-assign
+
 **Appetizer for every repo: Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.** 
 
 .. note::
