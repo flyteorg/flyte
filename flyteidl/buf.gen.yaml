@@ -10,3 +10,6 @@ plugins:
     out: gen/pb_python
   - plugin: buf.build/community/neoeinstein-prost
     out: gen/pb_rust
+  - plugin: buf.build/connectrpc/go
+    out: gen
+    opt: paths=source_relative
