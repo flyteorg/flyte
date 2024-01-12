@@ -260,7 +260,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 
 	const queued = "queued"
 	const success = "success"
-	for _, clearStateOnAnyTermination := range []bool{false, true} {
+	for _, enableCRDebugMetadata := range []bool{false, true} {
 		t.Run("identical-phase", func(t *testing.T) {
 			p := NodePhaseQueued
 			ns := NodeStatus{
@@ -268,7 +268,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 				Message: queued,
 			}
 			msg := queued
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 			assert.Nil(t, ns.QueuedAt)
 		})
 
@@ -276,7 +276,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			p := NodePhaseQueued
 			ns := NodeStatus{}
 			msg := queued
-			ns.UpdatePhase(p, metav1.NewTime(time.Time{}), msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, metav1.NewTime(time.Time{}), msg, enableCRDebugMetadata, nil)
 			assert.NotNil(t, ns.QueuedAt)
 		})
 
@@ -284,7 +284,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseQueued
 			msg := queued
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
 			assert.Equal(t, *ns.LastUpdatedAt, n)
 			assert.Equal(t, *ns.QueuedAt, n)
@@ -300,7 +300,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseRunning
 			msg := "running"
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
 			assert.Equal(t, *ns.LastUpdatedAt, n)
 			assert.Nil(t, ns.QueuedAt)
@@ -316,7 +316,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseTimingOut
 			msg := "timing-out"
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
 			assert.Equal(t, *ns.LastUpdatedAt, n)
 			assert.Nil(t, ns.QueuedAt)
@@ -332,7 +332,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseSucceeded
 			msg := success
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
 			assert.Nil(t, ns.LastUpdatedAt)
 			assert.Nil(t, ns.QueuedAt)
@@ -348,7 +348,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			ns := NodeStatus{}
 			p := NodePhaseSucceeded
 			msg := success
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
 			assert.Nil(t, ns.LastUpdatedAt)
 			assert.Nil(t, ns.QueuedAt)
@@ -374,7 +374,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			}
 			p := NodePhaseSucceeded
 			msg := success
-			ns.UpdatePhase(p, n, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n, msg, enableCRDebugMetadata, nil)
 
 			assert.Nil(t, ns.LastUpdatedAt)
 			assert.Nil(t, ns.QueuedAt)
@@ -406,7 +406,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 			n2 := metav1.NewTime(time.Now())
 			p := NodePhaseRunning
 			msg := "running"
-			ns.UpdatePhase(p, n2, msg, clearStateOnAnyTermination, nil)
+			ns.UpdatePhase(p, n2, msg, enableCRDebugMetadata, nil)
 
 			assert.Equal(t, *ns.LastUpdatedAt, n2)
 			assert.Equal(t, *ns.QueuedAt, n)
@@ -429,7 +429,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		p := NodePhaseFailed
 		msg := "failed"
 		err := &core.ExecutionError{}
-		ns.UpdatePhase(p, n, msg, false, err)
+		ns.UpdatePhase(p, n, msg, true, err)
 
 		assert.Equal(t, *ns.LastUpdatedAt, n)
 		assert.Nil(t, ns.QueuedAt)
@@ -446,7 +446,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		p := NodePhaseFailed
 		msg := "failed"
 		err := &core.ExecutionError{}
-		ns.UpdatePhase(p, n, msg, true, err)
+		ns.UpdatePhase(p, n, msg, false, err)
 
 		assert.Nil(t, ns.LastUpdatedAt)
 		assert.Nil(t, ns.QueuedAt)
@@ -463,7 +463,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		p := NodePhaseTimedOut
 		msg := "tm"
 		err := &core.ExecutionError{}
-		ns.UpdatePhase(p, n, msg, false, err)
+		ns.UpdatePhase(p, n, msg, true, err)
 
 		assert.Equal(t, *ns.LastUpdatedAt, n)
 		assert.Nil(t, ns.QueuedAt)
@@ -480,7 +480,7 @@ func TestNodeStatus_UpdatePhase(t *testing.T) {
 		p := NodePhaseTimedOut
 		msg := "tm"
 		err := &core.ExecutionError{}
-		ns.UpdatePhase(p, n, msg, true, err)
+		ns.UpdatePhase(p, n, msg, false, err)
 
 		assert.Nil(t, ns.LastUpdatedAt)
 		assert.Nil(t, ns.QueuedAt)

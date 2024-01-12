@@ -594,7 +594,7 @@ func (in *NodeStatus) GetOrCreateArrayNodeStatus() MutableArrayNodeStatus {
 	return in.ArrayNodeStatus
 }
 
-func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, clearStateOnAnyTermination bool, err *core.ExecutionError) {
+func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, enableCRDebugMetadata bool, err *core.ExecutionError) {
 	if in.Phase == p && in.Message == reason {
 		// We will not update the phase multiple times. This prevents the comparison from returning false positive
 		return
@@ -629,8 +629,8 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 		if in.StoppedAt == nil {
 			in.StoppedAt = &n
 		}
-		if p == NodePhaseSucceeded || p == NodePhaseSkipped || clearStateOnAnyTermination {
-			// Clear most status related fields after reaching a terminal state. This keeps the CRD state small to avoid
+		if p == NodePhaseSucceeded || p == NodePhaseSkipped || !enableCRDebugMetadata {
+			// Clear most status related fields after reaching a terminal state. This keeps the CR state small to avoid
 			// etcd size limits. Importantly we keep Phase, StoppedAt and Error which will be needed further.
 			in.Message = ""
 			in.QueuedAt = nil
