@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/golang/protobuf/proto"
-
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
@@ -140,7 +138,6 @@ func GenerateDatasetIDForTask(ctx context.Context, k catalog.Key) (*datacatalog.
 		Domain:  k.Identifier.Domain,
 		Name:    getDatasetNameFromTask(k.Identifier),
 		Version: datasetVersion,
-		Org:     k.Identifier.Org,
 	}
 	return datasetID, nil
 }
@@ -160,7 +157,6 @@ const (
 	execProjectKey     = "exec-project"
 	execNodeIDKey      = "exec-node"
 	execTaskAttemptKey = "exec-attempt"
-	execOrgKey         = "exec-org"
 )
 
 // Understanding Catalog Identifiers
@@ -191,7 +187,6 @@ func GetArtifactMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier)
 			execNameKey:        taskExecutionID.NodeExecutionId.GetExecutionId().GetName(),
 			execNodeIDKey:      taskExecutionID.NodeExecutionId.GetNodeId(),
 			execTaskAttemptKey: strconv.Itoa(int(taskExecutionID.GetRetryAttempt())),
-			execOrgKey:         taskExecutionID.GetNodeExecutionId().GetExecutionId().GetOrg(),
 		},
 	}
 }
@@ -214,11 +209,14 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 		return nil, fmt.Errorf("failed to parse [%v] to integer. Error: %w", val, err)
 	}
 
-	taskID := proto.Clone(&currentID).(*core.Identifier)
-	taskID.Version = GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown")
-
 	return &core.TaskExecutionIdentifier{
-		TaskId:       taskID,
+		TaskId: &core.Identifier{
+			ResourceType: currentID.ResourceType,
+			Project:      currentID.Project,
+			Domain:       currentID.Domain,
+			Name:         currentID.Name,
+			Version:      GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown"),
+		},
 		RetryAttempt: uint32(attempt),
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: GetOrDefault(artifactMd.KeyMap, execNodeIDKey, "unknown"),
@@ -226,7 +224,6 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 				Project: GetOrDefault(artifactMd.KeyMap, execProjectKey, currentID.GetProject()),
 				Domain:  GetOrDefault(artifactMd.KeyMap, execDomainKey, currentID.GetDomain()),
 				Name:    GetOrDefault(artifactMd.KeyMap, execNameKey, "unknown"),
-				Org:     GetOrDefault(artifactMd.KeyMap, execOrgKey, currentID.GetOrg()),
 			},
 		},
 	}, nil
