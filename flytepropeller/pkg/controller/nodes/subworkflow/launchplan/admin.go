@@ -269,12 +269,12 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 				Id: &exec.WorkflowExecutionIdentifier,
 			})
 			if err != nil {
-				outputUri := res.GetClosure().GetOutputs().GetUri()
+				outputURI := res.GetClosure().GetOutputs().GetUri()
 				// attempt remote storage read on GetExecutionData failure
-				if outputUri != "" {
-					err = a.store.ReadProtobuf(ctx, storage.DataReference(outputUri), outputs)
+				if outputURI != "" {
+					err = a.store.ReadProtobuf(ctx, storage.DataReference(outputURI), outputs)
 					if err != nil {
-						logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputUri, err)
+						logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputURI, err)
 					}
 				}
 				if err != nil {
