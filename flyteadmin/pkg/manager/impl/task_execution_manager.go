@@ -310,8 +310,7 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.InputUri)
+	inputs, err := util.GetInputs(ctx, m.storageClient, taskExecution.InputUri)
 	if err != nil {
 		return nil, err
 	}
@@ -322,13 +321,11 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	}
 
 	response := &admin.TaskExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
 	}
 
-	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
 	if response.FullOutputs != nil {
 		m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}

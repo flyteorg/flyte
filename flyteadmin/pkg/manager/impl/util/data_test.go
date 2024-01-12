@@ -7,7 +7,6 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	urlMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -25,61 +24,6 @@ var testLiteralMap = &core.LiteralMap{
 }
 
 const testOutputsURI = "s3://foo/bar/outputs.pb"
-
-func TestShouldFetchData(t *testing.T) {
-	t.Run("local config", func(t *testing.T) {
-		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
-			Scheme:         common.Local,
-			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}))
-	})
-	t.Run("no config", func(t *testing.T) {
-		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
-			Scheme:         common.None,
-			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}))
-	})
-	t.Run("no config", func(t *testing.T) {
-		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
-			Scheme: common.None,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}))
-	})
-	t.Run("max size under limit", func(t *testing.T) {
-		assert.True(t, shouldFetchData(&interfaces.RemoteDataConfig{
-			Scheme:         common.AWS,
-			MaxSizeInBytes: 1000,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}))
-	})
-	t.Run("max size over limit", func(t *testing.T) {
-		assert.False(t, shouldFetchData(&interfaces.RemoteDataConfig{
-			Scheme:         common.AWS,
-			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
-			Url:   "s3://data",
-			Bytes: 200,
-		}))
-	})
-	t.Run("empty url config", func(t *testing.T) {
-		assert.False(t, shouldFetchData(&interfaces.RemoteDataConfig{
-			Scheme:         common.AWS,
-			MaxSizeInBytes: 100,
-		}, admin.UrlBlob{
-			Bytes: 200,
-		}))
-	})
-}
 
 func TestGetInputs(t *testing.T) {
 	inputsURI := "s3://foo/bar/inputs.pb"
@@ -111,19 +55,17 @@ func TestGetInputs(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: true,
 		}
-		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
+		fullInputs, err := GetInputs(context.TODO(), mockStorage, inputsURI)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
-		assert.True(t, proto.Equal(inputURLBlob, &expectedURLBlob))
 	})
 	t.Run("should not sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{
 			Enabled: false,
 		}
-		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
+		fullInputs, err := GetInputs(context.TODO(), mockStorage, inputsURI)
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
-		assert.Empty(t, inputURLBlob)
 	})
 }
 

@@ -3640,10 +3640,6 @@ func TestGetExecutionData(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
-		Inputs: &admin.UrlBlob{
-			Url:   "inputs",
-			Bytes: 200,
-		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
 	}, dataResponse))

@@ -1724,8 +1724,7 @@ func (m *ExecutionManager) GetExecutionData(
 			return nil, err
 		}
 	}
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, executionModel.InputsURI.String())
+	inputs, err := util.GetInputs(ctx, m.storageClient, executionModel.InputsURI.String())
 	if err != nil {
 		return nil, err
 	}
@@ -1735,12 +1734,10 @@ func (m *ExecutionManager) GetExecutionData(
 		return nil, err
 	}
 	response := &admin.WorkflowExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 	}
 
-	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
 	if response.FullOutputs != nil {
 		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}

@@ -1293,10 +1293,6 @@ func TestGetNodeExecutionData(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&admin.NodeExecutionGetDataResponse{
-		Inputs: &admin.UrlBlob{
-			Url:   "inputs",
-			Bytes: 100,
-		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
 		DynamicWorkflow: &admin.DynamicWorkflowNodeMetadata{
