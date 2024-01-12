@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
+
+import "flyteidl/core/identifier.proto";
+
+message ExecutionEnvironmentAssignment {
+  string id = 1;
+  repeated string node_ids = 2;
+  ExecutionEnvironment environment = 3;
+}
+
+enum EnvironmentType {
+  FAST_TASK = 0;
+}
+
+message ExecutionEnvironment {
+  EnvironmentType type = 1;
+  FastTaskEnvironment fast_task = 2;
+}
+
+message FastTaskEnvironment {
+  string queue_id = 1;
+  string namespace = 2;
+  string pod_name = 3;
+}

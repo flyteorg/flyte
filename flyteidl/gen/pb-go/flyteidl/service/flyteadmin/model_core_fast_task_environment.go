@@ -12,5 +12,5 @@ package flyteadmin
 type CoreFastTaskEnvironment struct {
 	QueueId string `json:"queue_id,omitempty"`
 	Namespace string `json:"namespace,omitempty"`
-	PodId string `json:"pod_id,omitempty"`
+	PodName string `json:"pod_name,omitempty"`
 }

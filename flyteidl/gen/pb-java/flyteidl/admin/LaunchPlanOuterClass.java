@@ -4779,46 +4779,46 @@ public final class LaunchPlanOuterClass {
 
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> 
-        getPersistentEnvsList();
+    java.util.List<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment> 
+        getExecutionEnvsList();
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    flyteidl.core.PersistentEnvs.EnvironmentAssignment getPersistentEnvs(int index);
+    flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment getExecutionEnvs(int index);
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    int getPersistentEnvsCount();
+    int getExecutionEnvsCount();
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    java.util.List<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
-        getPersistentEnvsOrBuilderList();
+    java.util.List<? extends flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder> 
+        getExecutionEnvsOrBuilderList();
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder getPersistentEnvsOrBuilder(
+    flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder getExecutionEnvsOrBuilder(
         int index);
   }
   /**
@@ -4839,7 +4839,7 @@ public final class LaunchPlanOuterClass {
     }
     private LaunchPlanSpec() {
       role_ = "";
-      persistentEnvs_ = java.util.Collections.emptyList();
+      executionEnvs_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -5053,11 +5053,11 @@ public final class LaunchPlanOuterClass {
             }
             case 178: {
               if (!((mutable_bitField0_ & 0x00010000) != 0)) {
-                persistentEnvs_ = new java.util.ArrayList<flyteidl.core.PersistentEnvs.EnvironmentAssignment>();
+                executionEnvs_ = new java.util.ArrayList<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment>();
                 mutable_bitField0_ |= 0x00010000;
               }
-              persistentEnvs_.add(
-                  input.readMessage(flyteidl.core.PersistentEnvs.EnvironmentAssignment.parser(), extensionRegistry));
+              executionEnvs_.add(
+                  input.readMessage(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.parser(), extensionRegistry));
               break;
             }
             default: {
@@ -5076,7 +5076,7 @@ public final class LaunchPlanOuterClass {
             e).setUnfinishedMessage(this);
       } finally {
         if (((mutable_bitField0_ & 0x00010000) != 0)) {
-          persistentEnvs_ = java.util.Collections.unmodifiableList(persistentEnvs_);
+          executionEnvs_ = java.util.Collections.unmodifiableList(executionEnvs_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -5600,59 +5600,59 @@ public final class LaunchPlanOuterClass {
       return getEnvs();
     }
 
-    public static final int PERSISTENT_ENVS_FIELD_NUMBER = 22;
-    private java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> persistentEnvs_;
+    public static final int EXECUTION_ENVS_FIELD_NUMBER = 22;
+    private java.util.List<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment> executionEnvs_;
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    public java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> getPersistentEnvsList() {
-      return persistentEnvs_;
+    public java.util.List<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment> getExecutionEnvsList() {
+      return executionEnvs_;
     }
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    public java.util.List<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
-        getPersistentEnvsOrBuilderList() {
-      return persistentEnvs_;
+    public java.util.List<? extends flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder> 
+        getExecutionEnvsOrBuilderList() {
+      return executionEnvs_;
     }
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    public int getPersistentEnvsCount() {
-      return persistentEnvs_.size();
+    public int getExecutionEnvsCount() {
+      return executionEnvs_.size();
     }
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    public flyteidl.core.PersistentEnvs.EnvironmentAssignment getPersistentEnvs(int index) {
-      return persistentEnvs_.get(index);
+    public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment getExecutionEnvs(int index) {
+      return executionEnvs_.get(index);
     }
     /**
      * <pre>
-     * TODO &#64;hamersaw - docs
+     * Execution environment assignments to be set for the execution.
      * </pre>
      *
-     * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+     * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
      */
-    public flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder getPersistentEnvsOrBuilder(
+    public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder getExecutionEnvsOrBuilder(
         int index) {
-      return persistentEnvs_.get(index);
+      return executionEnvs_.get(index);
     }
 
     private byte memoizedIsInitialized = -1;
@@ -5717,8 +5717,8 @@ public final class LaunchPlanOuterClass {
       if (envs_ != null) {
         output.writeMessage(21, getEnvs());
       }
-      for (int i = 0; i < persistentEnvs_.size(); i++) {
-        output.writeMessage(22, persistentEnvs_.get(i));
+      for (int i = 0; i < executionEnvs_.size(); i++) {
+        output.writeMessage(22, executionEnvs_.get(i));
       }
       unknownFields.writeTo(output);
     }
@@ -5792,9 +5792,9 @@ public final class LaunchPlanOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(21, getEnvs());
       }
-      for (int i = 0; i < persistentEnvs_.size(); i++) {
+      for (int i = 0; i < executionEnvs_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(22, persistentEnvs_.get(i));
+          .computeMessageSize(22, executionEnvs_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -5882,8 +5882,8 @@ public final class LaunchPlanOuterClass {
         if (!getEnvs()
             .equals(other.getEnvs())) return false;
       }
-      if (!getPersistentEnvsList()
-          .equals(other.getPersistentEnvsList())) return false;
+      if (!getExecutionEnvsList()
+          .equals(other.getExecutionEnvsList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -5954,9 +5954,9 @@ public final class LaunchPlanOuterClass {
         hash = (37 * hash) + ENVS_FIELD_NUMBER;
         hash = (53 * hash) + getEnvs().hashCode();
       }
-      if (getPersistentEnvsCount() > 0) {
-        hash = (37 * hash) + PERSISTENT_ENVS_FIELD_NUMBER;
-        hash = (53 * hash) + getPersistentEnvsList().hashCode();
+      if (getExecutionEnvsCount() > 0) {
+        hash = (37 * hash) + EXECUTION_ENVS_FIELD_NUMBER;
+        hash = (53 * hash) + getExecutionEnvsList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -6090,7 +6090,7 @@ public final class LaunchPlanOuterClass {
       private void maybeForceBuilderInitialization() {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
-          getPersistentEnvsFieldBuilder();
+          getExecutionEnvsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -6180,11 +6180,11 @@ public final class LaunchPlanOuterClass {
           envs_ = null;
           envsBuilder_ = null;
         }
-        if (persistentEnvsBuilder_ == null) {
-          persistentEnvs_ = java.util.Collections.emptyList();
+        if (executionEnvsBuilder_ == null) {
+          executionEnvs_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00010000);
         } else {
-          persistentEnvsBuilder_.clear();
+          executionEnvsBuilder_.clear();
         }
         return this;
       }
@@ -6282,14 +6282,14 @@ public final class LaunchPlanOuterClass {
         } else {
           result.envs_ = envsBuilder_.build();
         }
-        if (persistentEnvsBuilder_ == null) {
+        if (executionEnvsBuilder_ == null) {
           if (((bitField0_ & 0x00010000) != 0)) {
-            persistentEnvs_ = java.util.Collections.unmodifiableList(persistentEnvs_);
+            executionEnvs_ = java.util.Collections.unmodifiableList(executionEnvs_);
             bitField0_ = (bitField0_ & ~0x00010000);
           }
-          result.persistentEnvs_ = persistentEnvs_;
+          result.executionEnvs_ = executionEnvs_;
         } else {
-          result.persistentEnvs_ = persistentEnvsBuilder_.build();
+          result.executionEnvs_ = executionEnvsBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -6389,29 +6389,29 @@ public final class LaunchPlanOuterClass {
         if (other.hasEnvs()) {
           mergeEnvs(other.getEnvs());
         }
-        if (persistentEnvsBuilder_ == null) {
-          if (!other.persistentEnvs_.isEmpty()) {
-            if (persistentEnvs_.isEmpty()) {
-              persistentEnvs_ = other.persistentEnvs_;
+        if (executionEnvsBuilder_ == null) {
+          if (!other.executionEnvs_.isEmpty()) {
+            if (executionEnvs_.isEmpty()) {
+              executionEnvs_ = other.executionEnvs_;
               bitField0_ = (bitField0_ & ~0x00010000);
             } else {
-              ensurePersistentEnvsIsMutable();
-              persistentEnvs_.addAll(other.persistentEnvs_);
+              ensureExecutionEnvsIsMutable();
+              executionEnvs_.addAll(other.executionEnvs_);
             }
             onChanged();
           }
         } else {
-          if (!other.persistentEnvs_.isEmpty()) {
-            if (persistentEnvsBuilder_.isEmpty()) {
-              persistentEnvsBuilder_.dispose();
-              persistentEnvsBuilder_ = null;
-              persistentEnvs_ = other.persistentEnvs_;
+          if (!other.executionEnvs_.isEmpty()) {
+            if (executionEnvsBuilder_.isEmpty()) {
+              executionEnvsBuilder_.dispose();
+              executionEnvsBuilder_ = null;
+              executionEnvs_ = other.executionEnvs_;
               bitField0_ = (bitField0_ & ~0x00010000);
-              persistentEnvsBuilder_ = 
+              executionEnvsBuilder_ = 
                 com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
-                   getPersistentEnvsFieldBuilder() : null;
+                   getExecutionEnvsFieldBuilder() : null;
             } else {
-              persistentEnvsBuilder_.addAllMessages(other.persistentEnvs_);
+              executionEnvsBuilder_.addAllMessages(other.executionEnvs_);
             }
           }
         }
@@ -8620,316 +8620,316 @@ public final class LaunchPlanOuterClass {
         return envsBuilder_;
       }
 
-      private java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> persistentEnvs_ =
+      private java.util.List<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment> executionEnvs_ =
         java.util.Collections.emptyList();
-      private void ensurePersistentEnvsIsMutable() {
+      private void ensureExecutionEnvsIsMutable() {
         if (!((bitField0_ & 0x00010000) != 0)) {
-          persistentEnvs_ = new java.util.ArrayList<flyteidl.core.PersistentEnvs.EnvironmentAssignment>(persistentEnvs_);
+          executionEnvs_ = new java.util.ArrayList<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment>(executionEnvs_);
           bitField0_ |= 0x00010000;
          }
       }
 
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          flyteidl.core.PersistentEnvs.EnvironmentAssignment, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder, flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> persistentEnvsBuilder_;
+          flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder> executionEnvsBuilder_;
 
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment> getPersistentEnvsList() {
-        if (persistentEnvsBuilder_ == null) {
-          return java.util.Collections.unmodifiableList(persistentEnvs_);
+      public java.util.List<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment> getExecutionEnvsList() {
+        if (executionEnvsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(executionEnvs_);
         } else {
-          return persistentEnvsBuilder_.getMessageList();
+          return executionEnvsBuilder_.getMessageList();
         }
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public int getPersistentEnvsCount() {
-        if (persistentEnvsBuilder_ == null) {
-          return persistentEnvs_.size();
+      public int getExecutionEnvsCount() {
+        if (executionEnvsBuilder_ == null) {
+          return executionEnvs_.size();
         } else {
-          return persistentEnvsBuilder_.getCount();
+          return executionEnvsBuilder_.getCount();
         }
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public flyteidl.core.PersistentEnvs.EnvironmentAssignment getPersistentEnvs(int index) {
-        if (persistentEnvsBuilder_ == null) {
-          return persistentEnvs_.get(index);
+      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment getExecutionEnvs(int index) {
+        if (executionEnvsBuilder_ == null) {
+          return executionEnvs_.get(index);
         } else {
-          return persistentEnvsBuilder_.getMessage(index);
+          return executionEnvsBuilder_.getMessage(index);
         }
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder setPersistentEnvs(
-          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment value) {
-        if (persistentEnvsBuilder_ == null) {
+      public Builder setExecutionEnvs(
+          int index, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment value) {
+        if (executionEnvsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.set(index, value);
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.set(index, value);
           onChanged();
         } else {
-          persistentEnvsBuilder_.setMessage(index, value);
+          executionEnvsBuilder_.setMessage(index, value);
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder setPersistentEnvs(
-          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder builderForValue) {
-        if (persistentEnvsBuilder_ == null) {
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.set(index, builderForValue.build());
+      public Builder setExecutionEnvs(
+          int index, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder builderForValue) {
+        if (executionEnvsBuilder_ == null) {
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.set(index, builderForValue.build());
           onChanged();
         } else {
-          persistentEnvsBuilder_.setMessage(index, builderForValue.build());
+          executionEnvsBuilder_.setMessage(index, builderForValue.build());
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder addPersistentEnvs(flyteidl.core.PersistentEnvs.EnvironmentAssignment value) {
-        if (persistentEnvsBuilder_ == null) {
+      public Builder addExecutionEnvs(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment value) {
+        if (executionEnvsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.add(value);
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.add(value);
           onChanged();
         } else {
-          persistentEnvsBuilder_.addMessage(value);
+          executionEnvsBuilder_.addMessage(value);
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder addPersistentEnvs(
-          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment value) {
-        if (persistentEnvsBuilder_ == null) {
+      public Builder addExecutionEnvs(
+          int index, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment value) {
+        if (executionEnvsBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.add(index, value);
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.add(index, value);
           onChanged();
         } else {
-          persistentEnvsBuilder_.addMessage(index, value);
+          executionEnvsBuilder_.addMessage(index, value);
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder addPersistentEnvs(
-          flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder builderForValue) {
-        if (persistentEnvsBuilder_ == null) {
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.add(builderForValue.build());
+      public Builder addExecutionEnvs(
+          flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder builderForValue) {
+        if (executionEnvsBuilder_ == null) {
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.add(builderForValue.build());
           onChanged();
         } else {
-          persistentEnvsBuilder_.addMessage(builderForValue.build());
+          executionEnvsBuilder_.addMessage(builderForValue.build());
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder addPersistentEnvs(
-          int index, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder builderForValue) {
-        if (persistentEnvsBuilder_ == null) {
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.add(index, builderForValue.build());
+      public Builder addExecutionEnvs(
+          int index, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder builderForValue) {
+        if (executionEnvsBuilder_ == null) {
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.add(index, builderForValue.build());
           onChanged();
         } else {
-          persistentEnvsBuilder_.addMessage(index, builderForValue.build());
+          executionEnvsBuilder_.addMessage(index, builderForValue.build());
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder addAllPersistentEnvs(
-          java.lang.Iterable<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignment> values) {
-        if (persistentEnvsBuilder_ == null) {
-          ensurePersistentEnvsIsMutable();
+      public Builder addAllExecutionEnvs(
+          java.lang.Iterable<? extends flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment> values) {
+        if (executionEnvsBuilder_ == null) {
+          ensureExecutionEnvsIsMutable();
           com.google.protobuf.AbstractMessageLite.Builder.addAll(
-              values, persistentEnvs_);
+              values, executionEnvs_);
           onChanged();
         } else {
-          persistentEnvsBuilder_.addAllMessages(values);
+          executionEnvsBuilder_.addAllMessages(values);
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder clearPersistentEnvs() {
-        if (persistentEnvsBuilder_ == null) {
-          persistentEnvs_ = java.util.Collections.emptyList();
+      public Builder clearExecutionEnvs() {
+        if (executionEnvsBuilder_ == null) {
+          executionEnvs_ = java.util.Collections.emptyList();
           bitField0_ = (bitField0_ & ~0x00010000);
           onChanged();
         } else {
-          persistentEnvsBuilder_.clear();
+          executionEnvsBuilder_.clear();
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public Builder removePersistentEnvs(int index) {
-        if (persistentEnvsBuilder_ == null) {
-          ensurePersistentEnvsIsMutable();
-          persistentEnvs_.remove(index);
+      public Builder removeExecutionEnvs(int index) {
+        if (executionEnvsBuilder_ == null) {
+          ensureExecutionEnvsIsMutable();
+          executionEnvs_.remove(index);
           onChanged();
         } else {
-          persistentEnvsBuilder_.remove(index);
+          executionEnvsBuilder_.remove(index);
         }
         return this;
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder getPersistentEnvsBuilder(
+      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder getExecutionEnvsBuilder(
           int index) {
-        return getPersistentEnvsFieldBuilder().getBuilder(index);
+        return getExecutionEnvsFieldBuilder().getBuilder(index);
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder getPersistentEnvsOrBuilder(
+      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder getExecutionEnvsOrBuilder(
           int index) {
-        if (persistentEnvsBuilder_ == null) {
-          return persistentEnvs_.get(index);  } else {
-          return persistentEnvsBuilder_.getMessageOrBuilder(index);
+        if (executionEnvsBuilder_ == null) {
+          return executionEnvs_.get(index);  } else {
+          return executionEnvsBuilder_.getMessageOrBuilder(index);
         }
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public java.util.List<? extends flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
-           getPersistentEnvsOrBuilderList() {
-        if (persistentEnvsBuilder_ != null) {
-          return persistentEnvsBuilder_.getMessageOrBuilderList();
+      public java.util.List<? extends flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder> 
+           getExecutionEnvsOrBuilderList() {
+        if (executionEnvsBuilder_ != null) {
+          return executionEnvsBuilder_.getMessageOrBuilderList();
         } else {
-          return java.util.Collections.unmodifiableList(persistentEnvs_);
+          return java.util.Collections.unmodifiableList(executionEnvs_);
         }
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder addPersistentEnvsBuilder() {
-        return getPersistentEnvsFieldBuilder().addBuilder(
-            flyteidl.core.PersistentEnvs.EnvironmentAssignment.getDefaultInstance());
+      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder addExecutionEnvsBuilder() {
+        return getExecutionEnvsFieldBuilder().addBuilder(
+            flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.getDefaultInstance());
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder addPersistentEnvsBuilder(
+      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder addExecutionEnvsBuilder(
           int index) {
-        return getPersistentEnvsFieldBuilder().addBuilder(
-            index, flyteidl.core.PersistentEnvs.EnvironmentAssignment.getDefaultInstance());
+        return getExecutionEnvsFieldBuilder().addBuilder(
+            index, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.getDefaultInstance());
       }
       /**
        * <pre>
-       * TODO &#64;hamersaw - docs
+       * Execution environment assignments to be set for the execution.
        * </pre>
        *
-       * <code>repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 22;</code>
+       * <code>repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 22;</code>
        */
-      public java.util.List<flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder> 
-           getPersistentEnvsBuilderList() {
-        return getPersistentEnvsFieldBuilder().getBuilderList();
+      public java.util.List<flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder> 
+           getExecutionEnvsBuilderList() {
+        return getExecutionEnvsFieldBuilder().getBuilderList();
       }
       private com.google.protobuf.RepeatedFieldBuilderV3<
-          flyteidl.core.PersistentEnvs.EnvironmentAssignment, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder, flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder> 
-          getPersistentEnvsFieldBuilder() {
-        if (persistentEnvsBuilder_ == null) {
-          persistentEnvsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
-              flyteidl.core.PersistentEnvs.EnvironmentAssignment, flyteidl.core.PersistentEnvs.EnvironmentAssignment.Builder, flyteidl.core.PersistentEnvs.EnvironmentAssignmentOrBuilder>(
-                  persistentEnvs_,
+          flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder> 
+          getExecutionEnvsFieldBuilder() {
+        if (executionEnvsBuilder_ == null) {
+          executionEnvsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignmentOrBuilder>(
+                  executionEnvs_,
                   ((bitField0_ & 0x00010000) != 0),
                   getParentForChildren(),
                   isClean());
-          persistentEnvs_ = null;
+          executionEnvs_ = null;
         }
-        return persistentEnvsBuilder_;
+        return executionEnvsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -15297,69 +15297,69 @@ public final class LaunchPlanOuterClass {
     java.lang.String[] descriptorData = {
       "\n flyteidl/admin/launch_plan.proto\022\016flyt" +
       "eidl.admin\032\035flyteidl/core/execution.prot" +
-      "o\032\034flyteidl/core/literals.proto\032\036flyteid" +
-      "l/core/identifier.proto\032\035flyteidl/core/i" +
-      "nterface.proto\032#flyteidl/core/persistent" +
-      "_envs.proto\032\034flyteidl/core/security.prot" +
-      "o\032\035flyteidl/admin/schedule.proto\032\033flytei" +
-      "dl/admin/common.proto\032\031google/protobuf/a" +
-      "ny.proto\032\037google/protobuf/timestamp.prot" +
-      "o\032\036google/protobuf/wrappers.proto\"n\n\027Lau" +
-      "nchPlanCreateRequest\022%\n\002id\030\001 \001(\0132\031.flyte" +
-      "idl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.flyt" +
-      "eidl.admin.LaunchPlanSpec\"\032\n\030LaunchPlanC" +
-      "reateResponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 \001(\013" +
-      "2\031.flyteidl.core.Identifier\022,\n\004spec\030\002 \001(" +
-      "\0132\036.flyteidl.admin.LaunchPlanSpec\0222\n\007clo" +
-      "sure\030\003 \001(\0132!.flyteidl.admin.LaunchPlanCl" +
-      "osure\"Q\n\016LaunchPlanList\0220\n\014launch_plans\030" +
-      "\001 \003(\0132\032.flyteidl.admin.LaunchPlan\022\r\n\005tok" +
-      "en\030\002 \001(\t\"J\n\004Auth\022\032\n\022assumable_iam_role\030\001" +
-      " \001(\t\022\"\n\032kubernetes_service_account\030\002 \001(\t" +
-      ":\002\030\001\"\254\006\n\016LaunchPlanSpec\022.\n\013workflow_id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022;\n\017entit" +
-      "y_metadata\030\002 \001(\0132\".flyteidl.admin.Launch" +
-      "PlanMetadata\0223\n\016default_inputs\030\003 \001(\0132\033.f" +
-      "lyteidl.core.ParameterMap\022/\n\014fixed_input" +
-      "s\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022\020\n\004ro" +
-      "le\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flyteidl." +
-      "admin.Labels\0220\n\013annotations\030\007 \001(\0132\033.flyt" +
-      "eidl.admin.Annotations\022&\n\004auth\030\010 \001(\0132\024.f" +
-      "lyteidl.admin.AuthB\002\030\001\022/\n\tauth_role\030\t \001(" +
-      "\0132\030.flyteidl.admin.AuthRoleB\002\030\001\0228\n\020secur" +
-      "ity_context\030\n \001(\0132\036.flyteidl.core.Securi" +
-      "tyContext\022;\n\022quality_of_service\030\020 \001(\0132\037." +
-      "flyteidl.core.QualityOfService\022C\n\026raw_ou" +
-      "tput_data_config\030\021 \001(\0132#.flyteidl.admin." +
-      "RawOutputDataConfig\022\027\n\017max_parallelism\030\022" +
-      " \001(\005\0221\n\rinterruptible\030\023 \001(\0132\032.google.pro" +
-      "tobuf.BoolValue\022\027\n\017overwrite_cache\030\024 \001(\010" +
-      "\022\"\n\004envs\030\025 \001(\0132\024.flyteidl.admin.Envs\022=\n\017" +
-      "persistent_envs\030\026 \003(\0132$.flyteidl.core.En" +
-      "vironmentAssignment\"\217\002\n\021LaunchPlanClosur" +
-      "e\022.\n\005state\030\001 \001(\0162\037.flyteidl.admin.Launch" +
-      "PlanState\0224\n\017expected_inputs\030\002 \001(\0132\033.fly" +
-      "teidl.core.ParameterMap\0224\n\020expected_outp" +
-      "uts\030\003 \001(\0132\032.flyteidl.core.VariableMap\022.\n" +
-      "\ncreated_at\030\004 \001(\0132\032.google.protobuf.Time" +
-      "stamp\022.\n\nupdated_at\030\005 \001(\0132\032.google.proto" +
-      "buf.Timestamp\"\246\001\n\022LaunchPlanMetadata\022*\n\010" +
-      "schedule\030\001 \001(\0132\030.flyteidl.admin.Schedule" +
-      "\0223\n\rnotifications\030\002 \003(\0132\034.flyteidl.admin" +
-      ".Notification\022/\n\021launch_conditions\030\003 \001(\013" +
-      "2\024.google.protobuf.Any\"p\n\027LaunchPlanUpda" +
-      "teRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Id" +
-      "entifier\022.\n\005state\030\002 \001(\0162\037.flyteidl.admin" +
-      ".LaunchPlanState\"\032\n\030LaunchPlanUpdateResp" +
-      "onse\"L\n\027ActiveLaunchPlanRequest\0221\n\002id\030\001 " +
-      "\001(\0132%.flyteidl.admin.NamedEntityIdentifi" +
-      "er\"\203\001\n\033ActiveLaunchPlanListRequest\022\017\n\007pr" +
-      "oject\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005limit\030\003 \001" +
-      "(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(\0132\024.fly" +
-      "teidl.admin.Sort*+\n\017LaunchPlanState\022\014\n\010I" +
-      "NACTIVE\020\000\022\n\n\006ACTIVE\020\001B=Z;github.com/flyt" +
-      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/a" +
-      "dminb\006proto3"
+      "o\032\"flyteidl/core/execution_envs.proto\032\034f" +
+      "lyteidl/core/literals.proto\032\036flyteidl/co" +
+      "re/identifier.proto\032\035flyteidl/core/inter" +
+      "face.proto\032\034flyteidl/core/security.proto" +
+      "\032\035flyteidl/admin/schedule.proto\032\033flyteid" +
+      "l/admin/common.proto\032\031google/protobuf/an" +
+      "y.proto\032\037google/protobuf/timestamp.proto" +
+      "\032\036google/protobuf/wrappers.proto\"n\n\027Laun" +
+      "chPlanCreateRequest\022%\n\002id\030\001 \001(\0132\031.flytei" +
+      "dl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.flyte" +
+      "idl.admin.LaunchPlanSpec\"\032\n\030LaunchPlanCr" +
+      "eateResponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 \001(\0132" +
+      "\031.flyteidl.core.Identifier\022,\n\004spec\030\002 \001(\013" +
+      "2\036.flyteidl.admin.LaunchPlanSpec\0222\n\007clos" +
+      "ure\030\003 \001(\0132!.flyteidl.admin.LaunchPlanClo" +
+      "sure\"Q\n\016LaunchPlanList\0220\n\014launch_plans\030\001" +
+      " \003(\0132\032.flyteidl.admin.LaunchPlan\022\r\n\005toke" +
+      "n\030\002 \001(\t\"J\n\004Auth\022\032\n\022assumable_iam_role\030\001 " +
+      "\001(\t\022\"\n\032kubernetes_service_account\030\002 \001(\t:" +
+      "\002\030\001\"\264\006\n\016LaunchPlanSpec\022.\n\013workflow_id\030\001 " +
+      "\001(\0132\031.flyteidl.core.Identifier\022;\n\017entity" +
+      "_metadata\030\002 \001(\0132\".flyteidl.admin.LaunchP" +
+      "lanMetadata\0223\n\016default_inputs\030\003 \001(\0132\033.fl" +
+      "yteidl.core.ParameterMap\022/\n\014fixed_inputs" +
+      "\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022\020\n\004rol" +
+      "e\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flyteidl.a" +
+      "dmin.Labels\0220\n\013annotations\030\007 \001(\0132\033.flyte" +
+      "idl.admin.Annotations\022&\n\004auth\030\010 \001(\0132\024.fl" +
+      "yteidl.admin.AuthB\002\030\001\022/\n\tauth_role\030\t \001(\013" +
+      "2\030.flyteidl.admin.AuthRoleB\002\030\001\0228\n\020securi" +
+      "ty_context\030\n \001(\0132\036.flyteidl.core.Securit" +
+      "yContext\022;\n\022quality_of_service\030\020 \001(\0132\037.f" +
+      "lyteidl.core.QualityOfService\022C\n\026raw_out" +
+      "put_data_config\030\021 \001(\0132#.flyteidl.admin.R" +
+      "awOutputDataConfig\022\027\n\017max_parallelism\030\022 " +
+      "\001(\005\0221\n\rinterruptible\030\023 \001(\0132\032.google.prot" +
+      "obuf.BoolValue\022\027\n\017overwrite_cache\030\024 \001(\010\022" +
+      "\"\n\004envs\030\025 \001(\0132\024.flyteidl.admin.Envs\022E\n\016e" +
+      "xecution_envs\030\026 \003(\0132-.flyteidl.core.Exec" +
+      "utionEnvironmentAssignment\"\217\002\n\021LaunchPla" +
+      "nClosure\022.\n\005state\030\001 \001(\0162\037.flyteidl.admin" +
+      ".LaunchPlanState\0224\n\017expected_inputs\030\002 \001(" +
+      "\0132\033.flyteidl.core.ParameterMap\0224\n\020expect" +
+      "ed_outputs\030\003 \001(\0132\032.flyteidl.core.Variabl" +
+      "eMap\022.\n\ncreated_at\030\004 \001(\0132\032.google.protob" +
+      "uf.Timestamp\022.\n\nupdated_at\030\005 \001(\0132\032.googl" +
+      "e.protobuf.Timestamp\"\246\001\n\022LaunchPlanMetad" +
+      "ata\022*\n\010schedule\030\001 \001(\0132\030.flyteidl.admin.S" +
+      "chedule\0223\n\rnotifications\030\002 \003(\0132\034.flyteid" +
+      "l.admin.Notification\022/\n\021launch_condition" +
+      "s\030\003 \001(\0132\024.google.protobuf.Any\"p\n\027LaunchP" +
+      "lanUpdateRequest\022%\n\002id\030\001 \001(\0132\031.flyteidl." +
+      "core.Identifier\022.\n\005state\030\002 \001(\0162\037.flyteid" +
+      "l.admin.LaunchPlanState\"\032\n\030LaunchPlanUpd" +
+      "ateResponse\"L\n\027ActiveLaunchPlanRequest\0221" +
+      "\n\002id\030\001 \001(\0132%.flyteidl.admin.NamedEntityI" +
+      "dentifier\"\203\001\n\033ActiveLaunchPlanListReques" +
+      "t\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(\t\022\r\n\005li" +
+      "mit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n\007sort_by\030\005 \001(" +
+      "\0132\024.flyteidl.admin.Sort*+\n\017LaunchPlanSta" +
+      "te\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020\001B=Z;github.c" +
+      "om/flyteorg/flyte/flyteidl/gen/pb-go/fly" +
+      "teidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -15373,10 +15373,10 @@ public final class LaunchPlanOuterClass {
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           flyteidl.core.Execution.getDescriptor(),
+          flyteidl.core.ExecutionEnvs.getDescriptor(),
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Interface.getDescriptor(),
-          flyteidl.core.PersistentEnvs.getDescriptor(),
           flyteidl.core.Security.getDescriptor(),
           flyteidl.admin.ScheduleOuterClass.getDescriptor(),
           flyteidl.admin.Common.getDescriptor(),
@@ -15419,7 +15419,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanSpec_descriptor,
-        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", "Envs", "PersistentEnvs", });
+        new java.lang.String[] { "WorkflowId", "EntityMetadata", "DefaultInputs", "FixedInputs", "Role", "Labels", "Annotations", "Auth", "AuthRole", "SecurityContext", "QualityOfService", "RawOutputDataConfig", "MaxParallelism", "Interruptible", "OverwriteCache", "Envs", "ExecutionEnvs", });
     internal_static_flyteidl_admin_LaunchPlanClosure_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_LaunchPlanClosure_fieldAccessorTable = new
@@ -15457,10 +15457,10 @@ public final class LaunchPlanOuterClass {
         internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor,
         new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", });
     flyteidl.core.Execution.getDescriptor();
+    flyteidl.core.ExecutionEnvs.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Interface.getDescriptor();
-    flyteidl.core.PersistentEnvs.getDescriptor();
     flyteidl.core.Security.getDescriptor();
     flyteidl.admin.ScheduleOuterClass.getDescriptor();
     flyteidl.admin.Common.getDescriptor();

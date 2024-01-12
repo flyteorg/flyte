@@ -204,11 +204,11 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
-func (e nodeExecContext) GetPersistentEnv(core.Environment_EnvironmentType) *core.Environment {
+func (e nodeExecContext) GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment {
 	config := e.ExecutionContext().GetExecutionConfig()
-	for _, persistentEnv := range config.PersistentEnvs {
-		if slices.Contains(persistentEnv.NodeIds, e.NodeID()) {
-			return persistentEnv.Environment
+	for _, executionEnvironment := range config.ExecutionEnvs {
+		if slices.Contains(executionEnvironment.NodeIds, e.NodeID()) {
+			return executionEnvironment.Environment
 		}
 	}
 

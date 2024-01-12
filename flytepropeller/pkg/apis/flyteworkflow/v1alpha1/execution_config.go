@@ -36,8 +36,8 @@ type ExecutionConfig struct {
 	OverwriteCache bool
 	// Defines a map of environment variable name / value pairs that are applied to all tasks.
 	EnvironmentVariables map[string]string
-	// TODO @hamersaw - docs
-	PersistentEnvs []PersistentEnv
+	// ExecutionEnvs defines execution environment assignments to be set for the execution.
+	ExecutionEnvs []ExecutionEnvironmentAssignment
 }
 
 type TaskPluginOverride struct {
@@ -63,7 +63,8 @@ type TaskResources struct {
 	Limits TaskResourceSpec
 }
 
-// TODO @hamersaw - docs
-type PersistentEnv struct {
-	*core.EnvironmentAssignment
+// ExecutionEnvironmentAssignment is a wrapper around core.ExecutionEnvironmentAssignment to define
+// and assign an execution environment to a collection of workflow nodes.
+type ExecutionEnvironmentAssignment struct {
+	*core.ExecutionEnvironmentAssignment
 }

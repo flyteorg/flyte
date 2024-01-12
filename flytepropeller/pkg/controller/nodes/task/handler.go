@@ -337,9 +337,9 @@ func (t Handler) ResolvePlugin(ctx context.Context, nCtx interfaces.NodeExecutio
 	//   or if there are two persistentEnv plugins for ttype and one is returned first and the other second?!
 	// we COULD only allow one persistentEnv plugin per ttype ... still need to figure out disappearing clusters
 	for _, plugin := range t.pluginsForType[ttype] {
-		if persistentEnvType := plugin.GetProperties().PersistentEnvType; persistentEnvType != nil {
-			persistentEnv := nCtx.GetPersistentEnv(*persistentEnvType)
-			if persistentEnv != nil {
+		if executionEnvType := plugin.GetProperties().ExecutionEnvType; executionEnvType != nil {
+			executionEnv := nCtx.GetExecutionEnv(*executionEnvType)
+			if executionEnv != nil {
 				return plugin, nil
 			}
 		}

@@ -183,9 +183,10 @@ from flyteadmin.models.core_container import CoreContainer
 from flyteadmin.models.core_container_port import CoreContainerPort
 from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig
 from flyteadmin.models.core_enum_type import CoreEnumType
-from flyteadmin.models.core_environment import CoreEnvironment
-from flyteadmin.models.core_environment_assignment import CoreEnvironmentAssignment
+from flyteadmin.models.core_environment_type import CoreEnvironmentType
 from flyteadmin.models.core_error import CoreError
+from flyteadmin.models.core_execution_environment import CoreExecutionEnvironment
+from flyteadmin.models.core_execution_environment_assignment import CoreExecutionEnvironmentAssignment
 from flyteadmin.models.core_execution_error import CoreExecutionError
 from flyteadmin.models.core_extended_resources import CoreExtendedResources
 from flyteadmin.models.core_fast_task_environment import CoreFastTaskEnvironment
@@ -261,7 +262,6 @@ from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetada
 from flyteadmin.models.core_workflow_node import CoreWorkflowNode
 from flyteadmin.models.core_workflow_template import CoreWorkflowTemplate
 from flyteadmin.models.data_loading_config_literal_map_format import DataLoadingConfigLiteralMapFormat
-from flyteadmin.models.environment_environment_type import EnvironmentEnvironmentType
 from flyteadmin.models.event_event_reason import EventEventReason
 from flyteadmin.models.event_external_resource_info import EventExternalResourceInfo
 from flyteadmin.models.event_node_execution_event import EventNodeExecutionEvent

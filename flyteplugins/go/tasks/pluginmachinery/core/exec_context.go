@@ -65,8 +65,8 @@ type TaskExecutionContext interface {
 	// Returns a handle to the Task events recorder, which get stored in the Admin.
 	EventsRecorder() EventsRecorder
 
-	// TODO @hamersaw - docs
-	GetPersistentEnv(core.Environment_EnvironmentType) *core.Environment
+	// GetExecutionEnv returns the execution environment for the given environment type (if exists).
+	GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment
 }
 
 // A simple fire-and-forget func

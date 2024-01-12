@@ -711,13 +711,6 @@
       ],
       "default": "SINGLE"
     },
-    "EnvironmentEnvironmentType": {
-      "type": "string",
-      "enum": [
-        "FASTTASK"
-      ],
-      "default": "FASTTASK"
-    },
     "QualityOfServiceTier": {
       "type": "string",
       "enum": [
@@ -1030,12 +1023,12 @@
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
         },
-        "persistent_envs": {
+        "execution_envs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coreEnvironmentAssignment"
+            "$ref": "#/definitions/coreExecutionEnvironmentAssignment"
           },
-          "title": "TODO @hamersaw - docs"
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -1429,33 +1422,12 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
-    "coreEnvironment": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/EnvironmentEnvironmentType"
-        },
-        "fasttask_environment": {
-          "$ref": "#/definitions/coreFastTaskEnvironment"
-        }
-      }
-    },
-    "coreEnvironmentAssignment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "node_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "environment": {
-          "$ref": "#/definitions/coreEnvironment"
-        }
-      }
+    "coreEnvironmentType": {
+      "type": "string",
+      "enum": [
+        "FAST_TASK"
+      ],
+      "default": "FAST_TASK"
     },
     "coreError": {
       "type": "object",
@@ -1471,6 +1443,34 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreExecutionEnvironment": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreEnvironmentType"
+        },
+        "fast_task": {
+          "$ref": "#/definitions/coreFastTaskEnvironment"
+        }
+      }
+    },
+    "coreExecutionEnvironmentAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "$ref": "#/definitions/coreExecutionEnvironment"
+        }
+      }
+    },
     "coreFastTaskEnvironment": {
       "type": "object",
       "properties": {
@@ -1480,7 +1480,7 @@
         "namespace": {
           "type": "string"
         },
-        "pod_id": {
+        "pod_name": {
           "type": "string"
         }
       }

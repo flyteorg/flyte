@@ -7261,6 +7261,197 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExecutionEnvironmentAssignment. */
+        interface IExecutionEnvironmentAssignment {
+
+            /** ExecutionEnvironmentAssignment id */
+            id?: (string|null);
+
+            /** ExecutionEnvironmentAssignment nodeIds */
+            nodeIds?: (string[]|null);
+
+            /** ExecutionEnvironmentAssignment environment */
+            environment?: (flyteidl.core.IExecutionEnvironment|null);
+        }
+
+        /** Represents an ExecutionEnvironmentAssignment. */
+        class ExecutionEnvironmentAssignment implements IExecutionEnvironmentAssignment {
+
+            /**
+             * Constructs a new ExecutionEnvironmentAssignment.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExecutionEnvironmentAssignment);
+
+            /** ExecutionEnvironmentAssignment id. */
+            public id: string;
+
+            /** ExecutionEnvironmentAssignment nodeIds. */
+            public nodeIds: string[];
+
+            /** ExecutionEnvironmentAssignment environment. */
+            public environment?: (flyteidl.core.IExecutionEnvironment|null);
+
+            /**
+             * Creates a new ExecutionEnvironmentAssignment instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionEnvironmentAssignment instance
+             */
+            public static create(properties?: flyteidl.core.IExecutionEnvironmentAssignment): flyteidl.core.ExecutionEnvironmentAssignment;
+
+            /**
+             * Encodes the specified ExecutionEnvironmentAssignment message. Does not implicitly {@link flyteidl.core.ExecutionEnvironmentAssignment.verify|verify} messages.
+             * @param message ExecutionEnvironmentAssignment message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExecutionEnvironmentAssignment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionEnvironmentAssignment message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionEnvironmentAssignment
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExecutionEnvironmentAssignment;
+
+            /**
+             * Verifies an ExecutionEnvironmentAssignment message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** EnvironmentType enum. */
+        enum EnvironmentType {
+            FAST_TASK = 0
+        }
+
+        /** Properties of an ExecutionEnvironment. */
+        interface IExecutionEnvironment {
+
+            /** ExecutionEnvironment type */
+            type?: (flyteidl.core.EnvironmentType|null);
+
+            /** ExecutionEnvironment fastTask */
+            fastTask?: (flyteidl.core.IFastTaskEnvironment|null);
+        }
+
+        /** Represents an ExecutionEnvironment. */
+        class ExecutionEnvironment implements IExecutionEnvironment {
+
+            /**
+             * Constructs a new ExecutionEnvironment.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IExecutionEnvironment);
+
+            /** ExecutionEnvironment type. */
+            public type: flyteidl.core.EnvironmentType;
+
+            /** ExecutionEnvironment fastTask. */
+            public fastTask?: (flyteidl.core.IFastTaskEnvironment|null);
+
+            /**
+             * Creates a new ExecutionEnvironment instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionEnvironment instance
+             */
+            public static create(properties?: flyteidl.core.IExecutionEnvironment): flyteidl.core.ExecutionEnvironment;
+
+            /**
+             * Encodes the specified ExecutionEnvironment message. Does not implicitly {@link flyteidl.core.ExecutionEnvironment.verify|verify} messages.
+             * @param message ExecutionEnvironment message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IExecutionEnvironment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionEnvironment message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionEnvironment
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.ExecutionEnvironment;
+
+            /**
+             * Verifies an ExecutionEnvironment message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a FastTaskEnvironment. */
+        interface IFastTaskEnvironment {
+
+            /** FastTaskEnvironment queueId */
+            queueId?: (string|null);
+
+            /** FastTaskEnvironment namespace */
+            namespace?: (string|null);
+
+            /** FastTaskEnvironment podName */
+            podName?: (string|null);
+        }
+
+        /** Represents a FastTaskEnvironment. */
+        class FastTaskEnvironment implements IFastTaskEnvironment {
+
+            /**
+             * Constructs a new FastTaskEnvironment.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IFastTaskEnvironment);
+
+            /** FastTaskEnvironment queueId. */
+            public queueId: string;
+
+            /** FastTaskEnvironment namespace. */
+            public namespace: string;
+
+            /** FastTaskEnvironment podName. */
+            public podName: string;
+
+            /**
+             * Creates a new FastTaskEnvironment instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns FastTaskEnvironment instance
+             */
+            public static create(properties?: flyteidl.core.IFastTaskEnvironment): flyteidl.core.FastTaskEnvironment;
+
+            /**
+             * Encodes the specified FastTaskEnvironment message. Does not implicitly {@link flyteidl.core.FastTaskEnvironment.verify|verify} messages.
+             * @param message FastTaskEnvironment message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IFastTaskEnvironment, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a FastTaskEnvironment message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns FastTaskEnvironment
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.FastTaskEnvironment;
+
+            /**
+             * Verifies a FastTaskEnvironment message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a Span. */
         interface ISpan {
 
@@ -7346,200 +7537,6 @@ export namespace flyteidl {
 
             /**
              * Verifies a Span message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an EnvironmentAssignment. */
-        interface IEnvironmentAssignment {
-
-            /** EnvironmentAssignment id */
-            id?: (string|null);
-
-            /** EnvironmentAssignment nodeIds */
-            nodeIds?: (string[]|null);
-
-            /** EnvironmentAssignment environment */
-            environment?: (flyteidl.core.IEnvironment|null);
-        }
-
-        /** Represents an EnvironmentAssignment. */
-        class EnvironmentAssignment implements IEnvironmentAssignment {
-
-            /**
-             * Constructs a new EnvironmentAssignment.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IEnvironmentAssignment);
-
-            /** EnvironmentAssignment id. */
-            public id: string;
-
-            /** EnvironmentAssignment nodeIds. */
-            public nodeIds: string[];
-
-            /** EnvironmentAssignment environment. */
-            public environment?: (flyteidl.core.IEnvironment|null);
-
-            /**
-             * Creates a new EnvironmentAssignment instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns EnvironmentAssignment instance
-             */
-            public static create(properties?: flyteidl.core.IEnvironmentAssignment): flyteidl.core.EnvironmentAssignment;
-
-            /**
-             * Encodes the specified EnvironmentAssignment message. Does not implicitly {@link flyteidl.core.EnvironmentAssignment.verify|verify} messages.
-             * @param message EnvironmentAssignment message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IEnvironmentAssignment, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an EnvironmentAssignment message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns EnvironmentAssignment
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.EnvironmentAssignment;
-
-            /**
-             * Verifies an EnvironmentAssignment message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of an Environment. */
-        interface IEnvironment {
-
-            /** Environment type */
-            type?: (flyteidl.core.Environment.EnvironmentType|null);
-
-            /** Environment fasttaskEnvironment */
-            fasttaskEnvironment?: (flyteidl.core.IFastTaskEnvironment|null);
-        }
-
-        /** Represents an Environment. */
-        class Environment implements IEnvironment {
-
-            /**
-             * Constructs a new Environment.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IEnvironment);
-
-            /** Environment type. */
-            public type: flyteidl.core.Environment.EnvironmentType;
-
-            /** Environment fasttaskEnvironment. */
-            public fasttaskEnvironment?: (flyteidl.core.IFastTaskEnvironment|null);
-
-            /**
-             * Creates a new Environment instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Environment instance
-             */
-            public static create(properties?: flyteidl.core.IEnvironment): flyteidl.core.Environment;
-
-            /**
-             * Encodes the specified Environment message. Does not implicitly {@link flyteidl.core.Environment.verify|verify} messages.
-             * @param message Environment message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IEnvironment, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes an Environment message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Environment
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Environment;
-
-            /**
-             * Verifies an Environment message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        namespace Environment {
-
-            /** EnvironmentType enum. */
-            enum EnvironmentType {
-                FASTTASK = 0
-            }
-        }
-
-        /** Properties of a FastTaskEnvironment. */
-        interface IFastTaskEnvironment {
-
-            /** FastTaskEnvironment queueId */
-            queueId?: (string|null);
-
-            /** FastTaskEnvironment namespace */
-            namespace?: (string|null);
-
-            /** FastTaskEnvironment podId */
-            podId?: (string|null);
-        }
-
-        /** Represents a FastTaskEnvironment. */
-        class FastTaskEnvironment implements IFastTaskEnvironment {
-
-            /**
-             * Constructs a new FastTaskEnvironment.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.IFastTaskEnvironment);
-
-            /** FastTaskEnvironment queueId. */
-            public queueId: string;
-
-            /** FastTaskEnvironment namespace. */
-            public namespace: string;
-
-            /** FastTaskEnvironment podId. */
-            public podId: string;
-
-            /**
-             * Creates a new FastTaskEnvironment instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns FastTaskEnvironment instance
-             */
-            public static create(properties?: flyteidl.core.IFastTaskEnvironment): flyteidl.core.FastTaskEnvironment;
-
-            /**
-             * Encodes the specified FastTaskEnvironment message. Does not implicitly {@link flyteidl.core.FastTaskEnvironment.verify|verify} messages.
-             * @param message FastTaskEnvironment message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.IFastTaskEnvironment, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a FastTaskEnvironment message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns FastTaskEnvironment
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.FastTaskEnvironment;
-
-            /**
-             * Verifies a FastTaskEnvironment message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -13001,8 +12998,8 @@ export namespace flyteidl {
             /** ExecutionSpec tags */
             tags?: (string[]|null);
 
-            /** ExecutionSpec persistentEnvs */
-            persistentEnvs?: (flyteidl.core.IEnvironmentAssignment[]|null);
+            /** ExecutionSpec executionEnvs */
+            executionEnvs?: (flyteidl.core.IExecutionEnvironmentAssignment[]|null);
         }
 
         /** Represents an ExecutionSpec. */
@@ -13065,8 +13062,8 @@ export namespace flyteidl {
             /** ExecutionSpec tags. */
             public tags: string[];
 
-            /** ExecutionSpec persistentEnvs. */
-            public persistentEnvs: flyteidl.core.IEnvironmentAssignment[];
+            /** ExecutionSpec executionEnvs. */
+            public executionEnvs: flyteidl.core.IExecutionEnvironmentAssignment[];
 
             /** ExecutionSpec notificationOverrides. */
             public notificationOverrides?: ("notifications"|"disableAll");
@@ -13955,8 +13952,8 @@ export namespace flyteidl {
             /** LaunchPlanSpec envs */
             envs?: (flyteidl.admin.IEnvs|null);
 
-            /** LaunchPlanSpec persistentEnvs */
-            persistentEnvs?: (flyteidl.core.IEnvironmentAssignment[]|null);
+            /** LaunchPlanSpec executionEnvs */
+            executionEnvs?: (flyteidl.core.IExecutionEnvironmentAssignment[]|null);
         }
 
         /** Represents a LaunchPlanSpec. */
@@ -14016,8 +14013,8 @@ export namespace flyteidl {
             /** LaunchPlanSpec envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
 
-            /** LaunchPlanSpec persistentEnvs. */
-            public persistentEnvs: flyteidl.core.IEnvironmentAssignment[];
+            /** LaunchPlanSpec executionEnvs. */
+            public executionEnvs: flyteidl.core.IExecutionEnvironmentAssignment[];
 
             /**
              * Creates a new LaunchPlanSpec instance using the specified properties.
@@ -15074,8 +15071,8 @@ export namespace flyteidl {
             /** WorkflowExecutionConfig envs */
             envs?: (flyteidl.admin.IEnvs|null);
 
-            /** WorkflowExecutionConfig persistentEnvs */
-            persistentEnvs?: (flyteidl.core.IEnvironmentAssignment[]|null);
+            /** WorkflowExecutionConfig executionEnvs */
+            executionEnvs?: (flyteidl.core.IExecutionEnvironmentAssignment[]|null);
         }
 
         /** Represents a WorkflowExecutionConfig. */
@@ -15111,8 +15108,8 @@ export namespace flyteidl {
             /** WorkflowExecutionConfig envs. */
             public envs?: (flyteidl.admin.IEnvs|null);
 
-            /** WorkflowExecutionConfig persistentEnvs. */
-            public persistentEnvs: flyteidl.core.IEnvironmentAssignment[];
+            /** WorkflowExecutionConfig executionEnvs. */
+            public executionEnvs: flyteidl.core.IExecutionEnvironmentAssignment[];
 
             /**
              * Creates a new WorkflowExecutionConfig instance using the specified properties.

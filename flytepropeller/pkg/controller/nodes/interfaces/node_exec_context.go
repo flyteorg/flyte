@@ -71,5 +71,5 @@ type NodeExecutionContext interface {
 	// Deprecated
 	NodeStatus() v1alpha1.ExecutableNodeStatus
 
-	GetPersistentEnv(core.Environment_EnvironmentType) *core.Environment
+	GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment
 }

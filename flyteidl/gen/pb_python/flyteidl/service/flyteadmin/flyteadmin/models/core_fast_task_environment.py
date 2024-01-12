@@ -33,29 +33,29 @@ class CoreFastTaskEnvironment(object):
     swagger_types = {
         'queue_id': 'str',
         'namespace': 'str',
-        'pod_id': 'str'
+        'pod_name': 'str'
     }
 
     attribute_map = {
         'queue_id': 'queue_id',
         'namespace': 'namespace',
-        'pod_id': 'pod_id'
+        'pod_name': 'pod_name'
     }
 
-    def __init__(self, queue_id=None, namespace=None, pod_id=None):  # noqa: E501
+    def __init__(self, queue_id=None, namespace=None, pod_name=None):  # noqa: E501
         """CoreFastTaskEnvironment - a model defined in Swagger"""  # noqa: E501
 
         self._queue_id = None
         self._namespace = None
-        self._pod_id = None
+        self._pod_name = None
         self.discriminator = None
 
         if queue_id is not None:
             self.queue_id = queue_id
         if namespace is not None:
             self.namespace = namespace
-        if pod_id is not None:
-            self.pod_id = pod_id
+        if pod_name is not None:
+            self.pod_name = pod_name
 
     @property
     def queue_id(self):
@@ -100,25 +100,25 @@ class CoreFastTaskEnvironment(object):
         self._namespace = namespace
 
     @property
-    def pod_id(self):
-        """Gets the pod_id of this CoreFastTaskEnvironment.  # noqa: E501
+    def pod_name(self):
+        """Gets the pod_name of this CoreFastTaskEnvironment.  # noqa: E501
 
 
-        :return: The pod_id of this CoreFastTaskEnvironment.  # noqa: E501
+        :return: The pod_name of this CoreFastTaskEnvironment.  # noqa: E501
         :rtype: str
         """
-        return self._pod_id
+        return self._pod_name
 
-    @pod_id.setter
-    def pod_id(self, pod_id):
-        """Sets the pod_id of this CoreFastTaskEnvironment.
+    @pod_name.setter
+    def pod_name(self, pod_name):
+        """Sets the pod_name of this CoreFastTaskEnvironment.
 
 
-        :param pod_id: The pod_id of this CoreFastTaskEnvironment.  # noqa: E501
+        :param pod_name: The pod_name of this CoreFastTaskEnvironment.  # noqa: E501
         :type: str
         """
 
-        self._pod_id = pod_id
+        self._pod_name = pod_name
 
     def to_dict(self):
         """Returns the model properties as a dict"""

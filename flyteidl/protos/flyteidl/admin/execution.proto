@@ -7,10 +7,10 @@ import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/execution_envs.proto";
 import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/metrics.proto";
-import "flyteidl/core/persistent_envs.proto";
 import "flyteidl/core/security.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
@@ -326,8 +326,8 @@ message ExecutionSpec {
     // Tags to be set for the execution.
     repeated string tags = 24;
 
-    // TODO @hamersaw
-    repeated core.EnvironmentAssignment persistent_envs = 25;
+    // Execution environment assignments to be set for the execution.
+    repeated core.ExecutionEnvironmentAssignment execution_envs = 25;
 }
 
 // Request to terminate an in-progress execution.  This action is irreversible.

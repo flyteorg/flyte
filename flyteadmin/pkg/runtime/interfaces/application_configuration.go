@@ -188,9 +188,9 @@ func (a *ApplicationConfig) GetEnvs() *admin.Envs {
 	}
 }
 
-// TODO @hamersaw - docs
-func (a *ApplicationConfig) GetPersistentEnvs() []*core.EnvironmentAssignment {
-	// does not make sense to have this at the application level
+// GetExecutionEnvs is required to satisfy the ExecutionConfig interface. However, it does not make
+// sense to expose this at the application level so we always return nil.
+func (a *ApplicationConfig) GetExecutionEnvs() []*core.ExecutionEnvironmentAssignment {
 	return nil
 }
 

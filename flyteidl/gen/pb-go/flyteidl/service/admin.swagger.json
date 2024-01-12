@@ -3306,13 +3306,6 @@
       "description": "- JSON: JSON / YAML for the metadata (which contains inlined primitive values). The representation is inline with the standard json specification as specified - https://www.json.org/json-en.html\n - PROTO: Proto is a serialized binary of `core.LiteralMap` defined in flyteidl/core",
       "title": "LiteralMapFormat decides the encoding format in which the input metadata should be made available to the containers.\nIf the user has access to the protocol buffer definitions, it is recommended to use the PROTO format.\nJSON and YAML do not need any protobuf definitions to read it\nAll remote references in core.LiteralMap are replaced with local filesystem references (the data is downloaded to local filesystem)"
     },
-    "EnvironmentEnvironmentType": {
-      "type": "string",
-      "enum": [
-        "FASTTASK"
-      ],
-      "default": "FASTTASK"
-    },
     "ExecutionErrorErrorKind": {
       "type": "string",
       "enum": [
@@ -4044,12 +4037,12 @@
           },
           "description": "Tags to be set for the execution."
         },
-        "persistent_envs": {
+        "execution_envs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coreEnvironmentAssignment"
+            "$ref": "#/definitions/coreExecutionEnvironmentAssignment"
           },
-          "title": "TODO @hamersaw"
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "An ExecutionSpec encompasses all data used to launch this execution. The Spec does not change over the lifetime\nof an execution as it progresses across phase changes."
@@ -4344,12 +4337,12 @@
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
         },
-        "persistent_envs": {
+        "execution_envs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coreEnvironmentAssignment"
+            "$ref": "#/definitions/coreExecutionEnvironmentAssignment"
           },
-          "title": "TODO @hamersaw - docs"
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "User-provided launch plan definition and configuration values."
@@ -5509,12 +5502,12 @@
           "$ref": "#/definitions/adminEnvs",
           "description": "Environment variables to be set for the execution."
         },
-        "persistent_envs": {
+        "execution_envs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coreEnvironmentAssignment"
+            "$ref": "#/definitions/coreExecutionEnvironmentAssignment"
           },
-          "title": "TODO @hamersaw - docs"
+          "description": "Execution environment assignments to be set for the execution."
         }
       },
       "description": "Adds defaults for customizable workflow-execution specifications and overrides."
@@ -6111,33 +6104,12 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
-    "coreEnvironment": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/EnvironmentEnvironmentType"
-        },
-        "fasttask_environment": {
-          "$ref": "#/definitions/coreFastTaskEnvironment"
-        }
-      }
-    },
-    "coreEnvironmentAssignment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "node_ids": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "environment": {
-          "$ref": "#/definitions/coreEnvironment"
-        }
-      }
+    "coreEnvironmentType": {
+      "type": "string",
+      "enum": [
+        "FAST_TASK"
+      ],
+      "default": "FAST_TASK"
     },
     "coreError": {
       "type": "object",
@@ -6152,6 +6124,34 @@
         }
       },
       "description": "Represents an error thrown from a node."
+    },
+    "coreExecutionEnvironment": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreEnvironmentType"
+        },
+        "fast_task": {
+          "$ref": "#/definitions/coreFastTaskEnvironment"
+        }
+      }
+    },
+    "coreExecutionEnvironmentAssignment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "node_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "environment": {
+          "$ref": "#/definitions/coreExecutionEnvironment"
+        }
+      }
     },
     "coreExecutionError": {
       "type": "object",
@@ -6193,7 +6193,7 @@
         "namespace": {
           "type": "string"
         },
-        "pod_id": {
+        "pod_name": {
           "type": "string"
         }
       }

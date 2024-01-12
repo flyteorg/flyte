@@ -122,34 +122,34 @@ func (_m *TaskExecutionContext) EventsRecorder() core.EventsRecorder {
 	return r0
 }
 
-type TaskExecutionContext_GetPersistentEnv struct {
+type TaskExecutionContext_GetExecutionEnv struct {
 	*mock.Call
 }
 
-func (_m TaskExecutionContext_GetPersistentEnv) Return(_a0 *flyteidlcore.Environment) *TaskExecutionContext_GetPersistentEnv {
-	return &TaskExecutionContext_GetPersistentEnv{Call: _m.Call.Return(_a0)}
+func (_m TaskExecutionContext_GetExecutionEnv) Return(_a0 *flyteidlcore.ExecutionEnvironment) *TaskExecutionContext_GetExecutionEnv {
+	return &TaskExecutionContext_GetExecutionEnv{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *TaskExecutionContext) OnGetPersistentEnv(_a0 flyteidlcore.Environment_EnvironmentType) *TaskExecutionContext_GetPersistentEnv {
-	c_call := _m.On("GetPersistentEnv", _a0)
-	return &TaskExecutionContext_GetPersistentEnv{Call: c_call}
+func (_m *TaskExecutionContext) OnGetExecutionEnv(_a0 flyteidlcore.EnvironmentType) *TaskExecutionContext_GetExecutionEnv {
+	c_call := _m.On("GetExecutionEnv", _a0)
+	return &TaskExecutionContext_GetExecutionEnv{Call: c_call}
 }
 
-func (_m *TaskExecutionContext) OnGetPersistentEnvMatch(matchers ...interface{}) *TaskExecutionContext_GetPersistentEnv {
-	c_call := _m.On("GetPersistentEnv", matchers...)
-	return &TaskExecutionContext_GetPersistentEnv{Call: c_call}
+func (_m *TaskExecutionContext) OnGetExecutionEnvMatch(matchers ...interface{}) *TaskExecutionContext_GetExecutionEnv {
+	c_call := _m.On("GetExecutionEnv", matchers...)
+	return &TaskExecutionContext_GetExecutionEnv{Call: c_call}
 }
 
-// GetPersistentEnv provides a mock function with given fields: _a0
-func (_m *TaskExecutionContext) GetPersistentEnv(_a0 flyteidlcore.Environment_EnvironmentType) *flyteidlcore.Environment {
+// GetExecutionEnv provides a mock function with given fields: _a0
+func (_m *TaskExecutionContext) GetExecutionEnv(_a0 flyteidlcore.EnvironmentType) *flyteidlcore.ExecutionEnvironment {
 	ret := _m.Called(_a0)
 
-	var r0 *flyteidlcore.Environment
-	if rf, ok := ret.Get(0).(func(flyteidlcore.Environment_EnvironmentType) *flyteidlcore.Environment); ok {
+	var r0 *flyteidlcore.ExecutionEnvironment
+	if rf, ok := ret.Get(0).(func(flyteidlcore.EnvironmentType) *flyteidlcore.ExecutionEnvironment); ok {
 		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*flyteidlcore.Environment)
+			r0 = ret.Get(0).(*flyteidlcore.ExecutionEnvironment)
 		}
 	}
 

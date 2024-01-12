@@ -36,12 +36,12 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fexecution_2eproto ::google::p
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fartifact_5fid_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_ArtifactID_flyteidl_2fcore_2fartifact_5fid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ExecutionError_flyteidl_2fcore_2fexecution_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_QualityOfService_flyteidl_2fcore_2fexecution_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fexecution_5fenvs_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ExecutionEnvironmentAssignment_flyteidl_2fcore_2fexecution_5fenvs_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Identifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_NodeExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_Literal_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fmetrics_2eproto ::google::protobuf::internal::SCCInfo<4> scc_info_Span_flyteidl_2fcore_2fmetrics_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fpersistent_5fenvs_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_EnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fsecurity_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_SecurityContext_flyteidl_2fcore_2fsecurity_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fduration_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Duration_google_2fprotobuf_2fduration_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2ftimestamp_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Timestamp_google_2fprotobuf_2ftimestamp_2eproto;
@@ -386,7 +386,7 @@ static void InitDefaultsExecutionSpec_flyteidl_2fadmin_2fexecution_2eproto() {
       &scc_info_ClusterAssignment_flyteidl_2fadmin_2fcluster_5fassignment_2eproto.base,
       &scc_info_BoolValue_google_2fprotobuf_2fwrappers_2eproto.base,
       &scc_info_Envs_flyteidl_2fadmin_2fcommon_2eproto.base,
-      &scc_info_EnvironmentAssignment_flyteidl_2fcore_2fpersistent_5fenvs_2eproto.base,}};
+      &scc_info_ExecutionEnvironmentAssignment_flyteidl_2fcore_2fexecution_5fenvs_2eproto.base,}};
 
 static void InitDefaultsExecutionTerminateRequest_flyteidl_2fadmin_2fexecution_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -689,7 +689,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fexecution_2eprot
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, overwrite_cache_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, envs_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, tags_),
-  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, persistent_envs_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, execution_envs_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionSpec, notification_overrides_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::ExecutionTerminateRequest, _internal_metadata_),
@@ -815,128 +815,128 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto[] =
   "dl.admin\032\'flyteidl/admin/cluster_assignm"
   "ent.proto\032\033flyteidl/admin/common.proto\032\034"
   "flyteidl/core/literals.proto\032\035flyteidl/c"
-  "ore/execution.proto\032\037flyteidl/core/artif"
-  "act_id.proto\032\036flyteidl/core/identifier.p"
-  "roto\032\033flyteidl/core/metrics.proto\032#flyte"
-  "idl/core/persistent_envs.proto\032\034flyteidl"
-  "/core/security.proto\032\036google/protobuf/du"
-  "ration.proto\032\037google/protobuf/timestamp."
-  "proto\032\036google/protobuf/wrappers.proto\"\237\001"
-  "\n\026ExecutionCreateRequest\022\017\n\007project\030\001 \001("
-  "\t\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030"
-  "\004 \001(\0132\035.flyteidl.admin.ExecutionSpec\022)\n\006"
-  "inputs\030\005 \001(\0132\031.flyteidl.core.LiteralMap\""
-  "\177\n\030ExecutionRelaunchRequest\0226\n\002id\030\001 \001(\0132"
-  "*.flyteidl.core.WorkflowExecutionIdentif"
-  "ier\022\014\n\004name\030\003 \001(\t\022\027\n\017overwrite_cache\030\004 \001"
-  "(\010J\004\010\002\020\003\"\224\001\n\027ExecutionRecoverRequest\0226\n\002"
-  "id\030\001 \001(\0132*.flyteidl.core.WorkflowExecuti"
-  "onIdentifier\022\014\n\004name\030\002 \001(\t\0223\n\010metadata\030\003"
-  " \001(\0132!.flyteidl.admin.ExecutionMetadata\""
-  "Q\n\027ExecutionCreateResponse\0226\n\002id\030\001 \001(\0132*"
+  "ore/execution.proto\032\"flyteidl/core/execu"
+  "tion_envs.proto\032\037flyteidl/core/artifact_"
+  "id.proto\032\036flyteidl/core/identifier.proto"
+  "\032\033flyteidl/core/metrics.proto\032\034flyteidl/"
+  "core/security.proto\032\036google/protobuf/dur"
+  "ation.proto\032\037google/protobuf/timestamp.p"
+  "roto\032\036google/protobuf/wrappers.proto\"\237\001\n"
+  "\026ExecutionCreateRequest\022\017\n\007project\030\001 \001(\t"
+  "\022\016\n\006domain\030\002 \001(\t\022\014\n\004name\030\003 \001(\t\022+\n\004spec\030\004"
+  " \001(\0132\035.flyteidl.admin.ExecutionSpec\022)\n\006i"
+  "nputs\030\005 \001(\0132\031.flyteidl.core.LiteralMap\"\177"
+  "\n\030ExecutionRelaunchRequest\0226\n\002id\030\001 \001(\0132*"
   ".flyteidl.core.WorkflowExecutionIdentifi"
-  "er\"U\n\033WorkflowExecutionGetRequest\0226\n\002id\030"
-  "\001 \001(\0132*.flyteidl.core.WorkflowExecutionI"
-  "dentifier\"\243\001\n\tExecution\0226\n\002id\030\001 \001(\0132*.fl"
-  "yteidl.core.WorkflowExecutionIdentifier\022"
-  "+\n\004spec\030\002 \001(\0132\035.flyteidl.admin.Execution"
-  "Spec\0221\n\007closure\030\003 \001(\0132 .flyteidl.admin.E"
-  "xecutionClosure\"M\n\rExecutionList\022-\n\nexec"
-  "utions\030\001 \003(\0132\031.flyteidl.admin.Execution\022"
-  "\r\n\005token\030\002 \001(\t\"X\n\016LiteralMapBlob\022/\n\006valu"
-  "es\030\001 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H"
-  "\000\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAbortMetadat"
-  "a\022\r\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030\002 \001(\t\"\360\005\n\020"
-  "ExecutionClosure\0225\n\007outputs\030\001 \001(\0132\036.flyt"
-  "eidl.admin.LiteralMapBlobB\002\030\001H\000\022.\n\005error"
-  "\030\002 \001(\0132\035.flyteidl.core.ExecutionErrorH\000\022"
-  "\031\n\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016abort_meta"
-  "data\030\014 \001(\0132\035.flyteidl.admin.AbortMetadat"
-  "aH\000\0224\n\013output_data\030\r \001(\0132\031.flyteidl.core"
-  ".LiteralMapB\002\030\001H\000\0226\n\017computed_inputs\030\003 \001"
-  "(\0132\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005pha"
-  "se\030\004 \001(\0162&.flyteidl.core.WorkflowExecuti"
-  "on.Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google.pr"
-  "otobuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.goo"
-  "gle.protobuf.Duration\022.\n\ncreated_at\030\007 \001("
-  "\0132\032.google.protobuf.Timestamp\022.\n\nupdated"
-  "_at\030\010 \001(\0132\032.google.protobuf.Timestamp\0223\n"
-  "\rnotifications\030\t \003(\0132\034.flyteidl.admin.No"
-  "tification\022.\n\013workflow_id\030\013 \001(\0132\031.flytei"
-  "dl.core.Identifier\022I\n\024state_change_detai"
-  "ls\030\016 \001(\0132+.flyteidl.admin.ExecutionState"
-  "ChangeDetailsB\017\n\routput_result\">\n\016System"
-  "Metadata\022\031\n\021execution_cluster\030\001 \001(\t\022\021\n\tn"
-  "amespace\030\002 \001(\t\"\213\004\n\021ExecutionMetadata\022=\n\004"
-  "mode\030\001 \001(\0162/.flyteidl.admin.ExecutionMet"
-  "adata.ExecutionMode\022\021\n\tprincipal\030\002 \001(\t\022\017"
-  "\n\007nesting\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132\032."
-  "google.protobuf.Timestamp\022E\n\025parent_node"
-  "_execution\030\005 \001(\0132&.flyteidl.core.NodeExe"
-  "cutionIdentifier\022G\n\023reference_execution\030"
-  "\020 \001(\0132*.flyteidl.core.WorkflowExecutionI"
-  "dentifier\0227\n\017system_metadata\030\021 \001(\0132\036.fly"
-  "teidl.admin.SystemMetadata\022/\n\014artifact_i"
-  "ds\030\022 \003(\0132\031.flyteidl.core.ArtifactID\"g\n\rE"
-  "xecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022"
-  "\n\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKF"
-  "LOW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020NotificationList"
-  "\0223\n\rnotifications\030\001 \003(\0132\034.flyteidl.admin"
-  ".Notification\"\361\006\n\rExecutionSpec\022.\n\013launc"
-  "h_plan\030\001 \001(\0132\031.flyteidl.core.Identifier\022"
-  "-\n\006inputs\030\002 \001(\0132\031.flyteidl.core.LiteralM"
-  "apB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admi"
-  "n.ExecutionMetadata\0229\n\rnotifications\030\005 \001"
-  "(\0132 .flyteidl.admin.NotificationListH\000\022\025"
-  "\n\013disable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026."
-  "flyteidl.admin.Labels\0220\n\013annotations\030\010 \001"
-  "(\0132\033.flyteidl.admin.Annotations\0228\n\020secur"
-  "ity_context\030\n \001(\0132\036.flyteidl.core.Securi"
-  "tyContext\022/\n\tauth_role\030\020 \001(\0132\030.flyteidl."
-  "admin.AuthRoleB\002\030\001\022;\n\022quality_of_service"
-  "\030\021 \001(\0132\037.flyteidl.core.QualityOfService\022"
-  "\027\n\017max_parallelism\030\022 \001(\005\022C\n\026raw_output_d"
-  "ata_config\030\023 \001(\0132#.flyteidl.admin.RawOut"
-  "putDataConfig\022=\n\022cluster_assignment\030\024 \001("
-  "\0132!.flyteidl.admin.ClusterAssignment\0221\n\r"
-  "interruptible\030\025 \001(\0132\032.google.protobuf.Bo"
-  "olValue\022\027\n\017overwrite_cache\030\026 \001(\010\022\"\n\004envs"
-  "\030\027 \001(\0132\024.flyteidl.admin.Envs\022\014\n\004tags\030\030 \003"
-  "(\t\022=\n\017persistent_envs\030\031 \003(\0132$.flyteidl.c"
-  "ore.EnvironmentAssignmentB\030\n\026notificatio"
-  "n_overridesJ\004\010\004\020\005\"b\n\031ExecutionTerminateR"
-  "equest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workf"
-  "lowExecutionIdentifier\022\r\n\005cause\030\002 \001(\t\"\034\n"
-  "\032ExecutionTerminateResponse\"Y\n\037WorkflowE"
-  "xecutionGetDataRequest\0226\n\002id\030\001 \001(\0132*.fly"
-  "teidl.core.WorkflowExecutionIdentifier\"\336"
-  "\001\n WorkflowExecutionGetDataResponse\022,\n\007o"
-  "utputs\030\001 \001(\0132\027.flyteidl.admin.UrlBlobB\002\030"
-  "\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admin.UrlBl"
-  "obB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.flyteidl.c"
-  "ore.LiteralMap\022/\n\014full_outputs\030\004 \001(\0132\031.f"
-  "lyteidl.core.LiteralMap\"\177\n\026ExecutionUpda"
-  "teRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Wo"
-  "rkflowExecutionIdentifier\022-\n\005state\030\002 \001(\016"
-  "2\036.flyteidl.admin.ExecutionState\"\220\001\n\033Exe"
-  "cutionStateChangeDetails\022-\n\005state\030\001 \001(\0162"
-  "\036.flyteidl.admin.ExecutionState\022/\n\013occur"
-  "red_at\030\002 \001(\0132\032.google.protobuf.Timestamp"
-  "\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027ExecutionUpdateRe"
-  "sponse\"k\n\"WorkflowExecutionGetMetricsReq"
-  "uest\0226\n\002id\030\001 \001(\0132*.flyteidl.core.Workflo"
-  "wExecutionIdentifier\022\r\n\005depth\030\002 \001(\005\"H\n#W"
-  "orkflowExecutionGetMetricsResponse\022!\n\004sp"
-  "an\030\001 \001(\0132\023.flyteidl.core.Span*>\n\016Executi"
-  "onState\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022EXECUTI"
-  "ON_ARCHIVED\020\001B=Z;github.com/flyteorg/fly"
-  "te/flyteidl/gen/pb-go/flyteidl/adminb\006pr"
-  "oto3"
+  "er\022\014\n\004name\030\003 \001(\t\022\027\n\017overwrite_cache\030\004 \001("
+  "\010J\004\010\002\020\003\"\224\001\n\027ExecutionRecoverRequest\0226\n\002i"
+  "d\030\001 \001(\0132*.flyteidl.core.WorkflowExecutio"
+  "nIdentifier\022\014\n\004name\030\002 \001(\t\0223\n\010metadata\030\003 "
+  "\001(\0132!.flyteidl.admin.ExecutionMetadata\"Q"
+  "\n\027ExecutionCreateResponse\0226\n\002id\030\001 \001(\0132*."
+  "flyteidl.core.WorkflowExecutionIdentifie"
+  "r\"U\n\033WorkflowExecutionGetRequest\0226\n\002id\030\001"
+  " \001(\0132*.flyteidl.core.WorkflowExecutionId"
+  "entifier\"\243\001\n\tExecution\0226\n\002id\030\001 \001(\0132*.fly"
+  "teidl.core.WorkflowExecutionIdentifier\022+"
+  "\n\004spec\030\002 \001(\0132\035.flyteidl.admin.ExecutionS"
+  "pec\0221\n\007closure\030\003 \001(\0132 .flyteidl.admin.Ex"
+  "ecutionClosure\"M\n\rExecutionList\022-\n\nexecu"
+  "tions\030\001 \003(\0132\031.flyteidl.admin.Execution\022\r"
+  "\n\005token\030\002 \001(\t\"X\n\016LiteralMapBlob\022/\n\006value"
+  "s\030\001 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001H\000"
+  "\022\r\n\003uri\030\002 \001(\tH\000B\006\n\004data\"1\n\rAbortMetadata"
+  "\022\r\n\005cause\030\001 \001(\t\022\021\n\tprincipal\030\002 \001(\t\"\360\005\n\020E"
+  "xecutionClosure\0225\n\007outputs\030\001 \001(\0132\036.flyte"
+  "idl.admin.LiteralMapBlobB\002\030\001H\000\022.\n\005error\030"
+  "\002 \001(\0132\035.flyteidl.core.ExecutionErrorH\000\022\031"
+  "\n\013abort_cause\030\n \001(\tB\002\030\001H\000\0227\n\016abort_metad"
+  "ata\030\014 \001(\0132\035.flyteidl.admin.AbortMetadata"
+  "H\000\0224\n\013output_data\030\r \001(\0132\031.flyteidl.core."
+  "LiteralMapB\002\030\001H\000\0226\n\017computed_inputs\030\003 \001("
+  "\0132\031.flyteidl.core.LiteralMapB\002\030\001\0225\n\005phas"
+  "e\030\004 \001(\0162&.flyteidl.core.WorkflowExecutio"
+  "n.Phase\022.\n\nstarted_at\030\005 \001(\0132\032.google.pro"
+  "tobuf.Timestamp\022+\n\010duration\030\006 \001(\0132\031.goog"
+  "le.protobuf.Duration\022.\n\ncreated_at\030\007 \001(\013"
+  "2\032.google.protobuf.Timestamp\022.\n\nupdated_"
+  "at\030\010 \001(\0132\032.google.protobuf.Timestamp\0223\n\r"
+  "notifications\030\t \003(\0132\034.flyteidl.admin.Not"
+  "ification\022.\n\013workflow_id\030\013 \001(\0132\031.flyteid"
+  "l.core.Identifier\022I\n\024state_change_detail"
+  "s\030\016 \001(\0132+.flyteidl.admin.ExecutionStateC"
+  "hangeDetailsB\017\n\routput_result\">\n\016SystemM"
+  "etadata\022\031\n\021execution_cluster\030\001 \001(\t\022\021\n\tna"
+  "mespace\030\002 \001(\t\"\213\004\n\021ExecutionMetadata\022=\n\004m"
+  "ode\030\001 \001(\0162/.flyteidl.admin.ExecutionMeta"
+  "data.ExecutionMode\022\021\n\tprincipal\030\002 \001(\t\022\017\n"
+  "\007nesting\030\003 \001(\r\0220\n\014scheduled_at\030\004 \001(\0132\032.g"
+  "oogle.protobuf.Timestamp\022E\n\025parent_node_"
+  "execution\030\005 \001(\0132&.flyteidl.core.NodeExec"
+  "utionIdentifier\022G\n\023reference_execution\030\020"
+  " \001(\0132*.flyteidl.core.WorkflowExecutionId"
+  "entifier\0227\n\017system_metadata\030\021 \001(\0132\036.flyt"
+  "eidl.admin.SystemMetadata\022/\n\014artifact_id"
+  "s\030\022 \003(\0132\031.flyteidl.core.ArtifactID\"g\n\rEx"
+  "ecutionMode\022\n\n\006MANUAL\020\000\022\r\n\tSCHEDULED\020\001\022\n"
+  "\n\006SYSTEM\020\002\022\014\n\010RELAUNCH\020\003\022\022\n\016CHILD_WORKFL"
+  "OW\020\004\022\r\n\tRECOVERED\020\005\"G\n\020NotificationList\022"
+  "3\n\rnotifications\030\001 \003(\0132\034.flyteidl.admin."
+  "Notification\"\371\006\n\rExecutionSpec\022.\n\013launch"
+  "_plan\030\001 \001(\0132\031.flyteidl.core.Identifier\022-"
+  "\n\006inputs\030\002 \001(\0132\031.flyteidl.core.LiteralMa"
+  "pB\002\030\001\0223\n\010metadata\030\003 \001(\0132!.flyteidl.admin"
+  ".ExecutionMetadata\0229\n\rnotifications\030\005 \001("
+  "\0132 .flyteidl.admin.NotificationListH\000\022\025\n"
+  "\013disable_all\030\006 \001(\010H\000\022&\n\006labels\030\007 \001(\0132\026.f"
+  "lyteidl.admin.Labels\0220\n\013annotations\030\010 \001("
+  "\0132\033.flyteidl.admin.Annotations\0228\n\020securi"
+  "ty_context\030\n \001(\0132\036.flyteidl.core.Securit"
+  "yContext\022/\n\tauth_role\030\020 \001(\0132\030.flyteidl.a"
+  "dmin.AuthRoleB\002\030\001\022;\n\022quality_of_service\030"
+  "\021 \001(\0132\037.flyteidl.core.QualityOfService\022\027"
+  "\n\017max_parallelism\030\022 \001(\005\022C\n\026raw_output_da"
+  "ta_config\030\023 \001(\0132#.flyteidl.admin.RawOutp"
+  "utDataConfig\022=\n\022cluster_assignment\030\024 \001(\013"
+  "2!.flyteidl.admin.ClusterAssignment\0221\n\ri"
+  "nterruptible\030\025 \001(\0132\032.google.protobuf.Boo"
+  "lValue\022\027\n\017overwrite_cache\030\026 \001(\010\022\"\n\004envs\030"
+  "\027 \001(\0132\024.flyteidl.admin.Envs\022\014\n\004tags\030\030 \003("
+  "\t\022E\n\016execution_envs\030\031 \003(\0132-.flyteidl.cor"
+  "e.ExecutionEnvironmentAssignmentB\030\n\026noti"
+  "fication_overridesJ\004\010\004\020\005\"b\n\031ExecutionTer"
+  "minateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.cor"
+  "e.WorkflowExecutionIdentifier\022\r\n\005cause\030\002"
+  " \001(\t\"\034\n\032ExecutionTerminateResponse\"Y\n\037Wo"
+  "rkflowExecutionGetDataRequest\0226\n\002id\030\001 \001("
+  "\0132*.flyteidl.core.WorkflowExecutionIdent"
+  "ifier\"\336\001\n WorkflowExecutionGetDataRespon"
+  "se\022,\n\007outputs\030\001 \001(\0132\027.flyteidl.admin.Url"
+  "BlobB\002\030\001\022+\n\006inputs\030\002 \001(\0132\027.flyteidl.admi"
+  "n.UrlBlobB\002\030\001\022.\n\013full_inputs\030\003 \001(\0132\031.fly"
+  "teidl.core.LiteralMap\022/\n\014full_outputs\030\004 "
+  "\001(\0132\031.flyteidl.core.LiteralMap\"\177\n\026Execut"
+  "ionUpdateRequest\0226\n\002id\030\001 \001(\0132*.flyteidl."
+  "core.WorkflowExecutionIdentifier\022-\n\005stat"
+  "e\030\002 \001(\0162\036.flyteidl.admin.ExecutionState\""
+  "\220\001\n\033ExecutionStateChangeDetails\022-\n\005state"
+  "\030\001 \001(\0162\036.flyteidl.admin.ExecutionState\022/"
+  "\n\013occurred_at\030\002 \001(\0132\032.google.protobuf.Ti"
+  "mestamp\022\021\n\tprincipal\030\003 \001(\t\"\031\n\027ExecutionU"
+  "pdateResponse\"k\n\"WorkflowExecutionGetMet"
+  "ricsRequest\0226\n\002id\030\001 \001(\0132*.flyteidl.core."
+  "WorkflowExecutionIdentifier\022\r\n\005depth\030\002 \001"
+  "(\005\"H\n#WorkflowExecutionGetMetricsRespons"
+  "e\022!\n\004span\030\001 \001(\0132\023.flyteidl.core.Span*>\n\016"
+  "ExecutionState\022\024\n\020EXECUTION_ACTIVE\020\000\022\026\n\022"
+  "EXECUTION_ARCHIVED\020\001B=Z;github.com/flyte"
+  "org/flyte/flyteidl/gen/pb-go/flyteidl/ad"
+  "minb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fexecution_2eproto,
-  "flyteidl/admin/execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fexecution_2eproto, 4804,
+  "flyteidl/admin/execution.proto", &assign_descriptors_table_flyteidl_2fadmin_2fexecution_2eproto, 4811,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fexecution_2eproto() {
@@ -946,10 +946,10 @@ void AddDescriptors_flyteidl_2fadmin_2fexecution_2eproto() {
     ::AddDescriptors_flyteidl_2fadmin_2fcommon_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fliterals_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fexecution_2eproto,
+    ::AddDescriptors_flyteidl_2fcore_2fexecution_5fenvs_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fartifact_5fid_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto,
-    ::AddDescriptors_flyteidl_2fcore_2fpersistent_5fenvs_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fsecurity_2eproto,
     ::AddDescriptors_google_2fprotobuf_2fduration_2eproto,
     ::AddDescriptors_google_2fprotobuf_2ftimestamp_2eproto,
@@ -7436,8 +7436,8 @@ void ExecutionSpec::clear_envs() {
   }
   envs_ = nullptr;
 }
-void ExecutionSpec::clear_persistent_envs() {
-  persistent_envs_.Clear();
+void ExecutionSpec::clear_execution_envs() {
+  execution_envs_.Clear();
 }
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int ExecutionSpec::kLaunchPlanFieldNumber;
@@ -7457,7 +7457,7 @@ const int ExecutionSpec::kInterruptibleFieldNumber;
 const int ExecutionSpec::kOverwriteCacheFieldNumber;
 const int ExecutionSpec::kEnvsFieldNumber;
 const int ExecutionSpec::kTagsFieldNumber;
-const int ExecutionSpec::kPersistentEnvsFieldNumber;
+const int ExecutionSpec::kExecutionEnvsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 ExecutionSpec::ExecutionSpec()
@@ -7469,7 +7469,7 @@ ExecutionSpec::ExecutionSpec(const ExecutionSpec& from)
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
       tags_(from.tags_),
-      persistent_envs_(from.persistent_envs_) {
+      execution_envs_(from.execution_envs_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_launch_plan()) {
     launch_plan_ = new ::flyteidl::core::Identifier(*from.launch_plan_);
@@ -7618,7 +7618,7 @@ void ExecutionSpec::Clear() {
   (void) cached_has_bits;
 
   tags_.Clear();
-  persistent_envs_.Clear();
+  execution_envs_.Clear();
   if (GetArenaNoVirtual() == nullptr && launch_plan_ != nullptr) {
     delete launch_plan_;
   }
@@ -7896,14 +7896,14 @@ const char* ExecutionSpec::_InternalParse(const char* begin, const char* end, vo
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 65535) == 450 && (ptr += 2));
         break;
       }
-      // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
+      // repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
       case 25: {
         if (static_cast<::google::protobuf::uint8>(tag) != 202) goto handle_unusual;
         do {
           ptr = ::google::protobuf::io::ReadSize(ptr, &size);
           GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
-          parser_till_end = ::flyteidl::core::EnvironmentAssignment::_InternalParse;
-          object = msg->add_persistent_envs();
+          parser_till_end = ::flyteidl::core::ExecutionEnvironmentAssignment::_InternalParse;
+          object = msg->add_execution_envs();
           if (size > end - ptr) goto len_delim_till_end;
           ptr += size;
           GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -8145,11 +8145,11 @@ bool ExecutionSpec::MergePartialFromCodedStream(
         break;
       }
 
-      // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
+      // repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
       case 25: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (202 & 0xFF)) {
           DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
-                input, add_persistent_envs()));
+                input, add_execution_envs()));
         } else {
           goto handle_unusual;
         }
@@ -8286,12 +8286,12 @@ void ExecutionSpec::SerializeWithCachedSizes(
       24, this->tags(i), output);
   }
 
-  // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
+  // repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->persistent_envs_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->execution_envs_size()); i < n; i++) {
     ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
       25,
-      this->persistent_envs(static_cast<int>(i)),
+      this->execution_envs(static_cast<int>(i)),
       output);
   }
 
@@ -8424,12 +8424,12 @@ void ExecutionSpec::SerializeWithCachedSizes(
       WriteStringToArray(24, this->tags(i), target);
   }
 
-  // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
+  // repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
   for (unsigned int i = 0,
-      n = static_cast<unsigned int>(this->persistent_envs_size()); i < n; i++) {
+      n = static_cast<unsigned int>(this->execution_envs_size()); i < n; i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
-        25, this->persistent_envs(static_cast<int>(i)), target);
+        25, this->execution_envs(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -8461,14 +8461,14 @@ size_t ExecutionSpec::ByteSizeLong() const {
       this->tags(i));
   }
 
-  // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
+  // repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
   {
-    unsigned int count = static_cast<unsigned int>(this->persistent_envs_size());
+    unsigned int count = static_cast<unsigned int>(this->execution_envs_size());
     total_size += 2UL * count;
     for (unsigned int i = 0; i < count; i++) {
       total_size +=
         ::google::protobuf::internal::WireFormatLite::MessageSize(
-          this->persistent_envs(static_cast<int>(i)));
+          this->execution_envs(static_cast<int>(i)));
     }
   }
 
@@ -8613,7 +8613,7 @@ void ExecutionSpec::MergeFrom(const ExecutionSpec& from) {
   (void) cached_has_bits;
 
   tags_.MergeFrom(from.tags_);
-  persistent_envs_.MergeFrom(from.persistent_envs_);
+  execution_envs_.MergeFrom(from.execution_envs_);
   if (from.has_launch_plan()) {
     mutable_launch_plan()->::flyteidl::core::Identifier::MergeFrom(from.launch_plan());
   }
@@ -8697,7 +8697,7 @@ void ExecutionSpec::InternalSwap(ExecutionSpec* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   tags_.InternalSwap(CastToBase(&other->tags_));
-  CastToBase(&persistent_envs_)->InternalSwap(CastToBase(&other->persistent_envs_));
+  CastToBase(&execution_envs_)->InternalSwap(CastToBase(&other->execution_envs_));
   swap(launch_plan_, other->launch_plan_);
   swap(inputs_, other->inputs_);
   swap(metadata_, other->metadata_);

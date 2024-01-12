@@ -20,7 +20,7 @@ from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E
 from flyteadmin.models.admin_envs import AdminEnvs  # noqa: F401,E501
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
-from flyteadmin.models.core_environment_assignment import CoreEnvironmentAssignment  # noqa: F401,E501
+from flyteadmin.models.core_execution_environment_assignment import CoreExecutionEnvironmentAssignment  # noqa: F401,E501
 from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
 
 
@@ -46,7 +46,7 @@ class AdminWorkflowExecutionConfig(object):
         'interruptible': 'bool',
         'overwrite_cache': 'bool',
         'envs': 'AdminEnvs',
-        'persistent_envs': 'list[CoreEnvironmentAssignment]'
+        'execution_envs': 'list[CoreExecutionEnvironmentAssignment]'
     }
 
     attribute_map = {
@@ -58,10 +58,10 @@ class AdminWorkflowExecutionConfig(object):
         'interruptible': 'interruptible',
         'overwrite_cache': 'overwrite_cache',
         'envs': 'envs',
-        'persistent_envs': 'persistent_envs'
+        'execution_envs': 'execution_envs'
     }
 
-    def __init__(self, max_parallelism=None, security_context=None, raw_output_data_config=None, labels=None, annotations=None, interruptible=None, overwrite_cache=None, envs=None, persistent_envs=None):  # noqa: E501
+    def __init__(self, max_parallelism=None, security_context=None, raw_output_data_config=None, labels=None, annotations=None, interruptible=None, overwrite_cache=None, envs=None, execution_envs=None):  # noqa: E501
         """AdminWorkflowExecutionConfig - a model defined in Swagger"""  # noqa: E501
 
         self._max_parallelism = None
@@ -72,7 +72,7 @@ class AdminWorkflowExecutionConfig(object):
         self._interruptible = None
         self._overwrite_cache = None
         self._envs = None
-        self._persistent_envs = None
+        self._execution_envs = None
         self.discriminator = None
 
         if max_parallelism is not None:
@@ -91,8 +91,8 @@ class AdminWorkflowExecutionConfig(object):
             self.overwrite_cache = overwrite_cache
         if envs is not None:
             self.envs = envs
-        if persistent_envs is not None:
-            self.persistent_envs = persistent_envs
+        if execution_envs is not None:
+            self.execution_envs = execution_envs
 
     @property
     def max_parallelism(self):
@@ -279,25 +279,27 @@ class AdminWorkflowExecutionConfig(object):
         self._envs = envs
 
     @property
-    def persistent_envs(self):
-        """Gets the persistent_envs of this AdminWorkflowExecutionConfig.  # noqa: E501
+    def execution_envs(self):
+        """Gets the execution_envs of this AdminWorkflowExecutionConfig.  # noqa: E501
 
+        Execution environment assignments to be set for the execution.  # noqa: E501
 
-        :return: The persistent_envs of this AdminWorkflowExecutionConfig.  # noqa: E501
-        :rtype: list[CoreEnvironmentAssignment]
+        :return: The execution_envs of this AdminWorkflowExecutionConfig.  # noqa: E501
+        :rtype: list[CoreExecutionEnvironmentAssignment]
         """
-        return self._persistent_envs
+        return self._execution_envs
 
-    @persistent_envs.setter
-    def persistent_envs(self, persistent_envs):
-        """Sets the persistent_envs of this AdminWorkflowExecutionConfig.
+    @execution_envs.setter
+    def execution_envs(self, execution_envs):
+        """Sets the execution_envs of this AdminWorkflowExecutionConfig.
 
+        Execution environment assignments to be set for the execution.  # noqa: E501
 
-        :param persistent_envs: The persistent_envs of this AdminWorkflowExecutionConfig.  # noqa: E501
-        :type: list[CoreEnvironmentAssignment]
+        :param execution_envs: The execution_envs of this AdminWorkflowExecutionConfig.  # noqa: E501
+        :type: list[CoreExecutionEnvironmentAssignment]
         """
 
-        self._persistent_envs = persistent_envs
+        self._execution_envs = execution_envs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

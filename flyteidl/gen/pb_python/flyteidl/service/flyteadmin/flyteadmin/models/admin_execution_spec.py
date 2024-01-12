@@ -24,7 +24,7 @@ from flyteadmin.models.admin_execution_metadata import AdminExecutionMetadata  #
 from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
 from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
 from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
-from flyteadmin.models.core_environment_assignment import CoreEnvironmentAssignment  # noqa: F401,E501
+from flyteadmin.models.core_execution_environment_assignment import CoreExecutionEnvironmentAssignment  # noqa: F401,E501
 from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
 from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
 from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
@@ -62,7 +62,7 @@ class AdminExecutionSpec(object):
         'overwrite_cache': 'bool',
         'envs': 'AdminEnvs',
         'tags': 'list[str]',
-        'persistent_envs': 'list[CoreEnvironmentAssignment]'
+        'execution_envs': 'list[CoreExecutionEnvironmentAssignment]'
     }
 
     attribute_map = {
@@ -83,10 +83,10 @@ class AdminExecutionSpec(object):
         'overwrite_cache': 'overwrite_cache',
         'envs': 'envs',
         'tags': 'tags',
-        'persistent_envs': 'persistent_envs'
+        'execution_envs': 'execution_envs'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None, overwrite_cache=None, envs=None, tags=None, persistent_envs=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None, overwrite_cache=None, envs=None, tags=None, execution_envs=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
 
         self._launch_plan = None
@@ -106,7 +106,7 @@ class AdminExecutionSpec(object):
         self._overwrite_cache = None
         self._envs = None
         self._tags = None
-        self._persistent_envs = None
+        self._execution_envs = None
         self.discriminator = None
 
         if launch_plan is not None:
@@ -143,8 +143,8 @@ class AdminExecutionSpec(object):
             self.envs = envs
         if tags is not None:
             self.tags = tags
-        if persistent_envs is not None:
-            self.persistent_envs = persistent_envs
+        if execution_envs is not None:
+            self.execution_envs = execution_envs
 
     @property
     def launch_plan(self):
@@ -530,25 +530,27 @@ class AdminExecutionSpec(object):
         self._tags = tags
 
     @property
-    def persistent_envs(self):
-        """Gets the persistent_envs of this AdminExecutionSpec.  # noqa: E501
+    def execution_envs(self):
+        """Gets the execution_envs of this AdminExecutionSpec.  # noqa: E501
 
+        Execution environment assignments to be set for the execution.  # noqa: E501
 
-        :return: The persistent_envs of this AdminExecutionSpec.  # noqa: E501
-        :rtype: list[CoreEnvironmentAssignment]
+        :return: The execution_envs of this AdminExecutionSpec.  # noqa: E501
+        :rtype: list[CoreExecutionEnvironmentAssignment]
         """
-        return self._persistent_envs
+        return self._execution_envs
 
-    @persistent_envs.setter
-    def persistent_envs(self, persistent_envs):
-        """Sets the persistent_envs of this AdminExecutionSpec.
+    @execution_envs.setter
+    def execution_envs(self, execution_envs):
+        """Sets the execution_envs of this AdminExecutionSpec.
 
+        Execution environment assignments to be set for the execution.  # noqa: E501
 
-        :param persistent_envs: The persistent_envs of this AdminExecutionSpec.  # noqa: E501
-        :type: list[CoreEnvironmentAssignment]
+        :param execution_envs: The execution_envs of this AdminExecutionSpec.  # noqa: E501
+        :type: list[CoreExecutionEnvironmentAssignment]
         """
 
-        self._persistent_envs = persistent_envs
+        self._execution_envs = execution_envs
 
     def to_dict(self):
         """Returns the model properties as a dict"""

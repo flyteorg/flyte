@@ -74,8 +74,8 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 			executionConfig.EnvironmentVariables = envs
 		}
 
-		for _, persistentEnv := range workflowExecutionConfig.GetPersistentEnvs() {
-			executionConfig.PersistentEnvs = append(executionConfig.PersistentEnvs, v1alpha1.PersistentEnv{persistentEnv})
+		for _, executionEnvironment := range workflowExecutionConfig.GetExecutionEnvs() {
+			executionConfig.ExecutionEnvs = append(executionConfig.ExecutionEnvs, v1alpha1.ExecutionEnvironmentAssignment{executionEnvironment})
 		}
 	}
 	if taskResources != nil {

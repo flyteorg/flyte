@@ -38,8 +38,10 @@ type PluginProperties struct {
 	DisableNodeLevelCaching bool
 	// Specifies the length of TaskExecutionID generated name. default: 50
 	GeneratedNameMaxLength *int
-	// TODO @hamersaw - docs
-	PersistentEnvType *core.Environment_EnvironmentType
+	// ExecutionEnvType specifies the execution environment type for the plugin. If not specified,
+	// the plugin does not support persistent execution environments and will be execution in an
+	// ephemeral environment.
+	ExecutionEnvType *core.EnvironmentType
 }
 
 // Interface for the core Flyte plugin

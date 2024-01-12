@@ -36,10 +36,10 @@
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/execution.pb.h"
+#include "flyteidl/core/execution_envs.pb.h"
 #include "flyteidl/core/artifact_id.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/metrics.pb.h"
-#include "flyteidl/core/persistent_envs.pb.h"
 #include "flyteidl/core/security.pb.h"
 #include <google/protobuf/duration.pb.h>
 #include <google/protobuf/timestamp.pb.h>
@@ -2317,17 +2317,17 @@ class ExecutionSpec final :
   const ::google::protobuf::RepeatedPtrField<::std::string>& tags() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_tags();
 
-  // repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
-  int persistent_envs_size() const;
-  void clear_persistent_envs();
-  static const int kPersistentEnvsFieldNumber = 25;
-  ::flyteidl::core::EnvironmentAssignment* mutable_persistent_envs(int index);
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >*
-      mutable_persistent_envs();
-  const ::flyteidl::core::EnvironmentAssignment& persistent_envs(int index) const;
-  ::flyteidl::core::EnvironmentAssignment* add_persistent_envs();
-  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >&
-      persistent_envs() const;
+  // repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
+  int execution_envs_size() const;
+  void clear_execution_envs();
+  static const int kExecutionEnvsFieldNumber = 25;
+  ::flyteidl::core::ExecutionEnvironmentAssignment* mutable_execution_envs(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ExecutionEnvironmentAssignment >*
+      mutable_execution_envs();
+  const ::flyteidl::core::ExecutionEnvironmentAssignment& execution_envs(int index) const;
+  ::flyteidl::core::ExecutionEnvironmentAssignment* add_execution_envs();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ExecutionEnvironmentAssignment >&
+      execution_envs() const;
 
   // .flyteidl.core.Identifier launch_plan = 1;
   bool has_launch_plan() const;
@@ -2480,7 +2480,7 @@ class ExecutionSpec final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> tags_;
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment > persistent_envs_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ExecutionEnvironmentAssignment > execution_envs_;
   ::flyteidl::core::Identifier* launch_plan_;
   ::flyteidl::core::LiteralMap* inputs_;
   ::flyteidl::admin::ExecutionMetadata* metadata_;
@@ -6503,31 +6503,31 @@ ExecutionSpec::mutable_tags() {
   return &tags_;
 }
 
-// repeated .flyteidl.core.EnvironmentAssignment persistent_envs = 25;
-inline int ExecutionSpec::persistent_envs_size() const {
-  return persistent_envs_.size();
+// repeated .flyteidl.core.ExecutionEnvironmentAssignment execution_envs = 25;
+inline int ExecutionSpec::execution_envs_size() const {
+  return execution_envs_.size();
 }
-inline ::flyteidl::core::EnvironmentAssignment* ExecutionSpec::mutable_persistent_envs(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.persistent_envs)
-  return persistent_envs_.Mutable(index);
+inline ::flyteidl::core::ExecutionEnvironmentAssignment* ExecutionSpec::mutable_execution_envs(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionSpec.execution_envs)
+  return execution_envs_.Mutable(index);
 }
-inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >*
-ExecutionSpec::mutable_persistent_envs() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.ExecutionSpec.persistent_envs)
-  return &persistent_envs_;
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ExecutionEnvironmentAssignment >*
+ExecutionSpec::mutable_execution_envs() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.ExecutionSpec.execution_envs)
+  return &execution_envs_;
 }
-inline const ::flyteidl::core::EnvironmentAssignment& ExecutionSpec::persistent_envs(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.persistent_envs)
-  return persistent_envs_.Get(index);
+inline const ::flyteidl::core::ExecutionEnvironmentAssignment& ExecutionSpec::execution_envs(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionSpec.execution_envs)
+  return execution_envs_.Get(index);
 }
-inline ::flyteidl::core::EnvironmentAssignment* ExecutionSpec::add_persistent_envs() {
-  // @@protoc_insertion_point(field_add:flyteidl.admin.ExecutionSpec.persistent_envs)
-  return persistent_envs_.Add();
+inline ::flyteidl::core::ExecutionEnvironmentAssignment* ExecutionSpec::add_execution_envs() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.ExecutionSpec.execution_envs)
+  return execution_envs_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::EnvironmentAssignment >&
-ExecutionSpec::persistent_envs() const {
-  // @@protoc_insertion_point(field_list:flyteidl.admin.ExecutionSpec.persistent_envs)
-  return persistent_envs_;
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ExecutionEnvironmentAssignment >&
+ExecutionSpec::execution_envs() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.ExecutionSpec.execution_envs)
+  return execution_envs_;
 }
 
 inline bool ExecutionSpec::has_notification_overrides() const {
