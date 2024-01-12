@@ -5,9 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
-	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
