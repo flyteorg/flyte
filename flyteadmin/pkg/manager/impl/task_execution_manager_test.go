@@ -897,16 +897,7 @@ func TestGetTaskExecutionData(t *testing.T) {
 			}, nil
 		})
 	mockTaskExecutionRemoteURL = dataMocks.NewMockRemoteURL()
-	mockTaskExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if uri == "input-uri.pb" {
-			return admin.UrlBlob{
-				Url:   "inputs",
-				Bytes: 100,
-			}, nil
-		}
 
-		return admin.UrlBlob{}, errors.New("unexpected input")
-	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{

@@ -8,7 +8,6 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
-	urlMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -28,16 +27,6 @@ const testOutputsURI = "s3://foo/bar/outputs.pb"
 func TestGetInputs(t *testing.T) {
 	inputsURI := "s3://foo/bar/inputs.pb"
 
-	expectedURLBlob := admin.UrlBlob{
-		Url:   "s3://foo/signed/inputs.pb",
-		Bytes: 1000,
-	}
-
-	mockRemoteURL := urlMocks.NewMockRemoteURL()
-	mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
-		assert.Equal(t, inputsURI, uri)
-		return expectedURLBlob, nil
-	}
 	remoteDataConfig := interfaces.RemoteDataConfig{
 		MaxSizeInBytes: 2000,
 	}

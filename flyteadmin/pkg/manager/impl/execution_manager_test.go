@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -3595,17 +3594,7 @@ func TestGetExecutionData(t *testing.T) {
 		}, nil
 	}
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
-	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
-		ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if strings.HasSuffix(uri, shared.Inputs) {
-			return admin.UrlBlob{
-				Url:   "inputs",
-				Bytes: 200,
-			}, nil
-		}
 
-		return admin.UrlBlob{}, errors.New("unexpected input")
-	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
