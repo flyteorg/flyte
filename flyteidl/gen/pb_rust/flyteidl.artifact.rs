@@ -189,13 +189,13 @@ pub struct CreateTriggerResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeleteTriggerRequest {
+pub struct DeactivateTriggerRequest {
     #[prost(message, optional, tag="1")]
     pub trigger_id: ::core::option::Option<super::core::Identifier>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeleteTriggerResponse {
+pub struct DeactivateTriggerResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -244,5 +244,17 @@ pub struct ExecutionInputsRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionInputsResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListUsageRequest {
+    #[prost(message, optional, tag="1")]
+    pub artifact_id: ::core::option::Option<super::core::ArtifactId>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListUsageResponse {
+    #[prost(message, repeated, tag="1")]
+    pub executions: ::prost::alloc::vec::Vec<super::core::WorkflowExecutionIdentifier>,
 }
 // @@protoc_insertion_point(module)
