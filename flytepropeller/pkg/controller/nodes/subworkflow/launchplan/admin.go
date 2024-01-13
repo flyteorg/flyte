@@ -268,7 +268,7 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			execData, err := a.adminClient.GetExecutionData(ctx, &admin.WorkflowExecutionGetDataRequest{
 				Id: &exec.WorkflowExecutionIdentifier,
 			})
-			if err != nil {
+			if err != nil || execData.GetFullOutputs() == nil || execData.GetFullOutputs().GetLiterals() == nil {
 				outputURI := res.GetClosure().GetOutputs().GetUri()
 				// attempt remote storage read on GetExecutionData failure
 				if outputURI != "" {
