@@ -897,7 +897,21 @@ func TestGetTaskExecutionData(t *testing.T) {
 			}, nil
 		})
 	mockTaskExecutionRemoteURL = dataMocks.NewMockRemoteURL()
+	mockTaskExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
+		if uri == "input-uri.pb" {
+			return admin.UrlBlob{
+				Url:   "inputs",
+				Bytes: 100,
+			}, nil
+		} else if uri == "test-output.pb" {
+			return admin.UrlBlob{
+				Url:   "outputs",
+				Bytes: 200,
+			}, nil
+		}
 
+		return admin.UrlBlob{}, errors.New("unexpected input")
+	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -933,6 +947,14 @@ func TestGetTaskExecutionData(t *testing.T) {
 	assert.Nil(t, err)
 	assert.True(t, getTaskCalled)
 	assert.True(t, proto.Equal(&admin.TaskExecutionGetDataResponse{
+		Inputs: &admin.UrlBlob{
+			Url:   "inputs",
+			Bytes: 100,
+		},
+		Outputs: &admin.UrlBlob{
+			Url:   "outputs",
+			Bytes: 200,
+		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
 		FlyteUrls: &admin.FlyteURLs{

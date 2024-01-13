@@ -310,23 +310,29 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		return nil, err
 	}
 
-	inputs, err := util.GetInputs(ctx, m.storageClient, taskExecution.InputUri)
+	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, taskExecution.InputUri)
 	if err != nil {
 		return nil, err
 	}
-	outputs, err := util.GetOutputs(ctx, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, taskExecution.Closure)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &admin.TaskExecutionGetDataResponse{
+		Inputs:      inputURLBlob,
+		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
 	}
 
-	if response.FullOutputs != nil {
+	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
+	if response.Outputs.Bytes > 0 {
+		m.metrics.TaskExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	} else if response.FullOutputs != nil {
 		m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}
 	return response, nil

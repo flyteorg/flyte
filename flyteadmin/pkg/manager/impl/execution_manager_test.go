@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -3594,7 +3595,22 @@ func TestGetExecutionData(t *testing.T) {
 		}, nil
 	}
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
+	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
+		ctx context.Context, uri string) (admin.UrlBlob, error) {
+		if uri == outputURI {
+			return admin.UrlBlob{
+				Url:   "outputs",
+				Bytes: 200,
+			}, nil
+		} else if strings.HasSuffix(uri, shared.Inputs) {
+			return admin.UrlBlob{
+				Url:   "inputs",
+				Bytes: 200,
+			}, nil
+		}
 
+		return admin.UrlBlob{}, errors.New("unexpected input")
+	}
 	mockStorage := commonMocks.GetMockStorageClient()
 	fullInputs := &core.LiteralMap{
 		Literals: map[string]*core.Literal{
@@ -3629,6 +3645,14 @@ func TestGetExecutionData(t *testing.T) {
 	})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
+		Outputs: &admin.UrlBlob{
+			Url:   "outputs",
+			Bytes: 200,
+		},
+		Inputs: &admin.UrlBlob{
+			Url:   "inputs",
+			Bytes: 200,
+		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
 	}, dataResponse))
@@ -3755,6 +3779,86 @@ func TestGetExecution_Legacy(t *testing.T) {
 	assert.True(t, proto.Equal(&executionIdentifier, execution.Id))
 	assert.True(t, proto.Equal(getExpectedLegacySpec(), execution.Spec))
 	assert.True(t, proto.Equal(getLegacyClosure(), execution.Closure))
+}
+
+func TestGetExecutionData_LegacyModel(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	startedAt := time.Date(2018, 8, 30, 0, 0, 0, 0, time.UTC)
+	closure := getLegacyClosure()
+	closure.OutputResult = &admin.ExecutionClosure_Outputs{
+		Outputs: &admin.LiteralMapBlob{
+			Data: &admin.LiteralMapBlob_Uri{
+				Uri: outputURI,
+			},
+		},
+	}
+	var closureBytes, _ = proto.Marshal(closure)
+
+	executionGetFunc := func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
+		return models.Execution{
+			BaseModel: models.BaseModel{
+				CreatedAt: testutils.MockCreatedAtValue,
+			},
+			ExecutionKey: models.ExecutionKey{
+				Project: "project",
+				Domain:  "domain",
+				Name:    "name",
+			},
+			Spec:         getLegacySpecBytes(),
+			Phase:        phase,
+			Closure:      closureBytes,
+			LaunchPlanID: uint(1),
+			WorkflowID:   uint(2),
+			StartedAt:    &startedAt,
+		}, nil
+	}
+	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
+	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
+		ctx context.Context, uri string) (admin.UrlBlob, error) {
+		if uri == outputURI {
+			return admin.UrlBlob{
+				Url:   "outputs",
+				Bytes: 200,
+			}, nil
+		} else if strings.HasSuffix(uri, shared.Inputs) {
+			return admin.UrlBlob{
+				Url:   "inputs",
+				Bytes: 200,
+			}, nil
+		}
+
+		return admin.UrlBlob{}, errors.New("unexpected input")
+	}
+
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
+	storageClient := getMockStorageForExecTest(context.Background())
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), storageClient, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+	dataResponse, err := execManager.GetExecutionData(context.Background(), admin.WorkflowExecutionGetDataRequest{
+		Id: &executionIdentifier,
+	})
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
+		Outputs: &admin.UrlBlob{
+			Url:   "outputs",
+			Bytes: 200,
+		},
+		Inputs: &admin.UrlBlob{
+			Url:   "inputs",
+			Bytes: 200,
+		},
+		FullInputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": testutils.MakeStringLiteral("foo-value-1"),
+			},
+		},
+		FullOutputs: &core.LiteralMap{},
+	}, dataResponse))
+	var inputs core.LiteralMap
+	err = storageClient.ReadProtobuf(context.Background(), storage.DataReference("s3://bucket/metadata/project/domain/name/inputs"), &inputs)
+	assert.Nil(t, err)
+	assert.True(t, proto.Equal(&inputs, closure.ComputedInputs))
 }
 
 func TestCreateExecution_LegacyClient(t *testing.T) {

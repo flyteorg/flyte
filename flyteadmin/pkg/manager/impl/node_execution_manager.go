@@ -495,18 +495,21 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return nil, err
 	}
 
-	inputs, err := util.GetInputs(ctx, m.storageClient, nodeExecution.InputUri)
+	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient, nodeExecution.InputUri)
 	if err != nil {
 		return nil, err
 	}
 
-	outputs, err := util.GetOutputs(ctx, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, nodeExecution.Closure)
 	if err != nil {
 		return nil, err
 	}
 
 	response := &admin.NodeExecutionGetDataResponse{
+		Inputs:      inputURLBlob,
+		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(*request.Id, nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
@@ -533,7 +536,10 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		}
 	}
 
-	if response.FullOutputs != nil {
+	m.metrics.NodeExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
+	if response.Outputs.Bytes > 0 {
+		m.metrics.NodeExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
+	} else if response.FullOutputs != nil {
 		m.metrics.NodeExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}
 
