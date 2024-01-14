@@ -2155,6 +2155,8 @@ pub struct TaskLog {
     pub message_format: i32,
     #[prost(message, optional, tag="4")]
     pub ttl: ::core::option::Option<::prost_types::Duration>,
+    #[prost(bool, tag="5")]
+    pub show_while_pending: bool,
 }
 /// Nested message and enum types in `TaskLog`.
 pub mod task_log {
