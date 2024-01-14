@@ -13800,6 +13800,7 @@
                  * @property {string|null} [name] TaskLog name
                  * @property {flyteidl.core.TaskLog.MessageFormat|null} [messageFormat] TaskLog messageFormat
                  * @property {google.protobuf.IDuration|null} [ttl] TaskLog ttl
+                 * @property {boolean|null} [ShowWhilePending] TaskLog ShowWhilePending
                  */
     
                 /**
@@ -13850,6 +13851,14 @@
                 TaskLog.prototype.ttl = null;
     
                 /**
+                 * TaskLog ShowWhilePending.
+                 * @member {boolean} ShowWhilePending
+                 * @memberof flyteidl.core.TaskLog
+                 * @instance
+                 */
+                TaskLog.prototype.ShowWhilePending = false;
+    
+                /**
                  * Creates a new TaskLog instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskLog
@@ -13881,6 +13890,8 @@
                         writer.uint32(/* id 3, wireType 0 =*/24).int32(message.messageFormat);
                     if (message.ttl != null && message.hasOwnProperty("ttl"))
                         $root.google.protobuf.Duration.encode(message.ttl, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.ShowWhilePending != null && message.hasOwnProperty("ShowWhilePending"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).bool(message.ShowWhilePending);
                     return writer;
                 };
     
@@ -13913,6 +13924,9 @@
                             break;
                         case 4:
                             message.ttl = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.ShowWhilePending = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13953,6 +13967,9 @@
                         if (error)
                             return "ttl." + error;
                     }
+                    if (message.ShowWhilePending != null && message.hasOwnProperty("ShowWhilePending"))
+                        if (typeof message.ShowWhilePending !== "boolean")
+                            return "ShowWhilePending: boolean expected";
                     return null;
                 };
     

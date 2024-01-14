@@ -103,7 +103,7 @@ class ExecutionError(_message.Message):
     def __init__(self, code: _Optional[str] = ..., message: _Optional[str] = ..., error_uri: _Optional[str] = ..., kind: _Optional[_Union[ExecutionError.ErrorKind, str]] = ...) -> None: ...
 
 class TaskLog(_message.Message):
-    __slots__ = ["uri", "name", "message_format", "ttl"]
+    __slots__ = ["uri", "name", "message_format", "ttl", "ShowWhilePending"]
     class MessageFormat(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         UNKNOWN: _ClassVar[TaskLog.MessageFormat]
@@ -116,11 +116,13 @@ class TaskLog(_message.Message):
     NAME_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FORMAT_FIELD_NUMBER: _ClassVar[int]
     TTL_FIELD_NUMBER: _ClassVar[int]
+    SHOWWHILEPENDING_FIELD_NUMBER: _ClassVar[int]
     uri: str
     name: str
     message_format: TaskLog.MessageFormat
     ttl: _duration_pb2.Duration
-    def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+    ShowWhilePending: bool
+    def __init__(self, uri: _Optional[str] = ..., name: _Optional[str] = ..., message_format: _Optional[_Union[TaskLog.MessageFormat, str]] = ..., ttl: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., ShowWhilePending: bool = ...) -> None: ...
 
 class QualityOfServiceSpec(_message.Message):
     __slots__ = ["queueing_budget"]
