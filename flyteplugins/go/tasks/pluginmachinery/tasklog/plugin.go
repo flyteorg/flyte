@@ -65,8 +65,9 @@ type Plugin interface {
 }
 
 type TemplateLogPlugin struct {
-	DisplayName   string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
-	TemplateURIs  []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
-	MessageFormat core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
-	Scheme        TemplateScheme             `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
+	DisplayName      string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
+	TemplateURIs     []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
+	MessageFormat    core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
+	Scheme           TemplateScheme             `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
+	ShowWhilePending bool                       `json:"showWhilePending" pflag:",If true, the log link will be shown even if the task is in a pending state."`
 }
