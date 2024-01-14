@@ -62,4 +62,5 @@ type TemplateLogPlugin struct {
 	MessageFormat       core.TaskLog_MessageFormat `json:"messageFormat" pflag:"-,Log Message Format."`
 	// Deprecated: Please, do not use
 	DeprecatedScheme TemplateScheme `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
+	ShowWhilePending bool           `json:"showWhilePending" pflag:",If true, the log link will be shown even if the task is in a pending state."`
 }

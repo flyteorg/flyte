@@ -466,7 +466,7 @@ func (sparkResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s.
 	occurredAt := time.Now()
 	switch app.Status.AppState.State {
 	case sparkOp.NewState:
-		return pluginsCore.PhaseInfoQueued(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(occurredAt, pluginsCore.DefaultPhaseVersion, "job queued", info), nil
 	case sparkOp.SubmittedState, sparkOp.PendingSubmissionState:
 		return pluginsCore.PhaseInfoInitializing(occurredAt, pluginsCore.DefaultPhaseVersion, "job submitted", info), nil
 	case sparkOp.FailedSubmissionState:

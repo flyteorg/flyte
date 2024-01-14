@@ -50,7 +50,8 @@ var logTemplateRegexes = struct {
 	tasklog.MustCreateRegex("rayJobID"),
 }
 
-type rayJobResourceHandler struct{}
+type rayJobResourceHandler struct {
+}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
@@ -558,7 +559,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	}
 
 	if len(rayJob.Status.JobDeploymentStatus) == 0 {
-		return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+		return pluginsCore.PhaseInfoQueuedWithTaskInfo(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling", info), nil
 	}
 
 	// KubeRay creates a Ray cluster first, and then submits a Ray job to the cluster
