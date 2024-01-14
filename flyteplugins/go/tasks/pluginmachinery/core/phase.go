@@ -226,7 +226,17 @@ func PhaseInfoQueued(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoQueuedWithTaskInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+	if info != nil && info.Logs != nil {
+		logs := info.Logs
+		// Delete the logs for which ShowWhilePending is not true
+		info.Logs = make([]*core.TaskLog, 0, len(logs))
+		for _, l := range logs {
+			if l.ShowWhilePending {
+				info.Logs = append(info.Logs, l)
+			}
+		}
+	}
 	pi := phaseInfo(PhaseQueued, version, nil, info, false)
 	pi.reason = reason
 	return pi
