@@ -50,8 +50,7 @@ var logTemplateRegexes = struct {
 	tasklog.MustCreateRegex("rayJobID"),
 }
 
-type rayJobResourceHandler struct {
-}
+type rayJobResourceHandler struct{}
 
 func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
