@@ -1034,6 +1034,12 @@ class TaskLog final :
   ::flyteidl::core::TaskLog_MessageFormat message_format() const;
   void set_message_format(::flyteidl::core::TaskLog_MessageFormat value);
 
+  // bool ShowWhilePending = 5;
+  void clear_showwhilepending();
+  static const int kShowWhilePendingFieldNumber = 5;
+  bool showwhilepending() const;
+  void set_showwhilepending(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.TaskLog)
  private:
   class HasBitSetters;
@@ -1043,6 +1049,7 @@ class TaskLog final :
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::Duration* ttl_;
   int message_format_;
+  bool showwhilepending_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fexecution_2eproto;
 };
@@ -1698,6 +1705,20 @@ inline void TaskLog::set_allocated_ttl(::google::protobuf::Duration* ttl) {
   }
   ttl_ = ttl;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskLog.ttl)
+}
+
+// bool ShowWhilePending = 5;
+inline void TaskLog::clear_showwhilepending() {
+  showwhilepending_ = false;
+}
+inline bool TaskLog::showwhilepending() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskLog.ShowWhilePending)
+  return showwhilepending_;
+}
+inline void TaskLog::set_showwhilepending(bool value) {
+  
+  showwhilepending_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.TaskLog.ShowWhilePending)
 }
 
 // -------------------------------------------------------------------

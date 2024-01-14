@@ -329,6 +329,8 @@ func (m *TaskLog) Validate() error {
 		}
 	}
 
+	// no validation rules for ShowWhilePending
+
 	return nil
 }
 

@@ -2988,6 +2988,11 @@ public final class Execution {
      * <code>.google.protobuf.Duration ttl = 4;</code>
      */
     com.google.protobuf.DurationOrBuilder getTtlOrBuilder();
+
+    /**
+     * <code>bool ShowWhilePending = 5;</code>
+     */
+    boolean getShowWhilePending();
   }
   /**
    * <pre>
@@ -3065,6 +3070,11 @@ public final class Execution {
                 ttl_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 40: {
+
+              showWhilePending_ = input.readBool();
               break;
             }
             default: {
@@ -3312,6 +3322,15 @@ public final class Execution {
       return getTtl();
     }
 
+    public static final int SHOWWHILEPENDING_FIELD_NUMBER = 5;
+    private boolean showWhilePending_;
+    /**
+     * <code>bool ShowWhilePending = 5;</code>
+     */
+    public boolean getShowWhilePending() {
+      return showWhilePending_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3338,6 +3357,9 @@ public final class Execution {
       if (ttl_ != null) {
         output.writeMessage(4, getTtl());
       }
+      if (showWhilePending_ != false) {
+        output.writeBool(5, showWhilePending_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3360,6 +3382,10 @@ public final class Execution {
       if (ttl_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getTtl());
+      }
+      if (showWhilePending_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(5, showWhilePending_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3386,6 +3412,8 @@ public final class Execution {
         if (!getTtl()
             .equals(other.getTtl())) return false;
       }
+      if (getShowWhilePending()
+          != other.getShowWhilePending()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3407,6 +3435,9 @@ public final class Execution {
         hash = (37 * hash) + TTL_FIELD_NUMBER;
         hash = (53 * hash) + getTtl().hashCode();
       }
+      hash = (37 * hash) + SHOWWHILEPENDING_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getShowWhilePending());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3557,6 +3588,8 @@ public final class Execution {
           ttl_ = null;
           ttlBuilder_ = null;
         }
+        showWhilePending_ = false;
+
         return this;
       }
 
@@ -3591,6 +3624,7 @@ public final class Execution {
         } else {
           result.ttl_ = ttlBuilder_.build();
         }
+        result.showWhilePending_ = showWhilePending_;
         onBuilt();
         return result;
       }
@@ -3652,6 +3686,9 @@ public final class Execution {
         }
         if (other.hasTtl()) {
           mergeTtl(other.getTtl());
+        }
+        if (other.getShowWhilePending() != false) {
+          setShowWhilePending(other.getShowWhilePending());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3980,6 +4017,32 @@ public final class Execution {
           ttl_ = null;
         }
         return ttlBuilder_;
+      }
+
+      private boolean showWhilePending_ ;
+      /**
+       * <code>bool ShowWhilePending = 5;</code>
+       */
+      public boolean getShowWhilePending() {
+        return showWhilePending_;
+      }
+      /**
+       * <code>bool ShowWhilePending = 5;</code>
+       */
+      public Builder setShowWhilePending(boolean value) {
+        
+        showWhilePending_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool ShowWhilePending = 5;</code>
+       */
+      public Builder clearShowWhilePending() {
+        
+        showWhilePending_ = false;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -5715,21 +5778,21 @@ public final class Execution {
       "Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\022\021\n\t" +
       "error_uri\030\003 \001(\t\0225\n\004kind\030\004 \001(\0162\'.flyteidl" +
       ".core.ExecutionError.ErrorKind\".\n\tErrorK" +
-      "ind\022\013\n\007UNKNOWN\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273" +
+      "ind\022\013\n\007UNKNOWN\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\325" +
       "\001\n\007TaskLog\022\013\n\003uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n" +
       "\016message_format\030\003 \001(\0162$.flyteidl.core.Ta" +
       "skLog.MessageFormat\022&\n\003ttl\030\004 \001(\0132\031.googl" +
-      "e.protobuf.Duration\"/\n\rMessageFormat\022\013\n\007" +
-      "UNKNOWN\020\000\022\007\n\003CSV\020\001\022\010\n\004JSON\020\002\"J\n\024QualityO" +
-      "fServiceSpec\0222\n\017queueing_budget\030\001 \001(\0132\031." +
-      "google.protobuf.Duration\"\302\001\n\020QualityOfSe" +
-      "rvice\0224\n\004tier\030\001 \001(\0162$.flyteidl.core.Qual" +
-      "ityOfService.TierH\000\0223\n\004spec\030\002 \001(\0132#.flyt" +
-      "eidl.core.QualityOfServiceSpecH\000\"4\n\004Tier" +
-      "\022\r\n\tUNDEFINED\020\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n" +
-      "\003LOW\020\003B\r\n\013designationB<Z:github.com/flyt" +
-      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/c" +
-      "oreb\006proto3"
+      "e.protobuf.Duration\022\030\n\020ShowWhilePending\030" +
+      "\005 \001(\010\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003C" +
+      "SV\020\001\022\010\n\004JSON\020\002\"J\n\024QualityOfServiceSpec\0222" +
+      "\n\017queueing_budget\030\001 \001(\0132\031.google.protobu" +
+      "f.Duration\"\302\001\n\020QualityOfService\0224\n\004tier\030" +
+      "\001 \001(\0162$.flyteidl.core.QualityOfService.T" +
+      "ierH\000\0223\n\004spec\030\002 \001(\0132#.flyteidl.core.Qual" +
+      "ityOfServiceSpecH\000\"4\n\004Tier\022\r\n\tUNDEFINED\020" +
+      "\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013desi" +
+      "gnationB<Z:github.com/flyteorg/flyte/fly" +
+      "teidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5773,7 +5836,7 @@ public final class Execution {
     internal_static_flyteidl_core_TaskLog_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskLog_descriptor,
-        new java.lang.String[] { "Uri", "Name", "MessageFormat", "Ttl", });
+        new java.lang.String[] { "Uri", "Name", "MessageFormat", "Ttl", "ShowWhilePending", });
     internal_static_flyteidl_core_QualityOfServiceSpec_descriptor =
       getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_core_QualityOfServiceSpec_fieldAccessorTable = new

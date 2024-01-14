@@ -36,23 +36,26 @@ class CoreTaskLog(object):
         'uri': 'str',
         'name': 'str',
         'message_format': 'TaskLogMessageFormat',
-        'ttl': 'str'
+        'ttl': 'str',
+        'show_while_pending': 'bool'
     }
 
     attribute_map = {
         'uri': 'uri',
         'name': 'name',
         'message_format': 'message_format',
-        'ttl': 'ttl'
+        'ttl': 'ttl',
+        'show_while_pending': 'ShowWhilePending'
     }
 
-    def __init__(self, uri=None, name=None, message_format=None, ttl=None):  # noqa: E501
+    def __init__(self, uri=None, name=None, message_format=None, ttl=None, show_while_pending=None):  # noqa: E501
         """CoreTaskLog - a model defined in Swagger"""  # noqa: E501
 
         self._uri = None
         self._name = None
         self._message_format = None
         self._ttl = None
+        self._show_while_pending = None
         self.discriminator = None
 
         if uri is not None:
@@ -63,6 +66,8 @@ class CoreTaskLog(object):
             self.message_format = message_format
         if ttl is not None:
             self.ttl = ttl
+        if show_while_pending is not None:
+            self.show_while_pending = show_while_pending
 
     @property
     def uri(self):
@@ -147,6 +152,27 @@ class CoreTaskLog(object):
         """
 
         self._ttl = ttl
+
+    @property
+    def show_while_pending(self):
+        """Gets the show_while_pending of this CoreTaskLog.  # noqa: E501
+
+
+        :return: The show_while_pending of this CoreTaskLog.  # noqa: E501
+        :rtype: bool
+        """
+        return self._show_while_pending
+
+    @show_while_pending.setter
+    def show_while_pending(self, show_while_pending):
+        """Sets the show_while_pending of this CoreTaskLog.
+
+
+        :param show_while_pending: The show_while_pending of this CoreTaskLog.  # noqa: E501
+        :type: bool
+        """
+
+        self._show_while_pending = show_while_pending
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -14,4 +14,5 @@ type CoreTaskLog struct {
 	Name string `json:"name,omitempty"`
 	MessageFormat *TaskLogMessageFormat `json:"message_format,omitempty"`
 	Ttl string `json:"ttl,omitempty"`
+	ShowWhilePending bool `json:"ShowWhilePending,omitempty"`
 }

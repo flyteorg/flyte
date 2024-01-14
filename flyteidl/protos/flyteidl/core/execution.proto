@@ -89,6 +89,7 @@ message TaskLog {
     string name = 2;
     MessageFormat message_format = 3;
     google.protobuf.Duration ttl = 4;
+    bool ShowWhilePending = 5;
 }
 
 // Represents customized execution run-time attributes.

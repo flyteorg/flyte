@@ -201,6 +201,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fexecution_2eproto
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskLog, name_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskLog, message_format_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskLog, ttl_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskLog, showwhilepending_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::QualityOfServiceSpec, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -222,8 +223,8 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 10, -1, sizeof(::flyteidl::core::TaskExecution)},
   { 15, -1, sizeof(::flyteidl::core::ExecutionError)},
   { 24, -1, sizeof(::flyteidl::core::TaskLog)},
-  { 33, -1, sizeof(::flyteidl::core::QualityOfServiceSpec)},
-  { 39, -1, sizeof(::flyteidl::core::QualityOfService)},
+  { 34, -1, sizeof(::flyteidl::core::QualityOfServiceSpec)},
+  { 40, -1, sizeof(::flyteidl::core::QualityOfService)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -261,26 +262,26 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto[] =
   "Error\022\014\n\004code\030\001 \001(\t\022\017\n\007message\030\002 \001(\t\022\021\n\t"
   "error_uri\030\003 \001(\t\0225\n\004kind\030\004 \001(\0162\'.flyteidl"
   ".core.ExecutionError.ErrorKind\".\n\tErrorK"
-  "ind\022\013\n\007UNKNOWN\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\273"
+  "ind\022\013\n\007UNKNOWN\020\000\022\010\n\004USER\020\001\022\n\n\006SYSTEM\020\002\"\325"
   "\001\n\007TaskLog\022\013\n\003uri\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022<\n"
   "\016message_format\030\003 \001(\0162$.flyteidl.core.Ta"
   "skLog.MessageFormat\022&\n\003ttl\030\004 \001(\0132\031.googl"
-  "e.protobuf.Duration\"/\n\rMessageFormat\022\013\n\007"
-  "UNKNOWN\020\000\022\007\n\003CSV\020\001\022\010\n\004JSON\020\002\"J\n\024QualityO"
-  "fServiceSpec\0222\n\017queueing_budget\030\001 \001(\0132\031."
-  "google.protobuf.Duration\"\302\001\n\020QualityOfSe"
-  "rvice\0224\n\004tier\030\001 \001(\0162$.flyteidl.core.Qual"
-  "ityOfService.TierH\000\0223\n\004spec\030\002 \001(\0132#.flyt"
-  "eidl.core.QualityOfServiceSpecH\000\"4\n\004Tier"
-  "\022\r\n\tUNDEFINED\020\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n"
-  "\003LOW\020\003B\r\n\013designationB<Z:github.com/flyt"
-  "eorg/flyte/flyteidl/gen/pb-go/flyteidl/c"
-  "oreb\006proto3"
+  "e.protobuf.Duration\022\030\n\020ShowWhilePending\030"
+  "\005 \001(\010\"/\n\rMessageFormat\022\013\n\007UNKNOWN\020\000\022\007\n\003C"
+  "SV\020\001\022\010\n\004JSON\020\002\"J\n\024QualityOfServiceSpec\0222"
+  "\n\017queueing_budget\030\001 \001(\0132\031.google.protobu"
+  "f.Duration\"\302\001\n\020QualityOfService\0224\n\004tier\030"
+  "\001 \001(\0162$.flyteidl.core.QualityOfService.T"
+  "ierH\000\0223\n\004spec\030\002 \001(\0132#.flyteidl.core.Qual"
+  "ityOfServiceSpecH\000\"4\n\004Tier\022\r\n\tUNDEFINED\020"
+  "\000\022\010\n\004HIGH\020\001\022\n\n\006MEDIUM\020\002\022\007\n\003LOW\020\003B\r\n\013desi"
+  "gnationB<Z:github.com/flyteorg/flyte/fly"
+  "teidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fexecution_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fexecution_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fexecution_2eproto,
-  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 1291,
+  "flyteidl/core/execution.proto", &assign_descriptors_table_flyteidl_2fcore_2fexecution_2eproto, 1317,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fexecution_2eproto() {
@@ -1620,6 +1621,7 @@ const int TaskLog::kUriFieldNumber;
 const int TaskLog::kNameFieldNumber;
 const int TaskLog::kMessageFormatFieldNumber;
 const int TaskLog::kTtlFieldNumber;
+const int TaskLog::kShowWhilePendingFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskLog::TaskLog()
@@ -1644,7 +1646,9 @@ TaskLog::TaskLog(const TaskLog& from)
   } else {
     ttl_ = nullptr;
   }
-  message_format_ = from.message_format_;
+  ::memcpy(&message_format_, &from.message_format_,
+    static_cast<size_t>(reinterpret_cast<char*>(&showwhilepending_) -
+    reinterpret_cast<char*>(&message_format_)) + sizeof(showwhilepending_));
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.TaskLog)
 }
 
@@ -1654,8 +1658,8 @@ void TaskLog::SharedCtor() {
   uri_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&ttl_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&message_format_) -
-      reinterpret_cast<char*>(&ttl_)) + sizeof(message_format_));
+      reinterpret_cast<char*>(&showwhilepending_) -
+      reinterpret_cast<char*>(&ttl_)) + sizeof(showwhilepending_));
 }
 
 TaskLog::~TaskLog() {
@@ -1690,7 +1694,9 @@ void TaskLog::Clear() {
     delete ttl_;
   }
   ttl_ = nullptr;
-  message_format_ = 0;
+  ::memset(&message_format_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&showwhilepending_) -
+      reinterpret_cast<char*>(&message_format_)) + sizeof(showwhilepending_));
   _internal_metadata_.Clear();
 }
 
@@ -1758,6 +1764,13 @@ const char* TaskLog::_InternalParse(const char* begin, const char* end, void* ob
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
             {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // bool ShowWhilePending = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 40) goto handle_unusual;
+        msg->set_showwhilepending(::google::protobuf::internal::ReadVarint(&ptr));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -1849,6 +1862,19 @@ bool TaskLog::MergePartialFromCodedStream(
         break;
       }
 
+      // bool ShowWhilePending = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (40 & 0xFF)) {
+
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   bool, ::google::protobuf::internal::WireFormatLite::TYPE_BOOL>(
+                 input, &showwhilepending_)));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1908,6 +1934,11 @@ void TaskLog::SerializeWithCachedSizes(
       4, HasBitSetters::ttl(this), output);
   }
 
+  // bool ShowWhilePending = 5;
+  if (this->showwhilepending() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteBool(5, this->showwhilepending(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1954,6 +1985,11 @@ void TaskLog::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         4, HasBitSetters::ttl(this), target);
+  }
+
+  // bool ShowWhilePending = 5;
+  if (this->showwhilepending() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteBoolToArray(5, this->showwhilepending(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2004,6 +2040,11 @@ size_t TaskLog::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->message_format());
   }
 
+  // bool ShowWhilePending = 5;
+  if (this->showwhilepending() != 0) {
+    total_size += 1 + 1;
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -2045,6 +2086,9 @@ void TaskLog::MergeFrom(const TaskLog& from) {
   if (from.message_format() != 0) {
     set_message_format(from.message_format());
   }
+  if (from.showwhilepending() != 0) {
+    set_showwhilepending(from.showwhilepending());
+  }
 }
 
 void TaskLog::CopyFrom(const ::google::protobuf::Message& from) {
@@ -2078,6 +2122,7 @@ void TaskLog::InternalSwap(TaskLog* other) {
     GetArenaNoVirtual());
   swap(ttl_, other->ttl_);
   swap(message_format_, other->message_format_);
+  swap(showwhilepending_, other->showwhilepending_);
 }
 
 ::google::protobuf::Metadata TaskLog::GetMetadata() const {
