@@ -5,6 +5,7 @@ userSettings:
   dbPassword: <DB_PASSWORD>
   rdsHost: <RDS_HOST>
   bucketName: <BUCKET_NAME>
+  userBucketName: <RAW_DATA_BUCKET_NAME>
   logGroup: <LOG_GROUP_NAME>
   redisHostUrl: <REDIS_HOST_URL>
   redisHostKey: <REDIS_HOST_KEY>

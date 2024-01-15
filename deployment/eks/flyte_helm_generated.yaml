@@ -192,7 +192,7 @@ data:
         durationMinutes: 3
   storage.yaml: | 
     propeller:
-      rawoutput-prefix: s3:///data
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -388,7 +388,7 @@ data:
       storage-prefix: metadata/datacatalog
   storage.yaml: | 
     propeller:
-      rawoutput-prefix: s3:///data
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -536,7 +536,7 @@ data:
         type: noop
   storage.yaml: | 
     propeller:
-      rawoutput-prefix: s3:///data
+      rawoutput-prefix: s3://<RAW_DATA_BUCKET_NAME>/data
     storage:
       type: s3
       container: "<BUCKET_NAME>"
@@ -884,7 +884,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "570c02a8ecfaaeb8c41b95e1c7552d79d1e8939fe9bf88fdcf46f76aa94fb4f"
+        configChecksum: "a66378327daf755a8cea8f042c9985b075f4ff1b7d41035f441301083ae3355"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1172,7 +1172,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "d2b4422443675df425e730b50f585783098d47541bd8ff756cc9e2185547351"
+        configChecksum: "8a96b2f36f440c1c0ecda8d41fe1ebf1acc9acb645e902553d20063cef472b6"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1263,7 +1263,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "570c02a8ecfaaeb8c41b95e1c7552d79d1e8939fe9bf88fdcf46f76aa94fb4f"
+        configChecksum: "a66378327daf755a8cea8f042c9985b075f4ff1b7d41035f441301083ae3355"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1351,7 +1351,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "90cbb264b40c626ef7015afd66333240c9a1556d10f2c9aa81e45a0984f7bbf"
+        configChecksum: "8c42ded7052058802087b7025eea4d26ef8cbb0fa591d929c703335c4688e02"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1433,7 +1433,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.10.7-b0
       annotations:
-        configChecksum: "90cbb264b40c626ef7015afd66333240c9a1556d10f2c9aa81e45a0984f7bbf"
+        configChecksum: "8c42ded7052058802087b7025eea4d26ef8cbb0fa591d929c703335c4688e02"
     spec:
       securityContext:
         fsGroup: 65534
