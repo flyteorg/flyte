@@ -137,7 +137,6 @@ message NamedEntityListRequest {
 
     // Optional, org key applied to the resource.
     string org = 8;
-
 }
 
 // Represents a list of NamedEntityIdentifiers.

@@ -672,15 +672,15 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
-    def test_update_project2(self):
-        """Test case for update_project2
+    def test_update_project(self):
+        """Test case for update_project
 
         Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
         """
         pass
 
-    def test_update_project4(self):
-        """Test case for update_project4
+    def test_update_project2(self):
+        """Test case for update_project2
 
         Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
         """

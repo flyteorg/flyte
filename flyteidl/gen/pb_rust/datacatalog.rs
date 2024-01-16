@@ -290,11 +290,8 @@ pub struct DatasetId {
     /// UUID for the dataset (if set the above fields are optional)
     #[prost(string, tag="5")]
     pub uuid: ::prost::alloc::string::String,
-    /// Optional, partition key applied to the dataset.
-    #[prost(string, tag="6")]
-    pub partition: ::prost::alloc::string::String,
     /// Optional, org key applied to the resource.
-    #[prost(string, tag="7")]
+    #[prost(string, tag="6")]
     pub org: ::prost::alloc::string::String,
 }
 ///
@@ -491,9 +488,9 @@ pub mod dataset_property_filter {
         Domain(::prost::alloc::string::String),
         #[prost(string, tag="4")]
         Version(::prost::alloc::string::String),
-        /// Optional, partition key applied to the dataset.
+        /// Optional, org key applied to the dataset.
         #[prost(string, tag="5")]
-        Partition(::prost::alloc::string::String),
+        Org(::prost::alloc::string::String),
     }
 }
 /// Pagination options for making list requests

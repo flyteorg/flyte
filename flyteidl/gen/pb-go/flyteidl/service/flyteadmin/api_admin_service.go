@@ -10138,7 +10138,7 @@ AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project
 
 @return AdminProjectUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -10230,7 +10230,7 @@ AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project
 
 @return AdminProjectUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProject4(ctx context.Context, org string, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, org string, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
