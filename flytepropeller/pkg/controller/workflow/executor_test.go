@@ -540,15 +540,15 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	tests := []struct {
 		name                         string
 		onFailurePolicy              v1alpha1.WorkflowOnFailurePolicy
-		clearPreviousError           bool
+		enableCRDebugMetadata        bool
 		expectedRoundsToFail         int
 		expectedNodesWithErrorsCount int
 		expectedFailedNodesCount     int
 	}{
 		{"failImidiately", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), false, 6, 1, 1},
-		{"failImidiately clearPreviousError", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), true, 6, 1, 1},
-		{"failAfterExecutableNodesComplete", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), false, 12, 2, 2},
-		{"failAfterExecutableNodesComplete clearPreviousError", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), true, 12, 1, 2},
+		{"failImidiately enableCRDebugMetadata", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_IMMEDIATELY), true, 6, 1, 1},
+		{"failAfterExecutableNodesComplete", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), false, 12, 1, 2},
+		{"failAfterExecutableNodesComplete enableCRDebugMetadata", v1alpha1.WorkflowOnFailurePolicy(core.WorkflowMetadata_FAIL_AFTER_EXECUTABLE_NODES_COMPLETE), true, 12, 2, 2},
 	}
 
 	wJSON, err := yamlutils.ReadYamlFileAsJSON("testdata/benchmark_wf.yaml")
@@ -557,7 +557,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 
 		t.Run(test.name, func(t *testing.T) {
 			nodeConfig := config.GetConfig().NodeConfig
-			nodeConfig.ClearPreviousError = test.clearPreviousError
+			nodeConfig.EnableCRDebugMetadata = test.enableCRDebugMetadata
 			nodeExec, err := nodes.NewExecutor(ctx, nodeConfig, store, enqueueWorkflow, eventSink, adminClient, adminClient,
 				maxOutputSize, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, handlerFactory, promutils.NewTestScope())
 			assert.NoError(t, err)

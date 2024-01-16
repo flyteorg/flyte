@@ -757,20 +757,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_node-config.clear-previous-error", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("node-config.clear-previous-error", testValue)
-			if vBool, err := cmdFlags.GetBool("node-config.clear-previous-error"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.NodeConfig.ClearPreviousError)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_max-streak-length", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

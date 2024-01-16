@@ -481,7 +481,6 @@ type nodeExecutor struct {
 	catalog                         catalog.Client
 	clusterID                       string
 	enableCRDebugMetadata           bool
-	clearPreviousError              bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
 	defaultExecutionDeadline        time.Duration
@@ -870,7 +869,7 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 }
 
 func (c *nodeExecutor) Clear(executableNodeStatus v1alpha1.ExecutableNodeStatus) {
-	if c.clearPreviousError {
+	if !c.enableCRDebugMetadata {
 		executableNodeStatus.ClearExecutionError()
 	}
 }
@@ -1449,7 +1448,6 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 		catalog:                         catalogClient,
 		clusterID:                       clusterID,
 		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
-		clearPreviousError:              nodeConfig.ClearPreviousError,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
