@@ -77,6 +77,13 @@
             "type": "string"
           },
           {
+            "name": "workflow_execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
@@ -655,6 +662,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

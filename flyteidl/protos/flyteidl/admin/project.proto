@@ -45,6 +45,9 @@ message Project {
         SYSTEM_GENERATED = 2;
     }
     ProjectState state = 6;
+
+    // Optional, org key applied to the resource.
+    string org = 7;
 }
 
 // Represents a list of projects.

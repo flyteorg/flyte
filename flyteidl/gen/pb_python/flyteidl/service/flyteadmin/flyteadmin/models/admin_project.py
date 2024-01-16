@@ -40,7 +40,8 @@ class AdminProject(object):
         'domains': 'list[AdminDomain]',
         'description': 'str',
         'labels': 'AdminLabels',
-        'state': 'ProjectProjectState'
+        'state': 'ProjectProjectState',
+        'org': 'str'
     }
 
     attribute_map = {
@@ -49,10 +50,11 @@ class AdminProject(object):
         'domains': 'domains',
         'description': 'description',
         'labels': 'labels',
-        'state': 'state'
+        'state': 'state',
+        'org': 'org'
     }
 
-    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None):  # noqa: E501
+    def __init__(self, id=None, name=None, domains=None, description=None, labels=None, state=None, org=None):  # noqa: E501
         """AdminProject - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -61,6 +63,7 @@ class AdminProject(object):
         self._description = None
         self._labels = None
         self._state = None
+        self._org = None
         self.discriminator = None
 
         if id is not None:
@@ -75,6 +78,8 @@ class AdminProject(object):
             self.labels = labels
         if state is not None:
             self.state = state
+        if org is not None:
+            self.org = org
 
     @property
     def id(self):
@@ -207,6 +212,29 @@ class AdminProject(object):
         """
 
         self._state = state
+
+    @property
+    def org(self):
+        """Gets the org of this AdminProject.  # noqa: E501
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :return: The org of this AdminProject.  # noqa: E501
+        :rtype: str
+        """
+        return self._org
+
+    @org.setter
+    def org(self, org):
+        """Sets the org of this AdminProject.
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :param org: The org of this AdminProject.  # noqa: E501
+        :type: str
+        """
+
+        self._org = org
 
     def to_dict(self):
         """Returns the model properties as a dict"""

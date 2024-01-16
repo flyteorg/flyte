@@ -188,6 +188,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fproject_2eproto:
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, description_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, labels_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, state_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Project, org_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Projects, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -224,11 +225,11 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fproject_2eproto:
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::admin::Domain)},
   { 7, -1, sizeof(::flyteidl::admin::Project)},
-  { 18, -1, sizeof(::flyteidl::admin::Projects)},
-  { 25, -1, sizeof(::flyteidl::admin::ProjectListRequest)},
-  { 34, -1, sizeof(::flyteidl::admin::ProjectRegisterRequest)},
-  { 40, -1, sizeof(::flyteidl::admin::ProjectRegisterResponse)},
-  { 45, -1, sizeof(::flyteidl::admin::ProjectUpdateResponse)},
+  { 19, -1, sizeof(::flyteidl::admin::Projects)},
+  { 26, -1, sizeof(::flyteidl::admin::ProjectListRequest)},
+  { 35, -1, sizeof(::flyteidl::admin::ProjectRegisterRequest)},
+  { 41, -1, sizeof(::flyteidl::admin::ProjectRegisterResponse)},
+  { 46, -1, sizeof(::flyteidl::admin::ProjectUpdateResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -250,28 +251,28 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto[] =
   "\n\034flyteidl/admin/project.proto\022\016flyteidl"
   ".admin\032\033flyteidl/admin/common.proto\"\"\n\006D"
-  "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\376\001\n\007Proj"
+  "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\213\002\n\007Proj"
   "ect\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\'\n\007domains"
   "\030\003 \003(\0132\026.flyteidl.admin.Domain\022\023\n\013descri"
   "ption\030\004 \001(\t\022&\n\006labels\030\005 \001(\0132\026.flyteidl.a"
   "dmin.Labels\0223\n\005state\030\006 \001(\0162$.flyteidl.ad"
-  "min.Project.ProjectState\">\n\014ProjectState"
-  "\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022\024\n\020SYSTEM_GEN"
-  "ERATED\020\002\"D\n\010Projects\022)\n\010projects\030\001 \003(\0132\027"
-  ".flyteidl.admin.Project\022\r\n\005token\030\002 \001(\t\"j"
-  "\n\022ProjectListRequest\022\r\n\005limit\030\001 \001(\r\022\r\n\005t"
-  "oken\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t\022%\n\007sort_by\030\004"
-  " \001(\0132\024.flyteidl.admin.Sort\"B\n\026ProjectReg"
-  "isterRequest\022(\n\007project\030\001 \001(\0132\027.flyteidl"
-  ".admin.Project\"\031\n\027ProjectRegisterRespons"
-  "e\"\027\n\025ProjectUpdateResponseB=Z;github.com"
-  "/flyteorg/flyte/flyteidl/gen/pb-go/flyte"
-  "idl/adminb\006proto3"
+  "min.Project.ProjectState\022\013\n\003org\030\007 \001(\t\">\n"
+  "\014ProjectState\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022"
+  "\024\n\020SYSTEM_GENERATED\020\002\"D\n\010Projects\022)\n\010pro"
+  "jects\030\001 \003(\0132\027.flyteidl.admin.Project\022\r\n\005"
+  "token\030\002 \001(\t\"j\n\022ProjectListRequest\022\r\n\005lim"
+  "it\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t"
+  "\022%\n\007sort_by\030\004 \001(\0132\024.flyteidl.admin.Sort\""
+  "B\n\026ProjectRegisterRequest\022(\n\007project\030\001 \001"
+  "(\0132\027.flyteidl.admin.Project\"\031\n\027ProjectRe"
+  "gisterResponse\"\027\n\025ProjectUpdateResponseB"
+  "=Z;github.com/flyteorg/flyte/flyteidl/ge"
+  "n/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fproject_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fproject_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fproject_2eproto,
-  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 737,
+  "flyteidl/admin/project.proto", &assign_descriptors_table_flyteidl_2fadmin_2fproject_2eproto, 750,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fproject_2eproto() {
@@ -708,6 +709,7 @@ const int Project::kDomainsFieldNumber;
 const int Project::kDescriptionFieldNumber;
 const int Project::kLabelsFieldNumber;
 const int Project::kStateFieldNumber;
+const int Project::kOrgFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Project::Project()
@@ -732,6 +734,10 @@ Project::Project(const Project& from)
   if (from.description().size() > 0) {
     description_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.description_);
   }
+  org_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.org().size() > 0) {
+    org_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.org_);
+  }
   if (from.has_labels()) {
     labels_ = new ::flyteidl::admin::Labels(*from.labels_);
   } else {
@@ -747,6 +753,7 @@ void Project::SharedCtor() {
   id_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   description_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  org_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&labels_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&state_) -
       reinterpret_cast<char*>(&labels_)) + sizeof(state_));
@@ -761,6 +768,7 @@ void Project::SharedDtor() {
   id_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   description_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  org_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete labels_;
 }
 
@@ -783,6 +791,7 @@ void Project::Clear() {
   id_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   name_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   description_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && labels_ != nullptr) {
     delete labels_;
   }
@@ -887,6 +896,22 @@ const char* Project::_InternalParse(const char* begin, const char* end, void* ob
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
         msg->set_state(static_cast<::flyteidl::admin::Project_ProjectState>(val));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // string org = 7;
+      case 7: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 58) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.admin.Project.org");
+        object = msg->mutable_org();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
         break;
       }
       default: {
@@ -1004,6 +1029,21 @@ bool Project::MergePartialFromCodedStream(
         break;
       }
 
+      // string org = 7;
+      case 7: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (58 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_org()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->org().data(), static_cast<int>(this->org().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.admin.Project.org"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1082,6 +1122,16 @@ void Project::SerializeWithCachedSizes(
       6, this->state(), output);
   }
 
+  // string org = 7;
+  if (this->org().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->org().data(), static_cast<int>(this->org().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Project.org");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      7, this->org(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1149,6 +1199,17 @@ void Project::SerializeWithCachedSizes(
       6, this->state(), target);
   }
 
+  // string org = 7;
+  if (this->org().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->org().data(), static_cast<int>(this->org().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.admin.Project.org");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        7, this->org(), target);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1200,6 +1261,13 @@ size_t Project::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::StringSize(
         this->description());
+  }
+
+  // string org = 7;
+  if (this->org().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->org());
   }
 
   // .flyteidl.admin.Labels labels = 5;
@@ -1255,6 +1323,10 @@ void Project::MergeFrom(const Project& from) {
 
     description_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.description_);
   }
+  if (from.org().size() > 0) {
+
+    org_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.org_);
+  }
   if (from.has_labels()) {
     mutable_labels()->::flyteidl::admin::Labels::MergeFrom(from.labels());
   }
@@ -1294,6 +1366,8 @@ void Project::InternalSwap(Project* other) {
   name_.Swap(&other->name_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   description_.Swap(&other->description_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  org_.Swap(&other->org_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(labels_, other->labels_);
   swap(state_, other->state_);
