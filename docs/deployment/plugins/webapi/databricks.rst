@@ -308,7 +308,7 @@ Add the Databricks access token to FlytePropeller:
         in your YAML file as follows:
 
         .. code-block:: yaml
-          :emphasize-lines: 3
+          :emphasize-lines: 2
 
           configuration:
             inlineSecretRef: flyte-binary-external-services
