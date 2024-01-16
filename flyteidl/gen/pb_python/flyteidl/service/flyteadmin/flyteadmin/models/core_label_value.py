@@ -35,26 +35,31 @@ class CoreLabelValue(object):
     """
     swagger_types = {
         'static_value': 'str',
+        'time_value': 'datetime',
         'triggered_binding': 'CoreArtifactBindingData',
         'input_binding': 'CoreInputBindingData'
     }
 
     attribute_map = {
         'static_value': 'static_value',
+        'time_value': 'time_value',
         'triggered_binding': 'triggered_binding',
         'input_binding': 'input_binding'
     }
 
-    def __init__(self, static_value=None, triggered_binding=None, input_binding=None):  # noqa: E501
+    def __init__(self, static_value=None, time_value=None, triggered_binding=None, input_binding=None):  # noqa: E501
         """CoreLabelValue - a model defined in Swagger"""  # noqa: E501
 
         self._static_value = None
+        self._time_value = None
         self._triggered_binding = None
         self._input_binding = None
         self.discriminator = None
 
         if static_value is not None:
             self.static_value = static_value
+        if time_value is not None:
+            self.time_value = time_value
         if triggered_binding is not None:
             self.triggered_binding = triggered_binding
         if input_binding is not None:
@@ -80,6 +85,27 @@ class CoreLabelValue(object):
         """
 
         self._static_value = static_value
+
+    @property
+    def time_value(self):
+        """Gets the time_value of this CoreLabelValue.  # noqa: E501
+
+
+        :return: The time_value of this CoreLabelValue.  # noqa: E501
+        :rtype: datetime
+        """
+        return self._time_value
+
+    @time_value.setter
+    def time_value(self, time_value):
+        """Sets the time_value of this CoreLabelValue.
+
+
+        :param time_value: The time_value of this CoreLabelValue.  # noqa: E501
+        :type: datetime
+        """
+
+        self._time_value = time_value
 
     @property
     def triggered_binding(self):

@@ -345,6 +345,7 @@ Class | Method | HTTP request | Description
  - [CoreTaskNode](docs/CoreTaskNode.md)
  - [CoreTaskNodeOverrides](docs/CoreTaskNodeOverrides.md)
  - [CoreTaskTemplate](docs/CoreTaskTemplate.md)
+ - [CoreTimePartition](docs/CoreTimePartition.md)
  - [CoreTypeAnnotation](docs/CoreTypeAnnotation.md)
  - [CoreTypeStructure](docs/CoreTypeStructure.md)
  - [CoreTypedInterface](docs/CoreTypedInterface.md)

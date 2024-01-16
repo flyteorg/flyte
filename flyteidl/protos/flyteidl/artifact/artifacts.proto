@@ -5,6 +5,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artif
 
 import "google/protobuf/any.proto";
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 import "flyteidl/admin/launch_plan.proto";
 import "flyteidl/core/literals.proto";
@@ -35,7 +36,7 @@ message CreateArtifactRequest {
 
   map<string, string> partitions = 4;
 
-  string tag = 5;
+  google.protobuf.Timestamp time_partition_value = 5;
 
   ArtifactSource source = 6;
 }
@@ -64,6 +65,10 @@ message ArtifactSpec {
   google.protobuf.Any user_metadata = 4;
 
   string metadata_type = 5;
+
+  google.protobuf.Timestamp created_at = 6;
+
+  string file_format = 7;
 }
 
 
@@ -96,13 +101,15 @@ message SearchArtifactsRequest {
 
   core.Partitions partitions = 2;
 
-  string principal = 3;
-  string version = 4;
+  google.protobuf.Timestamp time_partition_value = 3;
 
-  SearchOptions options = 5;
+  string principal = 4;
+  string version = 5;
 
-  string token = 6;
-  int32 limit = 7;
+  SearchOptions options = 6;
+
+  string token = 7;
+  int32 limit = 8;
 }
 
 message SearchArtifactsResponse {

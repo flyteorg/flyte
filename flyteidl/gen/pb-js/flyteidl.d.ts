@@ -78,6 +78,9 @@ export namespace flyteidl {
             /** ArtifactBindingData partitionKey */
             partitionKey?: (string|null);
 
+            /** ArtifactBindingData bindToTimePartition */
+            bindToTimePartition?: (boolean|null);
+
             /** ArtifactBindingData transform */
             transform?: (string|null);
         }
@@ -97,8 +100,14 @@ export namespace flyteidl {
             /** ArtifactBindingData partitionKey. */
             public partitionKey: string;
 
+            /** ArtifactBindingData bindToTimePartition. */
+            public bindToTimePartition: boolean;
+
             /** ArtifactBindingData transform. */
             public transform: string;
+
+            /** ArtifactBindingData partitionData. */
+            public partitionData?: ("partitionKey"|"bindToTimePartition");
 
             /**
              * Creates a new ArtifactBindingData instance using the specified properties.
@@ -191,6 +200,9 @@ export namespace flyteidl {
             /** LabelValue staticValue */
             staticValue?: (string|null);
 
+            /** LabelValue timeValue */
+            timeValue?: (google.protobuf.ITimestamp|null);
+
             /** LabelValue triggeredBinding */
             triggeredBinding?: (flyteidl.core.IArtifactBindingData|null);
 
@@ -210,6 +222,9 @@ export namespace flyteidl {
             /** LabelValue staticValue. */
             public staticValue: string;
 
+            /** LabelValue timeValue. */
+            public timeValue?: (google.protobuf.ITimestamp|null);
+
             /** LabelValue triggeredBinding. */
             public triggeredBinding?: (flyteidl.core.IArtifactBindingData|null);
 
@@ -217,7 +232,7 @@ export namespace flyteidl {
             public inputBinding?: (flyteidl.core.IInputBindingData|null);
 
             /** LabelValue value. */
-            public value?: ("staticValue"|"triggeredBinding"|"inputBinding");
+            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding");
 
             /**
              * Creates a new LabelValue instance using the specified properties.
@@ -304,6 +319,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TimePartition. */
+        interface ITimePartition {
+
+            /** TimePartition value */
+            value?: (flyteidl.core.ILabelValue|null);
+        }
+
+        /** Represents a TimePartition. */
+        class TimePartition implements ITimePartition {
+
+            /**
+             * Constructs a new TimePartition.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITimePartition);
+
+            /** TimePartition value. */
+            public value?: (flyteidl.core.ILabelValue|null);
+
+            /**
+             * Creates a new TimePartition instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TimePartition instance
+             */
+            public static create(properties?: flyteidl.core.ITimePartition): flyteidl.core.TimePartition;
+
+            /**
+             * Encodes the specified TimePartition message. Does not implicitly {@link flyteidl.core.TimePartition.verify|verify} messages.
+             * @param message TimePartition message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITimePartition, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TimePartition message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TimePartition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TimePartition;
+
+            /**
+             * Verifies a TimePartition message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an ArtifactID. */
         interface IArtifactID {
 
@@ -315,6 +382,9 @@ export namespace flyteidl {
 
             /** ArtifactID partitions */
             partitions?: (flyteidl.core.IPartitions|null);
+
+            /** ArtifactID timePartition */
+            timePartition?: (flyteidl.core.ITimePartition|null);
         }
 
         /** Represents an ArtifactID. */
@@ -335,8 +405,8 @@ export namespace flyteidl {
             /** ArtifactID partitions. */
             public partitions?: (flyteidl.core.IPartitions|null);
 
-            /** ArtifactID dimensions. */
-            public dimensions?: "partitions";
+            /** ArtifactID timePartition. */
+            public timePartition?: (flyteidl.core.ITimePartition|null);
 
             /**
              * Creates a new ArtifactID instance using the specified properties.
