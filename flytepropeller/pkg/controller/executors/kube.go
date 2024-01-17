@@ -23,18 +23,72 @@ type Client interface {
 	GetCache() cache.Cache
 }
 
+// fallbackClientReader reads from the cache first and if not found then reads from the configured reader, which
+// directly reads from the API
+type fallbackClientReader struct {
+	orderedClients []client.Reader
+}
+
+func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object) (err error) {
+	for _, k8sClient := range c.orderedClients {
+		if err = k8sClient.Get(ctx, key, out); err == nil {
+			return nil
+		}
+	}
+
+	return
+}
+
+func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (err error) {
+	for _, k8sClient := range c.orderedClients {
+		if err = k8sClient.List(ctx, list, opts...); err == nil {
+			return nil
+		}
+	}
+
+	return
+}
+
 // ClientBuilder builder is the interface for the client builder.
 type ClientBuilder interface {
+	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
+	// for this client. This function can be called multiple times, it should append to an internal slice.
+	WithUncached(objs ...client.Object) ClientBuilder
+
 	// Build returns a new client.
 	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
 }
 
 type FallbackClientBuilder struct {
-	scope promutils.Scope
+	uncached []client.Object
+	scope    promutils.Scope
 }
 
-func (f *FallbackClientBuilder) Build(_ cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
-	return client.New(config, options)
+func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
+	f.uncached = append(f.uncached, objs...)
+	return f
+}
+
+func (f FallbackClientBuilder) Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
+	c, err := client.New(config, options)
+	if err != nil {
+		return nil, err
+	}
+
+	c, err = newWriteThroughCachingWriter(c, 50000, f.scope)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.NewDelegatingClient(client.NewDelegatingClientInput{
+		Client: c,
+		CacheReader: fallbackClientReader{
+			orderedClients: []client.Reader{cache, c},
+		},
+		UncachedObjects: f.uncached,
+		// TODO figure out if this should be true?
+		// CacheUnstructured: true,
+	})
 }
 
 // NewFallbackClientBuilder Creates a new k8s client that uses the cached client for reads and falls back to making API

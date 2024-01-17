@@ -154,6 +154,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		},
 		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
 			k8sClient, err := client.New(config, options)
+			//k8sClient, err := executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(nil, config, options)
 			if err != nil {
 				return k8sClient, err
 			}
