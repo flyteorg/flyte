@@ -67,7 +67,6 @@ type fallbackClientReader struct {
 	orderedClients []client.Reader
 }
 
-
 func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object, opts ...client.GetOption) (err error) {
 	for _, k8sClient := range c.orderedClients {
 		if err = k8sClient.Get(ctx, key, out, opts...); err == nil {

@@ -108,7 +108,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache: executors.NewCache,
+		NewCache:  executors.NewCache,
 		NewClient: executors.NewClient,
 		Metrics: metricsserver.Options{
 			// Disable metrics serving

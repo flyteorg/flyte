@@ -143,7 +143,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 			SyncPeriod:        &cfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache: executors.NewCache,
+		NewCache:  executors.NewCache,
 		NewClient: executors.NewClient,
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
