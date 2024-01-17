@@ -51,11 +51,10 @@ var NewClient = func(config *rest.Config, options client.Options) (client.Client
 		return k8sClient, err
 	}
 
-	// TODO - should we wrap this in a writeThroughCachingWriter as well?
 	k8sOtelClient := otelutils.WrapK8sClient(k8sClient)
 	if reader != nil {
 		// once the k8s client is created we set the fallback reader's client to the k8s client
-		reader.orderedClients = append([]client.Reader{k8sOtelClient}, reader.orderedClients...)
+		reader.orderedClients = append(reader.orderedClients, k8sOtelClient)
 	}
 
 	return k8sOtelClient, nil
