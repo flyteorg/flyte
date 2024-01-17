@@ -521,6 +521,7 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 	h := &nodemocks.NodeHandler{}
 	h.OnAbortMatch(mock.Anything, mock.Anything, mock.Anything).Return(nil)
 
+	// Mock handler marks start-node successfully completed but other nodes as failed
 	startNodeMatcher := mock.MatchedBy(func(nodeExecContext fakeNodeExecContext) bool {
 		return nodeExecContext.Node().IsStartNode()
 	})
@@ -570,7 +571,6 @@ func TestWorkflowExecutor_HandleFlyteWorkflow_Failing(t *testing.T) {
 				WorkflowSpec:        &v1alpha1.WorkflowSpec{OnFailurePolicy: test.onFailurePolicy},
 			}
 			if assert.NoError(t, json.Unmarshal(wJSON, w)) {
-				// For benchmark workflow, we will run into the first failure on round 6
 
 				for i := 0; i < test.expectedRoundsToFail; i++ {
 					t.Run(fmt.Sprintf("Round[%d]", i), func(t *testing.T) {
