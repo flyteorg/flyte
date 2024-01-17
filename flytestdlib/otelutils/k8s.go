@@ -3,10 +3,7 @@ package otelutils
 import (
 	"context"
 	"fmt"
-	"time"
 
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -24,15 +21,7 @@ func WrapK8sCache(c cache.Cache) cache.Cache {
 func (c *K8sCacheWrapper) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	ctx, span := NewSpan(ctx, K8sClientTracer, fmt.Sprintf("%s.Cache/Get", k8sSpanPathPrefix))
 	defer span.End()
-
-	err := c.Cache.Get(ctx, key, obj, opts...)
-	if time.Since(obj.GetCreationTimestamp().Time) < (time.Second * 3) {
-		obj = nil
-		return k8serrors.NewNotFound(schema.GroupResource{Group: "foo", Resource: "bar"}, key.Name)
-	}
-
-	return err
-	//return c.Cache.Get(ctx, key, obj, opts...)
+	return c.Cache.Get(ctx, key, obj, opts...)
 }
 
 func (c *K8sCacheWrapper) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
@@ -54,14 +43,7 @@ func WrapK8sClient(c client.Client) client.Client {
 func (c *K8sClientWrapper) Get(ctx context.Context, key client.ObjectKey, obj client.Object, opts ...client.GetOption) error {
 	ctx, span := NewSpan(ctx, K8sClientTracer, fmt.Sprintf("%s.Client/Get", k8sSpanPathPrefix))
 	defer span.End()
-	err := c.Client.Get(ctx, key, obj, opts...)
-	if time.Since(obj.GetCreationTimestamp().Time) < (time.Second * 3) {
-		obj = nil
-		return k8serrors.NewNotFound(schema.GroupResource{Group: "foo", Resource: "bar"}, key.Name)
-	}
-
-	return err
-	//return c.Client.Get(ctx, key, obj, opts...)
+	return c.Client.Get(ctx, key, obj, opts...)
 }
 
 func (c *K8sClientWrapper) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
