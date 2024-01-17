@@ -9,6 +9,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -23,15 +24,53 @@ type Client interface {
 	GetCache() cache.Cache
 }
 
+var NewCache = func(config *rest.Config, options cache.Options) (cache.Cache, error) {
+	k8sCache, err := cache.New(config, options)
+	if err != nil {
+		return k8sCache, err
+	}
+
+	return otelutils.WrapK8sCache(k8sCache), nil
+}
+
+var NewClient = func(config *rest.Config, options client.Options) (client.Client, error) {
+	var reader *fallbackClientReader
+	if options.Cache != nil && options.Cache.Reader != nil {
+		// if caching is enabled we create a fallback reader so we can attempt the client if the cache
+		// reader does not have the object
+		reader = &fallbackClientReader{
+			orderedClients: []client.Reader{options.Cache.Reader},
+		}
+
+		options.Cache.Reader = reader
+	}
+
+	// create the k8s client
+	k8sClient, err := client.New(config, options)
+	if err != nil {
+		return k8sClient, err
+	}
+
+	// TODO - should we wrap this in a writeThroughCachingWriter as well?
+	k8sOtelClient := otelutils.WrapK8sClient(k8sClient)
+	if reader != nil {
+		// once the k8s client is created we set the fallback reader's client to the k8s client
+		reader.orderedClients = append([]client.Reader{k8sOtelClient}, reader.orderedClients...)
+	}
+
+	return k8sOtelClient, nil
+}
+
 // fallbackClientReader reads from the cache first and if not found then reads from the configured reader, which
 // directly reads from the API
 type fallbackClientReader struct {
 	orderedClients []client.Reader
 }
 
-func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object) (err error) {
+
+func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object, opts ...client.GetOption) (err error) {
 	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.Get(ctx, key, out); err == nil {
+		if err = k8sClient.Get(ctx, key, out, opts...); err == nil {
 			return nil
 		}
 	}
@@ -47,56 +86,6 @@ func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, 
 	}
 
 	return
-}
-
-// ClientBuilder builder is the interface for the client builder.
-type ClientBuilder interface {
-	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
-	// for this client. This function can be called multiple times, it should append to an internal slice.
-	WithUncached(objs ...client.Object) ClientBuilder
-
-	// Build returns a new client.
-	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
-}
-
-type FallbackClientBuilder struct {
-	uncached []client.Object
-	scope    promutils.Scope
-}
-
-func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
-	f.uncached = append(f.uncached, objs...)
-	return f
-}
-
-func (f FallbackClientBuilder) Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
-	c, err := client.New(config, options)
-	if err != nil {
-		return nil, err
-	}
-
-	c, err = newWriteThroughCachingWriter(c, 50000, f.scope)
-	if err != nil {
-		return nil, err
-	}
-
-	return client.NewDelegatingClient(client.NewDelegatingClientInput{
-		Client: c,
-		CacheReader: fallbackClientReader{
-			orderedClients: []client.Reader{cache, c},
-		},
-		UncachedObjects: f.uncached,
-		// TODO figure out if this should be true?
-		// CacheUnstructured: true,
-	})
-}
-
-// NewFallbackClientBuilder Creates a new k8s client that uses the cached client for reads and falls back to making API
-// calls if it failed. Write calls will always go to raw client directly.
-func NewFallbackClientBuilder(scope promutils.Scope) *FallbackClientBuilder {
-	return &FallbackClientBuilder{
-		scope: scope,
-	}
 }
 
 type writeThroughCachingWriter struct {

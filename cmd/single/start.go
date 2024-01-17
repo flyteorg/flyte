@@ -18,6 +18,7 @@ import (
 	adminScheduler "github.com/flyteorg/flyte/flyteadmin/scheduler"
 	propellerEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
@@ -33,9 +34,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
@@ -122,22 +121,8 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache: func(config *rest.Config, options cache.Options) (cache.Cache, error) {
-			k8sCache, err := cache.New(config, options)
-			if err != nil {
-				return k8sCache, err
-			}
-
-			return otelutils.WrapK8sCache(k8sCache), nil
-		},
-		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			k8sClient, err := client.New(config, options)
-			if err != nil {
-				return k8sClient, err
-			}
-
-			return otelutils.WrapK8sClient(k8sClient), nil
-		},
+		NewCache: executors.NewCache,
+		NewClient: executors.NewClient,
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
