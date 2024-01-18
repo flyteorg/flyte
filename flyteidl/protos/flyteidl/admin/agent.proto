@@ -85,6 +85,8 @@ message Resource {
   string message = 3;
   // log information for the task execution.
   repeated core.TaskLog log_links = 4;
+  // The phase of the execution is used to determine the phase of the plugin's execution.
+  core.TaskExecution.Phase phase = 5;
 }
 
 // A message used to delete a task.

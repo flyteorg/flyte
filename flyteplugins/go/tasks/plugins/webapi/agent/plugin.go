@@ -189,6 +189,10 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
+	logger.Infof(ctx, "@@@ resource.State [%v]", resource.State)
+	// switch resource.Phase {
+	// if it is undefined, default is 0 in the protobuf, then we will use resource.State to determine the phase
+	// }
 
 	switch resource.State {
 	case admin.State_PENDING:
