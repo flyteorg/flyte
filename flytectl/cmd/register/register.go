@@ -10,7 +10,7 @@ import (
 // Long descriptions are whitespace sensitive when generating docs using sphinx.
 const (
 	registerCmdShort = "Registers tasks, workflows, and launch plans from a list of generated serialized files."
-	registercmdLong  = `
+	registerCmdLong  = `
 Take input files as serialized versions of the tasks/workflows/launchplans and register them with FlyteAdmin.
 Currently, these input files are protobuf files generated as output from Flytekit serialize.
 Project and Domain are mandatory fields to be passed for registration and an optional version which defaults to v1.
@@ -23,7 +23,7 @@ func RemoteRegisterCommand() *cobra.Command {
 	registerCmd := &cobra.Command{
 		Use:   "register",
 		Short: registerCmdShort,
-		Long:  registercmdLong,
+		Long:  registerCmdLong,
 	}
 	registerResourcesFuncs := map[string]cmdcore.CommandEntry{
 		"files": {CmdFunc: registerFromFilesFunc, Aliases: []string{"file"}, PFlagProvider: rconfig.DefaultFilesConfig,

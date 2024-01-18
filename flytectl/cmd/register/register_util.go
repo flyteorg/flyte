@@ -491,10 +491,20 @@ func hydrateSpec(message proto.Message, uploadLocation storage.DataReference, co
 				return err
 			}
 		}
+		if workflowSpec.Template.GetFailureNode() != nil {
+			if err := hydrateNode(workflowSpec.Template.GetFailureNode(), config.Version, config.Force); err != nil {
+				return err
+			}
+		}
 		hydrateIdentifier(workflowSpec.Template.Id, config.Version, config.Force)
 		for _, subWorkflow := range workflowSpec.SubWorkflows {
 			for _, Noderef := range subWorkflow.Nodes {
 				if err := hydrateNode(Noderef, config.Version, config.Force); err != nil {
+					return err
+				}
+			}
+			if subWorkflow.GetFailureNode() != nil {
+				if err := hydrateNode(subWorkflow.GetFailureNode(), config.Version, config.Force); err != nil {
 					return err
 				}
 			}

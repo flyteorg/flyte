@@ -60,6 +60,31 @@ func TestRegisterFromFiles(t *testing.T) {
 		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
 		assert.Nil(t, err)
 	})
+	t.Run("Register a workflow with a failure node", func(t *testing.T) {
+		s := setup()
+		testScope := promutils.NewTestScope()
+		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+		registerFilesSetup()
+		rconfig.DefaultFilesConfig.Archive = true
+		rconfig.DefaultFilesConfig.OutputLocationPrefix = s3Output
+		rconfig.DefaultFilesConfig.DeprecatedSourceUploadPath = s3Output
+		mockStorage, err := storage.NewDataStore(&storage.Config{
+			Type: storage.TypeMemory,
+		}, testScope.NewSubScope("flytectl"))
+		assert.Nil(t, err)
+		Client = mockStorage
+
+		args := []string{"testdata/failure-node.tgz"}
+		s.MockAdminClient.OnCreateTaskMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.OnCreateWorkflowMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.OnCreateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		s.MockAdminClient.OnUpdateLaunchPlanMatch(mock.Anything, mock.Anything).Return(nil, nil)
+		mockDataProxy := s.MockClient.DataProxyClient().(*mocks.DataProxyServiceClient)
+		mockDataProxy.OnCreateUploadLocationMatch(s.Ctx, mock.Anything).Return(&service.CreateUploadLocationResponse{}, nil)
+
+		err = registerFromFilesFunc(s.Ctx, args, s.CmdCtx)
+		assert.Nil(t, err)
+	})
 	t.Run("Failed fast registration while uploading the codebase", func(t *testing.T) {
 		s := setup()
 		registerFilesSetup()
