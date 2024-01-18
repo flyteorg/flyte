@@ -91,7 +91,7 @@ class CoreArrayNode(object):
     def parallelism(self):
         """Gets the parallelism of this CoreArrayNode.  # noqa: E501
 
-        parallelism defines the minimum number of instances to bring up concurrently at any given point. Note that this is an optimistic restriction and that, due to network orging or other failures, the actual number of currently running instances might be more. This has to be a positive number if assigned. Default value is size.  # noqa: E501
+        parallelism defines the minimum number of instances to bring up concurrently at any given point. Note that this is an optimistic restriction and that, due to network partitioning or other failures, the actual number of currently running instances might be more. This has to be a positive number if assigned. Default value is size.  # noqa: E501
 
         :return: The parallelism of this CoreArrayNode.  # noqa: E501
         :rtype: int
@@ -102,7 +102,7 @@ class CoreArrayNode(object):
     def parallelism(self, parallelism):
         """Sets the parallelism of this CoreArrayNode.
 
-        parallelism defines the minimum number of instances to bring up concurrently at any given point. Note that this is an optimistic restriction and that, due to network orging or other failures, the actual number of currently running instances might be more. This has to be a positive number if assigned. Default value is size.  # noqa: E501
+        parallelism defines the minimum number of instances to bring up concurrently at any given point. Note that this is an optimistic restriction and that, due to network partitioning or other failures, the actual number of currently running instances might be more. This has to be a positive number if assigned. Default value is size.  # noqa: E501
 
         :param parallelism: The parallelism of this CoreArrayNode.  # noqa: E501
         :type: int

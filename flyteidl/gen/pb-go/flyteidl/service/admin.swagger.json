@@ -4388,7 +4388,7 @@
           },
           {
             "name": "id",
-            "description": "Deprecated, use identifier instead.\nGlobally unique project name.",
+            "description": "Globally unique project name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -4422,7 +4422,7 @@
         "parameters": [
           {
             "name": "id",
-            "description": "Deprecated, use identifier instead.\nGlobally unique project name.",
+            "description": "Globally unique project name.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -8137,7 +8137,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "Deprecated, use identifier instead.\nGlobally unique project name."
+          "description": "Globally unique project name."
         },
         "name": {
           "type": "string",
@@ -8981,7 +8981,7 @@
         "parallelism": {
           "type": "integer",
           "format": "int64",
-          "description": "parallelism defines the minimum number of instances to bring up concurrently at any given\npoint. Note that this is an optimistic restriction and that, due to network orging or\nother failures, the actual number of currently running instances might be more. This has to\nbe a positive number if assigned. Default value is size."
+          "description": "parallelism defines the minimum number of instances to bring up concurrently at any given\npoint. Note that this is an optimistic restriction and that, due to network partitioning or\nother failures, the actual number of currently running instances might be more. This has to\nbe a positive number if assigned. Default value is size."
         },
         "min_successes": {
           "type": "integer",

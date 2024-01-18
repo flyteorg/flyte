@@ -105,7 +105,6 @@ func (m *Domain) GetName() string {
 
 // Top-level namespace used to classify different entities like workflows and executions.
 type Project struct {
-	// Deprecated, use identifier instead.
 	// Globally unique project name.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Display name.

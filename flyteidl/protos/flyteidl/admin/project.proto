@@ -19,7 +19,6 @@ message Domain {
 
 // Top-level namespace used to classify different entities like workflows and executions.
 message Project {
-    // Deprecated, use identifier instead.
     // Globally unique project name.
     string id               = 1;
 

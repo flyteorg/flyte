@@ -2251,7 +2251,6 @@ pub struct Domain {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Project {
-    /// Deprecated, use identifier instead.
     /// Globally unique project name.
     #[prost(string, tag="1")]
     pub id: ::prost::alloc::string::String,

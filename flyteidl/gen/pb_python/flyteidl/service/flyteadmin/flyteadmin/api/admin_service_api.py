@@ -11850,7 +11850,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str id: Deprecated, use identifier instead. Globally unique project name. (required)
+        :param str id: Globally unique project name. (required)
         :param AdminProject body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
@@ -11872,7 +11872,7 @@ class AdminServiceApi(object):
         >>> result = thread.get()
 
         :param async_req bool
-        :param str id: Deprecated, use identifier instead. Globally unique project name. (required)
+        :param str id: Globally unique project name. (required)
         :param AdminProject body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
@@ -11956,7 +11956,7 @@ class AdminServiceApi(object):
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
-        :param str id: Deprecated, use identifier instead. Globally unique project name. (required)
+        :param str id: Globally unique project name. (required)
         :param AdminProject body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
@@ -11979,7 +11979,7 @@ class AdminServiceApi(object):
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
-        :param str id: Deprecated, use identifier instead. Globally unique project name. (required)
+        :param str id: Globally unique project name. (required)
         :param AdminProject body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,

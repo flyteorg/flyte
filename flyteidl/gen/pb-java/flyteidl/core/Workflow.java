@@ -8981,7 +8981,7 @@ public final class Workflow {
     /**
      * <pre>
      * parallelism defines the minimum number of instances to bring up concurrently at any given
-     * point. Note that this is an optimistic restriction and that, due to network orging or
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
      * other failures, the actual number of currently running instances might be more. This has to
      * be a positive number if assigned. Default value is size.
      * </pre>
@@ -9195,7 +9195,7 @@ public final class Workflow {
     /**
      * <pre>
      * parallelism defines the minimum number of instances to bring up concurrently at any given
-     * point. Note that this is an optimistic restriction and that, due to network orging or
+     * point. Note that this is an optimistic restriction and that, due to network partitioning or
      * other failures, the actual number of currently running instances might be more. This has to
      * be a positive number if assigned. Default value is size.
      * </pre>
@@ -9817,7 +9817,7 @@ public final class Workflow {
       /**
        * <pre>
        * parallelism defines the minimum number of instances to bring up concurrently at any given
-       * point. Note that this is an optimistic restriction and that, due to network orging or
+       * point. Note that this is an optimistic restriction and that, due to network partitioning or
        * other failures, the actual number of currently running instances might be more. This has to
        * be a positive number if assigned. Default value is size.
        * </pre>
@@ -9830,7 +9830,7 @@ public final class Workflow {
       /**
        * <pre>
        * parallelism defines the minimum number of instances to bring up concurrently at any given
-       * point. Note that this is an optimistic restriction and that, due to network orging or
+       * point. Note that this is an optimistic restriction and that, due to network partitioning or
        * other failures, the actual number of currently running instances might be more. This has to
        * be a positive number if assigned. Default value is size.
        * </pre>
@@ -9846,7 +9846,7 @@ public final class Workflow {
       /**
        * <pre>
        * parallelism defines the minimum number of instances to bring up concurrently at any given
-       * point. Note that this is an optimistic restriction and that, due to network orging or
+       * point. Note that this is an optimistic restriction and that, due to network partitioning or
        * other failures, the actual number of currently running instances might be more. This has to
        * be a positive number if assigned. Default value is size.
        * </pre>

@@ -788,7 +788,6 @@ public final class ProjectOuterClass {
 
     /**
      * <pre>
-     * Deprecated, use identifier instead.
      * Globally unique project name.
      * </pre>
      *
@@ -797,7 +796,6 @@ public final class ProjectOuterClass {
     java.lang.String getId();
     /**
      * <pre>
-     * Deprecated, use identifier instead.
      * Globally unique project name.
      * </pre>
      *
@@ -1189,7 +1187,6 @@ public final class ProjectOuterClass {
     private volatile java.lang.Object id_;
     /**
      * <pre>
-     * Deprecated, use identifier instead.
      * Globally unique project name.
      * </pre>
      *
@@ -1209,7 +1206,6 @@ public final class ProjectOuterClass {
     }
     /**
      * <pre>
-     * Deprecated, use identifier instead.
      * Globally unique project name.
      * </pre>
      *
@@ -1900,7 +1896,6 @@ public final class ProjectOuterClass {
       private java.lang.Object id_ = "";
       /**
        * <pre>
-       * Deprecated, use identifier instead.
        * Globally unique project name.
        * </pre>
        *
@@ -1920,7 +1915,6 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Deprecated, use identifier instead.
        * Globally unique project name.
        * </pre>
        *
@@ -1941,7 +1935,6 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Deprecated, use identifier instead.
        * Globally unique project name.
        * </pre>
        *
@@ -1959,7 +1952,6 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Deprecated, use identifier instead.
        * Globally unique project name.
        * </pre>
        *
@@ -1973,7 +1965,6 @@ public final class ProjectOuterClass {
       }
       /**
        * <pre>
-       * Deprecated, use identifier instead.
        * Globally unique project name.
        * </pre>
        *
