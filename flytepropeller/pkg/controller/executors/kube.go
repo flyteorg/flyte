@@ -33,7 +33,7 @@ var NewCache = func(config *rest.Config, options cache.Options) (cache.Cache, er
 	return otelutils.WrapK8sCache(k8sCache), nil
 }
 
-func BuildNewClientFunc(writeThroughFilterSize int, scope promutils.Scope) func(config *rest.Config, options client.Options) (client.Client, error) {
+func BuildNewClientFunc(writeFilterSize int, scope promutils.Scope) func(config *rest.Config, options client.Options) (client.Client, error) {
 	return func(config *rest.Config, options client.Options) (client.Client, error) {
 		var cacheReader client.Reader
 		cachelessOptions := options
@@ -47,7 +47,7 @@ func BuildNewClientFunc(writeThroughFilterSize int, scope promutils.Scope) func(
 			return k8sClient, err
 		}
 
-		filter, err := fastcheck.NewOppoBloomFilter(writeThroughFilterSize, scope.NewSubScope("kube_filter"))
+		filter, err := fastcheck.NewOppoBloomFilter(writeFilterSize, scope.NewSubScope("kube_filter"))
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func BuildNewClientFunc(writeThroughFilterSize int, scope promutils.Scope) func(
 		return flyteK8sClient{
 			Client:             k8sClient,
 			cacheReader:        cacheReader,
-			writeThroughFilter: filter,
+			writeFilter: filter,
 		}, nil
 	}
 }
@@ -63,7 +63,7 @@ func BuildNewClientFunc(writeThroughFilterSize int, scope promutils.Scope) func(
 type flyteK8sClient struct {
 	client.Client
 	cacheReader	       client.Reader
-	writeThroughFilter fastcheck.Filter
+	writeFilter fastcheck.Filter
 }
 
 func (f flyteK8sClient) Get(ctx context.Context, key client.ObjectKey, out client.Object, opts ...client.GetOption) (err error) {
@@ -91,14 +91,14 @@ func (f flyteK8sClient) List(ctx context.Context, list client.ObjectList, opts .
 func (f flyteK8sClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	// "c" represents create
 	id := idFromObject(obj, "c")
-	if f.writeThroughFilter.Contains(ctx, id) {
+	if f.writeFilter.Contains(ctx, id) {
 		return nil
 	}
 	err := f.Client.Create(ctx, obj, opts...)
 	if err != nil {
 		return err
 	}
-	f.writeThroughFilter.Add(ctx, id)
+	f.writeFilter.Add(ctx, id)
 	return nil
 }
 
@@ -107,14 +107,14 @@ func (f flyteK8sClient) Create(ctx context.Context, obj client.Object, opts ...c
 func (f flyteK8sClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	// "d" represents delete
 	id := idFromObject(obj, "d")
-	if f.writeThroughFilter.Contains(ctx, id) {
+	if f.writeFilter.Contains(ctx, id) {
 		return nil
 	}
 	err := f.Client.Delete(ctx, obj, opts...)
 	if err != nil {
 		return err
 	}
-	f.writeThroughFilter.Add(ctx, id)
+	f.writeFilter.Add(ctx, id)
 	return nil
 }
 
