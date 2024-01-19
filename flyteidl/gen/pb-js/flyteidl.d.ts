@@ -15185,6 +15185,9 @@ export namespace flyteidl {
 
             /** ListMatchableAttributesRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** ListMatchableAttributesRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ListMatchableAttributesRequest. */
@@ -15198,6 +15201,9 @@ export namespace flyteidl {
 
             /** ListMatchableAttributesRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** ListMatchableAttributesRequest org. */
+            public org: string;
 
             /**
              * Creates a new ListMatchableAttributesRequest instance using the specified properties.
@@ -16434,6 +16440,9 @@ export namespace flyteidl {
 
             /** ProjectListRequest sortBy */
             sortBy?: (flyteidl.admin.ISort|null);
+
+            /** ProjectListRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectListRequest. */
@@ -16456,6 +16465,9 @@ export namespace flyteidl {
 
             /** ProjectListRequest sortBy. */
             public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** ProjectListRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectListRequest instance using the specified properties.

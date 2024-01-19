@@ -1883,6 +1883,9 @@ pub struct ListMatchableAttributesRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="1")]
     pub resource_type: i32,
+    /// Optional, org filter applied to list project requests.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Response for a request for all matching resource attributes for a resource type.
 /// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
@@ -2342,6 +2345,9 @@ pub struct ProjectListRequest {
     /// +optional
     #[prost(message, optional, tag="4")]
     pub sort_by: ::core::option::Option<Sort>,
+    /// Optional, org filter applied to list project requests.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Adds a new user-project within the Flyte deployment.
 /// See :ref:`ref_flyteidl.admin.Project` for more details

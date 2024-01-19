@@ -36,8 +36,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_create_execution2(self):
+        """Test case for create_execution2
+
+        Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
+        """
+        pass
+
     def test_create_launch_plan(self):
         """Test case for create_launch_plan
+
+        Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
+        """
+        pass
+
+    def test_create_launch_plan2(self):
+        """Test case for create_launch_plan2
 
         Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
         """
@@ -50,8 +64,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_create_node_event2(self):
+        """Test case for create_node_event2
+
+        Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
+        """
+        pass
+
     def test_create_task(self):
         """Test case for create_task
+
+        Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
+        """
+        pass
+
+    def test_create_task2(self):
+        """Test case for create_task2
 
         Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
         """
@@ -64,6 +92,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_create_task_event2(self):
+        """Test case for create_task_event2
+
+        Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
+        """
+        pass
+
     def test_create_workflow(self):
         """Test case for create_workflow
 
@@ -71,8 +106,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_create_workflow2(self):
+        """Test case for create_workflow2
+
+        Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
+        """
+        pass
+
     def test_create_workflow_event(self):
         """Test case for create_workflow_event
+
+        Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
+        """
+        pass
+
+    def test_create_workflow_event2(self):
+        """Test case for create_workflow_event2
 
         Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
         """
@@ -357,6 +406,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_active_launch_plans2(self):
+        """Test case for list_active_launch_plans2
+
+        List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
+        """
+        pass
+
     def test_list_description_entities(self):
         """Test case for list_description_entities
 
@@ -448,6 +504,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_matchable_attributes2(self):
+        """Test case for list_matchable_attributes2
+
+        Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
+        """
+        pass
+
     def test_list_named_entities(self):
         """Test case for list_named_entities
 
@@ -492,6 +555,13 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_list_projects(self):
         """Test case for list_projects
+
+        Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
+        """
+        pass
+
+    def test_list_projects2(self):
+        """Test case for list_projects2
 
         Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
         """
@@ -602,6 +672,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_recover_execution2(self):
+        """Test case for recover_execution2
+
+        Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
+        """
+        pass
+
     def test_register_project(self):
         """Test case for register_project
 
@@ -609,8 +686,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_register_project2(self):
+        """Test case for register_project2
+
+        Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
+        """
+        pass
+
     def test_relaunch_execution(self):
         """Test case for relaunch_execution
+
+        Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
+        """
+        pass
+
+    def test_relaunch_execution2(self):
+        """Test case for relaunch_execution2
 
         Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
         """

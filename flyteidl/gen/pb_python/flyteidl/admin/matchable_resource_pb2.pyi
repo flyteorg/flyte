@@ -156,10 +156,12 @@ class MatchableAttributesConfiguration(_message.Message):
     def __init__(self, attributes: _Optional[_Union[MatchingAttributes, _Mapping]] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ..., launch_plan: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ListMatchableAttributesRequest(_message.Message):
-    __slots__ = ["resource_type"]
+    __slots__ = ["resource_type", "org"]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     resource_type: MatchableResource
-    def __init__(self, resource_type: _Optional[_Union[MatchableResource, str]] = ...) -> None: ...
+    org: str
+    def __init__(self, resource_type: _Optional[_Union[MatchableResource, str]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ListMatchableAttributesResponse(_message.Message):
     __slots__ = ["configurations"]

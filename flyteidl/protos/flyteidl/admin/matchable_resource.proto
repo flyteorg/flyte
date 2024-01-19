@@ -178,6 +178,9 @@ message MatchableAttributesConfiguration {
 message ListMatchableAttributesRequest {
     // +required
     MatchableResource resource_type = 1;
+
+    // Optional, org filter applied to list project requests.
+    string org = 2;
 }
 
 // Response for a request for all matching resource attributes for a resource type.
