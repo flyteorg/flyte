@@ -210,7 +210,7 @@ func migrateExecutionTags(tx *gorm.DB) error {
 	}
 
 	// add org primary key
-	err := tx.Exec("ALTER TABLE execution_admin_tags drop constraint execution_admin_tags_pkey cascade, add primary key (execution_org, execution_project, execution_domain, execution_name);").Error
+	err := tx.Exec("ALTER TABLE execution_admin_tags drop constraint execution_admin_tags_pkey cascade, add primary key (execution_org, execution_project, execution_domain, execution_name, admin_tag_id);").Error
 	if err != nil {
 		return err
 	}
@@ -607,7 +607,7 @@ func rollbackExecutionEvents(tx *gorm.DB) error {
 
 func rollbackExecutionTags(tx *gorm.DB) error {
 	// drop org from primary key
-	err := tx.Exec("ALTER TABLE execution_admin_tags drop constraint execution_admin_tags_pkey cascade, add primary key (execution_project, execution_domain, execution_name);").Error
+	err := tx.Exec("ALTER TABLE execution_admin_tags drop constraint execution_admin_tags_pkey cascade, add primary key (execution_project, execution_domain, execution_name, admin_tag_id);").Error
 	if err != nil {
 		return err
 	}
@@ -698,7 +698,12 @@ func rollbackTaskExecutions(tx *gorm.DB) error {
 		return err
 	}
 
-	dropOrgColumnSQL := strings.ReplaceAll(dropExecutionOrgColumn, entityTemplate, taskExecutions)
+	dropExecutionOrgColumnSQL := strings.ReplaceAll(dropExecutionOrgColumn, entityTemplate, taskExecutions)
+	if err := tx.Exec(dropExecutionOrgColumnSQL).Error; err != nil {
+		return err
+	}
+
+	dropOrgColumnSQL := strings.ReplaceAll(dropOrgColumn, entityTemplate, taskExecutions)
 	if err := tx.Exec(dropOrgColumnSQL).Error; err != nil {
 		return err
 	}
