@@ -6,7 +6,7 @@ dependencies:
   - pip
   - codespell
   - furo
-  - flytekit
+  - flytekit>=1.10.2
   - gitpython
   - ipython!=8.7.0
   - graphviz
@@ -67,6 +67,7 @@ dependencies:
     - flytekitplugins-kfpytorch
     - flytekitplugins-sqlalchemy
     - dolt_integrations
+    - modin
     - google-cloud
     - ydata_profiling
     - whylogs==1.3.3              # whylogs
