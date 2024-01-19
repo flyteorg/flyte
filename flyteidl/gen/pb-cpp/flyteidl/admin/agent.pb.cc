@@ -433,6 +433,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fadmin_2fagent_2eproto::o
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, outputs_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, message_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, log_links_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::admin::Resource, phase_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::admin::DeleteTaskRequest, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -486,13 +487,13 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 55, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
   { 62, -1, sizeof(::flyteidl::admin::GetTaskResponse)},
   { 69, -1, sizeof(::flyteidl::admin::Resource)},
-  { 78, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
-  { 85, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
-  { 90, -1, sizeof(::flyteidl::admin::Agent)},
-  { 97, -1, sizeof(::flyteidl::admin::GetAgentRequest)},
-  { 103, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
-  { 109, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
-  { 114, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
+  { 79, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
+  { 86, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
+  { 91, -1, sizeof(::flyteidl::admin::Agent)},
+  { 98, -1, sizeof(::flyteidl::admin::GetAgentRequest)},
+  { 104, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
+  { 110, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
+  { 115, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -551,28 +552,29 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\022\025\n\rresource_meta\030\002 \001(\014\"h\n\017GetTaskRespon"
   "se\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Re"
   "source\022)\n\tlog_links\030\002 \003(\0132\026.flyteidl.cor"
-  "e.TaskLog\"\230\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025."
+  "e.TaskLog\"\313\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025."
   "flyteidl.admin.State\022*\n\007outputs\030\002 \001(\0132\031."
   "flyteidl.core.LiteralMap\022\017\n\007message\030\003 \001("
   "\t\022)\n\tlog_links\030\004 \003(\0132\026.flyteidl.core.Tas"
-  "kLog\"=\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001"
-  " \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTas"
-  "kResponse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024supp"
-  "orted_task_types\030\002 \003(\t\"\037\n\017GetAgentReques"
-  "t\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005a"
-  "gent\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021Lis"
-  "tAgentsRequest\";\n\022ListAgentsResponse\022%\n\006"
-  "agents\030\001 \003(\0132\025.flyteidl.admin.Agent*^\n\005S"
-  "tate\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT"
-  "_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\t"
-  "SUCCEEDED\020\004B=Z;github.com/flyteorg/flyte"
-  "/flyteidl/gen/pb-go/flyteidl/adminb\006prot"
-  "o3"
+  "kLog\0221\n\005phase\030\005 \001(\0162\".flyteidl.core.Task"
+  "Execution.Phase\"=\n\021DeleteTaskRequest\022\021\n\t"
+  "task_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024"
+  "\n\022DeleteTaskResponse\"3\n\005Agent\022\014\n\004name\030\001 "
+  "\001(\t\022\034\n\024supported_task_types\030\002 \003(\t\"\037\n\017Get"
+  "AgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentRe"
+  "sponse\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin.A"
+  "gent\"\023\n\021ListAgentsRequest\";\n\022ListAgentsR"
+  "esponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.admin"
+  ".Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025"
+  "\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RU"
+  "NNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/fly"
+  "teorg/flyte/flyteidl/gen/pb-go/flyteidl/"
+  "adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1842,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1893,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -3304,6 +3306,7 @@ const int Resource::kStateFieldNumber;
 const int Resource::kOutputsFieldNumber;
 const int Resource::kMessageFieldNumber;
 const int Resource::kLogLinksFieldNumber;
+const int Resource::kPhaseFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 Resource::Resource()
@@ -3325,7 +3328,9 @@ Resource::Resource(const Resource& from)
   } else {
     outputs_ = nullptr;
   }
-  state_ = from.state_;
+  ::memcpy(&state_, &from.state_,
+    static_cast<size_t>(reinterpret_cast<char*>(&phase_) -
+    reinterpret_cast<char*>(&state_)) + sizeof(phase_));
   // @@protoc_insertion_point(copy_constructor:flyteidl.admin.Resource)
 }
 
@@ -3334,8 +3339,8 @@ void Resource::SharedCtor() {
       &scc_info_Resource_flyteidl_2fadmin_2fagent_2eproto.base);
   message_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   ::memset(&outputs_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&state_) -
-      reinterpret_cast<char*>(&outputs_)) + sizeof(state_));
+      reinterpret_cast<char*>(&phase_) -
+      reinterpret_cast<char*>(&outputs_)) + sizeof(phase_));
 }
 
 Resource::~Resource() {
@@ -3369,7 +3374,9 @@ void Resource::Clear() {
     delete outputs_;
   }
   outputs_ = nullptr;
-  state_ = 0;
+  ::memset(&state_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&phase_) -
+      reinterpret_cast<char*>(&state_)) + sizeof(phase_));
   _internal_metadata_.Clear();
 }
 
@@ -3437,6 +3444,14 @@ const char* Resource::_InternalParse(const char* begin, const char* end, void* o
               {parser_till_end, object}, ptr - size, ptr));
           if (ptr >= end) break;
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
+        break;
+      }
+      // .flyteidl.core.TaskExecution.Phase phase = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 40) goto handle_unusual;
+        ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
+        msg->set_phase(static_cast<::flyteidl::core::TaskExecution_Phase>(val));
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         break;
       }
       default: {
@@ -3524,6 +3539,20 @@ bool Resource::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.TaskExecution.Phase phase = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (40 & 0xFF)) {
+          int value = 0;
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   int, ::google::protobuf::internal::WireFormatLite::TYPE_ENUM>(
+                 input, &value)));
+          set_phase(static_cast< ::flyteidl::core::TaskExecution_Phase >(value));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -3582,6 +3611,12 @@ void Resource::SerializeWithCachedSizes(
       output);
   }
 
+  // .flyteidl.core.TaskExecution.Phase phase = 5;
+  if (this->phase() != 0) {
+    ::google::protobuf::internal::WireFormatLite::WriteEnum(
+      5, this->phase(), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -3625,6 +3660,12 @@ void Resource::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         4, this->log_links(static_cast<int>(i)), target);
+  }
+
+  // .flyteidl.core.TaskExecution.Phase phase = 5;
+  if (this->phase() != 0) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
+      5, this->phase(), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -3679,6 +3720,12 @@ size_t Resource::ByteSizeLong() const {
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->state());
   }
 
+  // .flyteidl.core.TaskExecution.Phase phase = 5;
+  if (this->phase() != 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::EnumSize(this->phase());
+  }
+
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
   SetCachedSize(cached_size);
   return total_size;
@@ -3717,6 +3764,9 @@ void Resource::MergeFrom(const Resource& from) {
   if (from.state() != 0) {
     set_state(from.state());
   }
+  if (from.phase() != 0) {
+    set_phase(from.phase());
+  }
 }
 
 void Resource::CopyFrom(const ::google::protobuf::Message& from) {
@@ -3749,6 +3799,7 @@ void Resource::InternalSwap(Resource* other) {
     GetArenaNoVirtual());
   swap(outputs_, other->outputs_);
   swap(state_, other->state_);
+  swap(phase_, other->phase_);
 }
 
 ::google::protobuf::Metadata Resource::GetMetadata() const {

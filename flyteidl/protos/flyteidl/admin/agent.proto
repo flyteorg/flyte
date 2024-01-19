@@ -75,13 +75,13 @@ message GetTaskResponse {
 }
 
 message Resource {
-  // The state of the execution is used to control its visibility in the UI/CLI.
+  // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
   State state = 1;
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
   core.LiteralMap outputs = 2;
-  // A descriptive message for the current state. e.g. waiting for cluster.
+  // A descriptive message for the currnt state. e.g. waiting for cluster.
   string message = 3;
   // log information for the task execution.
   repeated core.TaskLog log_links = 4;

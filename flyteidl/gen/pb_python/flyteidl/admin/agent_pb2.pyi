@@ -98,16 +98,18 @@ class GetTaskResponse(_message.Message):
     def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["state", "outputs", "message", "log_links"]
+    __slots__ = ["state", "outputs", "message", "log_links", "phase"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     MESSAGE_FIELD_NUMBER: _ClassVar[int]
     LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
     state: State
     outputs: _literals_pb2.LiteralMap
     message: str
     log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
+    phase: _execution_pb2.TaskExecution.Phase
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]

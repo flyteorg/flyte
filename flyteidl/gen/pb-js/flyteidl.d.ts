@@ -9097,6 +9097,9 @@ export namespace flyteidl {
 
             /** Resource logLinks */
             logLinks?: (flyteidl.core.ITaskLog[]|null);
+
+            /** Resource phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
         }
 
         /** Represents a Resource. */
@@ -9119,6 +9122,9 @@ export namespace flyteidl {
 
             /** Resource logLinks. */
             public logLinks: flyteidl.core.ITaskLog[];
+
+            /** Resource phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
 
             /**
              * Creates a new Resource instance using the specified properties.
