@@ -12,7 +12,7 @@ const (
 )
 
 // Represents Flyte resources repository.
-// In this model, the combination of (Project, Domain, Workflow, LaunchPlan, ResourceType) is unique
+// In this model, the combination of (Org, Project, Domain, Workflow, LaunchPlan, ResourceType) is unique
 type Resource struct {
 	ID           int64 `gorm:"AUTO_INCREMENT;column:id;primary_key"`
 	CreatedAt    time.Time

@@ -51,7 +51,7 @@ func (r *MockResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.Re
 	return models.Resource{}, nil
 }
 
-func (r *MockResourceRepo) ListAll(ctx context.Context, resourceType string) ([]models.Resource, error) {
+func (r *MockResourceRepo) ListAll(ctx context.Context, resourceType, org string) ([]models.Resource, error) {
 	if r.ListAllFunction != nil {
 		return r.ListAllFunction(ctx, resourceType)
 	}

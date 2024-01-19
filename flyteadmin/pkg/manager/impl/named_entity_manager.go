@@ -136,6 +136,7 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admi
 			InlineFilters: filters,
 			SortParameter: sortParameter,
 		},
+		Org:          request.Org,
 		Project:      request.Project,
 		Domain:       request.Domain,
 		ResourceType: request.ResourceType,
@@ -143,8 +144,8 @@ func (m *NamedEntityManager) ListNamedEntities(ctx context.Context, request admi
 
 	output, err := m.db.NamedEntityRepo().List(ctx, listInput)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to list named entities of type: %s with project: %s, domain: %s. Returned error was: %v",
-			request.ResourceType, request.Project, request.Domain, err)
+		logger.Debugf(ctx, "Failed to list named entities of type: %s with org: %s, project: %s, domain: %s. Returned error was: %v",
+			request.ResourceType, request.Org, request.Project, request.Domain, err)
 		return nil, err
 	}
 

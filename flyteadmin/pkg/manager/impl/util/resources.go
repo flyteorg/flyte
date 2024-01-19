@@ -90,6 +90,9 @@ func GetTaskResources(ctx context.Context, id *core.Identifier, resourceManager 
 	request := interfaces.ResourceRequest{
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	}
+	if id != nil && len(id.Org) > 0 {
+		request.Org = id.Org
+	}
 	if id != nil && len(id.Project) > 0 {
 		request.Project = id.Project
 	}

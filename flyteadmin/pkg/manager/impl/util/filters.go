@@ -198,6 +198,7 @@ func GetSingleValueEqualityFilter(entity common.Entity, field, value string) (co
 
 type FilterSpec struct {
 	// All of these fields are optional (although they should not *all* be empty).
+	Org            string
 	Project        string
 	Domain         string
 	Name           string
@@ -208,6 +209,15 @@ type FilterSpec struct {
 // which can be optionally specified in requests.
 func getIdentifierFilters(entity common.Entity, spec FilterSpec) ([]common.InlineFilter, error) {
 	filters := make([]common.InlineFilter, 0)
+
+	if spec.Org != "" {
+		orgFilter, err := GetSingleValueEqualityFilter(entity, shared.Project, spec.Org)
+		if err != nil {
+			return nil, err
+		}
+		filters = append(filters, orgFilter)
+	}
+
 	if spec.Project != "" {
 		projectFilter, err := GetSingleValueEqualityFilter(entity, shared.Project, spec.Project)
 		if err != nil {
@@ -269,7 +279,17 @@ func GetDbFilters(spec FilterSpec, primaryEntity common.Entity) ([]common.Inline
 
 func GetWorkflowExecutionIdentifierFilters(
 	ctx context.Context, workflowExecutionIdentifier core.WorkflowExecutionIdentifier) ([]common.InlineFilter, error) {
-	identifierFilters := make([]common.InlineFilter, 3)
+	identifierFilters := make([]common.InlineFilter, 4)
+
+	identifierOrgFilter, err := GetSingleValueEqualityFilter(
+		common.Execution, shared.Org, workflowExecutionIdentifier.Org)
+	if err != nil {
+		logger.Warningf(ctx, "Failed to create execution identifier filter for org: %s with identifier [%+v]",
+			workflowExecutionIdentifier.Org, workflowExecutionIdentifier)
+		return nil, err
+	}
+	identifierFilters[0] = identifierOrgFilter
+
 	identifierProjectFilter, err := GetSingleValueEqualityFilter(
 		common.Execution, shared.Project, workflowExecutionIdentifier.Project)
 	if err != nil {
@@ -277,7 +297,7 @@ func GetWorkflowExecutionIdentifierFilters(
 			workflowExecutionIdentifier.Project, workflowExecutionIdentifier)
 		return nil, err
 	}
-	identifierFilters[0] = identifierProjectFilter
+	identifierFilters[1] = identifierProjectFilter
 
 	identifierDomainFilter, err := GetSingleValueEqualityFilter(
 		common.Execution, shared.Domain, workflowExecutionIdentifier.Domain)
@@ -286,7 +306,7 @@ func GetWorkflowExecutionIdentifierFilters(
 			workflowExecutionIdentifier.Domain, workflowExecutionIdentifier)
 		return nil, err
 	}
-	identifierFilters[1] = identifierDomainFilter
+	identifierFilters[2] = identifierDomainFilter
 
 	identifierNameFilter, err := GetSingleValueEqualityFilter(
 		common.Execution, shared.Name, workflowExecutionIdentifier.Name)
@@ -295,7 +315,7 @@ func GetWorkflowExecutionIdentifierFilters(
 			workflowExecutionIdentifier.Name, workflowExecutionIdentifier)
 		return nil, err
 	}
-	identifierFilters[2] = identifierNameFilter
+	identifierFilters[3] = identifierNameFilter
 	return identifierFilters, nil
 }
 

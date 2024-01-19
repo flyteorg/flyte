@@ -3,6 +3,7 @@ package shared
 
 // Field names for reference
 const (
+	Org                   = "org"
 	Project               = "project"
 	Domain                = "domain"
 	Name                  = "name"

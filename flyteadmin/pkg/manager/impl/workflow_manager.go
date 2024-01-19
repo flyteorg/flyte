@@ -268,6 +268,7 @@ func (w *WorkflowManager) ListWorkflows(
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	ctx = contextutils.WithWorkflowID(ctx, request.Id.Name)
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:            request.Id.Org,
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
 		Name:           request.Id.Name,
@@ -323,6 +324,7 @@ func (w *WorkflowManager) ListWorkflowIdentifiers(ctx context.Context, request a
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:     request.Org,
 		Project: request.Project,
 		Domain:  request.Domain,
 	}, common.Workflow)

@@ -36,6 +36,7 @@ type ResourceInterface interface {
 
 // TODO we can move this to flyteidl, once we are exposing an endpoint
 type ResourceRequest struct {
+	Org          string
 	Project      string
 	Domain       string
 	Workflow     string
@@ -44,6 +45,7 @@ type ResourceRequest struct {
 }
 
 type ResourceResponse struct {
+	Org          string
 	Project      string
 	Domain       string
 	Workflow     string

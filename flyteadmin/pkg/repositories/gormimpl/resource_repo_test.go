@@ -217,9 +217,9 @@ func TestListAll(t *testing.T) {
 	response["launch_plan"] = "launch_plan"
 	response["attributes"] = []byte("attrs")
 
-	fakeResponse := query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."resource_type" = $1 ORDER BY priority desc`).WithReply(
+	fakeResponse := query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."org" = $1 AND "resources"."resource_type" = $2 ORDER BY priority desc`).WithReply(
 		[]map[string]interface{}{response})
-	output, err := resourceRepo.ListAll(context.Background(), "resource")
+	output, err := resourceRepo.ListAll(context.Background(), "resource", "org")
 	assert.Nil(t, err)
 	assert.Len(t, output, 1)
 	assert.Equal(t, project, output[0].Project)

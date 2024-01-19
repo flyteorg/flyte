@@ -184,11 +184,11 @@ func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (mo
 	return model, nil
 }
 
-func (r *ResourceRepo) ListAll(ctx context.Context, resourceType string) ([]models.Resource, error) {
+func (r *ResourceRepo) ListAll(ctx context.Context, resourceType, org string) ([]models.Resource, error) {
 	var resources []models.Resource
 	timer := r.metrics.ListDuration.Start()
 
-	tx := r.db.WithContext(ctx).Where(&models.Resource{ResourceType: resourceType}).Order(priorityDescending).Find(&resources)
+	tx := r.db.WithContext(ctx).Where(&models.Resource{Org: org, ResourceType: resourceType}).Order(priorityDescending).Find(&resources)
 	timer.Stop()
 
 	if tx.Error != nil {

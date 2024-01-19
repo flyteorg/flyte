@@ -56,6 +56,7 @@ func (m *ProjectManager) getDomains() []*admin.Domain {
 
 func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
 	spec := util.FilterSpec{
+		Org:            request.Org,
 		RequestFilters: request.Filters,
 	}
 	filters, err := util.GetDbFilters(spec, common.Project)

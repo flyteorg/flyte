@@ -642,24 +642,30 @@ func TestListTaskExecutions(t *testing.T) {
 			assert.Equal(t, 99, input.Limit)
 			assert.Equal(t, 1, input.Offset)
 
-			assert.Len(t, input.InlineFilters, 4)
+			assert.Len(t, input.InlineFilters, 5)
+
 			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-			assert.Equal(t, "exec project b", queryExpr.Args)
-			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+			assert.Equal(t, "exec org b", queryExpr.Args)
+			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
-			assert.Equal(t, "exec domain b", queryExpr.Args)
-			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+			assert.Equal(t, "exec project b", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "exec domain b", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "exec name b", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
 
-			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
-			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[4].GetEntity())
+			queryExpr, _ = input.InlineFilters[4].GetGormQueryExpr()
 			assert.Equal(t, "nodey b", queryExpr.Args)
 			assert.Equal(t, "node_id = ?", queryExpr.Query)
 
@@ -668,6 +674,7 @@ func TestListTaskExecutions(t *testing.T) {
 					{
 						TaskExecutionKey: models.TaskExecutionKey{
 							TaskKey: models.TaskKey{
+								Org:     "task org a",
 								Project: "task project a",
 								Domain:  "task domain a",
 								Name:    "task name a",
@@ -676,6 +683,7 @@ func TestListTaskExecutions(t *testing.T) {
 							NodeExecutionKey: models.NodeExecutionKey{
 								NodeID: "nodey a",
 								ExecutionKey: models.ExecutionKey{
+									Org:     "exec org a",
 									Project: "exec project a",
 									Domain:  "exec domain a",
 									Name:    "exec name a",
@@ -691,6 +699,7 @@ func TestListTaskExecutions(t *testing.T) {
 					{
 						TaskExecutionKey: models.TaskExecutionKey{
 							TaskKey: models.TaskKey{
+								Org:     "task org b",
 								Project: "task project b",
 								Domain:  "task domain b",
 								Name:    "task name b",
@@ -699,6 +708,7 @@ func TestListTaskExecutions(t *testing.T) {
 							NodeExecutionKey: models.NodeExecutionKey{
 								NodeID: "nodey b",
 								ExecutionKey: models.ExecutionKey{
+									Org:     "exec org b",
 									Project: "exec project b",
 									Domain:  "exec domain b",
 									Name:    "exec name b",
@@ -719,6 +729,7 @@ func TestListTaskExecutions(t *testing.T) {
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			NodeId: "nodey b",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     "exec org b",
 				Project: "exec project b",
 				Domain:  "exec domain b",
 				Name:    "exec name b",
@@ -735,6 +746,7 @@ func TestListTaskExecutions(t *testing.T) {
 			RetryAttempt: firstRetryAttempt,
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Org:     "exec org a",
 					Project: "exec project a",
 					Domain:  "exec domain a",
 					Name:    "exec name a",
@@ -743,6 +755,7 @@ func TestListTaskExecutions(t *testing.T) {
 			},
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
+				Org:          "task org a",
 				Project:      "task project a",
 				Domain:       "task domain a",
 				Name:         "task name a",
@@ -757,6 +770,7 @@ func TestListTaskExecutions(t *testing.T) {
 			RetryAttempt: secondRetryAttempt,
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Org:     "exec org b",
 					Project: "exec project b",
 					Domain:  "exec domain b",
 					Name:    "exec name b",
@@ -765,6 +779,7 @@ func TestListTaskExecutions(t *testing.T) {
 			},
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
+				Org:          "task org b",
 				Project:      "task project b",
 				Domain:       "task domain b",
 				Name:         "task name b",

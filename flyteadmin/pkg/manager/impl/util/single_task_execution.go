@@ -73,12 +73,14 @@ func CreateOrGetWorkflowModel(
 	task *admin.Task) (*models.Workflow, error) {
 	workflowIdentifier := core.Identifier{
 		ResourceType: core.ResourceType_WORKFLOW,
+		Org:          taskIdentifier.Org,
 		Project:      taskIdentifier.Project,
 		Domain:       taskIdentifier.Domain,
 		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
 		Version:      taskIdentifier.Version,
 	}
 	workflowModel, err := db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     workflowIdentifier.Org,
 		Project: workflowIdentifier.Project,
 		Domain:  workflowIdentifier.Domain,
 		Name:    workflowIdentifier.Name,
@@ -131,6 +133,7 @@ func CreateOrGetWorkflowModel(
 		_, err = namedEntityManager.UpdateNamedEntity(ctx, admin.NamedEntityUpdateRequest{
 			ResourceType: core.ResourceType_WORKFLOW,
 			Id: &admin.NamedEntityIdentifier{
+				Org:     workflowIdentifier.Org,
 				Project: workflowIdentifier.Project,
 				Domain:  workflowIdentifier.Domain,
 				Name:    workflowIdentifier.Name,
@@ -142,6 +145,7 @@ func CreateOrGetWorkflowModel(
 			return nil, err
 		}
 		workflowModel, err = db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
+			Org:     workflowIdentifier.Org,
 			Project: workflowIdentifier.Project,
 			Domain:  workflowIdentifier.Domain,
 			Name:    workflowIdentifier.Name,
@@ -164,6 +168,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 	var err error
 	launchPlanIdentifier := core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
+		Org:          taskIdentifier.Org,
 		Project:      taskIdentifier.Project,
 		Domain:       taskIdentifier.Domain,
 		Name:         generateWorkflowNameFromTask(taskIdentifier.Name),
@@ -181,6 +186,7 @@ func CreateOrGetLaunchPlan(ctx context.Context,
 			Spec: &admin.LaunchPlanSpec{
 				WorkflowId: &core.Identifier{
 					ResourceType: core.ResourceType_WORKFLOW,
+					Org:          taskIdentifier.Org,
 					Project:      taskIdentifier.Project,
 					Domain:       taskIdentifier.Domain,
 					Name:         taskIdentifier.Name,

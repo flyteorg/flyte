@@ -150,13 +150,16 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
-		assert.Len(t, input.InlineFilters, 4)
+		assert.Len(t, input.InlineFilters, 5)
 
-		projectExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-		domainExpr, _ := input.InlineFilters[1].GetGormQueryExpr()
-		nameExpr, _ := input.InlineFilters[2].GetGormQueryExpr()
-		activeExpr, _ := input.InlineFilters[3].GetGormQueryExpr()
+		orgExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
+		projectExpr, _ := input.InlineFilters[1].GetGormQueryExpr()
+		domainExpr, _ := input.InlineFilters[2].GetGormQueryExpr()
+		nameExpr, _ := input.InlineFilters[3].GetGormQueryExpr()
+		activeExpr, _ := input.InlineFilters[4].GetGormQueryExpr()
 
+		assert.Equal(t, orgExpr.Args, org)
+		assert.Equal(t, orgExpr.Query, testutils.OrgQueryPattern)
 		assert.Equal(t, projectExpr.Args, project)
 		assert.Equal(t, projectExpr.Query, testutils.ProjectQueryPattern)
 		assert.Equal(t, domainExpr.Args, domain)
@@ -169,6 +172,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 			LaunchPlans: []models.LaunchPlan{
 				{
 					LaunchPlanKey: models.LaunchPlanKey{
+						Org:     lpRequest.Id.Org,
 						Project: lpRequest.Id.Project,
 						Domain:  lpRequest.Id.Domain,
 						Name:    lpRequest.Id.Name,
@@ -185,6 +189,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(launchPlanListFunc)
 	response, err := lpManager.GetActiveLaunchPlan(context.Background(), admin.ActiveLaunchPlanRequest{
 		Id: &admin.NamedEntityIdentifier{
+			Org:     lpRequest.Id.Org,
 			Project: lpRequest.Id.Project,
 			Domain:  lpRequest.Id.Domain,
 			Name:    lpRequest.Id.Name,
@@ -210,7 +215,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan_NoneActive(t *testing.T) {
 			Name:    lpRequest.Id.Name,
 		},
 	})
-	assert.EqualError(t, err, "No active launch plan could be found: project:domain:name")
+	assert.EqualError(t, err, "No active launch plan could be found: :project:domain:name")
 	assert.Nil(t, response)
 }
 

@@ -56,6 +56,7 @@ func (d *DescriptionEntityManager) ListDescriptionEntity(ctx context.Context, re
 	}
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:            request.Id.Org,
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
 		Name:           request.Id.Name,

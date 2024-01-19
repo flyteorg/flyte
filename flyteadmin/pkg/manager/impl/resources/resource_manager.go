@@ -27,6 +27,7 @@ type ResourceManager struct {
 func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.ResourceRequest) (*interfaces.ResourceResponse, error) {
 	resource, err := m.db.ResourceRepo().Get(ctx, repo_interface.ResourceID{
 		ResourceType: request.ResourceType.String(),
+		Org:          request.Org,
 		Project:      request.Project,
 		Domain:       request.Domain,
 		Workflow:     request.Workflow,
@@ -44,6 +45,7 @@ func (m *ResourceManager) GetResource(ctx context.Context, request interfaces.Re
 	}
 	return &interfaces.ResourceResponse{
 		ResourceType: resource.ResourceType,
+		Org:          request.Org,
 		Project:      resource.Project,
 		Domain:       resource.Domain,
 		Workflow:     resource.Workflow,
@@ -56,6 +58,7 @@ func (m *ResourceManager) createOrMergeUpdateWorkflowAttributes(
 	ctx context.Context, request admin.WorkflowAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.WorkflowAttributesUpdateResponse, error) {
 	resourceID := repo_interface.ResourceID{
+		Org:          model.Org,
 		Project:      model.Project,
 		Domain:       model.Domain,
 		Workflow:     model.Workflow,
@@ -118,7 +121,7 @@ func (m *ResourceManager) GetWorkflowAttributes(
 		return nil, err
 	}
 	workflowAttributesModel, err := m.db.ResourceRepo().Get(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()})
+		ctx, repo_interface.ResourceID{Org: request.Org, Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()})
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +140,7 @@ func (m *ResourceManager) DeleteWorkflowAttributes(ctx context.Context,
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()}); err != nil {
+		ctx, repo_interface.ResourceID{Org: request.Org, Project: request.Project, Domain: request.Domain, Workflow: request.Workflow, ResourceType: request.ResourceType.String()}); err != nil {
 		return nil, err
 	}
 	logger.Infof(ctx, "Deleted workflow attributes for: %s-%s-%s (%s)", request.Project,
@@ -179,7 +182,7 @@ func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request 
 	}
 
 	projectAttributesModel, err := m.db.ResourceRepo().GetProjectLevel(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: "", ResourceType: request.ResourceType.String()})
+		ctx, repo_interface.ResourceID{Org: request.Org, Project: request.Project, Domain: "", ResourceType: request.ResourceType.String()})
 	if err != nil {
 		return nil, err
 	}
@@ -191,6 +194,7 @@ func (m *ResourceManager) GetProjectAttributesBase(ctx context.Context, request 
 
 	return &admin.ProjectAttributesGetResponse{
 		Attributes: &admin.ProjectAttributes{
+			Org:                request.Org,
 			Project:            request.Project,
 			MatchingAttributes: ma.Attributes,
 		},
@@ -212,6 +216,7 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 			// TODO: Will likely be removed after overarching settings project is done
 			return &admin.ProjectAttributesGetResponse{
 				Attributes: &admin.ProjectAttributes{
+					Org:     request.Org,
 					Project: request.Project,
 					MatchingAttributes: &admin.MatchingAttributes{
 						Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
@@ -234,6 +239,7 @@ func (m *ResourceManager) GetProjectAttributes(ctx context.Context, request admi
 		responseAttributes = &tmp
 		return &admin.ProjectAttributesGetResponse{
 			Attributes: &admin.ProjectAttributes{
+				Org:     request.Org,
 				Project: request.Project,
 				MatchingAttributes: &admin.MatchingAttributes{
 					Target: &admin.MatchingAttributes_WorkflowExecutionConfig{
@@ -265,6 +271,7 @@ func (m *ResourceManager) createOrMergeUpdateProjectDomainAttributes(
 	ctx context.Context, request admin.ProjectDomainAttributesUpdateRequest, model models.Resource,
 	resourceType admin.MatchableResource) (*admin.ProjectDomainAttributesUpdateResponse, error) {
 	resourceID := repo_interface.ResourceID{
+		Org:          model.Org,
 		Project:      model.Project,
 		Domain:       model.Domain,
 		Workflow:     model.Workflow,
@@ -301,6 +308,7 @@ func (m *ResourceManager) createOrMergeUpdateProjectAttributes(
 	resourceType admin.MatchableResource) (*admin.ProjectAttributesUpdateResponse, error) {
 
 	resourceID := repo_interface.ResourceID{
+		Org:          model.Org,
 		Project:      model.Project,
 		Domain:       model.Domain,
 		Workflow:     model.Workflow,
@@ -363,7 +371,7 @@ func (m *ResourceManager) GetProjectDomainAttributes(
 		return nil, err
 	}
 	projectAttributesModel, err := m.db.ResourceRepo().Get(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, ResourceType: request.ResourceType.String()})
+		ctx, repo_interface.ResourceID{Org: request.Org, Project: request.Project, Domain: request.Domain, ResourceType: request.ResourceType.String()})
 	if err != nil {
 		return nil, err
 	}
@@ -382,7 +390,7 @@ func (m *ResourceManager) DeleteProjectDomainAttributes(ctx context.Context,
 		return nil, err
 	}
 	if err := m.db.ResourceRepo().Delete(
-		ctx, repo_interface.ResourceID{Project: request.Project, Domain: request.Domain, ResourceType: request.ResourceType.String()}); err != nil {
+		ctx, repo_interface.ResourceID{Org: request.Org, Project: request.Project, Domain: request.Domain, ResourceType: request.ResourceType.String()}); err != nil {
 		return nil, err
 	}
 	logger.Infof(ctx, "Deleted project-domain attributes for: %s-%s (%s)", request.Project,
@@ -395,7 +403,7 @@ func (m *ResourceManager) ListAll(ctx context.Context, request admin.ListMatchab
 	if err := validation.ValidateListAllMatchableAttributesRequest(request); err != nil {
 		return nil, err
 	}
-	resources, err := m.db.ResourceRepo().ListAll(ctx, request.ResourceType.String())
+	resources, err := m.db.ResourceRepo().ListAll(ctx, request.ResourceType.String(), request.Org)
 	if err != nil {
 		return nil, err
 	}
