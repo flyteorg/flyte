@@ -30,6 +30,16 @@ class AsyncAgentServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
                 )
+        self.GetTaskMetrics = channel.unary_unary(
+                '/flyteidl.service.AsyncAgentService/GetTaskMetrics',
+                request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.FromString,
+                )
+        self.GetTaskLogs = channel.unary_unary(
+                '/flyteidl.service.AsyncAgentService/GetTaskLogs',
+                request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.FromString,
+                )
 
 
 class AsyncAgentServiceServicer(object):
@@ -57,6 +67,24 @@ class AsyncAgentServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetTaskMetrics(self, request, context):
+        """GetTaskMetrics returns one or more task execution metrics, if available.
+
+        Errors include
+        * OutOfRange if metrics are not available for the specified task time range
+        * various other errors
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetTaskLogs(self, request, context):
+        """GetTaskLogs returns task execution logs, if available.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_AsyncAgentServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -74,6 +102,16 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
                     servicer.DeleteTask,
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.SerializeToString,
+            ),
+            'GetTaskMetrics': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTaskMetrics,
+                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.SerializeToString,
+            ),
+            'GetTaskLogs': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetTaskLogs,
+                    request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -134,6 +172,40 @@ class AsyncAgentService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/DeleteTask',
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.DeleteTaskResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTaskMetrics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/GetTaskMetrics',
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.SerializeToString,
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetTaskLogs(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/GetTaskLogs',
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.SerializeToString,
+            flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

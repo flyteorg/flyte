@@ -149,7 +149,34 @@ func (_m *arrayEventRecorder) finalizeRequired(ctx context.Context) bool {
 	return r0
 }
 
+type arrayEventRecorder_process struct {
+	*mock.Call
+}
+
+func (_m arrayEventRecorder_process) Return(_a0 error) *arrayEventRecorder_process {
+	return &arrayEventRecorder_process{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *arrayEventRecorder) Onprocess(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) *arrayEventRecorder_process {
+	c_call := _m.On("process", ctx, nCtx, index, retryAttempt)
+	return &arrayEventRecorder_process{Call: c_call}
+}
+
+func (_m *arrayEventRecorder) OnprocessMatch(matchers ...interface{}) *arrayEventRecorder_process {
+	c_call := _m.On("process", matchers...)
+	return &arrayEventRecorder_process{Call: c_call}
+}
+
 // process provides a mock function with given fields: ctx, nCtx, index, retryAttempt
-func (_m *arrayEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) {
-	_m.Called(ctx, nCtx, index, retryAttempt)
+func (_m *arrayEventRecorder) process(ctx context.Context, nCtx interfaces.NodeExecutionContext, index int, retryAttempt uint32) error {
+	ret := _m.Called(ctx, nCtx, index, retryAttempt)
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, interfaces.NodeExecutionContext, int, uint32) error); ok {
+		r0 = rf(ctx, nCtx, index, retryAttempt)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
 }

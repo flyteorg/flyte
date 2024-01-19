@@ -71,8 +71,12 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		PodUnixFinishTime:    12345,
 	}
 	taskExecutionBase := Input{
-		LogName:         "main_logs",
-		TaskExecutionID: dummyTaskExecID(),
+		LogName:              "main_logs",
+		TaskExecutionID:      dummyTaskExecID(),
+		PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+		PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+		PodUnixStartTime:     123,
+		PodUnixFinishTime:    12345,
 	}
 	flyinBase := Input{
 		HostName:             "my-host",
@@ -178,6 +182,10 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 				{defaultRegexes.ExecutionName, "my-execution-name"},
 				{defaultRegexes.ExecutionProject, "my-execution-project"},
 				{defaultRegexes.ExecutionDomain, "my-execution-domain"},
+				{defaultRegexes.PodRFC3339StartTime, "1970-01-01T01:02:03+01:00"},
+				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
+				{defaultRegexes.PodUnixStartTime, "123"},
+				{defaultRegexes.PodUnixFinishTime, "12345"},
 			},
 			nil,
 			nil,
