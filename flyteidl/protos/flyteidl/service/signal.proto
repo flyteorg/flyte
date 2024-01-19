@@ -24,6 +24,9 @@ service SignalService {
   rpc ListSignals (flyteidl.admin.SignalListRequest) returns (flyteidl.admin.SignalList) {
     option (google.api.http) = {
       get: "/api/v1/signals/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+      additional_bindings: {
+        get: "/api/v1/signals/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch existing signal definitions matching the input signal id filters."
@@ -35,6 +38,10 @@ service SignalService {
     option (google.api.http) = {
       post: "/api/v1/signals"
       body: "*"
+      additional_bindings: {
+        post: "/api/v1/signals/org/{id.execution_id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Set a signal value."
