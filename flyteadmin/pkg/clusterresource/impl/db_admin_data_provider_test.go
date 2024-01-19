@@ -22,6 +22,7 @@ import (
 var errFoo = errors.New("foo")
 
 func TestGetClusterResourceAttributes(t *testing.T) {
+	org := "testorg"
 	project := "flytesnacks"
 	domain := "development"
 	var attributes = map[string]string{
@@ -47,7 +48,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
-		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), org, project, domain)
 		assert.NoError(t, err)
 		assert.EqualValues(t, attrs.Attributes, attributes)
 	})
@@ -58,7 +59,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
-		_, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		_, err := provider.GetClusterResourceAttributes(context.TODO(), org, project, domain)
 		assert.EqualError(t, err, errFoo.Error())
 	})
 	t.Run("weird db response", func(t *testing.T) {
@@ -79,7 +80,7 @@ func TestGetClusterResourceAttributes(t *testing.T) {
 		provider := dbAdminProvider{
 			resourceManager: &resourceManager,
 		}
-		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), project, domain)
+		attrs, err := provider.GetClusterResourceAttributes(context.TODO(), org, project, domain)
 		assert.Nil(t, attrs)
 		s, ok := status.FromError(err)
 		assert.True(t, ok)
