@@ -174,15 +174,15 @@ func populateWorkflowExecutionsForTestingOnly() {
 	}(ctx)
 
 	// Insert dummy launch plans;
-	db.Exec(`INSERT INTO launch_plans ("id", "project", "domain", "name", "version", "spec", "closure") ` +
-		`VALUES (1, 'project1', 'domain1', 'name1', 'version1', E'\\000', E'\\000')`)
-	db.Exec(`INSERT INTO launch_plans ("id", "project", "domain", "name", "version", "spec", "closure") ` +
-		`VALUES (3, 'project2', 'domain2', 'name2', 'version1', E'\\000', E'\\000')`)
+	db.Exec(`INSERT INTO launch_plans ("id", "org", "project", "domain", "name", "version", "spec", "closure") ` +
+		`VALUES (1, ''', 'project1', 'domain1', 'name1', 'version1', E'\\000', E'\\000')`)
+	db.Exec(`INSERT INTO launch_plans ("id", "org", "project", "domain", "name", "version", "spec", "closure") ` +
+		`VALUES (3, '', 'project2', 'domain2', 'name2', 'version1', E'\\000', E'\\000')`)
 	// And dummy workflows:
-	db.Exec(`INSERT INTO workflows ("id", "project", "domain", "name", "version", "remote_closure_identifier") ` +
-		`VALUES (2, 'project1', 'domain1', 'name1', 'version1', 's3://foo')`)
-	db.Exec(`INSERT INTO workflows ("id", "project", "domain", "name", "version", "remote_closure_identifier") ` +
-		`VALUES (4, 'project2', 'domain2', 'name2', 'version1', 's3://foo')`)
+	db.Exec(`INSERT INTO workflows ("id", "org", "project", "domain", "name", "version", "remote_closure_identifier") ` +
+		`VALUES (2, '', 'project1', 'domain1', 'name1', 'version1', 's3://foo')`)
+	db.Exec(`INSERT INTO workflows ("id", "org", "project", "domain", "name", "version", "remote_closure_identifier") ` +
+		`VALUES (4, '', 'project2', 'domain2', 'name2', 'version1', 's3://foo')`)
 
 	// Insert dummy tags
 	db.Exec(`INSERT INTO admin_tags ("id", "name", "org") ` + `VALUES (1, 'hello', '')`)

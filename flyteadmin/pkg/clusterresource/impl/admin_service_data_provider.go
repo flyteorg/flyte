@@ -16,8 +16,9 @@ type serviceAdminProvider struct {
 	adminClient service.AdminServiceClient
 }
 
-func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, project, domain string) (*admin.ClusterResourceAttributes, error) {
+func (p serviceAdminProvider) GetClusterResourceAttributes(ctx context.Context, org, project, domain string) (*admin.ClusterResourceAttributes, error) {
 	resource, err := p.adminClient.GetProjectDomainAttributes(ctx, &admin.ProjectDomainAttributesGetRequest{
+		Org:          org,
 		Project:      project,
 		Domain:       domain,
 		ResourceType: admin.MatchableResource_CLUSTER_RESOURCE,
