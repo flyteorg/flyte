@@ -226,7 +226,7 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/active_launch_plans/{project}/{domain}"
       additional_bindings {
-        get: "/api/v1/org/{org}/active_launch_plans/{project}/{domain}"
+        get: "/api/v1/active_launch_plans/org/{org}/{project}/{domain}"
       }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
@@ -510,7 +510,7 @@ service AdminService {
       post: "/api/v1/events/workflows"
       body: "*"
       additional_bindings {
-        post:  "/api/v1/events/workflows/org/{event.execution_id.org}"
+        post:  "/api/v1/events/org/{event.execution_id.org}/workflows"
         body: "*"
       }
     };
@@ -525,7 +525,7 @@ service AdminService {
       post: "/api/v1/events/nodes"
       body: "*"
       additional_bindings {
-        post:  "/api/v1/events/nodes/org/{event.id.execution_id.org}"
+        post:  "/api/v1/events/org/{event.id.execution_id.org}/nodes"
         body: "*"
       }
     };
@@ -540,7 +540,7 @@ service AdminService {
       post: "/api/v1/events/tasks"
       body: "*"
       additional_bindings {
-        post:  "/api/v1/events/tasks/org/{event.parent_node_execution_id.execution_id.org}"
+        post:  "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks"
         body: "*"
       }
     };

@@ -62,6 +62,80 @@
         ]
       }
     },
+    "/api/v1/active_launch_plans/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "operationId": "ListActiveLaunchPlans2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.\n+required.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.",
@@ -1476,7 +1550,41 @@
         ]
       }
     },
-    "/api/v1/events/nodes/org/{event.id.execution_id.org}": {
+    "/api/v1/events/org/{event.execution_id.org}/workflows": {
+      "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
+        "operationId": "CreateWorkflowEvent2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionEventResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "event.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/events/org/{event.id.execution_id.org}/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
         "operationId": "CreateNodeEvent2",
@@ -1502,6 +1610,40 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/adminNodeExecutionEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks": {
+      "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.",
+        "operationId": "CreateTaskEvent2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskExecutionEventResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "event.parent_node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminTaskExecutionEventRequest"
             }
           }
         ],
@@ -1537,40 +1679,6 @@
         ]
       }
     },
-    "/api/v1/events/tasks/org/{event.parent_node_execution_id.execution_id.org}": {
-      "post": {
-        "summary": "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.",
-        "operationId": "CreateTaskEvent2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminTaskExecutionEventResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "event.parent_node_execution_id.execution_id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminTaskExecutionEventRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/events/workflows": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
@@ -1584,40 +1692,6 @@
           }
         },
         "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminWorkflowExecutionEventRequest"
-            }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/events/workflows/org/{event.execution_id.org}": {
-      "post": {
-        "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
-        "operationId": "CreateWorkflowEvent2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminWorkflowExecutionEventResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "event.execution_id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
           {
             "name": "body",
             "in": "body",
@@ -4025,80 +4099,6 @@
             "in": "query",
             "required": false,
             "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/org/{org}/active_launch_plans/{project}/{domain}": {
-      "get": {
-        "summary": "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.",
-        "operationId": "ListActiveLaunchPlans2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminLaunchPlanList"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "project",
-            "description": "Name of the project that contains the identifiers.\n+required.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "domain",
-            "description": "Name of the domain the identifiers belongs to within the project.\n+required.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required.",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
           }
         ],
         "tags": [

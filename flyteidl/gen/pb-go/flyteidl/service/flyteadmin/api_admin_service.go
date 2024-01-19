@@ -493,7 +493,7 @@ func (a *AdminServiceApiService) CreateNodeEvent2(ctx context.Context, eventIdEx
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/events/nodes/org/{event.id.execution_id.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.id.execution_id.org}/nodes"
 	localVarPath = strings.Replace(localVarPath, "{"+"event.id.execution_id.org"+"}", fmt.Sprintf("%v", eventIdExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -853,7 +853,7 @@ func (a *AdminServiceApiService) CreateTaskEvent2(ctx context.Context, eventPare
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/events/tasks/org/{event.parent_node_execution_id.execution_id.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks"
 	localVarPath = strings.Replace(localVarPath, "{"+"event.parent_node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", eventParentNodeExecutionIdExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1213,7 +1213,7 @@ func (a *AdminServiceApiService) CreateWorkflowEvent2(ctx context.Context, event
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/events/workflows/org/{event.execution_id.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.execution_id.org}/workflows"
 	localVarPath = strings.Replace(localVarPath, "{"+"event.execution_id.org"+"}", fmt.Sprintf("%v", eventExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -5447,7 +5447,7 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans2(ctx context.Context, org
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/org/{org}/active_launch_plans/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/org/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)

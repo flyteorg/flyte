@@ -104,8 +104,8 @@ public final class Admin {
       "yteidl.admin.ActiveLaunchPlanListRequest" +
       "\032\036.flyteidl.admin.LaunchPlanList\"r\202\323\344\223\002l" +
       "\022./api/v1/active_launch_plans/{project}/" +
-      "{domain}Z:\0228/api/v1/org/{org}/active_lau" +
-      "nch_plans/{project}/{domain}\022\334\001\n\021ListLau" +
+      "{domain}Z:\0228/api/v1/active_launch_plans/" +
+      "org/{org}/{project}/{domain}\022\334\001\n\021ListLau" +
       "nchPlanIds\0220.flyteidl.admin.NamedEntityI" +
       "dentifierListRequest\032).flyteidl.admin.Na" +
       "medEntityIdentifierList\"j\202\323\344\223\002d\022*/api/v1" +
@@ -239,19 +239,19 @@ public final class Admin {
       "ent\022-.flyteidl.admin.WorkflowExecutionEv" +
       "entRequest\032..flyteidl.admin.WorkflowExec" +
       "utionEventResponse\"_\202\323\344\223\002Y\"\030/api/v1/even" +
-      "ts/workflows:\001*Z:\"5/api/v1/events/workfl" +
-      "ows/org/{event.execution_id.org}:\001*\022\304\001\n\017" +
+      "ts/workflows:\001*Z:\"5/api/v1/events/org/{e" +
+      "vent.execution_id.org}/workflows:\001*\022\304\001\n\017" +
       "CreateNodeEvent\022).flyteidl.admin.NodeExe" +
       "cutionEventRequest\032*.flyteidl.admin.Node" +
       "ExecutionEventResponse\"Z\202\323\344\223\002T\"\024/api/v1/" +
-      "events/nodes:\001*Z9\"4/api/v1/events/nodes/" +
-      "org/{event.id.execution_id.org}:\001*\022\332\001\n\017C" +
+      "events/nodes:\001*Z9\"4/api/v1/events/org/{e" +
+      "vent.id.execution_id.org}/nodes:\001*\022\332\001\n\017C" +
       "reateTaskEvent\022).flyteidl.admin.TaskExec" +
       "utionEventRequest\032*.flyteidl.admin.TaskE" +
       "xecutionEventResponse\"p\202\323\344\223\002j\"\024/api/v1/e" +
-      "vents/tasks:\001*ZO\"J/api/v1/events/tasks/o" +
-      "rg/{event.parent_node_execution_id.execu" +
-      "tion_id.org}:\001*\022\313\005\n\020GetTaskExecution\022\'.f" +
+      "vents/tasks:\001*ZO\"J/api/v1/events/org/{ev" +
+      "ent.parent_node_execution_id.execution_i" +
+      "d.org}/tasks:\001*\022\313\005\n\020GetTaskExecution\022\'.f" +
       "lyteidl.admin.TaskExecutionGetRequest\032\035." +
       "flyteidl.admin.TaskExecution\"\356\004\202\323\344\223\002\347\004\022\231" +
       "\002/api/v1/task_executions/{id.node_execut" +
