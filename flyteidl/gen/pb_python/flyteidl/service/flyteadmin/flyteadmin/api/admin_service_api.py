@@ -130,6 +130,111 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def create_execution2(self, org, body, **kwargs):  # noqa: E501
+        """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_execution2(org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org key applied to the resource. (required)
+        :param AdminExecutionCreateRequest body: (required)
+        :return: AdminExecutionCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_execution2_with_http_info(org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_execution2_with_http_info(org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_execution2_with_http_info(self, org, body, **kwargs):  # noqa: E501
+        """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_execution2_with_http_info(org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org key applied to the resource. (required)
+        :param AdminExecutionCreateRequest body: (required)
+        :return: AdminExecutionCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_execution2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'org' is set
+        if ('org' not in params or
+                params['org'] is None):
+            raise ValueError("Missing the required parameter `org` when calling `create_execution2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_execution2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'org' in params:
+            path_params['org'] = params['org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/executions/org/{org}', 'PUT',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminExecutionCreateResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def create_launch_plan(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
 
@@ -213,6 +318,111 @@ class AdminServiceApi(object):
 
         return self.api_client.call_api(
             '/api/v1/launch_plans', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminLaunchPlanCreateResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def create_launch_plan2(self, id_org, body, **kwargs):  # noqa: E501
+        """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_launch_plan2(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminLaunchPlanCreateRequest body: (required)
+        :return: AdminLaunchPlanCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_launch_plan2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_launch_plan2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_launch_plan2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+        """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_launch_plan2_with_http_info(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminLaunchPlanCreateRequest body: (required)
+        :return: AdminLaunchPlanCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_launch_plan2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_org' is set
+        if ('id_org' not in params or
+                params['id_org'] is None):
+            raise ValueError("Missing the required parameter `id_org` when calling `create_launch_plan2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_launch_plan2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_org' in params:
+            path_params['id.org'] = params['id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/launch_plans/org/{id.org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -324,6 +534,111 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def create_node_event2(self, event_id_execution_id_org, body, **kwargs):  # noqa: E501
+        """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_node_event2(event_id_execution_id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str event_id_execution_id_org: Optional, org key applied to the resource. (required)
+        :param AdminNodeExecutionEventRequest body: (required)
+        :return: AdminNodeExecutionEventResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_node_event2_with_http_info(event_id_execution_id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_node_event2_with_http_info(event_id_execution_id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_node_event2_with_http_info(self, event_id_execution_id_org, body, **kwargs):  # noqa: E501
+        """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_node_event2_with_http_info(event_id_execution_id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str event_id_execution_id_org: Optional, org key applied to the resource. (required)
+        :param AdminNodeExecutionEventRequest body: (required)
+        :return: AdminNodeExecutionEventResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['event_id_execution_id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_node_event2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'event_id_execution_id_org' is set
+        if ('event_id_execution_id_org' not in params or
+                params['event_id_execution_id_org'] is None):
+            raise ValueError("Missing the required parameter `event_id_execution_id_org` when calling `create_node_event2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_node_event2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'event_id_execution_id_org' in params:
+            path_params['event.id.execution_id.org'] = params['event_id_execution_id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/events/org/{event.id.execution_id.org}/nodes', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminNodeExecutionEventResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def create_task(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
 
@@ -407,6 +722,111 @@ class AdminServiceApi(object):
 
         return self.api_client.call_api(
             '/api/v1/tasks', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='FlyteidladminTaskCreateResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def create_task2(self, id_org, body, **kwargs):  # noqa: E501
+        """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_task2(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param FlyteidladminTaskCreateRequest body: (required)
+        :return: FlyteidladminTaskCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_task2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_task2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_task2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+        """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_task2_with_http_info(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param FlyteidladminTaskCreateRequest body: (required)
+        :return: FlyteidladminTaskCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_task2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_org' is set
+        if ('id_org' not in params or
+                params['id_org'] is None):
+            raise ValueError("Missing the required parameter `id_org` when calling `create_task2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_task2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_org' in params:
+            path_params['id.org'] = params['id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/tasks/org/{id.org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -518,6 +938,111 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def create_task_event2(self, event_parent_node_execution_id_execution_id_org, body, **kwargs):  # noqa: E501
+        """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_task_event2(event_parent_node_execution_id_execution_id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str event_parent_node_execution_id_execution_id_org: Optional, org key applied to the resource. (required)
+        :param AdminTaskExecutionEventRequest body: (required)
+        :return: AdminTaskExecutionEventResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_task_event2_with_http_info(self, event_parent_node_execution_id_execution_id_org, body, **kwargs):  # noqa: E501
+        """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str event_parent_node_execution_id_execution_id_org: Optional, org key applied to the resource. (required)
+        :param AdminTaskExecutionEventRequest body: (required)
+        :return: AdminTaskExecutionEventResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['event_parent_node_execution_id_execution_id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_task_event2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'event_parent_node_execution_id_execution_id_org' is set
+        if ('event_parent_node_execution_id_execution_id_org' not in params or
+                params['event_parent_node_execution_id_execution_id_org'] is None):
+            raise ValueError("Missing the required parameter `event_parent_node_execution_id_execution_id_org` when calling `create_task_event2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_task_event2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'event_parent_node_execution_id_execution_id_org' in params:
+            path_params['event.parent_node_execution_id.execution_id.org'] = params['event_parent_node_execution_id_execution_id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminTaskExecutionEventResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def create_workflow(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
 
@@ -615,6 +1140,111 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def create_workflow2(self, id_org, body, **kwargs):  # noqa: E501
+        """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_workflow2(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminWorkflowCreateRequest body: (required)
+        :return: AdminWorkflowCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_workflow2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_workflow2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_workflow2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+        """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_workflow2_with_http_info(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminWorkflowCreateRequest body: (required)
+        :return: AdminWorkflowCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_workflow2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_org' is set
+        if ('id_org' not in params or
+                params['id_org'] is None):
+            raise ValueError("Missing the required parameter `id_org` when calling `create_workflow2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_workflow2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_org' in params:
+            path_params['id.org'] = params['id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/workflows/org/{id.org}', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminWorkflowCreateResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def create_workflow_event(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
 
@@ -698,6 +1328,111 @@ class AdminServiceApi(object):
 
         return self.api_client.call_api(
             '/api/v1/events/workflows', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminWorkflowExecutionEventResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def create_workflow_event2(self, event_execution_id_org, body, **kwargs):  # noqa: E501
+        """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_workflow_event2(event_execution_id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str event_execution_id_org: Optional, org key applied to the resource. (required)
+        :param AdminWorkflowExecutionEventRequest body: (required)
+        :return: AdminWorkflowExecutionEventResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.create_workflow_event2_with_http_info(event_execution_id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.create_workflow_event2_with_http_info(event_execution_id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def create_workflow_event2_with_http_info(self, event_execution_id_org, body, **kwargs):  # noqa: E501
+        """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.create_workflow_event2_with_http_info(event_execution_id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str event_execution_id_org: Optional, org key applied to the resource. (required)
+        :param AdminWorkflowExecutionEventRequest body: (required)
+        :return: AdminWorkflowExecutionEventResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['event_execution_id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method create_workflow_event2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'event_execution_id_org' is set
+        if ('event_execution_id_org' not in params or
+                params['event_execution_id_org'] is None):
+            raise ValueError("Missing the required parameter `event_execution_id_org` when calling `create_workflow_event2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `create_workflow_event2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'event_execution_id_org' in params:
+            path_params['event.execution_id.org'] = params['event_execution_id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/events/org/{event.execution_id.org}/workflows', 'POST',
             path_params,
             query_params,
             header_params,
@@ -5796,6 +6531,135 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def list_active_launch_plans2(self, org, project, domain, **kwargs):  # noqa: E501
+        """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_active_launch_plans2(org, project, domain, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org key applied to the resource. (required)
+        :param str project: Name of the project that contains the identifiers. +required. (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminLaunchPlanList
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.list_active_launch_plans2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+        else:
+            (data) = self.list_active_launch_plans2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            return data
+
+    def list_active_launch_plans2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
+        """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_active_launch_plans2_with_http_info(org, project, domain, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org key applied to the resource. (required)
+        :param str project: Name of the project that contains the identifiers. +required. (required)
+        :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
+        :param int limit: Indicates the number of resources to be returned. +required.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminLaunchPlanList
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['org', 'project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method list_active_launch_plans2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'org' is set
+        if ('org' not in params or
+                params['org'] is None):
+            raise ValueError("Missing the required parameter `org` when calling `list_active_launch_plans2`")  # noqa: E501
+        # verify the required parameter 'project' is set
+        if ('project' not in params or
+                params['project'] is None):
+            raise ValueError("Missing the required parameter `project` when calling `list_active_launch_plans2`")  # noqa: E501
+        # verify the required parameter 'domain' is set
+        if ('domain' not in params or
+                params['domain'] is None):
+            raise ValueError("Missing the required parameter `domain` when calling `list_active_launch_plans2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'org' in params:
+            path_params['org'] = params['org']  # noqa: E501
+        if 'project' in params:
+            path_params['project'] = params['project']  # noqa: E501
+        if 'domain' in params:
+            path_params['domain'] = params['domain']  # noqa: E501
+
+        query_params = []
+        if 'limit' in params:
+            query_params.append(('limit', params['limit']))  # noqa: E501
+        if 'token' in params:
+            query_params.append(('token', params['token']))  # noqa: E501
+        if 'sort_by_key' in params:
+            query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
+        if 'sort_by_direction' in params:
+            query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/active_launch_plans/org/{org}/{project}/{domain}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminLaunchPlanList',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def list_description_entities(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
@@ -7466,6 +8330,7 @@ class AdminServiceApi(object):
 
         :param async_req bool
         :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str org: Optional, org filter applied to list project requests.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7487,12 +8352,13 @@ class AdminServiceApi(object):
 
         :param async_req bool
         :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str org: Optional, org filter applied to list project requests.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['resource_type']  # noqa: E501
+        all_params = ['resource_type', 'org']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -7511,6 +8377,109 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
+
+        query_params = []
+        if 'resource_type' in params:
+            query_params.append(('resource_type', params['resource_type']))  # noqa: E501
+        if 'org' in params:
+            query_params.append(('org', params['org']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/matchable_attributes', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminListMatchableAttributesResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def list_matchable_attributes2(self, org, **kwargs):  # noqa: E501
+        """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_matchable_attributes2(org, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org filter applied to list project requests. (required)
+        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :return: AdminListMatchableAttributesResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.list_matchable_attributes2_with_http_info(org, **kwargs)  # noqa: E501
+        else:
+            (data) = self.list_matchable_attributes2_with_http_info(org, **kwargs)  # noqa: E501
+            return data
+
+    def list_matchable_attributes2_with_http_info(self, org, **kwargs):  # noqa: E501
+        """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_matchable_attributes2_with_http_info(org, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org filter applied to list project requests. (required)
+        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :return: AdminListMatchableAttributesResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['org', 'resource_type']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method list_matchable_attributes2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'org' is set
+        if ('org' not in params or
+                params['org'] is None):
+            raise ValueError("Missing the required parameter `org` when calling `list_matchable_attributes2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'org' in params:
+            path_params['org'] = params['org']  # noqa: E501
 
         query_params = []
         if 'resource_type' in params:
@@ -7534,7 +8503,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/matchable_attributes', 'GET',
+            '/api/v1/matchable_attributes/org/{org}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -8517,6 +9486,7 @@ class AdminServiceApi(object):
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. +required.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str org: Optional, org filter applied to list project requests.
         :return: AdminProjects
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8542,12 +9512,13 @@ class AdminServiceApi(object):
         :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
         :param str sort_by_key: Indicates an attribute to sort the response values. +required.
         :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str org: Optional, org filter applied to list project requests.
         :return: AdminProjects
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction', 'org']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -8566,6 +9537,125 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
+
+        query_params = []
+        if 'limit' in params:
+            query_params.append(('limit', params['limit']))  # noqa: E501
+        if 'token' in params:
+            query_params.append(('token', params['token']))  # noqa: E501
+        if 'filters' in params:
+            query_params.append(('filters', params['filters']))  # noqa: E501
+        if 'sort_by_key' in params:
+            query_params.append(('sort_by.key', params['sort_by_key']))  # noqa: E501
+        if 'sort_by_direction' in params:
+            query_params.append(('sort_by.direction', params['sort_by_direction']))  # noqa: E501
+        if 'org' in params:
+            query_params.append(('org', params['org']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/projects', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProjects',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def list_projects2(self, org, **kwargs):  # noqa: E501
+        """Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_projects2(org, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org filter applied to list project requests. (required)
+        :param int limit: Indicates the number of projects to be returned. +required.
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminProjects
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.list_projects2_with_http_info(org, **kwargs)  # noqa: E501
+        else:
+            (data) = self.list_projects2_with_http_info(org, **kwargs)  # noqa: E501
+            return data
+
+    def list_projects2_with_http_info(self, org, **kwargs):  # noqa: E501
+        """Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.list_projects2_with_http_info(org, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str org: Optional, org filter applied to list project requests. (required)
+        :param int limit: Indicates the number of projects to be returned. +required.
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :return: AdminProjects
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['org', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method list_projects2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'org' is set
+        if ('org' not in params or
+                params['org'] is None):
+            raise ValueError("Missing the required parameter `org` when calling `list_projects2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'org' in params:
+            path_params['org'] = params['org']  # noqa: E501
 
         query_params = []
         if 'limit' in params:
@@ -8597,7 +9687,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/projects', 'GET',
+            '/api/v1/projects/org/{org}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -10623,6 +11713,111 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def recover_execution2(self, id_org, body, **kwargs):  # noqa: E501
+        """Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.recover_execution2(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminExecutionRecoverRequest body: (required)
+        :return: AdminExecutionCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.recover_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.recover_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def recover_execution2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+        """Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.recover_execution2_with_http_info(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminExecutionRecoverRequest body: (required)
+        :return: AdminExecutionCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method recover_execution2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_org' is set
+        if ('id_org' not in params or
+                params['id_org'] is None):
+            raise ValueError("Missing the required parameter `id_org` when calling `recover_execution2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `recover_execution2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_org' in params:
+            path_params['id.org'] = params['id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/executions/org/{id.org}/recover', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminExecutionCreateResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def register_project(self, body, **kwargs):  # noqa: E501
         """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
 
@@ -10720,6 +11915,111 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def register_project2(self, project_org, body, **kwargs):  # noqa: E501
+        """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.register_project2(project_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project_org: Optional, org key applied to the resource. (required)
+        :param AdminProjectRegisterRequest body: (required)
+        :return: AdminProjectRegisterResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.register_project2_with_http_info(project_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.register_project2_with_http_info(project_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def register_project2_with_http_info(self, project_org, body, **kwargs):  # noqa: E501
+        """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.register_project2_with_http_info(project_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project_org: Optional, org key applied to the resource. (required)
+        :param AdminProjectRegisterRequest body: (required)
+        :return: AdminProjectRegisterResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method register_project2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project_org' is set
+        if ('project_org' not in params or
+                params['project_org'] is None):
+            raise ValueError("Missing the required parameter `project_org` when calling `register_project2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `register_project2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project_org' in params:
+            path_params['project.org'] = params['project_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/projects/org/{project.org}', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProjectRegisterResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def relaunch_execution(self, body, **kwargs):  # noqa: E501
         """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
@@ -10803,6 +12103,111 @@ class AdminServiceApi(object):
 
         return self.api_client.call_api(
             '/api/v1/executions/relaunch', 'POST',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminExecutionCreateResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def relaunch_execution2(self, id_org, body, **kwargs):  # noqa: E501
+        """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.relaunch_execution2(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminExecutionRelaunchRequest body: (required)
+        :return: AdminExecutionCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.relaunch_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+        else:
+            (data) = self.relaunch_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return data
+
+    def relaunch_execution2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+        """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.relaunch_execution2_with_http_info(id_org, body, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_org: Optional, org key applied to the resource. (required)
+        :param AdminExecutionRelaunchRequest body: (required)
+        :return: AdminExecutionCreateResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_org', 'body']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method relaunch_execution2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_org' is set
+        if ('id_org' not in params or
+                params['id_org'] is None):
+            raise ValueError("Missing the required parameter `id_org` when calling `relaunch_execution2`")  # noqa: E501
+        # verify the required parameter 'body' is set
+        if ('body' not in params or
+                params['body'] is None):
+            raise ValueError("Missing the required parameter `body` when calling `relaunch_execution2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_org' in params:
+            path_params['id.org'] = params['id_org']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        if 'body' in params:
+            body_params = params['body']
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/executions/org/{id.org}/relaunch', 'POST',
             path_params,
             query_params,
             header_params,
@@ -11052,7 +12457,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'DELETE',
+            '/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'DELETE',
             path_params,
             query_params,
             header_params,
