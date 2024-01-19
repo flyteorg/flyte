@@ -34,15 +34,18 @@ var NewCache = func(config *rest.Config, options cache.Options) (cache.Cache, er
 }
 
 var NewClient = func(config *rest.Config, options client.Options) (client.Client, error) {
-	var reader *fallbackClientReader
 	if options.Cache != nil && options.Cache.Reader != nil {
+		uncachedOptions := options
+		uncachedOptions.Cache = nil
+		uncachedK8sClient, err := client.New(config, uncachedOptions)
+		if err != nil {
+			return nil, err
+		}
 		// if caching is enabled we create a fallback reader so we can attempt the client if the cache
 		// reader does not have the object
-		reader = &fallbackClientReader{
-			orderedClients: []client.Reader{options.Cache.Reader},
+		options.Cache.Reader = fallbackClientReader{
+			orderedClients: []client.Reader{options.Cache.Reader, uncachedK8sClient},
 		}
-
-		options.Cache.Reader = reader
 	}
 
 	// create the k8s client
@@ -52,10 +55,6 @@ var NewClient = func(config *rest.Config, options client.Options) (client.Client
 	}
 
 	k8sOtelClient := otelutils.WrapK8sClient(k8sClient)
-	if reader != nil {
-		// once the k8s client is created we set the fallback reader's client to the k8s client
-		reader.orderedClients = append(reader.orderedClients, k8sOtelClient)
-	}
 
 	return k8sOtelClient, nil
 }
