@@ -179,7 +179,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 	defer resp.Body.Close()
-	logger.Info(ctx, "Deleted query execution [%v]", resp)
+	logger.Infof(ctx, "Deleted query execution [%v]", resp)
 
 	return nil
 }

@@ -49,7 +49,7 @@ func (b *SimpleBackOffBlocker) reset() {
 }
 
 func (b *SimpleBackOffBlocker) backOff(ctx context.Context) time.Duration {
-	logger.Debug(ctx, "BackOff params [BackOffBaseSecond: %v] [BackOffExponent: %v] [MaxBackOffDuration: %v]",
+	logger.Debugf(ctx, "BackOff params [BackOffBaseSecond: %v] [BackOffExponent: %v] [MaxBackOffDuration: %v]",
 		b.BackOffBaseSecond, b.BackOffExponent, b.MaxBackOffDuration)
 
 	backOffDuration := time.Duration(time.Second.Nanoseconds() * int64(math.Pow(float64(b.BackOffBaseSecond),
