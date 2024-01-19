@@ -29,6 +29,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/tasks"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/tasks/org/{id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create and register a task definition."
@@ -97,6 +101,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/workflows"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/workflows/org/{id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create and register a workflow definition."
@@ -165,6 +173,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/launch_plans"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/launch_plans/org/{id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create and register a launch plan definition."
@@ -213,6 +225,9 @@ service AdminService {
   rpc ListActiveLaunchPlans (flyteidl.admin.ActiveLaunchPlanListRequest) returns (flyteidl.admin.LaunchPlanList) {
     option (google.api.http) = {
       get: "/api/v1/active_launch_plans/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/org/{org}/active_launch_plans/{project}/{domain}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch the active launch plan versions specified by input request filters."
@@ -275,6 +290,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/executions"
       body: "*"
+      additional_bindings {
+        put: "/api/v1/executions/org/{org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create a workflow execution."
@@ -286,6 +305,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/executions/relaunch"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/executions/org/{id.org}/relaunch"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Relaunch a workflow execution."
@@ -301,6 +324,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/executions/recover"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/executions/org/{id.org}/recover"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Recreates a previously-run workflow execution that will only start executing from the last known failure point. "
@@ -371,7 +398,7 @@ service AdminService {
       delete: "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
       body: "*"
       additional_bindings {
-        delete: "/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+        delete: "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
         body: "*"
       }
     };
@@ -437,6 +464,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/projects"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/projects/org/{project.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Register a project."
@@ -464,6 +495,9 @@ service AdminService {
   rpc ListProjects (flyteidl.admin.ProjectListRequest) returns (flyteidl.admin.Projects) {
     option (google.api.http) = {
       get:  "/api/v1/projects"
+      additional_bindings {
+        get:  "/api/v1/projects/org/{org}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Fetch registered projects."
@@ -475,6 +509,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/events/workflows"
       body: "*"
+      additional_bindings {
+        post:  "/api/v1/events/workflows/org/{event.execution_id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create a workflow execution event recording a phase transition."
@@ -486,6 +524,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/events/nodes"
       body: "*"
+      additional_bindings {
+        post:  "/api/v1/events/nodes/org/{event.id.execution_id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create a node execution event recording a phase transition."
@@ -497,6 +539,10 @@ service AdminService {
     option (google.api.http) = {
       post: "/api/v1/events/tasks"
       body: "*"
+      additional_bindings {
+        post:  "/api/v1/events/tasks/org/{event.parent_node_execution_id.execution_id.org}"
+        body: "*"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Create a task execution event recording a phase transition."
@@ -675,6 +721,9 @@ service AdminService {
   rpc ListMatchableAttributes (flyteidl.admin.ListMatchableAttributesRequest) returns (flyteidl.admin.ListMatchableAttributesResponse) {
     option (google.api.http) = {
       get: "/api/v1/matchable_attributes"
+      additional_bindings {
+        get: "/api/v1/matchable_attributes/org/{org}"
+      }
     };
     // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
     //   description: "Retrieve a list of MatchableAttributesConfiguration objects."
