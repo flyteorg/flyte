@@ -211,7 +211,7 @@ func getIdentifierFilters(entity common.Entity, spec FilterSpec) ([]common.Inlin
 	filters := make([]common.InlineFilter, 0)
 
 	if spec.Org != "" {
-		orgFilter, err := GetSingleValueEqualityFilter(entity, shared.Project, spec.Org)
+		orgFilter, err := GetSingleValueEqualityFilter(entity, shared.Org, spec.Org)
 		if err != nil {
 			return nil, err
 		}
