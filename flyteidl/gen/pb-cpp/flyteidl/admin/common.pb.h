@@ -353,6 +353,20 @@ class NamedEntityIdentifier final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
+  // string org = 4;
+  void clear_org();
+  static const int kOrgFieldNumber = 4;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // @@protoc_insertion_point(class_scope:flyteidl.admin.NamedEntityIdentifier)
  private:
   class HasBitSetters;
@@ -361,6 +375,7 @@ class NamedEntityIdentifier final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fcommon_2eproto;
 };
@@ -929,6 +944,20 @@ class NamedEntityIdentifierListRequest final :
   ::std::string* release_filters();
   void set_allocated_filters(::std::string* filters);
 
+  // string org = 7;
+  void clear_org();
+  static const int kOrgFieldNumber = 7;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.Sort sort_by = 5;
   bool has_sort_by() const;
   void clear_sort_by();
@@ -953,6 +982,7 @@ class NamedEntityIdentifierListRequest final :
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr token_;
   ::google::protobuf::internal::ArenaStringPtr filters_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::Sort* sort_by_;
   ::google::protobuf::uint32 limit_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -1111,6 +1141,20 @@ class NamedEntityListRequest final :
   ::std::string* release_filters();
   void set_allocated_filters(::std::string* filters);
 
+  // string org = 8;
+  void clear_org();
+  static const int kOrgFieldNumber = 8;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.Sort sort_by = 6;
   bool has_sort_by() const;
   void clear_sort_by();
@@ -1141,6 +1185,7 @@ class NamedEntityListRequest final :
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr token_;
   ::google::protobuf::internal::ArenaStringPtr filters_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::Sort* sort_by_;
   int resource_type_;
   ::google::protobuf::uint32 limit_;
@@ -3710,6 +3755,59 @@ inline void NamedEntityIdentifier::set_allocated_name(::std::string* name) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifier.name)
 }
 
+// string org = 4;
+inline void NamedEntityIdentifier::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityIdentifier::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityIdentifier.org)
+  return org_.GetNoArena();
+}
+inline void NamedEntityIdentifier::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityIdentifier.org)
+}
+#if LANG_CXX11
+inline void NamedEntityIdentifier::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityIdentifier.org)
+}
+#endif
+inline void NamedEntityIdentifier::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityIdentifier.org)
+}
+inline void NamedEntityIdentifier::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityIdentifier.org)
+}
+inline ::std::string* NamedEntityIdentifier::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityIdentifier.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityIdentifier::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityIdentifier.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityIdentifier::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifier.org)
+}
+
 // -------------------------------------------------------------------
 
 // NamedEntityMetadata
@@ -4253,6 +4351,59 @@ inline void NamedEntityIdentifierListRequest::set_allocated_filters(::std::strin
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifierListRequest.filters)
 }
 
+// string org = 7;
+inline void NamedEntityIdentifierListRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityIdentifierListRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+  return org_.GetNoArena();
+}
+inline void NamedEntityIdentifierListRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+}
+#if LANG_CXX11
+inline void NamedEntityIdentifierListRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+}
+#endif
+inline void NamedEntityIdentifierListRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+}
+inline void NamedEntityIdentifierListRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+}
+inline ::std::string* NamedEntityIdentifierListRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityIdentifierListRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityIdentifierListRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityIdentifierListRequest.org)
+}
+
 // -------------------------------------------------------------------
 
 // NamedEntityListRequest
@@ -4546,6 +4697,59 @@ inline void NamedEntityListRequest::set_allocated_filters(::std::string* filters
   }
   filters_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), filters);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.filters)
+}
+
+// string org = 8;
+inline void NamedEntityListRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& NamedEntityListRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.NamedEntityListRequest.org)
+  return org_.GetNoArena();
+}
+inline void NamedEntityListRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.NamedEntityListRequest.org)
+}
+#if LANG_CXX11
+inline void NamedEntityListRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.NamedEntityListRequest.org)
+}
+#endif
+inline void NamedEntityListRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.NamedEntityListRequest.org)
+}
+inline void NamedEntityListRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.NamedEntityListRequest.org)
+}
+inline ::std::string* NamedEntityListRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.NamedEntityListRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NamedEntityListRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.NamedEntityListRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void NamedEntityListRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.NamedEntityListRequest.org)
 }
 
 // -------------------------------------------------------------------

@@ -66,7 +66,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Task>> PrepareAsyncGetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Task>>(PrepareAsyncGetTaskRaw(context, request, cq));
     }
-    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
     virtual ::grpc::Status ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> AsyncListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>>(AsyncListTaskIdsRaw(context, request, cq));
@@ -286,7 +286,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectRegisterResponse>> PrepareAsyncRegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectRegisterResponse>>(PrepareAsyncRegisterProjectRaw(context, request, cq));
     }
-    // Updates an existing :ref:`ref_flyteidl.admin.Project` 
+    // Updates an existing :ref:`ref_flyteidl.admin.Project`
     // flyteidl.admin.Project should be passed but the domains property should be empty;
     // it will be ignored in the handler as domains cannot be updated via this API.
     virtual ::grpc::Status UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::flyteidl::admin::ProjectUpdateResponse* response) = 0;
@@ -296,7 +296,7 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectUpdateResponse>> PrepareAsyncUpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ProjectUpdateResponse>>(PrepareAsyncUpdateProjectRaw(context, request, cq));
     }
-    // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+    // Fetches a list of :ref:`ref_flyteidl.admin.Project`
     virtual ::grpc::Status ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest& request, ::flyteidl::admin::Projects* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Projects>> AsyncListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Projects>>(AsyncListProjectsRaw(context, request, cq));
@@ -500,7 +500,7 @@ class AdminService final {
       virtual void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetTask(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Task* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+      // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListTaskIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -639,14 +639,14 @@ class AdminService final {
       virtual void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void RegisterProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void RegisterProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectRegisterResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      // Updates an existing :ref:`ref_flyteidl.admin.Project` 
+      // Updates an existing :ref:`ref_flyteidl.admin.Project`
       // flyteidl.admin.Project should be passed but the domains property should be empty;
       // it will be ignored in the handler as domains cannot be updated via this API.
       virtual void UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectUpdateResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void UpdateProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void UpdateProject(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ProjectUpdateResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+      // Fetches a list of :ref:`ref_flyteidl.admin.Project`
       virtual void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListProjects(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Projects* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListProjects(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
@@ -1661,7 +1661,7 @@ class AdminService final {
     virtual ::grpc::Status CreateTask(::grpc::ServerContext* context, const ::flyteidl::admin::TaskCreateRequest* request, ::flyteidl::admin::TaskCreateResponse* response);
     // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
     virtual ::grpc::Status GetTask(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Task* response);
-    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+    // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
     virtual ::grpc::Status ListTaskIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response);
     // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
     virtual ::grpc::Status ListTasks(::grpc::ServerContext* context, const ::flyteidl::admin::ResourceListRequest* request, ::flyteidl::admin::TaskList* response);
@@ -1719,11 +1719,11 @@ class AdminService final {
     virtual ::grpc::Status GetNodeExecutionData(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetDataRequest* request, ::flyteidl::admin::NodeExecutionGetDataResponse* response);
     // Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.
     virtual ::grpc::Status RegisterProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRegisterRequest* request, ::flyteidl::admin::ProjectRegisterResponse* response);
-    // Updates an existing :ref:`ref_flyteidl.admin.Project` 
+    // Updates an existing :ref:`ref_flyteidl.admin.Project`
     // flyteidl.admin.Project should be passed but the domains property should be empty;
     // it will be ignored in the handler as domains cannot be updated via this API.
     virtual ::grpc::Status UpdateProject(::grpc::ServerContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::ProjectUpdateResponse* response);
-    // Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+    // Fetches a list of :ref:`ref_flyteidl.admin.Project`
     virtual ::grpc::Status ListProjects(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectListRequest* request, ::flyteidl::admin::Projects* response);
     // Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
     virtual ::grpc::Status CreateWorkflowEvent(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionEventRequest* request, ::flyteidl::admin::WorkflowExecutionEventResponse* response);

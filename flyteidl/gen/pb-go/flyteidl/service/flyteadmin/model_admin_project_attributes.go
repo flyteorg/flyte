@@ -11,6 +11,8 @@ package flyteadmin
 
 type AdminProjectAttributes struct {
 	// Unique project id for which this set of attributes will be applied.
-	Project string `json:"project,omitempty"`
+	Project            string                   `json:"project,omitempty"`
 	MatchingAttributes *AdminMatchingAttributes `json:"matching_attributes,omitempty"`
+	// Optional, org key applied to the project.
+	Org string `json:"org,omitempty"`
 }

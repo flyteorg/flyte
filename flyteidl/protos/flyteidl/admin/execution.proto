@@ -39,6 +39,9 @@ message ExecutionCreateRequest {
     // included in this map. If not required and not provided, defaults apply.
     // +optional
     core.LiteralMap inputs = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 // Request to relaunch the referenced execution.

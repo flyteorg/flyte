@@ -15,335 +15,8 @@
     "application/json"
   ],
   "paths": {
-    "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}": {
-      "get": {
-        "operationId": "GetArtifact3",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/artifactGetArtifactResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "query.artifact_id.artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.artifact_key.name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.static_value",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.input_binding.var",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.uri",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "details",
-            "description": "If false, then long_description is not returned.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          }
-        ],
-        "tags": [
-          "ArtifactRegistry"
-        ]
-      }
-    },
-    "/artifacts/api/v1/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}": {
-      "get": {
-        "operationId": "GetArtifact2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/artifactGetArtifactResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "query.artifact_id.artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.artifact_key.name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.version",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.static_value",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.input_binding.var",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.uri",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "details",
-            "description": "If false, then long_description is not returned.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          }
-        ],
-        "tags": [
-          "ArtifactRegistry"
-        ]
-      }
-    },
-    "/artifacts/api/v1/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}": {
-      "get": {
-        "operationId": "GetArtifact4",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/artifactGetArtifactResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "query.artifact_tag.artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.artifact_key.name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.static_value",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.input_binding.var",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.uri",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "details",
-            "description": "If false, then long_description is not returned.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          }
-        ],
-        "tags": [
-          "ArtifactRegistry"
-        ]
-      }
-    },
     "/artifacts/api/v1/artifacts": {
-      "get": {
+      "post": {
         "operationId": "GetArtifact",
         "responses": {
           "200": {
@@ -355,114 +28,38 @@
         },
         "parameters": [
           {
-            "name": "query.artifact_id.artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artifactGetArtifactRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
+    "/artifacts/api/v1/search": {
+      "post": {
+        "operationId": "SearchArtifacts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactSearchArtifactsResponse"
+            }
+          }
+        },
+        "parameters": [
           {
-            "name": "query.artifact_id.artifact_key.domain",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.artifact_key.name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_id.version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.artifact_key.domain",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.artifact_key.name",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.static_value",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.triggered_binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.artifact_tag.value.input_binding.var",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.uri",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "query.binding.partition_key",
-            "description": "These two fields are only relevant in the partition value case.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "query.binding.transform",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "details",
-            "description": "If false, then long_description is not returned.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artifactSearchArtifactsRequest"
+            }
           }
         ],
         "tags": [
@@ -512,162 +109,13 @@
               "INPUTS",
               "OUTPUTS"
             ]
-          }
-        ],
-        "tags": [
-          "ArtifactRegistry"
-        ]
-      }
-    },
-    "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}": {
-      "get": {
-        "operationId": "SearchArtifacts2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/artifactSearchArtifactsResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
-            "name": "artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "artifact_key.name",
+            "name": "exec_id.org",
+            "description": "Optional, org key applied to the resource.",
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "principal",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "options.strict_partitions",
-            "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "options.latest_by_key",
-            "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
-          }
-        ],
-        "tags": [
-          "ArtifactRegistry"
-        ]
-      }
-    },
-    "/artifacts/api/v1/search/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}": {
-      "get": {
-        "operationId": "SearchArtifacts",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/artifactSearchArtifactsResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "artifact_key.project",
-            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "artifact_key.domain",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "artifact_key.name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "principal",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "version",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "options.strict_partitions",
-            "description": "If true, this means a strict partition search. meaning if you don't specify the partition\nfield, that will mean, non-partitioned, rather than any partition.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "options.latest_by_key",
-            "description": "If true, only one artifact per key will be returned. It will be the latest one by creation time.",
-            "in": "query",
-            "required": false,
-            "type": "boolean",
-            "format": "boolean"
-          },
-          {
-            "name": "token",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int32"
           }
         ],
         "tags": [
@@ -694,6 +142,49 @@
             "schema": {
               "$ref": "#/definitions/artifactDeactivateTriggerRequest"
             }
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
+    "/artifacts/api/v1/usage/{artifact_id.artifact_key.project}/{artifact_id.artifact_key.domain}/{artifact_id.artifact_key.name}/{artifact_id.version}": {
+      "get": {
+        "operationId": "ListUsage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactListUsageResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "artifact_id.artifact_key.project",
+            "description": "Project and domain and suffix needs to be unique across a given artifact store.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_id.artifact_key.domain",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_id.artifact_key.name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "artifact_id.version",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1238,6 +729,19 @@
       ],
       "default": "INPUTS"
     },
+    "artifactGetArtifactRequest": {
+      "type": "object",
+      "properties": {
+        "query": {
+          "$ref": "#/definitions/coreArtifactQuery"
+        },
+        "details": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "If false, then long_description is not returned."
+        }
+      }
+    },
     "artifactGetArtifactResponse": {
       "type": "object",
       "properties": {
@@ -1246,8 +750,46 @@
         }
       }
     },
+    "artifactListUsageResponse": {
+      "type": "object",
+      "properties": {
+        "executions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
+          }
+        }
+      }
+    },
     "artifactRegisterResponse": {
       "type": "object"
+    },
+    "artifactSearchArtifactsRequest": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions"
+        },
+        "principal": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "options": {
+          "$ref": "#/definitions/artifactSearchOptions"
+        },
+        "token": {
+          "type": "string"
+        },
+        "limit": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
     },
     "artifactSearchArtifactsResponse": {
       "type": "object",
@@ -1451,6 +993,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -2046,6 +1592,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

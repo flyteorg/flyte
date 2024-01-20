@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 from flyteidl.admin import matchable_resource_pb2 as flyteidl_dot_admin_dot_matchable__resource__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.flyteidl/admin/project_domain_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"\xa0\x01\n\x17ProjectDomainAttributes\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12S\n\x13matching_attributes\x18\x03 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributesR\x12matchingAttributes\"o\n$ProjectDomainAttributesUpdateRequest\x12G\n\nattributes\x18\x01 \x01(\x0b\x32\'.flyteidl.admin.ProjectDomainAttributesR\nattributes\"\'\n%ProjectDomainAttributesUpdateResponse\"\x9d\x01\n!ProjectDomainAttributesGetRequest\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x46\n\rresource_type\x18\x03 \x01(\x0e\x32!.flyteidl.admin.MatchableResourceR\x0cresourceType\"m\n\"ProjectDomainAttributesGetResponse\x12G\n\nattributes\x18\x01 \x01(\x0b\x32\'.flyteidl.admin.ProjectDomainAttributesR\nattributes\"\xa0\x01\n$ProjectDomainAttributesDeleteRequest\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x46\n\rresource_type\x18\x03 \x01(\x0e\x32!.flyteidl.admin.MatchableResourceR\x0cresourceType\"\'\n%ProjectDomainAttributesDeleteResponseB\xc8\x01\n\x12\x63om.flyteidl.adminB\x1cProjectDomainAttributesProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n.flyteidl/admin/project_domain_attributes.proto\x12\x0e\x66lyteidl.admin\x1a\'flyteidl/admin/matchable_resource.proto\"\xb2\x01\n\x17ProjectDomainAttributes\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12S\n\x13matching_attributes\x18\x03 \x01(\x0b\x32\".flyteidl.admin.MatchingAttributesR\x12matchingAttributes\x12\x10\n\x03org\x18\x04 \x01(\tR\x03org\"o\n$ProjectDomainAttributesUpdateRequest\x12G\n\nattributes\x18\x01 \x01(\x0b\x32\'.flyteidl.admin.ProjectDomainAttributesR\nattributes\"\'\n%ProjectDomainAttributesUpdateResponse\"\xaf\x01\n!ProjectDomainAttributesGetRequest\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x46\n\rresource_type\x18\x03 \x01(\x0e\x32!.flyteidl.admin.MatchableResourceR\x0cresourceType\x12\x10\n\x03org\x18\x04 \x01(\tR\x03org\"m\n\"ProjectDomainAttributesGetResponse\x12G\n\nattributes\x18\x01 \x01(\x0b\x32\'.flyteidl.admin.ProjectDomainAttributesR\nattributes\"\xb2\x01\n$ProjectDomainAttributesDeleteRequest\x12\x18\n\x07project\x18\x01 \x01(\tR\x07project\x12\x16\n\x06\x64omain\x18\x02 \x01(\tR\x06\x64omain\x12\x46\n\rresource_type\x18\x03 \x01(\x0e\x32!.flyteidl.admin.MatchableResourceR\x0cresourceType\x12\x10\n\x03org\x18\x04 \x01(\tR\x03org\"\'\n%ProjectDomainAttributesDeleteResponseB\xc8\x01\n\x12\x63om.flyteidl.adminB\x1cProjectDomainAttributesProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,17 +24,17 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\022com.flyteidl.adminB\034ProjectDomainAttributesProtoP\001Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\242\002\003FAX\252\002\016Flyteidl.Admin\312\002\016Flyteidl\\Admin\342\002\032Flyteidl\\Admin\\GPBMetadata\352\002\017Flyteidl::Admin'
   _globals['_PROJECTDOMAINATTRIBUTES']._serialized_start=108
-  _globals['_PROJECTDOMAINATTRIBUTES']._serialized_end=268
-  _globals['_PROJECTDOMAINATTRIBUTESUPDATEREQUEST']._serialized_start=270
-  _globals['_PROJECTDOMAINATTRIBUTESUPDATEREQUEST']._serialized_end=381
-  _globals['_PROJECTDOMAINATTRIBUTESUPDATERESPONSE']._serialized_start=383
-  _globals['_PROJECTDOMAINATTRIBUTESUPDATERESPONSE']._serialized_end=422
-  _globals['_PROJECTDOMAINATTRIBUTESGETREQUEST']._serialized_start=425
-  _globals['_PROJECTDOMAINATTRIBUTESGETREQUEST']._serialized_end=582
-  _globals['_PROJECTDOMAINATTRIBUTESGETRESPONSE']._serialized_start=584
-  _globals['_PROJECTDOMAINATTRIBUTESGETRESPONSE']._serialized_end=693
-  _globals['_PROJECTDOMAINATTRIBUTESDELETEREQUEST']._serialized_start=696
-  _globals['_PROJECTDOMAINATTRIBUTESDELETEREQUEST']._serialized_end=856
-  _globals['_PROJECTDOMAINATTRIBUTESDELETERESPONSE']._serialized_start=858
-  _globals['_PROJECTDOMAINATTRIBUTESDELETERESPONSE']._serialized_end=897
+  _globals['_PROJECTDOMAINATTRIBUTES']._serialized_end=286
+  _globals['_PROJECTDOMAINATTRIBUTESUPDATEREQUEST']._serialized_start=288
+  _globals['_PROJECTDOMAINATTRIBUTESUPDATEREQUEST']._serialized_end=399
+  _globals['_PROJECTDOMAINATTRIBUTESUPDATERESPONSE']._serialized_start=401
+  _globals['_PROJECTDOMAINATTRIBUTESUPDATERESPONSE']._serialized_end=440
+  _globals['_PROJECTDOMAINATTRIBUTESGETREQUEST']._serialized_start=443
+  _globals['_PROJECTDOMAINATTRIBUTESGETREQUEST']._serialized_end=618
+  _globals['_PROJECTDOMAINATTRIBUTESGETRESPONSE']._serialized_start=620
+  _globals['_PROJECTDOMAINATTRIBUTESGETRESPONSE']._serialized_end=729
+  _globals['_PROJECTDOMAINATTRIBUTESDELETEREQUEST']._serialized_start=732
+  _globals['_PROJECTDOMAINATTRIBUTESDELETEREQUEST']._serialized_end=910
+  _globals['_PROJECTDOMAINATTRIBUTESDELETERESPONSE']._serialized_start=912
+  _globals['_PROJECTDOMAINATTRIBUTESDELETERESPONSE']._serialized_end=951
 # @@protoc_insertion_point(module_scope)
