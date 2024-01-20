@@ -142,6 +142,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 
 	// TODO: Make this one call to the DB instead of two.
 	executionModel, err := c.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     rawEvent.ExecutionId.Org,
 		Project: rawEvent.ExecutionId.Project,
 		Domain:  rawEvent.ExecutionId.Domain,
 		Name:    rawEvent.ExecutionId.Name,
@@ -160,6 +161,7 @@ func (c *CloudEventWrappedPublisher) TransformWorkflowExecutionEvent(ctx context
 		return nil, fmt.Errorf("workflow id is nil for execution [%+v]", ex)
 	}
 	workflowModel, err := c.db.WorkflowRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     ex.Closure.WorkflowId.Org,
 		Project: ex.Closure.WorkflowId.Project,
 		Domain:  ex.Closure.WorkflowId.Domain,
 		Name:    ex.Closure.WorkflowId.Name,
@@ -263,6 +265,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 
 	// This gets the parent workflow execution metadata
 	executionModel, err := c.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     rawEvent.Id.ExecutionId.Org,
 		Project: rawEvent.Id.ExecutionId.Project,
 		Domain:  rawEvent.Id.ExecutionId.Domain,
 		Name:    rawEvent.Id.ExecutionId.Name,
@@ -290,6 +293,7 @@ func (c *CloudEventWrappedPublisher) TransformNodeExecutionEvent(ctx context.Con
 	}
 	if lte != nil {
 		taskModel, err := c.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
+			Org:     lte.Id.TaskId.Org,
 			Project: lte.Id.TaskId.Project,
 			Domain:  lte.Id.TaskId.Domain,
 			Name:    lte.Id.TaskId.Name,
