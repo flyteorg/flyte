@@ -81,10 +81,10 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 			base32Digest := base32.StdEncoding.EncodeToString(req.ContentMd5)
 			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
 			if hexDigest != metadata.Etag() && base32Digest != metadata.Etag() && base64Digest != metadata.Etag() {
-				logger.Debug(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
+				logger.Debugf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
-			logger.Debug(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
+			logger.Debugf(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
 		}
 	}
 
