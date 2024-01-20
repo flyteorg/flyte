@@ -1562,6 +1562,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [

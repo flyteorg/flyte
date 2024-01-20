@@ -14,6 +14,7 @@ import (
 	ptypesStruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -51,7 +52,7 @@ func createTaskAndNodeExecution(
 		Id:   taskIdentifier,
 		Spec: testutils.GetValidTaskRequest().Spec,
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err)
 
 	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
 		RequestId: "request id",
@@ -64,7 +65,7 @@ func createTaskAndNodeExecution(
 			OccurredAt: occurredAtProto,
 		},
 	})
-	assert.Nil(t, err)
+	require.NoError(t, err)
 }
 
 func TestCreateTaskExecution(t *testing.T) {
