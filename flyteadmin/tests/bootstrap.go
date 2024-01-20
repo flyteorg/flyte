@@ -16,8 +16,8 @@ import (
 )
 
 const insertExecutionQueryStr = `INSERT INTO "executions" ` +
-	`("execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id") ` +
-	`VALUES ('%s', '%s', '%s', '%s', '%d', '%d')`
+	`("execution_org", "execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id") ` +
+	`VALUES ('', '%s', '%s', '%s', '%s', '%d', '%d')`
 
 var adminScope = promutils.NewScope("flyteadmin")
 

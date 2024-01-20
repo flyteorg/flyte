@@ -31,6 +31,7 @@ func CreateTaskModel(
 			Domain:  request.Id.Domain,
 			Name:    request.Id.Name,
 			Version: request.Id.Version,
+			Org:     request.Id.GetOrg(),
 		},
 		Closure: closureBytes,
 		Digest:  digest,
@@ -56,6 +57,7 @@ func FromTaskModel(taskModel models.Task) (admin.Task, error) {
 		Domain:       taskModel.Domain,
 		Name:         taskModel.Name,
 		Version:      taskModel.Version,
+		Org:          taskModel.Org,
 	}
 	return admin.Task{
 		Id:               &id,
@@ -83,6 +85,7 @@ func FromTaskModelsToIdentifiers(taskModels []models.Task) []*admin.NamedEntityI
 			Project: taskModel.Project,
 			Domain:  taskModel.Domain,
 			Name:    taskModel.Name,
+			Org:     taskModel.Org,
 		}
 	}
 	return ids

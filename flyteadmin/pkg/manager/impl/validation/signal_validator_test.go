@@ -218,6 +218,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
+					Org:     "org",
 				},
 				SignalId: "signal",
 			},
@@ -236,7 +237,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 			},
 		}
 		assert.EqualError(t, ValidateSignalSetRequest(ctx, repo, request),
-			"failed to validate that signal [{{project domain name} signal}] exists, err: [foo]")
+			"failed to validate that signal [{{project domain name org} signal}] exists, err: [foo]")
 	})
 
 	t.Run("InvalidType", func(t *testing.T) {

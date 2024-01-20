@@ -263,7 +263,7 @@ func TestValidateProjectAndDomain(t *testing.T) {
 		return models.Project{State: &activeState}, nil
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project-id", "domain")
+		"flyte-project-id", "domain", "org")
 	assert.Nil(t, err)
 }
 
@@ -276,7 +276,7 @@ func TestValidateProjectAndDomainArchivedProject(t *testing.T) {
 	}
 
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project-id", "domain")
+		"flyte-project-id", "domain", "org")
 	assert.EqualError(t, err,
 		"project [flyte-project-id] is not active")
 }
@@ -289,7 +289,7 @@ func TestValidateProjectAndDomainError(t *testing.T) {
 	}
 
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project-id", "domain")
+		"flyte-project-id", "domain", "org")
 	assert.EqualError(t, err,
 		"failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [foo]")
 }
@@ -301,7 +301,7 @@ func TestValidateProjectAndDomainNotFound(t *testing.T) {
 		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
-		"flyte-project", "domain")
+		"flyte-project", "domain", "org")
 	assert.EqualError(t, err, "failed to validate that project [flyte-project] and domain [domain] are registered, err: [project [flyte-project] not found]")
 }
 
@@ -314,7 +314,7 @@ func TestValidateProjectDb(t *testing.T) {
 			activeState := int32(admin.Project_ACTIVE)
 			return models.Project{State: &activeState}, nil
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id", "org")
 
 		assert.Nil(t, err)
 	})
@@ -325,7 +325,7 @@ func TestValidateProjectDb(t *testing.T) {
 
 			return models.Project{}, errors.New("missing")
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id", "org")
 		assert.Error(t, err)
 	})
 
@@ -335,7 +335,7 @@ func TestValidateProjectDb(t *testing.T) {
 			state := int32(admin.Project_ARCHIVED)
 			return models.Project{State: &state}, nil
 		}
-		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectForUpdate(context.Background(), mockRepo, "flyte-project-id", "org")
 		assert.Error(t, err)
 	})
 }
@@ -349,7 +349,7 @@ func TestValidateProjectExistsDb(t *testing.T) {
 			activeState := int32(admin.Project_ACTIVE)
 			return models.Project{State: &activeState}, nil
 		}
-		err := ValidateProjectExists(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectExists(context.Background(), mockRepo, "flyte-project-id", "org")
 
 		assert.Nil(t, err)
 	})
@@ -360,7 +360,7 @@ func TestValidateProjectExistsDb(t *testing.T) {
 
 			return models.Project{}, errors.New("missing")
 		}
-		err := ValidateProjectExists(context.Background(), mockRepo, "flyte-project-id")
+		err := ValidateProjectExists(context.Background(), mockRepo, "flyte-project-id", "org")
 		assert.Error(t, err)
 	})
 }

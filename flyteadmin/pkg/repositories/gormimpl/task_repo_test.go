@@ -55,21 +55,23 @@ func TestGetTask(t *testing.T) {
 		Domain:  domain,
 		Name:    name,
 		Version: version,
+		Org:     testOrg,
 	})
 	assert.Empty(t, output)
-	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" ")
+	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" org:\"org\" ")
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 AND "tasks"."version" = $4 LIMIT 1`).
+		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 AND "tasks"."version" = $4 AND "tasks"."org" = $5 LIMIT 1`).
 		WithReply(tasks)
 	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,
 		Version: version,
+		Org:     testOrg,
 	})
 	assert.Empty(t, err)
 	assert.Equal(t, project, output.Project)
@@ -244,7 +246,8 @@ func TestListTaskIds(t *testing.T) {
 	}
 
 	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithQuery(`GROUP BY project, domain, name`).WithReply(tasks)
+	GlobalMock.Logging = true
+	GlobalMock.NewMock().WithQuery(`GROUP BY org, project, domain, name`).WithReply(tasks)
 
 	collection, err := taskRepo.ListTaskIdentifiers(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{

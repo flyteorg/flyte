@@ -40,6 +40,7 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 				Domain:  input.TaskExecutionID.TaskId.Domain,
 				Name:    input.TaskExecutionID.TaskId.Name,
 				Version: input.TaskExecutionID.TaskId.Version,
+				Org:     input.TaskExecutionID.TaskId.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: input.TaskExecutionID.NodeExecutionId.NodeId,
@@ -47,6 +48,7 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 					Project: input.TaskExecutionID.NodeExecutionId.ExecutionId.Project,
 					Domain:  input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain,
 					Name:    input.TaskExecutionID.NodeExecutionId.ExecutionId.Name,
+					Org:     input.TaskExecutionID.NodeExecutionId.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &input.TaskExecutionID.RetryAttempt,
@@ -80,7 +82,7 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).WithContext(ctx).Save(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
+	tx := r.db.WithContext(ctx).WithContext(ctx).Updates(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
 	timer.Stop()
 
 	if err := tx.Error; err != nil {

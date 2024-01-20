@@ -13,6 +13,7 @@ type GetDescriptionEntityInput struct {
 	Domain       string
 	Name         string
 	Version      string
+	Org          string
 }
 
 type DescriptionEntityCollectionOutput struct {

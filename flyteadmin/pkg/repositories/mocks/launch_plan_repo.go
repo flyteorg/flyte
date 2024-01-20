@@ -70,6 +70,7 @@ func (r *MockLaunchPlanRepo) Get(
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		},
 	}, nil
 }

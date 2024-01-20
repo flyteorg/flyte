@@ -18,6 +18,7 @@ const name = "name"
 const description = "description"
 const resourceType = core.ResourceType_WORKFLOW
 const version = "XYZ"
+const testOrg = "org"
 
 func GetDbForTest(t *testing.T) *gorm.DB {
 	mocket.Catcher.Register()

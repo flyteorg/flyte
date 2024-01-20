@@ -40,6 +40,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
+			Org:     input.Org,
 		},
 	}).Take(&execution)
 	timer.Stop()
@@ -49,6 +50,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
+			Org:     input.Org,
 		})
 	} else if tx.Error != nil {
 		return models.Execution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -90,8 +92,8 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}
 
 	if ok := input.JoinTableEntities[common.AdminTag]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name",
-			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
+			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
 		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
 			AdminTagsTableName, AdminTagsTableName, executionAdminTagsTableName))
 	}

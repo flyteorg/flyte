@@ -19,7 +19,7 @@ func TestGetNamespaceName(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got := GetNamespaceName(tc.template, tc.project, tc.domain)
+		got := GetNamespaceName(tc.template, "", tc.project, tc.domain)
 		assert.Equal(t, got, tc.want)
 	}
 }

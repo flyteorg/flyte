@@ -17,6 +17,7 @@ type ExecutionKey struct {
 	Project string `gorm:"primary_key;column:execution_project" valid:"length(0|255)"`
 	Domain  string `gorm:"primary_key;column:execution_domain" valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;column:execution_name" valid:"length(0|255)"`
+	Org     string `gorm:"primary_key;column:execution_org" valid:"length(0|255)"`
 }
 
 // Database model to encapsulate a (workflow) execution.
@@ -69,13 +70,14 @@ type Execution struct {
 
 type AdminTag struct {
 	gorm.Model
+	Org  string
 	Name string `gorm:"index:,unique;size:255"`
 }
 
 func (b *AdminTag) BeforeCreate(tx *gorm.DB) (err error) {
 	tx.Statement.AddClause(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "name"}},            // key column
-		DoUpdates: clause.AssignmentColumns([]string{"name"}), // column needed to be updated
+		Columns:   []clause.Column{{Name: "name"}, {Name: "org"}},    // key column
+		DoUpdates: clause.AssignmentColumns([]string{"name", "org"}), // column needed to be updated
 	})
 	return nil
 }

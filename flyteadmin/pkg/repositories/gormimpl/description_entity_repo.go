@@ -23,7 +23,7 @@ type DescriptionEntityRepo struct {
 func (r *DescriptionEntityRepo) Get(ctx context.Context, input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
 	var descriptionEntity models.DescriptionEntity
 
-	filters, err := getDescriptionEntityFilters(input.ResourceType, input.Project, input.Domain, input.Name, input.Version)
+	filters, err := getDescriptionEntityFilters(input.ResourceType, input.Project, input.Domain, input.Name, input.Version, input.Org)
 	if err != nil {
 		return models.DescriptionEntity{}, err
 	}
@@ -75,7 +75,7 @@ func (r *DescriptionEntityRepo) List(
 	}, nil
 }
 
-func getDescriptionEntityFilters(resourceType core.ResourceType, project string, domain string, name string, version string) ([]common.InlineFilter, error) {
+func getDescriptionEntityFilters(resourceType core.ResourceType, project string, domain string, name string, version string, org string) ([]common.InlineFilter, error) {
 	entity := common.ResourceTypeToEntity[resourceType]
 
 	filters := make([]common.InlineFilter, 0)
@@ -99,6 +99,11 @@ func getDescriptionEntityFilters(resourceType core.ResourceType, project string,
 		return nil, err
 	}
 	filters = append(filters, versionFilter)
+	orgFilter, err := common.NewSingleValueFilter(entity, common.Equal, Org, org)
+	if err != nil {
+		return nil, err
+	}
+	filters = append(filters, orgFilter)
 
 	return filters, nil
 }

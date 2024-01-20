@@ -46,6 +46,7 @@ func GetTask(ctx context.Context, repo repoInterfaces.Repository, identifier cor
 func GetWorkflowModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.Workflow, error) {
 	workflowModel, err := (repo).WorkflowRepo().Get(ctx, repoInterfaces.Identifier{
+		Org:     identifier.Org,
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
 		Name:    identifier.Name,
@@ -95,6 +96,7 @@ func GetWorkflow(
 func GetLaunchPlanModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.LaunchPlan, error) {
 	launchPlanModel, err := (repo).LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
+		Org:     identifier.Org,
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
 		Name:    identifier.Name,
@@ -119,6 +121,7 @@ func GetNamedEntityModel(
 	ctx context.Context, repo repoInterfaces.Repository, resourceType core.ResourceType, identifier admin.NamedEntityIdentifier) (models.NamedEntity, error) {
 	metadataModel, err := (repo).NamedEntityRepo().Get(ctx, repoInterfaces.GetNamedEntityInput{
 		ResourceType: resourceType,
+		Org:          identifier.Org,
 		Project:      identifier.Project,
 		Domain:       identifier.Domain,
 		Name:         identifier.Name,
@@ -143,6 +146,7 @@ func GetDescriptionEntityModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier core.Identifier) (models.DescriptionEntity, error) {
 	descriptionEntityModel, err := (repo).DescriptionEntityRepo().Get(ctx, repoInterfaces.GetDescriptionEntityInput{
 		ResourceType: identifier.ResourceType,
+		Org:          identifier.Org,
 		Project:      identifier.Project,
 		Domain:       identifier.Domain,
 		Name:         identifier.Name,
@@ -170,7 +174,11 @@ func GetDescriptionEntity(
 }
 
 // Returns the set of filters necessary to query launch plan models to find the active version of a launch plan
-func GetActiveLaunchPlanVersionFilters(project, domain, name string) ([]common.InlineFilter, error) {
+func GetActiveLaunchPlanVersionFilters(org, project, domain, name string) ([]common.InlineFilter, error) {
+	orgFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Org, org)
+	if err != nil {
+		return nil, err
+	}
 	projectFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Project, project)
 	if err != nil {
 		return nil, err
@@ -187,11 +195,15 @@ func GetActiveLaunchPlanVersionFilters(project, domain, name string) ([]common.I
 	if err != nil {
 		return nil, err
 	}
-	return []common.InlineFilter{projectFilter, domainFilter, nameFilter, activeFilter}, nil
+	return []common.InlineFilter{orgFilter, projectFilter, domainFilter, nameFilter, activeFilter}, nil
 }
 
 // Returns the set of filters necessary to query launch plan models to find the active version of a launch plan
-func ListActiveLaunchPlanVersionsFilters(project, domain string) ([]common.InlineFilter, error) {
+func ListActiveLaunchPlanVersionsFilters(org, project, domain string) ([]common.InlineFilter, error) {
+	orgFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Org, org)
+	if err != nil {
+		return nil, err
+	}
 	projectFilter, err := common.NewSingleValueFilter(common.LaunchPlan, common.Equal, shared.Project, project)
 	if err != nil {
 		return nil, err
@@ -204,13 +216,14 @@ func ListActiveLaunchPlanVersionsFilters(project, domain string) ([]common.Inlin
 	if err != nil {
 		return nil, err
 	}
-	return []common.InlineFilter{projectFilter, domainFilter, activeFilter}, nil
+	return []common.InlineFilter{orgFilter, projectFilter, domainFilter, activeFilter}, nil
 }
 
 func GetExecutionModel(
 	ctx context.Context, repo repoInterfaces.Repository, identifier core.WorkflowExecutionIdentifier) (
 	*models.Execution, error) {
 	executionModel, err := repo.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
+		Org:     identifier.Org,
 		Project: identifier.Project,
 		Domain:  identifier.Domain,
 		Name:    identifier.Name,
@@ -236,6 +249,7 @@ func GetNodeExecutionModel(ctx context.Context, repo repoInterfaces.Repository, 
 func GetTaskModel(ctx context.Context, repo repoInterfaces.Repository, taskIdentifier *core.Identifier) (
 	*models.Task, error) {
 	taskModel, err := repo.TaskRepo().Get(ctx, repoInterfaces.Identifier{
+		Org:     taskIdentifier.Org,
 		Project: taskIdentifier.Project,
 		Domain:  taskIdentifier.Domain,
 		Name:    taskIdentifier.Name,
@@ -268,8 +282,9 @@ func GetTaskExecutionModel(
 // GetMatchableResource gets matchable resource for resourceType and project - domain - workflow combination.
 // Returns nil with nothing is found or return an error
 func GetMatchableResource(ctx context.Context, resourceManager interfaces.ResourceInterface, resourceType admin.MatchableResource,
-	project, domain, workflowName string) (*interfaces.ResourceResponse, error) {
+	org, project, domain, workflowName string) (*interfaces.ResourceResponse, error) {
 	matchableResource, err := resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Org:          org,
 		Project:      project,
 		Domain:       domain,
 		Workflow:     workflowName,

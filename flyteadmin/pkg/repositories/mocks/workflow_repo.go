@@ -41,6 +41,7 @@ func (r *MockWorkflowRepo) Get(ctx context.Context, input interfaces.Identifier)
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		},
 	}, nil
 }

@@ -14,4 +14,6 @@ type AdminWorkflowAttributesDeleteRequest struct {
 	Domain string `json:"domain,omitempty"`
 	Workflow string `json:"workflow,omitempty"`
 	ResourceType *AdminMatchableResource `json:"resource_type,omitempty"`
+	// Optional, org key applied to the attributes.
+	Org string `json:"org,omitempty"`
 }

@@ -90,6 +90,7 @@ func GetWorkflowRequest() admin.WorkflowCreateRequest {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
+		Org:          "org",
 	}
 	return admin.WorkflowCreateRequest{
 		Id: &identifier,
@@ -134,6 +135,7 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 			Domain:       "domain",
 			Name:         "name",
 			Version:      "version",
+			Org:          "org",
 		},
 		Spec: &admin.LaunchPlanSpec{
 			WorkflowId: &core.Identifier{
@@ -142,6 +144,7 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 				Domain:       "domain",
 				Name:         "name",
 				Version:      "version",
+				Org:          "org",
 			},
 			DefaultInputs: &core.ParameterMap{
 				Parameters: map[string]*core.Parameter{

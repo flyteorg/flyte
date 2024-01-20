@@ -174,23 +174,23 @@ func populateWorkflowExecutionsForTestingOnly() {
 	}(ctx)
 
 	// Insert dummy launch plans;
-	db.Exec(`INSERT INTO launch_plans ("id", "project", "domain", "name", "version", "spec", "closure") ` +
-		`VALUES (1, 'project1', 'domain1', 'name1', 'version1', E'\\000', E'\\000')`)
-	db.Exec(`INSERT INTO launch_plans ("id", "project", "domain", "name", "version", "spec", "closure") ` +
-		`VALUES (3, 'project2', 'domain2', 'name2', 'version1', E'\\000', E'\\000')`)
+	db.Exec(`INSERT INTO launch_plans ("id", "org", "project", "domain", "name", "version", "spec", "closure") ` +
+		`VALUES (1, '', 'project1', 'domain1', 'name1', 'version1', E'\\000', E'\\000')`)
+	db.Exec(`INSERT INTO launch_plans ("id", "org", "project", "domain", "name", "version", "spec", "closure") ` +
+		`VALUES (3, '', 'project2', 'domain2', 'name2', 'version1', E'\\000', E'\\000')`)
 	// And dummy workflows:
-	db.Exec(`INSERT INTO workflows ("id", "project", "domain", "name", "version", "remote_closure_identifier") ` +
-		`VALUES (2, 'project1', 'domain1', 'name1', 'version1', 's3://foo')`)
-	db.Exec(`INSERT INTO workflows ("id", "project", "domain", "name", "version", "remote_closure_identifier") ` +
-		`VALUES (4, 'project2', 'domain2', 'name2', 'version1', 's3://foo')`)
+	db.Exec(`INSERT INTO workflows ("id", "org", "project", "domain", "name", "version", "remote_closure_identifier") ` +
+		`VALUES (2, '', 'project1', 'domain1', 'name1', 'version1', 's3://foo')`)
+	db.Exec(`INSERT INTO workflows ("id", "org", "project", "domain", "name", "version", "remote_closure_identifier") ` +
+		`VALUES (4, '', 'project2', 'domain2', 'name2', 'version1', 's3://foo')`)
 
 	// Insert dummy tags
-	db.Exec(`INSERT INTO admin_tags ("id", "name") ` + `VALUES (1, 'hello')`)
-	db.Exec(`INSERT INTO admin_tags ("id", "name") ` + `VALUES (2, 'flyte')`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name1', 1)`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name1', 2)`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name3', 2)`)
-	db.Exec(`INSERT INTO execution_admin_tags ("execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('project1', 'domain1', 'name4', 1)`)
+	db.Exec(`INSERT INTO admin_tags ("id", "name", "org") ` + `VALUES (1, 'hello', '')`)
+	db.Exec(`INSERT INTO admin_tags ("id", "name", "org") ` + `VALUES (2, 'flyte', '')`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name1', 1)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name1', 2)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name3', 2)`)
+	db.Exec(`INSERT INTO execution_admin_tags ("execution_org", "execution_project", "execution_domain", "execution_name", "admin_tag_id") ` + `VALUES ('', 'project1', 'domain1', 'name4', 1)`)
 
 	for _, statement := range insertExecutionStatements {
 		db.Exec(statement)

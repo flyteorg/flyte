@@ -57,6 +57,7 @@ func CreateLaunchPlanModel(
 			Domain:  launchPlan.Id.Domain,
 			Name:    launchPlan.Id.Name,
 			Version: launchPlan.Id.Version,
+			Org:     launchPlan.Id.Org,
 		},
 		Spec:         spec,
 		State:        &state,
@@ -100,6 +101,7 @@ func FromLaunchPlanModel(model models.LaunchPlan) (*admin.LaunchPlan, error) {
 		Domain:       model.Domain,
 		Name:         model.Name,
 		Version:      model.Version,
+		Org:          model.Org,
 	}
 
 	return &admin.LaunchPlan{
@@ -128,6 +130,7 @@ func FromLaunchPlanModelsToIdentifiers(launchPlanModels []models.LaunchPlan) []*
 			Project: launchPlanModel.Project,
 			Domain:  launchPlanModel.Domain,
 			Name:    launchPlanModel.Name,
+			Org:     launchPlanModel.Org,
 		}
 	}
 	return ids

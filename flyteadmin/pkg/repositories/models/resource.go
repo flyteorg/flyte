@@ -12,7 +12,7 @@ const (
 )
 
 // Represents Flyte resources repository.
-// In this model, the combination of (Project, Domain, Workflow, LaunchPlan, ResourceType) is unique
+// In this model, the combination of (Org, Project, Domain, Workflow, LaunchPlan, ResourceType) is unique
 type Resource struct {
 	ID           int64 `gorm:"AUTO_INCREMENT;column:id;primary_key"`
 	CreatedAt    time.Time
@@ -22,6 +22,7 @@ type Resource struct {
 	Domain       string     `gorm:"uniqueIndex:resource_idx" valid:"length(0|255)"`
 	Workflow     string     `gorm:"uniqueIndex:resource_idx" valid:"length(0|255)"`
 	LaunchPlan   string     `gorm:"uniqueIndex:resource_idx" valid:"length(0|255)"`
+	Org          string     `gorm:"uniqueIndex:resource_idx" valid:"length(0|255)"`
 	ResourceType string     `gorm:"uniqueIndex:resource_idx" valid:"length(0|255)"`
 	Priority     ResourcePriority
 	// Serialized flyteidl.admin.MatchingAttributes.

@@ -21,6 +21,7 @@ func CreateProjectModel(project *admin.Project) models.Project {
 			Name:        project.Name,
 			Description: project.Description,
 			State:       &stateInt,
+			Org:         project.Org,
 		}
 	}
 	projectBytes, err := proto.Marshal(project)
@@ -33,6 +34,7 @@ func CreateProjectModel(project *admin.Project) models.Project {
 		Description: project.Description,
 		Labels:      projectBytes,
 		State:       &stateInt,
+		Org:         project.Org,
 	}
 }
 
@@ -48,6 +50,7 @@ func FromProjectModel(projectModel models.Project, domains []*admin.Domain) admi
 		Description: projectModel.Description,
 		Labels:      projectDeserialized.Labels,
 		State:       admin.Project_ProjectState(*projectModel.State),
+		Org:         projectModel.Org,
 	}
 	project.Domains = domains
 	return project

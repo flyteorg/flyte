@@ -68,6 +68,7 @@ func TestToLaunchPlanModel(t *testing.T) {
 	assert.Equal(t, "domain", launchPlanModel.Domain)
 	assert.Equal(t, "name", launchPlanModel.Name)
 	assert.Equal(t, "version", launchPlanModel.Version)
+	assert.Equal(t, testOrg, launchPlanModel.Org)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
 	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
@@ -115,6 +116,7 @@ func testLaunchPlanWithCronInternal(t *testing.T, lpRequest admin.LaunchPlanCrea
 	assert.Equal(t, "domain", launchPlanModel.Domain)
 	assert.Equal(t, "name", launchPlanModel.Name)
 	assert.Equal(t, "version", launchPlanModel.Version)
+	assert.Equal(t, testOrg, launchPlanModel.Org)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
 	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
@@ -151,6 +153,7 @@ func TestToLaunchPlanModelWithFixedRateSchedule(t *testing.T) {
 	assert.Equal(t, "domain", launchPlanModel.Domain)
 	assert.Equal(t, "name", launchPlanModel.Name)
 	assert.Equal(t, "version", launchPlanModel.Version)
+	assert.Equal(t, testOrg, launchPlanModel.Org)
 	assert.Equal(t, workflowID, launchPlanModel.WorkflowID)
 
 	expectedSpec, _ := proto.Marshal(lpRequest.Spec)
@@ -193,6 +196,7 @@ func TestFromLaunchPlanModel(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		Spec:    specBytes,
 		Closure: closureBytes,
@@ -206,6 +210,7 @@ func TestFromLaunchPlanModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
+		Org:          testOrg,
 	}, lp.Id))
 	assert.True(t, proto.Equal(&closure, lp.Closure))
 	assert.True(t, proto.Equal(lpRequest.Spec, lp.Spec))
@@ -239,6 +244,7 @@ func TestFromLaunchPlanModels(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		Spec:    specBytes,
 		Closure: closureBytes,

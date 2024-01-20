@@ -138,6 +138,7 @@ func GenerateDatasetIDForTask(ctx context.Context, k catalog.Key) (*datacatalog.
 		Domain:  k.Identifier.Domain,
 		Name:    getDatasetNameFromTask(k.Identifier),
 		Version: datasetVersion,
+		Org:     k.Identifier.Org,
 	}
 	return datasetID, nil
 }
@@ -157,6 +158,7 @@ const (
 	execProjectKey     = "exec-project"
 	execNodeIDKey      = "exec-node"
 	execTaskAttemptKey = "exec-attempt"
+	execOrgKey         = "exec-rog"
 )
 
 // Understanding Catalog Identifiers
@@ -187,6 +189,7 @@ func GetArtifactMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier)
 			execNameKey:        taskExecutionID.NodeExecutionId.GetExecutionId().GetName(),
 			execNodeIDKey:      taskExecutionID.NodeExecutionId.GetNodeId(),
 			execTaskAttemptKey: strconv.Itoa(int(taskExecutionID.GetRetryAttempt())),
+			execOrgKey:         taskExecutionID.GetNodeExecutionId().GetExecutionId().GetOrg(),
 		},
 	}
 }
@@ -216,6 +219,7 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 			Domain:       currentID.Domain,
 			Name:         currentID.Name,
 			Version:      GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown"),
+			Org:          currentID.Org,
 		},
 		RetryAttempt: uint32(attempt),
 		NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -224,6 +228,7 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 				Project: GetOrDefault(artifactMd.KeyMap, execProjectKey, currentID.GetProject()),
 				Domain:  GetOrDefault(artifactMd.KeyMap, execDomainKey, currentID.GetDomain()),
 				Name:    GetOrDefault(artifactMd.KeyMap, execNameKey, "unknown"),
+				Org:     GetOrDefault(artifactMd.KeyMap, execOrgKey, currentID.GetOrg()),
 			},
 		},
 	}, nil

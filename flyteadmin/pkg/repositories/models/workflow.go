@@ -6,6 +6,7 @@ type WorkflowKey struct {
 	Domain  string `gorm:"primary_key;index:workflow_project_domain_name_idx;index:workflow_project_domain_idx"  valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;index:workflow_project_domain_name_idx"  valid:"length(0|255)"`
 	Version string `gorm:"primary_key"`
+	Org     string `gorm:"primary_key;index:workflow_project_domain_name_idx;index:workflow_project_domain_idx" valid:"length(0|255)"`
 }
 
 // Database model to encapsulate a workflow.

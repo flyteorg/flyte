@@ -31,6 +31,7 @@ func TestToDescriptionEntityExecutionModel(t *testing.T) {
 		Project:      "project",
 		Domain:       "domain",
 		Version:      "xyz",
+		Org:          testOrg,
 	}
 
 	model, err := CreateDescriptionEntityModel(descriptionEntity, id)
@@ -53,6 +54,7 @@ func TestFromDescriptionEntityExecutionModel(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		ShortDescription: shortDescription,
 		LongDescription:  longDescriptionBytes,
@@ -78,6 +80,7 @@ func TestFromDescriptionEntityExecutionModels(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 				Version: "version",
+				Org:     testOrg,
 			},
 			ShortDescription: shortDescription,
 			LongDescription:  longDescriptionBytes,

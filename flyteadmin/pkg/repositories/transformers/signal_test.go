@@ -37,6 +37,7 @@ var (
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		SignalID: "signal",
 	}
@@ -46,6 +47,7 @@ var (
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 		SignalId: "signal",
 	}

@@ -41,6 +41,7 @@ func (r *MockTaskRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		},
 	}, nil
 }

@@ -81,6 +81,11 @@ scheduler:
 migrate:
 	go run cmd/main.go migrate run --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
 
+.PHONY: rollback
+rollback:
+	go run cmd/main.go migrate rollback --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml
+
+
 .PHONY: seed_projects
 seed_projects:
 	go run cmd/main.go migrate seed-projects project admintests flytekit --server.kube-config ~/.kube/config  --config flyteadmin_config.yaml

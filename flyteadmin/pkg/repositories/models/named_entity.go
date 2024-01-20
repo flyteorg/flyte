@@ -10,6 +10,7 @@ type NamedEntityMetadataKey struct {
 	Project      string            `gorm:"primary_key;index:named_entity_metadata_type_project_domain_name_idx" valid:"length(0|255)"`
 	Domain       string            `gorm:"primary_key;index:named_entity_metadata_type_project_domain_name_idx" valid:"length(0|255)"`
 	Name         string            `gorm:"primary_key;index:named_entity_metadata_type_project_domain_name_idx" valid:"length(0|255)"`
+	Org          string            `gorm:"primary_key;index:named_entity_metadata_type_project_domain_name_idx" valid:"length(0|255)"`
 }
 
 // Fields to be composed into any named entity
@@ -33,6 +34,7 @@ type NamedEntityKey struct {
 	Project      string `valid:"length(0|255)"`
 	Domain       string `valid:"length(0|255)"`
 	Name         string `valid:"length(0|255)"`
+	Org          string `valid:"length(0|255)"`
 }
 
 // Composes an identifier (NamedEntity) and its associated metadata fields

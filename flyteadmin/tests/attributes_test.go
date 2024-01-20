@@ -234,7 +234,7 @@ func TestUpdateProjectDomainAttributes(t *testing.T) {
 	})
 	fmt.Println(err)
 	assert.Nil(t, response)
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = Resource [{Project:admintests Domain:development Workflow: LaunchPlan: ResourceType:TASK_RESOURCE}] not found")
+	assert.EqualError(t, err, "rpc error: code = NotFound desc = Resource [{Project:admintests Domain:development Workflow: LaunchPlan: ResourceType:TASK_RESOURCE Org:}] not found")
 }
 
 func TestUpdateWorkflowAttributes(t *testing.T) {
@@ -295,7 +295,7 @@ func TestUpdateWorkflowAttributes(t *testing.T) {
 		Workflow:     "workflow",
 		ResourceType: admin.MatchableResource_TASK_RESOURCE,
 	})
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = Resource [{Project:admintests Domain:development Workflow:workflow LaunchPlan: ResourceType:TASK_RESOURCE}] not found")
+	assert.EqualError(t, err, "rpc error: code = NotFound desc = Resource [{Project:admintests Domain:development Workflow:workflow LaunchPlan: ResourceType:TASK_RESOURCE Org:}] not found")
 }
 
 func TestListAllMatchableAttributes(t *testing.T) {

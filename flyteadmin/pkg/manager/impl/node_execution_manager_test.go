@@ -780,19 +780,25 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 			interfaces.NodeExecutionCollectionOutput, error) {
 			assert.Equal(t, 1, input.Limit)
 			assert.Equal(t, 2, input.Offset)
-			assert.Len(t, input.InlineFilters, 3)
+			assert.Len(t, input.InlineFilters, 4)
+
 			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-			assert.Equal(t, "project", queryExpr.Args)
-			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+			assert.Equal(t, "org", queryExpr.Args)
+			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
-			assert.Equal(t, "domain", queryExpr.Args)
-			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+			assert.Equal(t, "project", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "domain", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
 
@@ -810,6 +816,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 						NodeExecutionKey: models.NodeExecutionKey{
 							NodeID: "node id",
 							ExecutionKey: models.ExecutionKey{
+								Org:     org,
 								Project: "project",
 								Domain:  "domain",
 								Name:    "name",
@@ -831,6 +838,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "node id",
 					ExecutionKey: models.ExecutionKey{
+						Org:     org,
 						Project: "project",
 						Domain:  "domain",
 						Name:    "name",
@@ -846,6 +854,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
+			Org:     org,
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -863,6 +872,7 @@ func TestListNodeExecutionsLevelZero(t *testing.T) {
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     org,
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
@@ -900,24 +910,30 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 			interfaces.NodeExecutionCollectionOutput, error) {
 			assert.Equal(t, 1, input.Limit)
 			assert.Equal(t, 2, input.Offset)
-			assert.Len(t, input.InlineFilters, 4)
+			assert.Len(t, input.InlineFilters, 5)
+
 			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-			assert.Equal(t, "project", queryExpr.Args)
-			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+			assert.Equal(t, "org", queryExpr.Args)
+			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
-			assert.Equal(t, "domain", queryExpr.Args)
-			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+			assert.Equal(t, "project", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "domain", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
 
-			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
-			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[4].GetEntity())
+			queryExpr, _ = input.InlineFilters[4].GetGormQueryExpr()
 			assert.Equal(t, parentID, queryExpr.Args)
 			assert.Equal(t, "parent_id = ?", queryExpr.Query)
 
@@ -928,6 +944,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 						NodeExecutionKey: models.NodeExecutionKey{
 							NodeID: "node id",
 							ExecutionKey: models.ExecutionKey{
+								Org:     org,
 								Project: "project",
 								Domain:  "domain",
 								Name:    "name",
@@ -946,6 +963,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, nil, nil, &eventWriterMocks.NodeExecutionEventWriter{})
 	nodeExecutions, err := nodeExecManager.ListNodeExecutions(context.Background(), admin.NodeExecutionListRequest{
 		WorkflowExecutionId: &core.WorkflowExecutionIdentifier{
+			Org:     org,
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
@@ -964,6 +982,7 @@ func TestListNodeExecutionsWithParent(t *testing.T) {
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     org,
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
@@ -1116,24 +1135,30 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			interfaces.NodeExecutionCollectionOutput, error) {
 			assert.Equal(t, 1, input.Limit)
 			assert.Equal(t, 2, input.Offset)
-			assert.Len(t, input.InlineFilters, 4)
+			assert.Len(t, input.InlineFilters, 5)
+
 			assert.Equal(t, common.Execution, input.InlineFilters[0].GetEntity())
 			queryExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-			assert.Equal(t, "project", queryExpr.Args)
-			assert.Equal(t, "execution_project = ?", queryExpr.Query)
+			assert.Equal(t, "org", queryExpr.Args)
+			assert.Equal(t, "execution_org = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[1].GetEntity())
 			queryExpr, _ = input.InlineFilters[1].GetGormQueryExpr()
-			assert.Equal(t, "domain", queryExpr.Args)
-			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+			assert.Equal(t, "project", queryExpr.Args)
+			assert.Equal(t, "execution_project = ?", queryExpr.Query)
 
 			assert.Equal(t, common.Execution, input.InlineFilters[2].GetEntity())
 			queryExpr, _ = input.InlineFilters[2].GetGormQueryExpr()
+			assert.Equal(t, "domain", queryExpr.Args)
+			assert.Equal(t, "execution_domain = ?", queryExpr.Query)
+
+			assert.Equal(t, common.Execution, input.InlineFilters[3].GetEntity())
+			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
 			assert.Equal(t, "name", queryExpr.Args)
 			assert.Equal(t, "execution_name = ?", queryExpr.Query)
 
-			assert.Equal(t, common.NodeExecution, input.InlineFilters[3].GetEntity())
-			queryExpr, _ = input.InlineFilters[3].GetGormQueryExpr()
+			assert.Equal(t, common.NodeExecution, input.InlineFilters[4].GetEntity())
+			queryExpr, _ = input.InlineFilters[4].GetGormQueryExpr()
 			assert.Equal(t, uint(8), queryExpr.Args)
 			assert.Equal(t, "parent_task_execution_id = ?", queryExpr.Query)
 
@@ -1144,6 +1169,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 						NodeExecutionKey: models.NodeExecutionKey{
 							NodeID: "node id",
 							ExecutionKey: models.ExecutionKey{
+								Org:     org,
 								Project: "project",
 								Domain:  "domain",
 								Name:    "name",
@@ -1164,6 +1190,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		TaskExecutionId: &core.TaskExecutionIdentifier{
 			NodeExecutionId: &core.NodeExecutionIdentifier{
 				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Org:     org,
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
@@ -1172,6 +1199,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 			},
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,
+				Org:          org,
 				Project:      "project",
 				Domain:       "domain",
 				Name:         "name",
@@ -1195,6 +1223,7 @@ func TestListNodeExecutionsForTask(t *testing.T) {
 		Id: &core.NodeExecutionIdentifier{
 			NodeId: "node id",
 			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     org,
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",

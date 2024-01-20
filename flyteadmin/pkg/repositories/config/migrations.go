@@ -1182,7 +1182,20 @@ var NoopMigrations = []*gormigrate.Migration{
 	},
 }
 
-var Migrations = append(LegacyMigrations, NoopMigrations...)
+var UnionMigrations = []*gormigrate.Migration{
+
+	{
+		ID: "2024-01-01-org-primary-key",
+		Migrate: func(tx *gorm.DB) error {
+			return migrateAddOrg(tx)
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return rollbackAddOrg(tx)
+		},
+	},
+}
+
+var Migrations = append(LegacyMigrations, append(NoopMigrations, UnionMigrations...)...)
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
 	var err error

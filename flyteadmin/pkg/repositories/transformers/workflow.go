@@ -30,6 +30,7 @@ func CreateWorkflowModel(request admin.WorkflowCreateRequest, remoteClosureIdent
 			Domain:  request.Id.Domain,
 			Name:    request.Id.Name,
 			Version: request.Id.Version,
+			Org:     request.Id.Org,
 		},
 		TypedInterface:          typedInterface,
 		RemoteClosureIdentifier: remoteClosureIdentifier,
@@ -44,6 +45,7 @@ func FromWorkflowModel(workflowModel models.Workflow) (admin.Workflow, error) {
 		Domain:       workflowModel.WorkflowKey.Domain,
 		Name:         workflowModel.WorkflowKey.Name,
 		Version:      workflowModel.WorkflowKey.Version,
+		Org:          workflowModel.WorkflowKey.Org,
 	}
 	createdAt, err := ptypes.TimestampProto(workflowModel.CreatedAt)
 	if err != nil {
@@ -94,6 +96,7 @@ func FromWorkflowModelsToIdentifiers(workflowModels []models.Workflow) []*admin.
 			Project: wf.Project,
 			Domain:  wf.Domain,
 			Name:    wf.Name,
+			Org:     wf.Org,
 		}
 	}
 

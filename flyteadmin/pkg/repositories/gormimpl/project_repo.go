@@ -31,11 +31,12 @@ func (r *ProjectRepo) Create(ctx context.Context, project models.Project) error 
 	return nil
 }
 
-func (r *ProjectRepo) Get(ctx context.Context, projectID string) (models.Project, error) {
+func (r *ProjectRepo) Get(ctx context.Context, projectID, org string) (models.Project, error) {
 	var project models.Project
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Project{
 		Identifier: projectID,
+		Org:        org,
 	}).Take(&project)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {

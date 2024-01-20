@@ -26,6 +26,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
+const org = "org"
 const project = "project"
 const domain = "domain"
 const name = "name"
@@ -451,10 +452,10 @@ func TestGetNamedEntity(t *testing.T) {
 }
 
 func TestGetActiveLaunchPlanVersionFilters(t *testing.T) {
-	filters, err := GetActiveLaunchPlanVersionFilters(project, domain, name)
+	filters, err := GetActiveLaunchPlanVersionFilters(org, project, domain, name)
 	assert.Nil(t, err)
 	assert.NotNil(t, filters)
-	assert.Len(t, filters, 4)
+	assert.Len(t, filters, 5)
 	for _, filter := range filters {
 		filterExpr, err := filter.GetGormQueryExpr()
 		assert.Nil(t, err)
@@ -463,14 +464,17 @@ func TestGetActiveLaunchPlanVersionFilters(t *testing.T) {
 }
 
 func TestListActiveLaunchPlanVersionsFilters(t *testing.T) {
-	filters, err := ListActiveLaunchPlanVersionsFilters(project, domain)
+	filters, err := ListActiveLaunchPlanVersionsFilters(org, project, domain)
 	assert.Nil(t, err)
-	assert.Len(t, filters, 3)
+	assert.Len(t, filters, 4)
 
-	projectExpr, _ := filters[0].GetGormQueryExpr()
-	domainExpr, _ := filters[1].GetGormQueryExpr()
-	activeExpr, _ := filters[2].GetGormQueryExpr()
+	orgExpr, _ := filters[0].GetGormQueryExpr()
+	projectExpr, _ := filters[1].GetGormQueryExpr()
+	domainExpr, _ := filters[2].GetGormQueryExpr()
+	activeExpr, _ := filters[3].GetGormQueryExpr()
 
+	assert.Equal(t, orgExpr.Args, org)
+	assert.Equal(t, orgExpr.Query, testutils.OrgQueryPattern)
 	assert.Equal(t, projectExpr.Args, project)
 	assert.Equal(t, projectExpr.Query, testutils.ProjectQueryPattern)
 	assert.Equal(t, domainExpr.Args, domain)
@@ -489,6 +493,7 @@ func TestGetMatchableResource(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Org:          org,
 				Project:      project,
 				Domain:       domain,
 				ResourceType: resourceType,
@@ -504,7 +509,7 @@ func TestGetMatchableResource(t *testing.T) {
 			}, nil
 		}
 
-		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
+		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, org, project, domain, "")
 		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
 		assert.Nil(t, err)
 	})
@@ -513,6 +518,7 @@ func TestGetMatchableResource(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Org:          org,
 				Project:      project,
 				Domain:       domain,
 				Workflow:     workflow,
@@ -529,7 +535,7 @@ func TestGetMatchableResource(t *testing.T) {
 			}, nil
 		}
 
-		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, workflow)
+		mr, err := GetMatchableResource(context.Background(), resourceManager, resourceType, org, project, domain, workflow)
 		assert.Equal(t, int32(12), mr.Attributes.GetWorkflowExecutionConfig().MaxParallelism)
 		assert.Nil(t, err)
 	})
@@ -539,6 +545,7 @@ func TestGetMatchableResource(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Org:          org,
 				Project:      project,
 				Domain:       domain,
 				ResourceType: resourceType,
@@ -546,7 +553,7 @@ func TestGetMatchableResource(t *testing.T) {
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.NotFound, "resource not found")
 		}
 
-		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
+		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, org, project, domain, "")
 		assert.Nil(t, err)
 	})
 
@@ -555,6 +562,7 @@ func TestGetMatchableResource(t *testing.T) {
 		resourceManager.GetResourceFunc = func(ctx context.Context,
 			request managerInterfaces.ResourceRequest) (*managerInterfaces.ResourceResponse, error) {
 			assert.EqualValues(t, request, managerInterfaces.ResourceRequest{
+				Org:          org,
 				Project:      project,
 				Domain:       domain,
 				ResourceType: resourceType,
@@ -562,7 +570,7 @@ func TestGetMatchableResource(t *testing.T) {
 			return nil, flyteAdminErrors.NewFlyteAdminError(codes.Internal, "internal error")
 		}
 
-		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, project, domain, "")
+		_, err := GetMatchableResource(context.Background(), resourceManager, resourceType, org, project, domain, "")
 		assert.NotNil(t, err)
 	})
 }

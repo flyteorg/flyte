@@ -50,6 +50,7 @@ func getMockLaunchPlanResponseFromDb(expected models.LaunchPlan) map[string]inte
 	launchPlan["workflow_id"] = expected.WorkflowID
 	launchPlan["closure"] = expected.Closure
 	launchPlan["state"] = expected.State
+	launchPlan["org"] = expected.Org
 	return launchPlan
 }
 
@@ -63,6 +64,7 @@ func TestGetLaunchPlan(t *testing.T) {
 			Domain:  domain,
 			Name:    name,
 			Version: version,
+			Org:     testOrg,
 		},
 		Spec:       launchPlanSpec,
 		WorkflowID: workflowID,
@@ -75,18 +77,20 @@ func TestGetLaunchPlan(t *testing.T) {
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "launch_plans" WHERE "launch_plans"."project" = $1 AND "launch_plans"."domain" = $2 AND "launch_plans"."name" = $3 AND "launch_plans"."version" = $4 LIMIT 1`).WithReply(launchPlans)
+		`SELECT * FROM "launch_plans" WHERE "launch_plans"."project" = $1 AND "launch_plans"."domain" = $2 AND "launch_plans"."name" = $3 AND "launch_plans"."version" = $4 AND "launch_plans"."org" = $5 LIMIT 1`).WithReply(launchPlans)
 	output, err := launchPlanRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,
 		Version: version,
+		Org:     testOrg,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, domain, output.Domain)
 	assert.Equal(t, name, output.Name)
 	assert.Equal(t, version, output.Version)
+	assert.Equal(t, testOrg, output.Org)
 	assert.Equal(t, launchPlanSpec, output.Spec)
 }
 
@@ -252,6 +256,7 @@ func TestListLaunchPlans_Pagination(t *testing.T) {
 				Domain:  domain,
 				Name:    name,
 				Version: version,
+				Org:     testOrg,
 			},
 			Spec:       launchPlanSpec,
 			WorkflowID: workflowID,
@@ -262,15 +267,17 @@ func TestListLaunchPlans_Pagination(t *testing.T) {
 	}
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 LIMIT 2 OFFSET 1`).WithReply(launchPlans)
+		`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."org","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.org = $4 LIMIT 2 OFFSET 1`).WithReply(launchPlans)
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
 			getEqualityFilter(common.LaunchPlan, "project", project),
 			getEqualityFilter(common.LaunchPlan, "domain", domain),
 			getEqualityFilter(common.LaunchPlan, "name", name),
+			getEqualityFilter(common.LaunchPlan, "org", testOrg),
 		},
 		Limit:  2,
 		Offset: 1,
@@ -283,6 +290,7 @@ func TestListLaunchPlans_Pagination(t *testing.T) {
 		assert.Equal(t, project, launchPlan.Project)
 		assert.Equal(t, domain, launchPlan.Domain)
 		assert.Equal(t, name, launchPlan.Name)
+		assert.Equal(t, testOrg, launchPlan.Org)
 		assert.Equal(t, versions[idx], launchPlan.Version)
 		assert.Equal(t, launchPlanSpec, launchPlan.Spec)
 		assert.Equal(t, workflowID, launchPlan.WorkflowID)
@@ -300,6 +308,7 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 			Domain:  domain,
 			Name:    name,
 			Version: "ABC",
+			Org:     testOrg,
 		},
 		Spec:       launchPlanSpec,
 		WorkflowID: workflowID,
@@ -311,7 +320,7 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	// Only match on queries that append the name filter
-	GlobalMock.NewMock().WithQuery(`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.version = $4 LIMIT 20`).WithReply(launchPlans[0:1])
+	GlobalMock.NewMock().WithQuery(`SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."org","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.version = $4 AND launch_plans.org = $5 LIMIT 20`).WithReply(launchPlans[0:1])
 
 	collection, err := launchPlanRepo.List(context.Background(), interfaces.ListResourceInput{
 		InlineFilters: []common.InlineFilter{
@@ -319,6 +328,7 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 			getEqualityFilter(common.LaunchPlan, "domain", domain),
 			getEqualityFilter(common.LaunchPlan, "name", name),
 			getEqualityFilter(common.LaunchPlan, "version", "ABC"),
+			getEqualityFilter(common.LaunchPlan, "org", testOrg),
 		},
 		Limit: 20,
 	})
@@ -329,6 +339,7 @@ func TestListLaunchPlans_Filters(t *testing.T) {
 	assert.Equal(t, project, collection.LaunchPlans[0].Project)
 	assert.Equal(t, domain, collection.LaunchPlans[0].Domain)
 	assert.Equal(t, name, collection.LaunchPlans[0].Name)
+	assert.Equal(t, testOrg, collection.LaunchPlans[0].Org)
 	assert.Equal(t, "ABC", collection.LaunchPlans[0].Version)
 	assert.Equal(t, launchPlanSpec, collection.LaunchPlans[0].Spec)
 	assert.Equal(t, workflowID, collection.LaunchPlans[0].WorkflowID)
@@ -391,6 +402,7 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 			Domain:  domain,
 			Name:    name,
 			Version: version,
+			Org:     testOrg,
 		},
 		Spec:       launchPlanSpec,
 		WorkflowID: workflowID,
@@ -400,11 +412,12 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 	launchPlans = append(launchPlans, launchPlan)
 
 	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
 	// HACK: gorm orders the filters on join clauses non-deterministically. Ordering of filters doesn't affect
 	// correctness, but because the mocket library only pattern matches on substrings, both variations of the (valid)
 	// SQL that gorm produces are checked below.
-	query := `SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND workflows.deleted_at = $4 LIMIT 20`
-	alternateQuery := `SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND workflows.deleted_at = $4 LIMIT 20`
+	query := `SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."org","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.org = $4 AND workflows.deleted_at = $5 LIMIT 20`
+	alternateQuery := `SELECT "launch_plans"."id","launch_plans"."created_at","launch_plans"."updated_at","launch_plans"."deleted_at","launch_plans"."project","launch_plans"."domain","launch_plans"."name","launch_plans"."version","launch_plans"."org","launch_plans"."spec","launch_plans"."workflow_id","launch_plans"."closure","launch_plans"."state","launch_plans"."digest","launch_plans"."schedule_type" FROM "launch_plans" inner join workflows on launch_plans.workflow_id = workflows.id WHERE launch_plans.project = $1 AND launch_plans.domain = $2 AND launch_plans.name = $3 AND launch_plans.org = $4 AND workflows.deleted_at = $5 LIMIT 20`
 	GlobalMock.NewMock().WithQuery(query).WithReply(launchPlans)
 	GlobalMock.NewMock().WithQuery(alternateQuery).WithReply(launchPlans)
 
@@ -413,6 +426,7 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 			getEqualityFilter(common.LaunchPlan, "project", project),
 			getEqualityFilter(common.LaunchPlan, "domain", domain),
 			getEqualityFilter(common.LaunchPlan, "name", name),
+			getEqualityFilter(common.LaunchPlan, "org", testOrg),
 			getEqualityFilter(common.Workflow, "deleted_at", "foo"),
 		},
 		Limit: 20,
@@ -425,6 +439,7 @@ func TestListLaunchPlansForWorkflow(t *testing.T) {
 		assert.Equal(t, project, launchPlan.Project)
 		assert.Equal(t, domain, launchPlan.Domain)
 		assert.Equal(t, name, launchPlan.Name)
+		assert.Equal(t, testOrg, launchPlan.Org)
 		assert.Contains(t, version, launchPlan.Version)
 		assert.Equal(t, launchPlanSpec, launchPlan.Spec)
 		assert.Equal(t, workflowID, launchPlan.WorkflowID)

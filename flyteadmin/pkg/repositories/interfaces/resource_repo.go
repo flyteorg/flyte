@@ -17,7 +17,7 @@ type ResourceRepoInterface interface {
 	// specificity resource.
 	GetProjectLevel(ctx context.Context, ID ResourceID) (models.Resource, error)
 	// Lists all resources
-	ListAll(ctx context.Context, resourceType string) ([]models.Resource, error)
+	ListAll(ctx context.Context, resourceType, org string) ([]models.Resource, error)
 	// Deletes a matching Type model when it exists.
 	Delete(ctx context.Context, ID ResourceID) error
 }
@@ -28,4 +28,5 @@ type ResourceID struct {
 	Workflow     string
 	LaunchPlan   string
 	ResourceType string
+	Org          string
 }

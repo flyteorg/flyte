@@ -352,7 +352,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 
 	// This will get the most specific Workflow Execution Config.
 	matchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, request.Domain, workflowName)
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Org, request.Project, request.Domain, workflowName)
 	if err != nil {
 		return nil, err
 	}
@@ -371,7 +371,7 @@ func (m *ExecutionManager) getExecutionConfig(ctx context.Context, request *admi
 	// system level defaults for the rest.
 	// See FLYTE-2322 for more background information.
 	projectMatchableResource, err := util.GetMatchableResource(ctx, m.resourceManager,
-		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Project, "", "")
+		admin.MatchableResource_WORKFLOW_EXECUTION_CONFIG, request.Org, request.Project, "", "")
 	if err != nil {
 		return nil, err
 	}
@@ -425,6 +425,7 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 	}
 
 	resource, err := m.resourceManager.GetResource(ctx, interfaces.ResourceRequest{
+		Org:          request.Org,
 		Project:      request.Project,
 		Domain:       request.Domain,
 		ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
@@ -448,6 +449,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	context.Context, *models.Execution, error) {
 
 	taskModel, err := m.db.TaskRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     request.Spec.LaunchPlan.Org,
 		Project: request.Spec.LaunchPlan.Project,
 		Domain:  request.Spec.LaunchPlan.Domain,
 		Name:    request.Spec.LaunchPlan.Name,
@@ -500,13 +502,14 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 
 	name := util.GetExecutionName(request)
 	workflowExecutionID := core.WorkflowExecutionIdentifier{
+		Org:     request.Org,
 		Project: request.Project,
 		Domain:  request.Domain,
 		Name:    name,
 	}
 	ctx = getExecutionContext(ctx, &workflowExecutionID)
 	namespace := common.GetNamespaceName(
-		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
+		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain)
 
 	requestSpec := request.Spec
 	if requestSpec.Metadata == nil {
@@ -531,11 +534,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
 		return nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -549,7 +552,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		labels = executionConfig.Labels.Values
 	}
 
-	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, request.Project, request.Org, labels)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1055,6 +1058,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	name := util.GetExecutionName(request)
 	workflowExecutionID := core.WorkflowExecutionIdentifier{
+		Org:     request.Org,
 		Project: request.Project,
 		Domain:  request.Domain,
 		Name:    name,
@@ -1084,11 +1088,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, *workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 	if err != nil {
 		return nil, nil, err
 	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1099,13 +1103,13 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	namespace := common.GetNamespaceName(
-		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
+		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Org, workflowExecutionID.Project, workflowExecutionID.Domain)
 
 	labels, err := resolveStringMap(executionConfig.GetLabels(), launchPlan.Spec.Labels, "labels", m.config.RegistrationValidationConfiguration().GetMaxLabelEntries())
 	if err != nil {
 		return nil, nil, err
 	}
-	labels, err = m.addProjectLabels(ctx, request.Project, labels)
+	labels, err = m.addProjectLabels(ctx, request.Project, request.Org, labels)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -1255,6 +1259,7 @@ func (m *ExecutionManager) publishExecutionStart(ctx context.Context, executionI
 func (m *ExecutionManager) createExecutionModel(
 	ctx context.Context, executionModel *models.Execution) (*core.WorkflowExecutionIdentifier, error) {
 	workflowExecutionIdentifier := core.WorkflowExecutionIdentifier{
+		Org:     executionModel.ExecutionKey.Org,
 		Project: executionModel.ExecutionKey.Project,
 		Domain:  executionModel.ExecutionKey.Domain,
 		Name:    executionModel.ExecutionKey.Name,
@@ -1332,6 +1337,7 @@ func (m *ExecutionManager) RelaunchExecution(
 	executionSpec.OverwriteCache = request.GetOverwriteCache()
 	var executionModel *models.Execution
 	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
+		Org:     request.Id.Org,
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,
@@ -1383,6 +1389,7 @@ func (m *ExecutionManager) RecoverExecution(
 	executionSpec.Metadata.ReferenceExecution = existingExecution.Id
 	var executionModel *models.Execution
 	ctx, executionModel, err = m.launchExecutionAndPrepareModel(ctx, admin.ExecutionCreateRequest{
+		Org:     request.Id.Org,
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Name,
@@ -1415,7 +1422,7 @@ func (m *ExecutionManager) emitScheduledWorkflowMetrics(
 	if err != nil {
 		logger.Warningf(context.Background(),
 			"failed to transform execution model when emitting scheduled workflow execution stats with for "+
-				"[%s/%s/%s]", executionModel.Project, executionModel.Domain, executionModel.Name)
+				"[%s/%s/%s/%s]", executionModel.Org, executionModel.Project, executionModel.Domain, executionModel.Name)
 		return
 	}
 	launchPlan, err := util.GetLaunchPlan(context.Background(), m.db, *execution.Spec.LaunchPlan)
@@ -1524,8 +1531,8 @@ func (m *ExecutionManager) emitOverallWorkflowExecutionTime(
 	}
 
 	if executionModel.ExecutionCreatedAt == nil {
-		logger.Warningf(context.Background(), "found execution with nil ExecutionCreatedAt: [%s/%s/%s]",
-			executionModel.Project, executionModel.Domain, executionModel.Name)
+		logger.Warningf(context.Background(), "found execution with nil ExecutionCreatedAt: [%s/%s/%s/%s]",
+			executionModel.Org, executionModel.Project, executionModel.Domain, executionModel.Name)
 		return
 	}
 	watch.Observe(*executionModel.ExecutionCreatedAt, terminalEventTime)
@@ -1656,7 +1663,7 @@ func (m *ExecutionManager) GetExecution(
 		return nil, err
 	}
 	namespace := common.GetNamespaceName(
-		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.GetId().GetProject(), request.GetId().GetDomain())
+		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.GetId().GetOrg(), request.GetId().GetProject(), request.GetId().GetDomain())
 	execution, transformerErr := transformers.FromExecutionModel(ctx, *executionModel, &transformers.ExecutionTransformerOptions{
 		DefaultNamespace: namespace,
 	})
@@ -1714,7 +1721,7 @@ func (m *ExecutionManager) GetExecutionData(
 		if err := proto.Unmarshal(executionModel.Closure, closure); err != nil {
 			return nil, err
 		}
-		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
+		newInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, closure.ComputedInputs, request.Id.Org, request.Id.Project, request.Id.Domain, request.Id.Name, shared.Inputs)
 		if err != nil {
 			return nil, err
 		}
@@ -1759,6 +1766,7 @@ func (m *ExecutionManager) ListExecutions(
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:            request.Id.Org,
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
 		Name:           request.Id.Name, // Optional, may be empty.
@@ -1895,6 +1903,7 @@ func (m *ExecutionManager) TerminateExecution(
 	ctx = getExecutionContext(ctx, request.Id)
 	// Save the abort reason (best effort)
 	executionModel, err := m.db.ExecutionRepo().Get(ctx, repositoryInterfaces.Identifier{
+		Org:     request.Id.Org,
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Id.Name,
@@ -1923,7 +1932,7 @@ func (m *ExecutionManager) TerminateExecution(
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
 	err = workflowExecutor.Abort(ctx, workflowengineInterfaces.AbortData{
 		Namespace: common.GetNamespaceName(
-			m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.Id.Project, request.Id.Domain),
+			m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), request.Id.Org, request.Id.Project, request.Id.Domain),
 
 		ExecutionID: request.Id,
 		Cluster:     executionModel.Cluster,
@@ -2009,8 +2018,8 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 }
 
 // Adds project labels with higher precedence to workflow labels. Project labels are ignored if a corresponding label is set on the workflow.
-func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName string, initialLabels map[string]string) (map[string]string, error) {
-	project, err := m.db.ProjectRepo().Get(ctx, projectName)
+func (m *ExecutionManager) addProjectLabels(ctx context.Context, projectName, org string, initialLabels map[string]string) (map[string]string, error) {
+	project, err := m.db.ProjectRepo().Get(ctx, projectName, org)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to get project for [%+v] with error: %v", project, err)
 		return nil, err

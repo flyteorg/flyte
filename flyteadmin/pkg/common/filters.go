@@ -75,6 +75,7 @@ var filterNameMappings = map[string]FilterExpression{
 }
 
 var executionIdentifierFields = map[string]bool{
+	"org":     true,
 	"project": true,
 	"domain":  true,
 	"name":    true,

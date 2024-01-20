@@ -178,6 +178,7 @@ func TestGetArtifactMetadataForSource(t *testing.T) {
 			execDomainKey:      tID.NodeExecutionId.ExecutionId.Domain,
 			execNodeIDKey:      tID.NodeExecutionId.NodeId,
 			execNameKey:        tID.NodeExecutionId.ExecutionId.Name,
+			execOrgKey:         tID.NodeExecutionId.ExecutionId.Org,
 		}},
 	}
 	for _, tt := range tests {

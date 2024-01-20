@@ -43,7 +43,7 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"name for ExecutionCreateRequest [%+v] exceeded allowed length %d", request, allowedExecutionNameLength)
 	}
-	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain); err != nil {
+	if err := ValidateProjectAndDomain(ctx, db, config, request.Project, request.Domain, request.Org); err != nil {
 		return err
 	}
 

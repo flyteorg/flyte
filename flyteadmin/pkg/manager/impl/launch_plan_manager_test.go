@@ -84,8 +84,7 @@ func TestCreateLaunchPlan(t *testing.T) {
 	var createCalled bool
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(
 		func(input models.LaunchPlan) error {
-			assert.Equal(t, []byte{0xc9, 0xa9, 0x1b, 0xf3, 0x0, 0x65, 0xe5, 0xce, 0xdb, 0xde, 0xbe, 0x14, 0x1b, 0x9b,
-				0x60, 0x8d, 0xeb, 0x69, 0x47, 0x69, 0xed, 0x82, 0xae, 0x2c, 0xde, 0x11, 0x70, 0xba, 0xdc, 0x11, 0xe8, 0xdb}, input.Digest)
+			assert.Equal(t, []byte{0x67, 0xc9, 0xe8, 0xc2, 0xa3, 0x6a, 0x1b, 0xb4, 0x1d, 0xb, 0x44, 0xc7, 0xca, 0xa5, 0x2a, 0xc1, 0x91, 0x32, 0xf, 0x31, 0x33, 0x94, 0xe, 0x2a, 0x8d, 0x89, 0x6b, 0x2d, 0xd7, 0x34, 0x49, 0xe2}, input.Digest)
 			createCalled = true
 			return nil
 		})
@@ -151,13 +150,16 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	closureBytes, _ := proto.Marshal(&closure)
 
 	launchPlanListFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
-		assert.Len(t, input.InlineFilters, 4)
+		assert.Len(t, input.InlineFilters, 5)
 
-		projectExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
-		domainExpr, _ := input.InlineFilters[1].GetGormQueryExpr()
-		nameExpr, _ := input.InlineFilters[2].GetGormQueryExpr()
-		activeExpr, _ := input.InlineFilters[3].GetGormQueryExpr()
+		orgExpr, _ := input.InlineFilters[0].GetGormQueryExpr()
+		projectExpr, _ := input.InlineFilters[1].GetGormQueryExpr()
+		domainExpr, _ := input.InlineFilters[2].GetGormQueryExpr()
+		nameExpr, _ := input.InlineFilters[3].GetGormQueryExpr()
+		activeExpr, _ := input.InlineFilters[4].GetGormQueryExpr()
 
+		assert.Equal(t, orgExpr.Args, org)
+		assert.Equal(t, orgExpr.Query, testutils.OrgQueryPattern)
 		assert.Equal(t, projectExpr.Args, project)
 		assert.Equal(t, projectExpr.Query, testutils.ProjectQueryPattern)
 		assert.Equal(t, domainExpr.Args, domain)
@@ -170,6 +172,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 			LaunchPlans: []models.LaunchPlan{
 				{
 					LaunchPlanKey: models.LaunchPlanKey{
+						Org:     lpRequest.Id.Org,
 						Project: lpRequest.Id.Project,
 						Domain:  lpRequest.Id.Domain,
 						Name:    lpRequest.Id.Name,
@@ -186,6 +189,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan(t *testing.T) {
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(launchPlanListFunc)
 	response, err := lpManager.GetActiveLaunchPlan(context.Background(), admin.ActiveLaunchPlanRequest{
 		Id: &admin.NamedEntityIdentifier{
+			Org:     lpRequest.Id.Org,
 			Project: lpRequest.Id.Project,
 			Domain:  lpRequest.Id.Domain,
 			Name:    lpRequest.Id.Name,
@@ -211,7 +215,7 @@ func TestLaunchPlanManager_GetActiveLaunchPlan_NoneActive(t *testing.T) {
 			Name:    lpRequest.Id.Name,
 		},
 	})
-	assert.EqualError(t, err, "No active launch plan could be found: project:domain:name")
+	assert.EqualError(t, err, "No active launch plan could be found: :project:domain:name")
 	assert.Nil(t, response)
 }
 

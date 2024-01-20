@@ -22,6 +22,7 @@ import (
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+const org = "org-baz"
 const proj = "project-foo"
 const domain = "domain-bar"
 
@@ -121,7 +122,7 @@ func TestPopulateDefaultTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues(t *testing.T) {
 	adminDataProvider := mocks.FlyteAdminDataProvider{}
-	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, proj, domain).Return(&admin.ClusterResourceAttributes{
+	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, org, proj, domain).Return(&admin.ClusterResourceAttributes{
 		Attributes: map[string]string{
 			"var1": "val1",
 			"var2": "val2",
@@ -135,7 +136,7 @@ func TestGetCustomTemplateValues(t *testing.T) {
 		"{{ var1 }}": "i'm getting overwritten",
 		"{{ var3 }}": "persist",
 	}
-	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), proj, domain, domainTemplateValues)
+	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), org, proj, domain, domainTemplateValues)
 	assert.Nil(t, err)
 	assert.EqualValues(t, templateValuesType{
 		"{{ var1 }}": "val1",
@@ -148,12 +149,12 @@ func TestGetCustomTemplateValues(t *testing.T) {
 
 func TestGetCustomTemplateValues_NothingToOverride(t *testing.T) {
 	adminDataProvider := mocks.FlyteAdminDataProvider{}
-	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, proj, domain).Return(
+	adminDataProvider.OnGetClusterResourceAttributesMatch(mock.Anything, org, proj, domain).Return(
 		nil, errors.NewFlyteAdminError(codes.NotFound, "foo"))
 	testController := controller{
 		adminDataProvider: &adminDataProvider,
 	}
-	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), proj, domain, templateValuesType{
+	customTemplateValues, err := testController.getCustomTemplateValues(context.Background(), org, proj, domain, templateValuesType{
 		"{{ var1 }}": "val1",
 		"{{ var2 }}": "val2",
 	})

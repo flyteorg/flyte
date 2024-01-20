@@ -46,6 +46,7 @@ var childExecutionID = &core.WorkflowExecutionIdentifier{
 	Project: "p",
 	Domain:  "d",
 	Name:    "name",
+	Org:     testOrg,
 }
 
 const dynamicWorkflowClosureRef = "s3://bucket/admin/metadata/workflow"
@@ -127,6 +128,7 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
+					Org:     testOrg,
 				},
 			},
 			Phase: core.NodeExecution_SUCCEEDED,
@@ -154,14 +156,14 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 	t.Run("output data stored offloaded", func(t *testing.T) {
 		mockStorage := commonMocks.GetMockStorageClient()
 		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
-			assert.Equal(t, reference.String(), "s3://bucket/metadata/project/domain/name/node id/offloaded_outputs")
+			assert.Equal(t, reference.String(), "s3://bucket/metadata/org/project/domain/name/node id/offloaded_outputs")
 			return nil
 		}
 
 		err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
 			interfaces.InlineEventDataPolicyOffload, mockStorage)
 		assert.Nil(t, err)
-		assert.Equal(t, "s3://bucket/metadata/project/domain/name/node id/offloaded_outputs", closure.GetOutputUri())
+		assert.Equal(t, "s3://bucket/metadata/org/project/domain/name/node id/offloaded_outputs", closure.GetOutputUri())
 	})
 }
 
@@ -203,6 +205,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
+					Org:     testOrg,
 				},
 			},
 			Phase: core.NodeExecution_RUNNING,
@@ -222,6 +225,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 							Name:         "x",
 							Project:      "proj",
 							Domain:       "domain",
+							Org:          testOrg,
 						},
 					},
 					CheckpointUri: "last checkpoint uri",
@@ -274,6 +278,7 @@ func TestCreateNodeExecutionModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 		},
 		Phase:                  "RUNNING",
@@ -347,6 +352,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 								Name:         "x",
 								Project:      "proj",
 								Domain:       "domain",
+								Org:          testOrg,
 							},
 						},
 						DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
@@ -356,6 +362,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 								Project:      "proj",
 								Domain:       "domain",
 								Version:      "v",
+								Org:          testOrg,
 							},
 							CompiledWorkflow: &core.CompiledWorkflowClosure{
 								Primary: &core.CompiledWorkflow{
@@ -462,7 +469,7 @@ func TestUpdateNodeExecutionModel(t *testing.T) {
 		err = UpdateNodeExecutionModel(context.TODO(), &request, &nodeExecutionModel, childExecutionID, dynamicWorkflowClosureRef,
 			interfaces.InlineEventDataPolicyStoreInline, ds)
 		assert.Nil(t, err)
-		assert.Equal(t, nodeExecutionModel.InputURI, "/metadata/project/domain/name/node-id/offloaded_inputs")
+		assert.Equal(t, nodeExecutionModel.InputURI, "/metadata/org/project/domain/name/node-id/offloaded_inputs")
 	})
 	t.Run("input data URI", func(t *testing.T) {
 		request := admin.NodeExecutionEventRequest{
@@ -497,6 +504,7 @@ func TestFromNodeExecutionModel(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 	}
 	nodeExecution, err := FromNodeExecutionModel(models.NodeExecution{
@@ -506,6 +514,7 @@ func TestFromNodeExecutionModel(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 		},
 		Phase:                 "NodeExecutionPhase_NODE_PHASE_RUNNING",
@@ -541,6 +550,7 @@ func TestFromNodeExecutionModel_Error(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 		},
 		Closure:               executionClosureBytes,
@@ -563,6 +573,7 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 			Project: "project",
 			Domain:  "domain",
 			Name:    "name",
+			Org:     testOrg,
 		},
 	}
 	nodeExecModel := models.NodeExecution{
@@ -572,6 +583,7 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 				Project: "project",
 				Domain:  "domain",
 				Name:    "name",
+				Org:     testOrg,
 			},
 		},
 		Phase:                 "NodeExecutionPhase_NODE_PHASE_RUNNING",
@@ -584,6 +596,7 @@ func TestFromNodeExecutionModelWithChildren(t *testing.T) {
 					Project: "project",
 					Domain:  "domain",
 					Name:    "name",
+					Org:     testOrg,
 				},
 			}},
 		},
@@ -668,7 +681,7 @@ func TestHandleNodeExecutionInputs(t *testing.T) {
 			},
 		}, ds)
 		assert.NoError(t, err)
-		expectedOffloadedInputsLocation := "/metadata/project/domain/name/node-id/offloaded_inputs"
+		expectedOffloadedInputsLocation := "/metadata/org/project/domain/name/node-id/offloaded_inputs"
 		assert.Equal(t, nodeExecutionModel.InputURI, expectedOffloadedInputsLocation)
 		actualInputs := &core.LiteralMap{}
 		err = ds.ReadProtobuf(ctx, storage.DataReference(expectedOffloadedInputsLocation), actualInputs)

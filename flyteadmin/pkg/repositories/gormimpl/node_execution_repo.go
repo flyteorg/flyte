@@ -41,6 +41,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 			},
 		},
 	}).Take(&nodeExecution)
@@ -54,6 +55,7 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 				},
 			})
 	} else if tx.Error != nil {
@@ -73,6 +75,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 			},
 		},
 	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
@@ -86,6 +89,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+					Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 				},
 			})
 	} else if tx.Error != nil {
@@ -116,8 +120,8 @@ func (r *NodeExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	// And add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// (this query isn't called for deletes).
 	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
-		executionTableName, nodeExecutionTableName, executionTableName,
+		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
+		executionTableName, nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName,
 		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters
@@ -151,6 +155,7 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
+				Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 			},
 		},
 	}).Take(&nodeExecution)
@@ -168,8 +173,8 @@ func (r *NodeExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 	// Add join condition (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// (this query isn't called for deletes).
 	tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_project = %s.execution_project AND "+
-		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name",
-		executionTableName, nodeExecutionTableName, executionTableName,
+		"%s.execution_domain = %s.execution_domain AND %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
+		executionTableName, nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName,
 		nodeExecutionTableName, executionTableName, nodeExecutionTableName, executionTableName))
 
 	// Apply filters

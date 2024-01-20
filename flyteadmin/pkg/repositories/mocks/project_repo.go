@@ -27,7 +27,7 @@ func (r *MockProjectRepo) Create(ctx context.Context, project models.Project) er
 	return nil
 }
 
-func (r *MockProjectRepo) Get(ctx context.Context, projectID string) (models.Project, error) {
+func (r *MockProjectRepo) Get(ctx context.Context, projectID, org string) (models.Project, error) {
 	if r.GetFunction != nil {
 		return r.GetFunction(ctx, projectID)
 	}

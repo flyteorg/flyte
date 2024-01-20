@@ -27,12 +27,15 @@ import (
 var taskEventOccurredAt = time.Now().UTC()
 var taskEventOccurredAtProto, _ = ptypes.TimestampProto(taskEventOccurredAt)
 
+const taskOrg = "task-org"
+
 var sampleTaskID = &core.Identifier{
 	ResourceType: core.ResourceType_TASK,
 	Project:      "project",
 	Domain:       "domain",
 	Name:         "task-id",
 	Version:      "task-v",
+	Org:          taskOrg,
 }
 
 var sampleNodeExecID = &core.NodeExecutionIdentifier{
@@ -41,6 +44,7 @@ var sampleNodeExecID = &core.NodeExecutionIdentifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "name",
+		Org:     testOrg,
 	},
 }
 
@@ -201,6 +205,7 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 				Domain:       "domain",
 				Name:         "name",
 				Version:      "version",
+				Org:          taskOrg,
 			},
 			RetryAttempt: 1,
 			ParentNodeExecutionId: &core.NodeExecutionIdentifier{
@@ -209,6 +214,7 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 					Project: "ex project",
 					Domain:  "ex domain",
 					Name:    "ex name",
+					Org:     testOrg,
 				},
 			},
 			Phase: core.TaskExecution_SUCCEEDED,
@@ -238,7 +244,7 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 	t.Run("output data stored offloaded", func(t *testing.T) {
 		mockStorage := commonMocks.GetMockStorageClient()
 		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
-			assert.Equal(t, reference.String(), "s3://bucket/metadata/ex project/ex domain/ex name/node id/project/domain/name/version/1/offloaded_outputs")
+			assert.Equal(t, reference.String(), "s3://bucket/metadata/org/ex project/ex domain/ex name/node id/task-org/project/domain/name/version/1/offloaded_outputs")
 			return nil
 		}
 
@@ -246,7 +252,7 @@ func TestAddTaskTerminalState_OutputData(t *testing.T) {
 		err := addTaskTerminalState(context.TODO(), &request, &taskExecutionModel, closure,
 			interfaces.InlineEventDataPolicyOffload, mockStorage)
 		assert.Nil(t, err)
-		assert.Equal(t, "s3://bucket/metadata/ex project/ex domain/ex name/node id/project/domain/name/version/1/offloaded_outputs", closure.GetOutputUri())
+		assert.Equal(t, "s3://bucket/metadata/org/ex project/ex domain/ex name/node id/task-org/project/domain/name/version/1/offloaded_outputs", closure.GetOutputUri())
 	})
 
 	assert.Equal(t, time.Minute, taskExecutionModel.Duration)
@@ -299,6 +305,7 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 				Domain:  sampleTaskID.Domain,
 				Name:    sampleTaskID.Name,
 				Version: sampleTaskID.Version,
+				Org:     sampleTaskID.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: sampleNodeExecID.NodeId,
@@ -306,12 +313,13 @@ func TestCreateTaskExecutionModelQueued(t *testing.T) {
 					Project: sampleNodeExecID.ExecutionId.Project,
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
+					Org:     sampleNodeExecID.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
 		},
 		Phase:                  "QUEUED",
-		InputURI:               "/metadata/project/domain/name/node-id/project/domain/task-id/task-v/1/offloaded_inputs",
+		InputURI:               "/metadata/org/project/domain/name/node-id/task-org/project/domain/task-id/task-v/1/offloaded_inputs",
 		Closure:                expectedClosureBytes,
 		StartedAt:              nil,
 		TaskExecutionCreatedAt: &taskEventOccurredAt,
@@ -381,6 +389,7 @@ func TestCreateTaskExecutionModelRunning(t *testing.T) {
 				Domain:  sampleTaskID.Domain,
 				Name:    sampleTaskID.Name,
 				Version: sampleTaskID.Version,
+				Org:     sampleTaskID.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: sampleNodeExecID.NodeId,
@@ -388,6 +397,7 @@ func TestCreateTaskExecutionModelRunning(t *testing.T) {
 					Project: sampleNodeExecID.ExecutionId.Project,
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
+					Org:     sampleNodeExecID.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -525,6 +535,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 				Domain:  sampleTaskID.Domain,
 				Name:    sampleTaskID.Name,
 				Version: sampleTaskID.Version,
+				Org:     sampleTaskID.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: sampleNodeExecID.NodeId,
@@ -532,6 +543,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 					Project: sampleNodeExecID.ExecutionId.Project,
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
+					Org:     sampleNodeExecID.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -630,6 +642,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 				Domain:  sampleTaskID.Domain,
 				Name:    sampleTaskID.Name,
 				Version: sampleTaskID.Version,
+				Org:     sampleTaskID.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: sampleNodeExecID.NodeId,
@@ -637,6 +650,7 @@ func TestUpdateTaskExecutionModelRunningToFailed(t *testing.T) {
 					Project: sampleNodeExecID.ExecutionId.Project,
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
+					Org:     sampleNodeExecID.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -677,6 +691,7 @@ func TestUpdateTaskExecutionModelSingleEvents(t *testing.T) {
 				Domain:  sampleTaskID.Domain,
 				Name:    sampleTaskID.Name,
 				Version: sampleTaskID.Version,
+				Org:     sampleTaskID.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: sampleNodeExecID.NodeId,
@@ -684,6 +699,7 @@ func TestUpdateTaskExecutionModelSingleEvents(t *testing.T) {
 					Project: sampleNodeExecID.ExecutionId.Project,
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
+					Org:     sampleNodeExecID.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -769,6 +785,7 @@ func TestUpdateTaskExecutionModelBatchedEvents(t *testing.T) {
 				Domain:  sampleTaskID.Domain,
 				Name:    sampleTaskID.Name,
 				Version: sampleTaskID.Version,
+				Org:     sampleTaskID.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: sampleNodeExecID.NodeId,
@@ -776,6 +793,7 @@ func TestUpdateTaskExecutionModelBatchedEvents(t *testing.T) {
 					Project: sampleNodeExecID.ExecutionId.Project,
 					Domain:  sampleNodeExecID.ExecutionId.Domain,
 					Name:    sampleNodeExecID.ExecutionId.Name,
+					Org:     sampleNodeExecID.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -871,6 +889,7 @@ func TestFromTaskExecutionModel(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 				Version: "version",
+				Org:     testOrg,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: "node id",
@@ -878,6 +897,7 @@ func TestFromTaskExecutionModel(t *testing.T) {
 					Project: "ex project",
 					Domain:  "ex domain",
 					Name:    "ex name",
+					Org:     testOrg,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -896,6 +916,7 @@ func TestFromTaskExecutionModel(t *testing.T) {
 				Domain:       "domain",
 				Name:         "name",
 				Version:      "version",
+				Org:          testOrg,
 			},
 			RetryAttempt: 1,
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -904,6 +925,7 @@ func TestFromTaskExecutionModel(t *testing.T) {
 					Project: "ex project",
 					Domain:  "ex domain",
 					Name:    "ex name",
+					Org:     testOrg,
 				},
 			},
 		},
@@ -930,6 +952,7 @@ func TestFromTaskExecutionModel_Error(t *testing.T) {
 				Domain:  "domain",
 				Name:    "name",
 				Version: "version",
+				Org:     testOrg,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: "node id",
@@ -937,6 +960,7 @@ func TestFromTaskExecutionModel_Error(t *testing.T) {
 					Project: "ex project",
 					Domain:  "ex domain",
 					Name:    "ex name",
+					Org:     testOrg,
 				},
 			},
 			RetryAttempt: &retryAttemptValue,
@@ -993,6 +1017,7 @@ func TestFromTaskExecutionModels(t *testing.T) {
 					Domain:  "domain",
 					Name:    "name",
 					Version: "version",
+					Org:     testOrg,
 				},
 				NodeExecutionKey: models.NodeExecutionKey{
 					NodeID: "nodey",
@@ -1000,6 +1025,7 @@ func TestFromTaskExecutionModels(t *testing.T) {
 						Project: "ex project",
 						Domain:  "ex domain",
 						Name:    "ex name",
+						Org:     testOrg,
 					},
 				},
 				RetryAttempt: &retryAttemptValue,
@@ -1020,6 +1046,7 @@ func TestFromTaskExecutionModels(t *testing.T) {
 				Domain:       "domain",
 				Name:         "name",
 				Version:      "version",
+				Org:          testOrg,
 			},
 			RetryAttempt: 1,
 			NodeExecutionId: &core.NodeExecutionIdentifier{
@@ -1028,6 +1055,7 @@ func TestFromTaskExecutionModels(t *testing.T) {
 					Project: "ex project",
 					Domain:  "ex domain",
 					Name:    "ex name",
+					Org:     testOrg,
 				},
 			},
 		},
@@ -1619,7 +1647,7 @@ func TestHandleTaskExecutionInputs(t *testing.T) {
 			},
 		}, ds)
 		assert.NoError(t, err)
-		expectedOffloadedInputsLocation := "/metadata/project/domain/name/node-id/project/domain/task-id/task-v/1/offloaded_inputs"
+		expectedOffloadedInputsLocation := "/metadata/org/project/domain/name/node-id/task-org/project/domain/task-id/task-v/1/offloaded_inputs"
 		assert.Equal(t, taskExecutionModel.InputURI, expectedOffloadedInputsLocation)
 		actualInputs := &core.LiteralMap{}
 		err = ds.ReadProtobuf(ctx, storage.DataReference(expectedOffloadedInputsLocation), actualInputs)

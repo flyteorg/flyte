@@ -171,6 +171,7 @@ func (t *TaskManager) ListTasks(ctx context.Context, request admin.ResourceListR
 	ctx = contextutils.WithProjectDomain(ctx, request.Id.Project, request.Id.Domain)
 	ctx = contextutils.WithTaskID(ctx, request.Id.Name)
 	spec := util.FilterSpec{
+		Org:            request.Id.Org,
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
 		Name:           request.Id.Name,
@@ -231,6 +232,7 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:     request.Org,
 		Project: request.Project,
 		Domain:  request.Domain,
 	}, common.Task)

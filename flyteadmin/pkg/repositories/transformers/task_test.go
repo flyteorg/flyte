@@ -41,6 +41,7 @@ func TestFromTaskModel(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		Closure: testutils.GetTaskClosureBytes(),
 	}
@@ -52,6 +53,7 @@ func TestFromTaskModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
+		Org:          testOrg,
 	}, task.Id))
 	expectedClosure := testutils.GetTaskClosure()
 	expectedClosure.CreatedAt = createdAtProto
@@ -75,6 +77,7 @@ func TestFromTaskModels(t *testing.T) {
 				Domain:  "domain a",
 				Name:    "name a",
 				Version: "version a",
+				Org:     testOrg,
 			},
 			Closure: testutils.GetTaskClosureBytes(),
 		},
@@ -100,6 +103,7 @@ func TestFromTaskModels(t *testing.T) {
 		Domain:       "domain a",
 		Name:         "name a",
 		Version:      "version a",
+		Org:          testOrg,
 	}, taskList[0].Id))
 	expectedClosure := testutils.GetTaskClosure()
 	expectedClosure.CreatedAt = createdAtAProto
@@ -126,6 +130,7 @@ func TestFromTaskModelsToIdentifiers(t *testing.T) {
 				Domain:  "domain a",
 				Name:    "name a",
 				Version: "version a",
+				Org:     testOrg,
 			},
 		},
 		{
@@ -142,6 +147,7 @@ func TestFromTaskModelsToIdentifiers(t *testing.T) {
 	assert.Equal(t, "domain a", taskIds[0].Domain)
 	assert.Equal(t, "project a", taskIds[0].Project)
 	assert.Equal(t, "name a", taskIds[0].Name)
+	assert.Equal(t, testOrg, taskIds[0].Org)
 	assert.Equal(t, "domain b", taskIds[1].Domain)
 	assert.Equal(t, "project b", taskIds[1].Project)
 	assert.Equal(t, "name b", taskIds[1].Name)

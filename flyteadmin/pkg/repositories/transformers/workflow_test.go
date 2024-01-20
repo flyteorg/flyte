@@ -26,6 +26,7 @@ func TestCreateWorkflow(t *testing.T) {
 	assert.Equal(t, "domain", workflow.Domain)
 	assert.Equal(t, "name", workflow.Name)
 	assert.Equal(t, "version", workflow.Version)
+	assert.Equal(t, testOrg, workflow.Org)
 	expectedTypedInterface := testutils.GetWorkflowRequestInterfaceBytes()
 	assert.Equal(t, expectedTypedInterface, workflow.TypedInterface)
 	assert.Equal(t, remoteClosureIdentifier, workflow.RemoteClosureIdentifier)
@@ -41,6 +42,7 @@ func TestCreateWorkflowEmptyInterface(t *testing.T) {
 	assert.Equal(t, "domain", workflow.Domain)
 	assert.Equal(t, "name", workflow.Name)
 	assert.Equal(t, "version", workflow.Version)
+	assert.Equal(t, testOrg, workflow.Org)
 	assert.Empty(t, workflow.TypedInterface)
 	assert.Equal(t, remoteClosureIdentifier, workflow.RemoteClosureIdentifier)
 	assert.Equal(t, workflowDigest, workflow.Digest)
@@ -58,6 +60,7 @@ func TestFromWorkflowModel(t *testing.T) {
 			Domain:  "domain",
 			Name:    "name",
 			Version: "version",
+			Org:     testOrg,
 		},
 		TypedInterface:          testutils.GetWorkflowRequestInterfaceBytes(),
 		RemoteClosureIdentifier: remoteClosureIdentifier,
@@ -70,6 +73,7 @@ func TestFromWorkflowModel(t *testing.T) {
 		Domain:       "domain",
 		Name:         "name",
 		Version:      "version",
+		Org:          testOrg,
 	}, workflow.Id))
 
 	var workflowInterface core.TypedInterface
@@ -105,6 +109,7 @@ func TestFromWorkflowModels(t *testing.T) {
 				Domain:  "domain a",
 				Name:    "name a",
 				Version: "version a",
+				Org:     testOrg,
 			},
 			TypedInterface:          testutils.GetWorkflowRequestInterfaceBytes(),
 			RemoteClosureIdentifier: remoteClosureIdentifier,
@@ -131,6 +136,7 @@ func TestFromWorkflowModels(t *testing.T) {
 		Domain:       "domain a",
 		Name:         "name a",
 		Version:      "version a",
+		Org:          testOrg,
 	}, workflowList[0].Id))
 
 	workflowInterface := testutils.GetWorkflowRequestInterface()

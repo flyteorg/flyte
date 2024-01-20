@@ -42,6 +42,7 @@ func (r *SchedulableEntityRepo) Activate(ctx context.Context, input models.Sched
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
+			Org:     input.Org,
 		},
 	}).Take(&schedulableEntity)
 	timer.Stop()
@@ -91,6 +92,7 @@ func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEn
 			Domain:  ID.Domain,
 			Name:    ID.Name,
 			Version: ID.Version,
+			Org:     ID.Org,
 		},
 	}).Take(&schedulableEntity)
 	timer.Stop()
@@ -103,6 +105,7 @@ func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEn
 					Domain:  ID.Domain,
 					Name:    ID.Name,
 					Version: ID.Version,
+					Org:     ID.Org,
 				})
 		}
 		return models.SchedulableEntity{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -120,6 +123,7 @@ func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityK
 			Domain:  ID.Domain,
 			Name:    ID.Name,
 			Version: ID.Version,
+			Org:     ID.Org,
 		},
 	}).Update("active", activate)
 	timer.Stop()
@@ -130,6 +134,7 @@ func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityK
 				Domain:  ID.Domain,
 				Name:    ID.Name,
 				Version: ID.Version,
+				Org:     ID.Org,
 			})
 		}
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)

@@ -22,6 +22,7 @@ func CreateNodeExecutionEventModel(request admin.NodeExecutionEventRequest) (*mo
 				Project: request.Event.Id.ExecutionId.Project,
 				Domain:  request.Event.Id.ExecutionId.Domain,
 				Name:    request.Event.Id.ExecutionId.Name,
+				Org:     request.GetEvent().GetId().GetExecutionId().Org,
 			},
 		},
 		RequestID:  request.RequestId,

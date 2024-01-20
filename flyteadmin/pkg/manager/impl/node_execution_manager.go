@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -171,13 +172,18 @@ func (m *NodeExecutionManager) updateNodeExecutionWithEvent(
 }
 
 func formatDynamicWorkflowID(identifier *core.Identifier) string {
-	return fmt.Sprintf("%s_%s_%s_%s", identifier.Project, identifier.Domain, identifier.Name, identifier.Version)
+	var orgFmtStr string
+	if len(identifier.Org) > 0 {
+		orgFmtStr = fmt.Sprintf("%s_", identifier.Org)
+	}
+	return fmt.Sprintf("%s%s_%s_%s_%s", orgFmtStr, identifier.Project, identifier.Domain, identifier.Name, identifier.Version)
 }
 
 func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 	ctx context.Context, nodeID *core.NodeExecutionIdentifier, workflowID *core.Identifier,
 	compiledWorkflowClosure *core.CompiledWorkflowClosure) (storage.DataReference, error) {
 	nestedSubKeys := []string{
+		nodeID.ExecutionId.Org,
 		nodeID.ExecutionId.Project,
 		nodeID.ExecutionId.Domain,
 		nodeID.ExecutionId.Name,
@@ -185,6 +191,9 @@ func (m *NodeExecutionManager) uploadDynamicWorkflowClosure(
 		formatDynamicWorkflowID(workflowID),
 	}
 	nestedKeys := append(m.storagePrefix, nestedSubKeys...)
+	nestedKeys = lo.Filter(nestedKeys, func(key string, _ int) bool {
+		return key != ""
+	})
 	remoteClosureDataRef, err := m.storageClient.ConstructReference(ctx, m.storageClient.GetBaseContainerFQN(ctx), nestedKeys...)
 
 	if err != nil {
@@ -211,6 +220,7 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 
 	executionID := request.Event.Id.ExecutionId
 	workflowExecution, err := m.db.ExecutionRepo().Get(ctx, repoInterfaces.Identifier{
+		Org:     executionID.Org,
 		Project: executionID.Project,
 		Domain:  executionID.Domain,
 		Name:    executionID.Name,
@@ -328,6 +338,7 @@ func (m *NodeExecutionManager) transformNodeExecutionModelList(ctx context.Conte
 	for idx, nodeExecutionModel := range nodeExecutionModels {
 		nodeExecution, err := m.transformNodeExecutionModel(ctx, nodeExecutionModel, &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
+				Org:     nodeExecutionModel.Org,
 				Project: nodeExecutionModel.Project,
 				Domain:  nodeExecutionModel.Domain,
 				Name:    nodeExecutionModel.Name,

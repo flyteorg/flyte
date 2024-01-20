@@ -27,7 +27,7 @@ func TestCreateProject(t *testing.T) {
 	query := GlobalMock.NewMock()
 	GlobalMock.Logging = true
 	query.WithQuery(
-		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","name","description","labels","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING "id"`)
+		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","org","name","description","labels","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING "id"`)
 
 	activeState := int32(admin.Project_ACTIVE)
 	err := projectRepo.Create(context.Background(), models.Project{
@@ -35,6 +35,7 @@ func TestCreateProject(t *testing.T) {
 		Name:        "proj",
 		Description: "projDescription",
 		State:       &activeState,
+		Org:         testOrg,
 	})
 	assert.NoError(t, err)
 	assert.True(t, query.Triggered)
@@ -49,24 +50,26 @@ func TestGetProject(t *testing.T) {
 	response["name"] = "project_name"
 	response["description"] = "project_description"
 	response["state"] = admin.Project_ACTIVE
+	response["org"] = testOrg
 
-	output, err := projectRepo.Get(context.Background(), "project_id")
+	output, err := projectRepo.Get(context.Background(), "project_id", testOrg)
 	assert.Empty(t, output)
 	assert.EqualError(t, err, "project [project_id] not found")
 
 	query := GlobalMock.NewMock()
 	GlobalMock.Logging = true
-	query.WithQuery(`SELECT * FROM "projects" WHERE "projects"."identifier" = $1 LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "projects" WHERE "projects"."identifier" = $1 AND "projects"."org" = $2 LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
 
-	output, err = projectRepo.Get(context.Background(), "project_id")
+	output, err = projectRepo.Get(context.Background(), "project_id", testOrg)
 	assert.Nil(t, err)
 	assert.Equal(t, "project_id", output.Identifier)
 	assert.Equal(t, "project_name", output.Name)
 	assert.Equal(t, "project_description", output.Description)
 	assert.Equal(t, int32(admin.Project_ACTIVE), *output.State)
+	assert.Equal(t, testOrg, output.Org)
 }
 
 func testListProjects(input interfaces.ListResourceInput, sql string, t *testing.T) {

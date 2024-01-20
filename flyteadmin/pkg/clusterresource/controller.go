@@ -191,7 +191,7 @@ func populateDefaultTemplateValues(defaultData map[runtimeInterfaces.DomainName]
 // substitutions based on the input project and domain. These database values are overlaid on top of the configured
 // variable defaults for the specific domain as defined in the admin application config file.
 func (c *controller) getCustomTemplateValues(
-	ctx context.Context, project, domain string, domainTemplateValues templateValuesType) (templateValuesType, error) {
+	ctx context.Context, org, project, domain string, domainTemplateValues templateValuesType) (templateValuesType, error) {
 	if len(domainTemplateValues) == 0 {
 		domainTemplateValues = make(templateValuesType)
 	}
@@ -201,7 +201,7 @@ func (c *controller) getCustomTemplateValues(
 	}
 	collectedErrs := make([]error, 0)
 	// All override values saved in the database take precedence over the domain-specific defaults.
-	attributes, err := c.adminDataProvider.GetClusterResourceAttributes(ctx, project, domain)
+	attributes, err := c.adminDataProvider.GetClusterResourceAttributes(ctx, org, project, domain)
 	if err != nil {
 		s, ok := status.FromError(err)
 		if !ok || s.Code() != codes.NotFound {
@@ -589,9 +589,9 @@ func (c *controller) Sync(ctx context.Context) error {
 
 	for _, project := range projects.Projects {
 		for _, domain := range project.Domains {
-			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Id, domain.Name)
+			namespace := common.GetNamespaceName(c.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), project.Org, project.Id, domain.Name)
 			customTemplateValues, err := c.getCustomTemplateValues(
-				ctx, project.Id, domain.Id, domainTemplateValues[domain.Id])
+				ctx, project.Org, project.Id, domain.Id, domainTemplateValues[domain.Id])
 			if err != nil {
 				logger.Errorf(ctx, "Failed to get custom template values for %s with err: %v", namespace, err)
 				errs = append(errs, err)

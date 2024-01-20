@@ -210,6 +210,7 @@ func (m *LaunchPlanManager) updateSchedules(
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to unmarshal newly enabled launch plan spec")
 	}
 	launchPlanIdentifier := core.Identifier{
+		Org:     newlyActiveLaunchPlan.Org,
 		Project: newlyActiveLaunchPlan.Project,
 		Domain:  newlyActiveLaunchPlan.Domain,
 		Name:    newlyActiveLaunchPlan.Name,
@@ -226,6 +227,7 @@ func (m *LaunchPlanManager) updateSchedules(
 	if !isScheduleEmpty(formerlyActiveLaunchPlanSpec) {
 		// Disable previous schedule
 		formerlyActiveLaunchPlanIdentifier := core.Identifier{
+			Org:     formerlyActiveLaunchPlan.Org,
 			Project: formerlyActiveLaunchPlan.Project,
 			Domain:  formerlyActiveLaunchPlan.Domain,
 			Name:    formerlyActiveLaunchPlan.Name,
@@ -273,6 +275,7 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 	}
 	if launchPlanSpec.EntityMetadata != nil && launchPlanSpec.EntityMetadata.Schedule != nil {
 		err = m.disableSchedule(ctx, core.Identifier{
+			Org:     launchPlanModel.Org,
 			Project: launchPlanModel.Project,
 			Domain:  launchPlanModel.Domain,
 			Name:    launchPlanModel.Name,
@@ -294,6 +297,7 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
 	*admin.LaunchPlanUpdateResponse, error) {
 	newlyActiveLaunchPlanModel, err := m.db.LaunchPlanRepo().Get(ctx, repoInterfaces.Identifier{
+		Org:     request.Id.Org,
 		Project: request.Id.Project,
 		Domain:  request.Id.Domain,
 		Name:    request.Id.Name,
@@ -310,7 +314,7 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 	}
 
 	// Find currently active version, if it exists.
-	filters, err := util.GetActiveLaunchPlanVersionFilters(newlyActiveLaunchPlanModel.Project, newlyActiveLaunchPlanModel.Domain, newlyActiveLaunchPlanModel.Name)
+	filters, err := util.GetActiveLaunchPlanVersionFilters(newlyActiveLaunchPlanModel.Org, newlyActiveLaunchPlanModel.Project, newlyActiveLaunchPlanModel.Domain, newlyActiveLaunchPlanModel.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -322,12 +326,12 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 	if err != nil {
 		// Not found is fine, there isn't always a guaranteed active launch plan model.
 		if err.(errors.FlyteAdminError).Code() != codes.NotFound {
-			logger.Infof(ctx, "Failed to search for an active launch plan model with project: %s, domain: %s, name: %s and err %v",
-				request.Id.Project, request.Id.Domain, request.Id.Name, err)
+			logger.Infof(ctx, "Failed to search for an active launch plan model with org: %s, project: %s, domain: %s, name: %s and err %v",
+				request.Id.Org, request.Id.Project, request.Id.Domain, request.Id.Name, err)
 			return nil, err
 		}
-		logger.Debugf(ctx, "No active launch plan model found to disable with project: %s, domain: %s, name: %s",
-			request.Id.Project, request.Id.Domain, request.Id.Name)
+		logger.Debugf(ctx, "No active launch plan model found to disable with org: %s, project: %s, domain: %s, name: %s",
+			request.Id.Org, request.Id.Project, request.Id.Domain, request.Id.Name)
 	} else if formerlyActiveLaunchPlanModelOutput.LaunchPlans != nil &&
 		len(formerlyActiveLaunchPlanModelOutput.LaunchPlans) > 0 {
 		formerlyActiveLaunchPlanModel = &formerlyActiveLaunchPlanModelOutput.LaunchPlans[0]
@@ -390,7 +394,7 @@ func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request adm
 	}
 	ctx = m.getNamedEntityContext(ctx, request.Id)
 
-	filters, err := util.GetActiveLaunchPlanVersionFilters(request.Id.Project, request.Id.Domain, request.Id.Name)
+	filters, err := util.GetActiveLaunchPlanVersionFilters(request.Id.Org, request.Id.Project, request.Id.Domain, request.Id.Name)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +412,7 @@ func (m *LaunchPlanManager) GetActiveLaunchPlan(ctx context.Context, request adm
 	}
 
 	if len(output.LaunchPlans) != 1 {
-		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "No active launch plan could be found: %s:%s:%s", request.Id.Project, request.Id.Domain, request.Id.Name)
+		return nil, errors.NewFlyteAdminErrorf(codes.NotFound, "No active launch plan could be found: %s:%s:%s:%s", request.Id.Org, request.Id.Project, request.Id.Domain, request.Id.Name)
 	}
 
 	return transformers.FromLaunchPlanModel(output.LaunchPlans[0])
@@ -425,6 +429,7 @@ func (m *LaunchPlanManager) ListLaunchPlans(ctx context.Context, request admin.R
 	ctx = m.getNamedEntityContext(ctx, request.Id)
 
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:            request.Id.Org,
 		Project:        request.Id.Project,
 		Domain:         request.Id.Domain,
 		Name:           request.Id.Name,
@@ -482,7 +487,7 @@ func (m *LaunchPlanManager) ListActiveLaunchPlans(ctx context.Context, request a
 	}
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 
-	filters, err := util.ListActiveLaunchPlanVersionsFilters(request.Project, request.Domain)
+	filters, err := util.ListActiveLaunchPlanVersionsFilters(request.Org, request.Project, request.Domain)
 	if err != nil {
 		return nil, err
 	}
@@ -530,6 +535,7 @@ func (m *LaunchPlanManager) ListLaunchPlanIds(ctx context.Context, request admin
 	*admin.NamedEntityIdentifierList, error) {
 	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
 	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:     request.Org,
 		Project: request.Project,
 		Domain:  request.Domain,
 	}, common.LaunchPlan)
