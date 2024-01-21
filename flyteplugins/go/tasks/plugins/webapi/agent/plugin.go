@@ -210,7 +210,9 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
-	case flyteIdl.TaskExecution_ABORTED, flyteIdl.TaskExecution_FAILED:
+	case flyteIdl.TaskExecution_ABORTED:
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase", taskInfo), nil
+	case flyteIdl.TaskExecution_FAILED:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	}
 
