@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"k8s.io/apimachinery/pkg/types"
 
 	idlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
@@ -144,6 +145,10 @@ func createNodeExecutionContext(dataStore *storage.DataStore, eventRecorder inte
 			Domain:  "domain",
 			Name:    "name",
 		},
+	})
+	nodeExecutionMetadata.OnGetOwnerID().Return(types.NamespacedName{
+		Namespace: "wf-namespace",
+		Name:      "wf-name",
 	})
 	nCtx.OnNodeExecutionMetadata().Return(nodeExecutionMetadata)
 

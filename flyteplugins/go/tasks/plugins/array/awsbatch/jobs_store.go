@@ -272,7 +272,7 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 			for _, jobDetail := range response {
 				job, found := jobIDsMap[*jobDetail.JobId]
 				if !found {
-					logger.Warn(ctx, "Received an update for unrequested job id [%v]", jobDetail.JobId)
+					logger.Warnf(ctx, "Received an update for unrequested job id [%v]", jobDetail.JobId)
 					continue
 				}
 

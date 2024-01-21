@@ -366,10 +366,10 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 			}
 
 			if !ok {
-				return nil, fmt.Errorf("failed to list agent with a non-gRPC error : [%v]", err)
+				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment, err)
 			}
 
-			return nil, fmt.Errorf("failed to list agent with error: [%v]", err)
+			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployment, err)
 		}
 
 		agents := res.GetAgents()

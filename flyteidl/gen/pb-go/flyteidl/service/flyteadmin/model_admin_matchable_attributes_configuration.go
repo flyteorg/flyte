@@ -9,11 +9,13 @@
 
 package flyteadmin
 
-// Represents a custom set of attributes applied for either a domain; a domain and project; or domain, project and workflow name. These are used to override system level defaults for kubernetes cluster resource management, default execution values, and more all across different levels of specificity.
+// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org); or domain, project and workflow name (and optional org). These are used to override system level defaults for kubernetes cluster resource management, default execution values, and more all across different levels of specificity.
 type AdminMatchableAttributesConfiguration struct {
 	Attributes *AdminMatchingAttributes `json:"attributes,omitempty"`
 	Domain string `json:"domain,omitempty"`
 	Project string `json:"project,omitempty"`
 	Workflow string `json:"workflow,omitempty"`
 	LaunchPlan string `json:"launch_plan,omitempty"`
+	// Optional, org key applied to the resource.
+	Org string `json:"org,omitempty"`
 }

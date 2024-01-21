@@ -36,23 +36,26 @@ class AdminWorkflowAttributes(object):
         'project': 'str',
         'domain': 'str',
         'workflow': 'str',
-        'matching_attributes': 'AdminMatchingAttributes'
+        'matching_attributes': 'AdminMatchingAttributes',
+        'org': 'str'
     }
 
     attribute_map = {
         'project': 'project',
         'domain': 'domain',
         'workflow': 'workflow',
-        'matching_attributes': 'matching_attributes'
+        'matching_attributes': 'matching_attributes',
+        'org': 'org'
     }
 
-    def __init__(self, project=None, domain=None, workflow=None, matching_attributes=None):  # noqa: E501
+    def __init__(self, project=None, domain=None, workflow=None, matching_attributes=None, org=None):  # noqa: E501
         """AdminWorkflowAttributes - a model defined in Swagger"""  # noqa: E501
 
         self._project = None
         self._domain = None
         self._workflow = None
         self._matching_attributes = None
+        self._org = None
         self.discriminator = None
 
         if project is not None:
@@ -63,6 +66,8 @@ class AdminWorkflowAttributes(object):
             self.workflow = workflow
         if matching_attributes is not None:
             self.matching_attributes = matching_attributes
+        if org is not None:
+            self.org = org
 
     @property
     def project(self):
@@ -153,6 +158,29 @@ class AdminWorkflowAttributes(object):
         """
 
         self._matching_attributes = matching_attributes
+
+    @property
+    def org(self):
+        """Gets the org of this AdminWorkflowAttributes.  # noqa: E501
+
+        Optional, org key applied to the attributes.  # noqa: E501
+
+        :return: The org of this AdminWorkflowAttributes.  # noqa: E501
+        :rtype: str
+        """
+        return self._org
+
+    @org.setter
+    def org(self, org):
+        """Sets the org of this AdminWorkflowAttributes.
+
+        Optional, org key applied to the attributes.  # noqa: E501
+
+        :param org: The org of this AdminWorkflowAttributes.  # noqa: E501
+        :type: str
+        """
+
+        self._org = org
 
     def to_dict(self):
         """Returns the model properties as a dict"""

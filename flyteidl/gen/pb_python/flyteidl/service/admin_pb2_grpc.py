@@ -317,7 +317,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListTaskIds(self, request, context):
-        """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+        """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -503,7 +503,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def UpdateProject(self, request, context):
-        """Updates an existing :ref:`ref_flyteidl.admin.Project` 
+        """Updates an existing :ref:`ref_flyteidl.admin.Project`
         flyteidl.admin.Project should be passed but the domains property should be empty;
         it will be ignored in the handler as domains cannot be updated via this API.
         """
@@ -512,7 +512,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListProjects(self, request, context):
-        """Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+        """Fetches a list of :ref:`ref_flyteidl.admin.Project`
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

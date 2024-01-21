@@ -34,10 +34,10 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.CreateTriggerRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.CreateTriggerResponse.FromString,
                 )
-        self.DeleteTrigger = channel.unary_unary(
-                '/flyteidl.artifact.ArtifactRegistry/DeleteTrigger',
-                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeleteTriggerRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeleteTriggerResponse.FromString,
+        self.DeactivateTrigger = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeactivateTriggerRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeactivateTriggerResponse.FromString,
                 )
         self.AddTag = channel.unary_unary(
                 '/flyteidl.artifact.ArtifactRegistry/AddTag',
@@ -63,6 +63,11 @@ class ArtifactRegistryStub(object):
                 '/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec',
                 request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
+                )
+        self.ListUsage = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/ListUsage',
+                request_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageResponse.FromString,
                 )
 
 
@@ -93,7 +98,7 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def DeleteTrigger(self, request, context):
+    def DeactivateTrigger(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -129,6 +134,12 @@ class ArtifactRegistryServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListUsage(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_ArtifactRegistryServicer_to_server(servicer, server):
     rpc_method_handlers = {
@@ -152,10 +163,10 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.CreateTriggerRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.CreateTriggerResponse.SerializeToString,
             ),
-            'DeleteTrigger': grpc.unary_unary_rpc_method_handler(
-                    servicer.DeleteTrigger,
-                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeleteTriggerRequest.FromString,
-                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeleteTriggerResponse.SerializeToString,
+            'DeactivateTrigger': grpc.unary_unary_rpc_method_handler(
+                    servicer.DeactivateTrigger,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeactivateTriggerRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.DeactivateTriggerResponse.SerializeToString,
             ),
             'AddTag': grpc.unary_unary_rpc_method_handler(
                     servicer.AddTag,
@@ -181,6 +192,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.FindByWorkflowExec,
                     request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.FromString,
                     response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.SerializeToString,
+            ),
+            'ListUsage': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListUsage,
+                    request_deserializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageRequest.FromString,
+                    response_serializer=flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageResponse.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
@@ -261,7 +277,7 @@ class ArtifactRegistry(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def DeleteTrigger(request,
+    def DeactivateTrigger(request,
             target,
             options=(),
             channel_credentials=None,
@@ -271,9 +287,9 @@ class ArtifactRegistry(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/DeleteTrigger',
-            flyteidl_dot_artifact_dot_artifacts__pb2.DeleteTriggerRequest.SerializeToString,
-            flyteidl_dot_artifact_dot_artifacts__pb2.DeleteTriggerResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger',
+            flyteidl_dot_artifact_dot_artifacts__pb2.DeactivateTriggerRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.DeactivateTriggerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -359,5 +375,22 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/FindByWorkflowExec',
             flyteidl_dot_artifact_dot_artifacts__pb2.FindByWorkflowExecRequest.SerializeToString,
             flyteidl_dot_artifact_dot_artifacts__pb2.SearchArtifactsResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListUsage(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/ListUsage',
+            flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageRequest.SerializeToString,
+            flyteidl_dot_artifact_dot_artifacts__pb2.ListUsageResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
