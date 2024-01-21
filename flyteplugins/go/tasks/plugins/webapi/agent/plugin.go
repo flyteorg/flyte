@@ -193,11 +193,13 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
-	// If the phase is undefined, we will use state to determine the phase
+	// If the phase is undefined, we will use state to determine the phase.
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
-	case flyteIdl.TaskExecution_INITIALIZING:
+		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_WAITING_FOR_RESOURCES:
+		return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+	case flyteIdl.TaskExecution_INITIALIZING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
@@ -208,8 +210,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
-	case flyteIdl.TaskExecution_ABORTED:
-	case flyteIdl.TaskExecution_FAILED:
+	case flyteIdl.TaskExecution_ABORTED, flyteIdl.TaskExecution_FAILED:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	}
 

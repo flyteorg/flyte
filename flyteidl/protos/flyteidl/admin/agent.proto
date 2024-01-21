@@ -84,7 +84,7 @@ message Resource {
   // Structured dataset pointing to the query result table.
   // +optional
   core.LiteralMap outputs = 2;
-  // A descriptive message for the currnt state. e.g. waiting for cluster.
+  // A descriptive message for the current state. e.g. waiting for cluster.
   string message = 3;
   // log information for the task execution.
   repeated core.TaskLog log_links = 4;
