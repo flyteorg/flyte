@@ -16,7 +16,7 @@ class Domain(_message.Message):
     def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
 
 class Project(_message.Message):
-    __slots__ = ["id", "name", "domains", "description", "labels", "state"]
+    __slots__ = ["id", "name", "domains", "description", "labels", "state", "org"]
     class ProjectState(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         ACTIVE: _ClassVar[Project.ProjectState]
@@ -31,13 +31,15 @@ class Project(_message.Message):
     DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     LABELS_FIELD_NUMBER: _ClassVar[int]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     id: str
     name: str
     domains: _containers.RepeatedCompositeFieldContainer[Domain]
     description: str
     labels: _common_pb2.Labels
     state: Project.ProjectState
-    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., domains: _Optional[_Iterable[_Union[Domain, _Mapping]]] = ..., description: _Optional[str] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., state: _Optional[_Union[Project.ProjectState, str]] = ...) -> None: ...
+    org: str
+    def __init__(self, id: _Optional[str] = ..., name: _Optional[str] = ..., domains: _Optional[_Iterable[_Union[Domain, _Mapping]]] = ..., description: _Optional[str] = ..., labels: _Optional[_Union[_common_pb2.Labels, _Mapping]] = ..., state: _Optional[_Union[Project.ProjectState, str]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class Projects(_message.Message):
     __slots__ = ["projects", "token"]
@@ -48,16 +50,18 @@ class Projects(_message.Message):
     def __init__(self, projects: _Optional[_Iterable[_Union[Project, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class ProjectListRequest(_message.Message):
-    __slots__ = ["limit", "token", "filters", "sort_by"]
+    __slots__ = ["limit", "token", "filters", "sort_by", "org"]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     FILTERS_FIELD_NUMBER: _ClassVar[int]
     SORT_BY_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     limit: int
     token: str
     filters: str
     sort_by: _common_pb2.Sort
-    def __init__(self, limit: _Optional[int] = ..., token: _Optional[str] = ..., filters: _Optional[str] = ..., sort_by: _Optional[_Union[_common_pb2.Sort, _Mapping]] = ...) -> None: ...
+    org: str
+    def __init__(self, limit: _Optional[int] = ..., token: _Optional[str] = ..., filters: _Optional[str] = ..., sort_by: _Optional[_Union[_common_pb2.Sort, _Mapping]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ProjectRegisterRequest(_message.Message):
     __slots__ = ["project"]

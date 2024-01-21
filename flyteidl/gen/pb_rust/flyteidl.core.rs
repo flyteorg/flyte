@@ -621,6 +621,9 @@ pub struct Identifier {
     /// Specific version of the resource.
     #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that uniquely identifies a Flyte workflow execution
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -636,6 +639,9 @@ pub struct WorkflowExecutionIdentifier {
     /// User or system provided value for the resource.
     #[prost(string, tag="4")]
     pub name: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that identify a Flyte node execution entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2028,6 +2034,58 @@ pub mod quality_of_service {
         Spec(super::QualityOfServiceSpec),
     }
 }
+/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
+/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
+/// precise definitions.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Span {
+    /// start_time defines the instance this span began.
+    #[prost(message, optional, tag="1")]
+    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// end_time defines the instance this span completed.
+    #[prost(message, optional, tag="2")]
+    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// spans defines a collection of Spans that breakdown this execution.
+    #[prost(message, repeated, tag="7")]
+    pub spans: ::prost::alloc::vec::Vec<Span>,
+    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
+    pub id: ::core::option::Option<span::Id>,
+}
+/// Nested message and enum types in `Span`.
+pub mod span {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Id {
+        /// workflow_id is the id of the workflow execution this Span represents.
+        #[prost(message, tag="3")]
+        WorkflowId(super::WorkflowExecutionIdentifier),
+        /// node_id is the id of the node execution this Span represents.
+        #[prost(message, tag="4")]
+        NodeId(super::NodeExecutionIdentifier),
+        /// task_id is the id of the task execution this Span represents.
+        #[prost(message, tag="5")]
+        TaskId(super::TaskExecutionIdentifier),
+        /// operation_id is the id of a unique operation that this Span represents.
+        #[prost(string, tag="6")]
+        OperationId(::prost::alloc::string::String),
+    }
+}
+/// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionMetricResult {
+    /// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+    #[prost(string, tag="1")]
+    pub metric: ::prost::alloc::string::String,
+    /// The result data in prometheus range query result format
+    /// <https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.>
+    /// This may include multiple time series, differentiated by their metric labels.
+    /// Start time is greater of (execution attempt start, 48h ago)
+    /// End time is lesser of (execution attempt end, now)
+    #[prost(message, optional, tag="2")]
+    pub data: ::core::option::Option<::prost_types::Struct>,
+}
 /// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
 /// Each expression results in a boolean result.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2711,6 +2769,8 @@ pub enum CatalogCacheStatus {
     CachePutFailure = 5,
     /// Used to indicate the cache lookup was skipped
     CacheSkipped = 6,
+    /// Used to indicate that the cache was evicted
+    CacheEvicted = 7,
 }
 impl CatalogCacheStatus {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -2726,6 +2786,7 @@ impl CatalogCacheStatus {
             CatalogCacheStatus::CacheLookupFailure => "CACHE_LOOKUP_FAILURE",
             CatalogCacheStatus::CachePutFailure => "CACHE_PUT_FAILURE",
             CatalogCacheStatus::CacheSkipped => "CACHE_SKIPPED",
+            CatalogCacheStatus::CacheEvicted => "CACHE_EVICTED",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2738,45 +2799,9 @@ impl CatalogCacheStatus {
             "CACHE_LOOKUP_FAILURE" => Some(Self::CacheLookupFailure),
             "CACHE_PUT_FAILURE" => Some(Self::CachePutFailure),
             "CACHE_SKIPPED" => Some(Self::CacheSkipped),
+            "CACHE_EVICTED" => Some(Self::CacheEvicted),
             _ => None,
         }
-    }
-}
-/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
-/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
-/// precise definitions.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Span {
-    /// start_time defines the instance this span began.
-    #[prost(message, optional, tag="1")]
-    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// end_time defines the instance this span completed.
-    #[prost(message, optional, tag="2")]
-    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// spans defines a collection of Spans that breakdown this execution.
-    #[prost(message, repeated, tag="7")]
-    pub spans: ::prost::alloc::vec::Vec<Span>,
-    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
-    pub id: ::core::option::Option<span::Id>,
-}
-/// Nested message and enum types in `Span`.
-pub mod span {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Id {
-        /// workflow_id is the id of the workflow execution this Span represents.
-        #[prost(message, tag="3")]
-        WorkflowId(super::WorkflowExecutionIdentifier),
-        /// node_id is the id of the node execution this Span represents.
-        #[prost(message, tag="4")]
-        NodeId(super::NodeExecutionIdentifier),
-        /// task_id is the id of the task execution this Span represents.
-        #[prost(message, tag="5")]
-        TaskId(super::TaskExecutionIdentifier),
-        /// operation_id is the id of a unique operation that this Span represents.
-        #[prost(string, tag="6")]
-        OperationId(::prost::alloc::string::String),
     }
 }
 /// Describes a set of tasks to execute and how the final outputs are produced.

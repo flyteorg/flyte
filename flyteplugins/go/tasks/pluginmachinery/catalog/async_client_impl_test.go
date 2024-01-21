@@ -110,8 +110,8 @@ func TestAsyncClientImpl_Download(t *testing.T) {
 func TestAsyncClientImpl_Upload(t *testing.T) {
 	ctx := context.Background()
 
-	inputHash1 := "{UNSPECIFIED     {} [] 0}:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
-	inputHash2 := "{UNSPECIFIED     {} [] 0}:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
+	inputHash1 := "{UNSPECIFIED      {} [] 0}:-0-DNhkpTTPC5YDtRGb4yT-PFxgMSgHzHrKAQKgQGEfGRY"
+	inputHash2 := "{UNSPECIFIED      {} [] 0}:-1-26M4dwarvBVJqJSUC4JC1GtRYgVBIAmQfsFSdLVMlAc"
 
 	q := &mocks.IndexedWorkQueue{}
 	info := &mocks.WorkItemInfo{}

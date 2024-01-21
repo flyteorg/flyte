@@ -15,6 +15,127 @@
     "application/json"
   ],
   "paths": {
+    "/api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "operationId": "GetActiveLaunchPlan2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlan"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/active_launch_plans/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "operationId": "ListActiveLaunchPlans2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.\n+required.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.",
@@ -47,6 +168,13 @@
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -93,6 +221,164 @@
           {
             "name": "token",
             "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "ListNodeExecutionsForTask2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "task_execution_id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.node_execution_id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.node_execution_id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.node_execution_id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.node_execution_id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.task_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.task_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.task_id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.task_id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.retry_attempt",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "task_execution_id.task_id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
+          },
+          {
+            "name": "task_execution_id.task_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the, server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -213,6 +499,20 @@
             "default": "UNSPECIFIED"
           },
           {
+            "name": "task_execution_id.task_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "task_execution_id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
@@ -259,6 +559,53 @@
         ]
       }
     },
+    "/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "GetExecutionData2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionGetDataResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.",
@@ -289,6 +636,66 @@
           {
             "name": "id.name",
             "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
+      "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
+        "operationId": "GetNodeExecutionData2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionGetDataResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
             "in": "path",
             "required": true,
             "type": "string"
@@ -337,6 +744,123 @@
             "name": "id.node_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
+      "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "GetTaskExecutionData2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskExecutionGetDataResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.retry_attempt",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "id.task_id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.task_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -434,6 +958,88 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.task_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
+        "operationId": "GetDescriptionEntity2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntity"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -495,6 +1101,217 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "operationId": "ListDescriptionEntities4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntityList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "operationId": "ListDescriptionEntities2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntityList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
           }
         ],
         "tags": [
@@ -505,7 +1322,7 @@
     "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
-        "operationId": "ListDescriptionEntities2",
+        "operationId": "ListDescriptionEntities3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -546,6 +1363,13 @@
           {
             "name": "id.name",
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -646,6 +1470,13 @@
             "type": "string"
           },
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
@@ -711,6 +1542,108 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/adminNodeExecutionEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/events/org/{event.execution_id.org}/workflows": {
+      "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
+        "operationId": "CreateWorkflowEvent2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionEventResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "event.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/events/org/{event.id.execution_id.org}/nodes": {
+      "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
+        "operationId": "CreateNodeEvent2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionEventResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "event.id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionEventRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks": {
+      "post": {
+        "summary": "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.",
+        "operationId": "CreateTaskEvent2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskExecutionEventResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "event.parent_node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminTaskExecutionEventRequest"
             }
           }
         ],
@@ -786,6 +1719,349 @@
           }
         },
         "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/executions/org/{id.org}/recover": {
+      "post": {
+        "summary": "Recreates a previously-run workflow execution that will only start executing from the last known failure point.\nIn Recover mode, users cannot change any input parameters or update the version of the execution.\nThis is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,\ndownstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.\nSee :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.",
+        "operationId": "RecoverExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionRecoverRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/executions/org/{id.org}/relaunch": {
+      "post": {
+        "summary": "Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`",
+        "operationId": "RelaunchExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionRelaunchRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "ListExecutions2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "GetExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecution"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "TerminateExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionTerminateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionTerminateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "summary": "Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "UpdateExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminExecutionUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/executions/org/{org}": {
+      "put": {
+        "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`",
+        "operationId": "CreateExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "body",
             "in": "body",
@@ -889,6 +2165,13 @@
             "type": "string"
           },
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "limit",
             "description": "Indicates the number of resources to be returned.\n+required.",
             "in": "query",
@@ -967,6 +2250,13 @@
             "description": "User or system provided value for the resource.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -1067,6 +2357,87 @@
         ]
       }
     },
+    "/api/v1/launch_plan_ids/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.",
+        "operationId": "ListLaunchPlanIds2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityIdentifierList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/launch_plan_ids/{project}/{domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.",
@@ -1134,6 +2505,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1168,10 +2546,341 @@
         ]
       }
     },
-    "/api/v1/launch_plans/{id.project}/{id.domain}": {
+    "/api/v1/launch_plans/org/{id.org}": {
+      "post": {
+        "summary": "Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition",
+        "operationId": "CreateLaunchPlan2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "operationId": "ListLaunchPlans4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
         "operationId": "ListLaunchPlans2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.",
+        "operationId": "GetLaunchPlan2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlan"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "summary": "Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "operationId": "UpdateLaunchPlan2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/launch_plans/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "operationId": "ListLaunchPlans3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -1198,6 +2907,13 @@
           {
             "name": "id.name",
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -1281,6 +2997,13 @@
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -1385,6 +3108,13 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1475,6 +3205,112 @@
               "CLUSTER_ASSIGNMENT"
             ],
             "default": "TASK_RESOURCE"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org filter applied to list project requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/matchable_attributes/org/{org}": {
+      "get": {
+        "summary": "Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.",
+        "operationId": "ListMatchableAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminListMatchableAttributesResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org filter applied to list project requests.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "GetExecutionMetrics2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowExecutionGetMetricsResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "depth",
+            "description": "depth defines the number of Flyte entity levels to traverse when breaking down execution details.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
           }
         ],
         "tags": [
@@ -1517,12 +3353,242 @@
             "type": "string"
           },
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "depth",
             "description": "depth defines the number of Flyte entity levels to traverse when breaking down execution details.",
             "in": "query",
             "required": false,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
+        "operationId": "GetNamedEntity2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntity"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "put": {
+        "summary": "Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.",
+        "operationId": "UpdateNamedEntity2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Resource type of the metadata to update\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.",
+        "operationId": "ListNamedEntities2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "resource_type",
+            "description": "Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1576,6 +3642,13 @@
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           }
         ],
@@ -1725,6 +3798,160 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.",
+        "operationId": "GetNodeExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/flyteidladminNodeExecution"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.",
+        "operationId": "ListNodeExecutions2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "workflow_execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow_execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow_execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow_execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "unique_parent_id",
+            "description": "Unique identifier of the parent node in the execution\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1771,6 +3998,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1810,6 +4044,13 @@
             "description": "User or system provided value for the resource.",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow_execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -1936,6 +4177,13 @@
               "CLUSTER_ASSIGNMENT"
             ],
             "default": "TASK_RESOURCE"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the project.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -1967,6 +4215,289 @@
             "required": true,
             "schema": {
               "$ref": "#/definitions/adminProjectAttributesDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}": {
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level",
+        "operationId": "UpdateProjectAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.org",
+            "description": "Optional, org key applied to the project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}": {
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "operationId": "UpdateProjectDomainAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.domain",
+            "description": "Unique domain id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/project_domain_attributes/org/{org}/{project}": {
+      "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "operationId": "GetProjectAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Which type of matchable attributes to return.\n+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "operationId": "DeleteProjectAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectAttributesDeleteRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/project_domain_attributes/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "operationId": "GetProjectDomainAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Which type of matchable attributes to return.\n+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "operationId": "DeleteProjectDomainAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectDomainAttributesDeleteRequest"
             }
           }
         ],
@@ -2060,6 +4591,13 @@
               "CLUSTER_ASSIGNMENT"
             ],
             "default": "TASK_RESOURCE"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2159,6 +4697,13 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org filter applied to list project requests.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2191,9 +4736,151 @@
         ]
       }
     },
+    "/api/v1/projects/org/{org}": {
+      "get": {
+        "summary": "Fetches a list of :ref:`ref_flyteidl.admin.Project`",
+        "operationId": "ListProjects2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjects"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org filter applied to list project requests.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of projects to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/projects/org/{org}/{id}": {
+      "put": {
+        "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
+        "operationId": "UpdateProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Globally unique project name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/projects/org/{project.org}": {
+      "post": {
+        "summary": "Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.",
+        "operationId": "RegisterProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProjectRegisterResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminProjectRegisterRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/projects/{id}": {
       "put": {
-        "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project` \nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
+        "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "operationId": "UpdateProject",
         "responses": {
           "200": {
@@ -2218,6 +4905,210 @@
             "schema": {
               "$ref": "#/definitions/adminProject"
             }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "GetTaskExecution2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/flyteidladminTaskExecution"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.task_id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.retry_attempt",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "id.task_id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.task_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}": {
+      "get": {
+        "summary": "Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "operationId": "ListTaskExecutions2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskExecutionList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "node_execution_id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "node_execution_id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "node_execution_id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "node_execution_id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
           }
         ],
         "tags": [
@@ -2314,6 +5205,20 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.task_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2359,6 +5264,13 @@
             "name": "node_execution_id.node_id",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "node_execution_id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -2475,6 +5387,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2509,10 +5428,370 @@
         ]
       }
     },
-    "/api/v1/tasks/{id.project}/{id.domain}": {
+    "/api/v1/tasks/org/{id.org}": {
+      "post": {
+        "summary": "Create and upload a :ref:`ref_flyteidl.admin.Task` definition",
+        "operationId": "CreateTask2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/flyteidladminTaskCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/flyteidladminTaskCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "operationId": "ListTasks4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
         "operationId": "ListTasks2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.Task` definition.",
+        "operationId": "GetTask2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTask"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/tasks/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.",
+        "operationId": "ListTaskIds2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityIdentifierList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/tasks/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "operationId": "ListTasks3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -2539,6 +5818,13 @@
           {
             "name": "id.name",
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2622,6 +5908,13 @@
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -2726,6 +6019,13 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2744,6 +6044,179 @@
             }
           }
         },
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}": {
+      "put": {
+        "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "operationId": "UpdateWorkflowAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesUpdateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "attributes.org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.project",
+            "description": "Unique project id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.domain",
+            "description": "Unique domain id for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "attributes.workflow",
+            "description": "Workflow name for which this set of attributes will be applied.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesUpdateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}": {
+      "get": {
+        "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "operationId": "GetWorkflowAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesGetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow",
+            "description": "Workflow name which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Which type of matchable attributes to return.\n+required.\n\n - TASK_RESOURCE: Applies to customizable task resource requests and limits.\n - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.\n - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.\n - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run\n - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.\n - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.\n - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.\n - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "TASK_RESOURCE",
+              "CLUSTER_RESOURCE",
+              "EXECUTION_QUEUE",
+              "EXECUTION_CLUSTER_LABEL",
+              "QUALITY_OF_SERVICE_SPECIFICATION",
+              "PLUGIN_OVERRIDE",
+              "WORKFLOW_EXECUTION_CONFIG",
+              "CLUSTER_ASSIGNMENT"
+            ],
+            "default": "TASK_RESOURCE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
+      "delete": {
+        "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "operationId": "DeleteWorkflowAttributes2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesDeleteResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Unique project id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Unique domain id which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "workflow",
+            "description": "Workflow name which this set of attributes references.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowAttributesDeleteRequest"
+            }
+          }
+        ],
         "tags": [
           "AdminService"
         ]
@@ -2848,6 +6321,13 @@
               "CLUSTER_ASSIGNMENT"
             ],
             "default": "TASK_RESOURCE"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the attributes.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -2968,6 +6448,13 @@
             "in": "query",
             "required": false,
             "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3002,10 +6489,370 @@
         ]
       }
     },
-    "/api/v1/workflows/{id.project}/{id.domain}": {
+    "/api/v1/workflows/org/{id.org}": {
+      "post": {
+        "summary": "Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition",
+        "operationId": "CreateWorkflow2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowCreateResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowCreateRequest"
+            }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "operationId": "ListWorkflows4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
         "operationId": "ListWorkflows2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.",
+        "operationId": "GetWorkflow2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflow"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.\n\n - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects.\nEventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects \nin a similar manner to other Flyte objects",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ],
+            "default": "UNSPECIFIED"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflows/org/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.",
+        "operationId": "ListWorkflowIds2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNamedEntityIdentifierList"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project that contains the identifiers.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the identifiers belongs to within the project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional.\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/workflows/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "operationId": "ListWorkflows3",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -3032,6 +6879,13 @@
           {
             "name": "id.name",
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -3115,6 +6969,13 @@
             "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
             "in": "path",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
             "type": "string"
           },
           {
@@ -3219,6 +7080,13 @@
               "DATASET"
             ],
             "default": "UNSPECIFIED"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3839,6 +7707,10 @@
         "inputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Request to launch an execution with the given project, domain and optionally-assigned name."
@@ -4403,9 +8275,13 @@
         },
         "launch_plan": {
           "type": "string"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
-      "description": "Represents a custom set of attributes applied for either a domain; a domain and project; or\ndomain, project and workflow name.\nThese are used to override system level defaults for kubernetes cluster resource management,\ndefault execution values, and more all across different levels of specificity."
+      "description": "Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);\nor domain, project and workflow name (and optional org).\nThese are used to override system level defaults for kubernetes cluster resource management,\ndefault execution values, and more all across different levels of specificity."
     },
     "adminMatchableResource": {
       "type": "string",
@@ -4483,6 +8359,10 @@
         "name": {
           "type": "string",
           "title": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that identifies a Flyte resource.\nA Flyte resource can be a task, workflow or launch plan.\nA resource can internally have multiple versions and is uniquely identified\nby project, domain, and name."
@@ -4817,6 +8697,10 @@
         },
         "state": {
           "$ref": "#/definitions/ProjectProjectState"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Top-level namespace used to classify different entities like workflows and executions."
@@ -4830,6 +8714,10 @@
         },
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the project."
         }
       },
       "title": "Defines a set of custom matching attributes at the project level.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
@@ -4844,6 +8732,10 @@
         "resource_type": {
           "$ref": "#/definitions/adminMatchableResource",
           "title": "Which type of matchable attributes to delete.\n+required"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the project."
         }
       },
       "title": "Request to delete a set matchable project level attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
@@ -4888,6 +8780,10 @@
         },
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the attributes."
         }
       },
       "title": "Defines a set of custom matching attributes which defines resource defaults for a project and domain.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
@@ -4906,6 +8802,10 @@
         "resource_type": {
           "$ref": "#/definitions/adminMatchableResource",
           "title": "Which type of matchable attributes to delete.\n+required"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the attributes."
         }
       },
       "title": "Request to delete a set matchable project domain attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
@@ -5366,6 +9266,10 @@
         },
         "matching_attributes": {
           "$ref": "#/definitions/adminMatchingAttributes"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the attributes."
         }
       },
       "title": "Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
@@ -5388,6 +9292,10 @@
         "resource_type": {
           "$ref": "#/definitions/adminMatchableResource",
           "title": "Which type of matchable attributes to delete.\n+required"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the attributes."
         }
       },
       "title": "Request to delete a set matchable workflow attribute override.\nFor more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`"
@@ -5856,10 +9764,11 @@
         "CACHE_POPULATED",
         "CACHE_LOOKUP_FAILURE",
         "CACHE_PUT_FAILURE",
-        "CACHE_SKIPPED"
+        "CACHE_SKIPPED",
+        "CACHE_EVICTED"
       ],
       "default": "CACHE_DISABLED",
-      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_SKIPPED: Used to indicate the cache lookup was skipped",
+      "description": "- CACHE_DISABLED: Used to indicate that caching was disabled\n - CACHE_MISS: Used to indicate that the cache lookup resulted in no matches\n - CACHE_HIT: used to indicate that the associated artifact was a result of a previous execution\n - CACHE_POPULATED: used to indicate that the resultant artifact was added to the cache\n - CACHE_LOOKUP_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_PUT_FAILURE: Used to indicate that cache lookup failed because of an error\n - CACHE_SKIPPED: Used to indicate the cache lookup was skipped\n - CACHE_EVICTED: Used to indicate that the cache was evicted",
       "title": "Indicates the status of CatalogCaching. The reason why this is not embedded in TaskNodeMetadata is, that we may use for other types of nodes as well in the future"
     },
     "coreCatalogMetadata": {
@@ -6200,6 +10109,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -7370,6 +11283,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

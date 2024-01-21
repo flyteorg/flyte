@@ -20,4 +20,6 @@ type AdminProject struct {
 	// Leverage Labels from flyteidl.admin.common.proto to tag projects with ownership information.
 	Labels *AdminLabels `json:"labels,omitempty"`
 	State *ProjectProjectState `json:"state,omitempty"`
+	// Optional, org key applied to the resource.
+	Org string `json:"org,omitempty"`
 }

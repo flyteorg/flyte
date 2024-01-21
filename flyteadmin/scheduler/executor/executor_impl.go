@@ -62,7 +62,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	}, scheduledTime)
 
 	if err != nil {
-		logger.Error(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
+		logger.Errorf(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 				return false
 			}
 			w.metrics.FailedExecutionCounter.Inc()
-			logger.Error(ctx, "failed to create execution create request %+v due to %v", executionRequest, err)
+			logger.Errorf(ctx, "failed to create execution create request %+v due to %v", executionRequest, err)
 			// TODO: Handle the case when admin launch plan state is archived but the schedule is active.
 			// After this bug is fixed in admin https://github.com/flyteorg/flyte/issues/1354
 			return true
@@ -118,7 +118,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		},
 	)
 	if err != nil && status.Code(err) != codes.AlreadyExists {
-		logger.Error(ctx, "failed to create execution create request %+v due to %v after all retries", executionRequest, err)
+		logger.Errorf(ctx, "failed to create execution create request %+v due to %v after all retries", executionRequest, err)
 		return err
 	}
 	w.metrics.SuccessfulExecutionCounter.Inc()
