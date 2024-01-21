@@ -1026,4 +1026,3 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 .. code-block:: bash
 
   kubectl get pods -n flyte
-
