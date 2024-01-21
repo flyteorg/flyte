@@ -216,6 +216,8 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	}
 
+	logger.Infof(ctx, "Agent returned an undefined phase [%v]. Checking state.", resource.Phase)
+
 	switch resource.State {
 	case admin.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
