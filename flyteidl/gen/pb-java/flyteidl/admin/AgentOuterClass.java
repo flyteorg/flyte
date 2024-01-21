@@ -6226,7 +6226,7 @@ public final class AgentOuterClass {
 
     /**
      * <pre>
-     * A descriptive message for the currnt state. e.g. waiting for cluster.
+     * A descriptive message for the current state. e.g. waiting for cluster.
      * </pre>
      *
      * <code>string message = 3;</code>
@@ -6234,7 +6234,7 @@ public final class AgentOuterClass {
     java.lang.String getMessage();
     /**
      * <pre>
-     * A descriptive message for the currnt state. e.g. waiting for cluster.
+     * A descriptive message for the current state. e.g. waiting for cluster.
      * </pre>
      *
      * <code>string message = 3;</code>
@@ -6490,7 +6490,7 @@ public final class AgentOuterClass {
     private volatile java.lang.Object message_;
     /**
      * <pre>
-     * A descriptive message for the currnt state. e.g. waiting for cluster.
+     * A descriptive message for the current state. e.g. waiting for cluster.
      * </pre>
      *
      * <code>string message = 3;</code>
@@ -6509,7 +6509,7 @@ public final class AgentOuterClass {
     }
     /**
      * <pre>
-     * A descriptive message for the currnt state. e.g. waiting for cluster.
+     * A descriptive message for the current state. e.g. waiting for cluster.
      * </pre>
      *
      * <code>string message = 3;</code>
@@ -7270,7 +7270,7 @@ public final class AgentOuterClass {
       private java.lang.Object message_ = "";
       /**
        * <pre>
-       * A descriptive message for the currnt state. e.g. waiting for cluster.
+       * A descriptive message for the current state. e.g. waiting for cluster.
        * </pre>
        *
        * <code>string message = 3;</code>
@@ -7289,7 +7289,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * A descriptive message for the currnt state. e.g. waiting for cluster.
+       * A descriptive message for the current state. e.g. waiting for cluster.
        * </pre>
        *
        * <code>string message = 3;</code>
@@ -7309,7 +7309,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * A descriptive message for the currnt state. e.g. waiting for cluster.
+       * A descriptive message for the current state. e.g. waiting for cluster.
        * </pre>
        *
        * <code>string message = 3;</code>
@@ -7326,7 +7326,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * A descriptive message for the currnt state. e.g. waiting for cluster.
+       * A descriptive message for the current state. e.g. waiting for cluster.
        * </pre>
        *
        * <code>string message = 3;</code>
@@ -7339,7 +7339,7 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * A descriptive message for the currnt state. e.g. waiting for cluster.
+       * A descriptive message for the current state. e.g. waiting for cluster.
        * </pre>
        *
        * <code>string message = 3;</code>

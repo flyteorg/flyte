@@ -330,7 +330,7 @@
         },
         "message": {
           "type": "string",
-          "description": "A descriptive message for the currnt state. e.g. waiting for cluster."
+          "description": "A descriptive message for the current state. e.g. waiting for cluster."
         },
         "log_links": {
           "type": "array",

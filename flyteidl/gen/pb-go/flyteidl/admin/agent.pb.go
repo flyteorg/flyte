@@ -404,7 +404,7 @@ type Resource struct {
 	// Structured dataset pointing to the query result table.
 	// +optional
 	Outputs *core.LiteralMap `protobuf:"bytes,2,opt,name=outputs,proto3" json:"outputs,omitempty"`
-	// A descriptive message for the currnt state. e.g. waiting for cluster.
+	// A descriptive message for the current state. e.g. waiting for cluster.
 	Message string `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`
 	// log information for the task execution.
 	LogLinks []*core.TaskLog `protobuf:"bytes,4,rep,name=log_links,json=logLinks,proto3" json:"log_links,omitempty"`
