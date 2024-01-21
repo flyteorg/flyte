@@ -602,7 +602,6 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 55, -1, sizeof(::flyteidl::admin::GetTaskRequest)},
   { 62, -1, sizeof(::flyteidl::admin::GetTaskResponse)},
   { 69, -1, sizeof(::flyteidl::admin::Resource)},
-<<<<<<< HEAD
   { 79, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
   { 86, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
   { 91, -1, sizeof(::flyteidl::admin::Agent)},
@@ -610,19 +609,10 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 104, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
   { 110, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
   { 115, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
-=======
-  { 78, -1, sizeof(::flyteidl::admin::DeleteTaskRequest)},
-  { 85, -1, sizeof(::flyteidl::admin::DeleteTaskResponse)},
-  { 90, -1, sizeof(::flyteidl::admin::Agent)},
-  { 97, -1, sizeof(::flyteidl::admin::GetAgentRequest)},
-  { 103, -1, sizeof(::flyteidl::admin::GetAgentResponse)},
-  { 109, -1, sizeof(::flyteidl::admin::ListAgentsRequest)},
-  { 114, -1, sizeof(::flyteidl::admin::ListAgentsResponse)},
-  { 120, -1, sizeof(::flyteidl::admin::GetTaskMetricsRequest)},
-  { 131, -1, sizeof(::flyteidl::admin::GetTaskMetricsResponse)},
-  { 137, -1, sizeof(::flyteidl::admin::GetTaskLogsRequest)},
-  { 146, -1, sizeof(::flyteidl::admin::GetTaskLogsResponse)},
->>>>>>> 6f5c47154549dd9f697f4a44547eda5197d40a52
+  { 121, -1, sizeof(::flyteidl::admin::GetTaskMetricsRequest)},
+  { 132, -1, sizeof(::flyteidl::admin::GetTaskMetricsResponse)},
+  { 138, -1, sizeof(::flyteidl::admin::GetTaskLogsRequest)},
+  { 147, -1, sizeof(::flyteidl::admin::GetTaskLogsResponse)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -657,54 +647,6 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "\n\032flyteidl/admin/agent.proto\022\016flyteidl.a"
   "dmin\032\034flyteidl/core/literals.proto\032\031flyt"
-<<<<<<< HEAD
-  "eidl/core/tasks.proto\032\035flyteidl/core/int"
-  "erface.proto\032\036flyteidl/core/identifier.p"
-  "roto\032\035flyteidl/core/execution.proto\"\232\004\n\025"
-  "TaskExecutionMetadata\022A\n\021task_execution_"
-  "id\030\001 \001(\0132&.flyteidl.core.TaskExecutionId"
-  "entifier\022\021\n\tnamespace\030\002 \001(\t\022A\n\006labels\030\003 "
-  "\003(\01321.flyteidl.admin.TaskExecutionMetada"
-  "ta.LabelsEntry\022K\n\013annotations\030\004 \003(\01326.fl"
-  "yteidl.admin.TaskExecutionMetadata.Annot"
-  "ationsEntry\022\033\n\023k8s_service_account\030\005 \001(\t"
-  "\022^\n\025environment_variables\030\006 \003(\0132\?.flytei"
-  "dl.admin.TaskExecutionMetadata.Environme"
-  "ntVariablesEntry\032-\n\013LabelsEntry\022\013\n\003key\030\001"
-  " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn"
-  "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E"
-  "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n"
-  "\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTaskRequest\022)"
-  "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa"
-  "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task"
-  "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_"
-  "execution_metadata\030\004 \001(\0132%.flyteidl.admi"
-  "n.TaskExecutionMetadata\"b\n\022CreateTaskRes"
-  "ponse\022\027\n\rresource_meta\030\001 \001(\014H\000\022,\n\010resour"
-  "ce\030\002 \001(\0132\030.flyteidl.admin.ResourceH\000B\005\n\003"
-  "res\":\n\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t"
-  "\022\025\n\rresource_meta\030\002 \001(\014\"h\n\017GetTaskRespon"
-  "se\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Re"
-  "source\022)\n\tlog_links\030\002 \003(\0132\026.flyteidl.cor"
-  "e.TaskLog\"\313\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025."
-  "flyteidl.admin.State\022*\n\007outputs\030\002 \001(\0132\031."
-  "flyteidl.core.LiteralMap\022\017\n\007message\030\003 \001("
-  "\t\022)\n\tlog_links\030\004 \003(\0132\026.flyteidl.core.Tas"
-  "kLog\0221\n\005phase\030\005 \001(\0162\".flyteidl.core.Task"
-  "Execution.Phase\"=\n\021DeleteTaskRequest\022\021\n\t"
-  "task_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024"
-  "\n\022DeleteTaskResponse\"3\n\005Agent\022\014\n\004name\030\001 "
-  "\001(\t\022\034\n\024supported_task_types\030\002 \003(\t\"\037\n\017Get"
-  "AgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentRe"
-  "sponse\022$\n\005agent\030\001 \001(\0132\025.flyteidl.admin.A"
-  "gent\"\023\n\021ListAgentsRequest\";\n\022ListAgentsR"
-  "esponse\022%\n\006agents\030\001 \003(\0132\025.flyteidl.admin"
-  ".Agent*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025"
-  "\n\021PERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RU"
-  "NNING\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/fly"
-  "teorg/flyte/flyteidl/gen/pb-go/flyteidl/"
-  "adminb\006proto3"
-=======
   "eidl/core/tasks.proto\032\036flyteidl/core/ide"
   "ntifier.proto\032\035flyteidl/core/execution.p"
   "roto\032\033flyteidl/core/metrics.proto\032\036googl"
@@ -734,44 +676,41 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta"
   "\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 "
   "\001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_lin"
-  "ks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"\230\001\n\010Res"
+  "ks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"\313\001\n\010Res"
   "ource\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.St"
   "ate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Lit"
   "eralMap\022\017\n\007message\030\003 \001(\t\022)\n\tlog_links\030\004 "
-  "\003(\0132\026.flyteidl.core.TaskLog\"=\n\021DeleteTas"
-  "kRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_"
-  "meta\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"3\n\005Agen"
-  "t\022\014\n\004name\030\001 \001(\t\022\034\n\024supported_task_types\030"
-  "\002 \003(\t\"\037\n\017GetAgentRequest\022\014\n\004name\030\001 \001(\t\"8"
-  "\n\020GetAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flyt"
-  "eidl.admin.Agent\"\023\n\021ListAgentsRequest\";\n"
-  "\022ListAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.fl"
-  "yteidl.admin.Agent\"\331\001\n\025GetTaskMetricsReq"
-  "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta"
-  "\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nstart_time\030\004 "
-  "\001(\0132\032.google.protobuf.Timestamp\022,\n\010end_t"
-  "ime\030\005 \001(\0132\032.google.protobuf.Timestamp\022\'\n"
-  "\004step\030\006 \001(\0132\031.google.protobuf.Duration\"O"
-  "\n\026GetTaskMetricsResponse\0225\n\007results\030\001 \003("
-  "\0132$.flyteidl.core.ExecutionMetricResult\""
-  "\\\n\022GetTaskLogsRequest\022\021\n\ttask_type\030\001 \001(\t"
-  "\022\025\n\rresource_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r"
-  "\n\005token\030\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007"
-  "results\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n"
-  "\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILUR"
-  "E\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEED"
-  "ED\020\004B=Z;github.com/flyteorg/flyte/flytei"
-  "dl/gen/pb-go/flyteidl/adminb\006proto3"
->>>>>>> 6f5c47154549dd9f697f4a44547eda5197d40a52
+  "\003(\0132\026.flyteidl.core.TaskLog\0221\n\005phase\030\005 \001"
+  "(\0162\".flyteidl.core.TaskExecution.Phase\"="
+  "\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025"
+  "\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTaskRespo"
+  "nse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024supported_"
+  "task_types\030\002 \003(\t\"\037\n\017GetAgentRequest\022\014\n\004n"
+  "ame\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005agent\030\001"
+  " \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListAgent"
+  "sRequest\";\n\022ListAgentsResponse\022%\n\006agents"
+  "\030\001 \003(\0132\025.flyteidl.admin.Agent\"\331\001\n\025GetTas"
+  "kMetricsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre"
+  "source_meta\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nst"
+  "art_time\030\004 \001(\0132\032.google.protobuf.Timesta"
+  "mp\022,\n\010end_time\030\005 \001(\0132\032.google.protobuf.T"
+  "imestamp\022\'\n\004step\030\006 \001(\0132\031.google.protobuf"
+  ".Duration\"O\n\026GetTaskMetricsResponse\0225\n\007r"
+  "esults\030\001 \003(\0132$.flyteidl.core.ExecutionMe"
+  "tricResult\"\\\n\022GetTaskLogsRequest\022\021\n\ttask"
+  "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\022\r\n\005li"
+  "nes\030\003 \001(\004\022\r\n\005token\030\004 \001(\t\"5\n\023GetTaskLogsR"
+  "esponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*"
+  "^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMA"
+  "NENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003"
+  "\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteorg/f"
+  "lyte/flyteidl/gen/pb-go/flyteidl/adminb\006"
+  "proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-<<<<<<< HEAD
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 1893,
-=======
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 2355,
->>>>>>> 6f5c47154549dd9f697f4a44547eda5197d40a52
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 2406,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {

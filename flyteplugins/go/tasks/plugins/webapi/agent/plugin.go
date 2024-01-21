@@ -42,7 +42,8 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	State    admin.State
+	Phase    flyteIdl.TaskExecution_Phase
+	State    admin.State // This is deprecated.
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
@@ -121,6 +122,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		logger.Infof(ctx, "Agent is executing a synchronous task.")
 		return nil,
 			ResourceWrapper{
+				Phase:    res.GetResource().Phase,
 				State:    res.GetResource().State,
 				Outputs:  res.GetResource().Outputs,
 				Message:  res.GetResource().Message,
@@ -159,6 +161,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}
 
 	return ResourceWrapper{
+		Phase:    res.Resource.Phase,
 		State:    res.Resource.State,
 		Outputs:  res.Resource.Outputs,
 		Message:  res.Resource.Message,
@@ -189,10 +192,26 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
-	logger.Infof(ctx, "@@@ resource.State [%v]", resource.State)
-	// switch resource.Phase {
-	// if it is undefined, default is 0 in the protobuf, then we will use resource.State to determine the phase
-	// }
+
+	// If the phase is undefined, we will use state to determine the phase
+	switch resource.Phase {
+	case flyteIdl.TaskExecution_QUEUED:
+	case flyteIdl.TaskExecution_INITIALIZING:
+	case flyteIdl.TaskExecution_WAITING_FOR_RESOURCES:
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+	case flyteIdl.TaskExecution_RUNNING:
+		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+	case flyteIdl.TaskExecution_SUCCEEDED:
+		err = writeOutput(ctx, taskCtx, resource)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+			return core.PhaseInfoUndefined, err
+		}
+		return core.PhaseInfoSuccess(taskInfo), nil
+	case flyteIdl.TaskExecution_ABORTED:
+	case flyteIdl.TaskExecution_FAILED:
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+	}
 
 	switch resource.State {
 	case admin.State_PENDING:
