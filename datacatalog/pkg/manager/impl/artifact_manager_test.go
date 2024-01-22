@@ -5,28 +5,28 @@ import (
 	stdErrors "errors"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 func init() {
@@ -135,6 +135,7 @@ func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *stor
 	serializedMetadata, err := proto.Marshal(artifact.Metadata)
 	assert.NoError(t, err)
 	datasetKey := models.DatasetKey{
+		Org:     expectedDataset.Org,
 		Project: expectedDataset.Project,
 		Domain:  expectedDataset.Domain,
 		Version: expectedDataset.Version,
@@ -143,6 +144,7 @@ func getExpectedArtifactModel(ctx context.Context, t *testing.T, datastore *stor
 	}
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
+			DatasetOrg:     expectedDataset.Org,
 			DatasetProject: expectedDataset.Project,
 			DatasetDomain:  expectedDataset.Domain,
 			DatasetVersion: expectedDataset.Version,
@@ -179,6 +181,7 @@ func TestCreateArtifact(t *testing.T) {
 	expectedDataset := getTestDataset()
 	mockDatasetModel := models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     expectedDataset.Id.Org,
 			Project: expectedDataset.Id.Project,
 			Domain:  expectedDataset.Id.Domain,
 			Name:    expectedDataset.Id.Name,
@@ -199,7 +202,8 @@ func TestCreateArtifact(t *testing.T) {
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
+				return dataset.Org == expectedDataset.Id.Org &&
+					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Name == expectedDataset.Id.Name &&
 					dataset.Version == expectedDataset.Id.Version
@@ -212,6 +216,7 @@ func TestCreateArtifact(t *testing.T) {
 				return artifact.ArtifactID == expectedArtifact.Id &&
 					artifact.SerializedMetadata != nil &&
 					len(artifact.ArtifactData) == len(expectedArtifact.Data) &&
+					artifact.ArtifactKey.DatasetOrg == expectedArtifact.Dataset.Org &&
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
@@ -337,6 +342,7 @@ func TestCreateArtifact(t *testing.T) {
 		dcRepo := newMockDataCatalogRepo()
 		mockDatasetModel := models.Dataset{
 			DatasetKey: models.DatasetKey{
+				Org:     expectedDataset.Id.Org,
 				Project: expectedDataset.Id.Project,
 				Domain:  expectedDataset.Id.Domain,
 				Name:    expectedDataset.Id.Name,
@@ -414,12 +420,14 @@ func TestGetArtifact(t *testing.T) {
 		dcRepo.MockTagRepo.On("Get", mock.Anything,
 			mock.MatchedBy(func(tag models.TagKey) bool {
 				return tag.TagName == expectedTag.TagName &&
+					tag.DatasetOrg == expectedTag.DatasetOrg &&
 					tag.DatasetProject == expectedTag.DatasetProject &&
 					tag.DatasetDomain == expectedTag.DatasetDomain &&
 					tag.DatasetVersion == expectedTag.DatasetVersion &&
 					tag.DatasetName == expectedTag.DatasetName
 			})).Return(models.Tag{
 			TagKey: models.TagKey{
+				DatasetOrg:     expectedTag.DatasetOrg,
 				DatasetProject: expectedTag.DatasetProject,
 				DatasetDomain:  expectedTag.DatasetDomain,
 				DatasetName:    expectedTag.DatasetName,
@@ -472,6 +480,7 @@ func TestListArtifact(t *testing.T) {
 	expectedDataset := getTestDataset()
 	mockDatasetModel := models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     expectedDataset.Id.Org,
 			Project: expectedDataset.Id.Project,
 			Domain:  expectedDataset.Id.Domain,
 			Name:    expectedDataset.Id.Name,
@@ -542,7 +551,8 @@ func TestListArtifact(t *testing.T) {
 
 		dcRepo.MockDatasetRepo.On("Get", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
+				return dataset.Org == expectedDataset.Id.Org &&
+					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Name == expectedDataset.Id.Name &&
 					dataset.Version == expectedDataset.Id.Version
@@ -555,7 +565,8 @@ func TestListArtifact(t *testing.T) {
 
 		dcRepo.MockArtifactRepo.On("List", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
+				return dataset.Org == expectedDataset.Id.Org &&
+					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Name == expectedDataset.Id.Name &&
 					dataset.Version == expectedDataset.Id.Version
@@ -595,7 +606,8 @@ func TestListArtifact(t *testing.T) {
 		}
 		dcRepo.MockArtifactRepo.On("List", mock.Anything,
 			mock.MatchedBy(func(dataset models.DatasetKey) bool {
-				return dataset.Project == expectedDataset.Id.Project &&
+				return dataset.Org == expectedDataset.Id.Org &&
+					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Name == expectedDataset.Id.Name &&
 					dataset.Version == expectedDataset.Id.Version
@@ -650,13 +662,13 @@ func TestUpdateArtifact(t *testing.T) {
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
 				return artifact.ArtifactID == expectedArtifact.Id &&
+					artifact.ArtifactKey.DatasetOrg == expectedArtifact.Dataset.Org &&
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
 					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
 					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
-
 
 		request := &datacatalog.UpdateArtifactRequest{
 			Dataset: expectedDataset.Id,
@@ -725,6 +737,7 @@ func TestUpdateArtifact(t *testing.T) {
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
 				return artifact.ArtifactID == expectedArtifact.Id &&
+					artifact.ArtifactKey.DatasetOrg == expectedArtifact.Dataset.Org &&
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
@@ -735,12 +748,14 @@ func TestUpdateArtifact(t *testing.T) {
 		dcRepo.MockTagRepo.On("Get", mock.Anything,
 			mock.MatchedBy(func(tag models.TagKey) bool {
 				return tag.TagName == expectedTag.TagName &&
+					tag.DatasetOrg == expectedTag.DatasetOrg &&
 					tag.DatasetProject == expectedTag.DatasetProject &&
 					tag.DatasetDomain == expectedTag.DatasetDomain &&
 					tag.DatasetVersion == expectedTag.DatasetVersion &&
 					tag.DatasetName == expectedTag.DatasetName
 			})).Return(models.Tag{
 			TagKey: models.TagKey{
+				DatasetOrg:     expectedTag.DatasetOrg,
 				DatasetProject: expectedTag.DatasetProject,
 				DatasetDomain:  expectedTag.DatasetDomain,
 				DatasetName:    expectedTag.DatasetName,

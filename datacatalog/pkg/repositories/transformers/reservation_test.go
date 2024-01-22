@@ -34,6 +34,7 @@ func TestCreateReservation(t *testing.T) {
 	heartbeatInterval := time.Second * 5
 	modelReservation := models.Reservation{
 		ReservationKey: models.ReservationKey{
+			DatasetOrg:     "o",
 			DatasetProject: "p",
 			DatasetName:    "n",
 			DatasetDomain:  "d",
@@ -55,6 +56,7 @@ func TestCreateReservation(t *testing.T) {
 	assert.Equal(t, reservationID.TagName, modelReservation.TagName)
 
 	datasetID := reservationID.DatasetId
+	assert.Equal(t, datasetID.Org, modelReservation.DatasetOrg)
 	assert.Equal(t, datasetID.Project, modelReservation.DatasetProject)
 	assert.Equal(t, datasetID.Name, modelReservation.DatasetName)
 	assert.Equal(t, datasetID.Domain, modelReservation.DatasetDomain)

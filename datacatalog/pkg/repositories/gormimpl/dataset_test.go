@@ -28,6 +28,7 @@ func init() {
 func getTestDataset() models.Dataset {
 	return models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     "testOrg",
 			Project: "testProject",
 			Domain:  "testDomain",
 			Name:    "testName",
@@ -51,6 +52,7 @@ func getTestDataset() models.Dataset {
 func getDBDatasetResponse(dataset models.Dataset) []map[string]interface{} {
 	expectedDatasetResponse := make([]map[string]interface{}, 0)
 	sampleDataset := make(map[string]interface{})
+	sampleDataset["org"] = dataset.Org
 	sampleDataset["project"] = dataset.Project
 	sampleDataset["domain"] = dataset.Domain
 	sampleDataset["name"] = dataset.Name
@@ -88,12 +90,13 @@ func TestCreateDatasetNoPartitions(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`INSERT INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","uuid","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
-			assert.EqualValues(t, dataset.Project, values[3].Value)
-			assert.EqualValues(t, dataset.Name, values[4].Value)
-			assert.EqualValues(t, dataset.Domain, values[5].Value)
-			assert.EqualValues(t, dataset.Version, values[6].Value)
-			assert.EqualValues(t, dataset.UUID, values[7].Value)
-			assert.EqualValues(t, dataset.SerializedMetadata, values[8].Value)
+			assert.EqualValues(t, dataset.Org, values[3].Value)
+			assert.EqualValues(t, dataset.Project, values[4].Value)
+			assert.EqualValues(t, dataset.Name, values[5].Value)
+			assert.EqualValues(t, dataset.Domain, values[6].Value)
+			assert.EqualValues(t, dataset.Version, values[7].Value)
+			assert.EqualValues(t, dataset.UUID, values[8].Value)
+			assert.EqualValues(t, dataset.SerializedMetadata, values[9].Value)
 			datasetCreated = true
 		},
 	)
@@ -117,12 +120,13 @@ func TestCreateDataset(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`INSERT INTO "datasets" ("created_at","updated_at","deleted_at","project","name","domain","version","uuid","serialized_metadata") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`).WithCallback(
 		func(s string, values []driver.NamedValue) {
-			assert.EqualValues(t, dataset.Project, values[3].Value)
-			assert.EqualValues(t, dataset.Name, values[4].Value)
-			assert.EqualValues(t, dataset.Domain, values[5].Value)
-			assert.EqualValues(t, dataset.Version, values[6].Value)
-			assert.EqualValues(t, dataset.UUID, values[7].Value)
-			assert.EqualValues(t, dataset.SerializedMetadata, values[8].Value)
+			assert.EqualValues(t, dataset.Org, values[3].Value)
+			assert.EqualValues(t, dataset.Project, values[4].Value)
+			assert.EqualValues(t, dataset.Name, values[5].Value)
+			assert.EqualValues(t, dataset.Domain, values[6].Value)
+			assert.EqualValues(t, dataset.Version, values[7].Value)
+			assert.EqualValues(t, dataset.UUID, values[8].Value)
+			assert.EqualValues(t, dataset.SerializedMetadata, values[9].Value)
 			datasetCreated = true
 		},
 	).WithReply([]map[string]interface{}{{"dataset_uuid": getDatasetUUID()}})
@@ -148,6 +152,7 @@ func TestGetDataset(t *testing.T) {
 
 	expectedDatasetResponse := make([]map[string]interface{}, 0)
 	sampleDataset := make(map[string]interface{})
+	sampleDataset["org"] = dataset.Org
 	sampleDataset["project"] = dataset.Project
 	sampleDataset["domain"] = dataset.Domain
 	sampleDataset["name"] = dataset.Name
@@ -172,6 +177,7 @@ func TestGetDataset(t *testing.T) {
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.NoError(t, err)
+	assert.Equal(t, dataset.Org, actualDataset.Org)
 	assert.Equal(t, dataset.Project, actualDataset.Project)
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
 	assert.Equal(t, dataset.Name, actualDataset.Name)
@@ -204,6 +210,7 @@ func TestGetDatasetWithUUID(t *testing.T) {
 	datasetRepo := NewDatasetRepo(utils.GetDbForTest(t), errors.NewPostgresErrorTransformer(), promutils.NewTestScope())
 	actualDataset, err := datasetRepo.Get(context.Background(), dataset.DatasetKey)
 	assert.NoError(t, err)
+	assert.Equal(t, dataset.Org, actualDataset.Org)
 	assert.Equal(t, dataset.Project, actualDataset.Project)
 	assert.Equal(t, dataset.Domain, actualDataset.Domain)
 	assert.Equal(t, dataset.Name, actualDataset.Name)
@@ -213,6 +220,7 @@ func TestGetDatasetWithUUID(t *testing.T) {
 func TestGetDatasetNotFound(t *testing.T) {
 	dataset := getTestDataset()
 	sampleDataset := make(map[string]interface{})
+	sampleDataset["org"] = dataset.Org
 	sampleDataset["project"] = dataset.Project
 	sampleDataset["domain"] = dataset.Domain
 	sampleDataset["name"] = dataset.Name
@@ -270,6 +278,7 @@ func TestListDatasets(t *testing.T) {
 	datasets, err := datasetRepo.List(context.Background(), listInput)
 	assert.NoError(t, err)
 	assert.Len(t, datasets, 1)
+	assert.Equal(t, datasets[0].Org, dataset.Org)
 	assert.Equal(t, datasets[0].Project, dataset.Project)
 	assert.Equal(t, datasets[0].Domain, dataset.Domain)
 	assert.Equal(t, datasets[0].Name, dataset.Name)
@@ -314,6 +323,7 @@ func TestListDatasetWithFilter(t *testing.T) {
 	}
 	datasets, err := datasetRepo.List(context.Background(), listInput)
 	assert.NoError(t, err)
+	assert.Equal(t, datasets[0].Org, dataset.Org)
 	assert.Equal(t, datasets[0].Project, dataset.Project)
 	assert.Equal(t, datasets[0].Domain, dataset.Domain)
 	assert.Equal(t, datasets[0].Name, dataset.Name)

@@ -20,6 +20,7 @@ import (
 )
 
 var tagName = "tag"
+var org = "o"
 var project = "p"
 var name = "n"
 var domain = "d"
@@ -50,7 +51,8 @@ func TestGetOrExtendReservation_CreateReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
-			return key.DatasetProject == datasetID.Project &&
+			return key.DatasetOrg == datasetID.Org &&
+				key.DatasetProject == datasetID.Project &&
 				key.DatasetDomain == datasetID.Domain &&
 				key.DatasetVersion == datasetID.Version &&
 				key.DatasetName == datasetID.Name &&
@@ -62,7 +64,8 @@ func TestGetOrExtendReservation_CreateReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Create",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
+			return reservation.DatasetOrg == datasetID.Org &&
+				reservation.DatasetProject == datasetID.Project &&
 				reservation.DatasetDomain == datasetID.Domain &&
 				reservation.DatasetName == datasetID.Name &&
 				reservation.DatasetVersion == datasetID.Version &&
@@ -98,7 +101,8 @@ func TestGetOrExtendReservation_MaxHeartbeatInterval(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
-			return key.DatasetProject == datasetID.Project &&
+			return key.DatasetOrg == datasetID.Org &&
+				key.DatasetProject == datasetID.Project &&
 				key.DatasetDomain == datasetID.Domain &&
 				key.DatasetVersion == datasetID.Version &&
 				key.DatasetName == datasetID.Name &&
@@ -110,7 +114,8 @@ func TestGetOrExtendReservation_MaxHeartbeatInterval(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Create",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
+			return reservation.DatasetOrg == datasetID.Org &&
+				reservation.DatasetProject == datasetID.Project &&
 				reservation.DatasetDomain == datasetID.Domain &&
 				reservation.DatasetName == datasetID.Name &&
 				reservation.DatasetVersion == datasetID.Version &&
@@ -151,7 +156,8 @@ func TestGetOrExtendReservation_ExtendReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Update",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
+			return reservation.DatasetOrg == datasetID.Org &&
+				reservation.DatasetProject == datasetID.Project &&
 				reservation.DatasetDomain == datasetID.Domain &&
 				reservation.DatasetName == datasetID.Name &&
 				reservation.DatasetVersion == datasetID.Version &&
@@ -191,7 +197,8 @@ func TestGetOrExtendReservation_TakeOverReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Update",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservation models.Reservation) bool {
-			return reservation.DatasetProject == datasetID.Project &&
+			return reservation.DatasetOrg == datasetID.Org &&
+				reservation.DatasetProject == datasetID.Project &&
 				reservation.DatasetDomain == datasetID.Domain &&
 				reservation.DatasetName == datasetID.Name &&
 				reservation.DatasetVersion == datasetID.Version &&
@@ -252,7 +259,8 @@ func TestReleaseReservation(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Delete",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservationKey models.ReservationKey) bool {
-			return reservationKey.DatasetProject == datasetID.Project &&
+			return reservationKey.DatasetOrg == datasetID.Org &&
+				reservationKey.DatasetProject == datasetID.Project &&
 				reservationKey.DatasetDomain == datasetID.Domain &&
 				reservationKey.DatasetName == datasetID.Name &&
 				reservationKey.DatasetVersion == datasetID.Version &&
@@ -286,7 +294,8 @@ func TestReleaseReservation_Failure(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Delete",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservationKey models.ReservationKey) bool {
-			return reservationKey.DatasetProject == datasetID.Project &&
+			return reservationKey.DatasetOrg == datasetID.Org &&
+				reservationKey.DatasetProject == datasetID.Project &&
 				reservationKey.DatasetDomain == datasetID.Domain &&
 				reservationKey.DatasetName == datasetID.Name &&
 				reservationKey.DatasetVersion == datasetID.Version &&
@@ -324,7 +333,8 @@ func TestReleaseReservation_GracefulFailure(t *testing.T) {
 	dcRepo.MockReservationRepo.On("Delete",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(reservationKey models.ReservationKey) bool {
-			return reservationKey.DatasetProject == datasetID.Project &&
+			return reservationKey.DatasetOrg == datasetID.Org &&
+				reservationKey.DatasetProject == datasetID.Project &&
 				reservationKey.DatasetDomain == datasetID.Domain &&
 				reservationKey.DatasetName == datasetID.Name &&
 				reservationKey.DatasetVersion == datasetID.Version &&
@@ -360,7 +370,9 @@ func setUpReservationRepoGet(dcRepo *mocks.DataCatalogRepo, prevExpiresAt time.T
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
-			return key.DatasetProject == datasetID.Project &&
+			return key.DatasetOrg == datasetID.Org &&
+				key.DatasetOrg == datasetID.Org &&
+				key.DatasetProject == datasetID.Project &&
 				key.DatasetDomain == datasetID.Domain &&
 				key.DatasetVersion == datasetID.Version &&
 				key.DatasetName == datasetID.Name &&
@@ -383,6 +395,7 @@ func setUpTagRepoGetNotFound(dcRepo *mocks.DataCatalogRepo) {
 
 func getReservationKey() models.ReservationKey {
 	return models.ReservationKey{
+		DatasetOrg:     org,
 		DatasetProject: project,
 		DatasetName:    name,
 		DatasetDomain:  domain,

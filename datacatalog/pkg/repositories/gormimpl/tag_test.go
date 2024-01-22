@@ -48,6 +48,7 @@ func getTestTag() models.Tag {
 	artifact := getTestArtifact()
 	return models.Tag{
 		TagKey: models.TagKey{
+			DatasetOrg:     artifact.DatasetOrg,
 			DatasetProject: artifact.DatasetProject,
 			DatasetDomain:  artifact.DatasetDomain,
 			DatasetName:    artifact.DatasetName,
@@ -95,6 +96,7 @@ func TestGetTag(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(getDBTagResponse(artifact))
 	getInput := models.TagKey{
+		DatasetOrg:     artifact.DatasetOrg,
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
 		DatasetName:    artifact.DatasetName,
@@ -124,6 +126,7 @@ func TestTagNotFound(t *testing.T) {
 		gorm.ErrRecordNotFound,
 	)
 	getInput := models.TagKey{
+		DatasetOrg:     artifact.DatasetOrg,
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
 		DatasetName:    artifact.DatasetName,

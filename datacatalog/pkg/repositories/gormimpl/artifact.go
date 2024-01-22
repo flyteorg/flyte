@@ -70,6 +70,7 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 		if result.Error.Error() == gorm.ErrRecordNotFound.Error() {
 			return models.Artifact{}, errors.GetMissingEntityError("Artifact", &datacatalog.Artifact{
 				Dataset: &datacatalog.DatasetID{
+					Org:     in.DatasetOrg,
 					Project: in.DatasetProject,
 					Domain:  in.DatasetDomain,
 					Name:    in.DatasetName,
@@ -146,6 +147,7 @@ func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) err
 		tx.Rollback()
 		return errors.GetMissingEntityError(string(common.Artifact), &datacatalog.Artifact{
 			Dataset: &datacatalog.DatasetID{
+				Org:     artifact.DatasetOrg,
 				Project: artifact.DatasetProject,
 				Domain:  artifact.DatasetDomain,
 				Name:    artifact.DatasetName,

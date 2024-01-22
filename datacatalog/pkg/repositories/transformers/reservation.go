@@ -15,6 +15,7 @@ func FromReservationID(reservationID *datacatalog.ReservationID) models.Reservat
 	datasetID := reservationID.DatasetId
 
 	return models.ReservationKey{
+		DatasetOrg:     datasetID.Org,
 		DatasetProject: datasetID.Project,
 		DatasetDomain:  datasetID.Domain,
 		DatasetName:    datasetID.Name,
@@ -33,6 +34,7 @@ func CreateReservation(reservation *models.Reservation, heartbeatInterval time.D
 	return datacatalog.Reservation{
 		ReservationId: &datacatalog.ReservationID{
 			DatasetId: &datacatalog.DatasetID{
+				Org:     reservation.DatasetOrg,
 				Project: reservation.DatasetProject,
 				Domain:  reservation.DatasetDomain,
 				Name:    reservation.DatasetName,

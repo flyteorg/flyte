@@ -36,6 +36,7 @@ func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactDat
 
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
+			DatasetOrg:     datasetID.Org,
 			DatasetProject: datasetID.Project,
 			DatasetDomain:  datasetID.Domain,
 			DatasetName:    datasetID.Name,
@@ -51,6 +52,7 @@ func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactDat
 
 func FromArtifactModel(artifact models.Artifact) (*datacatalog.Artifact, error) {
 	datasetID := &datacatalog.DatasetID{
+		Org:     artifact.DatasetOrg,
 		Project: artifact.DatasetProject,
 		Domain:  artifact.DatasetDomain,
 		Name:    artifact.DatasetName,
@@ -112,6 +114,7 @@ func ToArtifactKey(datasetID *datacatalog.DatasetID, artifactID string) models.A
 		ArtifactID: artifactID,
 	}
 	if datasetID != nil {
+		artifactKey.DatasetOrg = datasetID.Org
 		artifactKey.DatasetProject = datasetID.Project
 		artifactKey.DatasetDomain = datasetID.Domain
 		artifactKey.DatasetName = datasetID.Name

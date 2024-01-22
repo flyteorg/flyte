@@ -7,6 +7,7 @@ import (
 
 func ToTagKey(datasetID *datacatalog.DatasetID, tagName string) models.TagKey {
 	return models.TagKey{
+		DatasetOrg:     datasetID.Org,
 		DatasetProject: datasetID.Project,
 		DatasetDomain:  datasetID.Domain,
 		DatasetName:    datasetID.Name,

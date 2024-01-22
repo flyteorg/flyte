@@ -24,6 +24,7 @@ func init() {
 func getTestTag() models.Tag {
 	return models.Tag{
 		TagKey: models.TagKey{
+			DatasetOrg:     "test-org",
 			DatasetProject: "test-project",
 			DatasetDomain:  "test-domain",
 			DatasetVersion: "test-version",
@@ -47,7 +48,7 @@ func TestAddTag(t *testing.T) {
 	t.Run("HappyPath", func(t *testing.T) {
 		dcRepo.MockTagRepo.On("Create", mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(tag models.Tag) bool {
-				return tag.DatasetProject == expectedTag.DatasetProject &&
+				return tag.DatasetOrg == expectedTag.DatasetOrg && tag.DatasetProject == expectedTag.DatasetProject &&
 					tag.DatasetDomain == expectedTag.DatasetDomain &&
 					tag.DatasetName == expectedTag.DatasetName &&
 					tag.DatasetVersion == expectedTag.DatasetVersion &&
@@ -57,6 +58,7 @@ func TestAddTag(t *testing.T) {
 
 		artifact := models.Artifact{
 			ArtifactKey: models.ArtifactKey{
+				DatasetOrg:     expectedTag.DatasetOrg,
 				DatasetProject: expectedTag.DatasetProject,
 				DatasetDomain:  expectedTag.DatasetDomain,
 				DatasetName:    expectedTag.DatasetVersion,
@@ -68,6 +70,7 @@ func TestAddTag(t *testing.T) {
 
 		dataset := models.Dataset{
 			DatasetKey: models.DatasetKey{
+				Org:     expectedTag.DatasetOrg,
 				Project: expectedTag.DatasetProject,
 				Domain:  expectedTag.DatasetDomain,
 				Version: expectedTag.DatasetVersion,
@@ -77,7 +80,8 @@ func TestAddTag(t *testing.T) {
 
 		dcRepo.MockArtifactRepo.On("Get", mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifactKey models.ArtifactKey) bool {
-				return artifactKey.DatasetProject == expectedTag.DatasetProject &&
+				return artifactKey.DatasetOrg == expectedTag.DatasetOrg &&
+					artifactKey.DatasetProject == expectedTag.DatasetProject &&
 					artifactKey.DatasetDomain == expectedTag.DatasetDomain &&
 					artifactKey.DatasetName == expectedTag.DatasetName &&
 					artifactKey.DatasetVersion == expectedTag.DatasetVersion &&
@@ -86,7 +90,8 @@ func TestAddTag(t *testing.T) {
 
 		dcRepo.MockDatasetRepo.On("Get", mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
-				return datasetKey.Project == expectedTag.DatasetProject &&
+				return datasetKey.Org == expectedTag.DatasetOrg &&
+					datasetKey.Project == expectedTag.DatasetProject &&
 					datasetKey.Domain == expectedTag.DatasetDomain &&
 					datasetKey.Name == expectedTag.DatasetName &&
 					datasetKey.Version == expectedTag.DatasetVersion
@@ -98,6 +103,7 @@ func TestAddTag(t *testing.T) {
 				Name:       expectedTag.TagName,
 				ArtifactId: expectedTag.ArtifactID,
 				Dataset: &datacatalog.DatasetID{
+					Org:     expectedTag.DatasetOrg,
 					Project: expectedTag.DatasetProject,
 					Domain:  expectedTag.DatasetDomain,
 					Version: expectedTag.DatasetVersion,

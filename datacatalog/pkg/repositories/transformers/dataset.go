@@ -22,6 +22,7 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 
 	return &models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     dataset.Id.Org,
 			Project: dataset.Id.Project,
 			Domain:  dataset.Id.Domain,
 			Name:    dataset.Id.Name,
@@ -36,6 +37,7 @@ func CreateDatasetModel(dataset *datacatalog.Dataset) (*models.Dataset, error) {
 // Create a dataset ID from the dataset key model
 func FromDatasetID(datasetID *datacatalog.DatasetID) models.DatasetKey {
 	return models.DatasetKey{
+		Org:     datasetID.Org,
 		Project: datasetID.Project,
 		Domain:  datasetID.Domain,
 		Name:    datasetID.Name,
@@ -55,6 +57,7 @@ func FromDatasetModel(dataset models.Dataset) (*datacatalog.Dataset, error) {
 	return &datacatalog.Dataset{
 		Id: &datacatalog.DatasetID{
 			UUID:    dataset.UUID,
+			Org:     dataset.Org,
 			Project: dataset.Project,
 			Domain:  dataset.Domain,
 			Name:    dataset.Name,

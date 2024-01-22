@@ -55,6 +55,7 @@ func (h *dataSetRepo) Get(ctx context.Context, in models.DatasetKey) (models.Dat
 
 		if result.Error.Error() == gorm.ErrRecordNotFound.Error() {
 			return models.Dataset{}, errors.GetMissingEntityError("Dataset", &idl_datacatalog.DatasetID{
+				Org:     in.Org,
 				Project: in.Project,
 				Domain:  in.Domain,
 				Name:    in.Name,

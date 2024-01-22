@@ -59,6 +59,7 @@ func TestCreateDataset(t *testing.T) {
 			mock.MatchedBy(func(dataset models.Dataset) bool {
 
 				return dataset.Name == expectedDataset.Id.Name &&
+					dataset.Org == expectedDataset.Id.Org &&
 					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Version == expectedDataset.Id.Version &&
@@ -80,6 +81,7 @@ func TestCreateDataset(t *testing.T) {
 			mock.MatchedBy(func(dataset models.Dataset) bool {
 
 				return dataset.Name == expectedDataset.Id.Name &&
+					dataset.Org == expectedDataset.Id.Org &&
 					dataset.Project == expectedDataset.Id.Project &&
 					dataset.Domain == expectedDataset.Id.Domain &&
 					dataset.Version == expectedDataset.Id.Version &&
@@ -163,6 +165,7 @@ func TestGetDataset(t *testing.T) {
 			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
 
 				return datasetKey.Name == expectedDataset.Id.Name &&
+					datasetKey.Org == expectedDataset.Id.Org &&
 					datasetKey.Project == expectedDataset.Id.Project &&
 					datasetKey.Domain == expectedDataset.Id.Domain &&
 					datasetKey.Version == expectedDataset.Id.Version
@@ -184,6 +187,7 @@ func TestGetDataset(t *testing.T) {
 			mock.MatchedBy(func(datasetKey models.DatasetKey) bool {
 
 				return datasetKey.Name == expectedDataset.Id.Name &&
+					datasetKey.Org == expectedDataset.Id.Org &&
 					datasetKey.Project == expectedDataset.Id.Project &&
 					datasetKey.Domain == expectedDataset.Id.Domain &&
 					datasetKey.Version == expectedDataset.Id.Version

@@ -25,6 +25,7 @@ var datasetID = &datacatalog.DatasetID{
 }
 
 func assertDatasetIDEqualsModel(t *testing.T, idlDataset *datacatalog.DatasetID, model *models.DatasetKey) {
+	assert.Equal(t, idlDataset.Org, model.Org)
 	assert.Equal(t, idlDataset.Project, model.Project)
 	assert.Equal(t, idlDataset.Domain, model.Domain)
 	assert.Equal(t, idlDataset.Name, model.Name)
@@ -77,6 +78,7 @@ func TestFromDatasetID(t *testing.T) {
 func TestFromDatasetModelNoPartitionsOrMetadata(t *testing.T) {
 	datasetModel := &models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-name",
@@ -94,6 +96,7 @@ func TestFromDatasetModelNoPartitionsOrMetadata(t *testing.T) {
 func TestFromDatasetModelWithPartitions(t *testing.T) {
 	datasetModel := &models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     "test-org",
 			Project: "test-project",
 			Domain:  "test-domain",
 			Name:    "test-name",

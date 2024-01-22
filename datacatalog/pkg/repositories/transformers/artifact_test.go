@@ -50,6 +50,7 @@ func getTestTags() []models.Tag {
 func getDatasetModel() models.Dataset {
 	return models.Dataset{
 		DatasetKey: models.DatasetKey{
+			Org:     datasetID.Org,
 			Project: datasetID.Project,
 			Domain:  datasetID.Domain,
 			Name:    datasetID.Name,
@@ -114,6 +115,7 @@ func TestFromArtifactModel(t *testing.T) {
 
 	artifactModel := models.Artifact{
 		ArtifactKey: models.ArtifactKey{
+			DatasetOrg:     "org1",
 			DatasetProject: "project1",
 			DatasetDomain:  "domain1",
 			DatasetName:    "name1",

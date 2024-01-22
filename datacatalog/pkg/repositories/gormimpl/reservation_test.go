@@ -78,6 +78,7 @@ func TestGet(t *testing.T) {
 	reservationRepo := getReservationRepo(t)
 	reservation, err := reservationRepo.Get(context.Background(), expectedReservation.ReservationKey)
 	assert.Nil(t, err)
+	assert.Equal(t, expectedReservation.DatasetOrg, reservation.DatasetOrg)
 	assert.Equal(t, expectedReservation.DatasetProject, reservation.DatasetProject)
 	assert.Equal(t, expectedReservation.DatasetDomain, reservation.DatasetDomain)
 	assert.Equal(t, expectedReservation.DatasetName, reservation.DatasetName)
@@ -150,6 +151,7 @@ func getReservationRepo(t *testing.T) interfaces.ReservationRepo {
 func getDBResponse(reservation models.Reservation) []map[string]interface{} {
 	return []map[string]interface{}{
 		{
+			"dataset_org":     reservation.DatasetOrg,
 			"dataset_project": reservation.DatasetProject,
 			"dataset_name":    reservation.DatasetName,
 			"dataset_domain":  reservation.DatasetDomain,
@@ -163,6 +165,7 @@ func getDBResponse(reservation models.Reservation) []map[string]interface{} {
 
 func GetReservationKey() models.ReservationKey {
 	return models.ReservationKey{
+		DatasetOrg:     "testOrg",
 		DatasetProject: "testProject",
 		DatasetName:    "testDataset",
 		DatasetDomain:  "testDomain",

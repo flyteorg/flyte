@@ -15,6 +15,7 @@ const (
 	partitionKeyFieldName   = "key"
 	partitionValueFieldName = "value"
 	tagNameFieldName        = "tag_name"
+	orgFieldName            = "org"
 	projectFieldName        = "project"
 	domainFieldName         = "domain"
 	nameFieldName           = "name"
@@ -92,6 +93,19 @@ func constructModelFilter(ctx context.Context, singleFilter *datacatalog.SingleP
 		}
 	case *datacatalog.SinglePropertyFilter_DatasetFilter:
 		switch datasetProperty := propertyFilter.DatasetFilter.GetProperty().(type) {
+		case *datacatalog.DatasetPropertyFilter_Org:
+			org := datasetProperty.Org
+			logger.Debugf(ctx, "Constructing Dataset filter org:[%v]", org)
+			if err := validators.ValidateEmptyStringField(datasetProperty.Org, "org"); err != nil {
+				return models.ModelFilter{}, err
+			}
+			orgFilter := gormimpl.NewGormValueFilter(operator, orgFieldName, org)
+			modelValueFilters := []models.ModelValueFilter{orgFilter}
+
+			modelFilter = models.ModelFilter{
+				Entity:       common.Dataset,
+				ValueFilters: modelValueFilters,
+			}
 		case *datacatalog.DatasetPropertyFilter_Project:
 			project := datasetProperty.Project
 			logger.Debugf(ctx, "Constructing Dataset filter project:[%v]", project)

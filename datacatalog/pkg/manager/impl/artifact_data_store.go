@@ -28,7 +28,11 @@ type artifactDataStore struct {
 
 func (m *artifactDataStore) getDataLocation(ctx context.Context, artifact *datacatalog.Artifact, data *datacatalog.ArtifactData) (storage.DataReference, error) {
 	dataset := artifact.Dataset
-	return m.store.ConstructReference(ctx, m.storagePrefix, dataset.Project, dataset.Domain, dataset.Name, dataset.Version, artifact.Id, data.Name, artifactDataFile)
+	nestedKeys := []string{dataset.Org, dataset.Project, dataset.Domain, dataset.Name, dataset.Version, artifact.Id, data.Name, artifactDataFile}
+	if len(dataset.Org) == 0 {
+		nestedKeys = nestedKeys[1:]
+	}
+	return m.store.ConstructReference(ctx, m.storagePrefix)
 }
 
 // Store marshalled data in data.pb under the storage prefix

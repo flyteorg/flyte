@@ -1,6 +1,7 @@
 package models
 
 type TagKey struct {
+	DatasetOrg     string `gorm:"primary_key"`
 	DatasetProject string `gorm:"primary_key"`
 	DatasetName    string `gorm:"primary_key"`
 	DatasetDomain  string `gorm:"primary_key"`

@@ -28,6 +28,7 @@ func getTestArtifact() models.Artifact {
 	return models.Artifact{
 		ArtifactKey: models.ArtifactKey{
 			ArtifactID:     "123",
+			DatasetOrg:     "testOrg",
 			DatasetProject: "testProject",
 			DatasetDomain:  "testDomain",
 			DatasetName:    "testName",
@@ -50,6 +51,7 @@ func getTestPartition() models.Partition {
 func getDBArtifactResponse(artifact models.Artifact) []map[string]interface{} {
 	expectedArtifactResponse := make([]map[string]interface{}, 0)
 	sampleArtifact := make(map[string]interface{})
+	sampleArtifact["dataset_org"] = artifact.DatasetOrg
 	sampleArtifact["dataset_project"] = artifact.DatasetProject
 	sampleArtifact["dataset_domain"] = artifact.DatasetDomain
 	sampleArtifact["dataset_name"] = artifact.DatasetName
@@ -64,6 +66,7 @@ func getDBArtifactResponse(artifact models.Artifact) []map[string]interface{} {
 func getDBArtifactDataResponse(artifact models.Artifact) []map[string]interface{} {
 	expectedArtifactDataResponse := make([]map[string]interface{}, 0)
 	sampleArtifactData := make(map[string]interface{})
+	sampleArtifactData["dataset_org"] = artifact.DatasetOrg
 	sampleArtifactData["dataset_project"] = artifact.DatasetProject
 	sampleArtifactData["dataset_domain"] = artifact.DatasetDomain
 	sampleArtifactData["dataset_name"] = artifact.DatasetName
@@ -95,6 +98,7 @@ func getDBTagResponse(artifact models.Artifact) []map[string]interface{} {
 	sampleTag["tag_name"] = "test-tag"
 	sampleTag["artifact_id"] = artifact.ArtifactID
 	sampleTag["dataset_uuid"] = "test-uuid"
+	sampleTag["dataset_org"] = artifact.DatasetOrg
 	sampleTag["dataset_project"] = artifact.DatasetProject
 	sampleTag["dataset_domain"] = artifact.DatasetDomain
 	sampleTag["dataset_name"] = artifact.DatasetName
@@ -182,6 +186,7 @@ func TestGetArtifact(t *testing.T) {
 	GlobalMock.NewMock().WithQuery(
 		`SELECT * FROM "tags" WHERE ("tags"."artifact_id","tags"."dataset_uuid") IN (($1,$2))%!!(string=test-uuid)(EXTRA string=123)`).WithReply(expectedTagResponse)
 	getInput := models.ArtifactKey{
+		DatasetOrg:     artifact.DatasetOrg,
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
 		DatasetName:    artifact.DatasetName,
@@ -193,6 +198,7 @@ func TestGetArtifact(t *testing.T) {
 	response, err := artifactRepo.Get(context.Background(), getInput)
 	assert.NoError(t, err)
 	assert.Equal(t, artifact.ArtifactID, response.ArtifactID)
+	assert.Equal(t, artifact.DatasetOrg, response.DatasetOrg)
 	assert.Equal(t, artifact.DatasetProject, response.DatasetProject)
 	assert.Equal(t, artifact.DatasetDomain, response.DatasetDomain)
 	assert.Equal(t, artifact.DatasetName, response.DatasetName)
@@ -240,6 +246,7 @@ func TestGetArtifactDoesNotExist(t *testing.T) {
 	GlobalMock.Logging = true
 
 	getInput := models.ArtifactKey{
+		DatasetOrg:     artifact.DatasetOrg,
 		DatasetProject: artifact.DatasetProject,
 		DatasetDomain:  artifact.DatasetDomain,
 		DatasetName:    artifact.DatasetName,
