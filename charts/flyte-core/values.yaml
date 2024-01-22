@@ -92,6 +92,8 @@ flyteadmin:
         - '*'
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
+  # -- Labels for Flyteadmin pods
+  podLabels: {}
   # -- nodeSelector for Flyteadmin deployment
   nodeSelector: {}
   # -- tolerations for Flyteadmin deployment
@@ -158,6 +160,8 @@ flytescheduler:
     imagePullSecrets: []
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
+  # -- Labels for Flytescheduler pods
+  podLabels: {}
   # -- nodeSelector for Flytescheduler deployment
   nodeSelector: {}
   # -- tolerations for Flytescheduler deployment
@@ -216,6 +220,8 @@ datacatalog:
     imagePullSecrets: []
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
+  # -- Labels for Datacatalog pods
+  podLabels: {}
   # -- nodeSelector for Datacatalog deployment
   nodeSelector: {}
   # -- tolerations for Datacatalog deployment
@@ -282,6 +288,8 @@ flytepropeller:
     imagePullSecrets: []
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
+  # -- Labels for Flytepropeller pods
+  podLabels: {}
   # -- nodeSelector for Flytepropeller deployment
   nodeSelector: {}
   # -- tolerations for Flytepropeller deployment
@@ -344,6 +352,8 @@ flyteconsole:
     type: ClusterIP
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
+  # -- Labels for Flyteconsole pods
+  podLabels: {}
   # -- nodeSelector for Flyteconsole deployment
   nodeSelector: {}
   # -- tolerations for Flyteconsole deployment
@@ -824,6 +834,8 @@ cluster_resource_manager:
   service_account_name: flyteadmin
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
+  # -- Labels for ClusterResource pods
+  podLabels: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters

@@ -24,6 +24,7 @@ A Helm chart for Flyte agent
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
 | podAnnotations | object | `{}` | Annotations for flyteagent pods |
+| podLabels | object | `{}` | Labels for flyteagent pods |
 | ports.containerPort | int | `8000` |  |
 | ports.name | string | `"agent-grpc"` |  |
 | priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |

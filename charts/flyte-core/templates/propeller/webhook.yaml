@@ -26,6 +26,9 @@ spec:
         app: {{ template "flyte-pod-webhook.name" . }}
         app.kubernetes.io/name: {{ template "flyte-pod-webhook.name" . }}
         app.kubernetes.io/version: {{ .Values.flytepropeller.image.tag }}
+        {{- with .Values.flytepropeller.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
         {{- with .Values.flytepropeller.podAnnotations }}

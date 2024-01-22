@@ -17,7 +17,7 @@ spec:
         {{- with .Values.flytescheduler.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flytescheduler.labels" . | nindent 8 }}
+      labels: {{ include "flytescheduler.podLabels" . | nindent 8 }}
     spec:
       securityContext:
         fsGroup: 65534

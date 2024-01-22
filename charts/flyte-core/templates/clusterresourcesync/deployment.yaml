@@ -16,7 +16,7 @@ spec:
         {{- with .Values.cluster_resource_manager.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteclusterresourcesync.labels" . | nindent 8 }}
+      labels: {{ include "flyteclusterresourcesync.podLabels" . | nindent 8 }}
     spec:
       containers:
         - command:

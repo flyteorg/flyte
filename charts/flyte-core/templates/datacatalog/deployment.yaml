@@ -16,7 +16,7 @@ spec:
         {{- with .Values.datacatalog.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "datacatalog.labels" . | nindent 8 }}
+      labels: {{ include "datacatalog.podLabels" . | nindent 8 }}
     spec:
       securityContext:
         fsGroup: 1001

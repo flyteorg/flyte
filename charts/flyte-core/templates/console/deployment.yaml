@@ -16,7 +16,7 @@ spec:
         {{- with .Values.flyteconsole.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteconsole.labels" . | nindent 8 }}
+      labels: {{ include "flyteconsole.podLabels" . | nindent 8 }}
     spec:
       securityContext:
         runAsUser: 1000

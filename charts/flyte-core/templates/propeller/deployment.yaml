@@ -26,9 +26,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- if .Values.flytepropeller.manager }}
-      labels: {{ include "flytepropeller-manager.labels" . | nindent 8 }}
+      labels: {{ include "flytepropeller-manager.podLabels" . | nindent 8 }}
       {{- else }}
-      labels: {{ include "flytepropeller.labels" . | nindent 8 }}
+      labels: {{ include "flytepropeller.podLabels" . | nindent 8 }}
       {{- end }}
     spec:
       securityContext:
