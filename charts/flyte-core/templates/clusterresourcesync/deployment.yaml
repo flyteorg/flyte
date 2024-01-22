@@ -25,6 +25,12 @@ spec:
             - {{ .Values.flyteadmin.configPath }}
             - clusterresource
             - run
+          {{- if .Values.cluster_resource_manager.podEnv }}
+          env:
+            {{- with .Values.cluster_resource_manager.podEnv }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+          {{- end }}
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources

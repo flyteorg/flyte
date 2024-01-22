@@ -23,6 +23,12 @@ spec:
       - command:
         - pyflyte
         - serve
+        {{- if .Values.podEnv }}
+        env:
+        {{- with .Values.podEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- end }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         name: flyteagent

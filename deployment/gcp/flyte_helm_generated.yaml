@@ -1148,6 +1148,7 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        env:
         resources: 
           limits:
             cpu: 250m

@@ -56,6 +56,8 @@ serviceAccount:
   imagePullSecrets: []
 # -- Annotations for flyteagent pods
 podAnnotations: {}
+# -- Additional flyteagent pod container environment variables
+podEnv: {}
 # -- Labels for flyteagent pods
 podLabels: {}
 # -- nodeSelector for flyteagent deployment

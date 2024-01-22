@@ -160,6 +160,8 @@ flytescheduler:
     imagePullSecrets: []
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
+  # -- Additional Flytescheduler container environment variables
+  podEnv: {}
   # -- Labels for Flytescheduler pods
   podLabels: {}
   # -- nodeSelector for Flytescheduler deployment
@@ -220,6 +222,8 @@ datacatalog:
     imagePullSecrets: []
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
+  # -- Additional Datacatalog container environment variables
+  podEnv: {}
   # -- Labels for Datacatalog pods
   podLabels: {}
   # -- nodeSelector for Datacatalog deployment
@@ -288,6 +292,8 @@ flytepropeller:
     imagePullSecrets: []
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
+  # -- Additional Flytepropeller container environment variables
+  podEnv: {}
   # -- Labels for Flytepropeller pods
   podLabels: {}
   # -- nodeSelector for Flytepropeller deployment
@@ -352,6 +358,8 @@ flyteconsole:
     type: ClusterIP
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
+  # -- Additional Flyteconsole container environment variables
+  podEnv: {}
   # -- Labels for Flyteconsole pods
   podLabels: {}
   # -- nodeSelector for Flyteconsole deployment
@@ -581,7 +589,7 @@ configmap:
       eventVersion: 2
       testing:
         host: http://flyteadmin
-      
+
     # -- Authentication configuration
     auth:
       authorizedUris:
@@ -834,6 +842,8 @@ cluster_resource_manager:
   service_account_name: flyteadmin
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
+  # -- Additional ClusterResource container environment variables
+  podEnv: {}
   # -- Labels for ClusterResource pods
   podLabels: {}
   # -- Configmap for ClusterResource parameters

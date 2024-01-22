@@ -24,6 +24,7 @@ A Helm chart for Flyte agent
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
 | podAnnotations | object | `{}` | Annotations for flyteagent pods |
+| podEnv | object | `{}` | Additional flyteagent pod container environment variables |
 | podLabels | object | `{}` | Labels for flyteagent pods |
 | ports.containerPort | int | `8000` |  |
 | ports.name | string | `"agent-grpc"` |  |
