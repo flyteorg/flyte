@@ -28,7 +28,6 @@ import (
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	corev1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/clientcmd"
-	"k8s.io/kubernetes/pkg/api/v1/pod"
 )
 
 const (
@@ -103,12 +102,13 @@ func WatchFlyteDeployment(ctx context.Context, appsClient corev1.CoreV1Interface
 		ready = 0
 		if total != 0 {
 			for _, v := range pods.Items {
-				// TODO (jeev): We should really be using
-				// `IsContainersReadyConditionTrue`, but that is not available until
-				// version v1.22.11. We are on v1.13.0 for some reason.
-				if pod.IsPodReadyConditionTrue(v.Status) {
-					ready++
+				for _, condition := range v.Status.Conditions {
+					if string(condition.Type) == string(corev1api.PodReady) && condition.Status == corev1api.ConditionTrue {
+						ready++
+						break
+					}
 				}
+
 				if len(v.Status.Conditions) > 0 {
 					table.Append([]string{v.GetName(), string(v.Status.Phase), v.GetNamespace()})
 				}
