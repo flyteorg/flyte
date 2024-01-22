@@ -49,7 +49,7 @@ type Input struct {
 	PodUID                    string
 	TaskExecutionID           pluginsCore.TaskExecutionID
 	ExtraTemplateVarsByScheme *TemplateVarsByScheme
-	TaskTemplate			  *core.TaskTemplate
+	TaskTemplate              *core.TaskTemplate
 }
 
 // Output contains all task logs a plugin generates for a given Input.
@@ -64,9 +64,9 @@ type Plugin interface {
 }
 
 type TemplateLogPlugin struct {
-	DisplayName   string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
-	TemplateURIs  []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
-	DynamicTemplateURIs []TemplateURI         `json:"dynamicTemplateUris" pflag:",Dynamic URI Templates for generating task log links."`
-	MessageFormat core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
-	Scheme        TemplateScheme             `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
+	DisplayName         string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
+	TemplateURIs        []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
+	DynamicTemplateURIs []TemplateURI              `json:"dynamicTemplateUris" pflag:",Dynamic URI Templates for generating task log links."`
+	MessageFormat       core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
+	Scheme              TemplateScheme             `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 }

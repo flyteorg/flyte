@@ -70,7 +70,7 @@ type templateLogPluginCollection struct {
 func (t templateLogPluginCollection) GetTaskLogs(input tasklog.Input) (tasklog.Output, error) {
 	var taskLogs []*core.TaskLog
 
-	for _, plugin := range t.plugins {
+	for _, plugin := range append(t.plugins, t.dynamicPlugins...) {
 		o, err := plugin.GetTaskLogs(input)
 		if err != nil {
 			return tasklog.Output{}, err
@@ -113,7 +113,7 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 
 	if cfg.IsDynamicLogLinksEnabled {
 		if len(cfg.DynamicLogLinks.Flyin) > 0 {
-			dynamicPlugins = append(plugins, tasklog.TemplateLogPlugin{DisplayName: "Flyin Logs", Scheme: tasklog.TemplateSchemeDynamic, TemplateURIs: []tasklog.TemplateURI{cfg.DynamicLogLinks.Flyin}, MessageFormat: core.TaskLog_JSON})
+			dynamicPlugins = append(dynamicPlugins, tasklog.TemplateLogPlugin{DisplayName: "Flyin Logs", Scheme: tasklog.TemplateSchemeDynamic, DynamicTemplateURIs: []tasklog.TemplateURI{cfg.DynamicLogLinks.Flyin}, MessageFormat: core.TaskLog_JSON})
 		}
 	}
 
