@@ -676,41 +676,41 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto[] =
   "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta"
   "\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 "
   "\001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_lin"
-  "ks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"\313\001\n\010Res"
-  "ource\022$\n\005state\030\001 \001(\0162\025.flyteidl.admin.St"
-  "ate\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core.Lit"
-  "eralMap\022\017\n\007message\030\003 \001(\t\022)\n\tlog_links\030\004 "
-  "\003(\0132\026.flyteidl.core.TaskLog\0221\n\005phase\030\005 \001"
-  "(\0162\".flyteidl.core.TaskExecution.Phase\"="
-  "\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025"
-  "\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTaskRespo"
-  "nse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024supported_"
-  "task_types\030\002 \003(\t\"\037\n\017GetAgentRequest\022\014\n\004n"
-  "ame\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005agent\030\001"
-  " \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListAgent"
-  "sRequest\";\n\022ListAgentsResponse\022%\n\006agents"
-  "\030\001 \003(\0132\025.flyteidl.admin.Agent\"\331\001\n\025GetTas"
-  "kMetricsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre"
-  "source_meta\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nst"
-  "art_time\030\004 \001(\0132\032.google.protobuf.Timesta"
-  "mp\022,\n\010end_time\030\005 \001(\0132\032.google.protobuf.T"
-  "imestamp\022\'\n\004step\030\006 \001(\0132\031.google.protobuf"
-  ".Duration\"O\n\026GetTaskMetricsResponse\0225\n\007r"
-  "esults\030\001 \003(\0132$.flyteidl.core.ExecutionMe"
-  "tricResult\"\\\n\022GetTaskLogsRequest\022\021\n\ttask"
-  "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\022\r\n\005li"
-  "nes\030\003 \001(\004\022\r\n\005token\030\004 \001(\t\"5\n\023GetTaskLogsR"
-  "esponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*"
-  "^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMA"
-  "NENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003"
-  "\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteorg/f"
-  "lyte/flyteidl/gen/pb-go/flyteidl/adminb\006"
-  "proto3"
+  "ks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"\317\001\n\010Res"
+  "ource\022(\n\005state\030\001 \001(\0162\025.flyteidl.admin.St"
+  "ateB\002\030\001\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core"
+  ".LiteralMap\022\017\n\007message\030\003 \001(\t\022)\n\tlog_link"
+  "s\030\004 \003(\0132\026.flyteidl.core.TaskLog\0221\n\005phase"
+  "\030\005 \001(\0162\".flyteidl.core.TaskExecution.Pha"
+  "se\"=\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001 \001"
+  "(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTaskR"
+  "esponse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024suppor"
+  "ted_task_types\030\002 \003(\t\"\037\n\017GetAgentRequest\022"
+  "\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005age"
+  "nt\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListA"
+  "gentsRequest\";\n\022ListAgentsResponse\022%\n\006ag"
+  "ents\030\001 \003(\0132\025.flyteidl.admin.Agent\"\331\001\n\025Ge"
+  "tTaskMetricsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025"
+  "\n\rresource_meta\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022."
+  "\n\nstart_time\030\004 \001(\0132\032.google.protobuf.Tim"
+  "estamp\022,\n\010end_time\030\005 \001(\0132\032.google.protob"
+  "uf.Timestamp\022\'\n\004step\030\006 \001(\0132\031.google.prot"
+  "obuf.Duration\"O\n\026GetTaskMetricsResponse\022"
+  "5\n\007results\030\001 \003(\0132$.flyteidl.core.Executi"
+  "onMetricResult\"\\\n\022GetTaskLogsRequest\022\021\n\t"
+  "task_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\022\r"
+  "\n\005lines\030\003 \001(\004\022\r\n\005token\030\004 \001(\t\"5\n\023GetTaskL"
+  "ogsResponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030\002 "
+  "\001(\t*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021P"
+  "ERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNI"
+  "NG\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteo"
+  "rg/flyte/flyteidl/gen/pb-go/flyteidl/adm"
+  "inb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fagent_2eproto,
-  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 2406,
+  "flyteidl/admin/agent.proto", &assign_descriptors_table_flyteidl_2fadmin_2fagent_2eproto, 2410,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fagent_2eproto() {
@@ -3531,7 +3531,7 @@ const char* Resource::_InternalParse(const char* begin, const char* end, void* o
     ptr = ::google::protobuf::io::Parse32(ptr, &tag);
     GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
     switch (tag >> 3) {
-      // .flyteidl.admin.State state = 1;
+      // .flyteidl.admin.State state = 1 [deprecated = true];
       case 1: {
         if (static_cast<::google::protobuf::uint8>(tag) != 8) goto handle_unusual;
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
@@ -3626,7 +3626,7 @@ bool Resource::MergePartialFromCodedStream(
     tag = p.first;
     if (!p.second) goto handle_unusual;
     switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
-      // .flyteidl.admin.State state = 1;
+      // .flyteidl.admin.State state = 1 [deprecated = true];
       case 1: {
         if (static_cast< ::google::protobuf::uint8>(tag) == (8 & 0xFF)) {
           int value = 0;
@@ -3718,7 +3718,7 @@ void Resource::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.admin.State state = 1;
+  // .flyteidl.admin.State state = 1 [deprecated = true];
   if (this->state() != 0) {
     ::google::protobuf::internal::WireFormatLite::WriteEnum(
       1, this->state(), output);
@@ -3768,7 +3768,7 @@ void Resource::SerializeWithCachedSizes(
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .flyteidl.admin.State state = 1;
+  // .flyteidl.admin.State state = 1 [deprecated = true];
   if (this->state() != 0) {
     target = ::google::protobuf::internal::WireFormatLite::WriteEnumToArray(
       1, this->state(), target);
@@ -3852,7 +3852,7 @@ size_t Resource::ByteSizeLong() const {
         *outputs_);
   }
 
-  // .flyteidl.admin.State state = 1;
+  // .flyteidl.admin.State state = 1 [deprecated = true];
   if (this->state() != 0) {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::EnumSize(this->state());

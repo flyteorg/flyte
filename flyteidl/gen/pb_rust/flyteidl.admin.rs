@@ -88,6 +88,7 @@ pub struct GetTaskResponse {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Resource {
     /// DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
+    #[deprecated]
     #[prost(enumeration="State", tag="1")]
     pub state: i32,
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a

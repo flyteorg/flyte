@@ -79,7 +79,7 @@ message GetTaskResponse {
 
 message Resource {
   // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
-  State state = 1;
+  State state = 1 [deprecated = true];
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional

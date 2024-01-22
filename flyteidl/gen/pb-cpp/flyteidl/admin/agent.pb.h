@@ -1133,11 +1133,11 @@ class Resource final :
   ::flyteidl::core::LiteralMap* mutable_outputs();
   void set_allocated_outputs(::flyteidl::core::LiteralMap* outputs);
 
-  // .flyteidl.admin.State state = 1;
-  void clear_state();
-  static const int kStateFieldNumber = 1;
-  ::flyteidl::admin::State state() const;
-  void set_state(::flyteidl::admin::State value);
+  // .flyteidl.admin.State state = 1 [deprecated = true];
+  PROTOBUF_DEPRECATED void clear_state();
+  PROTOBUF_DEPRECATED static const int kStateFieldNumber = 1;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::State state() const;
+  PROTOBUF_DEPRECATED void set_state(::flyteidl::admin::State value);
 
   // .flyteidl.core.TaskExecution.Phase phase = 5;
   void clear_phase();
@@ -3367,7 +3367,7 @@ GetTaskResponse::log_links() const {
 
 // Resource
 
-// .flyteidl.admin.State state = 1;
+// .flyteidl.admin.State state = 1 [deprecated = true];
 inline void Resource::clear_state() {
   state_ = 0;
 }

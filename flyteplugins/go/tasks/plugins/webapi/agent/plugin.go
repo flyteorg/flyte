@@ -193,7 +193,6 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
-	// If the phase is undefined, we will use state to determine the phase.
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
 		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, resource.Message, taskInfo), nil
@@ -216,8 +215,12 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	}
 
-	logger.Infof(ctx, "Agent returned an undefined phase [%v]. Checking state.", resource.Phase)
+	// The default phase is undefined.
+	if resource.Phase != flyteIdl.TaskExecution_UNDEFINED {
+		return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
+	}
 
+	// If the phase is undefined, we will use state to determine the phase.
 	switch resource.State {
 	case admin.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
@@ -235,7 +238,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}
-	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
+	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {

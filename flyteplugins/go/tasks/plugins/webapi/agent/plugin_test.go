@@ -318,6 +318,20 @@ func TestPlugin(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
 	})
+
+	t.Run("test UNDEFINED Phase", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			State:    8,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.Error(t, err)
+		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
+	})
 }
 
 func TestInitializeAgentRegistry(t *testing.T) {
