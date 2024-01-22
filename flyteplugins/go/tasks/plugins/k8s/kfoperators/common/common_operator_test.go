@@ -2,7 +2,7 @@ package common
 
 import (
 	"fmt"
-  "os"
+	"os"
 	"testing"
 	"time"
 
@@ -25,7 +25,6 @@ func TestMain(m *testing.M) {
 	code := m.Run()
 	os.Exit(code)
 }
-
 
 func TestExtractCurrentCondition(t *testing.T) {
 	jobCreated := commonOp.JobCondition{
