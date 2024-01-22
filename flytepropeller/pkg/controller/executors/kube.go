@@ -33,7 +33,7 @@ var NewCache = func(config *rest.Config, options cache.Options) (cache.Cache, er
 	return otelutils.WrapK8sCache(k8sCache), nil
 }
 
-func BuildNewClientFunc(writeFilterSize int, scope promutils.Scope) func(config *rest.Config, options client.Options) (client.Client, error) {
+func BuildNewClientFunc(scope promutils.Scope) func(config *rest.Config, options client.Options) (client.Client, error) {
 	return func(config *rest.Config, options client.Options) (client.Client, error) {
 		var cacheReader client.Reader
 		cachelessOptions := options
@@ -44,10 +44,10 @@ func BuildNewClientFunc(writeFilterSize int, scope promutils.Scope) func(config 
 
 		k8sClient, err := client.New(config, cachelessOptions)
 		if err != nil {
-			return k8sClient, err
+			return nil, err
 		}
 
-		filter, err := fastcheck.NewOppoBloomFilter(writeFilterSize, scope.NewSubScope("kube_filter"))
+		filter, err := fastcheck.NewOppoBloomFilter(50000, scope.NewSubScope("kube_filter"))
 		if err != nil {
 			return nil, err
 		}

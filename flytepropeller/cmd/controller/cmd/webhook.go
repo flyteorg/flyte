@@ -109,7 +109,7 @@ func runWebhook(origContext context.Context, propellerCfg *config.Config, cfg *w
 			DefaultNamespaces: namespaceConfigs,
 		},
 		NewCache:  executors.NewCache,
-		NewClient: executors.BuildNewClientFunc(50000, propellerScope),
+		NewClient: executors.BuildNewClientFunc(webhookScope),
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
