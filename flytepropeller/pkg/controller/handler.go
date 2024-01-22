@@ -385,12 +385,13 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			// Workflow is too large, we will mark the workflow as failing and record it. This will automatically
 			// propagate the failure in the next round.
 			mutableW := w.DeepCopy()
-			// if workflow is already in a terminal state then cleanup is already handled
+			// catch potential indefinite update loop
 			if mutatedWf.GetExecutionStatus().IsTerminated() {
 				SetFinalizerIfEmpty(mutableW, FinalizerKey)
 				SetDefinitionVersionIfEmpty(mutableW, v1alpha1.LatestWorkflowDefinitionVersion)
 				SetCompletedLabel(mutableW, time.Now())
-				mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailed, "Workflow size has breached threshold, aborted", &core.ExecutionError{
+				msg := fmt.Sprintf("Workflow size has breached threshold. Finalized with status: %v", mutatedWf.GetExecutionStatus().GetPhase())
+				mutableW.Status.UpdatePhase(v1alpha1.WorkflowPhaseFailed, msg, &core.ExecutionError{
 					Kind:    core.ExecutionError_SYSTEM,
 					Code:    "WorkflowTooLarge",
 					Message: "Workflow execution state is too large for Flyte to handle.",
