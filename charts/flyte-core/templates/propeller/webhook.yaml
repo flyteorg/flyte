@@ -28,7 +28,7 @@ spec:
         app.kubernetes.io/version: {{ .Values.flytepropeller.image.tag }}
       annotations:
         configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
-        {{- with .Values.flyteadmin.podAnnotations }}
+        {{- with .Values.flytepropeller.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -60,7 +60,7 @@ spec:
                 fieldPath: metadata.namespace
         volumeMounts:
           - name: config-volume
-            mountPath: /etc/flyte/config      
+            mountPath: /etc/flyte/config
 {{- end }}
       containers:
         - name: webhook
