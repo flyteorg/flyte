@@ -144,7 +144,7 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 			DefaultNamespaces: namespaceConfigs,
 		},
 		NewCache:  executors.NewCache,
-		NewClient: executors.BuildNewClientFunc(50000, propellerScope),
+		NewClient: executors.BuildNewClientFunc(propellerScope),
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
