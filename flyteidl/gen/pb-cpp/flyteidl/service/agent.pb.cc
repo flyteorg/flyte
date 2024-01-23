@@ -39,7 +39,7 @@ static constexpr ::google::protobuf::Message* const* file_default_instances = nu
 const char descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto[] =
   "\n\034flyteidl/service/agent.proto\022\020flyteidl"
   ".service\032\034google/api/annotations.proto\032\032"
-  "flyteidl/admin/agent.proto2\314\003\n\021AsyncAgen"
+  "flyteidl/admin/agent.proto2\316\003\n\021AsyncAgen"
   "tService\022U\n\nCreateTask\022!.flyteidl.admin."
   "CreateTaskRequest\032\".flyteidl.admin.Creat"
   "eTaskResponse\"\000\022L\n\007GetTask\022\036.flyteidl.ad"
@@ -49,22 +49,22 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto[] =
   "DeleteTaskResponse\"\000\022a\n\016GetTaskMetrics\022%"
   ".flyteidl.admin.GetTaskMetricsRequest\032&."
   "flyteidl.admin.GetTaskMetricsResponse\"\000\022"
-  "X\n\013GetTaskLogs\022\".flyteidl.admin.GetTaskL"
+  "Z\n\013GetTaskLogs\022\".flyteidl.admin.GetTaskL"
   "ogsRequest\032#.flyteidl.admin.GetTaskLogsR"
-  "esponse\"\0002\360\001\n\024AgentMetadataService\022k\n\010Ge"
-  "tAgent\022\037.flyteidl.admin.GetAgentRequest\032"
-  " .flyteidl.admin.GetAgentResponse\"\034\202\323\344\223\002"
-  "\026\022\024/api/v1/agent/{name}\022k\n\nListAgents\022!."
-  "flyteidl.admin.ListAgentsRequest\032\".flyte"
-  "idl.admin.ListAgentsResponse\"\026\202\323\344\223\002\020\022\016/a"
-  "pi/v1/agentsB\?Z=github.com/flyteorg/flyt"
-  "e/flyteidl/gen/pb-go/flyteidl/serviceb\006p"
-  "roto3"
+  "esponse\"\0000\0012\360\001\n\024AgentMetadataService\022k\n\010"
+  "GetAgent\022\037.flyteidl.admin.GetAgentReques"
+  "t\032 .flyteidl.admin.GetAgentResponse\"\034\202\323\344"
+  "\223\002\026\022\024/api/v1/agent/{name}\022k\n\nListAgents\022"
+  "!.flyteidl.admin.ListAgentsRequest\032\".fly"
+  "teidl.admin.ListAgentsResponse\"\026\202\323\344\223\002\020\022\016"
+  "/api/v1/agentsB\?Z=github.com/flyteorg/fl"
+  "yte/flyteidl/gen/pb-go/flyteidl/serviceb"
+  "\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fagent_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fagent_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fagent_2eproto,
-  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 885,
+  "flyteidl/service/agent.proto", &assign_descriptors_table_flyteidl_2fservice_2fagent_2eproto, 887,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fagent_2eproto() {

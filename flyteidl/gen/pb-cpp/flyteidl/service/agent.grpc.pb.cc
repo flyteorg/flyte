@@ -38,7 +38,7 @@ AsyncAgentService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& 
   , rpcmethod_GetTask_(AsyncAgentService_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_DeleteTask_(AsyncAgentService_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetTaskMetrics_(AsyncAgentService_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetTaskLogs_(AsyncAgentService_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetTaskLogs_(AsyncAgentService_method_names[4], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   {}
 
 ::grpc::Status AsyncAgentService::Stub::CreateTask(::grpc::ClientContext* context, const ::flyteidl::admin::CreateTaskRequest& request, ::flyteidl::admin::CreateTaskResponse* response) {
@@ -153,32 +153,20 @@ void AsyncAgentService::Stub::experimental_async::GetTaskMetrics(::grpc::ClientC
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::GetTaskMetricsResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskMetrics_, context, request, false);
 }
 
-::grpc::Status AsyncAgentService::Stub::GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::flyteidl::admin::GetTaskLogsResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetTaskLogs_, context, request, response);
+::grpc::ClientReader< ::flyteidl::admin::GetTaskLogsResponse>* AsyncAgentService::Stub::GetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request) {
+  return ::grpc::internal::ClientReaderFactory< ::flyteidl::admin::GetTaskLogsResponse>::Create(channel_.get(), rpcmethod_GetTaskLogs_, context, request);
 }
 
-void AsyncAgentService::Stub::experimental_async::GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetTaskLogs_, context, request, response, std::move(f));
+void AsyncAgentService::Stub::experimental_async::GetTaskLogs(::grpc::ClientContext* context, ::flyteidl::admin::GetTaskLogsRequest* request, ::grpc::experimental::ClientReadReactor< ::flyteidl::admin::GetTaskLogsResponse>* reactor) {
+  ::grpc::internal::ClientCallbackReaderFactory< ::flyteidl::admin::GetTaskLogsResponse>::Create(stub_->channel_.get(), stub_->rpcmethod_GetTaskLogs_, context, request, reactor);
 }
 
-void AsyncAgentService::Stub::experimental_async::GetTaskLogs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskLogsResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetTaskLogs_, context, request, response, std::move(f));
+::grpc::ClientAsyncReader< ::flyteidl::admin::GetTaskLogsResponse>* AsyncAgentService::Stub::AsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc::internal::ClientAsyncReaderFactory< ::flyteidl::admin::GetTaskLogsResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskLogs_, context, request, true, tag);
 }
 
-void AsyncAgentService::Stub::experimental_async::GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetTaskLogs_, context, request, response, reactor);
-}
-
-void AsyncAgentService::Stub::experimental_async::GetTaskLogs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetTaskLogs_, context, request, response, reactor);
-}
-
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>* AsyncAgentService::Stub::AsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::GetTaskLogsResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskLogs_, context, request, true);
-}
-
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>* AsyncAgentService::Stub::PrepareAsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::GetTaskLogsResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskLogs_, context, request, false);
+::grpc::ClientAsyncReader< ::flyteidl::admin::GetTaskLogsResponse>* AsyncAgentService::Stub::PrepareAsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncReaderFactory< ::flyteidl::admin::GetTaskLogsResponse>::Create(channel_.get(), cq, rpcmethod_GetTaskLogs_, context, request, false, nullptr);
 }
 
 AsyncAgentService::Service::Service() {
@@ -204,8 +192,8 @@ AsyncAgentService::Service::Service() {
           std::mem_fn(&AsyncAgentService::Service::GetTaskMetrics), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AsyncAgentService_method_names[4],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< AsyncAgentService::Service, ::flyteidl::admin::GetTaskLogsRequest, ::flyteidl::admin::GetTaskLogsResponse>(
+      ::grpc::internal::RpcMethod::SERVER_STREAMING,
+      new ::grpc::internal::ServerStreamingHandler< AsyncAgentService::Service, ::flyteidl::admin::GetTaskLogsRequest, ::flyteidl::admin::GetTaskLogsResponse>(
           std::mem_fn(&AsyncAgentService::Service::GetTaskLogs), this)));
 }
 
@@ -240,10 +228,10 @@ AsyncAgentService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status AsyncAgentService::Service::GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) {
+::grpc::Status AsyncAgentService::Service::GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::grpc::ServerWriter< ::flyteidl::admin::GetTaskLogsResponse>* writer) {
   (void) context;
   (void) request;
-  (void) response;
+  (void) writer;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 

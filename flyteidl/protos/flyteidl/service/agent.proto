@@ -23,7 +23,7 @@ service AsyncAgentService {
   rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){};
 
   // GetTaskLogs returns task execution logs, if available.
-  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (flyteidl.admin.GetTaskLogsResponse){};
+  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (stream flyteidl.admin.GetTaskLogsResponse){};
 }
 
 // AgentMetadataService defines an RPC service that is also served over HTTP via grpc-gateway.

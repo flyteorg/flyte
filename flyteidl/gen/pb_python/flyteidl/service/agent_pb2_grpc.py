@@ -35,7 +35,7 @@ class AsyncAgentServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.FromString,
                 )
-        self.GetTaskLogs = channel.unary_unary(
+        self.GetTaskLogs = channel.unary_stream(
                 '/flyteidl.service.AsyncAgentService/GetTaskLogs',
                 request_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.FromString,
@@ -108,7 +108,7 @@ def add_AsyncAgentServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskMetricsResponse.SerializeToString,
             ),
-            'GetTaskLogs': grpc.unary_unary_rpc_method_handler(
+            'GetTaskLogs': grpc.unary_stream_rpc_method_handler(
                     servicer.GetTaskLogs,
                     request_deserializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.SerializeToString,
@@ -203,7 +203,7 @@ class AsyncAgentService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AsyncAgentService/GetTaskLogs',
+        return grpc.experimental.unary_stream(request, target, '/flyteidl.service.AsyncAgentService/GetTaskLogs',
             flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsRequest.SerializeToString,
             flyteidl_dot_admin_dot_agent__pb2.GetTaskLogsResponse.FromString,
             options, channel_credentials,
