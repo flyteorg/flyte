@@ -8,22 +8,53 @@ import "flyteidl/admin/agent.proto";
 
 // AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
 service AsyncAgentService {
-  // Send a task create request to the agent server.
-  rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){};
+  // ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+  rpc ExecuteTaskSync (stream flyteidl.admin.ExecuteTaskSyncRequest) returns (stream flyteidl.admin.ExecuteTaskSyncResponse){
+    option (google.api.http) = {
+      post: "/api/v1/agent/task/stream"
+      body: "*"
+    };
+  };
+
+  // CreateTask sends a task create request to the agent service.
+  rpc CreateTask (stream flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){
+    option (google.api.http) = {
+      post: "/api/v1/agent/task"
+      body: "*"
+    };
+  };
+
   // Get job status.
-  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){};
+  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (stream flyteidl.admin.GetTaskResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/{task_type.name}/{task_type.version}/{resource_meta}"
+    };
+  };
+
   // Delete the task resource.
-  rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){};
+  rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){
+    option (google.api.http) = {
+      delete: "/api/v1/agent/task_executions/{task_type.name}/{task_type.version}/{resource_meta}"
+    };
+  };
 
   // GetTaskMetrics returns one or more task execution metrics, if available.
   //
   // Errors include
   //  * OutOfRange if metrics are not available for the specified task time range
   //  * various other errors
-  rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){};
+  rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/metrics/{task_type.name}/{task_type.version}/{resource_meta}"
+    };
+  };
 
   // GetTaskLogs returns task execution logs, if available.
-  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (flyteidl.admin.GetTaskLogsResponse){};
+  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (stream flyteidl.admin.GetTaskLogsResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/logs/{task_type.name}/{task_type.version}/{resource_meta}"
+    };
+  };
 }
 
 // AgentMetadataService defines an RPC service that is also served over HTTP via grpc-gateway.
