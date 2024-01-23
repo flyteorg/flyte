@@ -142,7 +142,7 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 		url := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
 		queryParams := request.URL.Query()
 		if !GetRedirectURLAllowed(ctx, queryParams.Get(RedirectURLParameter), authCtx.Options()) {
-			logger.Errorf(ctx, "unauthorized redirect URI")
+			logger.Infof(ctx, "unauthorized redirect URI")
 			writer.WriteHeader(http.StatusForbidden)
 			return
 		}
