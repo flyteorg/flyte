@@ -83,12 +83,12 @@ func TestGetRedirectURLAllowed(t *testing.T) {
 	})
 	cfg := &config.Config{
 		AuthorizedURIs: []flytestdconfig.URL{
-			{URL: *config.MustParseURL("example.com")},
+			{URL: *config.MustParseURL("https://example.com")},
 			{URL: *config.MustParseURL("http://localhost:3008")},
 		},
 	}
 	t.Run("authorized url", func(t *testing.T) {
-		assert.True(t, GetRedirectURLAllowed(ctx, "example.com", cfg))
+		assert.True(t, GetRedirectURLAllowed(ctx, "https://example.com", cfg))
 	})
 	t.Run("authorized localhost url", func(t *testing.T) {
 		assert.True(t, GetRedirectURLAllowed(ctx, "http://localhost:3008", cfg))
