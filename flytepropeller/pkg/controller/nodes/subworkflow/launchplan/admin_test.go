@@ -466,7 +466,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 				ExecutionClosure: &admin.ExecutionClosure{
 					Phase:      core.WorkflowExecution_SUCCEEDED,
 					WorkflowId: &core.Identifier{Project: "p"}},
-				ExecutionOutputs: outputLiteral,
+				ExecutionOutputs: &core.OutputData{Outputs: outputLiteral},
 			},
 			expectedOutputs: outputLiteral,
 		},

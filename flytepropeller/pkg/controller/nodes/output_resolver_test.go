@@ -1,10 +1,11 @@
 package nodes
 
 import (
-	protoV1 "github.com/golang/protobuf/proto"
-	"google.golang.org/protobuf/proto"
 	"os"
 	"testing"
+
+	protoV1 "github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/stretchr/testify/assert"
 
