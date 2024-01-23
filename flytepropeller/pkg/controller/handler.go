@@ -387,7 +387,7 @@ func (p *Propeller) streak(ctx context.Context, w *v1alpha1.FlyteWorkflow, wfClo
 			mutableW := w.DeepCopy()
 			// catch potential indefinite update loop
 			if mutatedWf.GetExecutionStatus().IsTerminated() {
-				SetFinalizerIfEmpty(mutableW, FinalizerKey)
+				ResetFinalizers(mutableW)
 				SetDefinitionVersionIfEmpty(mutableW, v1alpha1.LatestWorkflowDefinitionVersion)
 				SetCompletedLabel(mutableW, time.Now())
 				msg := fmt.Sprintf("Workflow size has breached threshold. Finalized with status: %v", mutatedWf.GetExecutionStatus().GetPhase())

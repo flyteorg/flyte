@@ -843,7 +843,7 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
 		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
-			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && HasFinalizer(w) && HasCompletedLabel(w)
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !HasFinalizer(w) && HasCompletedLabel(w)
 		}), mock.Anything).Return(nil, nil).Once()
 		err := p.Handle(ctx, namespace, name)
 		assert.NoError(t, err)
