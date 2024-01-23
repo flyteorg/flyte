@@ -118,4 +118,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-  For MMCloud plugin on the Flyte cluster, please refer to `Memory Machine Cloud Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/mmcloud_plugin/index.html>`_
+For MMCloud plugin on the Flyte cluster, please refer to `Memory Machine Cloud Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/mmcloud_plugin/index.html>`_
