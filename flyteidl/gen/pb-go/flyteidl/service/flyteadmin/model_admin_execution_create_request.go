@@ -17,5 +17,7 @@ type AdminExecutionCreateRequest struct {
 	Spec *AdminExecutionSpec `json:"spec,omitempty"`
 	// The inputs required to start the execution. All required inputs must be included in this map. If not required and not provided, defaults apply. +optional Deprecated: Please use input_data instead.
 	Inputs *CoreLiteralMap `json:"inputs,omitempty"`
+	// Optional, org key applied to the resource.
+	Org string `json:"org,omitempty"`
 	InputData *CoreInputData `json:"input_data,omitempty"`
 }

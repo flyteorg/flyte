@@ -41,10 +41,13 @@ message ExecutionCreateRequest {
     // Deprecated: Please use input_data instead.
     core.LiteralMap inputs = 5 [deprecated = true];
 
+    // Optional, org key applied to the resource.
+    string org = 6;
+
     // The inputs required to start the execution. All required inputs must be
     // included in this map. If not required and not provided, defaults apply.
     // +optional
-    core.InputData input_data = 6;
+    core.InputData input_data = 7;
 }
 
 // Request to relaunch the referenced execution.

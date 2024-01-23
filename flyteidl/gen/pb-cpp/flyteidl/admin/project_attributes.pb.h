@@ -199,6 +199,20 @@ class ProjectAttributes final :
   ::std::string* release_project();
   void set_allocated_project(::std::string* project);
 
+  // string org = 3;
+  void clear_org();
+  static const int kOrgFieldNumber = 3;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchingAttributes matching_attributes = 2;
   bool has_matching_attributes() const;
   void clear_matching_attributes();
@@ -214,6 +228,7 @@ class ProjectAttributes final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::MatchingAttributes* matching_attributes_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fattributes_2eproto;
@@ -549,6 +564,20 @@ class ProjectAttributesGetRequest final :
   ::std::string* release_project();
   void set_allocated_project(::std::string* project);
 
+  // string org = 3;
+  void clear_org();
+  static const int kOrgFieldNumber = 3;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchableResource resource_type = 2;
   void clear_resource_type();
   static const int kResourceTypeFieldNumber = 2;
@@ -561,6 +590,7 @@ class ProjectAttributesGetRequest final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   int resource_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fattributes_2eproto;
@@ -791,6 +821,20 @@ class ProjectAttributesDeleteRequest final :
   ::std::string* release_project();
   void set_allocated_project(::std::string* project);
 
+  // string org = 3;
+  void clear_org();
+  static const int kOrgFieldNumber = 3;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchableResource resource_type = 2;
   void clear_resource_type();
   static const int kResourceTypeFieldNumber = 2;
@@ -803,6 +847,7 @@ class ProjectAttributesDeleteRequest final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr project_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   int resource_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_5fattributes_2eproto;
@@ -1021,6 +1066,59 @@ inline void ProjectAttributes::set_allocated_matching_attributes(::flyteidl::adm
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectAttributes.matching_attributes)
 }
 
+// string org = 3;
+inline void ProjectAttributes::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectAttributes::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectAttributes.org)
+  return org_.GetNoArena();
+}
+inline void ProjectAttributes::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectAttributes.org)
+}
+#if LANG_CXX11
+inline void ProjectAttributes::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectAttributes.org)
+}
+#endif
+inline void ProjectAttributes::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectAttributes.org)
+}
+inline void ProjectAttributes::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectAttributes.org)
+}
+inline ::std::string* ProjectAttributes::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectAttributes.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectAttributes::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectAttributes.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectAttributes::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectAttributes.org)
+}
+
 // -------------------------------------------------------------------
 
 // ProjectAttributesUpdateRequest
@@ -1151,6 +1249,59 @@ inline void ProjectAttributesGetRequest::set_resource_type(::flyteidl::admin::Ma
   // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectAttributesGetRequest.resource_type)
 }
 
+// string org = 3;
+inline void ProjectAttributesGetRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectAttributesGetRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectAttributesGetRequest.org)
+  return org_.GetNoArena();
+}
+inline void ProjectAttributesGetRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectAttributesGetRequest.org)
+}
+#if LANG_CXX11
+inline void ProjectAttributesGetRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectAttributesGetRequest.org)
+}
+#endif
+inline void ProjectAttributesGetRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectAttributesGetRequest.org)
+}
+inline void ProjectAttributesGetRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectAttributesGetRequest.org)
+}
+inline ::std::string* ProjectAttributesGetRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectAttributesGetRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectAttributesGetRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectAttributesGetRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectAttributesGetRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectAttributesGetRequest.org)
+}
+
 // -------------------------------------------------------------------
 
 // ProjectAttributesGetResponse
@@ -1275,6 +1426,59 @@ inline void ProjectAttributesDeleteRequest::set_resource_type(::flyteidl::admin:
   
   resource_type_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectAttributesDeleteRequest.resource_type)
+}
+
+// string org = 3;
+inline void ProjectAttributesDeleteRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ProjectAttributesDeleteRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+  return org_.GetNoArena();
+}
+inline void ProjectAttributesDeleteRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+}
+#if LANG_CXX11
+inline void ProjectAttributesDeleteRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+}
+#endif
+inline void ProjectAttributesDeleteRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+}
+inline void ProjectAttributesDeleteRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+}
+inline ::std::string* ProjectAttributesDeleteRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ProjectAttributesDeleteRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectAttributesDeleteRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ProjectAttributesDeleteRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectAttributesDeleteRequest.org)
 }
 
 // -------------------------------------------------------------------

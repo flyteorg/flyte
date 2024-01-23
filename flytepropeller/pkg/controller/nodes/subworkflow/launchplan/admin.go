@@ -19,6 +19,7 @@ import (
 	stdErr "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var isRecovery = true
@@ -33,6 +34,7 @@ func IsWorkflowTerminated(p core.WorkflowExecution_Phase) bool {
 type adminLaunchPlanExecutor struct {
 	adminClient service.AdminServiceClient
 	cache       cache.AutoRefresh
+	store       *storage.DataStore
 }
 
 type executionCacheItem struct {
@@ -267,24 +269,34 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 			execData, err := a.adminClient.GetExecutionData(ctx, &admin.WorkflowExecutionGetDataRequest{
 				Id: &exec.WorkflowExecutionIdentifier,
 			})
+			if err != nil || execData.GetFullOutputs() == nil || execData.GetFullOutputs().GetLiterals() == nil {
+				outputURI := res.GetClosure().GetOutputs().GetUri()
+				// attempt remote storage read on GetExecutionData failure
+				if outputURI != "" {
+					err = a.store.ReadProtobuf(ctx, storage.DataReference(outputURI), outputs)
+					if err != nil {
+						logger.Errorf(ctx, "Failed to read outputs from URI [%s] with err: %v", outputURI, err)
+					}
+				}
+				if err != nil {
+					resp = append(resp, cache.ItemSyncResponse{
+						ID: obj.GetID(),
+						Item: executionCacheItem{
+							WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
+							SyncError:                   err,
+						},
+						Action: cache.Update,
+					})
 
-			if err != nil {
-				resp = append(resp, cache.ItemSyncResponse{
-					ID: obj.GetID(),
-					Item: executionCacheItem{
-						WorkflowExecutionIdentifier: exec.WorkflowExecutionIdentifier,
-						SyncError:                   err,
-					},
-					Action: cache.Update,
-				})
+					continue
+				}
 
-				continue
-			}
-
-			outputs = execData.GetOutputData()
-			if outputs == nil && execData.GetFullOutputs() != nil {
-				outputs = &core.OutputData{
-					Outputs: execData.GetFullOutputs(),
+			} else {
+				outputs = execData.GetOutputData()
+				if outputs == nil && execData.GetFullOutputs() != nil {
+					outputs = &core.OutputData{
+						Outputs: execData.GetFullOutputs(),
+					}
 				}
 			}
 		}
@@ -305,9 +317,10 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 }
 
 func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
-	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope) (FlyteAdmin, error) {
+	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore) (FlyteAdmin, error) {
 	exec := &adminLaunchPlanExecutor{
 		adminClient: client,
+		store:       store,
 	}
 
 	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}

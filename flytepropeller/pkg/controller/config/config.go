@@ -98,6 +98,7 @@ var (
 			InterruptibleFailureThreshold:  -1,
 			DefaultMaxAttempts:             1,
 			IgnoreRetryCause:               false,
+			EnableCRDebugMetadata:          false,
 		},
 		MaxStreakLength: 8, // Turbo mode is enabled by default
 		ProfilerPort: config.Port{
@@ -213,6 +214,7 @@ type NodeConfig struct {
 	InterruptibleFailureThreshold  int32            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'"`
 	DefaultMaxAttempts             int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
 	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
+	EnableCRDebugMetadata          bool             `json:"enable-cr-debug-metadata" pflag:",Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd."`
 }
 
 // DefaultDeadlines contains default values for timeouts

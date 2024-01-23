@@ -40,6 +40,7 @@ class AdminExecutionCreateRequest(object):
         'name': 'str',
         'spec': 'AdminExecutionSpec',
         'inputs': 'CoreLiteralMap',
+        'org': 'str',
         'input_data': 'CoreInputData'
     }
 
@@ -49,10 +50,11 @@ class AdminExecutionCreateRequest(object):
         'name': 'name',
         'spec': 'spec',
         'inputs': 'inputs',
+        'org': 'org',
         'input_data': 'input_data'
     }
 
-    def __init__(self, project=None, domain=None, name=None, spec=None, inputs=None, input_data=None):  # noqa: E501
+    def __init__(self, project=None, domain=None, name=None, spec=None, inputs=None, org=None, input_data=None):  # noqa: E501
         """AdminExecutionCreateRequest - a model defined in Swagger"""  # noqa: E501
 
         self._project = None
@@ -60,6 +62,7 @@ class AdminExecutionCreateRequest(object):
         self._name = None
         self._spec = None
         self._inputs = None
+        self._org = None
         self._input_data = None
         self.discriminator = None
 
@@ -73,6 +76,8 @@ class AdminExecutionCreateRequest(object):
             self.spec = spec
         if inputs is not None:
             self.inputs = inputs
+        if org is not None:
+            self.org = org
         if input_data is not None:
             self.input_data = input_data
 
@@ -182,6 +187,29 @@ class AdminExecutionCreateRequest(object):
         """
 
         self._inputs = inputs
+
+    @property
+    def org(self):
+        """Gets the org of this AdminExecutionCreateRequest.  # noqa: E501
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :return: The org of this AdminExecutionCreateRequest.  # noqa: E501
+        :rtype: str
+        """
+        return self._org
+
+    @org.setter
+    def org(self, org):
+        """Sets the org of this AdminExecutionCreateRequest.
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :param org: The org of this AdminExecutionCreateRequest.  # noqa: E501
+        :type: str
+        """
+
+        self._org = org
 
     @property
     def input_data(self):

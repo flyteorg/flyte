@@ -28,89 +28,15 @@ var _ status.Status
 var _ = runtime.String
 var _ = utilities.NewDoubleArray
 
-var (
-	filter_ArtifactRegistry_GetArtifact_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
-)
-
 func request_ArtifactRegistry_GetArtifact_0(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq GetArtifactRequest
 	var metadata runtime.ServerMetadata
 
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
 	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_GetArtifact_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.GetArtifact(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-var (
-	filter_ArtifactRegistry_GetArtifact_1 = &utilities.DoubleArray{Encoding: map[string]int{"query": 0, "artifact_id": 1, "artifact_key": 2, "project": 3, "domain": 4, "name": 5, "version": 6}, Base: []int{1, 13, 1, 1, 1, 4, 3, 2, 0, 0, 9, 7, 6, 0, 9, 9, 0}, Check: []int{0, 1, 2, 3, 4, 2, 6, 7, 5, 8, 2, 11, 12, 13, 2, 15, 16}}
-)
-
-func request_ArtifactRegistry_GetArtifact_1(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetArtifactRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["query.artifact_id.artifact_key.project"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.artifact_key.project")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.artifact_key.project", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.artifact_key.project", err)
-	}
-
-	val, ok = pathParams["query.artifact_id.artifact_key.domain"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.artifact_key.domain")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.artifact_key.domain", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.artifact_key.domain", err)
-	}
-
-	val, ok = pathParams["query.artifact_id.artifact_key.name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.artifact_key.name")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.artifact_key.name", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.artifact_key.name", err)
-	}
-
-	val, ok = pathParams["query.artifact_id.version"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.version")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.version", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.version", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_GetArtifact_1); err != nil {
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -118,228 +44,16 @@ func request_ArtifactRegistry_GetArtifact_1(ctx context.Context, marshaler runti
 	return msg, metadata, err
 
 }
-
-var (
-	filter_ArtifactRegistry_GetArtifact_2 = &utilities.DoubleArray{Encoding: map[string]int{"query": 0, "artifact_id": 1, "artifact_key": 2, "project": 3, "domain": 4, "name": 5}, Base: []int{1, 9, 1, 1, 1, 4, 4, 0, 3, 0, 9, 7, 7, 0}, Check: []int{0, 1, 2, 3, 4, 2, 6, 5, 7, 9, 2, 11, 12, 13}}
-)
-
-func request_ArtifactRegistry_GetArtifact_2(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetArtifactRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["query.artifact_id.artifact_key.project"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.artifact_key.project")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.artifact_key.project", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.artifact_key.project", err)
-	}
-
-	val, ok = pathParams["query.artifact_id.artifact_key.domain"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.artifact_key.domain")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.artifact_key.domain", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.artifact_key.domain", err)
-	}
-
-	val, ok = pathParams["query.artifact_id.artifact_key.name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_id.artifact_key.name")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_id.artifact_key.name", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_id.artifact_key.name", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_GetArtifact_2); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.GetArtifact(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-var (
-	filter_ArtifactRegistry_GetArtifact_3 = &utilities.DoubleArray{Encoding: map[string]int{"query": 0, "artifact_tag": 1, "artifact_key": 2, "project": 3, "domain": 4, "name": 5}, Base: []int{1, 9, 1, 1, 1, 4, 4, 0, 3, 0, 9, 7, 7, 0}, Check: []int{0, 1, 2, 3, 4, 2, 6, 5, 7, 9, 2, 11, 12, 13}}
-)
-
-func request_ArtifactRegistry_GetArtifact_3(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq GetArtifactRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["query.artifact_tag.artifact_key.project"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_tag.artifact_key.project")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_tag.artifact_key.project", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_tag.artifact_key.project", err)
-	}
-
-	val, ok = pathParams["query.artifact_tag.artifact_key.domain"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_tag.artifact_key.domain")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_tag.artifact_key.domain", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_tag.artifact_key.domain", err)
-	}
-
-	val, ok = pathParams["query.artifact_tag.artifact_key.name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "query.artifact_tag.artifact_key.name")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "query.artifact_tag.artifact_key.name", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "query.artifact_tag.artifact_key.name", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_GetArtifact_3); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.GetArtifact(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-var (
-	filter_ArtifactRegistry_SearchArtifacts_0 = &utilities.DoubleArray{Encoding: map[string]int{"artifact_key": 0, "project": 1, "domain": 2, "name": 3}, Base: []int{1, 1, 1, 2, 3, 0, 0, 0}, Check: []int{0, 1, 2, 2, 2, 3, 4, 5}}
-)
 
 func request_ArtifactRegistry_SearchArtifacts_0(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq SearchArtifactsRequest
 	var metadata runtime.ServerMetadata
 
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["artifact_key.project"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "artifact_key.project")
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
 	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "artifact_key.project", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "artifact_key.project", err)
-	}
-
-	val, ok = pathParams["artifact_key.domain"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "artifact_key.domain")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "artifact_key.domain", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "artifact_key.domain", err)
-	}
-
-	val, ok = pathParams["artifact_key.name"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "artifact_key.name")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "artifact_key.name", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "artifact_key.name", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_SearchArtifacts_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	msg, err := client.SearchArtifacts(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
-	return msg, metadata, err
-
-}
-
-var (
-	filter_ArtifactRegistry_SearchArtifacts_1 = &utilities.DoubleArray{Encoding: map[string]int{"artifact_key": 0, "project": 1, "domain": 2}, Base: []int{1, 1, 1, 2, 0, 0}, Check: []int{0, 1, 2, 2, 3, 4}}
-)
-
-func request_ArtifactRegistry_SearchArtifacts_1(ctx context.Context, marshaler runtime.Marshaler, client ArtifactRegistryClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq SearchArtifactsRequest
-	var metadata runtime.ServerMetadata
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["artifact_key.project"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "artifact_key.project")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "artifact_key.project", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "artifact_key.project", err)
-	}
-
-	val, ok = pathParams["artifact_key.domain"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "artifact_key.domain")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "artifact_key.domain", val)
-
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "artifact_key.domain", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_ArtifactRegistry_SearchArtifacts_1); err != nil {
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
@@ -548,7 +262,7 @@ func RegisterArtifactRegistryHandler(ctx context.Context, mux *runtime.ServeMux,
 // "ArtifactRegistryClient" to call the correct interceptors.
 func RegisterArtifactRegistryHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ArtifactRegistryClient) error {
 
-	mux.Handle("GET", pattern_ArtifactRegistry_GetArtifact_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ArtifactRegistry_GetArtifact_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -568,67 +282,7 @@ func RegisterArtifactRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 
 	})
 
-	mux.Handle("GET", pattern_ArtifactRegistry_GetArtifact_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ArtifactRegistry_GetArtifact_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ArtifactRegistry_GetArtifact_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_ArtifactRegistry_GetArtifact_2, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ArtifactRegistry_GetArtifact_2(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ArtifactRegistry_GetArtifact_2(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_ArtifactRegistry_GetArtifact_3, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ArtifactRegistry_GetArtifact_3(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ArtifactRegistry_GetArtifact_3(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_ArtifactRegistry_SearchArtifacts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_ArtifactRegistry_SearchArtifacts_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
@@ -645,26 +299,6 @@ func RegisterArtifactRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 		}
 
 		forward_ArtifactRegistry_SearchArtifacts_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_ArtifactRegistry_SearchArtifacts_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		rctx, err := runtime.AnnotateContext(ctx, mux, req)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_ArtifactRegistry_SearchArtifacts_1(rctx, inboundMarshaler, client, req, pathParams)
-		ctx = runtime.NewServerMetadataContext(ctx, md)
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_ArtifactRegistry_SearchArtifacts_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -734,15 +368,7 @@ func RegisterArtifactRegistryHandlerClient(ctx context.Context, mux *runtime.Ser
 var (
 	pattern_ArtifactRegistry_GetArtifact_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 0}, []string{"artifacts", "api", "v1"}, ""))
 
-	pattern_ArtifactRegistry_GetArtifact_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"artifacts", "api", "v1", "artifact", "id", "query.artifact_id.artifact_key.project", "query.artifact_id.artifact_key.domain", "query.artifact_id.artifact_key.name", "query.artifact_id.version"}, ""))
-
-	pattern_ArtifactRegistry_GetArtifact_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"artifacts", "api", "v1", "artifact", "id", "query.artifact_id.artifact_key.project", "query.artifact_id.artifact_key.domain", "query.artifact_id.artifact_key.name"}, ""))
-
-	pattern_ArtifactRegistry_GetArtifact_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"artifacts", "api", "v1", "artifact", "tag", "query.artifact_tag.artifact_key.project", "query.artifact_tag.artifact_key.domain", "query.artifact_tag.artifact_key.name"}, ""))
-
-	pattern_ArtifactRegistry_SearchArtifacts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"artifacts", "api", "v1", "search", "artifact_key.project", "artifact_key.domain", "artifact_key.name"}, ""))
-
-	pattern_ArtifactRegistry_SearchArtifacts_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"artifacts", "api", "v1", "search", "artifact_key.project", "artifact_key.domain"}, ""))
+	pattern_ArtifactRegistry_SearchArtifacts_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"artifacts", "api", "v1", "search"}, ""))
 
 	pattern_ArtifactRegistry_DeactivateTrigger_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"artifacts", "api", "v1", "trigger", "deactivate"}, ""))
 
@@ -754,15 +380,7 @@ var (
 var (
 	forward_ArtifactRegistry_GetArtifact_0 = runtime.ForwardResponseMessage
 
-	forward_ArtifactRegistry_GetArtifact_1 = runtime.ForwardResponseMessage
-
-	forward_ArtifactRegistry_GetArtifact_2 = runtime.ForwardResponseMessage
-
-	forward_ArtifactRegistry_GetArtifact_3 = runtime.ForwardResponseMessage
-
 	forward_ArtifactRegistry_SearchArtifacts_0 = runtime.ForwardResponseMessage
-
-	forward_ArtifactRegistry_SearchArtifacts_1 = runtime.ForwardResponseMessage
 
 	forward_ArtifactRegistry_DeactivateTrigger_0 = runtime.ForwardResponseMessage
 

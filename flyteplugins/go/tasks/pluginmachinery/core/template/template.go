@@ -114,6 +114,21 @@ func Render(ctx context.Context, inputTemplate []string, params Parameters) ([]s
 	return res, nil
 }
 
+func IsInputOutputWrapperSupported(ctx context.Context, metadata RuntimeMetadata) bool {
+	if metadata != nil && metadata.GetType() == idlCore.RuntimeMetadata_FLYTE_SDK {
+		v, err := version.ParseSemantic(metadata.GetVersion())
+		if err != nil {
+			logger.Warnf(ctx, "Failed to parse version [%v] to determine the input path behavior. Proceeding with InputDataWrapper format.", metadata.GetVersion())
+		} else if !v.AtLeast(inputDataWrapperMinVersion) {
+			return false
+		}
+	} else {
+		return false
+	}
+
+	return true
+}
+
 func render(ctx context.Context, inputTemplate string, params Parameters, perRetryKey string) (string, error) {
 	val := outputRegex.ReplaceAllString(inputTemplate, params.OutputPath.GetOutputPrefixPath().String())
 	val = inputPrefixRegex.ReplaceAllString(val, params.Inputs.GetInputPrefixPath().String())
@@ -129,18 +144,7 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 	// Input format has been updated, check if flytekit has been updated to the new version, the GetInputPath()
 	// itself will upload the input (can be expensive) to the remote location
 	if inputFileRegex.MatchString(val) {
-		useNewFormat := true
-		if params.Runtime != nil && params.Runtime.GetType() == idlCore.RuntimeMetadata_FLYTE_SDK {
-			v, err := version.ParseSemantic(params.Runtime.GetVersion())
-			if err != nil {
-				logger.Warnf(ctx, "Failed to parse version [%v] to determine the input path behavior. Proceeding with InputDataWrapper format.", params.Runtime.GetVersion())
-			} else if !v.AtLeast(inputDataWrapperMinVersion) {
-				useNewFormat = false
-			}
-		} else {
-			useNewFormat = false
-		}
-
+		useNewFormat := IsInputOutputWrapperSupported(ctx, params.Runtime)
 		if useNewFormat {
 			val = inputFileRegex.ReplaceAllString(val, params.Inputs.GetInputDataPath().String())
 		} else {

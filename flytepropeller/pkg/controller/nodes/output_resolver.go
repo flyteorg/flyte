@@ -113,8 +113,8 @@ func resolveSubtaskOutput(ctx context.Context, store storage.ProtobufStore, node
 func resolveSingleOutput(ctx context.Context, store storage.ProtobufStore, nodeID string, outputsFileRef storage.DataReference,
 	varName string) (*core.Literal, error) {
 
-	oldOutputs := &core.LiteralMap{}
 	outputs := &core.OutputData{}
+	oldOutputs := &core.LiteralMap{}
 	if msgIndex, err := store.ReadProtobufAny(ctx, outputsFileRef, outputs, oldOutputs); err != nil {
 		return nil, errors.Wrapf(errors.CausedByError, nodeID, err, "Failed to GetPrevious data from outputDir [%v]",
 			outputsFileRef)

@@ -85,8 +85,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_project_attributes2(self):
+        """Test case for delete_project_attributes2
+
+        Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
+        """
+        pass
+
     def test_delete_project_domain_attributes(self):
         """Test case for delete_project_domain_attributes
+
+        Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
+        """
+        pass
+
+    def test_delete_project_domain_attributes2(self):
+        """Test case for delete_project_domain_attributes2
 
         Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
         """
@@ -99,8 +113,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_delete_workflow_attributes2(self):
+        """Test case for delete_workflow_attributes2
+
+        Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
+        """
+        pass
+
     def test_get_active_launch_plan(self):
         """Test case for get_active_launch_plan
+
+        Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
+        """
+        pass
+
+    def test_get_active_launch_plan2(self):
+        """Test case for get_active_launch_plan2
 
         Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
         """
@@ -113,8 +141,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_description_entity2(self):
+        """Test case for get_description_entity2
+
+        Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
+        """
+        pass
+
     def test_get_execution(self):
         """Test case for get_execution
+
+        Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
+    def test_get_execution2(self):
+        """Test case for get_execution2
 
         Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
         """
@@ -127,8 +169,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_execution_data2(self):
+        """Test case for get_execution_data2
+
+        Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
     def test_get_execution_metrics(self):
         """Test case for get_execution_metrics
+
+        Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
+    def test_get_execution_metrics2(self):
+        """Test case for get_execution_metrics2
 
         Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
         """
@@ -141,8 +197,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_launch_plan2(self):
+        """Test case for get_launch_plan2
+
+        Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.  # noqa: E501
+        """
+        pass
+
     def test_get_named_entity(self):
         """Test case for get_named_entity
+
+        Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
+        """
+        pass
+
+    def test_get_named_entity2(self):
+        """Test case for get_named_entity2
 
         Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
         """
@@ -155,8 +225,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_node_execution2(self):
+        """Test case for get_node_execution2
+
+        Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
+        """
+        pass
+
     def test_get_node_execution_data(self):
         """Test case for get_node_execution_data
+
+        Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
+        """
+        pass
+
+    def test_get_node_execution_data2(self):
+        """Test case for get_node_execution_data2
 
         Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
         """
@@ -169,8 +253,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_project_attributes2(self):
+        """Test case for get_project_attributes2
+
+        Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
+        """
+        pass
+
     def test_get_project_domain_attributes(self):
         """Test case for get_project_domain_attributes
+
+        Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
+        """
+        pass
+
+    def test_get_project_domain_attributes2(self):
+        """Test case for get_project_domain_attributes2
 
         Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
         """
@@ -183,6 +281,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_task2(self):
+        """Test case for get_task2
+
+        Fetch a :ref:`ref_flyteidl.admin.Task` definition.  # noqa: E501
+        """
+        pass
+
     def test_get_task_execution(self):
         """Test case for get_task_execution
 
@@ -190,8 +295,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_task_execution2(self):
+        """Test case for get_task_execution2
+
+        Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
+        """
+        pass
+
     def test_get_task_execution_data(self):
         """Test case for get_task_execution_data
+
+        Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
+        """
+        pass
+
+    def test_get_task_execution_data2(self):
+        """Test case for get_task_execution_data2
 
         Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
         """
@@ -210,8 +329,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_workflow2(self):
+        """Test case for get_workflow2
+
+        Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.  # noqa: E501
+        """
+        pass
+
     def test_get_workflow_attributes(self):
         """Test case for get_workflow_attributes
+
+        Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
+        """
+        pass
+
+    def test_get_workflow_attributes2(self):
+        """Test case for get_workflow_attributes2
 
         Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
         """
@@ -238,6 +371,20 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_description_entities3(self):
+        """Test case for list_description_entities3
+
+        Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+        """
+        pass
+
+    def test_list_description_entities4(self):
+        """Test case for list_description_entities4
+
+        Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
+        """
+        pass
+
     def test_list_executions(self):
         """Test case for list_executions
 
@@ -245,8 +392,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_executions2(self):
+        """Test case for list_executions2
+
+        Fetch a list of :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
     def test_list_launch_plan_ids(self):
         """Test case for list_launch_plan_ids
+
+        Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.  # noqa: E501
+        """
+        pass
+
+    def test_list_launch_plan_ids2(self):
+        """Test case for list_launch_plan_ids2
 
         Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.  # noqa: E501
         """
@@ -266,6 +427,20 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_launch_plans3(self):
+        """Test case for list_launch_plans3
+
+        Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
+        """
+        pass
+
+    def test_list_launch_plans4(self):
+        """Test case for list_launch_plans4
+
+        Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
+        """
+        pass
+
     def test_list_matchable_attributes(self):
         """Test case for list_matchable_attributes
 
@@ -280,6 +455,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_named_entities2(self):
+        """Test case for list_named_entities2
+
+        Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
+        """
+        pass
+
     def test_list_node_executions(self):
         """Test case for list_node_executions
 
@@ -287,8 +469,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_node_executions2(self):
+        """Test case for list_node_executions2
+
+        Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
+        """
+        pass
+
     def test_list_node_executions_for_task(self):
         """Test case for list_node_executions_for_task
+
+        Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
+        """
+        pass
+
+    def test_list_node_executions_for_task2(self):
+        """Test case for list_node_executions_for_task2
 
         Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
         """
@@ -308,8 +504,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_task_executions2(self):
+        """Test case for list_task_executions2
+
+        Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
+        """
+        pass
+
     def test_list_task_ids(self):
         """Test case for list_task_ids
+
+        Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.  # noqa: E501
+        """
+        pass
+
+    def test_list_task_ids2(self):
+        """Test case for list_task_ids2
 
         Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.  # noqa: E501
         """
@@ -329,8 +539,29 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_list_tasks3(self):
+        """Test case for list_tasks3
+
+        Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
+        """
+        pass
+
+    def test_list_tasks4(self):
+        """Test case for list_tasks4
+
+        Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
+        """
+        pass
+
     def test_list_workflow_ids(self):
         """Test case for list_workflow_ids
+
+        Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.  # noqa: E501
+        """
+        pass
+
+    def test_list_workflow_ids2(self):
+        """Test case for list_workflow_ids2
 
         Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.  # noqa: E501
         """
@@ -345,6 +576,20 @@ class TestAdminServiceApi(unittest.TestCase):
 
     def test_list_workflows2(self):
         """Test case for list_workflows2
+
+        Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
+        """
+        pass
+
+    def test_list_workflows3(self):
+        """Test case for list_workflows3
+
+        Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
+        """
+        pass
+
+    def test_list_workflows4(self):
+        """Test case for list_workflows4
 
         Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
         """
@@ -378,8 +623,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_terminate_execution2(self):
+        """Test case for terminate_execution2
+
+        Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
     def test_update_execution(self):
         """Test case for update_execution
+
+        Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
+        """
+        pass
+
+    def test_update_execution2(self):
+        """Test case for update_execution2
 
         Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
         """
@@ -392,8 +651,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_update_launch_plan2(self):
+        """Test case for update_launch_plan2
+
+        Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
+        """
+        pass
+
     def test_update_named_entity(self):
         """Test case for update_named_entity
+
+        Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
+        """
+        pass
+
+    def test_update_named_entity2(self):
+        """Test case for update_named_entity2
 
         Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
         """
@@ -402,12 +675,26 @@ class TestAdminServiceApi(unittest.TestCase):
     def test_update_project(self):
         """Test case for update_project
 
-        Updates an existing :ref:`ref_flyteidl.admin.Project`  flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
+        Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
+        """
+        pass
+
+    def test_update_project2(self):
+        """Test case for update_project2
+
+        Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
         """
         pass
 
     def test_update_project_attributes(self):
         """Test case for update_project_attributes
+
+        Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
+        """
+        pass
+
+    def test_update_project_attributes2(self):
+        """Test case for update_project_attributes2
 
         Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
         """
@@ -420,8 +707,22 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_update_project_domain_attributes2(self):
+        """Test case for update_project_domain_attributes2
+
+        Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
+        """
+        pass
+
     def test_update_workflow_attributes(self):
         """Test case for update_workflow_attributes
+
+        Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
+        """
+        pass
+
+    def test_update_workflow_attributes2(self):
+        """Test case for update_workflow_attributes2
 
         Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
         """

@@ -294,6 +294,9 @@ pub struct NamedEntityIdentifier {
     /// +optional - in certain contexts - like 'List API', 'Launch plans'
     #[prost(string, tag="3")]
     pub name: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Additional metadata around a named entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -395,6 +398,9 @@ pub struct NamedEntityIdentifierListRequest {
     /// +optional
     #[prost(string, tag="6")]
     pub filters: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="7")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Represents a request structure to list NamedEntity objects
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -427,6 +433,9 @@ pub struct NamedEntityListRequest {
     /// +optional
     #[prost(string, tag="7")]
     pub filters: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="8")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Represents a list of NamedEntityIdentifiers.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -943,10 +952,13 @@ pub struct ExecutionCreateRequest {
     #[deprecated]
     #[prost(message, optional, tag="5")]
     pub inputs: ::core::option::Option<super::core::LiteralMap>,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
     /// The inputs required to start the execution. All required inputs must be
     /// included in this map. If not required and not provided, defaults apply.
     /// +optional
-    #[prost(message, optional, tag="6")]
+    #[prost(message, optional, tag="7")]
     pub input_data: ::core::option::Option<super::core::InputData>,
 }
 /// Request to relaunch the referenced execution.
@@ -1720,7 +1732,7 @@ pub struct ActiveLaunchPlanRequest {
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<NamedEntityIdentifier>,
 }
-/// Represents a request structure to list active launch plans within a project/domain.
+/// Represents a request structure to list active launch plans within a project/domain and optional org.
 /// See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1746,6 +1758,9 @@ pub struct ActiveLaunchPlanListRequest {
     /// +optional
     #[prost(message, optional, tag="5")]
     pub sort_by: ::core::option::Option<Sort>,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// By default any launch plan regardless of state can be used to launch a workflow execution.
 /// However, at most one version of a launch plan
@@ -1942,8 +1957,8 @@ pub mod matching_attributes {
         ClusterAssignment(super::ClusterAssignment),
     }
 }
-/// Represents a custom set of attributes applied for either a domain; a domain and project; or
-/// domain, project and workflow name.
+/// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);
+/// or domain, project and workflow name (and optional org).
 /// These are used to override system level defaults for kubernetes cluster resource management,
 /// default execution values, and more all across different levels of specificity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1959,6 +1974,9 @@ pub struct MatchableAttributesConfiguration {
     pub workflow: ::prost::alloc::string::String,
     #[prost(string, tag="5")]
     pub launch_plan: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Request all matching resource attributes for a resource type.
 /// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
@@ -2365,6 +2383,9 @@ pub struct Project {
     pub labels: ::core::option::Option<Labels>,
     #[prost(enumeration="project::ProjectState", tag="6")]
     pub state: i32,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="7")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Nested message and enum types in `Project`.
 pub mod project {
@@ -2467,6 +2488,9 @@ pub struct ProjectAttributes {
     pub project: ::prost::alloc::string::String,
     #[prost(message, optional, tag="2")]
     pub matching_attributes: ::core::option::Option<MatchingAttributes>,
+    /// Optional, org key applied to the project.
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Sets custom attributes for a project
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
@@ -2495,6 +2519,9 @@ pub struct ProjectAttributesGetRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="2")]
     pub resource_type: i32,
+    /// Optional, org key applied to the project.
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Response to get an individual project level attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
@@ -2517,6 +2544,9 @@ pub struct ProjectAttributesDeleteRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="2")]
     pub resource_type: i32,
+    /// Optional, org key applied to the project.
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2536,6 +2566,9 @@ pub struct ProjectDomainAttributes {
     pub domain: ::prost::alloc::string::String,
     #[prost(message, optional, tag="3")]
     pub matching_attributes: ::core::option::Option<MatchingAttributes>,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Sets custom attributes for a project-domain combination.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
@@ -2568,6 +2601,9 @@ pub struct ProjectDomainAttributesGetRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="3")]
     pub resource_type: i32,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Response to get an individual project domain attribute override.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
@@ -2594,6 +2630,9 @@ pub struct ProjectDomainAttributesDeleteRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="3")]
     pub resource_type: i32,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -3106,6 +3145,9 @@ pub struct WorkflowAttributes {
     pub workflow: ::prost::alloc::string::String,
     #[prost(message, optional, tag="4")]
     pub matching_attributes: ::core::option::Option<MatchingAttributes>,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Sets custom attributes for a project, domain and workflow combination.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`
@@ -3141,6 +3183,9 @@ pub struct WorkflowAttributesGetRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="4")]
     pub resource_type: i32,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Response to get an individual workflow attribute override.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -3170,6 +3215,9 @@ pub struct WorkflowAttributesDeleteRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="4")]
     pub resource_type: i32,
+    /// Optional, org key applied to the attributes.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Purposefully empty, may be populated in the future.
 #[allow(clippy::derive_partial_eq_without_eq)]

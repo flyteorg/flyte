@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"google.golang.org/protobuf/reflect/protoreflect"
 	"time"
 
 	protoV1 "github.com/golang/protobuf/proto"
@@ -33,6 +34,52 @@ type DefaultProtobufStore struct {
 	metrics *protoMetrics
 }
 
+func hasUnrecognizedFields(msg protoreflect.Message) bool {
+	if msg == nil {
+		return false
+	}
+
+	if len(msg.GetUnknown()) > 0 {
+		return true
+	}
+
+	unrecognized := false
+
+	msg.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		defer func() {
+			if err := recover(); err != nil {
+				return
+			}
+		}()
+
+		if !v.IsValid() {
+			return true
+		}
+
+		if fd.Kind() != protoreflect.MessageKind {
+			return true
+		}
+
+		iface := v.Interface()
+		if iface == nil {
+			return true
+			//} else if _, casted := iface.(protoV1.Message); !casted {
+			//	unrecognized = true
+			//	return false
+		}
+
+		if vMessage := v.Message(); vMessage != nil && len(v.Message().GetUnknown()) > 0 {
+			unrecognized = true
+			return false
+		}
+
+		unrecognized = hasUnrecognizedFields(v.Message())
+		return !unrecognized
+	})
+
+	return unrecognized
+}
+
 func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference DataReference, msg ...protoV1.Message) (msgIndex int, err error) {
 	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.DefaultProtobufStore/ReadProtobuf")
 	defer span.End()
@@ -60,11 +107,12 @@ func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference Dat
 	for i, m := range msg {
 		t := s.metrics.UnmarshalTime.Start()
 		var mCopy proto.Message
+		v2Message := protoV1.MessageV2(m)
 		if len(msg) > 1 {
-			mCopy = proto.Clone(protoV1.MessageV2(m))
+			mCopy = proto.Clone(v2Message)
 		}
 
-		err = proto.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(docContents, protoV1.MessageV2(m))
+		err = proto.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(docContents, v2Message)
 		t.Stop()
 		if err != nil {
 			s.metrics.UnmarshalFailure.Inc()
@@ -72,7 +120,7 @@ func (s DefaultProtobufStore) ReadProtobufAny(ctx context.Context, reference Dat
 			continue
 		}
 
-		if len(msg) == 1 || !proto.Equal(mCopy, protoV1.MessageV2(m)) {
+		if len(msg) == 1 || (!hasUnrecognizedFields(protoV1.MessageV2(m).ProtoReflect()) && !proto.Equal(mCopy, v2Message)) {
 			return i, nil
 		}
 	}

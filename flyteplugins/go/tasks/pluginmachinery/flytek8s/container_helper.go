@@ -330,6 +330,14 @@ func AddFlyteCustomizationsToContainer(ctx context.Context, parameters template.
 		container.Resources = ApplyResourceOverrides(container.Resources, *platformResources, !assignIfUnset)
 	}
 
+	useNewFormat := template.IsInputOutputWrapperSupported(ctx, parameters.Runtime)
+	if useNewFormat {
+		container.Env = append(container.Env, v1.EnvVar{
+			Name:  "FLYTE_INPUT_OUTPUT_FORMAT",
+			Value: "VERSION_3",
+		})
+	}
+
 	logger.Infof(ctx, "Adjusted container resources [%v]", container.Resources)
 	return nil
 }

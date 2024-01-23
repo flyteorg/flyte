@@ -21,4 +21,6 @@ type CoreIdentifier struct {
 	Name string `json:"name,omitempty"`
 	// Specific version of the resource.
 	Version string `json:"version,omitempty"`
+	// Optional, org key applied to the resource.
+	Org string `json:"org,omitempty"`
 }
