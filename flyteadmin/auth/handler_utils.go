@@ -8,6 +8,7 @@ import (
 	"github.com/grpc-ecosystem/go-grpc-middleware/util/metautils"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const (
@@ -145,4 +146,33 @@ func GetPublicURL(ctx context.Context, req *http.Request, cfg *config.Config) *u
 	}
 
 	return u
+}
+
+func isAuthorizedRedirectURL(url *url.URL, authorizedURL *url.URL) bool {
+	return url.Hostname() == authorizedURL.Hostname() && url.Port() == authorizedURL.Port() && url.Scheme == authorizedURL.Scheme
+}
+
+func GetRedirectURLAllowed(ctx context.Context, urlRedirectParam string, cfg *config.Config) bool {
+	if len(urlRedirectParam) == 0 {
+		logger.Debugf(ctx, "not validating whether empty redirect url is authorized")
+		return true
+	}
+	redirectURL, err := url.Parse(urlRedirectParam)
+	if err != nil {
+		logger.Debugf(ctx, "failed to parse user-supplied redirect url: %s with err: %v", urlRedirectParam, err)
+		return false
+	}
+	if redirectURL.Host == "" {
+		logger.Debugf(ctx, "not validating whether relative redirect url is authorized")
+		return true
+	}
+	logger.Debugf(ctx, "validating whether redirect url: %s is authorized", redirectURL)
+	for _, authorizedURI := range cfg.AuthorizedURIs {
+		if isAuthorizedRedirectURL(redirectURL, &authorizedURI.URL) {
+			logger.Debugf(ctx, "authorizing redirect url: %s against authorized uri: %s", redirectURL.String(), authorizedURI.String())
+			return true
+		}
+	}
+	logger.Debugf(ctx, "not authorizing redirect url: %s", redirectURL.String())
+	return false
 }
