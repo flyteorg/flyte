@@ -94,6 +94,6 @@ func TestGetRedirectURLAllowed(t *testing.T) {
 		assert.True(t, GetRedirectURLAllowed(ctx, "http://localhost:3008", cfg))
 	})
 	t.Run("unauthorized url", func(t *testing.T) {
-		assert.True(t, GetRedirectURLAllowed(ctx, "flyte.com", cfg))
+		assert.False(t, GetRedirectURLAllowed(ctx, "https://flyte.com", cfg))
 	})
 }
