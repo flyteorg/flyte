@@ -196,19 +196,29 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 	return vars
 }
 
-func hasDynamicLogLinks(taskTemplate *core.TaskTemplate) bool {
+func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 	if taskTemplate == nil {
-		return false
+		return nil
 	}
 	config := taskTemplate.GetConfig()
 	if config == nil {
-		return false
+		return nil
 	}
-	// TODO: establish a better protocol to handle dynamic log links.
-	// One idea is to have a comma-separated list of dynamic log link types
-	// in the task template.
-	// NB: we are going to grandfather in the flyin way of doing things for now.
-	return config["link_type"] == "vscode"
+	linkType := config["link_type"]
+	if linkType == "" {
+		return nil
+	}
+	dynamicLogLinkTypes := []string{}
+	for _, linkType := range strings.Split(linkType, ",") {
+		// NB: we are going to grandfather in flyin.
+		if linkType == "vscode" {
+			dynamicLogLinkTypes = append(dynamicLogLinkTypes, "flyin")
+		} else {
+			dynamicLogLinkTypes = append(dynamicLogLinkTypes, linkType)
+		}
+	}
+
+	return dynamicLogLinkTypes
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
@@ -222,14 +232,15 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 		})
 	}
 
-	if hasDynamicLogLinks(input.TaskTemplate) {
-		// TODO: Only emit dynamic log links enabled in the task template.
-		for _, templateURI := range p.DynamicTemplateURIs {
-			taskLogs = append(taskLogs, &core.TaskLog{
-				Uri:           replaceAll(templateURI, templateVars),
-				Name:          p.DisplayName + input.LogName,
-				MessageFormat: p.MessageFormat,
-			})
+	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
+		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
+			if dynamicTemplateURI.Kind == dynamicLogLinkType {
+				taskLogs = append(taskLogs, &core.TaskLog{
+					Uri:           replaceAll(dynamicTemplateURI.TemplateURI, templateVars),
+					Name:          p.DisplayName + input.LogName,
+					MessageFormat: p.MessageFormat,
+				})
+			}
 		}
 	}
 
