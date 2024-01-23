@@ -369,20 +369,22 @@ func (w *WorkflowManager) GetDynamicNodeWorkflow(ctx context.Context, request ad
 	ctx = getNodeExecutionContext(ctx, request.Id)
 	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, w.db, request.Id)
 	if err != nil {
-		logger.Debugf(ctx, "Failed to get node execution with id [%+v] with err %v",
+		logger.Errorf(ctx, "failed to get node execution with id [%+v] with err %v",
 			request.Id, err)
 		return nil, err
 	}
 
 	if nodeExecutionModel.DynamicWorkflowRemoteClosureReference == "" {
-		return &admin.DynamicNodeWorkflowResponse{}, nil
+		return &admin.DynamicNodeWorkflowResponse{}, errors.NewFlyteAdminErrorf(codes.NotFound, "node does not contain dynamic workflow")
 	}
 
 	closure := &core.CompiledWorkflowClosure{}
-	err = w.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecutionModel.DynamicWorkflowRemoteClosureReference), closure)
+	location := nodeExecutionModel.DynamicWorkflowRemoteClosureReference
+	err = w.storageClient.ReadProtobuf(ctx, storage.DataReference(location), closure)
 	if err != nil {
+		logger.Errorf(ctx, "unable to read workflow_closure from location %s: %v", location, err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"Unable to read WorkflowClosure from location %s : %v", nodeExecutionModel.DynamicWorkflowRemoteClosureReference, err)
+			"unable to read workflow_closure from location %s : %v", location, err)
 	}
 
 	return &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: closure}, nil

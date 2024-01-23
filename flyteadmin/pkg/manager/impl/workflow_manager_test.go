@@ -453,12 +453,14 @@ func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
 	workflowManager := NewWorkflowManager(repo, getMockWorkflowConfigProvider(), getMockWorkflowCompiler(),
 		mockStorageClient, storagePrefix, mockScope.NewTestScope(),
 		artifacts.NewArtifactRegistry(ctx, nil))
-	expected := &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: nil}
 
 	resp, err := workflowManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
 
-	assert.NoError(t, err)
-	assert.True(t, proto.Equal(expected, resp))
+	st, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.NotFound, st.Code())
+	assert.Equal(t, "node does not contain dynamic workflow", st.Message())
+	assert.Empty(t, resp)
 }
 
 func Test_GetDynamicNodeWorkflow_StorageError(t *testing.T) {
@@ -490,7 +492,7 @@ func Test_GetDynamicNodeWorkflow_StorageError(t *testing.T) {
 	st, ok := status.FromError(err)
 	assert.True(t, ok)
 	assert.Equal(t, codes.Internal, st.Code())
-	assert.Equal(t, "Unable to read WorkflowClosure from location s3://flyte/metadata/admin/remote closure id : failure", st.Message())
+	assert.Equal(t, "unable to read workflow_closure from location s3://flyte/metadata/admin/remote closure id : failure", st.Message())
 	assert.Empty(t, resp)
 }
 
