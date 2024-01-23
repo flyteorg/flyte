@@ -297,6 +297,35 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	return &admin.NodeExecutionEventResponse{}, nil
 }
 
+func (m *NodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
+		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
+	}
+
+	ctx = getNodeExecutionContext(ctx, request.Id)
+	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Id)
+	if err != nil {
+		logger.Errorf(ctx, "failed to get node execution with id [%+v] with err %v",
+			request.Id, err)
+		return nil, err
+	}
+
+	if nodeExecutionModel.DynamicWorkflowRemoteClosureReference == "" {
+		return &admin.DynamicNodeWorkflowResponse{}, errors.NewFlyteAdminErrorf(codes.NotFound, "node does not contain dynamic workflow")
+	}
+
+	closure := &core.CompiledWorkflowClosure{}
+	location := nodeExecutionModel.DynamicWorkflowRemoteClosureReference
+	err = m.storageClient.ReadProtobuf(ctx, storage.DataReference(location), closure)
+	if err != nil {
+		logger.Errorf(ctx, "unable to read workflow_closure from location %s: %v", location, err)
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+			"unable to read workflow_closure from location %s : %v", location, err)
+	}
+
+	return &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: closure}, nil
+}
+
 // Handles making additional database calls, if necessary, to populate IsParent & IsDynamic data using the historical pattern of
 // preloading child node executions. Otherwise, simply calls transform on the input model.
 func (m *NodeExecutionManager) transformNodeExecutionModel(ctx context.Context, nodeExecutionModel models.NodeExecution,

@@ -20332,20 +20332,6 @@ export namespace flyteidl {
             public getWorkflow(request: flyteidl.admin.IObjectGetRequest): Promise<flyteidl.admin.Workflow>;
 
             /**
-             * Calls GetDynamicNodeWorkflow.
-             * @param request GetDynamicNodeWorkflowRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and DynamicNodeWorkflowResponse
-             */
-            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest, callback: flyteidl.service.AdminService.GetDynamicNodeWorkflowCallback): void;
-
-            /**
-             * Calls GetDynamicNodeWorkflow.
-             * @param request GetDynamicNodeWorkflowRequest message or plain object
-             * @returns Promise
-             */
-            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest): Promise<flyteidl.admin.DynamicNodeWorkflowResponse>;
-
-            /**
              * Calls ListWorkflowIds.
              * @param request NamedEntityIdentifierListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and NamedEntityIdentifierList
@@ -20596,6 +20582,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public getNodeExecution(request: flyteidl.admin.INodeExecutionGetRequest): Promise<flyteidl.admin.NodeExecution>;
+
+            /**
+             * Calls GetDynamicNodeWorkflow.
+             * @param request GetDynamicNodeWorkflowRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and DynamicNodeWorkflowResponse
+             */
+            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest, callback: flyteidl.service.AdminService.GetDynamicNodeWorkflowCallback): void;
+
+            /**
+             * Calls GetDynamicNodeWorkflow.
+             * @param request GetDynamicNodeWorkflowRequest message or plain object
+             * @returns Promise
+             */
+            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest): Promise<flyteidl.admin.DynamicNodeWorkflowResponse>;
 
             /**
              * Calls ListNodeExecutions.
@@ -21049,13 +21049,6 @@ export namespace flyteidl {
             type GetWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.Workflow) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AdminService#getDynamicNodeWorkflow}.
-             * @param error Error, if any
-             * @param [response] DynamicNodeWorkflowResponse
-             */
-            type GetDynamicNodeWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.DynamicNodeWorkflowResponse) => void;
-
-            /**
              * Callback as used by {@link flyteidl.service.AdminService#listWorkflowIds}.
              * @param error Error, if any
              * @param [response] NamedEntityIdentifierList
@@ -21180,6 +21173,13 @@ export namespace flyteidl {
              * @param [response] NodeExecution
              */
             type GetNodeExecutionCallback = (error: (Error|null), response?: flyteidl.admin.NodeExecution) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getDynamicNodeWorkflow}.
+             * @param error Error, if any
+             * @param [response] DynamicNodeWorkflowResponse
+             */
+            type GetDynamicNodeWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.DynamicNodeWorkflowResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNodeExecutions}.

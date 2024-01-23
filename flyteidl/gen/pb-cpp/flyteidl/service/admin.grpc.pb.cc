@@ -26,7 +26,6 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/ListTasks",
   "/flyteidl.service.AdminService/CreateWorkflow",
   "/flyteidl.service.AdminService/GetWorkflow",
-  "/flyteidl.service.AdminService/GetDynamicNodeWorkflow",
   "/flyteidl.service.AdminService/ListWorkflowIds",
   "/flyteidl.service.AdminService/ListWorkflows",
   "/flyteidl.service.AdminService/CreateLaunchPlan",
@@ -45,6 +44,7 @@ static const char* AdminService_method_names[] = {
   "/flyteidl.service.AdminService/ListExecutions",
   "/flyteidl.service.AdminService/TerminateExecution",
   "/flyteidl.service.AdminService/GetNodeExecution",
+  "/flyteidl.service.AdminService/GetDynamicNodeWorkflow",
   "/flyteidl.service.AdminService/ListNodeExecutions",
   "/flyteidl.service.AdminService/ListNodeExecutionsForTask",
   "/flyteidl.service.AdminService/GetNodeExecutionData",
@@ -89,25 +89,25 @@ AdminService::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_ListTasks_(AdminService_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_CreateWorkflow_(AdminService_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetWorkflow_(AdminService_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetDynamicNodeWorkflow_(AdminService_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListWorkflowIds_(AdminService_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListWorkflows_(AdminService_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CreateLaunchPlan_(AdminService_method_names[9], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetLaunchPlan_(AdminService_method_names[10], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetActiveLaunchPlan_(AdminService_method_names[11], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListActiveLaunchPlans_(AdminService_method_names[12], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListLaunchPlanIds_(AdminService_method_names[13], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListLaunchPlans_(AdminService_method_names[14], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateLaunchPlan_(AdminService_method_names[15], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_CreateExecution_(AdminService_method_names[16], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_RelaunchExecution_(AdminService_method_names[17], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_RecoverExecution_(AdminService_method_names[18], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetExecution_(AdminService_method_names[19], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_UpdateExecution_(AdminService_method_names[20], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetExecutionData_(AdminService_method_names[21], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_ListExecutions_(AdminService_method_names[22], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_TerminateExecution_(AdminService_method_names[23], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetNodeExecution_(AdminService_method_names[24], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListWorkflowIds_(AdminService_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListWorkflows_(AdminService_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateLaunchPlan_(AdminService_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetLaunchPlan_(AdminService_method_names[9], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetActiveLaunchPlan_(AdminService_method_names[10], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListActiveLaunchPlans_(AdminService_method_names[11], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListLaunchPlanIds_(AdminService_method_names[12], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListLaunchPlans_(AdminService_method_names[13], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateLaunchPlan_(AdminService_method_names[14], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_CreateExecution_(AdminService_method_names[15], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_RelaunchExecution_(AdminService_method_names[16], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_RecoverExecution_(AdminService_method_names[17], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetExecution_(AdminService_method_names[18], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_UpdateExecution_(AdminService_method_names[19], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetExecutionData_(AdminService_method_names[20], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_ListExecutions_(AdminService_method_names[21], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_TerminateExecution_(AdminService_method_names[22], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetNodeExecution_(AdminService_method_names[23], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetDynamicNodeWorkflow_(AdminService_method_names[24], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ListNodeExecutions_(AdminService_method_names[25], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_ListNodeExecutionsForTask_(AdminService_method_names[26], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_GetNodeExecutionData_(AdminService_method_names[27], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
@@ -305,34 +305,6 @@ void AdminService::Stub::experimental_async::GetWorkflow(::grpc::ClientContext* 
 
 ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Workflow>* AdminService::Stub::PrepareAsyncGetWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::Workflow>::Create(channel_.get(), cq, rpcmethod_GetWorkflow_, context, request, false);
-}
-
-::grpc::Status AdminService::Stub::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetDynamicNodeWorkflow_, context, request, response);
-}
-
-void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, std::move(f));
-}
-
-void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, std::move(f));
-}
-
-void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, reactor);
-}
-
-void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, reactor);
-}
-
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AdminService::Stub::AsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DynamicNodeWorkflowResponse>::Create(channel_.get(), cq, rpcmethod_GetDynamicNodeWorkflow_, context, request, true);
-}
-
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AdminService::Stub::PrepareAsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DynamicNodeWorkflowResponse>::Create(channel_.get(), cq, rpcmethod_GetDynamicNodeWorkflow_, context, request, false);
 }
 
 ::grpc::Status AdminService::Stub::ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) {
@@ -837,6 +809,34 @@ void AdminService::Stub::experimental_async::GetNodeExecution(::grpc::ClientCont
 
 ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecution>* AdminService::Stub::PrepareAsyncGetNodeExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::NodeExecution>::Create(channel_.get(), cq, rpcmethod_GetNodeExecution_, context, request, false);
+}
+
+::grpc::Status AdminService::Stub::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetDynamicNodeWorkflow_, context, request, response);
+}
+
+void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, std::move(f));
+}
+
+void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, reactor);
+}
+
+void AdminService::Stub::experimental_async::GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetDynamicNodeWorkflow_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AdminService::Stub::AsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DynamicNodeWorkflowResponse>::Create(channel_.get(), cq, rpcmethod_GetDynamicNodeWorkflow_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AdminService::Stub::PrepareAsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::DynamicNodeWorkflowResponse>::Create(channel_.get(), cq, rpcmethod_GetDynamicNodeWorkflow_, context, request, false);
 }
 
 ::grpc::Status AdminService::Stub::ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::flyteidl::admin::NodeExecutionList* response) {
@@ -1685,98 +1685,98 @@ AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>(
-          std::mem_fn(&AdminService::Service::GetDynamicNodeWorkflow), this)));
-  AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[7],
-      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
           std::mem_fn(&AdminService::Service::ListWorkflowIds), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[8],
+      AdminService_method_names[7],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>(
           std::mem_fn(&AdminService::Service::ListWorkflows), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[9],
+      AdminService_method_names[8],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>(
           std::mem_fn(&AdminService::Service::CreateLaunchPlan), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[10],
+      AdminService_method_names[9],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>(
           std::mem_fn(&AdminService::Service::GetLaunchPlan), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[11],
+      AdminService_method_names[10],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>(
           std::mem_fn(&AdminService::Service::GetActiveLaunchPlan), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[12],
+      AdminService_method_names[11],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>(
           std::mem_fn(&AdminService::Service::ListActiveLaunchPlans), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[13],
+      AdminService_method_names[12],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
           std::mem_fn(&AdminService::Service::ListLaunchPlanIds), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[14],
+      AdminService_method_names[13],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>(
           std::mem_fn(&AdminService::Service::ListLaunchPlans), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[15],
+      AdminService_method_names[14],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateLaunchPlan), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[16],
+      AdminService_method_names[15],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>(
           std::mem_fn(&AdminService::Service::CreateExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[17],
+      AdminService_method_names[16],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>(
           std::mem_fn(&AdminService::Service::RelaunchExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[18],
+      AdminService_method_names[17],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ExecutionRecoverRequest, ::flyteidl::admin::ExecutionCreateResponse>(
           std::mem_fn(&AdminService::Service::RecoverExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[19],
+      AdminService_method_names[18],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>(
           std::mem_fn(&AdminService::Service::GetExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[20],
+      AdminService_method_names[19],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ExecutionUpdateRequest, ::flyteidl::admin::ExecutionUpdateResponse>(
           std::mem_fn(&AdminService::Service::UpdateExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[21],
+      AdminService_method_names[20],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>(
           std::mem_fn(&AdminService::Service::GetExecutionData), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[22],
+      AdminService_method_names[21],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>(
           std::mem_fn(&AdminService::Service::ListExecutions), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[23],
+      AdminService_method_names[22],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>(
           std::mem_fn(&AdminService::Service::TerminateExecution), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      AdminService_method_names[24],
+      AdminService_method_names[23],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>(
           std::mem_fn(&AdminService::Service::GetNodeExecution), this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      AdminService_method_names[24],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>(
+          std::mem_fn(&AdminService::Service::GetDynamicNodeWorkflow), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[25],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
@@ -1969,13 +1969,6 @@ AdminService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status AdminService::Service::GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) {
-  (void) context;
-  (void) request;
-  (void) response;
-  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-}
-
 ::grpc::Status AdminService::Service::ListWorkflowIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response) {
   (void) context;
   (void) request;
@@ -2096,6 +2089,13 @@ AdminService::Service::~Service() {
 }
 
 ::grpc::Status AdminService::Service::GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status AdminService::Service::GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) {
   (void) context;
   (void) request;
   (void) response;

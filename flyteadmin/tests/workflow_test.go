@@ -6,21 +6,16 @@ package tests
 import (
 	"context"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"testing"
-	"time"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 )
 
 func TestCreateWorkflow(t *testing.T) {
@@ -84,123 +79,6 @@ func TestGetWorkflows(t *testing.T) {
 	t.Run("TestListWorkflow_PaginationHTTP", testListWorkflow_PaginationHTTP)
 	t.Run("TestListWorkflow_FiltersGrpc", testListWorkflow_FiltersGrpc)
 	t.Run("TestListWorkflow_FiltersHTTP", testListWorkflow_FiltersHTTP)
-}
-
-func TestGetDynamicNodeWorkflow(t *testing.T) {
-	ctx := context.Background()
-	truncateAllTablesForTestingOnly()
-	populateWorkflowExecutionForTestingOnly(project, domain, name)
-	client, conn := GetTestAdminServiceClient()
-	defer conn.Close()
-
-	occurredAt := time.Now()
-	occurredAtProto := timestamppb.New(occurredAt)
-
-	createTaskAndNodeExecution(ctx, t, client, conn, occurredAtProto)
-
-	_, err := client.CreateTaskEvent(ctx, &admin.TaskExecutionEventRequest{
-		RequestId: "request id",
-		Event: &event.TaskExecutionEvent{
-			TaskId:                taskIdentifier,
-			ParentNodeExecutionId: nodeExecutionId,
-			Phase:                 core.TaskExecution_RUNNING,
-			RetryAttempt:          1,
-			OccurredAt:            occurredAtProto,
-		},
-	})
-	require.NoError(t, err)
-
-	dynamicWfId := core.Identifier{
-		ResourceType: core.ResourceType_WORKFLOW,
-		Project:      "admintests",
-		Domain:       "development",
-		Name:         "name",
-		Version:      "version",
-	}
-	dynamicWf := &core.CompiledWorkflowClosure{
-		Primary: &core.CompiledWorkflow{
-			Template: &core.WorkflowTemplate{
-				Id:        &dynamicWfId,
-				Interface: &core.TypedInterface{},
-				Nodes: []*core.Node{
-					{
-						Id: "I'm a node",
-						Target: &core.Node_TaskNode{
-							TaskNode: &core.TaskNode{
-								Reference: &core.TaskNode_ReferenceId{
-									ReferenceId: taskIdentifier,
-								},
-							},
-						},
-					},
-				},
-			},
-		},
-	}
-	childOccurredAt := occurredAt.Add(time.Minute)
-	childOccurredAtProto := timestamppb.New(childOccurredAt)
-	childNodeExecutionID := &core.NodeExecutionIdentifier{
-		NodeId: "child_node",
-		ExecutionId: &core.WorkflowExecutionIdentifier{
-			Project: project,
-			Domain:  domain,
-			Name:    name,
-		},
-	}
-	_, err = client.CreateNodeEvent(ctx, &admin.NodeExecutionEventRequest{
-		RequestId: "request id",
-		Event: &event.NodeExecutionEvent{
-			Id:    childNodeExecutionID,
-			Phase: core.NodeExecution_RUNNING,
-			InputValue: &event.NodeExecutionEvent_InputUri{
-				InputUri: inputURI,
-			},
-			OccurredAt: childOccurredAtProto,
-			ParentTaskMetadata: &event.ParentTaskExecutionMetadata{
-				Id: taskExecutionIdentifier,
-			},
-			IsDynamic: true,
-			IsParent:  true,
-			TargetMetadata: &event.NodeExecutionEvent_TaskNodeMetadata{
-				TaskNodeMetadata: &event.TaskNodeMetadata{
-					DynamicWorkflow: &event.DynamicWorkflowNodeMetadata{
-						Id:                &dynamicWfId,
-						CompiledWorkflow:  dynamicWf,
-						DynamicJobSpecUri: "s3://bla-bla",
-					},
-				},
-			},
-		},
-	})
-	require.NoError(t, err)
-
-	t.Run("TestGetDynamicNodeWorkflowGrpc", func(t *testing.T) {
-		resp, err := client.GetDynamicNodeWorkflow(ctx, &admin.GetDynamicNodeWorkflowRequest{
-			Id: childNodeExecutionID,
-		})
-
-		assert.NoError(t, err)
-		assert.True(t, proto.Equal(dynamicWf, resp.GetCompiledWorkflow()))
-	})
-
-	t.Run("TestGetDynamicNodeWorkflowHttp", func(t *testing.T) {
-		url := fmt.Sprintf("%s/api/v1/dynamic_node_workflow/project/domain/execution%%20name/child_node", GetTestHostEndpoint())
-		getRequest, err := http.NewRequest(http.MethodGet, url, nil)
-		require.NoError(t, err)
-		addHTTPRequestHeaders(getRequest)
-
-		httpClient := &http.Client{Timeout: 2 * time.Second}
-		resp, err := httpClient.Do(getRequest)
-		require.NoError(t, err)
-		defer resp.Body.Close()
-
-		body, err := io.ReadAll(resp.Body)
-		require.NoError(t, err)
-		require.Equal(t, http.StatusOK, resp.StatusCode, "unexpected resp: %s", string(body))
-		wfResp := &admin.DynamicNodeWorkflowResponse{}
-		require.NoError(t, proto.Unmarshal(body, wfResp))
-		assert.True(t, proto.Equal(dynamicWf, wfResp.GetCompiledWorkflow()))
-	})
 }
 
 func testGetWorkflowGrpc(t *testing.T) {

@@ -98,14 +98,6 @@ class AdminService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>> PrepareAsyncGetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>>(PrepareAsyncGetWorkflowRaw(context, request, cq));
     }
-    // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
-    virtual ::grpc::Status GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) = 0;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>> AsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(AsyncGetDynamicNodeWorkflowRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>> PrepareAsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(PrepareAsyncGetDynamicNodeWorkflowRaw(context, request, cq));
-    }
     // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
     virtual ::grpc::Status ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) = 0;
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>> AsyncListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
@@ -253,6 +245,14 @@ class AdminService final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>> PrepareAsyncGetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>>(PrepareAsyncGetNodeExecutionRaw(context, request, cq));
+    }
+    // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
+    virtual ::grpc::Status GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>> AsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(AsyncGetDynamicNodeWorkflowRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>> PrepareAsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(PrepareAsyncGetDynamicNodeWorkflowRaw(context, request, cq));
     }
     // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::flyteidl::admin::NodeExecutionList* response) = 0;
@@ -520,11 +520,6 @@ class AdminService final {
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
-      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) = 0;
-      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
-      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
       virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) = 0;
@@ -619,6 +614,11 @@ class AdminService final {
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) = 0;
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
+      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
       virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
       virtual void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) = 0;
@@ -780,8 +780,6 @@ class AdminService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowCreateResponse>* PrepareAsyncCreateWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>* AsyncGetWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::Workflow>* PrepareAsyncGetWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) = 0;
-    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>* PrepareAsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>* AsyncListWorkflowIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NamedEntityIdentifierList>* PrepareAsyncListWorkflowIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::WorkflowList>* AsyncListWorkflowsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -818,6 +816,8 @@ class AdminService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ExecutionTerminateResponse>* PrepareAsyncTerminateExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>* AsyncGetNodeExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecution>* PrepareAsyncGetNodeExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DynamicNodeWorkflowResponse>* PrepareAsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>* AsyncListNodeExecutionsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>* PrepareAsyncListNodeExecutionsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::NodeExecutionList>* AsyncListNodeExecutionsForTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -921,13 +921,6 @@ class AdminService final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Workflow>> PrepareAsyncGetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Workflow>>(PrepareAsyncGetWorkflowRaw(context, request, cq));
-    }
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override;
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>> AsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(AsyncGetDynamicNodeWorkflowRaw(context, request, cq));
-    }
-    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>> PrepareAsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
-      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(PrepareAsyncGetDynamicNodeWorkflowRaw(context, request, cq));
     }
     ::grpc::Status ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::flyteidl::admin::NamedEntityIdentifierList* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityIdentifierList>> AsyncListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) {
@@ -1054,6 +1047,13 @@ class AdminService final {
     }
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecution>> PrepareAsyncGetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecution>>(PrepareAsyncGetNodeExecutionRaw(context, request, cq));
+    }
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>> AsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(AsyncGetDynamicNodeWorkflowRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>> PrepareAsyncGetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>>(PrepareAsyncGetDynamicNodeWorkflowRaw(context, request, cq));
     }
     ::grpc::Status ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::flyteidl::admin::NodeExecutionList* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecutionList>> AsyncListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) {
@@ -1285,10 +1285,6 @@ class AdminService final {
       void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, std::function<void(::grpc::Status)>) override;
       void GetWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) override;
-      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) override;
-      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
-      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
       void ListWorkflowIds(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NamedEntityIdentifierList* response, std::function<void(::grpc::Status)>) override;
       void ListWorkflowIds(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
@@ -1361,6 +1357,10 @@ class AdminService final {
       void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, std::function<void(::grpc::Status)>) override;
       void GetNodeExecution(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void GetNodeExecution(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetDynamicNodeWorkflow(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) override;
       void ListNodeExecutions(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::NodeExecutionList* response, std::function<void(::grpc::Status)>) override;
       void ListNodeExecutions(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
@@ -1500,8 +1500,6 @@ class AdminService final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowCreateResponse>* PrepareAsyncCreateWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::WorkflowCreateRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Workflow>* AsyncGetWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Workflow>* PrepareAsyncGetWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ObjectGetRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) override;
-    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* PrepareAsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityIdentifierList>* AsyncListWorkflowIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NamedEntityIdentifierList>* PrepareAsyncListWorkflowIdsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::WorkflowList>* AsyncListWorkflowsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ResourceListRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -1538,6 +1536,8 @@ class AdminService final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ExecutionTerminateResponse>* PrepareAsyncTerminateExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ExecutionTerminateRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecution>* AsyncGetNodeExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecution>* PrepareAsyncGetNodeExecutionRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionGetRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* AsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DynamicNodeWorkflowResponse>* PrepareAsyncGetDynamicNodeWorkflowRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecutionList>* AsyncListNodeExecutionsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecutionList>* PrepareAsyncListNodeExecutionsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionListRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::NodeExecutionList>* AsyncListNodeExecutionsForTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::NodeExecutionForTaskListRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -1602,7 +1602,6 @@ class AdminService final {
     const ::grpc::internal::RpcMethod rpcmethod_ListTasks_;
     const ::grpc::internal::RpcMethod rpcmethod_CreateWorkflow_;
     const ::grpc::internal::RpcMethod rpcmethod_GetWorkflow_;
-    const ::grpc::internal::RpcMethod rpcmethod_GetDynamicNodeWorkflow_;
     const ::grpc::internal::RpcMethod rpcmethod_ListWorkflowIds_;
     const ::grpc::internal::RpcMethod rpcmethod_ListWorkflows_;
     const ::grpc::internal::RpcMethod rpcmethod_CreateLaunchPlan_;
@@ -1621,6 +1620,7 @@ class AdminService final {
     const ::grpc::internal::RpcMethod rpcmethod_ListExecutions_;
     const ::grpc::internal::RpcMethod rpcmethod_TerminateExecution_;
     const ::grpc::internal::RpcMethod rpcmethod_GetNodeExecution_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetDynamicNodeWorkflow_;
     const ::grpc::internal::RpcMethod rpcmethod_ListNodeExecutions_;
     const ::grpc::internal::RpcMethod rpcmethod_ListNodeExecutionsForTask_;
     const ::grpc::internal::RpcMethod rpcmethod_GetNodeExecutionData_;
@@ -1669,8 +1669,6 @@ class AdminService final {
     virtual ::grpc::Status CreateWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowCreateRequest* request, ::flyteidl::admin::WorkflowCreateResponse* response);
     // Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
     virtual ::grpc::Status GetWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response);
-    // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
-    virtual ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response);
     // Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
     virtual ::grpc::Status ListWorkflowIds(::grpc::ServerContext* context, const ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::flyteidl::admin::NamedEntityIdentifierList* response);
     // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
@@ -1711,6 +1709,8 @@ class AdminService final {
     virtual ::grpc::Status TerminateExecution(::grpc::ServerContext* context, const ::flyteidl::admin::ExecutionTerminateRequest* request, ::flyteidl::admin::ExecutionTerminateResponse* response);
     // Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response);
+    // Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
+    virtual ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response);
     // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
     virtual ::grpc::Status ListNodeExecutions(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionListRequest* request, ::flyteidl::admin::NodeExecutionList* response);
     // Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.
@@ -1892,32 +1892,12 @@ class AdminService final {
     }
   };
   template <class BaseClass>
-  class WithAsyncMethod_GetDynamicNodeWorkflow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithAsyncMethod_GetDynamicNodeWorkflow() {
-      ::grpc::Service::MarkMethodAsync(6);
-    }
-    ~WithAsyncMethod_GetDynamicNodeWorkflow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestGetDynamicNodeWorkflow(::grpc::ServerContext* context, ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::DynamicNodeWorkflowResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithAsyncMethod_ListWorkflowIds : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ListWorkflowIds() {
-      ::grpc::Service::MarkMethodAsync(7);
+      ::grpc::Service::MarkMethodAsync(6);
     }
     ~WithAsyncMethod_ListWorkflowIds() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1928,7 +1908,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListWorkflowIds(::grpc::ServerContext* context, ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::NamedEntityIdentifierList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1937,7 +1917,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ListWorkflows() {
-      ::grpc::Service::MarkMethodAsync(8);
+      ::grpc::Service::MarkMethodAsync(7);
     }
     ~WithAsyncMethod_ListWorkflows() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1948,7 +1928,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListWorkflows(::grpc::ServerContext* context, ::flyteidl::admin::ResourceListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::WorkflowList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1957,7 +1937,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_CreateLaunchPlan() {
-      ::grpc::Service::MarkMethodAsync(9);
+      ::grpc::Service::MarkMethodAsync(8);
     }
     ~WithAsyncMethod_CreateLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1968,7 +1948,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateLaunchPlan(::grpc::ServerContext* context, ::flyteidl::admin::LaunchPlanCreateRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlanCreateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1977,7 +1957,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_GetLaunchPlan() {
-      ::grpc::Service::MarkMethodAsync(10);
+      ::grpc::Service::MarkMethodAsync(9);
     }
     ~WithAsyncMethod_GetLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -1988,7 +1968,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetLaunchPlan(::grpc::ServerContext* context, ::flyteidl::admin::ObjectGetRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlan>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1997,7 +1977,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_GetActiveLaunchPlan() {
-      ::grpc::Service::MarkMethodAsync(11);
+      ::grpc::Service::MarkMethodAsync(10);
     }
     ~WithAsyncMethod_GetActiveLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2008,7 +1988,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetActiveLaunchPlan(::grpc::ServerContext* context, ::flyteidl::admin::ActiveLaunchPlanRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlan>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2017,7 +1997,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ListActiveLaunchPlans() {
-      ::grpc::Service::MarkMethodAsync(12);
+      ::grpc::Service::MarkMethodAsync(11);
     }
     ~WithAsyncMethod_ListActiveLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2028,7 +2008,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListActiveLaunchPlans(::grpc::ServerContext* context, ::flyteidl::admin::ActiveLaunchPlanListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlanList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(12, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2037,7 +2017,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ListLaunchPlanIds() {
-      ::grpc::Service::MarkMethodAsync(13);
+      ::grpc::Service::MarkMethodAsync(12);
     }
     ~WithAsyncMethod_ListLaunchPlanIds() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2048,7 +2028,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListLaunchPlanIds(::grpc::ServerContext* context, ::flyteidl::admin::NamedEntityIdentifierListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::NamedEntityIdentifierList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(13, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(12, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2057,7 +2037,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ListLaunchPlans() {
-      ::grpc::Service::MarkMethodAsync(14);
+      ::grpc::Service::MarkMethodAsync(13);
     }
     ~WithAsyncMethod_ListLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2068,7 +2048,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListLaunchPlans(::grpc::ServerContext* context, ::flyteidl::admin::ResourceListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlanList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(14, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(13, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2077,7 +2057,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_UpdateLaunchPlan() {
-      ::grpc::Service::MarkMethodAsync(15);
+      ::grpc::Service::MarkMethodAsync(14);
     }
     ~WithAsyncMethod_UpdateLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2088,7 +2068,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestUpdateLaunchPlan(::grpc::ServerContext* context, ::flyteidl::admin::LaunchPlanUpdateRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::LaunchPlanUpdateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(15, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(14, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2097,7 +2077,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_CreateExecution() {
-      ::grpc::Service::MarkMethodAsync(16);
+      ::grpc::Service::MarkMethodAsync(15);
     }
     ~WithAsyncMethod_CreateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2108,7 +2088,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateExecution(::grpc::ServerContext* context, ::flyteidl::admin::ExecutionCreateRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ExecutionCreateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(16, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(15, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2117,7 +2097,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_RelaunchExecution() {
-      ::grpc::Service::MarkMethodAsync(17);
+      ::grpc::Service::MarkMethodAsync(16);
     }
     ~WithAsyncMethod_RelaunchExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2128,7 +2108,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRelaunchExecution(::grpc::ServerContext* context, ::flyteidl::admin::ExecutionRelaunchRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ExecutionCreateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(17, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(16, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2137,7 +2117,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_RecoverExecution() {
-      ::grpc::Service::MarkMethodAsync(18);
+      ::grpc::Service::MarkMethodAsync(17);
     }
     ~WithAsyncMethod_RecoverExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2148,7 +2128,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRecoverExecution(::grpc::ServerContext* context, ::flyteidl::admin::ExecutionRecoverRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ExecutionCreateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(18, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(17, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2157,7 +2137,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_GetExecution() {
-      ::grpc::Service::MarkMethodAsync(19);
+      ::grpc::Service::MarkMethodAsync(18);
     }
     ~WithAsyncMethod_GetExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2168,7 +2148,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetExecution(::grpc::ServerContext* context, ::flyteidl::admin::WorkflowExecutionGetRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::Execution>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(19, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(18, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2177,7 +2157,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_UpdateExecution() {
-      ::grpc::Service::MarkMethodAsync(20);
+      ::grpc::Service::MarkMethodAsync(19);
     }
     ~WithAsyncMethod_UpdateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2188,7 +2168,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestUpdateExecution(::grpc::ServerContext* context, ::flyteidl::admin::ExecutionUpdateRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ExecutionUpdateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(20, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(19, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2197,7 +2177,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_GetExecutionData() {
-      ::grpc::Service::MarkMethodAsync(21);
+      ::grpc::Service::MarkMethodAsync(20);
     }
     ~WithAsyncMethod_GetExecutionData() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2208,7 +2188,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetExecutionData(::grpc::ServerContext* context, ::flyteidl::admin::WorkflowExecutionGetDataRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::WorkflowExecutionGetDataResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(21, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(20, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2217,7 +2197,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_ListExecutions() {
-      ::grpc::Service::MarkMethodAsync(22);
+      ::grpc::Service::MarkMethodAsync(21);
     }
     ~WithAsyncMethod_ListExecutions() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2228,7 +2208,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListExecutions(::grpc::ServerContext* context, ::flyteidl::admin::ResourceListRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ExecutionList>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(22, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(21, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2237,7 +2217,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_TerminateExecution() {
-      ::grpc::Service::MarkMethodAsync(23);
+      ::grpc::Service::MarkMethodAsync(22);
     }
     ~WithAsyncMethod_TerminateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2248,7 +2228,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestTerminateExecution(::grpc::ServerContext* context, ::flyteidl::admin::ExecutionTerminateRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ExecutionTerminateResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(23, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(22, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -2257,7 +2237,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithAsyncMethod_GetNodeExecution() {
-      ::grpc::Service::MarkMethodAsync(24);
+      ::grpc::Service::MarkMethodAsync(23);
     }
     ~WithAsyncMethod_GetNodeExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -2268,6 +2248,26 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetNodeExecution(::grpc::ServerContext* context, ::flyteidl::admin::NodeExecutionGetRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::NodeExecution>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(23, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_GetDynamicNodeWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_GetDynamicNodeWorkflow() {
+      ::grpc::Service::MarkMethodAsync(24);
+    }
+    ~WithAsyncMethod_GetDynamicNodeWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetDynamicNodeWorkflow(::grpc::ServerContext* context, ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::DynamicNodeWorkflowResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(24, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -2851,7 +2851,7 @@ class AdminService final {
       ::grpc::Service::RequestAsyncUnary(53, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_CreateTask<WithAsyncMethod_GetTask<WithAsyncMethod_ListTaskIds<WithAsyncMethod_ListTasks<WithAsyncMethod_CreateWorkflow<WithAsyncMethod_GetWorkflow<WithAsyncMethod_GetDynamicNodeWorkflow<WithAsyncMethod_ListWorkflowIds<WithAsyncMethod_ListWorkflows<WithAsyncMethod_CreateLaunchPlan<WithAsyncMethod_GetLaunchPlan<WithAsyncMethod_GetActiveLaunchPlan<WithAsyncMethod_ListActiveLaunchPlans<WithAsyncMethod_ListLaunchPlanIds<WithAsyncMethod_ListLaunchPlans<WithAsyncMethod_UpdateLaunchPlan<WithAsyncMethod_CreateExecution<WithAsyncMethod_RelaunchExecution<WithAsyncMethod_RecoverExecution<WithAsyncMethod_GetExecution<WithAsyncMethod_UpdateExecution<WithAsyncMethod_GetExecutionData<WithAsyncMethod_ListExecutions<WithAsyncMethod_TerminateExecution<WithAsyncMethod_GetNodeExecution<WithAsyncMethod_ListNodeExecutions<WithAsyncMethod_ListNodeExecutionsForTask<WithAsyncMethod_GetNodeExecutionData<WithAsyncMethod_RegisterProject<WithAsyncMethod_UpdateProject<WithAsyncMethod_ListProjects<WithAsyncMethod_CreateWorkflowEvent<WithAsyncMethod_CreateNodeEvent<WithAsyncMethod_CreateTaskEvent<WithAsyncMethod_GetTaskExecution<WithAsyncMethod_ListTaskExecutions<WithAsyncMethod_GetTaskExecutionData<WithAsyncMethod_UpdateProjectDomainAttributes<WithAsyncMethod_GetProjectDomainAttributes<WithAsyncMethod_DeleteProjectDomainAttributes<WithAsyncMethod_UpdateProjectAttributes<WithAsyncMethod_GetProjectAttributes<WithAsyncMethod_DeleteProjectAttributes<WithAsyncMethod_UpdateWorkflowAttributes<WithAsyncMethod_GetWorkflowAttributes<WithAsyncMethod_DeleteWorkflowAttributes<WithAsyncMethod_ListMatchableAttributes<WithAsyncMethod_ListNamedEntities<WithAsyncMethod_GetNamedEntity<WithAsyncMethod_UpdateNamedEntity<WithAsyncMethod_GetVersion<WithAsyncMethod_GetDescriptionEntity<WithAsyncMethod_ListDescriptionEntities<WithAsyncMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > AsyncService;
+  typedef WithAsyncMethod_CreateTask<WithAsyncMethod_GetTask<WithAsyncMethod_ListTaskIds<WithAsyncMethod_ListTasks<WithAsyncMethod_CreateWorkflow<WithAsyncMethod_GetWorkflow<WithAsyncMethod_ListWorkflowIds<WithAsyncMethod_ListWorkflows<WithAsyncMethod_CreateLaunchPlan<WithAsyncMethod_GetLaunchPlan<WithAsyncMethod_GetActiveLaunchPlan<WithAsyncMethod_ListActiveLaunchPlans<WithAsyncMethod_ListLaunchPlanIds<WithAsyncMethod_ListLaunchPlans<WithAsyncMethod_UpdateLaunchPlan<WithAsyncMethod_CreateExecution<WithAsyncMethod_RelaunchExecution<WithAsyncMethod_RecoverExecution<WithAsyncMethod_GetExecution<WithAsyncMethod_UpdateExecution<WithAsyncMethod_GetExecutionData<WithAsyncMethod_ListExecutions<WithAsyncMethod_TerminateExecution<WithAsyncMethod_GetNodeExecution<WithAsyncMethod_GetDynamicNodeWorkflow<WithAsyncMethod_ListNodeExecutions<WithAsyncMethod_ListNodeExecutionsForTask<WithAsyncMethod_GetNodeExecutionData<WithAsyncMethod_RegisterProject<WithAsyncMethod_UpdateProject<WithAsyncMethod_ListProjects<WithAsyncMethod_CreateWorkflowEvent<WithAsyncMethod_CreateNodeEvent<WithAsyncMethod_CreateTaskEvent<WithAsyncMethod_GetTaskExecution<WithAsyncMethod_ListTaskExecutions<WithAsyncMethod_GetTaskExecutionData<WithAsyncMethod_UpdateProjectDomainAttributes<WithAsyncMethod_GetProjectDomainAttributes<WithAsyncMethod_DeleteProjectDomainAttributes<WithAsyncMethod_UpdateProjectAttributes<WithAsyncMethod_GetProjectAttributes<WithAsyncMethod_DeleteProjectAttributes<WithAsyncMethod_UpdateWorkflowAttributes<WithAsyncMethod_GetWorkflowAttributes<WithAsyncMethod_DeleteWorkflowAttributes<WithAsyncMethod_ListMatchableAttributes<WithAsyncMethod_ListNamedEntities<WithAsyncMethod_GetNamedEntity<WithAsyncMethod_UpdateNamedEntity<WithAsyncMethod_GetVersion<WithAsyncMethod_GetDescriptionEntity<WithAsyncMethod_ListDescriptionEntities<WithAsyncMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateTask : public BaseClass {
    private:
@@ -3039,43 +3039,12 @@ class AdminService final {
     virtual void GetWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::ObjectGetRequest* request, ::flyteidl::admin::Workflow* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow() {
-      ::grpc::Service::experimental().MarkMethodCallback(6,
-        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>(
-          [this](::grpc::ServerContext* context,
-                 const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request,
-                 ::flyteidl::admin::DynamicNodeWorkflowResponse* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   return this->GetDynamicNodeWorkflow(context, request, response, controller);
-                 }));
-    }
-    void SetMessageAllocatorFor_GetDynamicNodeWorkflow(
-        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>* allocator) {
-      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>*>(
-          ::grpc::Service::experimental().GetHandler(6))
-              ->SetMessageAllocator(allocator);
-    }
-    ~ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
   class ExperimentalWithCallbackMethod_ListWorkflowIds : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ListWorkflowIds() {
-      ::grpc::Service::experimental().MarkMethodCallback(7,
+      ::grpc::Service::experimental().MarkMethodCallback(6,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::NamedEntityIdentifierListRequest* request,
@@ -3087,7 +3056,7 @@ class AdminService final {
     void SetMessageAllocatorFor_ListWorkflowIds(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>*>(
-          ::grpc::Service::experimental().GetHandler(7))
+          ::grpc::Service::experimental().GetHandler(6))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ListWorkflowIds() override {
@@ -3106,7 +3075,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ListWorkflows() {
-      ::grpc::Service::experimental().MarkMethodCallback(8,
+      ::grpc::Service::experimental().MarkMethodCallback(7,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ResourceListRequest* request,
@@ -3118,7 +3087,7 @@ class AdminService final {
     void SetMessageAllocatorFor_ListWorkflows(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>*>(
-          ::grpc::Service::experimental().GetHandler(8))
+          ::grpc::Service::experimental().GetHandler(7))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ListWorkflows() override {
@@ -3137,7 +3106,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_CreateLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodCallback(9,
+      ::grpc::Service::experimental().MarkMethodCallback(8,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::LaunchPlanCreateRequest* request,
@@ -3149,7 +3118,7 @@ class AdminService final {
     void SetMessageAllocatorFor_CreateLaunchPlan(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(9))
+          ::grpc::Service::experimental().GetHandler(8))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_CreateLaunchPlan() override {
@@ -3168,7 +3137,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_GetLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodCallback(10,
+      ::grpc::Service::experimental().MarkMethodCallback(9,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ObjectGetRequest* request,
@@ -3180,7 +3149,7 @@ class AdminService final {
     void SetMessageAllocatorFor_GetLaunchPlan(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>*>(
-          ::grpc::Service::experimental().GetHandler(10))
+          ::grpc::Service::experimental().GetHandler(9))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_GetLaunchPlan() override {
@@ -3199,7 +3168,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_GetActiveLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodCallback(11,
+      ::grpc::Service::experimental().MarkMethodCallback(10,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ActiveLaunchPlanRequest* request,
@@ -3211,7 +3180,7 @@ class AdminService final {
     void SetMessageAllocatorFor_GetActiveLaunchPlan(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>*>(
-          ::grpc::Service::experimental().GetHandler(11))
+          ::grpc::Service::experimental().GetHandler(10))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_GetActiveLaunchPlan() override {
@@ -3230,7 +3199,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ListActiveLaunchPlans() {
-      ::grpc::Service::experimental().MarkMethodCallback(12,
+      ::grpc::Service::experimental().MarkMethodCallback(11,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ActiveLaunchPlanListRequest* request,
@@ -3242,7 +3211,7 @@ class AdminService final {
     void SetMessageAllocatorFor_ListActiveLaunchPlans(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>*>(
-          ::grpc::Service::experimental().GetHandler(12))
+          ::grpc::Service::experimental().GetHandler(11))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ListActiveLaunchPlans() override {
@@ -3261,7 +3230,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ListLaunchPlanIds() {
-      ::grpc::Service::experimental().MarkMethodCallback(13,
+      ::grpc::Service::experimental().MarkMethodCallback(12,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::NamedEntityIdentifierListRequest* request,
@@ -3273,7 +3242,7 @@ class AdminService final {
     void SetMessageAllocatorFor_ListLaunchPlanIds(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>*>(
-          ::grpc::Service::experimental().GetHandler(13))
+          ::grpc::Service::experimental().GetHandler(12))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ListLaunchPlanIds() override {
@@ -3292,7 +3261,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ListLaunchPlans() {
-      ::grpc::Service::experimental().MarkMethodCallback(14,
+      ::grpc::Service::experimental().MarkMethodCallback(13,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ResourceListRequest* request,
@@ -3304,7 +3273,7 @@ class AdminService final {
     void SetMessageAllocatorFor_ListLaunchPlans(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>*>(
-          ::grpc::Service::experimental().GetHandler(14))
+          ::grpc::Service::experimental().GetHandler(13))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ListLaunchPlans() override {
@@ -3323,7 +3292,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_UpdateLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodCallback(15,
+      ::grpc::Service::experimental().MarkMethodCallback(14,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::LaunchPlanUpdateRequest* request,
@@ -3335,7 +3304,7 @@ class AdminService final {
     void SetMessageAllocatorFor_UpdateLaunchPlan(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(15))
+          ::grpc::Service::experimental().GetHandler(14))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_UpdateLaunchPlan() override {
@@ -3354,7 +3323,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_CreateExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(16,
+      ::grpc::Service::experimental().MarkMethodCallback(15,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ExecutionCreateRequest* request,
@@ -3366,7 +3335,7 @@ class AdminService final {
     void SetMessageAllocatorFor_CreateExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(16))
+          ::grpc::Service::experimental().GetHandler(15))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_CreateExecution() override {
@@ -3385,7 +3354,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_RelaunchExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(17,
+      ::grpc::Service::experimental().MarkMethodCallback(16,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ExecutionRelaunchRequest* request,
@@ -3397,7 +3366,7 @@ class AdminService final {
     void SetMessageAllocatorFor_RelaunchExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(17))
+          ::grpc::Service::experimental().GetHandler(16))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_RelaunchExecution() override {
@@ -3416,7 +3385,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_RecoverExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(18,
+      ::grpc::Service::experimental().MarkMethodCallback(17,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionRecoverRequest, ::flyteidl::admin::ExecutionCreateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ExecutionRecoverRequest* request,
@@ -3428,7 +3397,7 @@ class AdminService final {
     void SetMessageAllocatorFor_RecoverExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionRecoverRequest, ::flyteidl::admin::ExecutionCreateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionRecoverRequest, ::flyteidl::admin::ExecutionCreateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(18))
+          ::grpc::Service::experimental().GetHandler(17))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_RecoverExecution() override {
@@ -3447,7 +3416,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_GetExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(19,
+      ::grpc::Service::experimental().MarkMethodCallback(18,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::WorkflowExecutionGetRequest* request,
@@ -3459,7 +3428,7 @@ class AdminService final {
     void SetMessageAllocatorFor_GetExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>*>(
-          ::grpc::Service::experimental().GetHandler(19))
+          ::grpc::Service::experimental().GetHandler(18))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_GetExecution() override {
@@ -3478,7 +3447,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_UpdateExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(20,
+      ::grpc::Service::experimental().MarkMethodCallback(19,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionUpdateRequest, ::flyteidl::admin::ExecutionUpdateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ExecutionUpdateRequest* request,
@@ -3490,7 +3459,7 @@ class AdminService final {
     void SetMessageAllocatorFor_UpdateExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionUpdateRequest, ::flyteidl::admin::ExecutionUpdateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionUpdateRequest, ::flyteidl::admin::ExecutionUpdateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(20))
+          ::grpc::Service::experimental().GetHandler(19))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_UpdateExecution() override {
@@ -3509,7 +3478,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_GetExecutionData() {
-      ::grpc::Service::experimental().MarkMethodCallback(21,
+      ::grpc::Service::experimental().MarkMethodCallback(20,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::WorkflowExecutionGetDataRequest* request,
@@ -3521,7 +3490,7 @@ class AdminService final {
     void SetMessageAllocatorFor_GetExecutionData(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>*>(
-          ::grpc::Service::experimental().GetHandler(21))
+          ::grpc::Service::experimental().GetHandler(20))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_GetExecutionData() override {
@@ -3540,7 +3509,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_ListExecutions() {
-      ::grpc::Service::experimental().MarkMethodCallback(22,
+      ::grpc::Service::experimental().MarkMethodCallback(21,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ResourceListRequest* request,
@@ -3552,7 +3521,7 @@ class AdminService final {
     void SetMessageAllocatorFor_ListExecutions(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>*>(
-          ::grpc::Service::experimental().GetHandler(22))
+          ::grpc::Service::experimental().GetHandler(21))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_ListExecutions() override {
@@ -3571,7 +3540,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_TerminateExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(23,
+      ::grpc::Service::experimental().MarkMethodCallback(22,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::ExecutionTerminateRequest* request,
@@ -3583,7 +3552,7 @@ class AdminService final {
     void SetMessageAllocatorFor_TerminateExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>*>(
-          ::grpc::Service::experimental().GetHandler(23))
+          ::grpc::Service::experimental().GetHandler(22))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_TerminateExecution() override {
@@ -3602,7 +3571,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithCallbackMethod_GetNodeExecution() {
-      ::grpc::Service::experimental().MarkMethodCallback(24,
+      ::grpc::Service::experimental().MarkMethodCallback(23,
         new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>(
           [this](::grpc::ServerContext* context,
                  const ::flyteidl::admin::NodeExecutionGetRequest* request,
@@ -3614,7 +3583,7 @@ class AdminService final {
     void SetMessageAllocatorFor_GetNodeExecution(
         ::grpc::experimental::MessageAllocator< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>* allocator) {
       static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>*>(
-          ::grpc::Service::experimental().GetHandler(24))
+          ::grpc::Service::experimental().GetHandler(23))
               ->SetMessageAllocator(allocator);
     }
     ~ExperimentalWithCallbackMethod_GetNodeExecution() override {
@@ -3626,6 +3595,37 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual void GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow() {
+      ::grpc::Service::experimental().MarkMethodCallback(24,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request,
+                 ::flyteidl::admin::DynamicNodeWorkflowResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetDynamicNodeWorkflow(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetDynamicNodeWorkflow(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>*>(
+          ::grpc::Service::experimental().GetHandler(24))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_ListNodeExecutions : public BaseClass {
@@ -4526,7 +4526,7 @@ class AdminService final {
     }
     virtual void GetExecutionMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::WorkflowExecutionGetMetricsRequest* request, ::flyteidl::admin::WorkflowExecutionGetMetricsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_CreateTask<ExperimentalWithCallbackMethod_GetTask<ExperimentalWithCallbackMethod_ListTaskIds<ExperimentalWithCallbackMethod_ListTasks<ExperimentalWithCallbackMethod_CreateWorkflow<ExperimentalWithCallbackMethod_GetWorkflow<ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow<ExperimentalWithCallbackMethod_ListWorkflowIds<ExperimentalWithCallbackMethod_ListWorkflows<ExperimentalWithCallbackMethod_CreateLaunchPlan<ExperimentalWithCallbackMethod_GetLaunchPlan<ExperimentalWithCallbackMethod_GetActiveLaunchPlan<ExperimentalWithCallbackMethod_ListActiveLaunchPlans<ExperimentalWithCallbackMethod_ListLaunchPlanIds<ExperimentalWithCallbackMethod_ListLaunchPlans<ExperimentalWithCallbackMethod_UpdateLaunchPlan<ExperimentalWithCallbackMethod_CreateExecution<ExperimentalWithCallbackMethod_RelaunchExecution<ExperimentalWithCallbackMethod_RecoverExecution<ExperimentalWithCallbackMethod_GetExecution<ExperimentalWithCallbackMethod_UpdateExecution<ExperimentalWithCallbackMethod_GetExecutionData<ExperimentalWithCallbackMethod_ListExecutions<ExperimentalWithCallbackMethod_TerminateExecution<ExperimentalWithCallbackMethod_GetNodeExecution<ExperimentalWithCallbackMethod_ListNodeExecutions<ExperimentalWithCallbackMethod_ListNodeExecutionsForTask<ExperimentalWithCallbackMethod_GetNodeExecutionData<ExperimentalWithCallbackMethod_RegisterProject<ExperimentalWithCallbackMethod_UpdateProject<ExperimentalWithCallbackMethod_ListProjects<ExperimentalWithCallbackMethod_CreateWorkflowEvent<ExperimentalWithCallbackMethod_CreateNodeEvent<ExperimentalWithCallbackMethod_CreateTaskEvent<ExperimentalWithCallbackMethod_GetTaskExecution<ExperimentalWithCallbackMethod_ListTaskExecutions<ExperimentalWithCallbackMethod_GetTaskExecutionData<ExperimentalWithCallbackMethod_UpdateProjectDomainAttributes<ExperimentalWithCallbackMethod_GetProjectDomainAttributes<ExperimentalWithCallbackMethod_DeleteProjectDomainAttributes<ExperimentalWithCallbackMethod_UpdateProjectAttributes<ExperimentalWithCallbackMethod_GetProjectAttributes<ExperimentalWithCallbackMethod_DeleteProjectAttributes<ExperimentalWithCallbackMethod_UpdateWorkflowAttributes<ExperimentalWithCallbackMethod_GetWorkflowAttributes<ExperimentalWithCallbackMethod_DeleteWorkflowAttributes<ExperimentalWithCallbackMethod_ListMatchableAttributes<ExperimentalWithCallbackMethod_ListNamedEntities<ExperimentalWithCallbackMethod_GetNamedEntity<ExperimentalWithCallbackMethod_UpdateNamedEntity<ExperimentalWithCallbackMethod_GetVersion<ExperimentalWithCallbackMethod_GetDescriptionEntity<ExperimentalWithCallbackMethod_ListDescriptionEntities<ExperimentalWithCallbackMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_CreateTask<ExperimentalWithCallbackMethod_GetTask<ExperimentalWithCallbackMethod_ListTaskIds<ExperimentalWithCallbackMethod_ListTasks<ExperimentalWithCallbackMethod_CreateWorkflow<ExperimentalWithCallbackMethod_GetWorkflow<ExperimentalWithCallbackMethod_ListWorkflowIds<ExperimentalWithCallbackMethod_ListWorkflows<ExperimentalWithCallbackMethod_CreateLaunchPlan<ExperimentalWithCallbackMethod_GetLaunchPlan<ExperimentalWithCallbackMethod_GetActiveLaunchPlan<ExperimentalWithCallbackMethod_ListActiveLaunchPlans<ExperimentalWithCallbackMethod_ListLaunchPlanIds<ExperimentalWithCallbackMethod_ListLaunchPlans<ExperimentalWithCallbackMethod_UpdateLaunchPlan<ExperimentalWithCallbackMethod_CreateExecution<ExperimentalWithCallbackMethod_RelaunchExecution<ExperimentalWithCallbackMethod_RecoverExecution<ExperimentalWithCallbackMethod_GetExecution<ExperimentalWithCallbackMethod_UpdateExecution<ExperimentalWithCallbackMethod_GetExecutionData<ExperimentalWithCallbackMethod_ListExecutions<ExperimentalWithCallbackMethod_TerminateExecution<ExperimentalWithCallbackMethod_GetNodeExecution<ExperimentalWithCallbackMethod_GetDynamicNodeWorkflow<ExperimentalWithCallbackMethod_ListNodeExecutions<ExperimentalWithCallbackMethod_ListNodeExecutionsForTask<ExperimentalWithCallbackMethod_GetNodeExecutionData<ExperimentalWithCallbackMethod_RegisterProject<ExperimentalWithCallbackMethod_UpdateProject<ExperimentalWithCallbackMethod_ListProjects<ExperimentalWithCallbackMethod_CreateWorkflowEvent<ExperimentalWithCallbackMethod_CreateNodeEvent<ExperimentalWithCallbackMethod_CreateTaskEvent<ExperimentalWithCallbackMethod_GetTaskExecution<ExperimentalWithCallbackMethod_ListTaskExecutions<ExperimentalWithCallbackMethod_GetTaskExecutionData<ExperimentalWithCallbackMethod_UpdateProjectDomainAttributes<ExperimentalWithCallbackMethod_GetProjectDomainAttributes<ExperimentalWithCallbackMethod_DeleteProjectDomainAttributes<ExperimentalWithCallbackMethod_UpdateProjectAttributes<ExperimentalWithCallbackMethod_GetProjectAttributes<ExperimentalWithCallbackMethod_DeleteProjectAttributes<ExperimentalWithCallbackMethod_UpdateWorkflowAttributes<ExperimentalWithCallbackMethod_GetWorkflowAttributes<ExperimentalWithCallbackMethod_DeleteWorkflowAttributes<ExperimentalWithCallbackMethod_ListMatchableAttributes<ExperimentalWithCallbackMethod_ListNamedEntities<ExperimentalWithCallbackMethod_GetNamedEntity<ExperimentalWithCallbackMethod_UpdateNamedEntity<ExperimentalWithCallbackMethod_GetVersion<ExperimentalWithCallbackMethod_GetDescriptionEntity<ExperimentalWithCallbackMethod_ListDescriptionEntities<ExperimentalWithCallbackMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateTask : public BaseClass {
    private:
@@ -4630,29 +4630,12 @@ class AdminService final {
     }
   };
   template <class BaseClass>
-  class WithGenericMethod_GetDynamicNodeWorkflow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithGenericMethod_GetDynamicNodeWorkflow() {
-      ::grpc::Service::MarkMethodGeneric(6);
-    }
-    ~WithGenericMethod_GetDynamicNodeWorkflow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-  };
-  template <class BaseClass>
   class WithGenericMethod_ListWorkflowIds : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ListWorkflowIds() {
-      ::grpc::Service::MarkMethodGeneric(7);
+      ::grpc::Service::MarkMethodGeneric(6);
     }
     ~WithGenericMethod_ListWorkflowIds() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4669,7 +4652,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ListWorkflows() {
-      ::grpc::Service::MarkMethodGeneric(8);
+      ::grpc::Service::MarkMethodGeneric(7);
     }
     ~WithGenericMethod_ListWorkflows() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4686,7 +4669,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_CreateLaunchPlan() {
-      ::grpc::Service::MarkMethodGeneric(9);
+      ::grpc::Service::MarkMethodGeneric(8);
     }
     ~WithGenericMethod_CreateLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4703,7 +4686,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_GetLaunchPlan() {
-      ::grpc::Service::MarkMethodGeneric(10);
+      ::grpc::Service::MarkMethodGeneric(9);
     }
     ~WithGenericMethod_GetLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4720,7 +4703,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_GetActiveLaunchPlan() {
-      ::grpc::Service::MarkMethodGeneric(11);
+      ::grpc::Service::MarkMethodGeneric(10);
     }
     ~WithGenericMethod_GetActiveLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4737,7 +4720,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ListActiveLaunchPlans() {
-      ::grpc::Service::MarkMethodGeneric(12);
+      ::grpc::Service::MarkMethodGeneric(11);
     }
     ~WithGenericMethod_ListActiveLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4754,7 +4737,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ListLaunchPlanIds() {
-      ::grpc::Service::MarkMethodGeneric(13);
+      ::grpc::Service::MarkMethodGeneric(12);
     }
     ~WithGenericMethod_ListLaunchPlanIds() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4771,7 +4754,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ListLaunchPlans() {
-      ::grpc::Service::MarkMethodGeneric(14);
+      ::grpc::Service::MarkMethodGeneric(13);
     }
     ~WithGenericMethod_ListLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4788,7 +4771,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_UpdateLaunchPlan() {
-      ::grpc::Service::MarkMethodGeneric(15);
+      ::grpc::Service::MarkMethodGeneric(14);
     }
     ~WithGenericMethod_UpdateLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4805,7 +4788,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_CreateExecution() {
-      ::grpc::Service::MarkMethodGeneric(16);
+      ::grpc::Service::MarkMethodGeneric(15);
     }
     ~WithGenericMethod_CreateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4822,7 +4805,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_RelaunchExecution() {
-      ::grpc::Service::MarkMethodGeneric(17);
+      ::grpc::Service::MarkMethodGeneric(16);
     }
     ~WithGenericMethod_RelaunchExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4839,7 +4822,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_RecoverExecution() {
-      ::grpc::Service::MarkMethodGeneric(18);
+      ::grpc::Service::MarkMethodGeneric(17);
     }
     ~WithGenericMethod_RecoverExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4856,7 +4839,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_GetExecution() {
-      ::grpc::Service::MarkMethodGeneric(19);
+      ::grpc::Service::MarkMethodGeneric(18);
     }
     ~WithGenericMethod_GetExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4873,7 +4856,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_UpdateExecution() {
-      ::grpc::Service::MarkMethodGeneric(20);
+      ::grpc::Service::MarkMethodGeneric(19);
     }
     ~WithGenericMethod_UpdateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4890,7 +4873,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_GetExecutionData() {
-      ::grpc::Service::MarkMethodGeneric(21);
+      ::grpc::Service::MarkMethodGeneric(20);
     }
     ~WithGenericMethod_GetExecutionData() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4907,7 +4890,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_ListExecutions() {
-      ::grpc::Service::MarkMethodGeneric(22);
+      ::grpc::Service::MarkMethodGeneric(21);
     }
     ~WithGenericMethod_ListExecutions() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4924,7 +4907,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_TerminateExecution() {
-      ::grpc::Service::MarkMethodGeneric(23);
+      ::grpc::Service::MarkMethodGeneric(22);
     }
     ~WithGenericMethod_TerminateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -4941,13 +4924,30 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithGenericMethod_GetNodeExecution() {
-      ::grpc::Service::MarkMethodGeneric(24);
+      ::grpc::Service::MarkMethodGeneric(23);
     }
     ~WithGenericMethod_GetNodeExecution() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
     ::grpc::Status GetNodeExecution(::grpc::ServerContext* context, const ::flyteidl::admin::NodeExecutionGetRequest* request, ::flyteidl::admin::NodeExecution* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_GetDynamicNodeWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_GetDynamicNodeWorkflow() {
+      ::grpc::Service::MarkMethodGeneric(24);
+    }
+    ~WithGenericMethod_GetDynamicNodeWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -5566,32 +5566,12 @@ class AdminService final {
     }
   };
   template <class BaseClass>
-  class WithRawMethod_GetDynamicNodeWorkflow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithRawMethod_GetDynamicNodeWorkflow() {
-      ::grpc::Service::MarkMethodRaw(6);
-    }
-    ~WithRawMethod_GetDynamicNodeWorkflow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    void RequestGetDynamicNodeWorkflow(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
-    }
-  };
-  template <class BaseClass>
   class WithRawMethod_ListWorkflowIds : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ListWorkflowIds() {
-      ::grpc::Service::MarkMethodRaw(7);
+      ::grpc::Service::MarkMethodRaw(6);
     }
     ~WithRawMethod_ListWorkflowIds() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5602,7 +5582,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListWorkflowIds(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(6, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5611,7 +5591,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ListWorkflows() {
-      ::grpc::Service::MarkMethodRaw(8);
+      ::grpc::Service::MarkMethodRaw(7);
     }
     ~WithRawMethod_ListWorkflows() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5622,7 +5602,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListWorkflows(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(7, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5631,7 +5611,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_CreateLaunchPlan() {
-      ::grpc::Service::MarkMethodRaw(9);
+      ::grpc::Service::MarkMethodRaw(8);
     }
     ~WithRawMethod_CreateLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5642,7 +5622,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateLaunchPlan(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(8, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5651,7 +5631,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_GetLaunchPlan() {
-      ::grpc::Service::MarkMethodRaw(10);
+      ::grpc::Service::MarkMethodRaw(9);
     }
     ~WithRawMethod_GetLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5662,7 +5642,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetLaunchPlan(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(9, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5671,7 +5651,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_GetActiveLaunchPlan() {
-      ::grpc::Service::MarkMethodRaw(11);
+      ::grpc::Service::MarkMethodRaw(10);
     }
     ~WithRawMethod_GetActiveLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5682,7 +5662,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetActiveLaunchPlan(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(10, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5691,7 +5671,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ListActiveLaunchPlans() {
-      ::grpc::Service::MarkMethodRaw(12);
+      ::grpc::Service::MarkMethodRaw(11);
     }
     ~WithRawMethod_ListActiveLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5702,7 +5682,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListActiveLaunchPlans(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(12, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(11, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5711,7 +5691,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ListLaunchPlanIds() {
-      ::grpc::Service::MarkMethodRaw(13);
+      ::grpc::Service::MarkMethodRaw(12);
     }
     ~WithRawMethod_ListLaunchPlanIds() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5722,7 +5702,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListLaunchPlanIds(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(13, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(12, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5731,7 +5711,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ListLaunchPlans() {
-      ::grpc::Service::MarkMethodRaw(14);
+      ::grpc::Service::MarkMethodRaw(13);
     }
     ~WithRawMethod_ListLaunchPlans() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5742,7 +5722,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListLaunchPlans(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(14, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(13, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5751,7 +5731,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_UpdateLaunchPlan() {
-      ::grpc::Service::MarkMethodRaw(15);
+      ::grpc::Service::MarkMethodRaw(14);
     }
     ~WithRawMethod_UpdateLaunchPlan() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5762,7 +5742,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestUpdateLaunchPlan(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(15, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(14, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5771,7 +5751,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_CreateExecution() {
-      ::grpc::Service::MarkMethodRaw(16);
+      ::grpc::Service::MarkMethodRaw(15);
     }
     ~WithRawMethod_CreateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5782,7 +5762,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestCreateExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(16, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(15, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5791,7 +5771,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_RelaunchExecution() {
-      ::grpc::Service::MarkMethodRaw(17);
+      ::grpc::Service::MarkMethodRaw(16);
     }
     ~WithRawMethod_RelaunchExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5802,7 +5782,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRelaunchExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(17, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(16, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5811,7 +5791,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_RecoverExecution() {
-      ::grpc::Service::MarkMethodRaw(18);
+      ::grpc::Service::MarkMethodRaw(17);
     }
     ~WithRawMethod_RecoverExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5822,7 +5802,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestRecoverExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(18, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(17, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5831,7 +5811,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_GetExecution() {
-      ::grpc::Service::MarkMethodRaw(19);
+      ::grpc::Service::MarkMethodRaw(18);
     }
     ~WithRawMethod_GetExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5842,7 +5822,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(19, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(18, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5851,7 +5831,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_UpdateExecution() {
-      ::grpc::Service::MarkMethodRaw(20);
+      ::grpc::Service::MarkMethodRaw(19);
     }
     ~WithRawMethod_UpdateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5862,7 +5842,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestUpdateExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(20, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(19, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5871,7 +5851,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_GetExecutionData() {
-      ::grpc::Service::MarkMethodRaw(21);
+      ::grpc::Service::MarkMethodRaw(20);
     }
     ~WithRawMethod_GetExecutionData() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5882,7 +5862,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetExecutionData(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(21, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(20, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5891,7 +5871,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_ListExecutions() {
-      ::grpc::Service::MarkMethodRaw(22);
+      ::grpc::Service::MarkMethodRaw(21);
     }
     ~WithRawMethod_ListExecutions() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5902,7 +5882,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestListExecutions(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(22, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(21, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5911,7 +5891,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_TerminateExecution() {
-      ::grpc::Service::MarkMethodRaw(23);
+      ::grpc::Service::MarkMethodRaw(22);
     }
     ~WithRawMethod_TerminateExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5922,7 +5902,7 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestTerminateExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
-      ::grpc::Service::RequestAsyncUnary(23, context, request, response, new_call_cq, notification_cq, tag);
+      ::grpc::Service::RequestAsyncUnary(22, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -5931,7 +5911,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithRawMethod_GetNodeExecution() {
-      ::grpc::Service::MarkMethodRaw(24);
+      ::grpc::Service::MarkMethodRaw(23);
     }
     ~WithRawMethod_GetNodeExecution() override {
       BaseClassMustBeDerivedFromService(this);
@@ -5942,6 +5922,26 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     void RequestGetNodeExecution(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(23, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetDynamicNodeWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_GetDynamicNodeWorkflow() {
+      ::grpc::Service::MarkMethodRaw(24);
+    }
+    ~WithRawMethod_GetDynamicNodeWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetDynamicNodeWorkflow(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(24, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
@@ -6676,37 +6676,12 @@ class AdminService final {
     virtual void GetWorkflow(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
-  class ExperimentalWithRawCallbackMethod_GetDynamicNodeWorkflow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    ExperimentalWithRawCallbackMethod_GetDynamicNodeWorkflow() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(6,
-        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
-          [this](::grpc::ServerContext* context,
-                 const ::grpc::ByteBuffer* request,
-                 ::grpc::ByteBuffer* response,
-                 ::grpc::experimental::ServerCallbackRpcController* controller) {
-                   this->GetDynamicNodeWorkflow(context, request, response, controller);
-                 }));
-    }
-    ~ExperimentalWithRawCallbackMethod_GetDynamicNodeWorkflow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable synchronous version of this method
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    virtual void GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
-  };
-  template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_ListWorkflowIds : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ListWorkflowIds() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(7,
+      ::grpc::Service::experimental().MarkMethodRawCallback(6,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6731,7 +6706,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ListWorkflows() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(8,
+      ::grpc::Service::experimental().MarkMethodRawCallback(7,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6756,7 +6731,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_CreateLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(9,
+      ::grpc::Service::experimental().MarkMethodRawCallback(8,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6781,7 +6756,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_GetLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(10,
+      ::grpc::Service::experimental().MarkMethodRawCallback(9,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6806,7 +6781,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_GetActiveLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(11,
+      ::grpc::Service::experimental().MarkMethodRawCallback(10,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6831,7 +6806,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ListActiveLaunchPlans() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(12,
+      ::grpc::Service::experimental().MarkMethodRawCallback(11,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6856,7 +6831,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ListLaunchPlanIds() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(13,
+      ::grpc::Service::experimental().MarkMethodRawCallback(12,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6881,7 +6856,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ListLaunchPlans() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(14,
+      ::grpc::Service::experimental().MarkMethodRawCallback(13,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6906,7 +6881,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_UpdateLaunchPlan() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(15,
+      ::grpc::Service::experimental().MarkMethodRawCallback(14,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6931,7 +6906,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_CreateExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(16,
+      ::grpc::Service::experimental().MarkMethodRawCallback(15,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6956,7 +6931,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_RelaunchExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(17,
+      ::grpc::Service::experimental().MarkMethodRawCallback(16,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -6981,7 +6956,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_RecoverExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(18,
+      ::grpc::Service::experimental().MarkMethodRawCallback(17,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7006,7 +6981,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_GetExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(19,
+      ::grpc::Service::experimental().MarkMethodRawCallback(18,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7031,7 +7006,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_UpdateExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(20,
+      ::grpc::Service::experimental().MarkMethodRawCallback(19,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7056,7 +7031,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_GetExecutionData() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(21,
+      ::grpc::Service::experimental().MarkMethodRawCallback(20,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7081,7 +7056,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_ListExecutions() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(22,
+      ::grpc::Service::experimental().MarkMethodRawCallback(21,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7106,7 +7081,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_TerminateExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(23,
+      ::grpc::Service::experimental().MarkMethodRawCallback(22,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7131,7 +7106,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     ExperimentalWithRawCallbackMethod_GetNodeExecution() {
-      ::grpc::Service::experimental().MarkMethodRawCallback(24,
+      ::grpc::Service::experimental().MarkMethodRawCallback(23,
         new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
           [this](::grpc::ServerContext* context,
                  const ::grpc::ByteBuffer* request,
@@ -7149,6 +7124,31 @@ class AdminService final {
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
     virtual void GetNodeExecution(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetDynamicNodeWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetDynamicNodeWorkflow() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(24,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetDynamicNodeWorkflow(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetDynamicNodeWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
   class ExperimentalWithRawCallbackMethod_ListNodeExecutions : public BaseClass {
@@ -7996,32 +7996,12 @@ class AdminService final {
     virtual ::grpc::Status StreamedGetWorkflow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::ObjectGetRequest,::flyteidl::admin::Workflow>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
-  class WithStreamedUnaryMethod_GetDynamicNodeWorkflow : public BaseClass {
-   private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
-   public:
-    WithStreamedUnaryMethod_GetDynamicNodeWorkflow() {
-      ::grpc::Service::MarkMethodStreamed(6,
-        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>(std::bind(&WithStreamedUnaryMethod_GetDynamicNodeWorkflow<BaseClass>::StreamedGetDynamicNodeWorkflow, this, std::placeholders::_1, std::placeholders::_2)));
-    }
-    ~WithStreamedUnaryMethod_GetDynamicNodeWorkflow() override {
-      BaseClassMustBeDerivedFromService(this);
-    }
-    // disable regular version of this method
-    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
-      abort();
-      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
-    }
-    // replace default version of method with streamed unary
-    virtual ::grpc::Status StreamedGetDynamicNodeWorkflow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetDynamicNodeWorkflowRequest,::flyteidl::admin::DynamicNodeWorkflowResponse>* server_unary_streamer) = 0;
-  };
-  template <class BaseClass>
   class WithStreamedUnaryMethod_ListWorkflowIds : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ListWorkflowIds() {
-      ::grpc::Service::MarkMethodStreamed(7,
+      ::grpc::Service::MarkMethodStreamed(6,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(std::bind(&WithStreamedUnaryMethod_ListWorkflowIds<BaseClass>::StreamedListWorkflowIds, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListWorkflowIds() override {
@@ -8041,7 +8021,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ListWorkflows() {
-      ::grpc::Service::MarkMethodStreamed(8,
+      ::grpc::Service::MarkMethodStreamed(7,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::WorkflowList>(std::bind(&WithStreamedUnaryMethod_ListWorkflows<BaseClass>::StreamedListWorkflows, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListWorkflows() override {
@@ -8061,7 +8041,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_CreateLaunchPlan() {
-      ::grpc::Service::MarkMethodStreamed(9,
+      ::grpc::Service::MarkMethodStreamed(8,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::LaunchPlanCreateRequest, ::flyteidl::admin::LaunchPlanCreateResponse>(std::bind(&WithStreamedUnaryMethod_CreateLaunchPlan<BaseClass>::StreamedCreateLaunchPlan, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_CreateLaunchPlan() override {
@@ -8081,7 +8061,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_GetLaunchPlan() {
-      ::grpc::Service::MarkMethodStreamed(10,
+      ::grpc::Service::MarkMethodStreamed(9,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ObjectGetRequest, ::flyteidl::admin::LaunchPlan>(std::bind(&WithStreamedUnaryMethod_GetLaunchPlan<BaseClass>::StreamedGetLaunchPlan, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetLaunchPlan() override {
@@ -8101,7 +8081,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_GetActiveLaunchPlan() {
-      ::grpc::Service::MarkMethodStreamed(11,
+      ::grpc::Service::MarkMethodStreamed(10,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanRequest, ::flyteidl::admin::LaunchPlan>(std::bind(&WithStreamedUnaryMethod_GetActiveLaunchPlan<BaseClass>::StreamedGetActiveLaunchPlan, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetActiveLaunchPlan() override {
@@ -8121,7 +8101,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ListActiveLaunchPlans() {
-      ::grpc::Service::MarkMethodStreamed(12,
+      ::grpc::Service::MarkMethodStreamed(11,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ActiveLaunchPlanListRequest, ::flyteidl::admin::LaunchPlanList>(std::bind(&WithStreamedUnaryMethod_ListActiveLaunchPlans<BaseClass>::StreamedListActiveLaunchPlans, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListActiveLaunchPlans() override {
@@ -8141,7 +8121,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ListLaunchPlanIds() {
-      ::grpc::Service::MarkMethodStreamed(13,
+      ::grpc::Service::MarkMethodStreamed(12,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::NamedEntityIdentifierListRequest, ::flyteidl::admin::NamedEntityIdentifierList>(std::bind(&WithStreamedUnaryMethod_ListLaunchPlanIds<BaseClass>::StreamedListLaunchPlanIds, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListLaunchPlanIds() override {
@@ -8161,7 +8141,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ListLaunchPlans() {
-      ::grpc::Service::MarkMethodStreamed(14,
+      ::grpc::Service::MarkMethodStreamed(13,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::LaunchPlanList>(std::bind(&WithStreamedUnaryMethod_ListLaunchPlans<BaseClass>::StreamedListLaunchPlans, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListLaunchPlans() override {
@@ -8181,7 +8161,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_UpdateLaunchPlan() {
-      ::grpc::Service::MarkMethodStreamed(15,
+      ::grpc::Service::MarkMethodStreamed(14,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::LaunchPlanUpdateRequest, ::flyteidl::admin::LaunchPlanUpdateResponse>(std::bind(&WithStreamedUnaryMethod_UpdateLaunchPlan<BaseClass>::StreamedUpdateLaunchPlan, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_UpdateLaunchPlan() override {
@@ -8201,7 +8181,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_CreateExecution() {
-      ::grpc::Service::MarkMethodStreamed(16,
+      ::grpc::Service::MarkMethodStreamed(15,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ExecutionCreateRequest, ::flyteidl::admin::ExecutionCreateResponse>(std::bind(&WithStreamedUnaryMethod_CreateExecution<BaseClass>::StreamedCreateExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_CreateExecution() override {
@@ -8221,7 +8201,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_RelaunchExecution() {
-      ::grpc::Service::MarkMethodStreamed(17,
+      ::grpc::Service::MarkMethodStreamed(16,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ExecutionRelaunchRequest, ::flyteidl::admin::ExecutionCreateResponse>(std::bind(&WithStreamedUnaryMethod_RelaunchExecution<BaseClass>::StreamedRelaunchExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_RelaunchExecution() override {
@@ -8241,7 +8221,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_RecoverExecution() {
-      ::grpc::Service::MarkMethodStreamed(18,
+      ::grpc::Service::MarkMethodStreamed(17,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ExecutionRecoverRequest, ::flyteidl::admin::ExecutionCreateResponse>(std::bind(&WithStreamedUnaryMethod_RecoverExecution<BaseClass>::StreamedRecoverExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_RecoverExecution() override {
@@ -8261,7 +8241,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_GetExecution() {
-      ::grpc::Service::MarkMethodStreamed(19,
+      ::grpc::Service::MarkMethodStreamed(18,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetRequest, ::flyteidl::admin::Execution>(std::bind(&WithStreamedUnaryMethod_GetExecution<BaseClass>::StreamedGetExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetExecution() override {
@@ -8281,7 +8261,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_UpdateExecution() {
-      ::grpc::Service::MarkMethodStreamed(20,
+      ::grpc::Service::MarkMethodStreamed(19,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ExecutionUpdateRequest, ::flyteidl::admin::ExecutionUpdateResponse>(std::bind(&WithStreamedUnaryMethod_UpdateExecution<BaseClass>::StreamedUpdateExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_UpdateExecution() override {
@@ -8301,7 +8281,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_GetExecutionData() {
-      ::grpc::Service::MarkMethodStreamed(21,
+      ::grpc::Service::MarkMethodStreamed(20,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::WorkflowExecutionGetDataRequest, ::flyteidl::admin::WorkflowExecutionGetDataResponse>(std::bind(&WithStreamedUnaryMethod_GetExecutionData<BaseClass>::StreamedGetExecutionData, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetExecutionData() override {
@@ -8321,7 +8301,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_ListExecutions() {
-      ::grpc::Service::MarkMethodStreamed(22,
+      ::grpc::Service::MarkMethodStreamed(21,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ResourceListRequest, ::flyteidl::admin::ExecutionList>(std::bind(&WithStreamedUnaryMethod_ListExecutions<BaseClass>::StreamedListExecutions, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_ListExecutions() override {
@@ -8341,7 +8321,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_TerminateExecution() {
-      ::grpc::Service::MarkMethodStreamed(23,
+      ::grpc::Service::MarkMethodStreamed(22,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ExecutionTerminateRequest, ::flyteidl::admin::ExecutionTerminateResponse>(std::bind(&WithStreamedUnaryMethod_TerminateExecution<BaseClass>::StreamedTerminateExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_TerminateExecution() override {
@@ -8361,7 +8341,7 @@ class AdminService final {
     void BaseClassMustBeDerivedFromService(const Service *service) {}
    public:
     WithStreamedUnaryMethod_GetNodeExecution() {
-      ::grpc::Service::MarkMethodStreamed(24,
+      ::grpc::Service::MarkMethodStreamed(23,
         new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::NodeExecutionGetRequest, ::flyteidl::admin::NodeExecution>(std::bind(&WithStreamedUnaryMethod_GetNodeExecution<BaseClass>::StreamedGetNodeExecution, this, std::placeholders::_1, std::placeholders::_2)));
     }
     ~WithStreamedUnaryMethod_GetNodeExecution() override {
@@ -8374,6 +8354,26 @@ class AdminService final {
     }
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedGetNodeExecution(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::NodeExecutionGetRequest,::flyteidl::admin::NodeExecution>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetDynamicNodeWorkflow : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetDynamicNodeWorkflow() {
+      ::grpc::Service::MarkMethodStreamed(24,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetDynamicNodeWorkflowRequest, ::flyteidl::admin::DynamicNodeWorkflowResponse>(std::bind(&WithStreamedUnaryMethod_GetDynamicNodeWorkflow<BaseClass>::StreamedGetDynamicNodeWorkflow, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetDynamicNodeWorkflow() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetDynamicNodeWorkflow(::grpc::ServerContext* context, const ::flyteidl::admin::GetDynamicNodeWorkflowRequest* request, ::flyteidl::admin::DynamicNodeWorkflowResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetDynamicNodeWorkflow(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetDynamicNodeWorkflowRequest,::flyteidl::admin::DynamicNodeWorkflowResponse>* server_unary_streamer) = 0;
   };
   template <class BaseClass>
   class WithStreamedUnaryMethod_ListNodeExecutions : public BaseClass {
@@ -8955,9 +8955,9 @@ class AdminService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedGetExecutionMetrics(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::WorkflowExecutionGetMetricsRequest,::flyteidl::admin::WorkflowExecutionGetMetricsResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_ListTaskIds<WithStreamedUnaryMethod_ListTasks<WithStreamedUnaryMethod_CreateWorkflow<WithStreamedUnaryMethod_GetWorkflow<WithStreamedUnaryMethod_GetDynamicNodeWorkflow<WithStreamedUnaryMethod_ListWorkflowIds<WithStreamedUnaryMethod_ListWorkflows<WithStreamedUnaryMethod_CreateLaunchPlan<WithStreamedUnaryMethod_GetLaunchPlan<WithStreamedUnaryMethod_GetActiveLaunchPlan<WithStreamedUnaryMethod_ListActiveLaunchPlans<WithStreamedUnaryMethod_ListLaunchPlanIds<WithStreamedUnaryMethod_ListLaunchPlans<WithStreamedUnaryMethod_UpdateLaunchPlan<WithStreamedUnaryMethod_CreateExecution<WithStreamedUnaryMethod_RelaunchExecution<WithStreamedUnaryMethod_RecoverExecution<WithStreamedUnaryMethod_GetExecution<WithStreamedUnaryMethod_UpdateExecution<WithStreamedUnaryMethod_GetExecutionData<WithStreamedUnaryMethod_ListExecutions<WithStreamedUnaryMethod_TerminateExecution<WithStreamedUnaryMethod_GetNodeExecution<WithStreamedUnaryMethod_ListNodeExecutions<WithStreamedUnaryMethod_ListNodeExecutionsForTask<WithStreamedUnaryMethod_GetNodeExecutionData<WithStreamedUnaryMethod_RegisterProject<WithStreamedUnaryMethod_UpdateProject<WithStreamedUnaryMethod_ListProjects<WithStreamedUnaryMethod_CreateWorkflowEvent<WithStreamedUnaryMethod_CreateNodeEvent<WithStreamedUnaryMethod_CreateTaskEvent<WithStreamedUnaryMethod_GetTaskExecution<WithStreamedUnaryMethod_ListTaskExecutions<WithStreamedUnaryMethod_GetTaskExecutionData<WithStreamedUnaryMethod_UpdateProjectDomainAttributes<WithStreamedUnaryMethod_GetProjectDomainAttributes<WithStreamedUnaryMethod_DeleteProjectDomainAttributes<WithStreamedUnaryMethod_UpdateProjectAttributes<WithStreamedUnaryMethod_GetProjectAttributes<WithStreamedUnaryMethod_DeleteProjectAttributes<WithStreamedUnaryMethod_UpdateWorkflowAttributes<WithStreamedUnaryMethod_GetWorkflowAttributes<WithStreamedUnaryMethod_DeleteWorkflowAttributes<WithStreamedUnaryMethod_ListMatchableAttributes<WithStreamedUnaryMethod_ListNamedEntities<WithStreamedUnaryMethod_GetNamedEntity<WithStreamedUnaryMethod_UpdateNamedEntity<WithStreamedUnaryMethod_GetVersion<WithStreamedUnaryMethod_GetDescriptionEntity<WithStreamedUnaryMethod_ListDescriptionEntities<WithStreamedUnaryMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > StreamedUnaryService;
+  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_ListTaskIds<WithStreamedUnaryMethod_ListTasks<WithStreamedUnaryMethod_CreateWorkflow<WithStreamedUnaryMethod_GetWorkflow<WithStreamedUnaryMethod_ListWorkflowIds<WithStreamedUnaryMethod_ListWorkflows<WithStreamedUnaryMethod_CreateLaunchPlan<WithStreamedUnaryMethod_GetLaunchPlan<WithStreamedUnaryMethod_GetActiveLaunchPlan<WithStreamedUnaryMethod_ListActiveLaunchPlans<WithStreamedUnaryMethod_ListLaunchPlanIds<WithStreamedUnaryMethod_ListLaunchPlans<WithStreamedUnaryMethod_UpdateLaunchPlan<WithStreamedUnaryMethod_CreateExecution<WithStreamedUnaryMethod_RelaunchExecution<WithStreamedUnaryMethod_RecoverExecution<WithStreamedUnaryMethod_GetExecution<WithStreamedUnaryMethod_UpdateExecution<WithStreamedUnaryMethod_GetExecutionData<WithStreamedUnaryMethod_ListExecutions<WithStreamedUnaryMethod_TerminateExecution<WithStreamedUnaryMethod_GetNodeExecution<WithStreamedUnaryMethod_GetDynamicNodeWorkflow<WithStreamedUnaryMethod_ListNodeExecutions<WithStreamedUnaryMethod_ListNodeExecutionsForTask<WithStreamedUnaryMethod_GetNodeExecutionData<WithStreamedUnaryMethod_RegisterProject<WithStreamedUnaryMethod_UpdateProject<WithStreamedUnaryMethod_ListProjects<WithStreamedUnaryMethod_CreateWorkflowEvent<WithStreamedUnaryMethod_CreateNodeEvent<WithStreamedUnaryMethod_CreateTaskEvent<WithStreamedUnaryMethod_GetTaskExecution<WithStreamedUnaryMethod_ListTaskExecutions<WithStreamedUnaryMethod_GetTaskExecutionData<WithStreamedUnaryMethod_UpdateProjectDomainAttributes<WithStreamedUnaryMethod_GetProjectDomainAttributes<WithStreamedUnaryMethod_DeleteProjectDomainAttributes<WithStreamedUnaryMethod_UpdateProjectAttributes<WithStreamedUnaryMethod_GetProjectAttributes<WithStreamedUnaryMethod_DeleteProjectAttributes<WithStreamedUnaryMethod_UpdateWorkflowAttributes<WithStreamedUnaryMethod_GetWorkflowAttributes<WithStreamedUnaryMethod_DeleteWorkflowAttributes<WithStreamedUnaryMethod_ListMatchableAttributes<WithStreamedUnaryMethod_ListNamedEntities<WithStreamedUnaryMethod_GetNamedEntity<WithStreamedUnaryMethod_UpdateNamedEntity<WithStreamedUnaryMethod_GetVersion<WithStreamedUnaryMethod_GetDescriptionEntity<WithStreamedUnaryMethod_ListDescriptionEntities<WithStreamedUnaryMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_ListTaskIds<WithStreamedUnaryMethod_ListTasks<WithStreamedUnaryMethod_CreateWorkflow<WithStreamedUnaryMethod_GetWorkflow<WithStreamedUnaryMethod_GetDynamicNodeWorkflow<WithStreamedUnaryMethod_ListWorkflowIds<WithStreamedUnaryMethod_ListWorkflows<WithStreamedUnaryMethod_CreateLaunchPlan<WithStreamedUnaryMethod_GetLaunchPlan<WithStreamedUnaryMethod_GetActiveLaunchPlan<WithStreamedUnaryMethod_ListActiveLaunchPlans<WithStreamedUnaryMethod_ListLaunchPlanIds<WithStreamedUnaryMethod_ListLaunchPlans<WithStreamedUnaryMethod_UpdateLaunchPlan<WithStreamedUnaryMethod_CreateExecution<WithStreamedUnaryMethod_RelaunchExecution<WithStreamedUnaryMethod_RecoverExecution<WithStreamedUnaryMethod_GetExecution<WithStreamedUnaryMethod_UpdateExecution<WithStreamedUnaryMethod_GetExecutionData<WithStreamedUnaryMethod_ListExecutions<WithStreamedUnaryMethod_TerminateExecution<WithStreamedUnaryMethod_GetNodeExecution<WithStreamedUnaryMethod_ListNodeExecutions<WithStreamedUnaryMethod_ListNodeExecutionsForTask<WithStreamedUnaryMethod_GetNodeExecutionData<WithStreamedUnaryMethod_RegisterProject<WithStreamedUnaryMethod_UpdateProject<WithStreamedUnaryMethod_ListProjects<WithStreamedUnaryMethod_CreateWorkflowEvent<WithStreamedUnaryMethod_CreateNodeEvent<WithStreamedUnaryMethod_CreateTaskEvent<WithStreamedUnaryMethod_GetTaskExecution<WithStreamedUnaryMethod_ListTaskExecutions<WithStreamedUnaryMethod_GetTaskExecutionData<WithStreamedUnaryMethod_UpdateProjectDomainAttributes<WithStreamedUnaryMethod_GetProjectDomainAttributes<WithStreamedUnaryMethod_DeleteProjectDomainAttributes<WithStreamedUnaryMethod_UpdateProjectAttributes<WithStreamedUnaryMethod_GetProjectAttributes<WithStreamedUnaryMethod_DeleteProjectAttributes<WithStreamedUnaryMethod_UpdateWorkflowAttributes<WithStreamedUnaryMethod_GetWorkflowAttributes<WithStreamedUnaryMethod_DeleteWorkflowAttributes<WithStreamedUnaryMethod_ListMatchableAttributes<WithStreamedUnaryMethod_ListNamedEntities<WithStreamedUnaryMethod_GetNamedEntity<WithStreamedUnaryMethod_UpdateNamedEntity<WithStreamedUnaryMethod_GetVersion<WithStreamedUnaryMethod_GetDescriptionEntity<WithStreamedUnaryMethod_ListDescriptionEntities<WithStreamedUnaryMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_ListTaskIds<WithStreamedUnaryMethod_ListTasks<WithStreamedUnaryMethod_CreateWorkflow<WithStreamedUnaryMethod_GetWorkflow<WithStreamedUnaryMethod_ListWorkflowIds<WithStreamedUnaryMethod_ListWorkflows<WithStreamedUnaryMethod_CreateLaunchPlan<WithStreamedUnaryMethod_GetLaunchPlan<WithStreamedUnaryMethod_GetActiveLaunchPlan<WithStreamedUnaryMethod_ListActiveLaunchPlans<WithStreamedUnaryMethod_ListLaunchPlanIds<WithStreamedUnaryMethod_ListLaunchPlans<WithStreamedUnaryMethod_UpdateLaunchPlan<WithStreamedUnaryMethod_CreateExecution<WithStreamedUnaryMethod_RelaunchExecution<WithStreamedUnaryMethod_RecoverExecution<WithStreamedUnaryMethod_GetExecution<WithStreamedUnaryMethod_UpdateExecution<WithStreamedUnaryMethod_GetExecutionData<WithStreamedUnaryMethod_ListExecutions<WithStreamedUnaryMethod_TerminateExecution<WithStreamedUnaryMethod_GetNodeExecution<WithStreamedUnaryMethod_GetDynamicNodeWorkflow<WithStreamedUnaryMethod_ListNodeExecutions<WithStreamedUnaryMethod_ListNodeExecutionsForTask<WithStreamedUnaryMethod_GetNodeExecutionData<WithStreamedUnaryMethod_RegisterProject<WithStreamedUnaryMethod_UpdateProject<WithStreamedUnaryMethod_ListProjects<WithStreamedUnaryMethod_CreateWorkflowEvent<WithStreamedUnaryMethod_CreateNodeEvent<WithStreamedUnaryMethod_CreateTaskEvent<WithStreamedUnaryMethod_GetTaskExecution<WithStreamedUnaryMethod_ListTaskExecutions<WithStreamedUnaryMethod_GetTaskExecutionData<WithStreamedUnaryMethod_UpdateProjectDomainAttributes<WithStreamedUnaryMethod_GetProjectDomainAttributes<WithStreamedUnaryMethod_DeleteProjectDomainAttributes<WithStreamedUnaryMethod_UpdateProjectAttributes<WithStreamedUnaryMethod_GetProjectAttributes<WithStreamedUnaryMethod_DeleteProjectAttributes<WithStreamedUnaryMethod_UpdateWorkflowAttributes<WithStreamedUnaryMethod_GetWorkflowAttributes<WithStreamedUnaryMethod_DeleteWorkflowAttributes<WithStreamedUnaryMethod_ListMatchableAttributes<WithStreamedUnaryMethod_ListNamedEntities<WithStreamedUnaryMethod_GetNamedEntity<WithStreamedUnaryMethod_UpdateNamedEntity<WithStreamedUnaryMethod_GetVersion<WithStreamedUnaryMethod_GetDescriptionEntity<WithStreamedUnaryMethod_ListDescriptionEntities<WithStreamedUnaryMethod_GetExecutionMetrics<Service > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > > StreamedService;
 };
 
 }  // namespace service

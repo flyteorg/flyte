@@ -54,24 +54,6 @@ func (m *AdminService) GetWorkflow(ctx context.Context, request *admin.ObjectGet
 	return response, nil
 }
 
-func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
-	defer m.interceptPanic(ctx, request)
-	if request == nil {
-		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
-	}
-
-	var response *admin.DynamicNodeWorkflowResponse
-	var err error
-	m.Metrics.workflowEndpointMetrics.getDynamicNodeWorkflow.Time(func() {
-		response, err = m.WorkflowManager.GetDynamicNodeWorkflow(ctx, *request)
-	})
-	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.get)
-	}
-	m.Metrics.workflowEndpointMetrics.getDynamicNodeWorkflow.Success()
-	return response, nil
-}
-
 func (m *AdminService) ListWorkflowIds(ctx context.Context, request *admin.NamedEntityIdentifierListRequest) (
 	*admin.NamedEntityIdentifierList, error) {
 	defer m.interceptPanic(ctx, request)
