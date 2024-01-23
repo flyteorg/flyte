@@ -13,6 +13,13 @@ on:
       go-version:
         required: true
         type: string
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 jobs:
   integration:
     name: Integration tests
@@ -50,3 +57,9 @@ jobs:
           echo "current-context:" $(kubectl config current-context)
           echo "environment-kubeconfig:" ${KUBECONFIG}
           IMAGE_NAME=${{ inputs.component }} IMAGE=${{ github.repository_owner }}/${{ inputs.component }}:builder make k8s_integration_execute
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ failure() && github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+        with:
+          detached: true
+          limit-access-to-actor: true

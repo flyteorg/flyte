@@ -28,24 +28,31 @@ type protoMetrics struct {
 	ReadFailureUnrelatedToCache  prometheus.Counter
 }
 
-// Implements ProtobufStore to marshal and unmarshal protobufs to/from a RawStore
+// DefaultProtobufStore implements ProtobufStore to marshal and unmarshal protobufs to/from a RawStore
 type DefaultProtobufStore struct {
 	RawStore
 	metrics *protoMetrics
 }
 
+// hasUnrecognizedFields recursively checks a protobuf message for unrecognized fields. When the unmarshaller unmarshalls
+// a byte array into a message, it will not error if the byte array contains unrecognized fields. This function checks
+// for unrecognized fields by checking if the message has any unknown fields or if any of its nested messages have
+// unknown fields.
 func hasUnrecognizedFields(msg protoreflect.Message) bool {
 	if msg == nil {
 		return false
 	}
 
+	// If the top level message has unknown fields, then the message has unrecognized fields
 	if len(msg.GetUnknown()) > 0 {
 		return true
 	}
 
 	unrecognized := false
 
+	// Iterate over all sub-fields
 	msg.Range(func(fd protoreflect.FieldDescriptor, v protoreflect.Value) bool {
+		// TODO: This is a hack because the protoreflect.Value.Message() panics if the value is not a message
 		defer func() {
 			if err := recover(); err != nil {
 				return
@@ -63,9 +70,6 @@ func hasUnrecognizedFields(msg protoreflect.Message) bool {
 		iface := v.Interface()
 		if iface == nil {
 			return true
-			//} else if _, casted := iface.(protoV1.Message); !casted {
-			//	unrecognized = true
-			//	return false
 		}
 
 		if vMessage := v.Message(); vMessage != nil && len(v.Message().GetUnknown()) > 0 {

@@ -42,11 +42,6 @@ func TestOutputTemp(t *testing.T) {
 	var lastErr error
 	var index int
 	for i, m := range msg {
-		//var mCopy proto.Message
-		//if len(msg) > 1 {
-		//	mCopy = proto.Clone(protoV1.MessageV2(m))
-		//}
-
 		err = proto.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(f, protoV1.MessageV2(m))
 		if err != nil {
 			lastErr = err
