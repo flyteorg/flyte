@@ -19,28 +19,32 @@ LAUNCH_PLAN: ResourceType
 DATASET: ResourceType
 
 class Identifier(_message.Message):
-    __slots__ = ["resource_type", "project", "domain", "name", "version"]
+    __slots__ = ["resource_type", "project", "domain", "name", "version", "org"]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     resource_type: ResourceType
     project: str
     domain: str
     name: str
     version: str
-    def __init__(self, resource_type: _Optional[_Union[ResourceType, str]] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, resource_type: _Optional[_Union[ResourceType, str]] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., version: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class WorkflowExecutionIdentifier(_message.Message):
-    __slots__ = ["project", "domain", "name"]
+    __slots__ = ["project", "domain", "name", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class NodeExecutionIdentifier(_message.Message):
     __slots__ = ["node_id", "execution_id"]

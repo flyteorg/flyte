@@ -21,6 +21,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 			"existingLabel": "existingLabelValue",
 		}
 		existingMetadata.OnGetLabels().Return(existingLabels)
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
 		assert.NoError(t, err)
@@ -40,6 +41,7 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 			"existingLabel": "existingLabelValue",
 		}
 		existingMetadata.OnGetLabels().Return(existingLabels)
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{
 			SecurityContext: &core.SecurityContext{
@@ -63,6 +65,26 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 			"existingLabel":        "existingLabelValue",
 			"inject-flyte-secrets": "true",
 		}, actual.GetLabels())
+	})
+
+	t.Run("Inject exec identity", func(t *testing.T) {
+
+		existingMetadata := &mocks.TaskExecutionMetadata{}
+		existingAnnotations := map[string]string{}
+		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "test-exec-identity"}})
+
+		existingLabels := map[string]string{
+			"existingLabel": "existingLabelValue",
+		}
+		existingMetadata.OnGetLabels().Return(existingLabels)
+
+		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, 2, len(actual.GetLabels()))
+		assert.Equal(t, "test-exec-identity", actual.GetLabels()[executionIdentityVariable])
 	})
 }
 

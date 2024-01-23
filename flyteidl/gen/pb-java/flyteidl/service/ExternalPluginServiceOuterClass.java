@@ -4658,30 +4658,29 @@ public final class ExternalPluginServiceOuterClass {
       "\n.flyteidl/service/external_plugin_servi" +
       "ce.proto\022\020flyteidl.service\032\034flyteidl/cor" +
       "e/literals.proto\032\031flyteidl/core/tasks.pr" +
-      "oto\032\035flyteidl/core/interface.proto\"\210\001\n\021T" +
-      "askCreateRequest\022)\n\006inputs\030\001 \001(\0132\031.flyte" +
-      "idl.core.LiteralMap\022-\n\010template\030\002 \001(\0132\033." +
-      "flyteidl.core.TaskTemplate\022\025\n\routput_pre" +
-      "fix\030\003 \001(\t:\002\030\001\"(\n\022TaskCreateResponse\022\016\n\006j" +
-      "ob_id\030\001 \001(\t:\002\030\001\"7\n\016TaskGetRequest\022\021\n\ttas" +
-      "k_type\030\001 \001(\t\022\016\n\006job_id\030\002 \001(\t:\002\030\001\"i\n\017Task" +
-      "GetResponse\022&\n\005state\030\001 \001(\0162\027.flyteidl.se" +
-      "rvice.State\022*\n\007outputs\030\002 \001(\0132\031.flyteidl." +
-      "core.LiteralMap:\002\030\001\":\n\021TaskDeleteRequest" +
-      "\022\021\n\ttask_type\030\001 \001(\t\022\016\n\006job_id\030\002 \001(\t:\002\030\001\"" +
-      "\030\n\022TaskDeleteResponse:\002\030\001*b\n\005State\022\025\n\021RE" +
-      "TRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001" +
-      "\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020" +
-      "\004\032\002\030\0012\250\002\n\025ExternalPluginService\022\\\n\nCreat" +
-      "eTask\022#.flyteidl.service.TaskCreateReque" +
-      "st\032$.flyteidl.service.TaskCreateResponse" +
-      "\"\003\210\002\001\022S\n\007GetTask\022 .flyteidl.service.Task" +
-      "GetRequest\032!.flyteidl.service.TaskGetRes" +
-      "ponse\"\003\210\002\001\022\\\n\nDeleteTask\022#.flyteidl.serv" +
-      "ice.TaskDeleteRequest\032$.flyteidl.service" +
-      ".TaskDeleteResponse\"\003\210\002\001B?Z=github.com/f" +
-      "lyteorg/flyte/flyteidl/gen/pb-go/flyteid" +
-      "l/serviceb\006proto3"
+      "oto\"\210\001\n\021TaskCreateRequest\022)\n\006inputs\030\001 \001(" +
+      "\0132\031.flyteidl.core.LiteralMap\022-\n\010template" +
+      "\030\002 \001(\0132\033.flyteidl.core.TaskTemplate\022\025\n\ro" +
+      "utput_prefix\030\003 \001(\t:\002\030\001\"(\n\022TaskCreateResp" +
+      "onse\022\016\n\006job_id\030\001 \001(\t:\002\030\001\"7\n\016TaskGetReque" +
+      "st\022\021\n\ttask_type\030\001 \001(\t\022\016\n\006job_id\030\002 \001(\t:\002\030" +
+      "\001\"i\n\017TaskGetResponse\022&\n\005state\030\001 \001(\0162\027.fl" +
+      "yteidl.service.State\022*\n\007outputs\030\002 \001(\0132\031." +
+      "flyteidl.core.LiteralMap:\002\030\001\":\n\021TaskDele" +
+      "teRequest\022\021\n\ttask_type\030\001 \001(\t\022\016\n\006job_id\030\002" +
+      " \001(\t:\002\030\001\"\030\n\022TaskDeleteResponse:\002\030\001*b\n\005St" +
+      "ate\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT_" +
+      "FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tS" +
+      "UCCEEDED\020\004\032\002\030\0012\250\002\n\025ExternalPluginService" +
+      "\022\\\n\nCreateTask\022#.flyteidl.service.TaskCr" +
+      "eateRequest\032$.flyteidl.service.TaskCreat" +
+      "eResponse\"\003\210\002\001\022S\n\007GetTask\022 .flyteidl.ser" +
+      "vice.TaskGetRequest\032!.flyteidl.service.T" +
+      "askGetResponse\"\003\210\002\001\022\\\n\nDeleteTask\022#.flyt" +
+      "eidl.service.TaskDeleteRequest\032$.flyteid" +
+      "l.service.TaskDeleteResponse\"\003\210\002\001B?Z=git" +
+      "hub.com/flyteorg/flyte/flyteidl/gen/pb-g" +
+      "o/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4696,7 +4695,6 @@ public final class ExternalPluginServiceOuterClass {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.Tasks.getDescriptor(),
-          flyteidl.core.Interface.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_service_TaskCreateRequest_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -4736,7 +4734,6 @@ public final class ExternalPluginServiceOuterClass {
         new java.lang.String[] { });
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Tasks.getDescriptor();
-    flyteidl.core.Interface.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -140,24 +140,28 @@ class MatchingAttributes(_message.Message):
     def __init__(self, task_resource_attributes: _Optional[_Union[TaskResourceAttributes, _Mapping]] = ..., cluster_resource_attributes: _Optional[_Union[ClusterResourceAttributes, _Mapping]] = ..., execution_queue_attributes: _Optional[_Union[ExecutionQueueAttributes, _Mapping]] = ..., execution_cluster_label: _Optional[_Union[ExecutionClusterLabel, _Mapping]] = ..., quality_of_service: _Optional[_Union[_execution_pb2.QualityOfService, _Mapping]] = ..., plugin_overrides: _Optional[_Union[PluginOverrides, _Mapping]] = ..., workflow_execution_config: _Optional[_Union[WorkflowExecutionConfig, _Mapping]] = ..., cluster_assignment: _Optional[_Union[_cluster_assignment_pb2.ClusterAssignment, _Mapping]] = ...) -> None: ...
 
 class MatchableAttributesConfiguration(_message.Message):
-    __slots__ = ["attributes", "domain", "project", "workflow", "launch_plan"]
+    __slots__ = ["attributes", "domain", "project", "workflow", "launch_plan", "org"]
     ATTRIBUTES_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     WORKFLOW_FIELD_NUMBER: _ClassVar[int]
     LAUNCH_PLAN_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     attributes: MatchingAttributes
     domain: str
     project: str
     workflow: str
     launch_plan: str
-    def __init__(self, attributes: _Optional[_Union[MatchingAttributes, _Mapping]] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ..., launch_plan: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, attributes: _Optional[_Union[MatchingAttributes, _Mapping]] = ..., domain: _Optional[str] = ..., project: _Optional[str] = ..., workflow: _Optional[str] = ..., launch_plan: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ListMatchableAttributesRequest(_message.Message):
-    __slots__ = ["resource_type"]
+    __slots__ = ["resource_type", "org"]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     resource_type: MatchableResource
-    def __init__(self, resource_type: _Optional[_Union[MatchableResource, str]] = ...) -> None: ...
+    org: str
+    def __init__(self, resource_type: _Optional[_Union[MatchableResource, str]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ListMatchableAttributesResponse(_message.Message):
     __slots__ = ["configurations"]

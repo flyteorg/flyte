@@ -144,11 +144,11 @@ message CreateTriggerRequest {
 
 message CreateTriggerResponse {}
 
-message DeleteTriggerRequest {
+message DeactivateTriggerRequest {
   core.Identifier trigger_id = 1;
 }
 
-message DeleteTriggerResponse {}
+message DeactivateTriggerResponse {}
 
 message ArtifactProducer {
   // These can be tasks, and workflows. Keeping track of the launch plans that a given workflow has is purely in
@@ -184,28 +184,39 @@ message ExecutionInputsRequest {
 
 message ExecutionInputsResponse {}
 
+message ListUsageRequest {
+  core.ArtifactID artifact_id = 1;
+}
+
+message ListUsageResponse {
+  repeated core.WorkflowExecutionIdentifier executions = 1;
+}
+
 service ArtifactRegistry {
   rpc CreateArtifact (CreateArtifactRequest) returns (CreateArtifactResponse) {}
 
   rpc GetArtifact (GetArtifactRequest) returns (GetArtifactResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/data/artifacts"
-      additional_bindings {get: "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}/{query.artifact_id.version}"}
-      additional_bindings {get: "/artifacts/api/v1/data/artifact/id/{query.artifact_id.artifact_key.project}/{query.artifact_id.artifact_key.domain}/{query.artifact_id.artifact_key.name}"}
-      additional_bindings {get: "/artifacts/api/v1/data/artifact/tag/{query.artifact_tag.artifact_key.project}/{query.artifact_tag.artifact_key.domain}/{query.artifact_tag.artifact_key.name}"}
+      post: "/artifacts/api/v1/artifacts"
+      body: "*"
     };
   }
 
   rpc SearchArtifacts (SearchArtifactsRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/data/query/s/{artifact_key.project}/{artifact_key.domain}/{artifact_key.name}"
-      additional_bindings {get: "/artifacts/api/v1/data/query/{artifact_key.project}/{artifact_key.domain}"}
+      post: "/artifacts/api/v1/search"
+      body: "*"
     };
   }
 
   rpc CreateTrigger (CreateTriggerRequest) returns (CreateTriggerResponse) {}
 
-  rpc DeleteTrigger (DeleteTriggerRequest) returns (DeleteTriggerResponse) {}
+  rpc DeactivateTrigger (DeactivateTriggerRequest) returns (DeactivateTriggerResponse) {
+    option (google.api.http) = {
+      patch: "/artifacts/api/v1/trigger/deactivate"
+      body: "*"
+    };
+  }
 
   rpc AddTag(AddTagRequest) returns (AddTagResponse) {}
 
@@ -217,8 +228,13 @@ service ArtifactRegistry {
 
   rpc FindByWorkflowExec (FindByWorkflowExecRequest) returns (SearchArtifactsResponse) {
     option (google.api.http) = {
-      get: "/artifacts/api/v1/data/query/e/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
+      get: "/artifacts/api/v1/search/execution/{exec_id.project}/{exec_id.domain}/{exec_id.name}/{direction}"
     };
   }
 
+  rpc ListUsage (ListUsageRequest) returns (ListUsageResponse) {
+    option (google.api.http) = {
+      get: "/artifacts/api/v1/usage/{artifact_id.artifact_key.project}/{artifact_id.artifact_key.domain}/{artifact_id.artifact_key.name}/{artifact_id.version}"
+    };
+  }
 }

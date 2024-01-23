@@ -6,6 +6,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 import "flyteidl/core/identifier.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 // Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
 // which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
@@ -33,4 +34,17 @@ message Span {
 
     // spans defines a collection of Spans that breakdown this execution.
     repeated Span spans = 7;
+}
+
+// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+message ExecutionMetricResult {
+    // The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+    string metric = 1;
+
+    // The result data in prometheus range query result format
+    // https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.
+    // This may include multiple time series, differentiated by their metric labels.
+    // Start time is greater of (execution attempt start, 48h ago)
+    // End time is lesser of (execution attempt end, now)
+    google.protobuf.Struct data = 2;
 }

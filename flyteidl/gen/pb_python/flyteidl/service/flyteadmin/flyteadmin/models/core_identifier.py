@@ -37,7 +37,8 @@ class CoreIdentifier(object):
         'project': 'str',
         'domain': 'str',
         'name': 'str',
-        'version': 'str'
+        'version': 'str',
+        'org': 'str'
     }
 
     attribute_map = {
@@ -45,10 +46,11 @@ class CoreIdentifier(object):
         'project': 'project',
         'domain': 'domain',
         'name': 'name',
-        'version': 'version'
+        'version': 'version',
+        'org': 'org'
     }
 
-    def __init__(self, resource_type=None, project=None, domain=None, name=None, version=None):  # noqa: E501
+    def __init__(self, resource_type=None, project=None, domain=None, name=None, version=None, org=None):  # noqa: E501
         """CoreIdentifier - a model defined in Swagger"""  # noqa: E501
 
         self._resource_type = None
@@ -56,6 +58,7 @@ class CoreIdentifier(object):
         self._domain = None
         self._name = None
         self._version = None
+        self._org = None
         self.discriminator = None
 
         if resource_type is not None:
@@ -68,6 +71,8 @@ class CoreIdentifier(object):
             self.name = name
         if version is not None:
             self.version = version
+        if org is not None:
+            self.org = org
 
     @property
     def resource_type(self):
@@ -183,6 +188,29 @@ class CoreIdentifier(object):
         """
 
         self._version = version
+
+    @property
+    def org(self):
+        """Gets the org of this CoreIdentifier.  # noqa: E501
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :return: The org of this CoreIdentifier.  # noqa: E501
+        :rtype: str
+        """
+        return self._org
+
+    @org.setter
+    def org(self, org):
+        """Sets the org of this CoreIdentifier.
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :param org: The org of this CoreIdentifier.  # noqa: E501
+        :type: str
+        """
+
+        self._org = org
 
     def to_dict(self):
         """Returns the model properties as a dict"""

@@ -170,13 +170,13 @@ class CreateTriggerResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
-class DeleteTriggerRequest(_message.Message):
+class DeactivateTriggerRequest(_message.Message):
     __slots__ = ["trigger_id"]
     TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
     trigger_id: _identifier_pb2.Identifier
     def __init__(self, trigger_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
 
-class DeleteTriggerResponse(_message.Message):
+class DeactivateTriggerResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
@@ -223,3 +223,15 @@ class ExecutionInputsRequest(_message.Message):
 class ExecutionInputsResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class ListUsageRequest(_message.Message):
+    __slots__ = ["artifact_id"]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    artifact_id: _artifact_id_pb2.ArtifactID
+    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ...) -> None: ...
+
+class ListUsageResponse(_message.Message):
+    __slots__ = ["executions"]
+    EXECUTIONS_FIELD_NUMBER: _ClassVar[int]
+    executions: _containers.RepeatedCompositeFieldContainer[_identifier_pb2.WorkflowExecutionIdentifier]
+    def __init__(self, executions: _Optional[_Iterable[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]]] = ...) -> None: ...

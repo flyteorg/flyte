@@ -20,6 +20,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::p
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_NodeExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fmetrics_2eproto ::google::protobuf::internal::SCCInfo<4> scc_info_Span_flyteidl_2fcore_2fmetrics_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2fstruct_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ListValue_google_2fprotobuf_2fstruct_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_google_2fprotobuf_2ftimestamp_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Timestamp_google_2fprotobuf_2ftimestamp_2eproto;
 namespace flyteidl {
 namespace core {
@@ -31,6 +32,10 @@ class SpanDefaultTypeInternal {
   const ::flyteidl::core::TaskExecutionIdentifier* task_id_;
   ::google::protobuf::internal::ArenaStringPtr operation_id_;
 } _Span_default_instance_;
+class ExecutionMetricResultDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<ExecutionMetricResult> _instance;
+} _ExecutionMetricResult_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
 static void InitDefaultsSpan_flyteidl_2fcore_2fmetrics_2eproto() {
@@ -51,11 +56,27 @@ static void InitDefaultsSpan_flyteidl_2fcore_2fmetrics_2eproto() {
       &scc_info_NodeExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,
       &scc_info_TaskExecutionIdentifier_flyteidl_2fcore_2fidentifier_2eproto.base,}};
 
-void InitDefaults_flyteidl_2fcore_2fmetrics_2eproto() {
-  ::google::protobuf::internal::InitSCC(&scc_info_Span_flyteidl_2fcore_2fmetrics_2eproto.base);
+static void InitDefaultsExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::core::_ExecutionMetricResult_default_instance_;
+    new (ptr) ::flyteidl::core::ExecutionMetricResult();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::core::ExecutionMetricResult::InitAsDefaultInstance();
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fmetrics_2eproto[1];
+::google::protobuf::internal::SCCInfo<1> scc_info_ExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto}, {
+      &scc_info_ListValue_google_2fprotobuf_2fstruct_2eproto.base,}};
+
+void InitDefaults_flyteidl_2fcore_2fmetrics_2eproto() {
+  ::google::protobuf::internal::InitSCC(&scc_info_Span_flyteidl_2fcore_2fmetrics_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_ExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto.base);
+}
+
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fmetrics_2eproto[2];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fcore_2fmetrics_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fmetrics_2eproto = nullptr;
 
@@ -73,50 +94,63 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fmetrics_2eproto::
   offsetof(::flyteidl::core::SpanDefaultTypeInternal, operation_id_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::Span, spans_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::Span, id_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionMetricResult, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionMetricResult, metric_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::ExecutionMetricResult, data_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::Span)},
+  { 13, -1, sizeof(::flyteidl::core::ExecutionMetricResult)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_Span_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_ExecutionMetricResult_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto = {
   {}, AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto, "flyteidl/core/metrics.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fcore_2fmetrics_2eproto::offsets,
-  file_level_metadata_flyteidl_2fcore_2fmetrics_2eproto, 1, file_level_enum_descriptors_flyteidl_2fcore_2fmetrics_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fmetrics_2eproto,
+  file_level_metadata_flyteidl_2fcore_2fmetrics_2eproto, 2, file_level_enum_descriptors_flyteidl_2fcore_2fmetrics_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fmetrics_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fcore_2fmetrics_2eproto[] =
   "\n\033flyteidl/core/metrics.proto\022\rflyteidl."
   "core\032\036flyteidl/core/identifier.proto\032\037go"
-  "ogle/protobuf/timestamp.proto\"\337\002\n\004Span\022."
-  "\n\nstart_time\030\001 \001(\0132\032.google.protobuf.Tim"
-  "estamp\022,\n\010end_time\030\002 \001(\0132\032.google.protob"
-  "uf.Timestamp\022A\n\013workflow_id\030\003 \001(\0132*.flyt"
-  "eidl.core.WorkflowExecutionIdentifierH\000\022"
-  "9\n\007node_id\030\004 \001(\0132&.flyteidl.core.NodeExe"
-  "cutionIdentifierH\000\0229\n\007task_id\030\005 \001(\0132&.fl"
-  "yteidl.core.TaskExecutionIdentifierH\000\022\026\n"
-  "\014operation_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.f"
-  "lyteidl.core.SpanB\004\n\002idB<Z:github.com/fl"
-  "yteorg/flyte/flyteidl/gen/pb-go/flyteidl"
-  "/coreb\006proto3"
+  "ogle/protobuf/timestamp.proto\032\034google/pr"
+  "otobuf/struct.proto\"\337\002\n\004Span\022.\n\nstart_ti"
+  "me\030\001 \001(\0132\032.google.protobuf.Timestamp\022,\n\010"
+  "end_time\030\002 \001(\0132\032.google.protobuf.Timesta"
+  "mp\022A\n\013workflow_id\030\003 \001(\0132*.flyteidl.core."
+  "WorkflowExecutionIdentifierH\000\0229\n\007node_id"
+  "\030\004 \001(\0132&.flyteidl.core.NodeExecutionIden"
+  "tifierH\000\0229\n\007task_id\030\005 \001(\0132&.flyteidl.cor"
+  "e.TaskExecutionIdentifierH\000\022\026\n\014operation"
+  "_id\030\006 \001(\tH\000\022\"\n\005spans\030\007 \003(\0132\023.flyteidl.co"
+  "re.SpanB\004\n\002id\"N\n\025ExecutionMetricResult\022\016"
+  "\n\006metric\030\001 \001(\t\022%\n\004data\030\002 \001(\0132\027.google.pr"
+  "otobuf.StructB<Z:github.com/flyteorg/fly"
+  "te/flyteidl/gen/pb-go/flyteidl/coreb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fmetrics_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fmetrics_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fmetrics_2eproto,
-  "flyteidl/core/metrics.proto", &assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto, 533,
+  "flyteidl/core/metrics.proto", &assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto, 643,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[3] =
   {
     ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
     ::AddDescriptors_google_2fprotobuf_2ftimestamp_2eproto,
+    ::AddDescriptors_google_2fprotobuf_2fstruct_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fmetrics_2eproto, deps, 2);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fmetrics_2eproto, deps, 3);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -915,6 +949,376 @@ void Span::InternalSwap(Span* other) {
 }
 
 
+// ===================================================================
+
+void ExecutionMetricResult::InitAsDefaultInstance() {
+  ::flyteidl::core::_ExecutionMetricResult_default_instance_._instance.get_mutable()->data_ = const_cast< ::google::protobuf::Struct*>(
+      ::google::protobuf::Struct::internal_default_instance());
+}
+class ExecutionMetricResult::HasBitSetters {
+ public:
+  static const ::google::protobuf::Struct& data(const ExecutionMetricResult* msg);
+};
+
+const ::google::protobuf::Struct&
+ExecutionMetricResult::HasBitSetters::data(const ExecutionMetricResult* msg) {
+  return *msg->data_;
+}
+void ExecutionMetricResult::clear_data() {
+  if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
+    delete data_;
+  }
+  data_ = nullptr;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int ExecutionMetricResult::kMetricFieldNumber;
+const int ExecutionMetricResult::kDataFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+ExecutionMetricResult::ExecutionMetricResult()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.core.ExecutionMetricResult)
+}
+ExecutionMetricResult::ExecutionMetricResult(const ExecutionMetricResult& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  metric_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (from.metric().size() > 0) {
+    metric_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.metric_);
+  }
+  if (from.has_data()) {
+    data_ = new ::google::protobuf::Struct(*from.data_);
+  } else {
+    data_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.core.ExecutionMetricResult)
+}
+
+void ExecutionMetricResult::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_ExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto.base);
+  metric_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  data_ = nullptr;
+}
+
+ExecutionMetricResult::~ExecutionMetricResult() {
+  // @@protoc_insertion_point(destructor:flyteidl.core.ExecutionMetricResult)
+  SharedDtor();
+}
+
+void ExecutionMetricResult::SharedDtor() {
+  metric_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (this != internal_default_instance()) delete data_;
+}
+
+void ExecutionMetricResult::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ExecutionMetricResult& ExecutionMetricResult::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_ExecutionMetricResult_flyteidl_2fcore_2fmetrics_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void ExecutionMetricResult::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.core.ExecutionMetricResult)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  metric_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (GetArenaNoVirtual() == nullptr && data_ != nullptr) {
+    delete data_;
+  }
+  data_ = nullptr;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* ExecutionMetricResult::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<ExecutionMetricResult*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // string metric = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        ctx->extra_parse_data().SetFieldName("flyteidl.core.ExecutionMetricResult.metric");
+        object = msg->mutable_metric();
+        if (size > end - ptr + ::google::protobuf::internal::ParseContext::kSlopBytes) {
+          parser_till_end = ::google::protobuf::internal::GreedyStringParserUTF8;
+          goto string_till_end;
+        }
+        GOOGLE_PROTOBUF_PARSER_ASSERT(::google::protobuf::internal::StringCheckUTF8(ptr, size, ctx));
+        ::google::protobuf::internal::InlineGreedyStringParser(object, ptr, size, ctx);
+        ptr += size;
+        break;
+      }
+      // .google.protobuf.Struct data = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::google::protobuf::Struct::_InternalParse;
+        object = msg->mutable_data();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+string_till_end:
+  static_cast<::std::string*>(object)->clear();
+  static_cast<::std::string*>(object)->reserve(size);
+  goto len_delim_till_end;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool ExecutionMetricResult::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.core.ExecutionMetricResult)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // string metric = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
+                input, this->mutable_metric()));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            this->metric().data(), static_cast<int>(this->metric().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.core.ExecutionMetricResult.metric"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      // .google.protobuf.Struct data = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_data()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.core.ExecutionMetricResult)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.core.ExecutionMetricResult)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void ExecutionMetricResult::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.core.ExecutionMetricResult)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string metric = 1;
+  if (this->metric().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->metric().data(), static_cast<int>(this->metric().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.ExecutionMetricResult.metric");
+    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
+      1, this->metric(), output);
+  }
+
+  // .google.protobuf.Struct data = 2;
+  if (this->has_data()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, HasBitSetters::data(this), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.core.ExecutionMetricResult)
+}
+
+::google::protobuf::uint8* ExecutionMetricResult::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.ExecutionMetricResult)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string metric = 1;
+  if (this->metric().size() > 0) {
+    ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+      this->metric().data(), static_cast<int>(this->metric().length()),
+      ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+      "flyteidl.core.ExecutionMetricResult.metric");
+    target =
+      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
+        1, this->metric(), target);
+  }
+
+  // .google.protobuf.Struct data = 2;
+  if (this->has_data()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        2, HasBitSetters::data(this), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.ExecutionMetricResult)
+  return target;
+}
+
+size_t ExecutionMetricResult::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.core.ExecutionMetricResult)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string metric = 1;
+  if (this->metric().size() > 0) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::StringSize(
+        this->metric());
+  }
+
+  // .google.protobuf.Struct data = 2;
+  if (this->has_data()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *data_);
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void ExecutionMetricResult::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.ExecutionMetricResult)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ExecutionMetricResult* source =
+      ::google::protobuf::DynamicCastToGenerated<ExecutionMetricResult>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.ExecutionMetricResult)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.core.ExecutionMetricResult)
+    MergeFrom(*source);
+  }
+}
+
+void ExecutionMetricResult::MergeFrom(const ExecutionMetricResult& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.core.ExecutionMetricResult)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.metric().size() > 0) {
+
+    metric_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.metric_);
+  }
+  if (from.has_data()) {
+    mutable_data()->::google::protobuf::Struct::MergeFrom(from.data());
+  }
+}
+
+void ExecutionMetricResult::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.core.ExecutionMetricResult)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ExecutionMetricResult::CopyFrom(const ExecutionMetricResult& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.core.ExecutionMetricResult)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ExecutionMetricResult::IsInitialized() const {
+  return true;
+}
+
+void ExecutionMetricResult::Swap(ExecutionMetricResult* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void ExecutionMetricResult::InternalSwap(ExecutionMetricResult* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  metric_.Swap(&other->metric_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+    GetArenaNoVirtual());
+  swap(data_, other->data_);
+}
+
+::google::protobuf::Metadata ExecutionMetricResult::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fmetrics_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fmetrics_2eproto[kIndexInFileMessages];
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace core
 }  // namespace flyteidl
@@ -922,6 +1326,9 @@ namespace google {
 namespace protobuf {
 template<> PROTOBUF_NOINLINE ::flyteidl::core::Span* Arena::CreateMaybeMessage< ::flyteidl::core::Span >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::Span >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::ExecutionMetricResult* Arena::CreateMaybeMessage< ::flyteidl::core::ExecutionMetricResult >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::ExecutionMetricResult >(arena);
 }
 }  // namespace protobuf
 }  // namespace google
