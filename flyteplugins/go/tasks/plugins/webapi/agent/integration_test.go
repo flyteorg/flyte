@@ -40,22 +40,22 @@ type MockPlugin struct {
 type MockAsyncTask struct {
 }
 
-func (m *MockAsyncTask) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
-	panic("not implemented")
+func (m *MockAsyncTask) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error) {
+	panic("implement me")
 }
 
-func (m *MockAsyncTask) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error) {
+func (m *MockAsyncTask) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
 	panic("not implemented")
 }
 
 type MockSyncTask struct {
 }
 
-func (m *MockSyncTask) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
-	panic("not implemented")
+func (m *MockSyncTask) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (service.AsyncAgentService_GetTaskLogsClient, error) {
+	panic("implement me")
 }
 
-func (m *MockSyncTask) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error) {
+func (m *MockSyncTask) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
 	panic("not implemented")
 }
 
