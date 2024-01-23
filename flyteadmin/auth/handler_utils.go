@@ -152,14 +152,14 @@ func isAuthorizedRedirectURL(url *url.URL, authorizedURL *url.URL) bool {
 	return url.Hostname() == authorizedURL.Hostname() && url.Port() == authorizedURL.Port() && url.Scheme == authorizedURL.Scheme
 }
 
-func GetRedirectURLAllowed(ctx context.Context, redirectParam string, cfg *config.Config) bool {
-	if len(redirectParam) == 0 {
+func GetRedirectURLAllowed(ctx context.Context, urlRedirectParam string, cfg *config.Config) bool {
+	if len(urlRedirectParam) == 0 {
 		logger.Debugf(ctx, "not validating whether empty redirect url is authorized")
 		return true
 	}
-	redirectURL, err := url.Parse(redirectParam)
+	redirectURL, err := url.Parse(urlRedirectParam)
 	if err != nil {
-		logger.Debugf(ctx, "failed to parse user-supplied redirect url: %s with err: %v", redirectParam, err)
+		logger.Debugf(ctx, "failed to parse user-supplied redirect url: %s with err: %v", urlRedirectParam, err)
 		return false
 	}
 	if redirectURL.Host == "" {
