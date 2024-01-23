@@ -42,27 +42,18 @@ func BuildNewClientFunc(scope promutils.Scope) func(config *rest.Config, options
 			cachelessOptions.Cache = nil
 		}
 
-		k8sClient, err := client.New(config, cachelessOptions)
+		kubeClient, err := client.New(config, cachelessOptions)
 		if err != nil {
 			return nil, err
 		}
 
-		filter, err := fastcheck.NewOppoBloomFilter(50000, scope.NewSubScope("kube_filter"))
-		if err != nil {
-			return nil, err
-		}
-
-		return flyteK8sClient{
-			Client:             k8sClient,
-			cacheReader:        cacheReader,
-			writeFilter: filter,
-		}, nil
+		return newFlyteK8sClient(kubeClient, cacheReader, scope)
 	}
 }
 
 type flyteK8sClient struct {
 	client.Client
-	cacheReader	       client.Reader
+	cacheReader client.Reader
 	writeFilter fastcheck.Filter
 }
 
@@ -120,4 +111,17 @@ func (f flyteK8sClient) Delete(ctx context.Context, obj client.Object, opts ...c
 
 func idFromObject(obj client.Object, op string) []byte {
 	return []byte(fmt.Sprintf("%s:%s:%s:%s", obj.GetObjectKind().GroupVersionKind().String(), obj.GetNamespace(), obj.GetName(), op))
+}
+
+func newFlyteK8sClient(kubeClient client.Client, cacheReader client.Reader, scope promutils.Scope) (flyteK8sClient, error) {
+	writeFilter, err := fastcheck.NewOppoBloomFilter(50000, scope.NewSubScope("kube_filter"))
+	if err != nil {
+		return flyteK8sClient{}, err
+	}
+
+	return flyteK8sClient{
+		Client:      kubeClient,
+		cacheReader: cacheReader,
+		writeFilter: writeFilter,
+	}, nil
 }
