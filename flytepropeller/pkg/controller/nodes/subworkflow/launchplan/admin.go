@@ -149,7 +149,7 @@ func (a *adminLaunchPlanExecutor) Launch(ctx context.Context, launchCtx LaunchCo
 
 	_, err = a.cache.GetOrCreate(executionID.String(), executionCacheItem{WorkflowExecutionIdentifier: *executionID})
 	if err != nil {
-		logger.Info(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
+		logger.Infof(ctx, "Failed to add ExecID [%v] to auto refresh cache", executionID)
 	}
 
 	return nil

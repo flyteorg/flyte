@@ -256,7 +256,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 
-	logger.Info(ctx, "Cancelled job [%s]", formatJobReference(resourceMeta.JobReference))
+	logger.Infof(ctx, "Cancelled job [%s]", formatJobReference(resourceMeta.JobReference))
 
 	return nil
 }

@@ -39,24 +39,29 @@ static constexpr ::google::protobuf::Message* const* file_default_instances = nu
 const char descriptor_table_protodef_flyteidl_2fservice_2fsignal_2eproto[] =
   "\n\035flyteidl/service/signal.proto\022\020flyteid"
   "l.service\032\034google/api/annotations.proto\032"
-  "\033flyteidl/admin/signal.proto2\232\003\n\rSignalS"
+  "\033flyteidl/admin/signal.proto2\336\004\n\rSignalS"
   "ervice\022W\n\021GetOrCreateSignal\022(.flyteidl.a"
   "dmin.SignalGetOrCreateRequest\032\026.flyteidl"
-  ".admin.Signal\"\000\022\301\001\n\013ListSignals\022!.flytei"
+  ".admin.Signal\"\000\022\324\002\n\013ListSignals\022!.flytei"
   "dl.admin.SignalListRequest\032\032.flyteidl.ad"
-  "min.SignalList\"s\202\323\344\223\002m\022k/api/v1/signals/"
-  "{workflow_execution_id.project}/{workflo"
-  "w_execution_id.domain}/{workflow_executi"
-  "on_id.name}\022l\n\tSetSignal\022 .flyteidl.admi"
-  "n.SignalSetRequest\032!.flyteidl.admin.Sign"
-  "alSetResponse\"\032\202\323\344\223\002\024\"\017/api/v1/signals:\001"
-  "*B\?Z=github.com/flyteorg/flyte/flyteidl/"
-  "gen/pb-go/flyteidl/serviceb\006proto3"
+  "min.SignalList\"\205\002\202\323\344\223\002\376\001\022k/api/v1/signal"
+  "s/{workflow_execution_id.project}/{workf"
+  "low_execution_id.domain}/{workflow_execu"
+  "tion_id.name}Z\216\001\022\213\001/api/v1/signals/org/{"
+  "workflow_execution_id.org}/{workflow_exe"
+  "cution_id.project}/{workflow_execution_i"
+  "d.domain}/{workflow_execution_id.name}\022\234"
+  "\001\n\tSetSignal\022 .flyteidl.admin.SignalSetR"
+  "equest\032!.flyteidl.admin.SignalSetRespons"
+  "e\"J\202\323\344\223\002D\"\017/api/v1/signals:\001*Z.\")/api/v1"
+  "/signals/org/{id.execution_id.org}:\001*B\?Z"
+  "=github.com/flyteorg/flyte/flyteidl/gen/"
+  "pb-go/flyteidl/serviceb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fsignal_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fsignal_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fsignal_2eproto,
-  "flyteidl/service/signal.proto", &assign_descriptors_table_flyteidl_2fservice_2fsignal_2eproto, 594,
+  "flyteidl/service/signal.proto", &assign_descriptors_table_flyteidl_2fservice_2fsignal_2eproto, 790,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fsignal_2eproto() {
