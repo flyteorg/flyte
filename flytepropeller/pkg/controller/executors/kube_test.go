@@ -103,9 +103,9 @@ func TestFlyteK8sClient(t *testing.T) {
 
 	// test cache reader
 	tests := []struct {
-		name    string
-		initCacheReader bool
-		cacheMissCount int
+		name                   string
+		initCacheReader        bool
+		cacheMissCount         int
 		expectedClientGetCount int
 	}{
 		{"no-cache", false, 0, 2},
