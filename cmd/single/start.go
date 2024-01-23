@@ -122,7 +122,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			DefaultNamespaces: namespaceConfigs,
 		},
 		NewCache: executors.NewCache,
-		NewClient: executors.NewClient,
+		NewClient: executors.BuildNewClientFunc(propellerScope),
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
