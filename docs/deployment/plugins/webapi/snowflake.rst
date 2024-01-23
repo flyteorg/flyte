@@ -240,3 +240,5 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 .. code-block::
 
   kubectl get pods -n flyte
+
+  For Snowflake plugin on the Flyte cluster, please refer to `Snowflake Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_plugin/snowflake.html>`_

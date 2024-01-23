@@ -4,8 +4,18 @@ import (
 	"context"
 	"net/http"
 	"os"
+
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	_ "github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
@@ -29,14 +39,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	_ "github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
-	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const defaultNamespace = "all"
@@ -122,7 +124,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			DefaultNamespaces: namespaceConfigs,
 		},
 		NewCache:  executors.NewCache,
-		NewClient: executors.NewClient,
+		NewClient: executors.BuildNewClientFunc(propellerScope),
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",
