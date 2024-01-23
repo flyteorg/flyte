@@ -198,6 +198,12 @@ jobs:
       - name: End2End
         run: |
           make end2end_execute
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ failure() }}
+        with:
+          limit-access-to-actor: true
+
 
   build-and-push-sandbox-bundled-image:
     if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
