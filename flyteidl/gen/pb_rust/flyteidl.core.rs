@@ -621,6 +621,9 @@ pub struct Identifier {
     /// Specific version of the resource.
     #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that uniquely identifies a Flyte workflow execution
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -636,6 +639,9 @@ pub struct WorkflowExecutionIdentifier {
     /// User or system provided value for the resource.
     #[prost(string, tag="4")]
     pub name: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that identify a Flyte node execution entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2763,6 +2769,8 @@ pub enum CatalogCacheStatus {
     CachePutFailure = 5,
     /// Used to indicate the cache lookup was skipped
     CacheSkipped = 6,
+    /// Used to indicate that the cache was evicted
+    CacheEvicted = 7,
 }
 impl CatalogCacheStatus {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -2778,6 +2786,7 @@ impl CatalogCacheStatus {
             CatalogCacheStatus::CacheLookupFailure => "CACHE_LOOKUP_FAILURE",
             CatalogCacheStatus::CachePutFailure => "CACHE_PUT_FAILURE",
             CatalogCacheStatus::CacheSkipped => "CACHE_SKIPPED",
+            CatalogCacheStatus::CacheEvicted => "CACHE_EVICTED",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2790,6 +2799,7 @@ impl CatalogCacheStatus {
             "CACHE_LOOKUP_FAILURE" => Some(Self::CacheLookupFailure),
             "CACHE_PUT_FAILURE" => Some(Self::CachePutFailure),
             "CACHE_SKIPPED" => Some(Self::CacheSkipped),
+            "CACHE_EVICTED" => Some(Self::CacheEvicted),
             _ => None,
         }
     }

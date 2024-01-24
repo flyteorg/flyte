@@ -48,6 +48,24 @@ func (m *AdminService) GetNodeExecution(
 	return response, nil
 }
 
+func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+
+	var response *admin.DynamicNodeWorkflowResponse
+	var err error
+	m.Metrics.nodeExecutionEndpointMetrics.getDynamicNodeWorkflow.Time(func() {
+		response, err = m.NodeExecutionManager.GetDynamicNodeWorkflow(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.get)
+	}
+	m.Metrics.nodeExecutionEndpointMetrics.getDynamicNodeWorkflow.Success()
+	return response, nil
+}
+
 func (m *AdminService) ListNodeExecutions(
 	ctx context.Context, request *admin.NodeExecutionListRequest) (*admin.NodeExecutionList, error) {
 	defer m.interceptPanic(ctx, request)

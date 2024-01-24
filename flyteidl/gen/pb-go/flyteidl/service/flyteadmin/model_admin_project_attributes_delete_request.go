@@ -10,6 +10,8 @@
 package flyteadmin
 
 type AdminProjectAttributesDeleteRequest struct {
-	Project string `json:"project,omitempty"`
+	Project      string                  `json:"project,omitempty"`
 	ResourceType *AdminMatchableResource `json:"resource_type,omitempty"`
+	// Optional, org key applied to the project.
+	Org string `json:"org,omitempty"`
 }

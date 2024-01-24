@@ -13,6 +13,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -210,6 +211,118 @@ func TestPlugin(t *testing.T) {
 		taskContext := new(webapiPlugin.StatusContext)
 		taskContext.On("Resource").Return(ResourceWrapper{
 			State:    5,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.Error(t, err)
+		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_UNDEFINED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_UNDEFINED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_QUEUED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_QUEUED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseQueued, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_WAITING_FOR_RESOURCES Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_WAITING_FOR_RESOURCES,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseWaitingForResources, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_INITIALIZING Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_INITIALIZING,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseInitializing, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_RUNNING Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_RUNNING,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhaseRunning, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_ABORTED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_ABORTED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+	})
+
+	t.Run("test TaskExecution_FAILED Status", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			Phase:    flyteIdl.TaskExecution_FAILED,
+			Outputs:  nil,
+			Message:  "",
+			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},
+		})
+
+		phase, err := plugin.Status(context.Background(), taskContext)
+		assert.NoError(t, err)
+		assert.Equal(t, pluginsCore.PhasePermanentFailure, phase.Phase())
+	})
+
+	t.Run("test UNDEFINED Phase", func(t *testing.T) {
+		taskContext := new(webapiPlugin.StatusContext)
+		taskContext.On("Resource").Return(ResourceWrapper{
+			State:    8,
 			Outputs:  nil,
 			Message:  "",
 			LogLinks: []*flyteIdlCore.TaskLog{{Uri: "http://localhost:3000/log", Name: "Log Link"}},

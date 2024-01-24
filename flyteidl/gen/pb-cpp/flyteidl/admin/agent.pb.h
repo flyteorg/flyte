@@ -1133,11 +1133,17 @@ class Resource final :
   ::flyteidl::core::LiteralMap* mutable_outputs();
   void set_allocated_outputs(::flyteidl::core::LiteralMap* outputs);
 
-  // .flyteidl.admin.State state = 1;
-  void clear_state();
-  static const int kStateFieldNumber = 1;
-  ::flyteidl::admin::State state() const;
-  void set_state(::flyteidl::admin::State value);
+  // .flyteidl.admin.State state = 1 [deprecated = true];
+  PROTOBUF_DEPRECATED void clear_state();
+  PROTOBUF_DEPRECATED static const int kStateFieldNumber = 1;
+  PROTOBUF_DEPRECATED ::flyteidl::admin::State state() const;
+  PROTOBUF_DEPRECATED void set_state(::flyteidl::admin::State value);
+
+  // .flyteidl.core.TaskExecution.Phase phase = 5;
+  void clear_phase();
+  static const int kPhaseFieldNumber = 5;
+  ::flyteidl::core::TaskExecution_Phase phase() const;
+  void set_phase(::flyteidl::core::TaskExecution_Phase value);
 
   // @@protoc_insertion_point(class_scope:flyteidl.admin.Resource)
  private:
@@ -1148,6 +1154,7 @@ class Resource final :
   ::google::protobuf::internal::ArenaStringPtr message_;
   ::flyteidl::core::LiteralMap* outputs_;
   int state_;
+  int phase_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fagent_2eproto;
 };
@@ -3360,7 +3367,7 @@ GetTaskResponse::log_links() const {
 
 // Resource
 
-// .flyteidl.admin.State state = 1;
+// .flyteidl.admin.State state = 1 [deprecated = true];
 inline void Resource::clear_state() {
   state_ = 0;
 }
@@ -3497,6 +3504,20 @@ inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
 Resource::log_links() const {
   // @@protoc_insertion_point(field_list:flyteidl.admin.Resource.log_links)
   return log_links_;
+}
+
+// .flyteidl.core.TaskExecution.Phase phase = 5;
+inline void Resource::clear_phase() {
+  phase_ = 0;
+}
+inline ::flyteidl::core::TaskExecution_Phase Resource::phase() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.Resource.phase)
+  return static_cast< ::flyteidl::core::TaskExecution_Phase >(phase_);
+}
+inline void Resource::set_phase(::flyteidl::core::TaskExecution_Phase value) {
+  
+  phase_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.admin.Resource.phase)
 }
 
 // -------------------------------------------------------------------

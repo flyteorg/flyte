@@ -48,6 +48,24 @@ public final class ProjectAttributesOuterClass {
      * <code>.flyteidl.admin.MatchingAttributes matching_attributes = 2;</code>
      */
     flyteidl.admin.MatchableResourceOuterClass.MatchingAttributesOrBuilder getMatchingAttributesOrBuilder();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -68,6 +86,7 @@ public final class ProjectAttributesOuterClass {
     }
     private ProjectAttributes() {
       project_ = "";
+      org_ = "";
     }
 
     @java.lang.Override
@@ -111,6 +130,12 @@ public final class ProjectAttributesOuterClass {
                 matchingAttributes_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -208,6 +233,48 @@ public final class ProjectAttributesOuterClass {
       return getMatchingAttributes();
     }
 
+    public static final int ORG_FIELD_NUMBER = 3;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -228,6 +295,9 @@ public final class ProjectAttributesOuterClass {
       if (matchingAttributes_ != null) {
         output.writeMessage(2, getMatchingAttributes());
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -243,6 +313,9 @@ public final class ProjectAttributesOuterClass {
       if (matchingAttributes_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, getMatchingAttributes());
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -266,6 +339,8 @@ public final class ProjectAttributesOuterClass {
         if (!getMatchingAttributes()
             .equals(other.getMatchingAttributes())) return false;
       }
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -283,6 +358,8 @@ public final class ProjectAttributesOuterClass {
         hash = (37 * hash) + MATCHING_ATTRIBUTES_FIELD_NUMBER;
         hash = (53 * hash) + getMatchingAttributes().hashCode();
       }
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -429,6 +506,8 @@ public final class ProjectAttributesOuterClass {
           matchingAttributes_ = null;
           matchingAttributesBuilder_ = null;
         }
+        org_ = "";
+
         return this;
       }
 
@@ -461,6 +540,7 @@ public final class ProjectAttributesOuterClass {
         } else {
           result.matchingAttributes_ = matchingAttributesBuilder_.build();
         }
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -515,6 +595,10 @@ public final class ProjectAttributesOuterClass {
         }
         if (other.hasMatchingAttributes()) {
           mergeMatchingAttributes(other.getMatchingAttributes());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -749,6 +833,95 @@ public final class ProjectAttributesOuterClass {
           matchingAttributes_ = null;
         }
         return matchingAttributesBuilder_;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -1940,6 +2113,24 @@ public final class ProjectAttributesOuterClass {
      * <code>.flyteidl.admin.MatchableResource resource_type = 2;</code>
      */
     flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -1961,6 +2152,7 @@ public final class ProjectAttributesOuterClass {
     private ProjectAttributesGetRequest() {
       project_ = "";
       resourceType_ = 0;
+      org_ = "";
     }
 
     @java.lang.Override
@@ -1997,6 +2189,12 @@ public final class ProjectAttributesOuterClass {
               int rawValue = input.readEnum();
 
               resourceType_ = rawValue;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -2102,6 +2300,48 @@ public final class ProjectAttributesOuterClass {
       return result == null ? flyteidl.admin.MatchableResourceOuterClass.MatchableResource.UNRECOGNIZED : result;
     }
 
+    public static final int ORG_FIELD_NUMBER = 3;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2122,6 +2362,9 @@ public final class ProjectAttributesOuterClass {
       if (resourceType_ != flyteidl.admin.MatchableResourceOuterClass.MatchableResource.TASK_RESOURCE.getNumber()) {
         output.writeEnum(2, resourceType_);
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -2137,6 +2380,9 @@ public final class ProjectAttributesOuterClass {
       if (resourceType_ != flyteidl.admin.MatchableResourceOuterClass.MatchableResource.TASK_RESOURCE.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, resourceType_);
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2156,6 +2402,8 @@ public final class ProjectAttributesOuterClass {
       if (!getProject()
           .equals(other.getProject())) return false;
       if (resourceType_ != other.resourceType_) return false;
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2171,6 +2419,8 @@ public final class ProjectAttributesOuterClass {
       hash = (53 * hash) + getProject().hashCode();
       hash = (37 * hash) + RESOURCE_TYPE_FIELD_NUMBER;
       hash = (53 * hash) + resourceType_;
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2313,6 +2563,8 @@ public final class ProjectAttributesOuterClass {
 
         resourceType_ = 0;
 
+        org_ = "";
+
         return this;
       }
 
@@ -2341,6 +2593,7 @@ public final class ProjectAttributesOuterClass {
         flyteidl.admin.ProjectAttributesOuterClass.ProjectAttributesGetRequest result = new flyteidl.admin.ProjectAttributesOuterClass.ProjectAttributesGetRequest(this);
         result.project_ = project_;
         result.resourceType_ = resourceType_;
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -2395,6 +2648,10 @@ public final class ProjectAttributesOuterClass {
         }
         if (other.resourceType_ != 0) {
           setResourceTypeValue(other.getResourceTypeValue());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2585,6 +2842,95 @@ public final class ProjectAttributesOuterClass {
       public Builder clearResourceType() {
         
         resourceType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
         onChanged();
         return this;
       }
@@ -3299,6 +3645,24 @@ public final class ProjectAttributesOuterClass {
      * <code>.flyteidl.admin.MatchableResource resource_type = 2;</code>
      */
     flyteidl.admin.MatchableResourceOuterClass.MatchableResource getResourceType();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -3320,6 +3684,7 @@ public final class ProjectAttributesOuterClass {
     private ProjectAttributesDeleteRequest() {
       project_ = "";
       resourceType_ = 0;
+      org_ = "";
     }
 
     @java.lang.Override
@@ -3356,6 +3721,12 @@ public final class ProjectAttributesOuterClass {
               int rawValue = input.readEnum();
 
               resourceType_ = rawValue;
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -3461,6 +3832,48 @@ public final class ProjectAttributesOuterClass {
       return result == null ? flyteidl.admin.MatchableResourceOuterClass.MatchableResource.UNRECOGNIZED : result;
     }
 
+    public static final int ORG_FIELD_NUMBER = 3;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the project.
+     * </pre>
+     *
+     * <code>string org = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3481,6 +3894,9 @@ public final class ProjectAttributesOuterClass {
       if (resourceType_ != flyteidl.admin.MatchableResourceOuterClass.MatchableResource.TASK_RESOURCE.getNumber()) {
         output.writeEnum(2, resourceType_);
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3496,6 +3912,9 @@ public final class ProjectAttributesOuterClass {
       if (resourceType_ != flyteidl.admin.MatchableResourceOuterClass.MatchableResource.TASK_RESOURCE.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(2, resourceType_);
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3515,6 +3934,8 @@ public final class ProjectAttributesOuterClass {
       if (!getProject()
           .equals(other.getProject())) return false;
       if (resourceType_ != other.resourceType_) return false;
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3530,6 +3951,8 @@ public final class ProjectAttributesOuterClass {
       hash = (53 * hash) + getProject().hashCode();
       hash = (37 * hash) + RESOURCE_TYPE_FIELD_NUMBER;
       hash = (53 * hash) + resourceType_;
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -3672,6 +4095,8 @@ public final class ProjectAttributesOuterClass {
 
         resourceType_ = 0;
 
+        org_ = "";
+
         return this;
       }
 
@@ -3700,6 +4125,7 @@ public final class ProjectAttributesOuterClass {
         flyteidl.admin.ProjectAttributesOuterClass.ProjectAttributesDeleteRequest result = new flyteidl.admin.ProjectAttributesOuterClass.ProjectAttributesDeleteRequest(this);
         result.project_ = project_;
         result.resourceType_ = resourceType_;
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -3754,6 +4180,10 @@ public final class ProjectAttributesOuterClass {
         }
         if (other.resourceType_ != 0) {
           setResourceTypeValue(other.getResourceTypeValue());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -3944,6 +4374,95 @@ public final class ProjectAttributesOuterClass {
       public Builder clearResourceType() {
         
         resourceType_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the project.
+       * </pre>
+       *
+       * <code>string org = 3;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
         onChanged();
         return this;
       }
@@ -4465,23 +4984,24 @@ public final class ProjectAttributesOuterClass {
     java.lang.String[] descriptorData = {
       "\n\'flyteidl/admin/project_attributes.prot" +
       "o\022\016flyteidl.admin\032\'flyteidl/admin/matcha" +
-      "ble_resource.proto\"e\n\021ProjectAttributes\022" +
+      "ble_resource.proto\"r\n\021ProjectAttributes\022" +
       "\017\n\007project\030\001 \001(\t\022?\n\023matching_attributes\030" +
       "\002 \001(\0132\".flyteidl.admin.MatchingAttribute" +
-      "s\"W\n\036ProjectAttributesUpdateRequest\0225\n\na" +
-      "ttributes\030\001 \001(\0132!.flyteidl.admin.Project" +
-      "Attributes\"!\n\037ProjectAttributesUpdateRes" +
-      "ponse\"h\n\033ProjectAttributesGetRequest\022\017\n\007" +
-      "project\030\001 \001(\t\0228\n\rresource_type\030\002 \001(\0162!.f" +
-      "lyteidl.admin.MatchableResource\"U\n\034Proje" +
-      "ctAttributesGetResponse\0225\n\nattributes\030\001 " +
-      "\001(\0132!.flyteidl.admin.ProjectAttributes\"k" +
-      "\n\036ProjectAttributesDeleteRequest\022\017\n\007proj" +
-      "ect\030\001 \001(\t\0228\n\rresource_type\030\002 \001(\0162!.flyte" +
-      "idl.admin.MatchableResource\"!\n\037ProjectAt" +
-      "tributesDeleteResponseB=Z;github.com/fly" +
-      "teorg/flyte/flyteidl/gen/pb-go/flyteidl/" +
-      "adminb\006proto3"
+      "s\022\013\n\003org\030\003 \001(\t\"W\n\036ProjectAttributesUpdat" +
+      "eRequest\0225\n\nattributes\030\001 \001(\0132!.flyteidl." +
+      "admin.ProjectAttributes\"!\n\037ProjectAttrib" +
+      "utesUpdateResponse\"u\n\033ProjectAttributesG" +
+      "etRequest\022\017\n\007project\030\001 \001(\t\0228\n\rresource_t" +
+      "ype\030\002 \001(\0162!.flyteidl.admin.MatchableReso" +
+      "urce\022\013\n\003org\030\003 \001(\t\"U\n\034ProjectAttributesGe" +
+      "tResponse\0225\n\nattributes\030\001 \001(\0132!.flyteidl" +
+      ".admin.ProjectAttributes\"x\n\036ProjectAttri" +
+      "butesDeleteRequest\022\017\n\007project\030\001 \001(\t\0228\n\rr" +
+      "esource_type\030\002 \001(\0162!.flyteidl.admin.Matc" +
+      "hableResource\022\013\n\003org\030\003 \001(\t\"!\n\037ProjectAtt" +
+      "ributesDeleteResponseB=Z;github.com/flyt" +
+      "eorg/flyte/flyteidl/gen/pb-go/flyteidl/a" +
+      "dminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4501,7 +5021,7 @@ public final class ProjectAttributesOuterClass {
     internal_static_flyteidl_admin_ProjectAttributes_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectAttributes_descriptor,
-        new java.lang.String[] { "Project", "MatchingAttributes", });
+        new java.lang.String[] { "Project", "MatchingAttributes", "Org", });
     internal_static_flyteidl_admin_ProjectAttributesUpdateRequest_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_admin_ProjectAttributesUpdateRequest_fieldAccessorTable = new
@@ -4519,7 +5039,7 @@ public final class ProjectAttributesOuterClass {
     internal_static_flyteidl_admin_ProjectAttributesGetRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectAttributesGetRequest_descriptor,
-        new java.lang.String[] { "Project", "ResourceType", });
+        new java.lang.String[] { "Project", "ResourceType", "Org", });
     internal_static_flyteidl_admin_ProjectAttributesGetResponse_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_admin_ProjectAttributesGetResponse_fieldAccessorTable = new
@@ -4531,7 +5051,7 @@ public final class ProjectAttributesOuterClass {
     internal_static_flyteidl_admin_ProjectAttributesDeleteRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectAttributesDeleteRequest_descriptor,
-        new java.lang.String[] { "Project", "ResourceType", });
+        new java.lang.String[] { "Project", "ResourceType", "Org", });
     internal_static_flyteidl_admin_ProjectAttributesDeleteResponse_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_ProjectAttributesDeleteResponse_fieldAccessorTable = new
