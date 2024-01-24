@@ -393,4 +393,18 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.config.dynamic-log-links", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "a=1,b=2"
+
+			cmdFlags.Set("logs.config.dynamic-log-links", testValue)
+			if vStringToString, err := cmdFlags.GetStringToString("logs.config.dynamic-log-links"); err == nil {
+				testDecodeRaw_Config(t, vStringToString, &actual.LogConfig.Config.DynamicLogLinks)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

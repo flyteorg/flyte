@@ -112,8 +112,16 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 	}
 
 	if cfg.IsDynamicLogLinksEnabled {
-		if len(cfg.DynamicLogLinks.Flyin) > 0 {
-			dynamicPlugins = append(dynamicPlugins, tasklog.TemplateLogPlugin{DisplayName: "Flyin Logs", Scheme: tasklog.TemplateSchemeDynamic, DynamicTemplateURIs: []tasklog.DynamicTemplateURI{{TemplateURI: cfg.DynamicLogLinks.Flyin, Kind: "flyin"}}, MessageFormat: core.TaskLog_JSON})
+		for logLinkType, dynamicLogLink := range cfg.DynamicLogLinks {
+			dynamicPlugins = append(
+				dynamicPlugins,
+				tasklog.TemplateLogPlugin{
+					DisplayName: fmt.Sprintf("%s logs", logLinkType),
+					Scheme: tasklog.TemplateSchemeDynamic,
+					DynamicTemplateURIs: []tasklog.DynamicTemplateURI{
+						{TemplateURI: dynamicLogLink, Kind: logLinkType}},
+					MessageFormat: core.TaskLog_JSON,
+				})
 		}
 	}
 
