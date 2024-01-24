@@ -50,7 +50,7 @@ var (
 	prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
 	currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
 	// TODO(haytham): write down the right version once we release flytekit
-	inputDataWrapperMinVersion = version.MustParseSemantic("v1.10.3")
+	inputDataWrapperMinVersion = version.MustParseSemantic("v1.11.0")
 )
 
 type ErrorCollection struct {
@@ -119,14 +119,13 @@ func IsInputOutputWrapperSupported(ctx context.Context, metadata RuntimeMetadata
 		v, err := version.ParseSemantic(metadata.GetVersion())
 		if err != nil {
 			logger.Warnf(ctx, "Failed to parse version [%v] to determine the input path behavior. Proceeding with InputDataWrapper format.", metadata.GetVersion())
-		} else if !v.AtLeast(inputDataWrapperMinVersion) {
+		} else if v.LessThan(inputDataWrapperMinVersion) {
 			return false
 		}
-	} else {
-		return false
 	}
 
-	return true
+	// TODO: Invert this after updating other SDKs
+	return false
 }
 
 func render(ctx context.Context, inputTemplate string, params Parameters, perRetryKey string) (string, error) {
