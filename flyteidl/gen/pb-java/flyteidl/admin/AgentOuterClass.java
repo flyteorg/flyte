@@ -6477,20 +6477,20 @@ public final class AgentOuterClass {
 
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    int getStateValue();
+    @java.lang.Deprecated int getStateValue();
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    flyteidl.admin.AgentOuterClass.State getState();
+    @java.lang.Deprecated flyteidl.admin.AgentOuterClass.State getState();
 
     /**
      * <pre>
@@ -6533,7 +6533,7 @@ public final class AgentOuterClass {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 5;</code>
+     * <code>.flyteidl.core.OutputData outputs = 6;</code>
      */
     boolean hasOutputs();
     /**
@@ -6543,7 +6543,7 @@ public final class AgentOuterClass {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 5;</code>
+     * <code>.flyteidl.core.OutputData outputs = 6;</code>
      */
     flyteidl.core.Literals.OutputData getOutputs();
     /**
@@ -6553,7 +6553,7 @@ public final class AgentOuterClass {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 5;</code>
+     * <code>.flyteidl.core.OutputData outputs = 6;</code>
      */
     flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder();
 
@@ -6618,6 +6618,23 @@ public final class AgentOuterClass {
      */
     flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    int getPhaseValue();
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    flyteidl.core.Execution.TaskExecution.Phase getPhase();
   }
   /**
    * Protobuf type {@code flyteidl.admin.Resource}
@@ -6635,6 +6652,7 @@ public final class AgentOuterClass {
       state_ = 0;
       message_ = "";
       logLinks_ = java.util.Collections.emptyList();
+      phase_ = 0;
     }
 
     @java.lang.Override
@@ -6695,7 +6713,13 @@ public final class AgentOuterClass {
                   input.readMessage(flyteidl.core.Execution.TaskLog.parser(), extensionRegistry));
               break;
             }
-            case 42: {
+            case 40: {
+              int rawValue = input.readEnum();
+
+              phase_ = rawValue;
+              break;
+            }
+            case 50: {
               flyteidl.core.Literals.OutputData.Builder subBuilder = null;
               if (outputs_ != null) {
                 subBuilder = outputs_.toBuilder();
@@ -6748,22 +6772,22 @@ public final class AgentOuterClass {
     private int state_;
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    public int getStateValue() {
+    @java.lang.Deprecated public int getStateValue() {
       return state_;
     }
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    public flyteidl.admin.AgentOuterClass.State getState() {
+    @java.lang.Deprecated public flyteidl.admin.AgentOuterClass.State getState() {
       @SuppressWarnings("deprecation")
       flyteidl.admin.AgentOuterClass.State result = flyteidl.admin.AgentOuterClass.State.valueOf(state_);
       return result == null ? flyteidl.admin.AgentOuterClass.State.UNRECOGNIZED : result;
@@ -6811,7 +6835,7 @@ public final class AgentOuterClass {
       return getDeprecatedOutputs();
     }
 
-    public static final int OUTPUTS_FIELD_NUMBER = 5;
+    public static final int OUTPUTS_FIELD_NUMBER = 6;
     private flyteidl.core.Literals.OutputData outputs_;
     /**
      * <pre>
@@ -6820,7 +6844,7 @@ public final class AgentOuterClass {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 5;</code>
+     * <code>.flyteidl.core.OutputData outputs = 6;</code>
      */
     public boolean hasOutputs() {
       return outputs_ != null;
@@ -6832,7 +6856,7 @@ public final class AgentOuterClass {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 5;</code>
+     * <code>.flyteidl.core.OutputData outputs = 6;</code>
      */
     public flyteidl.core.Literals.OutputData getOutputs() {
       return outputs_ == null ? flyteidl.core.Literals.OutputData.getDefaultInstance() : outputs_;
@@ -6844,7 +6868,7 @@ public final class AgentOuterClass {
      * +optional
      * </pre>
      *
-     * <code>.flyteidl.core.OutputData outputs = 5;</code>
+     * <code>.flyteidl.core.OutputData outputs = 6;</code>
      */
     public flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder() {
       return getOutputs();
@@ -6947,6 +6971,31 @@ public final class AgentOuterClass {
       return logLinks_.get(index);
     }
 
+    public static final int PHASE_FIELD_NUMBER = 5;
+    private int phase_;
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    public int getPhaseValue() {
+      return phase_;
+    }
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    public flyteidl.core.Execution.TaskExecution.Phase getPhase() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Execution.TaskExecution.Phase result = flyteidl.core.Execution.TaskExecution.Phase.valueOf(phase_);
+      return result == null ? flyteidl.core.Execution.TaskExecution.Phase.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6973,8 +7022,11 @@ public final class AgentOuterClass {
       for (int i = 0; i < logLinks_.size(); i++) {
         output.writeMessage(4, logLinks_.get(i));
       }
+      if (phase_ != flyteidl.core.Execution.TaskExecution.Phase.UNDEFINED.getNumber()) {
+        output.writeEnum(5, phase_);
+      }
       if (outputs_ != null) {
-        output.writeMessage(5, getOutputs());
+        output.writeMessage(6, getOutputs());
       }
       unknownFields.writeTo(output);
     }
@@ -7000,9 +7052,13 @@ public final class AgentOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, logLinks_.get(i));
       }
+      if (phase_ != flyteidl.core.Execution.TaskExecution.Phase.UNDEFINED.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(5, phase_);
+      }
       if (outputs_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(5, getOutputs());
+          .computeMessageSize(6, getOutputs());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -7034,6 +7090,7 @@ public final class AgentOuterClass {
           .equals(other.getMessage())) return false;
       if (!getLogLinksList()
           .equals(other.getLogLinksList())) return false;
+      if (phase_ != other.phase_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -7061,6 +7118,8 @@ public final class AgentOuterClass {
         hash = (37 * hash) + LOG_LINKS_FIELD_NUMBER;
         hash = (53 * hash) + getLogLinksList().hashCode();
       }
+      hash = (37 * hash) + PHASE_FIELD_NUMBER;
+      hash = (53 * hash) + phase_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -7217,6 +7276,8 @@ public final class AgentOuterClass {
         } else {
           logLinksBuilder_.clear();
         }
+        phase_ = 0;
+
         return this;
       }
 
@@ -7266,6 +7327,7 @@ public final class AgentOuterClass {
         } else {
           result.logLinks_ = logLinksBuilder_.build();
         }
+        result.phase_ = phase_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -7354,6 +7416,9 @@ public final class AgentOuterClass {
             }
           }
         }
+        if (other.phase_ != 0) {
+          setPhaseValue(other.getPhaseValue());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -7387,46 +7452,46 @@ public final class AgentOuterClass {
       private int state_ = 0;
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public int getStateValue() {
+      @java.lang.Deprecated public int getStateValue() {
         return state_;
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public Builder setStateValue(int value) {
+      @java.lang.Deprecated public Builder setStateValue(int value) {
         state_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public flyteidl.admin.AgentOuterClass.State getState() {
+      @java.lang.Deprecated public flyteidl.admin.AgentOuterClass.State getState() {
         @SuppressWarnings("deprecation")
         flyteidl.admin.AgentOuterClass.State result = flyteidl.admin.AgentOuterClass.State.valueOf(state_);
         return result == null ? flyteidl.admin.AgentOuterClass.State.UNRECOGNIZED : result;
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public Builder setState(flyteidl.admin.AgentOuterClass.State value) {
+      @java.lang.Deprecated public Builder setState(flyteidl.admin.AgentOuterClass.State value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -7437,12 +7502,12 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public Builder clearState() {
+      @java.lang.Deprecated public Builder clearState() {
         
         state_ = 0;
         onChanged();
@@ -7639,7 +7704,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public boolean hasOutputs() {
         return outputsBuilder_ != null || outputs_ != null;
@@ -7651,7 +7716,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public flyteidl.core.Literals.OutputData getOutputs() {
         if (outputsBuilder_ == null) {
@@ -7667,7 +7732,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public Builder setOutputs(flyteidl.core.Literals.OutputData value) {
         if (outputsBuilder_ == null) {
@@ -7689,7 +7754,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public Builder setOutputs(
           flyteidl.core.Literals.OutputData.Builder builderForValue) {
@@ -7709,7 +7774,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public Builder mergeOutputs(flyteidl.core.Literals.OutputData value) {
         if (outputsBuilder_ == null) {
@@ -7733,7 +7798,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public Builder clearOutputs() {
         if (outputsBuilder_ == null) {
@@ -7753,7 +7818,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public flyteidl.core.Literals.OutputData.Builder getOutputsBuilder() {
         
@@ -7767,7 +7832,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       public flyteidl.core.Literals.OutputDataOrBuilder getOutputsOrBuilder() {
         if (outputsBuilder_ != null) {
@@ -7784,7 +7849,7 @@ public final class AgentOuterClass {
        * +optional
        * </pre>
        *
-       * <code>.flyteidl.core.OutputData outputs = 5;</code>
+       * <code>.flyteidl.core.OutputData outputs = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           flyteidl.core.Literals.OutputData, flyteidl.core.Literals.OutputData.Builder, flyteidl.core.Literals.OutputDataOrBuilder> 
@@ -8199,6 +8264,71 @@ public final class AgentOuterClass {
           logLinks_ = null;
         }
         return logLinksBuilder_;
+      }
+
+      private int phase_ = 0;
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public int getPhaseValue() {
+        return phase_;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public Builder setPhaseValue(int value) {
+        phase_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public flyteidl.core.Execution.TaskExecution.Phase getPhase() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Execution.TaskExecution.Phase result = flyteidl.core.Execution.TaskExecution.Phase.valueOf(phase_);
+        return result == null ? flyteidl.core.Execution.TaskExecution.Phase.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public Builder setPhase(flyteidl.core.Execution.TaskExecution.Phase value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        phase_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public Builder clearPhase() {
+        
+        phase_ = 0;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -17192,35 +17322,37 @@ public final class AgentOuterClass {
       "\022\025\n\rresource_meta\030\002 \001(\014\"h\n\017GetTaskRespon" +
       "se\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Re" +
       "source\022)\n\tlog_links\030\002 \003(\0132\026.flyteidl.cor" +
-      "e.TaskLog\"\323\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025." +
-      "flyteidl.admin.State\0229\n\022deprecated_outpu" +
-      "ts\030\002 \001(\0132\031.flyteidl.core.LiteralMapB\002\030\001\022" +
-      "*\n\007outputs\030\005 \001(\0132\031.flyteidl.core.OutputD" +
-      "ata\022\017\n\007message\030\003 \001(\t\022)\n\tlog_links\030\004 \003(\0132" +
-      "\026.flyteidl.core.TaskLog\"=\n\021DeleteTaskReq" +
-      "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta" +
-      "\030\002 \001(\014\"\024\n\022DeleteTaskResponse\"3\n\005Agent\022\014\n" +
-      "\004name\030\001 \001(\t\022\034\n\024supported_task_types\030\002 \003(" +
-      "\t\"\037\n\017GetAgentRequest\022\014\n\004name\030\001 \001(\t\"8\n\020Ge" +
-      "tAgentResponse\022$\n\005agent\030\001 \001(\0132\025.flyteidl" +
-      ".admin.Agent\"\023\n\021ListAgentsRequest\";\n\022Lis" +
-      "tAgentsResponse\022%\n\006agents\030\001 \003(\0132\025.flytei" +
-      "dl.admin.Agent\"\331\001\n\025GetTaskMetricsRequest" +
-      "\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001" +
-      "(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nstart_time\030\004 \001(\0132" +
-      "\032.google.protobuf.Timestamp\022,\n\010end_time\030" +
-      "\005 \001(\0132\032.google.protobuf.Timestamp\022\'\n\004ste" +
-      "p\030\006 \001(\0132\031.google.protobuf.Duration\"O\n\026Ge" +
-      "tTaskMetricsResponse\0225\n\007results\030\001 \003(\0132$." +
-      "flyteidl.core.ExecutionMetricResult\"\\\n\022G" +
-      "etTaskLogsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\r" +
-      "resource_meta\030\002 \001(\014\022\r\n\005lines\030\003 \001(\004\022\r\n\005to" +
-      "ken\030\004 \001(\t\"5\n\023GetTaskLogsResponse\022\017\n\007resu" +
-      "lts\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*^\n\005State\022\025\n\021RET" +
-      "RYABLE_FAILURE\020\000\022\025\n\021PERMANENT_FAILURE\020\001\022" +
-      "\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\tSUCCEEDED\020\004" +
-      "B=Z;github.com/flyteorg/flyte/flyteidl/g" +
-      "en/pb-go/flyteidl/adminb\006proto3"
+      "e.TaskLog\"\212\002\n\010Resource\022(\n\005state\030\001 \001(\0162\025." +
+      "flyteidl.admin.StateB\002\030\001\0229\n\022deprecated_o" +
+      "utputs\030\002 \001(\0132\031.flyteidl.core.LiteralMapB" +
+      "\002\030\001\022*\n\007outputs\030\006 \001(\0132\031.flyteidl.core.Out" +
+      "putData\022\017\n\007message\030\003 \001(\t\022)\n\tlog_links\030\004 " +
+      "\003(\0132\026.flyteidl.core.TaskLog\0221\n\005phase\030\005 \001" +
+      "(\0162\".flyteidl.core.TaskExecution.Phase\"=" +
+      "\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001 \001(\t\022\025" +
+      "\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTaskRespo" +
+      "nse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024supported_" +
+      "task_types\030\002 \003(\t\"\037\n\017GetAgentRequest\022\014\n\004n" +
+      "ame\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005agent\030\001" +
+      " \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListAgent" +
+      "sRequest\";\n\022ListAgentsResponse\022%\n\006agents" +
+      "\030\001 \003(\0132\025.flyteidl.admin.Agent\"\331\001\n\025GetTas" +
+      "kMetricsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rre" +
+      "source_meta\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022.\n\nst" +
+      "art_time\030\004 \001(\0132\032.google.protobuf.Timesta" +
+      "mp\022,\n\010end_time\030\005 \001(\0132\032.google.protobuf.T" +
+      "imestamp\022\'\n\004step\030\006 \001(\0132\031.google.protobuf" +
+      ".Duration\"O\n\026GetTaskMetricsResponse\0225\n\007r" +
+      "esults\030\001 \003(\0132$.flyteidl.core.ExecutionMe" +
+      "tricResult\"\\\n\022GetTaskLogsRequest\022\021\n\ttask" +
+      "_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\022\r\n\005li" +
+      "nes\030\003 \001(\004\022\r\n\005token\030\004 \001(\t\"5\n\023GetTaskLogsR" +
+      "esponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030\002 \001(\t*" +
+      "^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMA" +
+      "NENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003" +
+      "\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteorg/f" +
+      "lyte/flyteidl/gen/pb-go/flyteidl/adminb\006" +
+      "proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -17294,7 +17426,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
-        new java.lang.String[] { "State", "DeprecatedOutputs", "Outputs", "Message", "LogLinks", });
+        new java.lang.String[] { "State", "DeprecatedOutputs", "Outputs", "Message", "LogLinks", "Phase", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new

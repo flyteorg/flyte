@@ -83,8 +83,8 @@ message GetTaskResponse {
 }
 
 message Resource {
-  // The state of the execution is used to control its visibility in the UI/CLI.
-  State state = 1;
+  // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
+  State state = 1 [deprecated = true];
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
@@ -93,11 +93,13 @@ message Resource {
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
-  core.OutputData outputs = 5;
+  core.OutputData outputs = 6;
   // A descriptive message for the current state. e.g. waiting for cluster.
   string message = 3;
   // log information for the task execution.
   repeated core.TaskLog log_links = 4;
+  // The phase of the execution is used to determine the phase of the plugin's execution.
+  core.TaskExecution.Phase phase = 5;
 }
 
 // A message used to delete a task.

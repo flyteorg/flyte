@@ -322,7 +322,7 @@
       "properties": {
         "state": {
           "$ref": "#/definitions/flyteidladminState",
-          "description": "The state of the execution is used to control its visibility in the UI/CLI."
+          "description": "DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI."
         },
         "deprecated_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
@@ -342,6 +342,10 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "description": "log information for the task execution."
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
         }
       }
     },
@@ -1226,6 +1230,21 @@
         }
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
+    },
+    "coreTaskExecutionPhase": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "ABORTED",
+        "FAILED",
+        "INITIALIZING",
+        "WAITING_FOR_RESOURCES"
+      ],
+      "default": "UNDEFINED",
+      "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
     },
     "coreTaskLog": {
       "type": "object",
