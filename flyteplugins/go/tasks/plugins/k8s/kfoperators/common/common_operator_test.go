@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -17,6 +18,13 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
+
+func TestMain(m *testing.M) {
+	// All tests should run assuming UTC timezone.
+	time.Local = time.UTC
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestExtractCurrentCondition(t *testing.T) {
 	jobCreated := commonOp.JobCondition{

@@ -245,4 +245,16 @@ pub struct ExecutionInputsRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionInputsResponse {
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListUsageRequest {
+    #[prost(message, optional, tag="1")]
+    pub artifact_id: ::core::option::Option<super::core::ArtifactId>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ListUsageResponse {
+    #[prost(message, repeated, tag="1")]
+    pub executions: ::prost::alloc::vec::Vec<super::core::WorkflowExecutionIdentifier>,
+}
 // @@protoc_insertion_point(module)

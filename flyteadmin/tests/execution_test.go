@@ -160,7 +160,7 @@ func populateWorkflowExecutionsForTestingOnly() {
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
-		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
+		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)
 	}
 	sqlDB, err := db.DB()
 	if err != nil {

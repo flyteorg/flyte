@@ -79,6 +79,14 @@ public final class Catalog {
      * <code>CACHE_SKIPPED = 6;</code>
      */
     CACHE_SKIPPED(6),
+    /**
+     * <pre>
+     * Used to indicate that the cache was evicted
+     * </pre>
+     *
+     * <code>CACHE_EVICTED = 7;</code>
+     */
+    CACHE_EVICTED(7),
     UNRECOGNIZED(-1),
     ;
 
@@ -138,6 +146,14 @@ public final class Catalog {
      * <code>CACHE_SKIPPED = 6;</code>
      */
     public static final int CACHE_SKIPPED_VALUE = 6;
+    /**
+     * <pre>
+     * Used to indicate that the cache was evicted
+     * </pre>
+     *
+     * <code>CACHE_EVICTED = 7;</code>
+     */
+    public static final int CACHE_EVICTED_VALUE = 7;
 
 
     public final int getNumber() {
@@ -165,6 +181,7 @@ public final class Catalog {
         case 4: return CACHE_LOOKUP_FAILURE;
         case 5: return CACHE_PUT_FAILURE;
         case 6: return CACHE_SKIPPED;
+        case 7: return CACHE_EVICTED;
         default: return null;
       }
     }
@@ -2864,13 +2881,14 @@ public final class Catalog {
       "ogReservation\"\207\001\n\006Status\022\030\n\024RESERVATION_" +
       "DISABLED\020\000\022\030\n\024RESERVATION_ACQUIRED\020\001\022\026\n\022" +
       "RESERVATION_EXISTS\020\002\022\030\n\024RESERVATION_RELE" +
-      "ASED\020\003\022\027\n\023RESERVATION_FAILURE\020\004*\240\001\n\022Cata" +
+      "ASED\020\003\022\027\n\023RESERVATION_FAILURE\020\004*\263\001\n\022Cata" +
       "logCacheStatus\022\022\n\016CACHE_DISABLED\020\000\022\016\n\nCA" +
       "CHE_MISS\020\001\022\r\n\tCACHE_HIT\020\002\022\023\n\017CACHE_POPUL" +
       "ATED\020\003\022\030\n\024CACHE_LOOKUP_FAILURE\020\004\022\025\n\021CACH" +
-      "E_PUT_FAILURE\020\005\022\021\n\rCACHE_SKIPPED\020\006B<Z:gi" +
-      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
-      "go/flyteidl/coreb\006proto3"
+      "E_PUT_FAILURE\020\005\022\021\n\rCACHE_SKIPPED\020\006\022\021\n\rCA" +
+      "CHE_EVICTED\020\007B<Z:github.com/flyteorg/fly" +
+      "te/flyteidl/gen/pb-go/flyteidl/coreb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
