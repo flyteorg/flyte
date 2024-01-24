@@ -2,7 +2,39 @@ apiVersion: v1
 entries:
   flyte:
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.233555087Z"
+    created: "2024-01-24T00:09:33.098469619Z"
+    dependencies:
+    - alias: flyte
+      name: flyte-core
+      repository: file://../flyte-core
+      version: v1.10.7-b2
+    - condition: contour.enabled
+      name: contour
+      repository: https://charts.bitnami.com/bitnami
+      version: 7.10.1
+    - alias: sparkoperator
+      condition: sparkoperator.enabled
+      name: spark-operator
+      repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
+      version: 1.1.15
+    - alias: daskoperator
+      condition: daskoperator.enabled
+      name: dask-kubernetes-operator
+      repository: https://helm.dask.org
+      version: 2022.12.0
+    - condition: kubernetes-dashboard.enabled
+      name: kubernetes-dashboard
+      repository: https://kubernetes.github.io/dashboard/
+      version: 4.0.2
+    description: A Helm chart for Flyte Sandbox
+    digest: 9ddc2ca9f606a4e9f8a11f01d09c15fdd91216d92a881a44e2dff7ccb4e95147
+    name: flyte
+    type: application
+    urls:
+    - https://flyteorg.github.io/flyte/flyte-v1.10.7-b2.tgz
+    version: v1.10.7-b2
+  - apiVersion: v2
+    created: "2024-01-24T00:09:33.083137182Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -34,7 +66,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.10.7-b1.tgz
     version: v1.10.7-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.219959283Z"
+    created: "2024-01-24T00:09:33.069478978Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -66,7 +98,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.10.7-b0.tgz
     version: v1.10.7-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.205661567Z"
+    created: "2024-01-24T00:09:33.052424033Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -98,7 +130,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.10.6.tgz
     version: v1.10.6
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.191600265Z"
+    created: "2024-01-24T00:09:33.037048602Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -130,7 +162,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.10.6-b0.tgz
     version: v1.10.6-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.177778102Z"
+    created: "2024-01-24T00:09:33.021684646Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -162,7 +194,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.10.0.tgz
     version: v1.10.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.163989773Z"
+    created: "2024-01-24T00:09:33.007375885Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -194,7 +226,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.10.0-b0.tgz
     version: v1.10.0-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.669361525Z"
+    created: "2024-01-24T00:09:33.555429865Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -226,7 +258,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.9.1.tgz
     version: v1.9.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.655853654Z"
+    created: "2024-01-24T00:09:33.539648402Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -258,7 +290,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.9.0.tgz
     version: v1.9.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.642428843Z"
+    created: "2024-01-24T00:09:33.525138564Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -290,7 +322,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.8.1.tgz
     version: v1.8.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.627765927Z"
+    created: "2024-01-24T00:09:33.510849639Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -322,7 +354,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.8.0.tgz
     version: v1.8.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.613755604Z"
+    created: "2024-01-24T00:09:33.495730889Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -354,7 +386,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.7.0.tgz
     version: v1.7.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.600319884Z"
+    created: "2024-01-24T00:09:33.481750995Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -386,7 +418,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.6.2.tgz
     version: v1.6.2
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.587505323Z"
+    created: "2024-01-24T00:09:33.46818186Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -418,7 +450,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.6.1.tgz
     version: v1.6.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.573379908Z"
+    created: "2024-01-24T00:09:33.453658618Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -450,7 +482,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.6.0.tgz
     version: v1.6.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.560414703Z"
+    created: "2024-01-24T00:09:33.439875769Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -482,7 +514,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.6.0-b1.tgz
     version: v1.6.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.546517219Z"
+    created: "2024-01-24T00:09:33.425454701Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -514,7 +546,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.5.1.tgz
     version: v1.5.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.533588338Z"
+    created: "2024-01-24T00:09:33.41178703Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -546,7 +578,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.5.0.tgz
     version: v1.5.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.519954888Z"
+    created: "2024-01-24T00:09:33.39807757Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -578,7 +610,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.5.0-a0.tgz
     version: v1.5.0-a0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.507047504Z"
+    created: "2024-01-24T00:09:33.383170918Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -610,7 +642,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.4.3.tgz
     version: v1.4.3
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.494173364Z"
+    created: "2024-01-24T00:09:33.369400153Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -642,7 +674,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.4.2.tgz
     version: v1.4.2
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.479929433Z"
+    created: "2024-01-24T00:09:33.355410904Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -674,7 +706,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.4.1.tgz
     version: v1.4.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.466540148Z"
+    created: "2024-01-24T00:09:33.340440828Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -706,7 +738,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.4.0.tgz
     version: v1.4.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.453848062Z"
+    created: "2024-01-24T00:09:33.326523524Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -738,7 +770,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.4.0-b0.tgz
     version: v1.4.0-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.440641346Z"
+    created: "2024-01-24T00:09:33.312628974Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -770,7 +802,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0.tgz
     version: v1.3.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.426719477Z"
+    created: "2024-01-24T00:09:33.297537138Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -797,7 +829,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b9.tgz
     version: v1.3.0-b9
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.414905758Z"
+    created: "2024-01-24T00:09:33.28529599Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -824,7 +856,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b8.tgz
     version: v1.3.0-b8
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.401944825Z"
+    created: "2024-01-24T00:09:33.273074213Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -851,7 +883,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b7.tgz
     version: v1.3.0-b7
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.390338776Z"
+    created: "2024-01-24T00:09:33.260123313Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -878,7 +910,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b6.tgz
     version: v1.3.0-b6
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.378305025Z"
+    created: "2024-01-24T00:09:33.248002034Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -905,7 +937,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b5.tgz
     version: v1.3.0-b5
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.366315582Z"
+    created: "2024-01-24T00:09:33.23614364Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -932,7 +964,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b4.tgz
     version: v1.3.0-b4
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.354317272Z"
+    created: "2024-01-24T00:09:33.223881079Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -959,7 +991,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b3.tgz
     version: v1.3.0-b3
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.341298726Z"
+    created: "2024-01-24T00:09:33.211266405Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -986,7 +1018,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b2.tgz
     version: v1.3.0-b2
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.329284183Z"
+    created: "2024-01-24T00:09:33.198615404Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1013,7 +1045,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.3.0-b1.tgz
     version: v1.3.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.317367319Z"
+    created: "2024-01-24T00:09:33.185673371Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1040,7 +1072,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.1.tgz
     version: v1.2.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.305750947Z"
+    created: "2024-01-24T00:09:33.173016118Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1067,7 +1099,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.1-b1.tgz
     version: v1.2.1-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.293905809Z"
+    created: "2024-01-24T00:09:33.159288905Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1094,7 +1126,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.0.tgz
     version: v1.2.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.282122865Z"
+    created: "2024-01-24T00:09:33.146862969Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1121,7 +1153,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.0-b5.tgz
     version: v1.2.0-b5
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.270173476Z"
+    created: "2024-01-24T00:09:33.13486184Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1148,7 +1180,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.0-b3.tgz
     version: v1.2.0-b3
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.257828289Z"
+    created: "2024-01-24T00:09:33.122937873Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1175,7 +1207,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.0-b2.tgz
     version: v1.2.0-b2
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.245285057Z"
+    created: "2024-01-24T00:09:33.110596036Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1202,7 +1234,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-v1.2.0-b1.tgz
     version: v1.2.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.149281877Z"
+    created: "2024-01-24T00:09:32.993332501Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -1231,7 +1263,23 @@ entries:
   flyte-binary:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.616565891Z"
+    created: "2024-01-24T00:09:32.428978585Z"
+    dependencies:
+    - alias: flyteagent
+      condition: flyteagent.enabled
+      name: flyteagent
+      repository: file://../flyteagent
+      version: v1.10.7-b2
+    description: Chart for basic single Flyte executable deployment
+    digest: ef50bb8121d708416ee042ffe7c778dd6d9b99051831c9a8bf14b49bff7593e8
+    name: flyte-binary
+    type: application
+    urls:
+    - https://flyteorg.github.io/flyte/flyte-binary-v1.10.7-b2.tgz
+    version: v1.10.7-b2
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2024-01-24T00:09:32.427472243Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1247,7 +1295,7 @@ entries:
     version: v1.10.7-b1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.614715085Z"
+    created: "2024-01-24T00:09:32.425907302Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1263,7 +1311,7 @@ entries:
     version: v1.10.7-b0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.61194416Z"
+    created: "2024-01-24T00:09:32.423352407Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1279,7 +1327,7 @@ entries:
     version: v1.10.6
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.609863675Z"
+    created: "2024-01-24T00:09:32.421787726Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1295,7 +1343,7 @@ entries:
     version: v1.10.6-b0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.607885391Z"
+    created: "2024-01-24T00:09:32.420079737Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1311,7 +1359,7 @@ entries:
     version: v1.10.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.606293068Z"
+    created: "2024-01-24T00:09:32.418461525Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1327,7 +1375,7 @@ entries:
     version: v1.10.0-b0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.641852809Z"
+    created: "2024-01-24T00:09:32.455084079Z"
     description: Chart for basic single Flyte executable deployment
     digest: 940b56d767719264fc81acbef842e1d88eb4aaab634055b00bca35671d94ca24
     name: flyte-binary
@@ -1337,7 +1385,7 @@ entries:
     version: v1.9.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.640472702Z"
+    created: "2024-01-24T00:09:32.453680088Z"
     description: Chart for basic single Flyte executable deployment
     digest: 639ceb4fca820a9801a36cf98632be12a4736ba86ec195ebf625856ca45794b1
     name: flyte-binary
@@ -1347,7 +1395,7 @@ entries:
     version: v1.9.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.638354867Z"
+    created: "2024-01-24T00:09:32.452298538Z"
     description: Chart for basic single Flyte executable deployment
     digest: ce431711a4b32e1c53be2f905f6ab57e0be7aabf1a83073117ff1638cc5b2ae5
     name: flyte-binary
@@ -1357,7 +1405,7 @@ entries:
     version: v1.8.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.637069467Z"
+    created: "2024-01-24T00:09:32.449853488Z"
     description: Chart for basic single Flyte executable deployment
     digest: 88b7af95aca316ad8b7df9ccce769310fe20e91c9fc1fe29a7d714420777b46b
     name: flyte-binary
@@ -1367,7 +1415,7 @@ entries:
     version: v1.8.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.635773397Z"
+    created: "2024-01-24T00:09:32.448520309Z"
     description: Chart for basic single Flyte executable deployment
     digest: d69f7b5e3fb0862b2f99168515d6a088c17c83c8119ef2ac1ee06b4e45c0457a
     name: flyte-binary
@@ -1377,7 +1425,7 @@ entries:
     version: v1.7.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.634631875Z"
+    created: "2024-01-24T00:09:32.447420556Z"
     description: Chart for basic single Flyte executable deployment
     digest: 2e5d599277d21f30750b25afa120026cc3b282945f2f91a114c44fb72db3c76a
     name: flyte-binary
@@ -1387,7 +1435,7 @@ entries:
     version: v1.6.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.63356348Z"
+    created: "2024-01-24T00:09:32.446344657Z"
     description: Chart for basic single Flyte executable deployment
     digest: 49f51da7a244fc404849eea12f5e7d6cb9425ae72b6b3be27ff85da64d0e4871
     name: flyte-binary
@@ -1397,7 +1445,7 @@ entries:
     version: v1.6.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.632511205Z"
+    created: "2024-01-24T00:09:32.445327659Z"
     description: Chart for basic single Flyte executable deployment
     digest: 466c662ff4e06d9d141cce09fdd76cfe279676e41f2609a37efd47b2ce6ee18e
     name: flyte-binary
@@ -1407,7 +1455,7 @@ entries:
     version: v1.6.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.631524603Z"
+    created: "2024-01-24T00:09:32.44433213Z"
     description: Chart for basic single Flyte executable deployment
     digest: c6d937f8334cf756a40f777d6b72bd459f26949221975d40b2fd15bb6ed33ba7
     name: flyte-binary
@@ -1417,7 +1465,7 @@ entries:
     version: v1.6.0-b1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.629361034Z"
+    created: "2024-01-24T00:09:32.443282971Z"
     description: Chart for basic single Flyte executable deployment
     digest: 9e0525567ad7887fb1a19d9c21503d1c639281e3f19afe2e5a35a33d96041ebe
     name: flyte-binary
@@ -1427,7 +1475,7 @@ entries:
     version: v1.5.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.62842179Z"
+    created: "2024-01-24T00:09:32.440997666Z"
     description: Chart for basic single Flyte executable deployment
     digest: 57c8dceeb84d6297855b4deedc08f2f35b5961f8f50f39d6d3b58f8cb56b360e
     name: flyte-binary
@@ -1437,7 +1485,7 @@ entries:
     version: v1.5.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.627464062Z"
+    created: "2024-01-24T00:09:32.44001933Z"
     description: Chart for basic single Flyte executable deployment
     digest: 1964e1d82980c2597a47949f025d19d49e32bceef1e2cb46cf36b13511002072
     name: flyte-binary
@@ -1447,7 +1495,7 @@ entries:
     version: v1.5.0-a0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.626494722Z"
+    created: "2024-01-24T00:09:32.439053467Z"
     description: Chart for basic single Flyte executable deployment
     digest: 2e140f73088c2b742b61e6eebe7b2823730d9550231a37b965fcb5e08615770d
     name: flyte-binary
@@ -1457,7 +1505,7 @@ entries:
     version: v1.4.3
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.625571287Z"
+    created: "2024-01-24T00:09:32.438026229Z"
     description: Chart for basic single Flyte executable deployment
     digest: b980147e2cc5c92afa7923248b274821d14913f768660ea5fab38e25c5271f52
     name: flyte-binary
@@ -1467,7 +1515,7 @@ entries:
     version: v1.4.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.624641331Z"
+    created: "2024-01-24T00:09:32.43710011Z"
     description: Chart for basic single Flyte executable deployment
     digest: 6d9828205c65dd1a8a41ee1baf41627e5f51554646eb30ce990fcd71a6c58584
     name: flyte-binary
@@ -1477,7 +1525,7 @@ entries:
     version: v1.4.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.623724328Z"
+    created: "2024-01-24T00:09:32.436174442Z"
     description: Chart for basic single Flyte executable deployment
     digest: a0edb5df48ac7020337416bf4b1cf1b1b4a2e131e7c3dacb0a142884ba4a7798
     name: flyte-binary
@@ -1487,7 +1535,7 @@ entries:
     version: v1.4.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.622738808Z"
+    created: "2024-01-24T00:09:32.435285182Z"
     description: Chart for basic single Flyte executable deployment
     digest: 93de3707c8f57127f3b4068c545eca2d0bbdaed827f283a608d70b0150cc9797
     name: flyte-binary
@@ -1497,7 +1545,7 @@ entries:
     version: v1.4.0-b0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.6208337Z"
+    created: "2024-01-24T00:09:32.434339547Z"
     description: Chart for basic single Flyte executable deployment
     digest: 344ae54271d0a23836b3816dfff94e5636063b622fe2f6fa1b646a4ee4fd6556
     name: flyte-binary
@@ -1507,7 +1555,7 @@ entries:
     version: v1.3.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.619962173Z"
+    created: "2024-01-24T00:09:32.432712747Z"
     description: Chart for basic single Flyte executable deployment
     digest: 0bb7dfde79936024adb66a83acc2cb95d487586d0f09e457b46b031dad5c553d
     name: flyte-binary
@@ -1517,7 +1565,7 @@ entries:
     version: v1.3.0-b9
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.619101776Z"
+    created: "2024-01-24T00:09:32.431518297Z"
     description: Chart for basic single Flyte executable deployment
     digest: 00c904a7e1559458ac96bb535c5920cf5879c0f52a14cd075de9b80e16b0eb09
     name: flyte-binary
@@ -1527,7 +1575,7 @@ entries:
     version: v1.3.0-b8
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.618269241Z"
+    created: "2024-01-24T00:09:32.43063048Z"
     description: Chart for basic single Flyte executable deployment
     digest: a598b0232eaf3cc15e8a212754fb54cbd82cdccac40977848303eedc2a359d2f
     name: flyte-binary
@@ -1537,7 +1585,7 @@ entries:
     version: v1.3.0-b7
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.617426959Z"
+    created: "2024-01-24T00:09:32.429812763Z"
     description: Chart for basic single Flyte executable deployment
     digest: 927e3efc2f537bffcbebda1596df30eb0536ae84d393f9cd8f5d0d21beb2f8d0
     name: flyte-binary
@@ -1547,7 +1595,7 @@ entries:
     version: v1.3.0-b6
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:00.604765435Z"
+    created: "2024-01-24T00:09:32.416913315Z"
     description: Chart for basic single Flyte executable deployment
     digest: c760c40b5949ee665949b1b944209750f9225d3959e035bf71b36fcc1ad20eec
     name: flyte-binary
@@ -1557,7 +1605,22 @@ entries:
     version: 0.1.0
   flyte-core:
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.663677449Z"
+    created: "2024-01-24T00:09:32.482896298Z"
+    dependencies:
+    - alias: flyteagent
+      condition: flyteagent.enabled
+      name: flyteagent
+      repository: file://../flyteagent
+      version: v1.10.7-b2
+    description: A Helm chart for Flyte core
+    digest: c35313631ac76c260f1ac01a4743787111ba93ea8d79d970ec5b66d1d3319898
+    name: flyte-core
+    type: application
+    urls:
+    - https://flyteorg.github.io/flyte/flyte-core-v1.10.7-b2.tgz
+    version: v1.10.7-b2
+  - apiVersion: v2
+    created: "2024-01-24T00:09:32.478827052Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1572,7 +1635,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.10.7-b1.tgz
     version: v1.10.7-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.660623736Z"
+    created: "2024-01-24T00:09:32.475754115Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1587,7 +1650,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.10.7-b0.tgz
     version: v1.10.7-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.656756981Z"
+    created: "2024-01-24T00:09:32.472246197Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1602,7 +1665,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.10.6.tgz
     version: v1.10.6
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.653697327Z"
+    created: "2024-01-24T00:09:32.468035633Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1617,7 +1680,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.10.6-b0.tgz
     version: v1.10.6-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.650670775Z"
+    created: "2024-01-24T00:09:32.46498098Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1632,7 +1695,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.10.0.tgz
     version: v1.10.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.647071615Z"
+    created: "2024-01-24T00:09:32.461472721Z"
     dependencies:
     - alias: flyteagent
       condition: flyteagent.enabled
@@ -1647,7 +1710,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.10.0-b0.tgz
     version: v1.10.0-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.757180347Z"
+    created: "2024-01-24T00:09:32.579500569Z"
     description: A Helm chart for Flyte core
     digest: aa174ded0f4032c398d15ed59333b2c8e85baaa2d8f41ef8ed7e6288368c92ca
     name: flyte-core
@@ -1656,7 +1719,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.9.1.tgz
     version: v1.9.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.754486525Z"
+    created: "2024-01-24T00:09:32.575726608Z"
     description: A Helm chart for Flyte core
     digest: fb6ed735d8dfcddf3aecd06db1afa5a90424e3acd90d76cb9dcb23f82aa64bb8
     name: flyte-core
@@ -1665,7 +1728,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.9.0.tgz
     version: v1.9.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.750874136Z"
+    created: "2024-01-24T00:09:32.573040363Z"
     description: A Helm chart for Flyte core
     digest: 5c73d24d6de70840321a32fbeb06c6dfd92209c6d6b00aea07e658354882e89c
     name: flyte-core
@@ -1674,7 +1737,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.8.1.tgz
     version: v1.8.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.748252147Z"
+    created: "2024-01-24T00:09:32.570270732Z"
     description: A Helm chart for Flyte core
     digest: 9e3dfa5517c0114a2e1fb71dd33a3c5dd990caf2fe1a6a7912b736330fd6136f
     name: flyte-core
@@ -1683,7 +1746,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.8.0.tgz
     version: v1.8.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.745570818Z"
+    created: "2024-01-24T00:09:32.566252745Z"
     description: A Helm chart for Flyte core
     digest: ba64ad708fa11afdf023d1727690d3af5a2ec202363dbfa3762d330009637860
     name: flyte-core
@@ -1692,7 +1755,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.7.0.tgz
     version: v1.7.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.74211567Z"
+    created: "2024-01-24T00:09:32.563515385Z"
     description: A Helm chart for Flyte core
     digest: 53148e56b6171ec78ccc20f499ef094e0b0d94d6dbf2244f209f00490a0fb7c9
     name: flyte-core
@@ -1701,7 +1764,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.6.2.tgz
     version: v1.6.2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.739577678Z"
+    created: "2024-01-24T00:09:32.560905022Z"
     description: A Helm chart for Flyte core
     digest: 7853472fbbfc48910fcba9eef0ed92362e6a822da359c8d15856302a2efb8245
     name: flyte-core
@@ -1710,7 +1773,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.6.1.tgz
     version: v1.6.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.737114046Z"
+    created: "2024-01-24T00:09:32.557254544Z"
     description: A Helm chart for Flyte core
     digest: 1be7a888cd4a540f6362474ad55106da6a7747a19f2f8614a1bac3931d845a8b
     name: flyte-core
@@ -1719,7 +1782,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.6.0.tgz
     version: v1.6.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.734587997Z"
+    created: "2024-01-24T00:09:32.554677763Z"
     description: A Helm chart for Flyte core
     digest: 3fb45d3245970654fb06d83016ba1d07c899b876eb72aaf418fa563f2d424df6
     name: flyte-core
@@ -1728,7 +1791,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.6.0-b1.tgz
     version: v1.6.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.731033757Z"
+    created: "2024-01-24T00:09:32.552154672Z"
     description: A Helm chart for Flyte core
     digest: 72c5014d456f1eb86a45cade49eaf4b686a17064c75b7b40baa373887055bc38
     name: flyte-core
@@ -1737,7 +1800,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.5.1.tgz
     version: v1.5.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.728571657Z"
+    created: "2024-01-24T00:09:32.549618417Z"
     description: A Helm chart for Flyte core
     digest: 85de8e815832c246233f571e9259830a229a986dd712e43af0a2b762be309c5d
     name: flyte-core
@@ -1746,7 +1809,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.5.0.tgz
     version: v1.5.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.726076557Z"
+    created: "2024-01-24T00:09:32.546046088Z"
     description: A Helm chart for Flyte core
     digest: f4e2c23f5e2566d8dfe1c91a552c609c4ce4aa582b4b44057f050d7daca6bdaf
     name: flyte-core
@@ -1755,7 +1818,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.5.0-a0.tgz
     version: v1.5.0-a0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.722733763Z"
+    created: "2024-01-24T00:09:32.543547573Z"
     description: A Helm chart for Flyte core
     digest: 264f79c94e6ad3d1846d4e417fb59f1922285622a30cfcfa9a91a21fd0b7e8a1
     name: flyte-core
@@ -1764,7 +1827,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.4.3.tgz
     version: v1.4.3
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.720290481Z"
+    created: "2024-01-24T00:09:32.54099083Z"
     description: A Helm chart for Flyte core
     digest: 9016a97bddd58ddfb65f326ab5217ab496839972c56d6478365a96413232efa8
     name: flyte-core
@@ -1773,7 +1836,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.4.2.tgz
     version: v1.4.2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.717829074Z"
+    created: "2024-01-24T00:09:32.537394904Z"
     description: A Helm chart for Flyte core
     digest: 23fa2125d6fb630c126f1c0d2ddf72fcba41ce922de607747f4fa1dfcbec96b9
     name: flyte-core
@@ -1782,7 +1845,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.4.1.tgz
     version: v1.4.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.715323616Z"
+    created: "2024-01-24T00:09:32.53490193Z"
     description: A Helm chart for Flyte core
     digest: bdf4a2a071c22a91639e990193caac1ca56e4a7812a427fbb2c3ae55c15aa9ac
     name: flyte-core
@@ -1791,7 +1854,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.4.0.tgz
     version: v1.4.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.711898314Z"
+    created: "2024-01-24T00:09:32.532396232Z"
     description: A Helm chart for Flyte core
     digest: 8a981239b134c630a6518044973dd1effb2a0af5cc55870564cfd4316ec9710b
     name: flyte-core
@@ -1800,7 +1863,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.4.0-b0.tgz
     version: v1.4.0-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.709433011Z"
+    created: "2024-01-24T00:09:32.529728491Z"
     description: A Helm chart for Flyte core
     digest: 1f3f9839a5adb30e15891f5d0e3680b7178b7fcfbdf0118de72d95ca76f3fea4
     name: flyte-core
@@ -1809,7 +1872,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0.tgz
     version: v1.3.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.706960344Z"
+    created: "2024-01-24T00:09:32.526316623Z"
     description: A Helm chart for Flyte core
     digest: 8c7ec679c13aac23b87b5c8917ae29bc459305a27bd9ff7ba8f4258e3d4cc285
     name: flyte-core
@@ -1818,7 +1881,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b9.tgz
     version: v1.3.0-b9
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.703623318Z"
+    created: "2024-01-24T00:09:32.523846993Z"
     description: A Helm chart for Flyte core
     digest: 75afcc38581cabad977ac4873744831803edbf2f6611320e80ca773f121d8c28
     name: flyte-core
@@ -1827,7 +1890,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b8.tgz
     version: v1.3.0-b8
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.701218027Z"
+    created: "2024-01-24T00:09:32.521318983Z"
     description: A Helm chart for Flyte core
     digest: 70d08af866bfe9b4bf5b8c111d2065ba05ed731d6928731897a4752b72bfe3bb
     name: flyte-core
@@ -1836,7 +1899,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b7.tgz
     version: v1.3.0-b7
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.698784302Z"
+    created: "2024-01-24T00:09:32.517798404Z"
     description: A Helm chart for Flyte core
     digest: e176d1341f00f48540c44e1f9e71232720a556f0a542f6762e9129b835a97064
     name: flyte-core
@@ -1845,7 +1908,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b6.tgz
     version: v1.3.0-b6
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.696367659Z"
+    created: "2024-01-24T00:09:32.515304007Z"
     description: A Helm chart for Flyte core
     digest: 144a45aa5c27adc1df6a6429022de60029445d0263a832df6a3125ad8903435f
     name: flyte-core
@@ -1854,7 +1917,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b5.tgz
     version: v1.3.0-b5
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.69296249Z"
+    created: "2024-01-24T00:09:32.512784202Z"
     description: A Helm chart for Flyte core
     digest: b5e788ed9f592e66886448902af5635c29bf9a71359a4d4ff4b1a3656453f951
     name: flyte-core
@@ -1863,7 +1926,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b4.tgz
     version: v1.3.0-b4
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.690557939Z"
+    created: "2024-01-24T00:09:32.509552877Z"
     description: A Helm chart for Flyte core
     digest: ceabf2d198976d47cd78820e6648438433375e23912aeb54ce3b694a1d92cfb7
     name: flyte-core
@@ -1872,7 +1935,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b3.tgz
     version: v1.3.0-b3
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.688166844Z"
+    created: "2024-01-24T00:09:32.507118612Z"
     description: A Helm chart for Flyte core
     digest: 93ea7de18b8075740907217ccc024cc80e802906bb6bcb452860409cf69c20a8
     name: flyte-core
@@ -1881,7 +1944,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b2.tgz
     version: v1.3.0-b2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.684843019Z"
+    created: "2024-01-24T00:09:32.504593277Z"
     description: A Helm chart for Flyte core
     digest: 823fb89a99ae4c5706ad1ab0367c2c2a79bc32ae2a6209f0b9738ebd543ea298
     name: flyte-core
@@ -1890,7 +1953,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.3.0-b1.tgz
     version: v1.3.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.682397542Z"
+    created: "2024-01-24T00:09:32.502087809Z"
     description: A Helm chart for Flyte core
     digest: 51151430958260e6a1c3498a7ffd92c1f17e957cbd292e98312460a1591b2f9a
     name: flyte-core
@@ -1899,7 +1962,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.1.tgz
     version: v1.2.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.68000798Z"
+    created: "2024-01-24T00:09:32.498542934Z"
     description: A Helm chart for Flyte core
     digest: 52b69681b9363e9b57d643ae8f2128fabb3278a00ac1fcdd3203fd5e5fc55083
     name: flyte-core
@@ -1908,7 +1971,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.1-b1.tgz
     version: v1.2.1-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.67749125Z"
+    created: "2024-01-24T00:09:32.496087861Z"
     description: A Helm chart for Flyte core
     digest: 1409b354c12f41e76c621f29d2b6d0d0c6d08b20691ad49c295cc46ff1721698
     name: flyte-core
@@ -1917,7 +1980,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.0.tgz
     version: v1.2.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.673898385Z"
+    created: "2024-01-24T00:09:32.493625173Z"
     description: A Helm chart for Flyte core
     digest: d1057d2a92ab8a3a6107a2f51ebbb4763fa36b163a32dd8919221e4129938e3e
     name: flyte-core
@@ -1926,7 +1989,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.0-b5.tgz
     version: v1.2.0-b5
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.671491991Z"
+    created: "2024-01-24T00:09:32.490323704Z"
     description: A Helm chart for Flyte core
     digest: 3401eb9add341629773bc1dedebe3878b93cb762d1b08708c974acb232d06a8e
     name: flyte-core
@@ -1935,7 +1998,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.0-b3.tgz
     version: v1.2.0-b3
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.669028741Z"
+    created: "2024-01-24T00:09:32.487933371Z"
     description: A Helm chart for Flyte core
     digest: b225fedcdd234f48eb3a2c465979d22d55d8fae3d46c201ace9405c48e8740aa
     name: flyte-core
@@ -1944,7 +2007,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.0-b2.tgz
     version: v1.2.0-b2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.665890952Z"
+    created: "2024-01-24T00:09:32.485433144Z"
     description: A Helm chart for Flyte core
     digest: 617ac37e094fc056bbbca888b16c76254d936b0fb02bea40bd700775131acb0d
     name: flyte-core
@@ -1953,7 +2016,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-core-v1.2.0-b1.tgz
     version: v1.2.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.644147955Z"
+    created: "2024-01-24T00:09:32.457459954Z"
     description: A Helm chart for Flyte core
     digest: 6a8c7b21b9b884c03a96b588cfa438dc5d57c76088b85056b6eacbd32bd0e157
     name: flyte-core
@@ -1963,7 +2026,35 @@ entries:
     version: v1.1.0
   flyte-deps:
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.822857097Z"
+    created: "2024-01-24T00:09:32.656464302Z"
+    dependencies:
+    - condition: contour.enabled
+      name: contour
+      repository: https://charts.bitnami.com/bitnami
+      version: 7.10.1
+    - alias: sparkoperator
+      condition: sparkoperator.enabled
+      name: spark-operator
+      repository: https://googlecloudplatform.github.io/spark-on-k8s-operator
+      version: 1.1.15
+    - alias: daskoperator
+      condition: daskoperator.enabled
+      name: dask-kubernetes-operator
+      repository: https://helm.dask.org
+      version: 2022.12.0
+    - condition: kubernetes-dashboard.enabled
+      name: kubernetes-dashboard
+      repository: https://kubernetes.github.io/dashboard/
+      version: 4.0.2
+    description: A Helm chart for Flyte dependency
+    digest: 8697f91d6ca2487cff0d3d1dc42d8b875c0f449851608b1f89a5a636f7100116
+    name: flyte-deps
+    type: application
+    urls:
+    - https://flyteorg.github.io/flyte/flyte-deps-v1.10.7-b2.tgz
+    version: v1.10.7-b2
+  - apiVersion: v2
+    created: "2024-01-24T00:09:32.646805682Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -1991,7 +2082,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.10.7-b1.tgz
     version: v1.10.7-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.812777498Z"
+    created: "2024-01-24T00:09:32.637253338Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2019,7 +2110,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.10.7-b0.tgz
     version: v1.10.7-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.803580225Z"
+    created: "2024-01-24T00:09:32.626282406Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2047,7 +2138,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.10.6.tgz
     version: v1.10.6
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.794081615Z"
+    created: "2024-01-24T00:09:32.616707813Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2075,7 +2166,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.10.6-b0.tgz
     version: v1.10.6-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.785233375Z"
+    created: "2024-01-24T00:09:32.606922399Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2103,7 +2194,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.10.0.tgz
     version: v1.10.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.775611244Z"
+    created: "2024-01-24T00:09:32.597419299Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2131,7 +2222,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.10.0-b0.tgz
     version: v1.10.0-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.116229118Z"
+    created: "2024-01-24T00:09:32.95944727Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2159,7 +2250,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.9.1.tgz
     version: v1.9.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.107044644Z"
+    created: "2024-01-24T00:09:32.949887896Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2187,7 +2278,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.9.0.tgz
     version: v1.9.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.097748066Z"
+    created: "2024-01-24T00:09:32.940489738Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2215,7 +2306,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.8.1.tgz
     version: v1.8.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.088289932Z"
+    created: "2024-01-24T00:09:32.930960807Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2243,7 +2334,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.8.0.tgz
     version: v1.8.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.078871157Z"
+    created: "2024-01-24T00:09:32.92134213Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2271,7 +2362,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.7.0.tgz
     version: v1.7.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.069494979Z"
+    created: "2024-01-24T00:09:32.911716527Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2299,7 +2390,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.6.2.tgz
     version: v1.6.2
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.060282781Z"
+    created: "2024-01-24T00:09:32.902055633Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2327,7 +2418,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.6.1.tgz
     version: v1.6.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.051040814Z"
+    created: "2024-01-24T00:09:32.892432294Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2355,7 +2446,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.6.0.tgz
     version: v1.6.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.040906593Z"
+    created: "2024-01-24T00:09:32.882582027Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2383,7 +2474,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.6.0-b1.tgz
     version: v1.6.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.031813045Z"
+    created: "2024-01-24T00:09:32.873082361Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2411,7 +2502,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.5.1.tgz
     version: v1.5.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.022610536Z"
+    created: "2024-01-24T00:09:32.863416172Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2439,7 +2530,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.5.0.tgz
     version: v1.5.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.013155048Z"
+    created: "2024-01-24T00:09:32.852951477Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2467,7 +2558,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.5.0-a0.tgz
     version: v1.5.0-a0
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.003855195Z"
+    created: "2024-01-24T00:09:32.843259625Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2495,7 +2586,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.4.3.tgz
     version: v1.4.3
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.994641201Z"
+    created: "2024-01-24T00:09:32.833443306Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2523,7 +2614,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.4.2.tgz
     version: v1.4.2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.985049225Z"
+    created: "2024-01-24T00:09:32.823577495Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2551,7 +2642,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.4.1.tgz
     version: v1.4.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.976057744Z"
+    created: "2024-01-24T00:09:32.814150567Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2579,7 +2670,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.4.0.tgz
     version: v1.4.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.966524093Z"
+    created: "2024-01-24T00:09:32.804629542Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2607,7 +2698,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.4.0-b0.tgz
     version: v1.4.0-b0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.957294525Z"
+    created: "2024-01-24T00:09:32.794993703Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2635,7 +2726,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0.tgz
     version: v1.3.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.947234621Z"
+    created: "2024-01-24T00:09:32.784282272Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2658,7 +2749,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b9.tgz
     version: v1.3.0-b9
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.939556894Z"
+    created: "2024-01-24T00:09:32.776232449Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2681,7 +2772,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b8.tgz
     version: v1.3.0-b8
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.931782554Z"
+    created: "2024-01-24T00:09:32.768123918Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2704,7 +2795,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b7.tgz
     version: v1.3.0-b7
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.924051117Z"
+    created: "2024-01-24T00:09:32.760953631Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2727,7 +2818,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b6.tgz
     version: v1.3.0-b6
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.91593282Z"
+    created: "2024-01-24T00:09:32.75262226Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2750,7 +2841,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b5.tgz
     version: v1.3.0-b5
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.908843466Z"
+    created: "2024-01-24T00:09:32.744241418Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2773,7 +2864,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b4.tgz
     version: v1.3.0-b4
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.900695773Z"
+    created: "2024-01-24T00:09:32.736260984Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2796,7 +2887,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b3.tgz
     version: v1.3.0-b3
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.892720254Z"
+    created: "2024-01-24T00:09:32.72824217Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2819,7 +2910,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b2.tgz
     version: v1.3.0-b2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.884927668Z"
+    created: "2024-01-24T00:09:32.720038053Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2842,7 +2933,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.3.0-b1.tgz
     version: v1.3.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.87712485Z"
+    created: "2024-01-24T00:09:32.712071741Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2865,7 +2956,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.1.tgz
     version: v1.2.1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.869219886Z"
+    created: "2024-01-24T00:09:32.704637431Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2888,7 +2979,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.1-b1.tgz
     version: v1.2.1-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.861431313Z"
+    created: "2024-01-24T00:09:32.696169572Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2911,7 +3002,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.0.tgz
     version: v1.2.0
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.853326471Z"
+    created: "2024-01-24T00:09:32.687905081Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2934,7 +3025,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.0-b5.tgz
     version: v1.2.0-b5
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.846248708Z"
+    created: "2024-01-24T00:09:32.679917199Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2957,7 +3048,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.0-b3.tgz
     version: v1.2.0-b3
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.837553995Z"
+    created: "2024-01-24T00:09:32.67172793Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -2980,7 +3071,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.0-b2.tgz
     version: v1.2.0-b2
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.829756206Z"
+    created: "2024-01-24T00:09:32.663627776Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -3003,7 +3094,7 @@ entries:
     - https://flyteorg.github.io/flyte/flyte-deps-v1.2.0-b1.tgz
     version: v1.2.0-b1
   - apiVersion: v2
-    created: "2024-01-19T00:15:00.765235632Z"
+    created: "2024-01-24T00:09:32.587731102Z"
     dependencies:
     - condition: contour.enabled
       name: contour
@@ -3027,7 +3118,7 @@ entries:
     version: v1.1.0
   flyte-sandbox:
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.137501818Z"
+    created: "2024-01-24T00:09:32.981082485Z"
     dependencies:
     - alias: flyte
       name: flyte-core
@@ -3055,7 +3146,7 @@ entries:
     version: v0.18.2-b1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-01-19T00:15:01.12774368Z"
+    created: "2024-01-24T00:09:32.970062669Z"
     dependencies:
     - condition: docker-registry.enabled
       name: docker-registry
@@ -3078,7 +3169,7 @@ entries:
       repository: https://charts.bitnami.com/bitnami
       version: 12.1.9
     description: A Helm chart for the Flyte local sandbox
-    digest: dd279a690962116a13d96d2aef10c0d2491dbc24df8267b759efb92b152ad10d
+    digest: b8abdafadd55583e7f5fe928c0cbadc63e1c6b9d886d493535e88860922ae62c
     name: flyte-sandbox
     type: application
     urls:
@@ -3086,12 +3177,12 @@ entries:
     version: 0.1.0
   flyteagent:
   - apiVersion: v2
-    created: "2024-01-19T00:15:01.669754179Z"
+    created: "2024-01-24T00:09:33.555841433Z"
     description: A Helm chart for Flyte agent
-    digest: 1e224c6c8a89baaf8a5ec13438ce5d90a6fef3c416929c454d4e880e4a4697f8
+    digest: 53787f1888f96955952a575f3de4228787c12a180a7828e8eb0edd29bd9c404b
     name: flyteagent
     type: application
     urls:
     - https://flyteorg.github.io/flyte/flyteagent-v0.1.10.tgz
     version: v0.1.10
-generated: "2024-01-19T00:15:00.602904189Z"
+generated: "2024-01-24T00:09:32.415113682Z"
