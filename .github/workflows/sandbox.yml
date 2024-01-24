@@ -10,8 +10,9 @@ on:
       - docker/**
       - charts/**
       - .github/workflows/sandbox.yml
-  release:
-    types: [published]
+  # NOTE: Disable publishing
+  # release:
+  #   types: [published]
 
 jobs:
   trigger-sandbox-build:

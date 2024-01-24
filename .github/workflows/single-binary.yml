@@ -98,25 +98,26 @@ jobs:
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
-      - name: Login to GitHub Container Registry
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Build and push Image
-        if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-        uses: docker/build-push-action@v3
-        with:
-          context: .
-          platforms: linux/arm64, linux/amd64
-          tags: ${{ steps.image-names.outputs.tags }}
-          build-args: |
-            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
-            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
-          file: Dockerfile
-          push: true
+      # NOTE: Disable publishing
+      # - name: Login to GitHub Container Registry
+      #   if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ghcr.io
+      #     username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+      #     password: "${{ secrets.FLYTE_BOT_PAT }}"
+      # - name: Build and push Image
+      #   if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: .
+      #     platforms: linux/arm64, linux/amd64
+      #     tags: ${{ steps.image-names.outputs.tags }}
+      #     build-args: |
+      #       FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
+      #       FLYTE_VERSION=${{ env.FLYTE_VERSION }}
+      #     file: Dockerfile
+      #     push: true
 
   sandbox-bundled-functional-tests:
     runs-on: ubuntu-latest
@@ -231,18 +232,19 @@ jobs:
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
             type=sha,format=long,
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
-      - name: Build and push multi-arch image
-        uses: docker/build-push-action@v3
-        with:
-          context: docker/sandbox-bundled
-          allow: "security.insecure"
-          platforms: linux/arm64, linux/amd64
-          tags: ${{ steps.image-names.outputs.tags }}
-          build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
-          push: true
+      # NOTE: Disable publishing
+      # - name: Login to GitHub Container Registry
+      #   uses: docker/login-action@v2
+      #   with:
+      #     registry: ghcr.io
+      #     username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+      #     password: "${{ secrets.FLYTE_BOT_PAT }}"
+      # - name: Build and push multi-arch image
+      #   uses: docker/build-push-action@v3
+      #   with:
+      #     context: docker/sandbox-bundled
+      #     allow: "security.insecure"
+      #     platforms: linux/arm64, linux/amd64
+      #     tags: ${{ steps.image-names.outputs.tags }}
+      #     build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
+      #     push: true

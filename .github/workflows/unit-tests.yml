@@ -27,15 +27,4 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
       - name: Unit Tests
-        env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-        run: make install && make test_unit_codecov
-      # TODO(monorepo): Figure out how to do code coverage aggregation
-      - name: Push CodeCov
-        uses: codecov/codecov-action@v3.1.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.FLYTE_BOT_PAT }}
-        with:
-          file: coverage.txt
-          flags: unittests
-          fail_ci_if_error: false
+        run: make install && make test_unit_cover
