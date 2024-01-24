@@ -160,6 +160,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 
+	logger.Infof(ctx, "@@@ Agent  phase [%v], state [%v], loglinks: [%v]", res.Resource.Phase, res.Resource.State, res.LogLinks)
 	return ResourceWrapper{
 		Phase:    res.Resource.Phase,
 		State:    res.Resource.State,
@@ -201,7 +202,11 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case flyteIdl.TaskExecution_INITIALIZING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_RUNNING:
+		logger.Infof(ctx, "@@@ running")
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+		// return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+
+		// return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
 		err = writeOutput(ctx, taskCtx, resource)
 		if err != nil {

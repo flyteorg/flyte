@@ -42,6 +42,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 	}
 
 	newPhase, err := p.Status(ctx, newPluginContext(cacheItem.ResourceMeta, cacheItem.Resource, "", tCtx))
+	logger.Infof(ctx, "@@@ newPhase: [%v]", newPhase)
 	if err != nil {
 		return nil, core.PhaseInfoUndefined, err
 	}

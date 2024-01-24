@@ -1,12 +1,14 @@
 package core
 
 import (
+	"context"
 	"fmt"
 	"time"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const DefaultPhaseVersion = uint32(0)
@@ -184,12 +186,15 @@ var PhaseInfoUndefined = PhaseInfo{phase: PhaseUndefined}
 
 func phaseInfo(p Phase, v uint32, err *core.ExecutionError, info *TaskInfo, cleanupOnFailure bool) PhaseInfo {
 	if info == nil {
+		logger.Infof(context.Background(), "@@@ TaskInfo is nil, creating a new one")
 		info = &TaskInfo{}
 	}
 	if info.OccurredAt == nil {
 		t := time.Now()
 		info.OccurredAt = &t
 	}
+	logger.Infof(context.Background(), "@@@ Creating PhaseInfo with phase [%v] and info [%v]", p, info)
+	logger.Infof(context.Background(), "@@@ info.Logs [%v]", info.Logs)
 	return PhaseInfo{
 		phase:            p,
 		version:          v,

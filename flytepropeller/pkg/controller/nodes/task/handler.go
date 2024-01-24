@@ -383,6 +383,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		}()
 		childCtx := context.WithValue(ctx, pluginContextKey, p.GetID())
 		trns, err = p.Handle(childCtx, tCtx)
+		logger.Infof(ctx, "@@@ Final Plugin [%s] returned transition phase logs: [%v]", p.GetID(), trns.Info().Info().Logs)
 		return
 	}()
 	if err != nil {
@@ -512,6 +513,8 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 				CheckpointUri: tCtx.ow.GetCheckpointPrefix().String(),
 			})
 	}
+
+	logger.Infof(ctx, "@@@ [%v]: Go to the end.", p.GetID())
 
 	return pluginTrns, nil
 }

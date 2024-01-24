@@ -81,10 +81,13 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 		} else {
 			nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
 		}
+		logger.Infof(ctx, "@@@ PhaseNotStarted phaseInfo logs:[%v]", phaseInfo.Info().Logs)
 	case PhaseAllocationTokenAcquired:
 		nextState, phaseInfo, err = launch(ctx, c.p, tCtx, c.cache, &incomingState)
+		logger.Infof(ctx, "@@@ PhaseAllocationTokenAcquired phaseInfo logs:[%v]", phaseInfo.Info().Logs)
 	case PhaseResourcesCreated:
 		nextState, phaseInfo, err = monitor(ctx, tCtx, c.p, c.cache, &incomingState)
+		logger.Infof(ctx, "@@@ PhaseResourcesCreated phaseInfo logs:[%v]", phaseInfo.Info().Logs)
 	}
 
 	if err != nil {
