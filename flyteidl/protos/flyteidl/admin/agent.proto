@@ -20,6 +20,7 @@ enum State {
   SUCCEEDED = 4;
 }
 
+// TaskOverrides is a set of overrides that can be applied to a task.
 message TaskOverrides {
   core.Resources resources = 1;
   core.ExtendedResources extended_resources = 2;
