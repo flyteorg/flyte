@@ -22456,6 +22456,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
+                 * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  */
     
                 /**
@@ -22507,6 +22508,14 @@
                 Resource.prototype.logLinks = $util.emptyArray;
     
                 /**
+                 * Resource phase.
+                 * @member {flyteidl.core.TaskExecution.Phase} phase
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.phase = 0;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -22539,6 +22548,8 @@
                     if (message.logLinks != null && message.logLinks.length)
                         for (var i = 0; i < message.logLinks.length; ++i)
                             $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
                     return writer;
                 };
     
@@ -22573,6 +22584,9 @@
                             if (!(message.logLinks && message.logLinks.length))
                                 message.logLinks = [];
                             message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            break;
+                        case 5:
+                            message.phase = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22621,6 +22635,20 @@
                                 return "logLinks." + error;
                         }
                     }
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        switch (message.phase) {
+                        default:
+                            return "phase: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            break;
+                        }
                     return null;
                 };
     
