@@ -117,7 +117,7 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 				dynamicPlugins,
 				tasklog.TemplateLogPlugin{
 					DisplayName: fmt.Sprintf("%s logs", logLinkType),
-					Scheme: tasklog.TemplateSchemeDynamic,
+					Scheme:      tasklog.TemplateSchemeDynamic,
 					DynamicTemplateURIs: []tasklog.DynamicTemplateURI{
 						{TemplateURI: dynamicLogLink, Kind: logLinkType}},
 					MessageFormat: core.TaskLog_JSON,
