@@ -1341,7 +1341,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 
 	if currentPhase == v1alpha1.NodePhaseTimingOut {
 		logger.Debugf(ctx, "node timing out")
-		if err := c.Abort(ctx, h, nCtx, "node timed out", true); err != nil {
+		if err := c.Abort(ctx, h, nCtx, "node timed out", false); err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
 
