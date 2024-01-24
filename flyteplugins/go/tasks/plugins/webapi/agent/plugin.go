@@ -225,12 +225,12 @@ func newAgentPlugin() webapi.PluginEntry {
 	cs, err := initializeClients(context.Background())
 	if err != nil {
 		// We should wait for all agents to be up and running before starting the server
-		panic(fmt.Sprintf("failed to initalize clients with error: %v", err))
+		panic(fmt.Sprintf("failed to initialize clients with error: %v", err))
 	}
 
 	agentRegistry, err := initializeAgentRegistry(cs)
 	if err != nil {
-		panic(fmt.Sprintf("failed to initalize agent registry with error: %v", err))
+		panic(fmt.Sprintf("failed to initialize agent registry with error: %v", err))
 	}
 
 	cfg := GetConfig()

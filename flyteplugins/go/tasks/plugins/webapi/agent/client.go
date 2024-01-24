@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/x509"
 	"fmt"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -88,6 +89,7 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]*Agent, error) {
 	agentRegistry := make(map[string]*Agent)
 	cfg := GetConfig()
 	var agentDeployments []*Agent
+	fmt.Printf("@@@ cfg.AgentForTaskTypes: [%v]\n", cfg.AgentForTaskTypes)
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {

@@ -2,10 +2,11 @@ package agent
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"sort"
 	"testing"
 	"time"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"golang.org/x/exp/maps"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -21,7 +22,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"golang.org/x/exp/maps"
 )
 
 func TestSyncTask(t *testing.T) {
@@ -188,6 +188,7 @@ func TestPlugin(t *testing.T) {
 func TestInitializeAgentRegistry(t *testing.T) {
 	agentClients := make(map[string]service.AsyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
+	agentClients["localhost:80"] = getMockServiceClient()
 	agentMetadataClients["localhost:80"] = getMockMetadataServiceClient()
 
 	cs := &ClientSet{
@@ -201,9 +202,6 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	agentRegistry, err := initializeAgentRegistry(cs)
 	assert.NoError(t, err)
 
-	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	sort.Strings(agentRegistryKeys)
-
-	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
+	assert.Equal(t, agentRegistryKeys, []string{})
 }

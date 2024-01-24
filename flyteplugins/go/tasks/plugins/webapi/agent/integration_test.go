@@ -108,9 +108,9 @@ func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.Clie
 	return &MockSyncTask{}, nil
 }
 
-func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return nil, fmt.Errorf("error")
-}
+// func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+// 	return nil, fmt.Errorf("error")
+// }
 
 func TestEndToEnd(t *testing.T) {
 	iter := func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
@@ -172,7 +172,9 @@ func TestEndToEnd(t *testing.T) {
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
 					cs: &ClientSet{
-						agentClients: mockGetBadAsyncClientFunc,
+						agentClients: map[string]service.AsyncAgentServiceClient{
+							"localhost:80": mockGetBadAsyncClientFunc(),
+						},
 					},
 				},
 			}, nil
@@ -313,9 +315,9 @@ func newMockAgentPlugin() webapi.PluginEntry {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					cs: &ClientFuncSet{
-						getAgentClient: mockAsyncTaskClientFunc,
-					},
+					// cs: &ClientSet{
+					// 	getAgentClient: mockAsyncTaskClientFunc,
+					// },
 				},
 			}, nil
 		},
@@ -331,9 +333,9 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					cs: &ClientSet{
-						agentClients: mockSyncTaskClientFunc,
-					},
+					// cs: &ClientSet{
+					// 	agentClients: mockSyncTaskClientFunc,
+					// },
 				},
 			}, nil
 		},

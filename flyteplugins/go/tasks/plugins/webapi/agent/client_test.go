@@ -2,11 +2,12 @@ package agent
 
 import (
 	"context"
+	"testing"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"testing"
 )
 
 func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
@@ -25,8 +26,9 @@ func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
 	return mockMetadataServiceClient
 }
 
-func getMockServiceClient() *agentMocks.AgentMetadataServiceClient {
-	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
+// TODO, USE CREATE, GET DELETE FUNCTION TO MOCK THE OUTPUT
+func getMockServiceClient() *agentMocks.AsyncAgentServiceClient {
+	mockServiceClient := new(agentMocks.AsyncAgentServiceClient)
 	mockRequest := &admin.ListAgentsRequest{}
 	mockResponse := &admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
@@ -37,8 +39,12 @@ func getMockServiceClient() *agentMocks.AgentMetadataServiceClient {
 		},
 	}
 
-	mockMetadataServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
-	return mockMetadataServiceClient
+	mockServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	return mockServiceClient
+}
+
+func mockGetBadAsyncClientFunc() *agentMocks.AsyncAgentServiceClient {
+	return nil
 }
 
 func TestInitializeClientFunc(t *testing.T) {
