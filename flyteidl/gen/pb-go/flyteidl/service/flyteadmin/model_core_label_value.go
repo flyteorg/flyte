@@ -9,8 +9,13 @@
 
 package flyteadmin
 
+import (
+	"time"
+)
+
 type CoreLabelValue struct {
 	StaticValue string `json:"static_value,omitempty"`
+	TimeValue time.Time `json:"time_value,omitempty"`
 	TriggeredBinding *CoreArtifactBindingData `json:"triggered_binding,omitempty"`
 	InputBinding *CoreInputBindingData `json:"input_binding,omitempty"`
 }

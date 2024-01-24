@@ -24,8 +24,8 @@ pub struct CreateArtifactRequest {
     pub spec: ::core::option::Option<ArtifactSpec>,
     #[prost(map="string, string", tag="4")]
     pub partitions: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
-    #[prost(string, tag="5")]
-    pub tag: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="5")]
+    pub time_partition_value: ::core::option::Option<::prost_types::Timestamp>,
     #[prost(message, optional, tag="6")]
     pub source: ::core::option::Option<ArtifactSource>,
 }
@@ -61,6 +61,10 @@ pub struct ArtifactSpec {
     pub user_metadata: ::core::option::Option<::prost_types::Any>,
     #[prost(string, tag="5")]
     pub metadata_type: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="6")]
+    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+    #[prost(string, tag="7")]
+    pub file_format: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -101,15 +105,17 @@ pub struct SearchArtifactsRequest {
     pub artifact_key: ::core::option::Option<super::core::ArtifactKey>,
     #[prost(message, optional, tag="2")]
     pub partitions: ::core::option::Option<super::core::Partitions>,
-    #[prost(string, tag="3")]
-    pub principal: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub time_partition_value: ::core::option::Option<::prost_types::Timestamp>,
     #[prost(string, tag="4")]
+    pub principal: ::prost::alloc::string::String,
+    #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="5")]
+    #[prost(message, optional, tag="6")]
     pub options: ::core::option::Option<SearchOptions>,
-    #[prost(string, tag="6")]
+    #[prost(string, tag="7")]
     pub token: ::prost::alloc::string::String,
-    #[prost(int32, tag="7")]
+    #[prost(int32, tag="8")]
     pub limit: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
