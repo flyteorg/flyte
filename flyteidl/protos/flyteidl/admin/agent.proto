@@ -160,8 +160,18 @@ message GetTaskLogsRequest {
   bytes resource_meta = 2;
 }
 
+message GetTaskLogsResponseHeader {
+  string token = 1;
+}
+
+message GetTaskLogsResponseBody {
+  repeated string results = 1;
+}
+
 // A response containing the logs for a task execution.
 message GetTaskLogsResponse {
-  // The execution log results.
-  string results = 1;
+  oneof part {
+    GetTaskLogsResponseHeader header = 1;
+    GetTaskLogsResponseBody body = 2;
+  }
 }
