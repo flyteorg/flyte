@@ -98,7 +98,9 @@ func (a *arrayNodeHandler) Abort(ctx context.Context, nCtx interfaces.NodeExecut
 					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 				}
 
-				eventRecorder.process(ctx, nCtx, i, retryAttempt)
+				if err := eventRecorder.process(ctx, nCtx, i, retryAttempt); err != nil {
+					logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
+				}
 			}
 		}
 	}
@@ -241,7 +243,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 				logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
 			}
 
-			eventRecorder.process(ctx, nCtx, i, 0)
+			if err := eventRecorder.process(ctx, nCtx, i, 0); err != nil {
+				logger.Warnf(ctx, "failed to record ArrayNode events: %v", err)
+			}
 		}
 
 		// transition ArrayNode to `ArrayNodePhaseExecuting`
@@ -331,7 +335,9 @@ func (a *arrayNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeExecu
 					}
 				}
 			}
-			eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts())
+			if err := eventRecorder.process(ctx, nCtx, index, subNodeStatus.GetAttempts()); err != nil {
+				return handler.UnknownTransition, err
+			}
 
 			// update subNode state
 			arrayNodeState.SubNodePhases.SetItem(index, uint64(subNodeStatus.GetPhase()))
@@ -633,7 +639,7 @@ func (a *arrayNodeHandler) buildArrayNodeContext(ctx context.Context, nCtx inter
 	// currently just mocking based on node phase -> which works for all k8s plugins
 	// we can not pre-allocated a bit array because max size is 256B and with 5k fanout node state = 1.28MB
 	pluginStateBytes := a.pluginStateBytesStarted
-	if taskPhase == int(core.PhaseUndefined) || taskPhase == int(core.PhaseRetryableFailure) {
+	if taskPhase == int(core.PhaseUndefined) || taskPhase == int(core.PhaseRetryableFailure) || taskPhase == int(core.PhaseWaitingForResources) {
 		pluginStateBytes = a.pluginStateBytesNotStarted
 	}
 

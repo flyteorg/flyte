@@ -416,7 +416,7 @@ data:
       templatePath: /etc/flyte/cluster-resource-templates
     logger:
       show-source: true
-      level: 6
+      level: 5
     propeller:
       create-flyteworkflow-crd: true
     webhook:
@@ -457,7 +457,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.6"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b2"
       k8s-array:
         logs:
           config:
@@ -796,7 +796,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RjR3Qnc0dWtGbHE3S3pnbA==
+  haSharedSecret: dWZVZnFyN055a2NqT1lTTw==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1194,7 +1194,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: e2233c2adb914be363ec4fae808ed60ffb230367503f73643f011e728b853b49
+        checksum/configuration: 98f436232001bb629ccb144b80f87538ab271997bfc494a3f51c33a99b826d70
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1336,6 +1336,7 @@ spec:
           periodSeconds: 30
         securityContext:
           privileged: true
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
 ---
 apiVersion: apps/v1
@@ -1359,7 +1360,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: d027248867ca693de77339af17e89c22e7ad604b7abe616e40ca947ad0626a83
+        checksum/secret: c07763867933245f95f13aa477630c8c337c62efee4cba504729dc8a4f9e5ce2
       labels:
         app: docker-registry
         release: flyte-sandbox

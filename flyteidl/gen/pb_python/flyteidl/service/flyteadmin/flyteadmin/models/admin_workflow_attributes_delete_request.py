@@ -36,23 +36,26 @@ class AdminWorkflowAttributesDeleteRequest(object):
         'project': 'str',
         'domain': 'str',
         'workflow': 'str',
-        'resource_type': 'AdminMatchableResource'
+        'resource_type': 'AdminMatchableResource',
+        'org': 'str'
     }
 
     attribute_map = {
         'project': 'project',
         'domain': 'domain',
         'workflow': 'workflow',
-        'resource_type': 'resource_type'
+        'resource_type': 'resource_type',
+        'org': 'org'
     }
 
-    def __init__(self, project=None, domain=None, workflow=None, resource_type=None):  # noqa: E501
+    def __init__(self, project=None, domain=None, workflow=None, resource_type=None, org=None):  # noqa: E501
         """AdminWorkflowAttributesDeleteRequest - a model defined in Swagger"""  # noqa: E501
 
         self._project = None
         self._domain = None
         self._workflow = None
         self._resource_type = None
+        self._org = None
         self.discriminator = None
 
         if project is not None:
@@ -63,6 +66,8 @@ class AdminWorkflowAttributesDeleteRequest(object):
             self.workflow = workflow
         if resource_type is not None:
             self.resource_type = resource_type
+        if org is not None:
+            self.org = org
 
     @property
     def project(self):
@@ -147,6 +152,29 @@ class AdminWorkflowAttributesDeleteRequest(object):
         """
 
         self._resource_type = resource_type
+
+    @property
+    def org(self):
+        """Gets the org of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
+
+        Optional, org key applied to the attributes.  # noqa: E501
+
+        :return: The org of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
+        :rtype: str
+        """
+        return self._org
+
+    @org.setter
+    def org(self, org):
+        """Sets the org of this AdminWorkflowAttributesDeleteRequest.
+
+        Optional, org key applied to the attributes.  # noqa: E501
+
+        :param org: The org of this AdminWorkflowAttributesDeleteRequest.  # noqa: E501
+        :type: str
+        """
+
+        self._org = org
 
     def to_dict(self):
         """Returns the model properties as a dict"""

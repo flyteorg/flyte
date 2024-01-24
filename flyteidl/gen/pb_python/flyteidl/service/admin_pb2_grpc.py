@@ -150,6 +150,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.FromString,
                 )
+        self.GetDynamicNodeWorkflow = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetDynamicNodeWorkflow',
+                request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.GetDynamicNodeWorkflowRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.DynamicNodeWorkflowResponse.FromString,
+                )
         self.ListNodeExecutions = channel.unary_unary(
                 '/flyteidl.service.AdminService/ListNodeExecutions',
                 request_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionListRequest.SerializeToString,
@@ -317,7 +322,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListTaskIds(self, request, context):
-        """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects. 
+        """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -474,6 +479,13 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def GetDynamicNodeWorkflow(self, request, context):
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def ListNodeExecutions(self, request, context):
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.
         """
@@ -503,7 +515,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def UpdateProject(self, request, context):
-        """Updates an existing :ref:`ref_flyteidl.admin.Project` 
+        """Updates an existing :ref:`ref_flyteidl.admin.Project`
         flyteidl.admin.Project should be passed but the domains property should be empty;
         it will be ignored in the handler as domains cannot be updated via this API.
         """
@@ -512,7 +524,7 @@ class AdminServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ListProjects(self, request, context):
-        """Fetches a list of :ref:`ref_flyteidl.admin.Project` 
+        """Fetches a list of :ref:`ref_flyteidl.admin.Project`
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -800,6 +812,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.GetNodeExecution,
                     request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.SerializeToString,
+            ),
+            'GetDynamicNodeWorkflow': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetDynamicNodeWorkflow,
+                    request_deserializer=flyteidl_dot_admin_dot_node__execution__pb2.GetDynamicNodeWorkflowRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_node__execution__pb2.DynamicNodeWorkflowResponse.SerializeToString,
             ),
             'ListNodeExecutions': grpc.unary_unary_rpc_method_handler(
                     servicer.ListNodeExecutions,
@@ -1363,6 +1380,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetNodeExecution',
             flyteidl_dot_admin_dot_node__execution__pb2.NodeExecutionGetRequest.SerializeToString,
             flyteidl_dot_admin_dot_node__execution__pb2.NodeExecution.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetDynamicNodeWorkflow(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetDynamicNodeWorkflow',
+            flyteidl_dot_admin_dot_node__execution__pb2.GetDynamicNodeWorkflowRequest.SerializeToString,
+            flyteidl_dot_admin_dot_node__execution__pb2.DynamicNodeWorkflowResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

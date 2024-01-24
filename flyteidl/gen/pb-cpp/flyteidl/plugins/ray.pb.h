@@ -206,6 +206,18 @@ class RayJob final :
   ::flyteidl::plugins::RayCluster* mutable_ray_cluster();
   void set_allocated_ray_cluster(::flyteidl::plugins::RayCluster* ray_cluster);
 
+  // bool shutdown_after_job_finishes = 3;
+  void clear_shutdown_after_job_finishes();
+  static const int kShutdownAfterJobFinishesFieldNumber = 3;
+  bool shutdown_after_job_finishes() const;
+  void set_shutdown_after_job_finishes(bool value);
+
+  // int32 ttl_seconds_after_finished = 4;
+  void clear_ttl_seconds_after_finished();
+  static const int kTtlSecondsAfterFinishedFieldNumber = 4;
+  ::google::protobuf::int32 ttl_seconds_after_finished() const;
+  void set_ttl_seconds_after_finished(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.RayJob)
  private:
   class HasBitSetters;
@@ -213,6 +225,8 @@ class RayJob final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr runtime_env_;
   ::flyteidl::plugins::RayCluster* ray_cluster_;
+  bool shutdown_after_job_finishes_;
+  ::google::protobuf::int32 ttl_seconds_after_finished_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fplugins_2fray_2eproto;
 };
@@ -334,6 +348,12 @@ class RayCluster final :
   ::flyteidl::plugins::HeadGroupSpec* mutable_head_group_spec();
   void set_allocated_head_group_spec(::flyteidl::plugins::HeadGroupSpec* head_group_spec);
 
+  // bool enable_autoscaling = 3;
+  void clear_enable_autoscaling();
+  static const int kEnableAutoscalingFieldNumber = 3;
+  bool enable_autoscaling() const;
+  void set_enable_autoscaling(bool value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.RayCluster)
  private:
   class HasBitSetters;
@@ -341,6 +361,7 @@ class RayCluster final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::plugins::WorkerGroupSpec > worker_group_spec_;
   ::flyteidl::plugins::HeadGroupSpec* head_group_spec_;
+  bool enable_autoscaling_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fplugins_2fray_2eproto;
 };
@@ -785,6 +806,34 @@ inline void RayJob::set_allocated_runtime_env(::std::string* runtime_env) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.plugins.RayJob.runtime_env)
 }
 
+// bool shutdown_after_job_finishes = 3;
+inline void RayJob::clear_shutdown_after_job_finishes() {
+  shutdown_after_job_finishes_ = false;
+}
+inline bool RayJob::shutdown_after_job_finishes() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.RayJob.shutdown_after_job_finishes)
+  return shutdown_after_job_finishes_;
+}
+inline void RayJob::set_shutdown_after_job_finishes(bool value) {
+  
+  shutdown_after_job_finishes_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.RayJob.shutdown_after_job_finishes)
+}
+
+// int32 ttl_seconds_after_finished = 4;
+inline void RayJob::clear_ttl_seconds_after_finished() {
+  ttl_seconds_after_finished_ = 0;
+}
+inline ::google::protobuf::int32 RayJob::ttl_seconds_after_finished() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.RayJob.ttl_seconds_after_finished)
+  return ttl_seconds_after_finished_;
+}
+inline void RayJob::set_ttl_seconds_after_finished(::google::protobuf::int32 value) {
+  
+  ttl_seconds_after_finished_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.RayJob.ttl_seconds_after_finished)
+}
+
 // -------------------------------------------------------------------
 
 // RayCluster
@@ -868,6 +917,20 @@ inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::plugins::WorkerGr
 RayCluster::worker_group_spec() const {
   // @@protoc_insertion_point(field_list:flyteidl.plugins.RayCluster.worker_group_spec)
   return worker_group_spec_;
+}
+
+// bool enable_autoscaling = 3;
+inline void RayCluster::clear_enable_autoscaling() {
+  enable_autoscaling_ = false;
+}
+inline bool RayCluster::enable_autoscaling() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.RayCluster.enable_autoscaling)
+  return enable_autoscaling_;
+}
+inline void RayCluster::set_enable_autoscaling(bool value) {
+  
+  enable_autoscaling_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.RayCluster.enable_autoscaling)
 }
 
 // -------------------------------------------------------------------

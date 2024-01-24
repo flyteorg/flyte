@@ -10142,6 +10142,31 @@ public final class LaunchPlanOuterClass {
      */
     flyteidl.admin.Common.NotificationOrBuilder getNotificationsOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * Additional metadata for how to launch the launch plan
+     * </pre>
+     *
+     * <code>.google.protobuf.Any launch_conditions = 3;</code>
+     */
+    boolean hasLaunchConditions();
+    /**
+     * <pre>
+     * Additional metadata for how to launch the launch plan
+     * </pre>
+     *
+     * <code>.google.protobuf.Any launch_conditions = 3;</code>
+     */
+    com.google.protobuf.Any getLaunchConditions();
+    /**
+     * <pre>
+     * Additional metadata for how to launch the launch plan
+     * </pre>
+     *
+     * <code>.google.protobuf.Any launch_conditions = 3;</code>
+     */
+    com.google.protobuf.AnyOrBuilder getLaunchConditionsOrBuilder();
   }
   /**
    * <pre>
@@ -10208,6 +10233,19 @@ public final class LaunchPlanOuterClass {
               }
               notifications_.add(
                   input.readMessage(flyteidl.admin.Common.Notification.parser(), extensionRegistry));
+              break;
+            }
+            case 26: {
+              com.google.protobuf.Any.Builder subBuilder = null;
+              if (launchConditions_ != null) {
+                subBuilder = launchConditions_.toBuilder();
+              }
+              launchConditions_ = input.readMessage(com.google.protobuf.Any.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(launchConditions_);
+                launchConditions_ = subBuilder.buildPartial();
+              }
+
               break;
             }
             default: {
@@ -10334,6 +10372,39 @@ public final class LaunchPlanOuterClass {
       return notifications_.get(index);
     }
 
+    public static final int LAUNCH_CONDITIONS_FIELD_NUMBER = 3;
+    private com.google.protobuf.Any launchConditions_;
+    /**
+     * <pre>
+     * Additional metadata for how to launch the launch plan
+     * </pre>
+     *
+     * <code>.google.protobuf.Any launch_conditions = 3;</code>
+     */
+    public boolean hasLaunchConditions() {
+      return launchConditions_ != null;
+    }
+    /**
+     * <pre>
+     * Additional metadata for how to launch the launch plan
+     * </pre>
+     *
+     * <code>.google.protobuf.Any launch_conditions = 3;</code>
+     */
+    public com.google.protobuf.Any getLaunchConditions() {
+      return launchConditions_ == null ? com.google.protobuf.Any.getDefaultInstance() : launchConditions_;
+    }
+    /**
+     * <pre>
+     * Additional metadata for how to launch the launch plan
+     * </pre>
+     *
+     * <code>.google.protobuf.Any launch_conditions = 3;</code>
+     */
+    public com.google.protobuf.AnyOrBuilder getLaunchConditionsOrBuilder() {
+      return getLaunchConditions();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10354,6 +10425,9 @@ public final class LaunchPlanOuterClass {
       for (int i = 0; i < notifications_.size(); i++) {
         output.writeMessage(2, notifications_.get(i));
       }
+      if (launchConditions_ != null) {
+        output.writeMessage(3, getLaunchConditions());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10370,6 +10444,10 @@ public final class LaunchPlanOuterClass {
       for (int i = 0; i < notifications_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(2, notifications_.get(i));
+      }
+      if (launchConditions_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(3, getLaunchConditions());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10393,6 +10471,11 @@ public final class LaunchPlanOuterClass {
       }
       if (!getNotificationsList()
           .equals(other.getNotificationsList())) return false;
+      if (hasLaunchConditions() != other.hasLaunchConditions()) return false;
+      if (hasLaunchConditions()) {
+        if (!getLaunchConditions()
+            .equals(other.getLaunchConditions())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10411,6 +10494,10 @@ public final class LaunchPlanOuterClass {
       if (getNotificationsCount() > 0) {
         hash = (37 * hash) + NOTIFICATIONS_FIELD_NUMBER;
         hash = (53 * hash) + getNotificationsList().hashCode();
+      }
+      if (hasLaunchConditions()) {
+        hash = (37 * hash) + LAUNCH_CONDITIONS_FIELD_NUMBER;
+        hash = (53 * hash) + getLaunchConditions().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -10563,6 +10650,12 @@ public final class LaunchPlanOuterClass {
         } else {
           notificationsBuilder_.clear();
         }
+        if (launchConditionsBuilder_ == null) {
+          launchConditions_ = null;
+        } else {
+          launchConditions_ = null;
+          launchConditionsBuilder_ = null;
+        }
         return this;
       }
 
@@ -10604,6 +10697,11 @@ public final class LaunchPlanOuterClass {
           result.notifications_ = notifications_;
         } else {
           result.notifications_ = notificationsBuilder_.build();
+        }
+        if (launchConditionsBuilder_ == null) {
+          result.launchConditions_ = launchConditions_;
+        } else {
+          result.launchConditions_ = launchConditionsBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -10682,6 +10780,9 @@ public final class LaunchPlanOuterClass {
               notificationsBuilder_.addAllMessages(other.notifications_);
             }
           }
+        }
+        if (other.hasLaunchConditions()) {
+          mergeLaunchConditions(other.getLaunchConditions());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -11176,6 +11277,159 @@ public final class LaunchPlanOuterClass {
           notifications_ = null;
         }
         return notificationsBuilder_;
+      }
+
+      private com.google.protobuf.Any launchConditions_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder> launchConditionsBuilder_;
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public boolean hasLaunchConditions() {
+        return launchConditionsBuilder_ != null || launchConditions_ != null;
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public com.google.protobuf.Any getLaunchConditions() {
+        if (launchConditionsBuilder_ == null) {
+          return launchConditions_ == null ? com.google.protobuf.Any.getDefaultInstance() : launchConditions_;
+        } else {
+          return launchConditionsBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public Builder setLaunchConditions(com.google.protobuf.Any value) {
+        if (launchConditionsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          launchConditions_ = value;
+          onChanged();
+        } else {
+          launchConditionsBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public Builder setLaunchConditions(
+          com.google.protobuf.Any.Builder builderForValue) {
+        if (launchConditionsBuilder_ == null) {
+          launchConditions_ = builderForValue.build();
+          onChanged();
+        } else {
+          launchConditionsBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public Builder mergeLaunchConditions(com.google.protobuf.Any value) {
+        if (launchConditionsBuilder_ == null) {
+          if (launchConditions_ != null) {
+            launchConditions_ =
+              com.google.protobuf.Any.newBuilder(launchConditions_).mergeFrom(value).buildPartial();
+          } else {
+            launchConditions_ = value;
+          }
+          onChanged();
+        } else {
+          launchConditionsBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public Builder clearLaunchConditions() {
+        if (launchConditionsBuilder_ == null) {
+          launchConditions_ = null;
+          onChanged();
+        } else {
+          launchConditions_ = null;
+          launchConditionsBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public com.google.protobuf.Any.Builder getLaunchConditionsBuilder() {
+        
+        onChanged();
+        return getLaunchConditionsFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      public com.google.protobuf.AnyOrBuilder getLaunchConditionsOrBuilder() {
+        if (launchConditionsBuilder_ != null) {
+          return launchConditionsBuilder_.getMessageOrBuilder();
+        } else {
+          return launchConditions_ == null ?
+              com.google.protobuf.Any.getDefaultInstance() : launchConditions_;
+        }
+      }
+      /**
+       * <pre>
+       * Additional metadata for how to launch the launch plan
+       * </pre>
+       *
+       * <code>.google.protobuf.Any launch_conditions = 3;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder> 
+          getLaunchConditionsFieldBuilder() {
+        if (launchConditionsBuilder_ == null) {
+          launchConditionsBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Any, com.google.protobuf.Any.Builder, com.google.protobuf.AnyOrBuilder>(
+                  getLaunchConditions(),
+                  getParentForChildren(),
+                  isClean());
+          launchConditions_ = null;
+        }
+        return launchConditionsBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -13258,10 +13512,28 @@ public final class LaunchPlanOuterClass {
      * <code>.flyteidl.admin.Sort sort_by = 5;</code>
      */
     flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
-   * Represents a request structure to list active launch plans within a project/domain.
+   * Represents a request structure to list active launch plans within a project/domain and optional org.
    * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
    * </pre>
    *
@@ -13280,6 +13552,7 @@ public final class LaunchPlanOuterClass {
       project_ = "";
       domain_ = "";
       token_ = "";
+      org_ = "";
     }
 
     @java.lang.Override
@@ -13340,6 +13613,12 @@ public final class LaunchPlanOuterClass {
                 sortBy_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -13558,6 +13837,48 @@ public final class LaunchPlanOuterClass {
       return getSortBy();
     }
 
+    public static final int ORG_FIELD_NUMBER = 6;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13587,6 +13908,9 @@ public final class LaunchPlanOuterClass {
       if (sortBy_ != null) {
         output.writeMessage(5, getSortBy());
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13612,6 +13936,9 @@ public final class LaunchPlanOuterClass {
       if (sortBy_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, getSortBy());
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -13641,6 +13968,8 @@ public final class LaunchPlanOuterClass {
         if (!getSortBy()
             .equals(other.getSortBy())) return false;
       }
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -13664,6 +13993,8 @@ public final class LaunchPlanOuterClass {
         hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
         hash = (53 * hash) + getSortBy().hashCode();
       }
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -13761,7 +14092,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Represents a request structure to list active launch plans within a project/domain.
+     * Represents a request structure to list active launch plans within a project/domain and optional org.
      * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
      * </pre>
      *
@@ -13816,6 +14147,8 @@ public final class LaunchPlanOuterClass {
           sortBy_ = null;
           sortByBuilder_ = null;
         }
+        org_ = "";
+
         return this;
       }
 
@@ -13851,6 +14184,7 @@ public final class LaunchPlanOuterClass {
         } else {
           result.sortBy_ = sortByBuilder_.build();
         }
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -13916,6 +14250,10 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasSortBy()) {
           mergeSortBy(other.getSortBy());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -14435,6 +14773,95 @@ public final class LaunchPlanOuterClass {
         }
         return sortByBuilder_;
       }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -14563,60 +14990,63 @@ public final class LaunchPlanOuterClass {
       "l/core/identifier.proto\032\035flyteidl/core/i" +
       "nterface.proto\032\034flyteidl/core/security.p" +
       "roto\032\035flyteidl/admin/schedule.proto\032\033fly" +
-      "teidl/admin/common.proto\032\037google/protobu" +
-      "f/timestamp.proto\032\036google/protobuf/wrapp" +
-      "ers.proto\"n\n\027LaunchPlanCreateRequest\022%\n\002" +
-      "id\030\001 \001(\0132\031.flyteidl.core.Identifier\022,\n\004s" +
-      "pec\030\002 \001(\0132\036.flyteidl.admin.LaunchPlanSpe" +
-      "c\"\032\n\030LaunchPlanCreateResponse\"\225\001\n\nLaunch" +
-      "Plan\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
-      "ier\022,\n\004spec\030\002 \001(\0132\036.flyteidl.admin.Launc" +
-      "hPlanSpec\0222\n\007closure\030\003 \001(\0132!.flyteidl.ad" +
-      "min.LaunchPlanClosure\"Q\n\016LaunchPlanList\022" +
-      "0\n\014launch_plans\030\001 \003(\0132\032.flyteidl.admin.L" +
-      "aunchPlan\022\r\n\005token\030\002 \001(\t\"J\n\004Auth\022\032\n\022assu" +
-      "mable_iam_role\030\001 \001(\t\022\"\n\032kubernetes_servi" +
-      "ce_account\030\002 \001(\t:\002\030\001\"\355\005\n\016LaunchPlanSpec\022" +
-      ".\n\013workflow_id\030\001 \001(\0132\031.flyteidl.core.Ide" +
-      "ntifier\022;\n\017entity_metadata\030\002 \001(\0132\".flyte" +
-      "idl.admin.LaunchPlanMetadata\0223\n\016default_" +
-      "inputs\030\003 \001(\0132\033.flyteidl.core.ParameterMa" +
-      "p\022/\n\014fixed_inputs\030\004 \001(\0132\031.flyteidl.core." +
-      "LiteralMap\022\020\n\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006" +
-      " \001(\0132\026.flyteidl.admin.Labels\0220\n\013annotati" +
-      "ons\030\007 \001(\0132\033.flyteidl.admin.Annotations\022&" +
-      "\n\004auth\030\010 \001(\0132\024.flyteidl.admin.AuthB\002\030\001\022/" +
-      "\n\tauth_role\030\t \001(\0132\030.flyteidl.admin.AuthR" +
-      "oleB\002\030\001\0228\n\020security_context\030\n \001(\0132\036.flyt" +
-      "eidl.core.SecurityContext\022;\n\022quality_of_" +
-      "service\030\020 \001(\0132\037.flyteidl.core.QualityOfS" +
-      "ervice\022C\n\026raw_output_data_config\030\021 \001(\0132#" +
-      ".flyteidl.admin.RawOutputDataConfig\022\027\n\017m" +
-      "ax_parallelism\030\022 \001(\005\0221\n\rinterruptible\030\023 " +
-      "\001(\0132\032.google.protobuf.BoolValue\022\027\n\017overw" +
-      "rite_cache\030\024 \001(\010\022\"\n\004envs\030\025 \001(\0132\024.flyteid" +
-      "l.admin.Envs\"\217\002\n\021LaunchPlanClosure\022.\n\005st" +
-      "ate\030\001 \001(\0162\037.flyteidl.admin.LaunchPlanSta" +
-      "te\0224\n\017expected_inputs\030\002 \001(\0132\033.flyteidl.c" +
-      "ore.ParameterMap\0224\n\020expected_outputs\030\003 \001" +
-      "(\0132\032.flyteidl.core.VariableMap\022.\n\ncreate" +
-      "d_at\030\004 \001(\0132\032.google.protobuf.Timestamp\022." +
-      "\n\nupdated_at\030\005 \001(\0132\032.google.protobuf.Tim" +
-      "estamp\"u\n\022LaunchPlanMetadata\022*\n\010schedule" +
-      "\030\001 \001(\0132\030.flyteidl.admin.Schedule\0223\n\rnoti" +
-      "fications\030\002 \003(\0132\034.flyteidl.admin.Notific" +
-      "ation\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001" +
-      " \001(\0132\031.flyteidl.core.Identifier\022.\n\005state" +
-      "\030\002 \001(\0162\037.flyteidl.admin.LaunchPlanState\"" +
-      "\032\n\030LaunchPlanUpdateResponse\"L\n\027ActiveLau" +
-      "nchPlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.ad" +
-      "min.NamedEntityIdentifier\"\203\001\n\033ActiveLaun" +
-      "chPlanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006do" +
-      "main\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t" +
-      "\022%\n\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*" +
-      "+\n\017LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTI" +
-      "VE\020\001B=Z;github.com/flyteorg/flyte/flytei" +
-      "dl/gen/pb-go/flyteidl/adminb\006proto3"
+      "teidl/admin/common.proto\032\031google/protobu" +
+      "f/any.proto\032\037google/protobuf/timestamp.p" +
+      "roto\032\036google/protobuf/wrappers.proto\"n\n\027" +
+      "LaunchPlanCreateRequest\022%\n\002id\030\001 \001(\0132\031.fl" +
+      "yteidl.core.Identifier\022,\n\004spec\030\002 \001(\0132\036.f" +
+      "lyteidl.admin.LaunchPlanSpec\"\032\n\030LaunchPl" +
+      "anCreateResponse\"\225\001\n\nLaunchPlan\022%\n\002id\030\001 " +
+      "\001(\0132\031.flyteidl.core.Identifier\022,\n\004spec\030\002" +
+      " \001(\0132\036.flyteidl.admin.LaunchPlanSpec\0222\n\007" +
+      "closure\030\003 \001(\0132!.flyteidl.admin.LaunchPla" +
+      "nClosure\"Q\n\016LaunchPlanList\0220\n\014launch_pla" +
+      "ns\030\001 \003(\0132\032.flyteidl.admin.LaunchPlan\022\r\n\005" +
+      "token\030\002 \001(\t\"J\n\004Auth\022\032\n\022assumable_iam_rol" +
+      "e\030\001 \001(\t\022\"\n\032kubernetes_service_account\030\002 " +
+      "\001(\t:\002\030\001\"\355\005\n\016LaunchPlanSpec\022.\n\013workflow_i" +
+      "d\030\001 \001(\0132\031.flyteidl.core.Identifier\022;\n\017en" +
+      "tity_metadata\030\002 \001(\0132\".flyteidl.admin.Lau" +
+      "nchPlanMetadata\0223\n\016default_inputs\030\003 \001(\0132" +
+      "\033.flyteidl.core.ParameterMap\022/\n\014fixed_in" +
+      "puts\030\004 \001(\0132\031.flyteidl.core.LiteralMap\022\020\n" +
+      "\004role\030\005 \001(\tB\002\030\001\022&\n\006labels\030\006 \001(\0132\026.flytei" +
+      "dl.admin.Labels\0220\n\013annotations\030\007 \001(\0132\033.f" +
+      "lyteidl.admin.Annotations\022&\n\004auth\030\010 \001(\0132" +
+      "\024.flyteidl.admin.AuthB\002\030\001\022/\n\tauth_role\030\t" +
+      " \001(\0132\030.flyteidl.admin.AuthRoleB\002\030\001\0228\n\020se" +
+      "curity_context\030\n \001(\0132\036.flyteidl.core.Sec" +
+      "urityContext\022;\n\022quality_of_service\030\020 \001(\013" +
+      "2\037.flyteidl.core.QualityOfService\022C\n\026raw" +
+      "_output_data_config\030\021 \001(\0132#.flyteidl.adm" +
+      "in.RawOutputDataConfig\022\027\n\017max_parallelis" +
+      "m\030\022 \001(\005\0221\n\rinterruptible\030\023 \001(\0132\032.google." +
+      "protobuf.BoolValue\022\027\n\017overwrite_cache\030\024 " +
+      "\001(\010\022\"\n\004envs\030\025 \001(\0132\024.flyteidl.admin.Envs\"" +
+      "\217\002\n\021LaunchPlanClosure\022.\n\005state\030\001 \001(\0162\037.f" +
+      "lyteidl.admin.LaunchPlanState\0224\n\017expecte" +
+      "d_inputs\030\002 \001(\0132\033.flyteidl.core.Parameter" +
+      "Map\0224\n\020expected_outputs\030\003 \001(\0132\032.flyteidl" +
+      ".core.VariableMap\022.\n\ncreated_at\030\004 \001(\0132\032." +
+      "google.protobuf.Timestamp\022.\n\nupdated_at\030" +
+      "\005 \001(\0132\032.google.protobuf.Timestamp\"\246\001\n\022La" +
+      "unchPlanMetadata\022*\n\010schedule\030\001 \001(\0132\030.fly" +
+      "teidl.admin.Schedule\0223\n\rnotifications\030\002 " +
+      "\003(\0132\034.flyteidl.admin.Notification\022/\n\021lau" +
+      "nch_conditions\030\003 \001(\0132\024.google.protobuf.A" +
+      "ny\"p\n\027LaunchPlanUpdateRequest\022%\n\002id\030\001 \001(" +
+      "\0132\031.flyteidl.core.Identifier\022.\n\005state\030\002 " +
+      "\001(\0162\037.flyteidl.admin.LaunchPlanState\"\032\n\030" +
+      "LaunchPlanUpdateResponse\"L\n\027ActiveLaunch" +
+      "PlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.admin" +
+      ".NamedEntityIdentifier\"\220\001\n\033ActiveLaunchP" +
+      "lanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domai" +
+      "n\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n" +
+      "\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort\022\013\n\003" +
+      "org\030\006 \001(\t*+\n\017LaunchPlanState\022\014\n\010INACTIVE" +
+      "\020\000\022\n\n\006ACTIVE\020\001B=Z;github.com/flyteorg/fl" +
+      "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14636,6 +15066,7 @@ public final class LaunchPlanOuterClass {
           flyteidl.core.Security.getDescriptor(),
           flyteidl.admin.ScheduleOuterClass.getDescriptor(),
           flyteidl.admin.Common.getDescriptor(),
+          com.google.protobuf.AnyProto.getDescriptor(),
           com.google.protobuf.TimestampProto.getDescriptor(),
           com.google.protobuf.WrappersProto.getDescriptor(),
         }, assigner);
@@ -14686,7 +15117,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_LaunchPlanMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_LaunchPlanMetadata_descriptor,
-        new java.lang.String[] { "Schedule", "Notifications", });
+        new java.lang.String[] { "Schedule", "Notifications", "LaunchConditions", });
     internal_static_flyteidl_admin_LaunchPlanUpdateRequest_descriptor =
       getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_admin_LaunchPlanUpdateRequest_fieldAccessorTable = new
@@ -14710,7 +15141,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", });
+        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", "Org", });
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
@@ -14718,6 +15149,7 @@ public final class LaunchPlanOuterClass {
     flyteidl.core.Security.getDescriptor();
     flyteidl.admin.ScheduleOuterClass.getDescriptor();
     flyteidl.admin.Common.getDescriptor();
+    com.google.protobuf.AnyProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
     com.google.protobuf.WrappersProto.getDescriptor();
   }

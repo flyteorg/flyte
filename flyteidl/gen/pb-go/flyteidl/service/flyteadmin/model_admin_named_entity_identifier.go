@@ -15,5 +15,7 @@ type AdminNamedEntityIdentifier struct {
 	Project string `json:"project,omitempty"`
 	// Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
 	Domain string `json:"domain,omitempty"`
-	Name string `json:"name,omitempty"`
+	Name   string `json:"name,omitempty"`
+	// Optional, org key applied to the resource.
+	Org string `json:"org,omitempty"`
 }

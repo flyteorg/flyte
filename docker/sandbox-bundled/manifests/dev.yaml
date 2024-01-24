@@ -499,7 +499,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: RWxBOE5BV0lIeEJ2d1c3ZA==
+  haSharedSecret: cDQ2bUZZQkg4bjg2Y2hGRQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -910,6 +910,7 @@ spec:
           periodSeconds: 30
         securityContext:
           privileged: true
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
 ---
 apiVersion: apps/v1
@@ -933,7 +934,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: a2181c7387731100215f7ae94400f7330557b063f01f807d5aa2f333f266126e
+        checksum/secret: e65c1b8ed75e538fd09b9d94538d1a99a986534b18625406a2bc9cce8aeffe1a
       labels:
         app: docker-registry
         release: flyte-sandbox

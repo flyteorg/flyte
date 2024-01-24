@@ -593,6 +593,54 @@ func (_m *AdminServiceClient) GetDescriptionEntity(ctx context.Context, in *admi
 	return r0, r1
 }
 
+type AdminServiceClient_GetDynamicNodeWorkflow struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetDynamicNodeWorkflow) Return(_a0 *admin.DynamicNodeWorkflowResponse, _a1 error) *AdminServiceClient_GetDynamicNodeWorkflow {
+	return &AdminServiceClient_GetDynamicNodeWorkflow{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetDynamicNodeWorkflow(ctx context.Context, in *admin.GetDynamicNodeWorkflowRequest, opts ...grpc.CallOption) *AdminServiceClient_GetDynamicNodeWorkflow {
+	c_call := _m.On("GetDynamicNodeWorkflow", ctx, in, opts)
+	return &AdminServiceClient_GetDynamicNodeWorkflow{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetDynamicNodeWorkflowMatch(matchers ...interface{}) *AdminServiceClient_GetDynamicNodeWorkflow {
+	c_call := _m.On("GetDynamicNodeWorkflow", matchers...)
+	return &AdminServiceClient_GetDynamicNodeWorkflow{Call: c_call}
+}
+
+// GetDynamicNodeWorkflow provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetDynamicNodeWorkflow(ctx context.Context, in *admin.GetDynamicNodeWorkflowRequest, opts ...grpc.CallOption) (*admin.DynamicNodeWorkflowResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.DynamicNodeWorkflowResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetDynamicNodeWorkflowRequest, ...grpc.CallOption) *admin.DynamicNodeWorkflowResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.DynamicNodeWorkflowResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetDynamicNodeWorkflowRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetExecution struct {
 	*mock.Call
 }
