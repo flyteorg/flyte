@@ -87,7 +87,8 @@ pub struct GetTaskResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Resource {
-    /// The state of the execution is used to control its visibility in the UI/CLI.
+    /// DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
+    #[deprecated]
     #[prost(enumeration="State", tag="1")]
     pub state: i32,
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -101,6 +102,9 @@ pub struct Resource {
     /// log information for the task execution.
     #[prost(message, repeated, tag="4")]
     pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    /// The phase of the execution is used to determine the phase of the plugin's execution.
+    #[prost(enumeration="super::core::task_execution::Phase", tag="5")]
+    pub phase: i32,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1945,6 +1949,9 @@ pub struct ListMatchableAttributesRequest {
     /// +required
     #[prost(enumeration="MatchableResource", tag="1")]
     pub resource_type: i32,
+    /// Optional, org filter applied to list project requests.
+    #[prost(string, tag="2")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Response for a request for all matching resource attributes for a resource type.
 /// See :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for more details
@@ -2273,6 +2280,18 @@ pub struct NodeExecutionGetDataResponse {
     #[prost(message, optional, tag="17")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDynamicNodeWorkflowRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DynamicNodeWorkflowResponse {
+    #[prost(message, optional, tag="1")]
+    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
+}
 /// Represents the Email object that is sent to a publisher/subscriber
 /// to forward the notification.
 /// Note: This is internal to Admin and doesn't need to be exposed to other components.
@@ -2404,6 +2423,9 @@ pub struct ProjectListRequest {
     /// +optional
     #[prost(message, optional, tag="4")]
     pub sort_by: ::core::option::Option<Sort>,
+    /// Optional, org filter applied to list project requests.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Adds a new user-project within the Flyte deployment.
 /// See :ref:`ref_flyteidl.admin.Project` for more details

@@ -12,16 +12,15 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"golang.org/x/sync/errgroup"
-	"k8s.io/client-go/rest"
 	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/metrics"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
@@ -144,22 +143,8 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 			SyncPeriod:        &cfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache: func(config *rest.Config, options cache.Options) (cache.Cache, error) {
-			k8sCache, err := cache.New(config, options)
-			if err != nil {
-				return k8sCache, err
-			}
-
-			return otelutils.WrapK8sCache(k8sCache), nil
-		},
-		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			k8sClient, err := client.New(config, options)
-			if err != nil {
-				return k8sClient, err
-			}
-
-			return otelutils.WrapK8sClient(k8sClient), nil
-		},
+		NewCache:  executors.NewCache,
+		NewClient: executors.BuildNewClientFunc(propellerScope),
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",

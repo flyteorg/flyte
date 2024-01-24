@@ -22631,6 +22631,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
+                 * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  */
     
                 /**
@@ -22682,6 +22683,14 @@
                 Resource.prototype.logLinks = $util.emptyArray;
     
                 /**
+                 * Resource phase.
+                 * @member {flyteidl.core.TaskExecution.Phase} phase
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.phase = 0;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -22714,6 +22723,8 @@
                     if (message.logLinks != null && message.logLinks.length)
                         for (var i = 0; i < message.logLinks.length; ++i)
                             $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
                     return writer;
                 };
     
@@ -22748,6 +22759,9 @@
                             if (!(message.logLinks && message.logLinks.length))
                                 message.logLinks = [];
                             message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            break;
+                        case 5:
+                            message.phase = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -22796,6 +22810,20 @@
                                 return "logLinks." + error;
                         }
                     }
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        switch (message.phase) {
+                        default:
+                            return "phase: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            break;
+                        }
                     return null;
                 };
     
@@ -37598,6 +37626,7 @@
                  * @memberof flyteidl.admin
                  * @interface IListMatchableAttributesRequest
                  * @property {flyteidl.admin.MatchableResource|null} [resourceType] ListMatchableAttributesRequest resourceType
+                 * @property {string|null} [org] ListMatchableAttributesRequest org
                  */
     
                 /**
@@ -37622,6 +37651,14 @@
                  * @instance
                  */
                 ListMatchableAttributesRequest.prototype.resourceType = 0;
+    
+                /**
+                 * ListMatchableAttributesRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ListMatchableAttributesRequest
+                 * @instance
+                 */
+                ListMatchableAttributesRequest.prototype.org = "";
     
                 /**
                  * Creates a new ListMatchableAttributesRequest instance using the specified properties.
@@ -37649,6 +37686,8 @@
                         writer = $Writer.create();
                     if (message.resourceType != null && message.hasOwnProperty("resourceType"))
                         writer.uint32(/* id 1, wireType 0 =*/8).int32(message.resourceType);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.org);
                     return writer;
                 };
     
@@ -37672,6 +37711,9 @@
                         switch (tag >>> 3) {
                         case 1:
                             message.resourceType = reader.int32();
+                            break;
+                        case 2:
+                            message.org = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -37706,6 +37748,9 @@
                         case 7:
                             break;
                         }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
                     return null;
                 };
     
@@ -39916,6 +39961,230 @@
                 return NodeExecutionGetDataResponse;
             })();
     
+            admin.GetDynamicNodeWorkflowRequest = (function() {
+    
+                /**
+                 * Properties of a GetDynamicNodeWorkflowRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IGetDynamicNodeWorkflowRequest
+                 * @property {flyteidl.core.INodeExecutionIdentifier|null} [id] GetDynamicNodeWorkflowRequest id
+                 */
+    
+                /**
+                 * Constructs a new GetDynamicNodeWorkflowRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a GetDynamicNodeWorkflowRequest.
+                 * @implements IGetDynamicNodeWorkflowRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest=} [properties] Properties to set
+                 */
+                function GetDynamicNodeWorkflowRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * GetDynamicNodeWorkflowRequest id.
+                 * @member {flyteidl.core.INodeExecutionIdentifier|null|undefined} id
+                 * @memberof flyteidl.admin.GetDynamicNodeWorkflowRequest
+                 * @instance
+                 */
+                GetDynamicNodeWorkflowRequest.prototype.id = null;
+    
+                /**
+                 * Creates a new GetDynamicNodeWorkflowRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.GetDynamicNodeWorkflowRequest
+                 * @static
+                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.GetDynamicNodeWorkflowRequest} GetDynamicNodeWorkflowRequest instance
+                 */
+                GetDynamicNodeWorkflowRequest.create = function create(properties) {
+                    return new GetDynamicNodeWorkflowRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified GetDynamicNodeWorkflowRequest message. Does not implicitly {@link flyteidl.admin.GetDynamicNodeWorkflowRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.GetDynamicNodeWorkflowRequest
+                 * @static
+                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest} message GetDynamicNodeWorkflowRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                GetDynamicNodeWorkflowRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.id != null && message.hasOwnProperty("id"))
+                        $root.flyteidl.core.NodeExecutionIdentifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a GetDynamicNodeWorkflowRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.GetDynamicNodeWorkflowRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.GetDynamicNodeWorkflowRequest} GetDynamicNodeWorkflowRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                GetDynamicNodeWorkflowRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.GetDynamicNodeWorkflowRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.id = $root.flyteidl.core.NodeExecutionIdentifier.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a GetDynamicNodeWorkflowRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.GetDynamicNodeWorkflowRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                GetDynamicNodeWorkflowRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.id != null && message.hasOwnProperty("id")) {
+                        var error = $root.flyteidl.core.NodeExecutionIdentifier.verify(message.id);
+                        if (error)
+                            return "id." + error;
+                    }
+                    return null;
+                };
+    
+                return GetDynamicNodeWorkflowRequest;
+            })();
+    
+            admin.DynamicNodeWorkflowResponse = (function() {
+    
+                /**
+                 * Properties of a DynamicNodeWorkflowResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IDynamicNodeWorkflowResponse
+                 * @property {flyteidl.core.ICompiledWorkflowClosure|null} [compiledWorkflow] DynamicNodeWorkflowResponse compiledWorkflow
+                 */
+    
+                /**
+                 * Constructs a new DynamicNodeWorkflowResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a DynamicNodeWorkflowResponse.
+                 * @implements IDynamicNodeWorkflowResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IDynamicNodeWorkflowResponse=} [properties] Properties to set
+                 */
+                function DynamicNodeWorkflowResponse(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * DynamicNodeWorkflowResponse compiledWorkflow.
+                 * @member {flyteidl.core.ICompiledWorkflowClosure|null|undefined} compiledWorkflow
+                 * @memberof flyteidl.admin.DynamicNodeWorkflowResponse
+                 * @instance
+                 */
+                DynamicNodeWorkflowResponse.prototype.compiledWorkflow = null;
+    
+                /**
+                 * Creates a new DynamicNodeWorkflowResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.DynamicNodeWorkflowResponse
+                 * @static
+                 * @param {flyteidl.admin.IDynamicNodeWorkflowResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.DynamicNodeWorkflowResponse} DynamicNodeWorkflowResponse instance
+                 */
+                DynamicNodeWorkflowResponse.create = function create(properties) {
+                    return new DynamicNodeWorkflowResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified DynamicNodeWorkflowResponse message. Does not implicitly {@link flyteidl.admin.DynamicNodeWorkflowResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.DynamicNodeWorkflowResponse
+                 * @static
+                 * @param {flyteidl.admin.IDynamicNodeWorkflowResponse} message DynamicNodeWorkflowResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                DynamicNodeWorkflowResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow"))
+                        $root.flyteidl.core.CompiledWorkflowClosure.encode(message.compiledWorkflow, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a DynamicNodeWorkflowResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.DynamicNodeWorkflowResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.DynamicNodeWorkflowResponse} DynamicNodeWorkflowResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                DynamicNodeWorkflowResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.DynamicNodeWorkflowResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.compiledWorkflow = $root.flyteidl.core.CompiledWorkflowClosure.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a DynamicNodeWorkflowResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.DynamicNodeWorkflowResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                DynamicNodeWorkflowResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.compiledWorkflow != null && message.hasOwnProperty("compiledWorkflow")) {
+                        var error = $root.flyteidl.core.CompiledWorkflowClosure.verify(message.compiledWorkflow);
+                        if (error)
+                            return "compiledWorkflow." + error;
+                    }
+                    return null;
+                };
+    
+                return DynamicNodeWorkflowResponse;
+            })();
+    
             admin.EmailMessage = (function() {
     
                 /**
@@ -40605,6 +40874,7 @@
                  * @property {string|null} [token] ProjectListRequest token
                  * @property {string|null} [filters] ProjectListRequest filters
                  * @property {flyteidl.admin.ISort|null} [sortBy] ProjectListRequest sortBy
+                 * @property {string|null} [org] ProjectListRequest org
                  */
     
                 /**
@@ -40655,6 +40925,14 @@
                 ProjectListRequest.prototype.sortBy = null;
     
                 /**
+                 * ProjectListRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ProjectListRequest
+                 * @instance
+                 */
+                ProjectListRequest.prototype.org = "";
+    
+                /**
                  * Creates a new ProjectListRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.ProjectListRequest
@@ -40686,6 +40964,8 @@
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.filters);
                     if (message.sortBy != null && message.hasOwnProperty("sortBy"))
                         $root.flyteidl.admin.Sort.encode(message.sortBy, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.org);
                     return writer;
                 };
     
@@ -40718,6 +40998,9 @@
                             break;
                         case 4:
                             message.sortBy = $root.flyteidl.admin.Sort.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.org = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -40752,6 +41035,9 @@
                         if (error)
                             return "sortBy." + error;
                     }
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
                     return null;
                 };
     
@@ -49207,6 +49493,39 @@
                  * @instance
                  * @param {flyteidl.admin.INodeExecutionGetRequest} request NodeExecutionGetRequest message or plain object
                  * @returns {Promise<flyteidl.admin.NodeExecution>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getDynamicNodeWorkflow}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetDynamicNodeWorkflowCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.DynamicNodeWorkflowResponse} [response] DynamicNodeWorkflowResponse
+                 */
+    
+                /**
+                 * Calls GetDynamicNodeWorkflow.
+                 * @function getDynamicNodeWorkflow
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest} request GetDynamicNodeWorkflowRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetDynamicNodeWorkflowCallback} callback Node-style callback called with the error, if any, and DynamicNodeWorkflowResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getDynamicNodeWorkflow = function getDynamicNodeWorkflow(request, callback) {
+                    return this.rpcCall(getDynamicNodeWorkflow, $root.flyteidl.admin.GetDynamicNodeWorkflowRequest, $root.flyteidl.admin.DynamicNodeWorkflowResponse, request, callback);
+                }, "name", { value: "GetDynamicNodeWorkflow" });
+    
+                /**
+                 * Calls GetDynamicNodeWorkflow.
+                 * @function getDynamicNodeWorkflow
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest} request GetDynamicNodeWorkflowRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.DynamicNodeWorkflowResponse>} Promise
                  * @variation 2
                  */
     

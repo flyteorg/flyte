@@ -80,6 +80,9 @@ message ProjectListRequest {
     // Sort ordering.
     // +optional
     Sort sort_by    = 4;
+
+    // Optional, org filter applied to list project requests.
+    string org = 5;
 }
 
 // Adds a new user-project within the Flyte deployment.
