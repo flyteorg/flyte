@@ -2276,6 +2276,18 @@ pub struct NodeExecutionGetDataResponse {
     #[prost(message, optional, tag="17")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDynamicNodeWorkflowRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DynamicNodeWorkflowResponse {
+    #[prost(message, optional, tag="1")]
+    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
+}
 /// Represents the Email object that is sent to a publisher/subscriber
 /// to forward the notification.
 /// Note: This is internal to Admin and doesn't need to be exposed to other components.
@@ -3067,18 +3079,6 @@ pub mod create_workflow_failure_reason {
         #[prost(message, tag="2")]
         ExistsIdenticalStructure(super::WorkflowErrorExistsIdenticalStructure),
     }
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetDynamicNodeWorkflowRequest {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DynamicNodeWorkflowResponse {
-    #[prost(message, optional, tag="1")]
-    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
 }
 /// Defines a set of custom matching attributes which defines resource defaults for a project, domain and workflow.
 /// For more info on matchable attributes, see :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration`

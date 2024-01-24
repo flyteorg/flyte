@@ -77,15 +77,3 @@ class CreateWorkflowFailureReason(_message.Message):
     exists_different_structure: WorkflowErrorExistsDifferentStructure
     exists_identical_structure: WorkflowErrorExistsIdenticalStructure
     def __init__(self, exists_different_structure: _Optional[_Union[WorkflowErrorExistsDifferentStructure, _Mapping]] = ..., exists_identical_structure: _Optional[_Union[WorkflowErrorExistsIdenticalStructure, _Mapping]] = ...) -> None: ...
-
-class GetDynamicNodeWorkflowRequest(_message.Message):
-    __slots__ = ["id"]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    id: _identifier_pb2.NodeExecutionIdentifier
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
-
-class DynamicNodeWorkflowResponse(_message.Message):
-    __slots__ = ["compiled_workflow"]
-    COMPILED_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
-    compiled_workflow: _compiler_pb2.CompiledWorkflowClosure
-    def __init__(self, compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ...) -> None: ...

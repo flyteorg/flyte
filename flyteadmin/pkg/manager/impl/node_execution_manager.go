@@ -314,13 +314,9 @@ func (m *NodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, reque
 		return &admin.DynamicNodeWorkflowResponse{}, errors.NewFlyteAdminErrorf(codes.NotFound, "node does not contain dynamic workflow")
 	}
 
-	closure := &core.CompiledWorkflowClosure{}
-	location := nodeExecutionModel.DynamicWorkflowRemoteClosureReference
-	err = m.storageClient.ReadProtobuf(ctx, storage.DataReference(location), closure)
+	closure, err := m.fetchDynamicWorkflowClosure(ctx, nodeExecutionModel.DynamicWorkflowRemoteClosureReference)
 	if err != nil {
-		logger.Errorf(ctx, "unable to read workflow_closure from location %s: %v", location, err)
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-			"unable to read workflow_closure from location %s : %v", location, err)
+		return nil, err
 	}
 
 	return &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: closure}, nil
@@ -545,23 +541,15 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	}
 
 	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
-		closure := &core.CompiledWorkflowClosure{}
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecutionModel.DynamicWorkflowRemoteClosureReference), closure)
+		closure, err := m.fetchDynamicWorkflowClosure(ctx, nodeExecutionModel.DynamicWorkflowRemoteClosureReference)
 		if err != nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-				"Unable to read WorkflowClosure from location %s : %v", nodeExecutionModel.DynamicWorkflowRemoteClosureReference, err)
+			return nil, err
 		}
 
-		if wf := closure.Primary; wf == nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow definition in loaded dynamic workflow model.")
-		} else if template := wf.Template; template == nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow template in loaded dynamic workflow model.")
-		} else {
-			response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
-				Id:                closure.Primary.Template.Id,
-				CompiledWorkflow:  closure,
-				DynamicJobSpecUri: nodeExecution.Closure.DynamicJobSpecUri,
-			}
+		response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
+			Id:                closure.Primary.Template.Id,
+			CompiledWorkflow:  closure,
+			DynamicJobSpecUri: nodeExecution.Closure.DynamicJobSpecUri,
 		}
 	}
 
@@ -573,6 +561,21 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	}
 
 	return response, nil
+}
+
+func (m *NodeExecutionManager) fetchDynamicWorkflowClosure(ctx context.Context, ref string) (*core.CompiledWorkflowClosure, error) {
+	closure := &core.CompiledWorkflowClosure{}
+	err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(ref), closure)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Unable to read WorkflowClosure from location %s : %v", ref, err)
+	}
+
+	if wf := closure.Primary; wf == nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow definition in loaded dynamic workflow model.")
+	} else if template := wf.Template; template == nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow template in loaded dynamic workflow model.")
+	}
+	return closure, nil
 }
 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
