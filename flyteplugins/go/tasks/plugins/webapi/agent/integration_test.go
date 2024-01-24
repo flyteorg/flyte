@@ -100,13 +100,13 @@ func (m *MockSyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest,
 	return &admin.DeleteTaskResponse{}, nil
 }
 
-func mockAsyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return &MockAsyncTask{}, nil
-}
+// func mockAsyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+// 	return &MockAsyncTask{}, nil
+// }
 
-func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	return &MockSyncTask{}, nil
-}
+// func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
+// 	return &MockSyncTask{}, nil
+// }
 
 // func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
 // 	return nil, fmt.Errorf("error")
@@ -307,6 +307,7 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 }
 
 func newMockAgentPlugin() webapi.PluginEntry {
+
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
@@ -315,9 +316,11 @@ func newMockAgentPlugin() webapi.PluginEntry {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					// cs: &ClientSet{
-					// 	getAgentClient: mockAsyncTaskClientFunc,
-					// },
+					cs: &ClientSet{
+						agentClients: map[string]service.AsyncAgentServiceClient{
+							"": &MockAsyncTask{},
+						},
+					},
 				},
 			}, nil
 		},
@@ -333,9 +336,11 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 				Plugin{
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
-					// cs: &ClientSet{
-					// 	agentClients: mockSyncTaskClientFunc,
-					// },
+					cs: &ClientSet{
+						agentClients: map[string]service.AsyncAgentServiceClient{
+							"": &MockSyncTask{},
+						},
+					},
 				},
 			}, nil
 		},

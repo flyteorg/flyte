@@ -5,19 +5,18 @@ import (
 	"crypto/x509"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"golang.org/x/exp/maps"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 
-	"google.golang.org/grpc"
-
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // ClientSet contains the clients exposed to communicate with various agent services.
@@ -89,7 +88,6 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]*Agent, error) {
 	agentRegistry := make(map[string]*Agent)
 	cfg := GetConfig()
 	var agentDeployments []*Agent
-	fmt.Printf("@@@ cfg.AgentForTaskTypes: [%v]\n", cfg.AgentForTaskTypes)
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
