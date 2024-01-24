@@ -24,7 +24,7 @@ func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	err := flag.CommandLine.Parse([]string{})
 	if err != nil {
-		logger.Error(context.TODO(), "Error in initializing: %v", err)
+		logger.Errorf(context.TODO(), "Error in initializing: %v", err)
 		os.Exit(-1)
 	}
 }

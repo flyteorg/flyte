@@ -77,7 +77,7 @@ func (f TokenOrchestrator) FetchTokenFromAuthFlow(ctx context.Context) (*oauth2.
 
 	go func() {
 		if err = server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			logger.Fatal(ctx, "Couldn't start the callback http server on host %v due to %v", redirectURL.Host,
+			logger.Fatalf(ctx, "Couldn't start the callback http server on host %v due to %v", redirectURL.Host,
 				err)
 		}
 	}()
