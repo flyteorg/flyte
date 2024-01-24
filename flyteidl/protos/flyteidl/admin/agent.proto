@@ -11,6 +11,15 @@ import "flyteidl/core/metrics.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 
+// The state of the execution is used to control its visibility in the UI/CLI.
+enum State {
+  RETRYABLE_FAILURE = 0;
+  PERMANENT_FAILURE = 1;
+  PENDING = 2;
+  RUNNING = 3;
+  SUCCEEDED = 4;
+}
+
 message TaskOverrides {
   core.Resources resources = 1;
   core.ExtendedResources extended_resources = 2;
@@ -106,12 +115,18 @@ message GetTaskResponseHeader {
 }
 
 message Resource {
-  // The state of the execution is used to control its visibility in the UI/CLI.
-  core.TaskExecution.Phase phase = 1;
+  // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
+  State state = 1 [deprecated = true];
+  // The outputs of the execution. It's typically used by sql task. Agent service will create a
+  // Structured dataset pointing to the query result table.
+  // +optional
+  core.LiteralMap outputs = 2;
   // A descriptive message for the current state. e.g. waiting for cluster.
-  string message = 2;
+  string message = 3;
   // log information for the task execution.
-  repeated core.TaskLog log_links = 3;
+  repeated core.TaskLog log_links = 4;
+  // The phase of the execution is used to determine the phase of the plugin's execution.
+  core.TaskExecution.Phase phase = 5;
 }
 
 // A message used to delete a task.
