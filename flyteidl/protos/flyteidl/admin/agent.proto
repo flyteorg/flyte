@@ -212,11 +212,21 @@ message GetTaskLogsRequest {
   string token = 4;
 }
 
-// A response containing the logs for a task execution.
-message GetTaskLogsResponse {
-  // The execution log results.
-  repeated string results = 1;
+message GetTaskLogsResponseHeader {
   // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
   // in a query. If there are no more results, this value will be empty.
-  string token = 2;
+  string token = 1;
+}
+
+message GetTaskLogsResponseBody {
+  // The execution log results.
+  repeated string results = 1;
+}
+
+// A response containing the logs for a task execution.
+message GetTaskLogsResponse {
+  oneof part {
+    GetTaskLogsResponseHeader header = 1;
+    GetTaskLogsResponseBody body = 2;
+  }
 }
