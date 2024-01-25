@@ -280,7 +280,7 @@ Spin up a cluster
 
   .. tabs::
 
-    If you have installed Flyte using the `flyte-sandbox Helm chart<https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
+    If you have installed Flyte using the `flyte-sandbox Helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
 
     * You have the correct kubeconfig and have selected the correct Kubernetes context.
 
