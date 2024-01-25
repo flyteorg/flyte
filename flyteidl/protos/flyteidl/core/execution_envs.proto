@@ -9,7 +9,10 @@ import "flyteidl/core/identifier.proto";
 message ExecutionEnvironmentAssignment {
   string id = 1;
   repeated string node_ids = 2;
-  ExecutionEnvironment environment = 3;
+  oneof assignment {
+    ExecutionEnvironment environment = 3;
+    ExecutionEnvironmentSpec environment_spec = 4;
+  }
 }
 
 enum EnvironmentType {
@@ -25,4 +28,14 @@ message FastTaskEnvironment {
   string queue_id = 1;
   string namespace = 2;
   string pod_name = 3;
+}
+
+message ExecutionEnvironmentSpec {
+  EnvironmentType type = 1;
+  FastTaskEnvironmentSpec fast_task = 2;
+}
+
+message FastTaskEnvironmentSpec {
+  string image = 1;
+  int32 replica_count = 2;
 }

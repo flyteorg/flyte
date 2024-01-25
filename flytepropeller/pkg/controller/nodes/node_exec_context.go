@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/execution_env"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -134,6 +135,7 @@ type nodeExecContext struct {
 	shardSelector       ioutils.ShardSelector
 	nl                  executors.NodeLookup
 	ic                  executors.ExecutionContext
+	executionEnvService *executionenv.ExecutionEnvironmentService
 }
 
 func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
@@ -204,21 +206,39 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
-func (e nodeExecContext) GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment {
+func (e nodeExecContext) GetExecutionEnv(envType core.EnvironmentType) *core.ExecutionEnvironment {
+	// check if there is an explicit execution environment assignment for this node in the ExecutionConfig
 	config := e.ExecutionContext().GetExecutionConfig()
-	for _, executionEnvironment := range config.ExecutionEnvs {
-		if slices.Contains(executionEnvironment.NodeIds, e.NodeID()) {
-			return executionEnvironment.Environment
+	for _, executionEnvAssignment := range config.ExecutionEnvs {
+		if slices.Contains(executionEnvAssignment.NodeIds, e.NodeID()) {
+			if env := executionEnvAssignment.Environment; env != nil {
+				if envType != env.Type {
+					continue
+				}
+
+				// if execution environment exists then use it
+				return env
+			} else if envSpec := executionEnvAssignment.EnvironmentSpec; envSpec != nil {
+				if envType != envSpec.Type {
+					continue
+				}
+
+				// if execution environment spec exists then retrieve execution environment
+				return e.executionEnvService.GetEnvironment(e, executionEnvAssignment.Id)
+			}
 		}
 	}
+
+	// TODO - if no explicit assignment, then use ExecutionEnvironmentService to check for default
 
 	return nil
 }
 
 func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext executors.ExecutionContext, nl executors.NodeLookup,
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
-	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader, nsm *nodeStateManager,
-	enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector) *nodeExecContext {
+	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader,
+	nsm *nodeStateManager, enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector,
+	executionEnvService *executionenv.ExecutionEnvironmentService) *nodeExecContext {
 
 	md := nodeExecMetadata{
 		Meta: execContext,
@@ -260,6 +280,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 		shardSelector:       outputShardSelector,
 		nl:                  nl,
 		ic:                  execContext,
+		executionEnvService: executionEnvService,
 	}
 }
 
@@ -351,5 +372,6 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		workflowEnqueuer,
 		rawOutputPrefix,
 		c.shardSelector,
+		c.executionEnvService,
 	), nil
 }

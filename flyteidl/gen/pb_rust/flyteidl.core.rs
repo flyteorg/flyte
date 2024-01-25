@@ -2749,8 +2749,19 @@ pub struct ExecutionEnvironmentAssignment {
     pub id: ::prost::alloc::string::String,
     #[prost(string, repeated, tag="2")]
     pub node_ids: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
-    #[prost(message, optional, tag="3")]
-    pub environment: ::core::option::Option<ExecutionEnvironment>,
+    #[prost(oneof="execution_environment_assignment::Assignment", tags="3, 4")]
+    pub assignment: ::core::option::Option<execution_environment_assignment::Assignment>,
+}
+/// Nested message and enum types in `ExecutionEnvironmentAssignment`.
+pub mod execution_environment_assignment {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Assignment {
+        #[prost(message, tag="3")]
+        Environment(super::ExecutionEnvironment),
+        #[prost(message, tag="4")]
+        EnvironmentSpec(super::ExecutionEnvironmentSpec),
+    }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2769,6 +2780,22 @@ pub struct FastTaskEnvironment {
     pub namespace: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub pod_name: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionEnvironmentSpec {
+    #[prost(enumeration="EnvironmentType", tag="1")]
+    pub r#type: i32,
+    #[prost(message, optional, tag="2")]
+    pub fast_task: ::core::option::Option<FastTaskEnvironmentSpec>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct FastTaskEnvironmentSpec {
+    #[prost(string, tag="1")]
+    pub image: ::prost::alloc::string::String,
+    #[prost(int32, tag="2")]
+    pub replica_count: i32,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

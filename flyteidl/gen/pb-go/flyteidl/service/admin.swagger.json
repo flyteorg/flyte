@@ -6150,6 +6150,20 @@
         },
         "environment": {
           "$ref": "#/definitions/coreExecutionEnvironment"
+        },
+        "environment_spec": {
+          "$ref": "#/definitions/coreExecutionEnvironmentSpec"
+        }
+      }
+    },
+    "coreExecutionEnvironmentSpec": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreEnvironmentType"
+        },
+        "fast_task": {
+          "$ref": "#/definitions/coreFastTaskEnvironmentSpec"
         }
       }
     },
@@ -6195,6 +6209,18 @@
         },
         "pod_name": {
           "type": "string"
+        }
+      }
+    },
+    "coreFastTaskEnvironmentSpec": {
+      "type": "object",
+      "properties": {
+        "image": {
+          "type": "string"
+        },
+        "replica_count": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },

@@ -13,14 +13,16 @@ class EnvironmentType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 FAST_TASK: EnvironmentType
 
 class ExecutionEnvironmentAssignment(_message.Message):
-    __slots__ = ["id", "node_ids", "environment"]
+    __slots__ = ["id", "node_ids", "environment", "environment_spec"]
     ID_FIELD_NUMBER: _ClassVar[int]
     NODE_IDS_FIELD_NUMBER: _ClassVar[int]
     ENVIRONMENT_FIELD_NUMBER: _ClassVar[int]
+    ENVIRONMENT_SPEC_FIELD_NUMBER: _ClassVar[int]
     id: str
     node_ids: _containers.RepeatedScalarFieldContainer[str]
     environment: ExecutionEnvironment
-    def __init__(self, id: _Optional[str] = ..., node_ids: _Optional[_Iterable[str]] = ..., environment: _Optional[_Union[ExecutionEnvironment, _Mapping]] = ...) -> None: ...
+    environment_spec: ExecutionEnvironmentSpec
+    def __init__(self, id: _Optional[str] = ..., node_ids: _Optional[_Iterable[str]] = ..., environment: _Optional[_Union[ExecutionEnvironment, _Mapping]] = ..., environment_spec: _Optional[_Union[ExecutionEnvironmentSpec, _Mapping]] = ...) -> None: ...
 
 class ExecutionEnvironment(_message.Message):
     __slots__ = ["type", "fast_task"]
@@ -39,3 +41,19 @@ class FastTaskEnvironment(_message.Message):
     namespace: str
     pod_name: str
     def __init__(self, queue_id: _Optional[str] = ..., namespace: _Optional[str] = ..., pod_name: _Optional[str] = ...) -> None: ...
+
+class ExecutionEnvironmentSpec(_message.Message):
+    __slots__ = ["type", "fast_task"]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    FAST_TASK_FIELD_NUMBER: _ClassVar[int]
+    type: EnvironmentType
+    fast_task: FastTaskEnvironmentSpec
+    def __init__(self, type: _Optional[_Union[EnvironmentType, str]] = ..., fast_task: _Optional[_Union[FastTaskEnvironmentSpec, _Mapping]] = ...) -> None: ...
+
+class FastTaskEnvironmentSpec(_message.Message):
+    __slots__ = ["image", "replica_count"]
+    IMAGE_FIELD_NUMBER: _ClassVar[int]
+    REPLICA_COUNT_FIELD_NUMBER: _ClassVar[int]
+    image: str
+    replica_count: int
+    def __init__(self, image: _Optional[str] = ..., replica_count: _Optional[int] = ...) -> None: ...

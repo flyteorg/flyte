@@ -187,9 +187,11 @@ from flyteadmin.models.core_environment_type import CoreEnvironmentType
 from flyteadmin.models.core_error import CoreError
 from flyteadmin.models.core_execution_environment import CoreExecutionEnvironment
 from flyteadmin.models.core_execution_environment_assignment import CoreExecutionEnvironmentAssignment
+from flyteadmin.models.core_execution_environment_spec import CoreExecutionEnvironmentSpec
 from flyteadmin.models.core_execution_error import CoreExecutionError
 from flyteadmin.models.core_extended_resources import CoreExtendedResources
 from flyteadmin.models.core_fast_task_environment import CoreFastTaskEnvironment
+from flyteadmin.models.core_fast_task_environment_spec import CoreFastTaskEnvironmentSpec
 from flyteadmin.models.core_gpu_accelerator import CoreGPUAccelerator
 from flyteadmin.models.core_gate_node import CoreGateNode
 from flyteadmin.models.core_io_strategy import CoreIOStrategy

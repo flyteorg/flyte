@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fcore_2fexecution_5fenvs_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[3]
+  static const ::google::protobuf::internal::ParseTable schema[5]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -58,16 +58,24 @@ extern ExecutionEnvironmentDefaultTypeInternal _ExecutionEnvironment_default_ins
 class ExecutionEnvironmentAssignment;
 class ExecutionEnvironmentAssignmentDefaultTypeInternal;
 extern ExecutionEnvironmentAssignmentDefaultTypeInternal _ExecutionEnvironmentAssignment_default_instance_;
+class ExecutionEnvironmentSpec;
+class ExecutionEnvironmentSpecDefaultTypeInternal;
+extern ExecutionEnvironmentSpecDefaultTypeInternal _ExecutionEnvironmentSpec_default_instance_;
 class FastTaskEnvironment;
 class FastTaskEnvironmentDefaultTypeInternal;
 extern FastTaskEnvironmentDefaultTypeInternal _FastTaskEnvironment_default_instance_;
+class FastTaskEnvironmentSpec;
+class FastTaskEnvironmentSpecDefaultTypeInternal;
+extern FastTaskEnvironmentSpecDefaultTypeInternal _FastTaskEnvironmentSpec_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::core::ExecutionEnvironment* Arena::CreateMaybeMessage<::flyteidl::core::ExecutionEnvironment>(Arena*);
 template<> ::flyteidl::core::ExecutionEnvironmentAssignment* Arena::CreateMaybeMessage<::flyteidl::core::ExecutionEnvironmentAssignment>(Arena*);
+template<> ::flyteidl::core::ExecutionEnvironmentSpec* Arena::CreateMaybeMessage<::flyteidl::core::ExecutionEnvironmentSpec>(Arena*);
 template<> ::flyteidl::core::FastTaskEnvironment* Arena::CreateMaybeMessage<::flyteidl::core::FastTaskEnvironment>(Arena*);
+template<> ::flyteidl::core::FastTaskEnvironmentSpec* Arena::CreateMaybeMessage<::flyteidl::core::FastTaskEnvironmentSpec>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -126,6 +134,12 @@ class ExecutionEnvironmentAssignment final :
     return default_instance().GetDescriptor();
   }
   static const ExecutionEnvironmentAssignment& default_instance();
+
+  enum AssignmentCase {
+    kEnvironment = 3,
+    kEnvironmentSpec = 4,
+    ASSIGNMENT_NOT_SET = 0,
+  };
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const ExecutionEnvironmentAssignment* internal_default_instance() {
@@ -235,15 +249,37 @@ class ExecutionEnvironmentAssignment final :
   ::flyteidl::core::ExecutionEnvironment* mutable_environment();
   void set_allocated_environment(::flyteidl::core::ExecutionEnvironment* environment);
 
+  // .flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;
+  bool has_environment_spec() const;
+  void clear_environment_spec();
+  static const int kEnvironmentSpecFieldNumber = 4;
+  const ::flyteidl::core::ExecutionEnvironmentSpec& environment_spec() const;
+  ::flyteidl::core::ExecutionEnvironmentSpec* release_environment_spec();
+  ::flyteidl::core::ExecutionEnvironmentSpec* mutable_environment_spec();
+  void set_allocated_environment_spec(::flyteidl::core::ExecutionEnvironmentSpec* environment_spec);
+
+  void clear_assignment();
+  AssignmentCase assignment_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionEnvironmentAssignment)
  private:
   class HasBitSetters;
+  void set_has_environment();
+  void set_has_environment_spec();
+
+  inline bool has_assignment() const;
+  inline void clear_has_assignment();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> node_ids_;
   ::google::protobuf::internal::ArenaStringPtr id_;
-  ::flyteidl::core::ExecutionEnvironment* environment_;
+  union AssignmentUnion {
+    AssignmentUnion() {}
+    ::flyteidl::core::ExecutionEnvironment* environment_;
+    ::flyteidl::core::ExecutionEnvironmentSpec* environment_spec_;
+  } assignment_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_flyteidl_2fcore_2fexecution_5fenvs_2eproto;
 };
 // -------------------------------------------------------------------
@@ -518,6 +554,255 @@ class FastTaskEnvironment final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fexecution_5fenvs_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ExecutionEnvironmentSpec final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.ExecutionEnvironmentSpec) */ {
+ public:
+  ExecutionEnvironmentSpec();
+  virtual ~ExecutionEnvironmentSpec();
+
+  ExecutionEnvironmentSpec(const ExecutionEnvironmentSpec& from);
+
+  inline ExecutionEnvironmentSpec& operator=(const ExecutionEnvironmentSpec& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ExecutionEnvironmentSpec(ExecutionEnvironmentSpec&& from) noexcept
+    : ExecutionEnvironmentSpec() {
+    *this = ::std::move(from);
+  }
+
+  inline ExecutionEnvironmentSpec& operator=(ExecutionEnvironmentSpec&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ExecutionEnvironmentSpec& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ExecutionEnvironmentSpec* internal_default_instance() {
+    return reinterpret_cast<const ExecutionEnvironmentSpec*>(
+               &_ExecutionEnvironmentSpec_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  void Swap(ExecutionEnvironmentSpec* other);
+  friend void swap(ExecutionEnvironmentSpec& a, ExecutionEnvironmentSpec& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ExecutionEnvironmentSpec* New() const final {
+    return CreateMaybeMessage<ExecutionEnvironmentSpec>(nullptr);
+  }
+
+  ExecutionEnvironmentSpec* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ExecutionEnvironmentSpec>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ExecutionEnvironmentSpec& from);
+  void MergeFrom(const ExecutionEnvironmentSpec& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ExecutionEnvironmentSpec* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;
+  bool has_fast_task() const;
+  void clear_fast_task();
+  static const int kFastTaskFieldNumber = 2;
+  const ::flyteidl::core::FastTaskEnvironmentSpec& fast_task() const;
+  ::flyteidl::core::FastTaskEnvironmentSpec* release_fast_task();
+  ::flyteidl::core::FastTaskEnvironmentSpec* mutable_fast_task();
+  void set_allocated_fast_task(::flyteidl::core::FastTaskEnvironmentSpec* fast_task);
+
+  // .flyteidl.core.EnvironmentType type = 1;
+  void clear_type();
+  static const int kTypeFieldNumber = 1;
+  ::flyteidl::core::EnvironmentType type() const;
+  void set_type(::flyteidl::core::EnvironmentType value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionEnvironmentSpec)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::FastTaskEnvironmentSpec* fast_task_;
+  int type_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fexecution_5fenvs_2eproto;
+};
+// -------------------------------------------------------------------
+
+class FastTaskEnvironmentSpec final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.FastTaskEnvironmentSpec) */ {
+ public:
+  FastTaskEnvironmentSpec();
+  virtual ~FastTaskEnvironmentSpec();
+
+  FastTaskEnvironmentSpec(const FastTaskEnvironmentSpec& from);
+
+  inline FastTaskEnvironmentSpec& operator=(const FastTaskEnvironmentSpec& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  FastTaskEnvironmentSpec(FastTaskEnvironmentSpec&& from) noexcept
+    : FastTaskEnvironmentSpec() {
+    *this = ::std::move(from);
+  }
+
+  inline FastTaskEnvironmentSpec& operator=(FastTaskEnvironmentSpec&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const FastTaskEnvironmentSpec& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const FastTaskEnvironmentSpec* internal_default_instance() {
+    return reinterpret_cast<const FastTaskEnvironmentSpec*>(
+               &_FastTaskEnvironmentSpec_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  void Swap(FastTaskEnvironmentSpec* other);
+  friend void swap(FastTaskEnvironmentSpec& a, FastTaskEnvironmentSpec& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline FastTaskEnvironmentSpec* New() const final {
+    return CreateMaybeMessage<FastTaskEnvironmentSpec>(nullptr);
+  }
+
+  FastTaskEnvironmentSpec* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<FastTaskEnvironmentSpec>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const FastTaskEnvironmentSpec& from);
+  void MergeFrom(const FastTaskEnvironmentSpec& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(FastTaskEnvironmentSpec* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string image = 1;
+  void clear_image();
+  static const int kImageFieldNumber = 1;
+  const ::std::string& image() const;
+  void set_image(const ::std::string& value);
+  #if LANG_CXX11
+  void set_image(::std::string&& value);
+  #endif
+  void set_image(const char* value);
+  void set_image(const char* value, size_t size);
+  ::std::string* mutable_image();
+  ::std::string* release_image();
+  void set_allocated_image(::std::string* image);
+
+  // int32 replica_count = 2;
+  void clear_replica_count();
+  static const int kReplicaCountFieldNumber = 2;
+  ::google::protobuf::int32 replica_count() const;
+  void set_replica_count(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.FastTaskEnvironmentSpec)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr image_;
+  ::google::protobuf::int32 replica_count_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fexecution_5fenvs_2eproto;
+};
 // ===================================================================
 
 
@@ -653,55 +938,95 @@ ExecutionEnvironmentAssignment::mutable_node_ids() {
 
 // .flyteidl.core.ExecutionEnvironment environment = 3;
 inline bool ExecutionEnvironmentAssignment::has_environment() const {
-  return this != internal_default_instance() && environment_ != nullptr;
+  return assignment_case() == kEnvironment;
+}
+inline void ExecutionEnvironmentAssignment::set_has_environment() {
+  _oneof_case_[0] = kEnvironment;
 }
 inline void ExecutionEnvironmentAssignment::clear_environment() {
-  if (GetArenaNoVirtual() == nullptr && environment_ != nullptr) {
-    delete environment_;
+  if (has_environment()) {
+    delete assignment_.environment_;
+    clear_has_assignment();
   }
-  environment_ = nullptr;
-}
-inline const ::flyteidl::core::ExecutionEnvironment& ExecutionEnvironmentAssignment::environment() const {
-  const ::flyteidl::core::ExecutionEnvironment* p = environment_;
-  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionEnvironmentAssignment.environment)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::ExecutionEnvironment*>(
-      &::flyteidl::core::_ExecutionEnvironment_default_instance_);
 }
 inline ::flyteidl::core::ExecutionEnvironment* ExecutionEnvironmentAssignment::release_environment() {
   // @@protoc_insertion_point(field_release:flyteidl.core.ExecutionEnvironmentAssignment.environment)
-  
-  ::flyteidl::core::ExecutionEnvironment* temp = environment_;
-  environment_ = nullptr;
-  return temp;
+  if (has_environment()) {
+    clear_has_assignment();
+      ::flyteidl::core::ExecutionEnvironment* temp = assignment_.environment_;
+    assignment_.environment_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::ExecutionEnvironment& ExecutionEnvironmentAssignment::environment() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionEnvironmentAssignment.environment)
+  return has_environment()
+      ? *assignment_.environment_
+      : *reinterpret_cast< ::flyteidl::core::ExecutionEnvironment*>(&::flyteidl::core::_ExecutionEnvironment_default_instance_);
 }
 inline ::flyteidl::core::ExecutionEnvironment* ExecutionEnvironmentAssignment::mutable_environment() {
-  
-  if (environment_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::ExecutionEnvironment>(GetArenaNoVirtual());
-    environment_ = p;
+  if (!has_environment()) {
+    clear_assignment();
+    set_has_environment();
+    assignment_.environment_ = CreateMaybeMessage< ::flyteidl::core::ExecutionEnvironment >(
+        GetArenaNoVirtual());
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.core.ExecutionEnvironmentAssignment.environment)
-  return environment_;
-}
-inline void ExecutionEnvironmentAssignment::set_allocated_environment(::flyteidl::core::ExecutionEnvironment* environment) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete environment_;
-  }
-  if (environment) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      environment = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, environment, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  environment_ = environment;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ExecutionEnvironmentAssignment.environment)
+  return assignment_.environment_;
 }
 
+// .flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;
+inline bool ExecutionEnvironmentAssignment::has_environment_spec() const {
+  return assignment_case() == kEnvironmentSpec;
+}
+inline void ExecutionEnvironmentAssignment::set_has_environment_spec() {
+  _oneof_case_[0] = kEnvironmentSpec;
+}
+inline void ExecutionEnvironmentAssignment::clear_environment_spec() {
+  if (has_environment_spec()) {
+    delete assignment_.environment_spec_;
+    clear_has_assignment();
+  }
+}
+inline ::flyteidl::core::ExecutionEnvironmentSpec* ExecutionEnvironmentAssignment::release_environment_spec() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.ExecutionEnvironmentAssignment.environment_spec)
+  if (has_environment_spec()) {
+    clear_has_assignment();
+      ::flyteidl::core::ExecutionEnvironmentSpec* temp = assignment_.environment_spec_;
+    assignment_.environment_spec_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::flyteidl::core::ExecutionEnvironmentSpec& ExecutionEnvironmentAssignment::environment_spec() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionEnvironmentAssignment.environment_spec)
+  return has_environment_spec()
+      ? *assignment_.environment_spec_
+      : *reinterpret_cast< ::flyteidl::core::ExecutionEnvironmentSpec*>(&::flyteidl::core::_ExecutionEnvironmentSpec_default_instance_);
+}
+inline ::flyteidl::core::ExecutionEnvironmentSpec* ExecutionEnvironmentAssignment::mutable_environment_spec() {
+  if (!has_environment_spec()) {
+    clear_assignment();
+    set_has_environment_spec();
+    assignment_.environment_spec_ = CreateMaybeMessage< ::flyteidl::core::ExecutionEnvironmentSpec >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.ExecutionEnvironmentAssignment.environment_spec)
+  return assignment_.environment_spec_;
+}
+
+inline bool ExecutionEnvironmentAssignment::has_assignment() const {
+  return assignment_case() != ASSIGNMENT_NOT_SET;
+}
+inline void ExecutionEnvironmentAssignment::clear_has_assignment() {
+  _oneof_case_[0] = ASSIGNMENT_NOT_SET;
+}
+inline ExecutionEnvironmentAssignment::AssignmentCase ExecutionEnvironmentAssignment::assignment_case() const {
+  return ExecutionEnvironmentAssignment::AssignmentCase(_oneof_case_[0]);
+}
 // -------------------------------------------------------------------
 
 // ExecutionEnvironment
@@ -934,9 +1259,153 @@ inline void FastTaskEnvironment::set_allocated_pod_name(::std::string* pod_name)
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.FastTaskEnvironment.pod_name)
 }
 
+// -------------------------------------------------------------------
+
+// ExecutionEnvironmentSpec
+
+// .flyteidl.core.EnvironmentType type = 1;
+inline void ExecutionEnvironmentSpec::clear_type() {
+  type_ = 0;
+}
+inline ::flyteidl::core::EnvironmentType ExecutionEnvironmentSpec::type() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionEnvironmentSpec.type)
+  return static_cast< ::flyteidl::core::EnvironmentType >(type_);
+}
+inline void ExecutionEnvironmentSpec::set_type(::flyteidl::core::EnvironmentType value) {
+  
+  type_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.ExecutionEnvironmentSpec.type)
+}
+
+// .flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;
+inline bool ExecutionEnvironmentSpec::has_fast_task() const {
+  return this != internal_default_instance() && fast_task_ != nullptr;
+}
+inline void ExecutionEnvironmentSpec::clear_fast_task() {
+  if (GetArenaNoVirtual() == nullptr && fast_task_ != nullptr) {
+    delete fast_task_;
+  }
+  fast_task_ = nullptr;
+}
+inline const ::flyteidl::core::FastTaskEnvironmentSpec& ExecutionEnvironmentSpec::fast_task() const {
+  const ::flyteidl::core::FastTaskEnvironmentSpec* p = fast_task_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionEnvironmentSpec.fast_task)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::FastTaskEnvironmentSpec*>(
+      &::flyteidl::core::_FastTaskEnvironmentSpec_default_instance_);
+}
+inline ::flyteidl::core::FastTaskEnvironmentSpec* ExecutionEnvironmentSpec::release_fast_task() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.ExecutionEnvironmentSpec.fast_task)
+  
+  ::flyteidl::core::FastTaskEnvironmentSpec* temp = fast_task_;
+  fast_task_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::FastTaskEnvironmentSpec* ExecutionEnvironmentSpec::mutable_fast_task() {
+  
+  if (fast_task_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::FastTaskEnvironmentSpec>(GetArenaNoVirtual());
+    fast_task_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.ExecutionEnvironmentSpec.fast_task)
+  return fast_task_;
+}
+inline void ExecutionEnvironmentSpec::set_allocated_fast_task(::flyteidl::core::FastTaskEnvironmentSpec* fast_task) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete fast_task_;
+  }
+  if (fast_task) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      fast_task = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, fast_task, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  fast_task_ = fast_task;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ExecutionEnvironmentSpec.fast_task)
+}
+
+// -------------------------------------------------------------------
+
+// FastTaskEnvironmentSpec
+
+// string image = 1;
+inline void FastTaskEnvironmentSpec::clear_image() {
+  image_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& FastTaskEnvironmentSpec::image() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.FastTaskEnvironmentSpec.image)
+  return image_.GetNoArena();
+}
+inline void FastTaskEnvironmentSpec::set_image(const ::std::string& value) {
+  
+  image_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.FastTaskEnvironmentSpec.image)
+}
+#if LANG_CXX11
+inline void FastTaskEnvironmentSpec::set_image(::std::string&& value) {
+  
+  image_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.FastTaskEnvironmentSpec.image)
+}
+#endif
+inline void FastTaskEnvironmentSpec::set_image(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  image_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.FastTaskEnvironmentSpec.image)
+}
+inline void FastTaskEnvironmentSpec::set_image(const char* value, size_t size) {
+  
+  image_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.FastTaskEnvironmentSpec.image)
+}
+inline ::std::string* FastTaskEnvironmentSpec::mutable_image() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.FastTaskEnvironmentSpec.image)
+  return image_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* FastTaskEnvironmentSpec::release_image() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.FastTaskEnvironmentSpec.image)
+  
+  return image_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void FastTaskEnvironmentSpec::set_allocated_image(::std::string* image) {
+  if (image != nullptr) {
+    
+  } else {
+    
+  }
+  image_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), image);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.FastTaskEnvironmentSpec.image)
+}
+
+// int32 replica_count = 2;
+inline void FastTaskEnvironmentSpec::clear_replica_count() {
+  replica_count_ = 0;
+}
+inline ::google::protobuf::int32 FastTaskEnvironmentSpec::replica_count() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.FastTaskEnvironmentSpec.replica_count)
+  return replica_count_;
+}
+inline void FastTaskEnvironmentSpec::set_replica_count(::google::protobuf::int32 value) {
+  
+  replica_count_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.FastTaskEnvironmentSpec.replica_count)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

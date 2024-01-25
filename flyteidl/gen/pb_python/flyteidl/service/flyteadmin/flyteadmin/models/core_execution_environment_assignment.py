@@ -17,6 +17,7 @@ import re  # noqa: F401
 import six
 
 from flyteadmin.models.core_execution_environment import CoreExecutionEnvironment  # noqa: F401,E501
+from flyteadmin.models.core_execution_environment_spec import CoreExecutionEnvironmentSpec  # noqa: F401,E501
 
 
 class CoreExecutionEnvironmentAssignment(object):
@@ -35,21 +36,24 @@ class CoreExecutionEnvironmentAssignment(object):
     swagger_types = {
         'id': 'str',
         'node_ids': 'list[str]',
-        'environment': 'CoreExecutionEnvironment'
+        'environment': 'CoreExecutionEnvironment',
+        'environment_spec': 'CoreExecutionEnvironmentSpec'
     }
 
     attribute_map = {
         'id': 'id',
         'node_ids': 'node_ids',
-        'environment': 'environment'
+        'environment': 'environment',
+        'environment_spec': 'environment_spec'
     }
 
-    def __init__(self, id=None, node_ids=None, environment=None):  # noqa: E501
+    def __init__(self, id=None, node_ids=None, environment=None, environment_spec=None):  # noqa: E501
         """CoreExecutionEnvironmentAssignment - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._node_ids = None
         self._environment = None
+        self._environment_spec = None
         self.discriminator = None
 
         if id is not None:
@@ -58,6 +62,8 @@ class CoreExecutionEnvironmentAssignment(object):
             self.node_ids = node_ids
         if environment is not None:
             self.environment = environment
+        if environment_spec is not None:
+            self.environment_spec = environment_spec
 
     @property
     def id(self):
@@ -121,6 +127,27 @@ class CoreExecutionEnvironmentAssignment(object):
         """
 
         self._environment = environment
+
+    @property
+    def environment_spec(self):
+        """Gets the environment_spec of this CoreExecutionEnvironmentAssignment.  # noqa: E501
+
+
+        :return: The environment_spec of this CoreExecutionEnvironmentAssignment.  # noqa: E501
+        :rtype: CoreExecutionEnvironmentSpec
+        """
+        return self._environment_spec
+
+    @environment_spec.setter
+    def environment_spec(self, environment_spec):
+        """Sets the environment_spec of this CoreExecutionEnvironmentAssignment.
+
+
+        :param environment_spec: The environment_spec of this CoreExecutionEnvironmentAssignment.  # noqa: E501
+        :type: CoreExecutionEnvironmentSpec
+        """
+
+        self._environment_spec = environment_spec
 
     def to_dict(self):
         """Returns the model properties as a dict"""

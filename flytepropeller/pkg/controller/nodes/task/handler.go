@@ -268,6 +268,19 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 			if !ok {
 				pluginsForTaskType = make(map[pluginID]pluginCore.Plugin)
 			}
+			if executionEnvType := cp.GetProperties().ExecutionEnvType; executionEnvType != nil {
+				// if the plugin has an execution environment type specified, validate that there
+				// are no other plugins also registered for the same task type with an execution
+				// environment type specified. this ensures that plugin execution is deterministic.
+				for _, p := range pluginsForTaskType {
+					if p.GetProperties().ExecutionEnvType != nil {
+						logger.Errorf(ctx, "TaskType [%s] has multiple plugins with execution environment type specified: [%s] and [%s]",
+							tt, p.GetID(), cp.GetID())
+						return regErrors.New(fmt.Sprintf("TaskType [%s] has multiple plugins with execution environment type specified: [%s] and [%s]",
+							tt, p.GetID(), cp.GetID()))
+					}
+				}
+			}
 			pluginsForTaskType[cp.GetID()] = cp
 			t.pluginsForType[tt] = pluginsForTaskType
 
@@ -332,10 +345,8 @@ func (t Handler) ResolvePlugin(ctx context.Context, nCtx interfaces.NodeExecutio
 		}
 	}
 
-	// TODO @hamersaw - check if cluster is available
-	//   what happens if the cluster was available, but no longer is?!?
-	//   or if there are two persistentEnv plugins for ttype and one is returned first and the other second?!
-	// we COULD only allow one persistentEnv plugin per ttype ... still need to figure out disappearing clusters
+	// if there is a plugin registered that supports an execution environment and a cooresponding
+	// environment is available we automatically use that plugin.
 	for _, plugin := range t.pluginsForType[ttype] {
 		if executionEnvType := plugin.GetProperties().ExecutionEnvType; executionEnvType != nil {
 			executionEnv := nCtx.GetExecutionEnv(*executionEnvType)

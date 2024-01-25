@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	k8_api_err "k8s.io/apimachinery/pkg/api/errors"
@@ -34,6 +35,7 @@ func (e K8sWorkflowExecutor) ID() string {
 }
 
 func (e K8sWorkflowExecutor) Execute(ctx context.Context, data interfaces.ExecutionData) (interfaces.ExecutionResponse, error) {
+	fmt.Printf("HAMERSAW - %+v\n", data.ExecutionParameters.ExecutionConfig.GetExecutionEnvs())
 	flyteWf, err := e.workflowBuilder.Build(data.WorkflowClosure, data.ExecutionParameters.Inputs, data.ExecutionID, data.Namespace)
 	if err != nil {
 		logger.Infof(ctx, "failed to build the workflow [%+v] %v",

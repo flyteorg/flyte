@@ -66,5 +66,8 @@ type TaskResources struct {
 // ExecutionEnvironmentAssignment is a wrapper around core.ExecutionEnvironmentAssignment to define
 // and assign an execution environment to a collection of workflow nodes.
 type ExecutionEnvironmentAssignment struct {
-	*core.ExecutionEnvironmentAssignment
+	Id              string   `json:"id,omitempty"`
+	NodeIds         []string `json:"node_ids,omitempty"`
+	Environment     *core.ExecutionEnvironment `json:"environment,omitempty"`
+	EnvironmentSpec *core.ExecutionEnvironmentSpec `json:"environment_spec,omitempty"`
 }

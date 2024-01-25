@@ -32,6 +32,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	flyteK8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flytepropeller/events"
+	"github.com/flyteorg/flyte/flytepropeller/execution_env"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	clientset "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
@@ -437,9 +438,11 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}
 
+	executionEnvService := executionenv.NewExecutionEnvironmentService(ctx, kubeClient, scope)
+
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
 		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
-		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
+		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, executionEnvService, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}

@@ -13,4 +13,5 @@ type CoreExecutionEnvironmentAssignment struct {
 	Id string `json:"id,omitempty"`
 	NodeIds []string `json:"node_ids,omitempty"`
 	Environment *CoreExecutionEnvironment `json:"environment,omitempty"`
+	EnvironmentSpec *CoreExecutionEnvironmentSpec `json:"environment_spec,omitempty"`
 }
