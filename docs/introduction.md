@@ -85,7 +85,7 @@ flytesnacks/getting_started/core_use_cases
 :caption: Tutorials
 :hidden:
 
-Tutorials <tutorials>
+Tutorials <flytesnacks/tutorials>
 Model Training <ml_training>
 feature_engineering
 bioinformatics_examples
