@@ -7,8 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
-
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
@@ -32,7 +30,6 @@ type Clientset struct {
 	identityServiceClient     service.IdentityServiceClient
 	dataProxyServiceClient    service.DataProxyServiceClient
 	signalServiceClient       service.SignalServiceClient
-	artifactServiceClient     artifact.ArtifactRegistryClient
 }
 
 // AdminClient retrieves the AdminServiceClient
@@ -60,10 +57,6 @@ func (c Clientset) DataProxyClient() service.DataProxyServiceClient {
 
 func (c Clientset) SignalServiceClient() service.SignalServiceClient {
 	return c.signalServiceClient
-}
-
-func (c Clientset) ArtifactServiceClient() artifact.ArtifactRegistryClient {
-	return c.artifactServiceClient
 }
 
 func NewAdminClient(ctx context.Context, conn *grpc.ClientConn) service.AdminServiceClient {
@@ -206,7 +199,6 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
 	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
 	cs.signalServiceClient = service.NewSignalServiceClient(adminConnection)
-	cs.artifactServiceClient = artifact.NewArtifactRegistryClient(adminConnection)
 
 	return &cs, nil
 }
