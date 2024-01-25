@@ -13,7 +13,7 @@ import (
 	grpcmiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcauth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
 	grpcprometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/pkg/errors"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/otel/propagation"
@@ -37,7 +37,8 @@ import (
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	grpcService "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/gateway/flyteidl/service"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -129,10 +130,10 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	configuration := runtime2.NewConfigurationProvider()
 	adminServer := adminservice.NewAdminServer(ctx, pluginRegistry, configuration, cfg.KubeConfig, cfg.Master, dataStorageClient, scope.NewSubScope("admin"))
-	service.RegisterAdminServiceServer(grpcServer, adminServer)
+	grpcService.RegisterAdminServiceServer(grpcServer, adminServer)
 	if cfg.Security.UseAuth {
-		service.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
-		service.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
+		grpcService.RegisterAuthMetadataServiceServer(grpcServer, authCtx.AuthMetadataService())
+		grpcService.RegisterIdentityServiceServer(grpcServer, authCtx.IdentityService())
 	}
 
 	dataProxySvc, err := dataproxy.NewService(cfg.DataProxy, adminServer.NodeExecutionManager, dataStorageClient, adminServer.TaskExecutionManager)
@@ -141,9 +142,9 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	}
 
 	pluginRegistry.RegisterDefault(plugins.PluginIDDataProxy, dataProxySvc)
-	service.RegisterDataProxyServiceServer(grpcServer, plugins.Get[service.DataProxyServiceServer](pluginRegistry, plugins.PluginIDDataProxy))
+	grpcService.RegisterDataProxyServiceServer(grpcServer, plugins.Get[grpcService.DataProxyServiceServer](pluginRegistry, plugins.PluginIDDataProxy))
 
-	service.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
+	grpcService.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
 
 	additionalService := plugins.Get[common.RegisterAdditionalGRPCService](pluginRegistry, plugins.PluginIDAdditionalGRPCService)
 	if additionalService != nil {
@@ -164,7 +165,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 func GetHandleOpenapiSpec(ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		swaggerBytes, err := service.Asset("admin.swagger.json")
+		swaggerBytes, err := grpcService.Asset("admin.swagger.json")
 		if err != nil {
 			logger.Warningf(ctx, "Err %v", err)
 			w.WriteHeader(http.StatusFailedDependency)

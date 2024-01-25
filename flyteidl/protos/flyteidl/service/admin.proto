@@ -19,7 +19,8 @@ import "flyteidl/admin/task_execution.proto";
 import "flyteidl/admin/version.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/admin/description_entity.proto";
-// import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
 
 // The following defines an RPC service that is also served over HTTP via grpc-gateway.
 // Standard response codes for both are defined here: https://github.com/grpc-ecosystem/grpc-gateway/blob/master/runtime/errors.go
@@ -34,21 +35,21 @@ service AdminService {
         body: "*"
       }
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Create and register a task definition."
-    //   responses: {
-    //     key: "400"
-    //     value: {
-    //       description: "Returned for bad request that may have failed validation."
-    //     }
-    //   }
-    //   responses: {
-    //     key: "409"
-    //     value: {
-    //       description: "Returned for a request that references an identical entity that has already been registered."
-    //     }
-    //   }
-    // };
+     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+       description: "Create and register a task definition."
+       responses: {
+         key: "400"
+         value: {
+           description: "Returned for bad request that may have failed validation."
+         }
+       }
+       responses: {
+         key: "409"
+         value: {
+           description: "Returned for a request that references an identical entity that has already been registered."
+         }
+       }
+     };
   }
 
   // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
