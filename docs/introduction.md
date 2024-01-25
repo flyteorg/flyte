@@ -56,10 +56,10 @@ Community <https://docs.flyte.org/en/latest/community/index.html>
 :hidden:
 
 Introduction to Flyte <self>
-getting_started/quickstart_guide
-getting_started/getting_started_with_workflow_development
-getting_started/flyte_fundamentals
-getting_started/core_use_cases
+flytesnacks/getting_started/quickstart_guide
+flytesnacks/getting_started/getting_started_with_workflow_development
+flytesnacks/getting_started/flyte_fundamentals
+flytesnacks/getting_started/core_use_cases
 ```
 
 ```{toctree}
