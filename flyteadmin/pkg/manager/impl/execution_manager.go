@@ -44,7 +44,6 @@ import (
 )
 
 const childContainerQueueKey = "child_queue"
-const artifactTrackerKey = "_ua"
 
 // Map of [project] -> map of [domain] -> stop watch
 type projectDomainScopedStopWatchMap = map[string]map[string]*promutils.StopWatch
