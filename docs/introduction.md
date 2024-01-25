@@ -67,8 +67,8 @@ getting_started/core_use_cases
 :caption: User Guide
 :hidden:
 
-📖 User Guide <userguide>
-🌳 Environment Setup <environment_setup>
+📖 User Guide <flytesnacks/userguide>
+🌳 Environment Setup <flytesnacks/environment_setup>
 🔤 Basics <auto_examples/basics/index>
 ⌨️ Data Types and IO <auto_examples/data_types_and_io/index>
 🔮 Advanced Composition <auto_examples/advanced_composition/index>
@@ -77,7 +77,7 @@ getting_started/core_use_cases
 ⚗️ Testing <auto_examples/testing/index>
 🚢 Productionizing <auto_examples/productionizing/index>
 🏗 Extending <auto_examples/extending/index>
-📝 Contributing <contribute>
+📝 Contributing <flytesnacks/contribute>
 ```
 
 ```{toctree}
