@@ -36,6 +36,7 @@
 #include "flyteidl/admin/common.pb.h"
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/execution.pb.h"
+#include "flyteidl/core/artifact_id.pb.h"
 #include "flyteidl/core/identifier.pb.h"
 #include "flyteidl/core/metrics.pb.h"
 #include "flyteidl/core/security.pb.h"
@@ -347,6 +348,20 @@ class ExecutionCreateRequest final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
+  // string org = 6;
+  void clear_org();
+  static const int kOrgFieldNumber = 6;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.ExecutionSpec spec = 4;
   bool has_spec() const;
   void clear_spec();
@@ -373,6 +388,7 @@ class ExecutionCreateRequest final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::ExecutionSpec* spec_;
   ::flyteidl::core::LiteralMap* inputs_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -1982,6 +1998,18 @@ class ExecutionMetadata final :
 
   // accessors -------------------------------------------------------
 
+  // repeated .flyteidl.core.ArtifactID artifact_ids = 18;
+  int artifact_ids_size() const;
+  void clear_artifact_ids();
+  static const int kArtifactIdsFieldNumber = 18;
+  ::flyteidl::core::ArtifactID* mutable_artifact_ids(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
+      mutable_artifact_ids();
+  const ::flyteidl::core::ArtifactID& artifact_ids(int index) const;
+  ::flyteidl::core::ArtifactID* add_artifact_ids();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
+      artifact_ids() const;
+
   // string principal = 2;
   void clear_principal();
   static const int kPrincipalFieldNumber = 2;
@@ -2049,6 +2077,7 @@ class ExecutionMetadata final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > artifact_ids_;
   ::google::protobuf::internal::ArenaStringPtr principal_;
   ::google::protobuf::Timestamp* scheduled_at_;
   ::flyteidl::core::NodeExecutionIdentifier* parent_node_execution_;
@@ -3837,6 +3866,59 @@ inline void ExecutionCreateRequest::set_allocated_inputs(::flyteidl::core::Liter
   }
   inputs_ = inputs;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionCreateRequest.inputs)
+}
+
+// string org = 6;
+inline void ExecutionCreateRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ExecutionCreateRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionCreateRequest.org)
+  return org_.GetNoArena();
+}
+inline void ExecutionCreateRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.ExecutionCreateRequest.org)
+}
+#if LANG_CXX11
+inline void ExecutionCreateRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.ExecutionCreateRequest.org)
+}
+#endif
+inline void ExecutionCreateRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.ExecutionCreateRequest.org)
+}
+inline void ExecutionCreateRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.ExecutionCreateRequest.org)
+}
+inline ::std::string* ExecutionCreateRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionCreateRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ExecutionCreateRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ExecutionCreateRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ExecutionCreateRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionCreateRequest.org)
 }
 
 // -------------------------------------------------------------------
@@ -5697,6 +5779,33 @@ inline void ExecutionMetadata::set_allocated_system_metadata(::flyteidl::admin::
   }
   system_metadata_ = system_metadata;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ExecutionMetadata.system_metadata)
+}
+
+// repeated .flyteidl.core.ArtifactID artifact_ids = 18;
+inline int ExecutionMetadata::artifact_ids_size() const {
+  return artifact_ids_.size();
+}
+inline ::flyteidl::core::ArtifactID* ExecutionMetadata::mutable_artifact_ids(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
+ExecutionMetadata::mutable_artifact_ids() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return &artifact_ids_;
+}
+inline const ::flyteidl::core::ArtifactID& ExecutionMetadata::artifact_ids(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_.Get(index);
+}
+inline ::flyteidl::core::ArtifactID* ExecutionMetadata::add_artifact_ids() {
+  // @@protoc_insertion_point(field_add:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
+ExecutionMetadata::artifact_ids() const {
+  // @@protoc_insertion_point(field_list:flyteidl.admin.ExecutionMetadata.artifact_ids)
+  return artifact_ids_;
 }
 
 // -------------------------------------------------------------------

@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -48,7 +49,7 @@ func insertTasksForTests(t *testing.T, client service.AdminServiceClient) {
 					}
 
 					_, err := client.CreateTask(ctx, &req)
-					assert.Nil(t, err)
+					require.NoError(t, err)
 				}
 			}
 		}
@@ -105,7 +106,7 @@ func insertWorkflowsForTests(t *testing.T, client service.AdminServiceClient) {
 					}
 
 					_, err := client.CreateWorkflow(ctx, &req)
-					assert.Nil(t, err, "Failed to create workflow test data with err %v", err)
+					require.NoError(t, err, "Failed to create workflow test data with err %v", err)
 				}
 			}
 		}

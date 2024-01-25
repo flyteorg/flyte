@@ -16,23 +16,30 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/sandboxutils"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func NewCloudEventsPublisher(ctx context.Context, config runtimeInterfaces.CloudEventsConfig, scope promutils.Scope) interfaces.Publisher {
-	if !config.Enable {
+func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Repository, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, cloudEventsConfig runtimeInterfaces.CloudEventsConfig, remoteDataConfig runtimeInterfaces.RemoteDataConfig, scope promutils.Scope) interfaces.Publisher {
+	if !cloudEventsConfig.Enable {
+		logger.Infof(ctx, "CloudEvents are disabled, config is [+%v]", cloudEventsConfig)
 		return implementations.NewNoopPublish()
 	}
-	reconnectAttempts := config.ReconnectAttempts
-	reconnectDelay := time.Duration(config.ReconnectDelaySeconds) * time.Second
-	switch config.Type {
+	reconnectAttempts := cloudEventsConfig.ReconnectAttempts
+	reconnectDelay := time.Duration(cloudEventsConfig.ReconnectDelaySeconds) * time.Second
+
+	var sender interfaces.Sender
+	switch cloudEventsConfig.Type {
 	case common.AWS:
 		snsConfig := gizmoAWS.SNSConfig{
-			Topic: config.EventsPublisherConfig.TopicName,
+			Topic: cloudEventsConfig.EventsPublisherConfig.TopicName,
 		}
-		snsConfig.Region = config.AWSConfig.Region
+		snsConfig.Region = cloudEventsConfig.AWSConfig.Region
 
 		var publisher pubsub.Publisher
 		var err error
@@ -45,12 +52,13 @@ func NewCloudEventsPublisher(ctx context.Context, config runtimeInterfaces.Cloud
 		if err != nil {
 			panic(err)
 		}
-		return cloudEventImplementations.NewCloudEventsPublisher(&cloudEventImplementations.PubSubSender{Pub: publisher}, scope, config.EventsPublisherConfig.EventTypes)
+		sender = &cloudEventImplementations.PubSubSender{Pub: publisher}
+
 	case common.GCP:
 		pubsubConfig := gizmoGCP.Config{
-			Topic: config.EventsPublisherConfig.TopicName,
+			Topic: cloudEventsConfig.EventsPublisherConfig.TopicName,
 		}
-		pubsubConfig.ProjectID = config.GCPConfig.ProjectID
+		pubsubConfig.ProjectID = cloudEventsConfig.GCPConfig.ProjectID
 		var publisher pubsub.MultiPublisher
 		var err error
 		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
@@ -61,30 +69,46 @@ func NewCloudEventsPublisher(ctx context.Context, config runtimeInterfaces.Cloud
 		if err != nil {
 			panic(err)
 		}
-		return cloudEventImplementations.NewCloudEventsPublisher(&cloudEventImplementations.PubSubSender{Pub: publisher}, scope, config.EventsPublisherConfig.EventTypes)
+		sender = &cloudEventImplementations.PubSubSender{Pub: publisher}
+
 	case cloudEventImplementations.Kafka:
 		saramaConfig := sarama.NewConfig()
 		var err error
-		saramaConfig.Version, err = sarama.ParseKafkaVersion(config.KafkaConfig.Version)
+		saramaConfig.Version, err = sarama.ParseKafkaVersion(cloudEventsConfig.KafkaConfig.Version)
 		if err != nil {
 			logger.Fatalf(ctx, "failed to parse kafka version, %v", err)
 			panic(err)
 		}
-		sender, err := kafka_sarama.NewSender(config.KafkaConfig.Brokers, saramaConfig, config.EventsPublisherConfig.TopicName)
+		kafkaSender, err := kafka_sarama.NewSender(cloudEventsConfig.KafkaConfig.Brokers, saramaConfig, cloudEventsConfig.EventsPublisherConfig.TopicName)
 		if err != nil {
 			panic(err)
 		}
-		client, err := cloudevents.NewClient(sender, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
+		client, err := cloudevents.NewClient(kafkaSender, cloudevents.WithTimeNow(), cloudevents.WithUUIDs())
 		if err != nil {
 			logger.Fatalf(ctx, "failed to create kafka client, %v", err)
 			panic(err)
 		}
-		return cloudEventImplementations.NewCloudEventsPublisher(&cloudEventImplementations.KafkaSender{Client: client}, scope, config.EventsPublisherConfig.EventTypes)
+		sender = &cloudEventImplementations.KafkaSender{Client: client}
+
+	case common.Sandbox:
+		var publisher pubsub.Publisher
+		publisher = sandboxutils.NewCloudEventsPublisher()
+		sender = &cloudEventImplementations.PubSubSender{
+			Pub: publisher,
+		}
+
 	case common.Local:
 		fallthrough
 	default:
 		logger.Infof(ctx,
-			"Using default noop cloud events publisher implementation for config type [%s]", config.Type)
+			"Using default noop cloud events publisher implementation for config type [%s]", cloudEventsConfig.Type)
 		return implementations.NewNoopPublish()
 	}
+
+	if cloudEventsConfig.CloudEventVersion == runtimeInterfaces.CloudEventVersionv2 {
+		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig)
+	}
+
+	return cloudEventImplementations.NewCloudEventsPublisher(sender, scope, cloudEventsConfig.EventsPublisherConfig.EventTypes)
+
 }

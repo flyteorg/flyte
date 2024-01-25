@@ -154,8 +154,8 @@ message MatchingAttributes {
   }
 }
 
-// Represents a custom set of attributes applied for either a domain; a domain and project; or
-// domain, project and workflow name.
+// Represents a custom set of attributes applied for either a domain (and optional org); a domain and project (and optional org);
+// or domain, project and workflow name (and optional org).
 // These are used to override system level defaults for kubernetes cluster resource management,
 // default execution values, and more all across different levels of specificity.
 message MatchableAttributesConfiguration {
@@ -168,6 +168,9 @@ message MatchableAttributesConfiguration {
     string workflow = 4;
 
     string launch_plan = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 // Request all matching resource attributes for a resource type.
@@ -175,6 +178,9 @@ message MatchableAttributesConfiguration {
 message ListMatchableAttributesRequest {
     // +required
     MatchableResource resource_type = 1;
+
+    // Optional, org filter applied to list project requests.
+    string org = 2;
 }
 
 // Response for a request for all matching resource attributes for a resource type.

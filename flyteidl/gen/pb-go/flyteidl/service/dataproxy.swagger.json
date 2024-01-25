@@ -264,6 +264,13 @@
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional metadata for literals."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -572,6 +579,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

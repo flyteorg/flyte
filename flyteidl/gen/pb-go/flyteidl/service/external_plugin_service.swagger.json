@@ -163,6 +163,72 @@
         }
       }
     },
+    "coreArtifactBindingData": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "partition_key": {
+          "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "transform": {
+          "type": "string",
+          "title": "This is only relevant in the time partition case"
+        }
+      },
+      "title": "Only valid for triggers"
+    },
+    "coreArtifactID": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "version": {
+          "type": "string"
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
+        }
+      }
+    },
+    "coreArtifactKey": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "coreArtifactTag": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
+    },
     "coreBinary": {
       "type": "object",
       "properties": {
@@ -392,6 +458,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -417,6 +487,14 @@
         }
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
+    },
+    "coreInputBindingData": {
+      "type": "object",
+      "properties": {
+        "var": {
+          "type": "string"
+        }
+      }
     },
     "coreK8sObjectMetadata": {
       "type": "object",
@@ -470,6 +548,26 @@
       },
       "description": "A generic key value pair."
     },
+    "coreLabelValue": {
+      "type": "object",
+      "properties": {
+        "static_value": {
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
+        },
+        "triggered_binding": {
+          "$ref": "#/definitions/coreArtifactBindingData"
+        },
+        "input_binding": {
+          "$ref": "#/definitions/coreInputBindingData"
+        }
+      }
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -488,6 +586,13 @@
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional metadata for literals."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -613,6 +718,17 @@
       ],
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
+    },
+    "corePartitions": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLabelValue"
+          }
+        }
+      }
     },
     "corePrimitive": {
       "type": "object",
@@ -934,6 +1050,13 @@
         "pod_template_name": {
           "type": "string",
           "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
+        },
+        "cache_ignore_input_vars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
         }
       },
       "title": "Task Metadata"
@@ -992,6 +1115,14 @@
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
+    },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
     },
     "coreTypeAnnotation": {
       "type": "object",
@@ -1067,6 +1198,13 @@
         "description": {
           "type": "string",
           "title": "+optional string describing input variable"
+        },
+        "artifact_partial_id": {
+          "$ref": "#/definitions/coreArtifactID",
+          "description": "+optional This object allows the user to specify how Artifacts are created.\nname, tag, partitions can be specified. The other fields (version and project/domain) are ignored."
+        },
+        "artifact_tag": {
+          "$ref": "#/definitions/coreArtifactTag"
         }
       },
       "description": "Defines a strongly typed variable."

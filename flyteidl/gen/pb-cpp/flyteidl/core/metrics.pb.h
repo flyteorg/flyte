@@ -33,6 +33,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/identifier.pb.h"
 #include <google/protobuf/timestamp.pb.h>
+#include <google/protobuf/struct.pb.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fmetrics_2eproto
@@ -43,7 +44,7 @@ struct TableStruct_flyteidl_2fcore_2fmetrics_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[1]
+  static const ::google::protobuf::internal::ParseTable schema[2]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -52,6 +53,9 @@ struct TableStruct_flyteidl_2fcore_2fmetrics_2eproto {
 void AddDescriptors_flyteidl_2fcore_2fmetrics_2eproto();
 namespace flyteidl {
 namespace core {
+class ExecutionMetricResult;
+class ExecutionMetricResultDefaultTypeInternal;
+extern ExecutionMetricResultDefaultTypeInternal _ExecutionMetricResult_default_instance_;
 class Span;
 class SpanDefaultTypeInternal;
 extern SpanDefaultTypeInternal _Span_default_instance_;
@@ -59,6 +63,7 @@ extern SpanDefaultTypeInternal _Span_default_instance_;
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::core::ExecutionMetricResult* Arena::CreateMaybeMessage<::flyteidl::core::ExecutionMetricResult>(Arena*);
 template<> ::flyteidl::core::Span* Arena::CreateMaybeMessage<::flyteidl::core::Span>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -271,6 +276,136 @@ class Span final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
+  friend struct ::TableStruct_flyteidl_2fcore_2fmetrics_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ExecutionMetricResult final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.ExecutionMetricResult) */ {
+ public:
+  ExecutionMetricResult();
+  virtual ~ExecutionMetricResult();
+
+  ExecutionMetricResult(const ExecutionMetricResult& from);
+
+  inline ExecutionMetricResult& operator=(const ExecutionMetricResult& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ExecutionMetricResult(ExecutionMetricResult&& from) noexcept
+    : ExecutionMetricResult() {
+    *this = ::std::move(from);
+  }
+
+  inline ExecutionMetricResult& operator=(ExecutionMetricResult&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ExecutionMetricResult& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ExecutionMetricResult* internal_default_instance() {
+    return reinterpret_cast<const ExecutionMetricResult*>(
+               &_ExecutionMetricResult_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(ExecutionMetricResult* other);
+  friend void swap(ExecutionMetricResult& a, ExecutionMetricResult& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ExecutionMetricResult* New() const final {
+    return CreateMaybeMessage<ExecutionMetricResult>(nullptr);
+  }
+
+  ExecutionMetricResult* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ExecutionMetricResult>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ExecutionMetricResult& from);
+  void MergeFrom(const ExecutionMetricResult& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ExecutionMetricResult* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string metric = 1;
+  void clear_metric();
+  static const int kMetricFieldNumber = 1;
+  const ::std::string& metric() const;
+  void set_metric(const ::std::string& value);
+  #if LANG_CXX11
+  void set_metric(::std::string&& value);
+  #endif
+  void set_metric(const char* value);
+  void set_metric(const char* value, size_t size);
+  ::std::string* mutable_metric();
+  ::std::string* release_metric();
+  void set_allocated_metric(::std::string* metric);
+
+  // .google.protobuf.Struct data = 2;
+  bool has_data() const;
+  void clear_data();
+  static const int kDataFieldNumber = 2;
+  const ::google::protobuf::Struct& data() const;
+  ::google::protobuf::Struct* release_data();
+  ::google::protobuf::Struct* mutable_data();
+  void set_allocated_data(::google::protobuf::Struct* data);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionMetricResult)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr metric_;
+  ::google::protobuf::Struct* data_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fmetrics_2eproto;
 };
 // ===================================================================
@@ -612,9 +747,114 @@ inline void Span::clear_has_id() {
 inline Span::IdCase Span::id_case() const {
   return Span::IdCase(_oneof_case_[0]);
 }
+// -------------------------------------------------------------------
+
+// ExecutionMetricResult
+
+// string metric = 1;
+inline void ExecutionMetricResult::clear_metric() {
+  metric_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ExecutionMetricResult::metric() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionMetricResult.metric)
+  return metric_.GetNoArena();
+}
+inline void ExecutionMetricResult::set_metric(const ::std::string& value) {
+  
+  metric_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.ExecutionMetricResult.metric)
+}
+#if LANG_CXX11
+inline void ExecutionMetricResult::set_metric(::std::string&& value) {
+  
+  metric_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.ExecutionMetricResult.metric)
+}
+#endif
+inline void ExecutionMetricResult::set_metric(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  metric_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.ExecutionMetricResult.metric)
+}
+inline void ExecutionMetricResult::set_metric(const char* value, size_t size) {
+  
+  metric_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.ExecutionMetricResult.metric)
+}
+inline ::std::string* ExecutionMetricResult::mutable_metric() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.ExecutionMetricResult.metric)
+  return metric_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ExecutionMetricResult::release_metric() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.ExecutionMetricResult.metric)
+  
+  return metric_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ExecutionMetricResult::set_allocated_metric(::std::string* metric) {
+  if (metric != nullptr) {
+    
+  } else {
+    
+  }
+  metric_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), metric);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ExecutionMetricResult.metric)
+}
+
+// .google.protobuf.Struct data = 2;
+inline bool ExecutionMetricResult::has_data() const {
+  return this != internal_default_instance() && data_ != nullptr;
+}
+inline const ::google::protobuf::Struct& ExecutionMetricResult::data() const {
+  const ::google::protobuf::Struct* p = data_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.ExecutionMetricResult.data)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Struct*>(
+      &::google::protobuf::_Struct_default_instance_);
+}
+inline ::google::protobuf::Struct* ExecutionMetricResult::release_data() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.ExecutionMetricResult.data)
+  
+  ::google::protobuf::Struct* temp = data_;
+  data_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Struct* ExecutionMetricResult::mutable_data() {
+  
+  if (data_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Struct>(GetArenaNoVirtual());
+    data_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.ExecutionMetricResult.data)
+  return data_;
+}
+inline void ExecutionMetricResult::set_allocated_data(::google::protobuf::Struct* data) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(data_);
+  }
+  if (data) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(data)->GetArena();
+    if (message_arena != submessage_arena) {
+      data = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, data, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  data_ = data;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ExecutionMetricResult.data)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 
 // @@protoc_insertion_point(namespace_scope)
 

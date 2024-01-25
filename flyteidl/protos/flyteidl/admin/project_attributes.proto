@@ -12,6 +12,9 @@ message ProjectAttributes {
     string project = 1;
 
     MatchingAttributes matching_attributes = 2;
+
+    // Optional, org key applied to the project.
+    string org = 3;
 }
 
 // Sets custom attributes for a project
@@ -35,6 +38,9 @@ message ProjectAttributesGetRequest {
     // Which type of matchable attributes to return.
     // +required
     MatchableResource resource_type = 2;
+
+    // Optional, org key applied to the project.
+    string org = 3;
 }
 
 // Response to get an individual project level attribute override.
@@ -53,6 +59,9 @@ message ProjectAttributesDeleteRequest {
     // Which type of matchable attributes to delete.
     // +required
     MatchableResource resource_type = 2;
+
+    // Optional, org key applied to the project.
+    string org = 3;
 }
 
 // Purposefully empty, may be populated in the future.

@@ -160,3 +160,99 @@ func (_m *AsyncAgentServiceClient) GetTask(ctx context.Context, in *admin.GetTas
 
 	return r0, r1
 }
+
+type AsyncAgentServiceClient_GetTaskLogs struct {
+	*mock.Call
+}
+
+func (_m AsyncAgentServiceClient_GetTaskLogs) Return(_a0 *admin.GetTaskLogsResponse, _a1 error) *AsyncAgentServiceClient_GetTaskLogs {
+	return &AsyncAgentServiceClient_GetTaskLogs{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AsyncAgentServiceClient) OnGetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) *AsyncAgentServiceClient_GetTaskLogs {
+	c_call := _m.On("GetTaskLogs", ctx, in, opts)
+	return &AsyncAgentServiceClient_GetTaskLogs{Call: c_call}
+}
+
+func (_m *AsyncAgentServiceClient) OnGetTaskLogsMatch(matchers ...interface{}) *AsyncAgentServiceClient_GetTaskLogs {
+	c_call := _m.On("GetTaskLogs", matchers...)
+	return &AsyncAgentServiceClient_GetTaskLogs{Call: c_call}
+}
+
+// GetTaskLogs provides a mock function with given fields: ctx, in, opts
+func (_m *AsyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.GetTaskLogsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskLogsRequest, ...grpc.CallOption) *admin.GetTaskLogsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetTaskLogsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskLogsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AsyncAgentServiceClient_GetTaskMetrics struct {
+	*mock.Call
+}
+
+func (_m AsyncAgentServiceClient_GetTaskMetrics) Return(_a0 *admin.GetTaskMetricsResponse, _a1 error) *AsyncAgentServiceClient_GetTaskMetrics {
+	return &AsyncAgentServiceClient_GetTaskMetrics{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AsyncAgentServiceClient) OnGetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) *AsyncAgentServiceClient_GetTaskMetrics {
+	c_call := _m.On("GetTaskMetrics", ctx, in, opts)
+	return &AsyncAgentServiceClient_GetTaskMetrics{Call: c_call}
+}
+
+func (_m *AsyncAgentServiceClient) OnGetTaskMetricsMatch(matchers ...interface{}) *AsyncAgentServiceClient_GetTaskMetrics {
+	c_call := _m.On("GetTaskMetrics", matchers...)
+	return &AsyncAgentServiceClient_GetTaskMetrics{Call: c_call}
+}
+
+// GetTaskMetrics provides a mock function with given fields: ctx, in, opts
+func (_m *AsyncAgentServiceClient) GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.GetTaskMetricsResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.GetTaskMetricsRequest, ...grpc.CallOption) *admin.GetTaskMetricsResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.GetTaskMetricsResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.GetTaskMetricsRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}

@@ -2,6 +2,7 @@ from flyteidl.admin import cluster_assignment_pb2 as _cluster_assignment_pb2
 from flyteidl.admin import common_pb2 as _common_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import execution_pb2 as _execution_pb2
+from flyteidl.core import artifact_id_pb2 as _artifact_id_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from flyteidl.core import metrics_pb2 as _metrics_pb2
 from flyteidl.core import security_pb2 as _security_pb2
@@ -24,18 +25,20 @@ EXECUTION_ACTIVE: ExecutionState
 EXECUTION_ARCHIVED: ExecutionState
 
 class ExecutionCreateRequest(_message.Message):
-    __slots__ = ["project", "domain", "name", "spec", "inputs"]
+    __slots__ = ["project", "domain", "name", "spec", "inputs", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
     spec: ExecutionSpec
     inputs: _literals_pb2.LiteralMap
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., spec: _Optional[_Union[ExecutionSpec, _Mapping]] = ..., inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ExecutionRelaunchRequest(_message.Message):
     __slots__ = ["id", "name", "overwrite_cache"]
@@ -144,7 +147,7 @@ class SystemMetadata(_message.Message):
     def __init__(self, execution_cluster: _Optional[str] = ..., namespace: _Optional[str] = ...) -> None: ...
 
 class ExecutionMetadata(_message.Message):
-    __slots__ = ["mode", "principal", "nesting", "scheduled_at", "parent_node_execution", "reference_execution", "system_metadata"]
+    __slots__ = ["mode", "principal", "nesting", "scheduled_at", "parent_node_execution", "reference_execution", "system_metadata", "artifact_ids"]
     class ExecutionMode(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
         __slots__ = []
         MANUAL: _ClassVar[ExecutionMetadata.ExecutionMode]
@@ -166,6 +169,7 @@ class ExecutionMetadata(_message.Message):
     PARENT_NODE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
     REFERENCE_EXECUTION_FIELD_NUMBER: _ClassVar[int]
     SYSTEM_METADATA_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_IDS_FIELD_NUMBER: _ClassVar[int]
     mode: ExecutionMetadata.ExecutionMode
     principal: str
     nesting: int
@@ -173,7 +177,8 @@ class ExecutionMetadata(_message.Message):
     parent_node_execution: _identifier_pb2.NodeExecutionIdentifier
     reference_execution: _identifier_pb2.WorkflowExecutionIdentifier
     system_metadata: SystemMetadata
-    def __init__(self, mode: _Optional[_Union[ExecutionMetadata.ExecutionMode, str]] = ..., principal: _Optional[str] = ..., nesting: _Optional[int] = ..., scheduled_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., system_metadata: _Optional[_Union[SystemMetadata, _Mapping]] = ...) -> None: ...
+    artifact_ids: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
+    def __init__(self, mode: _Optional[_Union[ExecutionMetadata.ExecutionMode, str]] = ..., principal: _Optional[str] = ..., nesting: _Optional[int] = ..., scheduled_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., parent_node_execution: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ..., reference_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., system_metadata: _Optional[_Union[SystemMetadata, _Mapping]] = ..., artifact_ids: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ...) -> None: ...
 
 class NotificationList(_message.Message):
     __slots__ = ["notifications"]

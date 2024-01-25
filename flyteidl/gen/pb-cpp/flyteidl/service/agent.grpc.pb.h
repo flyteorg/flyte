@@ -40,7 +40,7 @@ class ServerContext;
 namespace flyteidl {
 namespace service {
 
-// AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+// AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
 class AsyncAgentService final {
  public:
   static constexpr char const* service_full_name() {
@@ -73,6 +73,26 @@ class AsyncAgentService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DeleteTaskResponse>> PrepareAsyncDeleteTask(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DeleteTaskResponse>>(PrepareAsyncDeleteTaskRaw(context, request, cq));
     }
+    // GetTaskMetrics returns one or more task execution metrics, if available.
+    //
+    // Errors include
+    //  * OutOfRange if metrics are not available for the specified task time range
+    //  * various other errors
+    virtual ::grpc::Status GetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::flyteidl::admin::GetTaskMetricsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskMetricsResponse>> AsyncGetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskMetricsResponse>>(AsyncGetTaskMetricsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskMetricsResponse>> PrepareAsyncGetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskMetricsResponse>>(PrepareAsyncGetTaskMetricsRaw(context, request, cq));
+    }
+    // GetTaskLogs returns task execution logs, if available.
+    virtual ::grpc::Status GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::flyteidl::admin::GetTaskLogsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskLogsResponse>> AsyncGetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskLogsResponse>>(AsyncGetTaskLogsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskLogsResponse>> PrepareAsyncGetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskLogsResponse>>(PrepareAsyncGetTaskLogsRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -91,6 +111,20 @@ class AsyncAgentService final {
       virtual void DeleteTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DeleteTaskResponse* response, std::function<void(::grpc::Status)>) = 0;
       virtual void DeleteTask(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest* request, ::flyteidl::admin::DeleteTaskResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
       virtual void DeleteTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DeleteTaskResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // GetTaskMetrics returns one or more task execution metrics, if available.
+      //
+      // Errors include
+      //  * OutOfRange if metrics are not available for the specified task time range
+      //  * various other errors
+      virtual void GetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskMetrics(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskMetricsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTaskMetrics(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskMetricsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // GetTaskLogs returns task execution logs, if available.
+      virtual void GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskLogs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskLogsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetTaskLogs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
     };
     virtual class experimental_async_interface* experimental_async() { return nullptr; }
   private:
@@ -100,6 +134,10 @@ class AsyncAgentService final {
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskResponse>* PrepareAsyncGetTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DeleteTaskResponse>* AsyncDeleteTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::DeleteTaskResponse>* PrepareAsyncDeleteTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskMetricsResponse>* AsyncGetTaskMetricsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskMetricsResponse>* PrepareAsyncGetTaskMetricsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskLogsResponse>* AsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetTaskLogsResponse>* PrepareAsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -125,6 +163,20 @@ class AsyncAgentService final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DeleteTaskResponse>> PrepareAsyncDeleteTask(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DeleteTaskResponse>>(PrepareAsyncDeleteTaskRaw(context, request, cq));
     }
+    ::grpc::Status GetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::flyteidl::admin::GetTaskMetricsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskMetricsResponse>> AsyncGetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskMetricsResponse>>(AsyncGetTaskMetricsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskMetricsResponse>> PrepareAsyncGetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskMetricsResponse>>(PrepareAsyncGetTaskMetricsRaw(context, request, cq));
+    }
+    ::grpc::Status GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::flyteidl::admin::GetTaskLogsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>> AsyncGetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>>(AsyncGetTaskLogsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>> PrepareAsyncGetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>>(PrepareAsyncGetTaskLogsRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -140,6 +192,14 @@ class AsyncAgentService final {
       void DeleteTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DeleteTaskResponse* response, std::function<void(::grpc::Status)>) override;
       void DeleteTask(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest* request, ::flyteidl::admin::DeleteTaskResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
       void DeleteTask(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::DeleteTaskResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskMetrics(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskMetricsResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskMetrics(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskMetrics(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskMetricsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskLogs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskLogsResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetTaskLogs(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetTaskLogs(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -157,9 +217,15 @@ class AsyncAgentService final {
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskResponse>* PrepareAsyncGetTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DeleteTaskResponse>* AsyncDeleteTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::DeleteTaskResponse>* PrepareAsyncDeleteTaskRaw(::grpc::ClientContext* context, const ::flyteidl::admin::DeleteTaskRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskMetricsResponse>* AsyncGetTaskMetricsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskMetricsResponse>* PrepareAsyncGetTaskMetricsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskMetricsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>* AsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetTaskLogsResponse>* PrepareAsyncGetTaskLogsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetTaskLogsRequest& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_CreateTask_;
     const ::grpc::internal::RpcMethod rpcmethod_GetTask_;
     const ::grpc::internal::RpcMethod rpcmethod_DeleteTask_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetTaskMetrics_;
+    const ::grpc::internal::RpcMethod rpcmethod_GetTaskLogs_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -173,6 +239,14 @@ class AsyncAgentService final {
     virtual ::grpc::Status GetTask(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskRequest* request, ::flyteidl::admin::GetTaskResponse* response);
     // Delete the task resource.
     virtual ::grpc::Status DeleteTask(::grpc::ServerContext* context, const ::flyteidl::admin::DeleteTaskRequest* request, ::flyteidl::admin::DeleteTaskResponse* response);
+    // GetTaskMetrics returns one or more task execution metrics, if available.
+    //
+    // Errors include
+    //  * OutOfRange if metrics are not available for the specified task time range
+    //  * various other errors
+    virtual ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response);
+    // GetTaskLogs returns task execution logs, if available.
+    virtual ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response);
   };
   template <class BaseClass>
   class WithAsyncMethod_CreateTask : public BaseClass {
@@ -234,7 +308,47 @@ class AsyncAgentService final {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_CreateTask<WithAsyncMethod_GetTask<WithAsyncMethod_DeleteTask<Service > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_GetTaskMetrics : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_GetTaskMetrics() {
+      ::grpc::Service::MarkMethodAsync(3);
+    }
+    ~WithAsyncMethod_GetTaskMetrics() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetTaskMetrics(::grpc::ServerContext* context, ::flyteidl::admin::GetTaskMetricsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::GetTaskMetricsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_GetTaskLogs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_GetTaskLogs() {
+      ::grpc::Service::MarkMethodAsync(4);
+    }
+    ~WithAsyncMethod_GetTaskLogs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetTaskLogs(::grpc::ServerContext* context, ::flyteidl::admin::GetTaskLogsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::GetTaskLogsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_CreateTask<WithAsyncMethod_GetTask<WithAsyncMethod_DeleteTask<WithAsyncMethod_GetTaskMetrics<WithAsyncMethod_GetTaskLogs<Service > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_CreateTask : public BaseClass {
    private:
@@ -328,7 +442,69 @@ class AsyncAgentService final {
     }
     virtual void DeleteTask(::grpc::ServerContext* context, const ::flyteidl::admin::DeleteTaskRequest* request, ::flyteidl::admin::DeleteTaskResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
-  typedef ExperimentalWithCallbackMethod_CreateTask<ExperimentalWithCallbackMethod_GetTask<ExperimentalWithCallbackMethod_DeleteTask<Service > > > ExperimentalCallbackService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetTaskMetrics : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetTaskMetrics() {
+      ::grpc::Service::experimental().MarkMethodCallback(3,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetTaskMetricsRequest, ::flyteidl::admin::GetTaskMetricsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::GetTaskMetricsRequest* request,
+                 ::flyteidl::admin::GetTaskMetricsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetTaskMetrics(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetTaskMetrics(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetTaskMetricsRequest, ::flyteidl::admin::GetTaskMetricsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetTaskMetricsRequest, ::flyteidl::admin::GetTaskMetricsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(3))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetTaskMetrics() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetTaskLogs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetTaskLogs() {
+      ::grpc::Service::experimental().MarkMethodCallback(4,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetTaskLogsRequest, ::flyteidl::admin::GetTaskLogsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::GetTaskLogsRequest* request,
+                 ::flyteidl::admin::GetTaskLogsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetTaskLogs(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetTaskLogs(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetTaskLogsRequest, ::flyteidl::admin::GetTaskLogsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetTaskLogsRequest, ::flyteidl::admin::GetTaskLogsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(4))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetTaskLogs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_CreateTask<ExperimentalWithCallbackMethod_GetTask<ExperimentalWithCallbackMethod_DeleteTask<ExperimentalWithCallbackMethod_GetTaskMetrics<ExperimentalWithCallbackMethod_GetTaskLogs<Service > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_CreateTask : public BaseClass {
    private:
@@ -376,6 +552,40 @@ class AsyncAgentService final {
     }
     // disable synchronous version of this method
     ::grpc::Status DeleteTask(::grpc::ServerContext* context, const ::flyteidl::admin::DeleteTaskRequest* request, ::flyteidl::admin::DeleteTaskResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_GetTaskMetrics : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_GetTaskMetrics() {
+      ::grpc::Service::MarkMethodGeneric(3);
+    }
+    ~WithGenericMethod_GetTaskMetrics() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_GetTaskLogs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_GetTaskLogs() {
+      ::grpc::Service::MarkMethodGeneric(4);
+    }
+    ~WithGenericMethod_GetTaskLogs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -438,6 +648,46 @@ class AsyncAgentService final {
     }
     void RequestDeleteTask(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncUnary(2, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetTaskMetrics : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_GetTaskMetrics() {
+      ::grpc::Service::MarkMethodRaw(3);
+    }
+    ~WithRawMethod_GetTaskMetrics() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetTaskMetrics(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(3, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetTaskLogs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_GetTaskLogs() {
+      ::grpc::Service::MarkMethodRaw(4);
+    }
+    ~WithRawMethod_GetTaskLogs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetTaskLogs(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(4, context, request, response, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -516,6 +766,56 @@ class AsyncAgentService final {
     virtual void DeleteTask(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetTaskMetrics : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetTaskMetrics() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(3,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetTaskMetrics(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetTaskMetrics() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskMetrics(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetTaskLogs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetTaskLogs() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(4,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetTaskLogs(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetTaskLogs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetTaskLogs(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_CreateTask : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service *service) {}
@@ -575,9 +875,426 @@ class AsyncAgentService final {
     // replace default version of method with streamed unary
     virtual ::grpc::Status StreamedDeleteTask(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::DeleteTaskRequest,::flyteidl::admin::DeleteTaskResponse>* server_unary_streamer) = 0;
   };
-  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_DeleteTask<Service > > > StreamedUnaryService;
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetTaskMetrics : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetTaskMetrics() {
+      ::grpc::Service::MarkMethodStreamed(3,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetTaskMetricsRequest, ::flyteidl::admin::GetTaskMetricsResponse>(std::bind(&WithStreamedUnaryMethod_GetTaskMetrics<BaseClass>::StreamedGetTaskMetrics, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetTaskMetrics() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetTaskMetrics(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskMetricsRequest* request, ::flyteidl::admin::GetTaskMetricsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetTaskMetrics(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetTaskMetricsRequest,::flyteidl::admin::GetTaskMetricsResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetTaskLogs : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetTaskLogs() {
+      ::grpc::Service::MarkMethodStreamed(4,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetTaskLogsRequest, ::flyteidl::admin::GetTaskLogsResponse>(std::bind(&WithStreamedUnaryMethod_GetTaskLogs<BaseClass>::StreamedGetTaskLogs, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetTaskLogs() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetTaskLogs(::grpc::ServerContext* context, const ::flyteidl::admin::GetTaskLogsRequest* request, ::flyteidl::admin::GetTaskLogsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetTaskLogs(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetTaskLogsRequest,::flyteidl::admin::GetTaskLogsResponse>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_DeleteTask<WithStreamedUnaryMethod_GetTaskMetrics<WithStreamedUnaryMethod_GetTaskLogs<Service > > > > > StreamedUnaryService;
   typedef Service SplitStreamedService;
-  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_DeleteTask<Service > > > StreamedService;
+  typedef WithStreamedUnaryMethod_CreateTask<WithStreamedUnaryMethod_GetTask<WithStreamedUnaryMethod_DeleteTask<WithStreamedUnaryMethod_GetTaskMetrics<WithStreamedUnaryMethod_GetTaskLogs<Service > > > > > StreamedService;
+};
+
+// AgentMetadataService defines an RPC service that is also served over HTTP via grpc-gateway.
+// This service allows propeller or users to get the metadata of agents.
+class AgentMetadataService final {
+ public:
+  static constexpr char const* service_full_name() {
+    return "flyteidl.service.AgentMetadataService";
+  }
+  class StubInterface {
+   public:
+    virtual ~StubInterface() {}
+    // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+    virtual ::grpc::Status GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::flyteidl::admin::GetAgentResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>> AsyncGetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>>(AsyncGetAgentRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>> PrepareAsyncGetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>>(PrepareAsyncGetAgentRaw(context, request, cq));
+    }
+    // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+    virtual ::grpc::Status ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) = 0;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>> AsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>>(AsyncListAgentsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>> PrepareAsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>>(PrepareAsyncListAgentsRaw(context, request, cq));
+    }
+    class experimental_async_interface {
+     public:
+      virtual ~experimental_async_interface() {}
+      // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+      virtual void GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+      virtual void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+      virtual void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) = 0;
+    };
+    virtual class experimental_async_interface* experimental_async() { return nullptr; }
+  private:
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>* AsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::GetAgentResponse>* PrepareAsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>* AsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientAsyncResponseReaderInterface< ::flyteidl::admin::ListAgentsResponse>* PrepareAsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) = 0;
+  };
+  class Stub final : public StubInterface {
+   public:
+    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
+    ::grpc::Status GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::flyteidl::admin::GetAgentResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>> AsyncGetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>>(AsyncGetAgentRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>> PrepareAsyncGetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>>(PrepareAsyncGetAgentRaw(context, request, cq));
+    }
+    ::grpc::Status ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::flyteidl::admin::ListAgentsResponse* response) override;
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>> AsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>>(AsyncListAgentsRaw(context, request, cq));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>> PrepareAsyncListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>>(PrepareAsyncListAgentsRaw(context, request, cq));
+    }
+    class experimental_async final :
+      public StubInterface::experimental_async_interface {
+     public:
+      void GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetAgent(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void GetAgent(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) override;
+      void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, std::function<void(::grpc::Status)>) override;
+      void ListAgents(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+      void ListAgents(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) override;
+     private:
+      friend class Stub;
+      explicit experimental_async(Stub* stub): stub_(stub) { }
+      Stub* stub() { return stub_; }
+      Stub* stub_;
+    };
+    class experimental_async_interface* experimental_async() override { return &async_stub_; }
+
+   private:
+    std::shared_ptr< ::grpc::ChannelInterface> channel_;
+    class experimental_async async_stub_{this};
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>* AsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::GetAgentResponse>* PrepareAsyncGetAgentRaw(::grpc::ClientContext* context, const ::flyteidl::admin::GetAgentRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* AsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientAsyncResponseReader< ::flyteidl::admin::ListAgentsResponse>* PrepareAsyncListAgentsRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ListAgentsRequest& request, ::grpc::CompletionQueue* cq) override;
+    const ::grpc::internal::RpcMethod rpcmethod_GetAgent_;
+    const ::grpc::internal::RpcMethod rpcmethod_ListAgents_;
+  };
+  static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
+
+  class Service : public ::grpc::Service {
+   public:
+    Service();
+    virtual ~Service();
+    // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+    virtual ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response);
+    // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+    virtual ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response);
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_GetAgent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_GetAgent() {
+      ::grpc::Service::MarkMethodAsync(0);
+    }
+    ~WithAsyncMethod_GetAgent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetAgent(::grpc::ServerContext* context, ::flyteidl::admin::GetAgentRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::GetAgentResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithAsyncMethod_ListAgents : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithAsyncMethod_ListAgents() {
+      ::grpc::Service::MarkMethodAsync(1);
+    }
+    ~WithAsyncMethod_ListAgents() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestListAgents(::grpc::ServerContext* context, ::flyteidl::admin::ListAgentsRequest* request, ::grpc::ServerAsyncResponseWriter< ::flyteidl::admin::ListAgentsResponse>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_GetAgent<WithAsyncMethod_ListAgents<Service > > AsyncService;
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_GetAgent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_GetAgent() {
+      ::grpc::Service::experimental().MarkMethodCallback(0,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetAgentRequest, ::flyteidl::admin::GetAgentResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::GetAgentRequest* request,
+                 ::flyteidl::admin::GetAgentResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->GetAgent(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_GetAgent(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::GetAgentRequest, ::flyteidl::admin::GetAgentResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::GetAgentRequest, ::flyteidl::admin::GetAgentResponse>*>(
+          ::grpc::Service::experimental().GetHandler(0))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_GetAgent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_ListAgents : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithCallbackMethod_ListAgents() {
+      ::grpc::Service::experimental().MarkMethodCallback(1,
+        new ::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>(
+          [this](::grpc::ServerContext* context,
+                 const ::flyteidl::admin::ListAgentsRequest* request,
+                 ::flyteidl::admin::ListAgentsResponse* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   return this->ListAgents(context, request, response, controller);
+                 }));
+    }
+    void SetMessageAllocatorFor_ListAgents(
+        ::grpc::experimental::MessageAllocator< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>* allocator) {
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>*>(
+          ::grpc::Service::experimental().GetHandler(1))
+              ->SetMessageAllocator(allocator);
+    }
+    ~ExperimentalWithCallbackMethod_ListAgents() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  typedef ExperimentalWithCallbackMethod_GetAgent<ExperimentalWithCallbackMethod_ListAgents<Service > > ExperimentalCallbackService;
+  template <class BaseClass>
+  class WithGenericMethod_GetAgent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_GetAgent() {
+      ::grpc::Service::MarkMethodGeneric(0);
+    }
+    ~WithGenericMethod_GetAgent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_ListAgents : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithGenericMethod_ListAgents() {
+      ::grpc::Service::MarkMethodGeneric(1);
+    }
+    ~WithGenericMethod_ListAgents() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_GetAgent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_GetAgent() {
+      ::grpc::Service::MarkMethodRaw(0);
+    }
+    ~WithRawMethod_GetAgent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestGetAgent(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(0, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_ListAgents : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithRawMethod_ListAgents() {
+      ::grpc::Service::MarkMethodRaw(1);
+    }
+    ~WithRawMethod_ListAgents() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestListAgents(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncResponseWriter< ::grpc::ByteBuffer>* response, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncUnary(1, context, request, response, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_GetAgent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_GetAgent() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(0,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->GetAgent(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_GetAgent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void GetAgent(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_ListAgents : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    ExperimentalWithRawCallbackMethod_ListAgents() {
+      ::grpc::Service::experimental().MarkMethodRawCallback(1,
+        new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+          [this](::grpc::ServerContext* context,
+                 const ::grpc::ByteBuffer* request,
+                 ::grpc::ByteBuffer* response,
+                 ::grpc::experimental::ServerCallbackRpcController* controller) {
+                   this->ListAgents(context, request, response, controller);
+                 }));
+    }
+    ~ExperimentalWithRawCallbackMethod_ListAgents() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual void ListAgents(::grpc::ServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response, ::grpc::experimental::ServerCallbackRpcController* controller) { controller->Finish(::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "")); }
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_GetAgent : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_GetAgent() {
+      ::grpc::Service::MarkMethodStreamed(0,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::GetAgentRequest, ::flyteidl::admin::GetAgentResponse>(std::bind(&WithStreamedUnaryMethod_GetAgent<BaseClass>::StreamedGetAgent, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_GetAgent() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status GetAgent(::grpc::ServerContext* context, const ::flyteidl::admin::GetAgentRequest* request, ::flyteidl::admin::GetAgentResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedGetAgent(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::GetAgentRequest,::flyteidl::admin::GetAgentResponse>* server_unary_streamer) = 0;
+  };
+  template <class BaseClass>
+  class WithStreamedUnaryMethod_ListAgents : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service *service) {}
+   public:
+    WithStreamedUnaryMethod_ListAgents() {
+      ::grpc::Service::MarkMethodStreamed(1,
+        new ::grpc::internal::StreamedUnaryHandler< ::flyteidl::admin::ListAgentsRequest, ::flyteidl::admin::ListAgentsResponse>(std::bind(&WithStreamedUnaryMethod_ListAgents<BaseClass>::StreamedListAgents, this, std::placeholders::_1, std::placeholders::_2)));
+    }
+    ~WithStreamedUnaryMethod_ListAgents() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status ListAgents(::grpc::ServerContext* context, const ::flyteidl::admin::ListAgentsRequest* request, ::flyteidl::admin::ListAgentsResponse* response) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with streamed unary
+    virtual ::grpc::Status StreamedListAgents(::grpc::ServerContext* context, ::grpc::ServerUnaryStreamer< ::flyteidl::admin::ListAgentsRequest,::flyteidl::admin::ListAgentsResponse>* server_unary_streamer) = 0;
+  };
+  typedef WithStreamedUnaryMethod_GetAgent<WithStreamedUnaryMethod_ListAgents<Service > > StreamedUnaryService;
+  typedef Service SplitStreamedService;
+  typedef WithStreamedUnaryMethod_GetAgent<WithStreamedUnaryMethod_ListAgents<Service > > StreamedService;
 };
 
 }  // namespace service

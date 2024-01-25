@@ -57,7 +57,7 @@ learning and analytics.
 
 Created at [Lyft](https://www.lyft.com/) in collaboration with Spotify,
 Freenome, and many others, Flyte provides first-class support for
-{doc}`Python <reference_flytekit>`,
+{doc}`Python <api/flytekit/docs_index>`,
 [Java, and Scala](https://github.com/flyteorg/flytekit-java). Data Scientists
 and ML Engineers in the industry use Flyte to create:
 
@@ -79,12 +79,12 @@ contribute its architecture and design. You can also access the
 * - {doc}`🔤 Intro to Flyte <introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
-* - {doc}`📖 User Guide <userguide>`
+* - {doc}`📖 User Guide <flytesnacks/userguide>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
-* - {doc}`📚 Tutorials <tutorials>`
+* - {doc}`📚 Tutorials <flytesnacks/tutorials>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,
     bioinformatics, and more.
-* - {doc}`🔌 Integrations <integrations>`
+* - {doc}`🔌 Integrations <flytesnacks/integrations>`
   - Leverage a rich ecosystem of third-party tools and libraries to make your
     Flyte workflows even more effective.
 * - {ref}`🚀 Deployment Guide <deployment>`
@@ -102,11 +102,11 @@ Below are the API reference to the different components of Flyte:
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Flytekit <reference_flytekit>`
+* - {doc}`Flytekit <api/flytekit/docs_index>`
   - Flyte's official Python SDK.
-* - {doc}`FlyteCTL <reference_flytectl>`
+* - {doc}`FlyteCTL <flytectl/docs_index>`
   - Flyte's command-line interface for interacting with a Flyte cluster.
-* - {doc}`FlyteIDL <reference_flyteidl>`
+* - {doc}`FlyteIDL <flytectl/docs_index>`
   - Flyte's core specification language.
 ```
 
@@ -145,9 +145,9 @@ Core Use Cases <flytesnacks/getting_started/core_use_cases>
 :name: examples-guides
 :hidden:
 
-User Guide <userguide>
-Tutorials <tutorials>
-Integrations <integrations>
+User Guide <flytesnacks/userguide>
+Tutorials <flytesnacks/tutorials>
+Integrations <flytesnacks/integrations>
 ```
 
 ```{toctree}
@@ -172,8 +172,8 @@ reference/swagger
 :name: apitoc
 :hidden:
 
-flytekit <reference_flytekit>
-flytectl <reference_flytectl>
+flytekit <api/flytekit/docs_index>
+flytectl <flytectl/docs_index>
 flyteidl <reference_flyteidl>
 ```
 
