@@ -4,8 +4,18 @@ import (
 	"context"
 	"net/http"
 	"os"
+
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	_ "github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
@@ -18,6 +28,7 @@ import (
 	adminScheduler "github.com/flyteorg/flyte/flyteadmin/scheduler"
 	propellerEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	propellerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
 	webhookEntrypoint "github.com/flyteorg/flyte/flytepropeller/pkg/webhook"
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
@@ -28,16 +39,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	_ "github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
-	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const defaultNamespace = "all"
@@ -122,22 +123,8 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
 			DefaultNamespaces: namespaceConfigs,
 		},
-		NewCache: func(config *rest.Config, options cache.Options) (cache.Cache, error) {
-			k8sCache, err := cache.New(config, options)
-			if err != nil {
-				return k8sCache, err
-			}
-
-			return otelutils.WrapK8sCache(k8sCache), nil
-		},
-		NewClient: func(config *rest.Config, options client.Options) (client.Client, error) {
-			k8sClient, err := client.New(config, options)
-			if err != nil {
-				return k8sClient, err
-			}
-
-			return otelutils.WrapK8sClient(k8sClient), nil
-		},
+		NewCache:  executors.NewCache,
+		NewClient: executors.BuildNewClientFunc(propellerScope),
 		Metrics: metricsserver.Options{
 			// Disable metrics serving
 			BindAddress: "0",

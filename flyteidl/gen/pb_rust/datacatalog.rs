@@ -290,6 +290,9 @@ pub struct DatasetId {
     /// UUID for the dataset (if set the above fields are optional)
     #[prost(string, tag="5")]
     pub uuid: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 ///
 /// Artifact message. It is composed of several string fields.
@@ -469,7 +472,7 @@ pub struct KeyValuePair {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DatasetPropertyFilter {
-    #[prost(oneof="dataset_property_filter::Property", tags="1, 2, 3, 4")]
+    #[prost(oneof="dataset_property_filter::Property", tags="1, 2, 3, 4, 5")]
     pub property: ::core::option::Option<dataset_property_filter::Property>,
 }
 /// Nested message and enum types in `DatasetPropertyFilter`.
@@ -485,6 +488,9 @@ pub mod dataset_property_filter {
         Domain(::prost::alloc::string::String),
         #[prost(string, tag="4")]
         Version(::prost::alloc::string::String),
+        /// Optional, org key applied to the dataset.
+        #[prost(string, tag="5")]
+        Org(::prost::alloc::string::String),
     }
 }
 /// Pagination options for making list requests

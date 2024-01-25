@@ -34,7 +34,6 @@
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/tasks.pb.h"
-#include "flyteidl/core/interface.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 #define PROTOBUF_INTERNAL_EXPORT_flyteidl_2fservice_2fexternal_5fplugin_5fservice_2eproto

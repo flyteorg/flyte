@@ -16,8 +16,8 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fartifact_5fid_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_ArtifactID_flyteidl_2fcore_2fartifact_5fid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fartifact_5fid_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_ArtifactTag_flyteidl_2fcore_2fartifact_5fid_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fartifact_5fid_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_ArtifactID_flyteidl_2fcore_2fartifact_5fid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fartifact_5fid_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_ArtifactQuery_flyteidl_2fcore_2fartifact_5fid_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ParameterMap_ParametersEntry_DoNotUse_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_VariableMap_VariablesEntry_DoNotUse_flyteidl_2fcore_2finterface_2eproto;

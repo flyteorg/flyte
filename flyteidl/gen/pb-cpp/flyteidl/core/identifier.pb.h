@@ -257,6 +257,20 @@ class Identifier final :
   ::std::string* release_version();
   void set_allocated_version(::std::string* version);
 
+  // string org = 6;
+  void clear_org();
+  static const int kOrgFieldNumber = 6;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.core.ResourceType resource_type = 1;
   void clear_resource_type();
   static const int kResourceTypeFieldNumber = 1;
@@ -272,6 +286,7 @@ class Identifier final :
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr name_;
   ::google::protobuf::internal::ArenaStringPtr version_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   int resource_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fidentifier_2eproto;
@@ -415,6 +430,20 @@ class WorkflowExecutionIdentifier final :
   ::std::string* release_name();
   void set_allocated_name(::std::string* name);
 
+  // string org = 5;
+  void clear_org();
+  static const int kOrgFieldNumber = 5;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.WorkflowExecutionIdentifier)
  private:
   class HasBitSetters;
@@ -423,6 +452,7 @@ class WorkflowExecutionIdentifier final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr name_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fidentifier_2eproto;
 };
@@ -1055,6 +1085,59 @@ inline void Identifier::set_allocated_version(::std::string* version) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Identifier.version)
 }
 
+// string org = 6;
+inline void Identifier::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& Identifier::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.Identifier.org)
+  return org_.GetNoArena();
+}
+inline void Identifier::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.Identifier.org)
+}
+#if LANG_CXX11
+inline void Identifier::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.Identifier.org)
+}
+#endif
+inline void Identifier::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.Identifier.org)
+}
+inline void Identifier::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.Identifier.org)
+}
+inline ::std::string* Identifier::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.Identifier.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* Identifier::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.Identifier.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void Identifier::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Identifier.org)
+}
+
 // -------------------------------------------------------------------
 
 // WorkflowExecutionIdentifier
@@ -1216,6 +1299,59 @@ inline void WorkflowExecutionIdentifier::set_allocated_name(::std::string* name)
   }
   name_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), name);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.WorkflowExecutionIdentifier.name)
+}
+
+// string org = 5;
+inline void WorkflowExecutionIdentifier::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& WorkflowExecutionIdentifier::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.WorkflowExecutionIdentifier.org)
+  return org_.GetNoArena();
+}
+inline void WorkflowExecutionIdentifier::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.WorkflowExecutionIdentifier.org)
+}
+#if LANG_CXX11
+inline void WorkflowExecutionIdentifier::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.WorkflowExecutionIdentifier.org)
+}
+#endif
+inline void WorkflowExecutionIdentifier::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.WorkflowExecutionIdentifier.org)
+}
+inline void WorkflowExecutionIdentifier::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.WorkflowExecutionIdentifier.org)
+}
+inline ::std::string* WorkflowExecutionIdentifier::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.WorkflowExecutionIdentifier.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* WorkflowExecutionIdentifier::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.WorkflowExecutionIdentifier.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void WorkflowExecutionIdentifier::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.WorkflowExecutionIdentifier.org)
 }
 
 // -------------------------------------------------------------------

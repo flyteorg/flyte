@@ -116,6 +116,97 @@ func (a *AdminServiceApiService) CreateExecution(ctx context.Context, body Admin
 }
 
 /* 
+AdminServiceApiService Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the resource.
+ * @param body
+
+@return AdminExecutionCreateResponse
+*/
+func (a *AdminServiceApiService) CreateExecution2(ctx context.Context, org string, body AdminExecutionCreateRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecutionCreateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecutionCreateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
@@ -133,6 +224,97 @@ func (a *AdminServiceApiService) CreateLaunchPlan(ctx context.Context, body Admi
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlanCreateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminLaunchPlanCreateResponse
+*/
+func (a *AdminServiceApiService) CreateLaunchPlan2(ctx context.Context, idOrg string, body AdminLaunchPlanCreateRequest) (AdminLaunchPlanCreateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlanCreateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -294,6 +476,97 @@ func (a *AdminServiceApiService) CreateNodeEvent(ctx context.Context, body Admin
 }
 
 /* 
+AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param eventIdExecutionIdOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminNodeExecutionEventResponse
+*/
+func (a *AdminServiceApiService) CreateNodeEvent2(ctx context.Context, eventIdExecutionIdOrg string, body AdminNodeExecutionEventRequest) (AdminNodeExecutionEventResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNodeExecutionEventResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.id.execution_id.org}/nodes"
+	localVarPath = strings.Replace(localVarPath, "{"+"event.id.execution_id.org"+"}", fmt.Sprintf("%v", eventIdExecutionIdOrg), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNodeExecutionEventResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
@@ -311,6 +584,97 @@ func (a *AdminServiceApiService) CreateTask(ctx context.Context, body Flyteidlad
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v FlyteidladminTaskCreateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param body
+
+@return FlyteidladminTaskCreateResponse
+*/
+func (a *AdminServiceApiService) CreateTask2(ctx context.Context, idOrg string, body FlyteidladminTaskCreateRequest) (FlyteidladminTaskCreateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue FlyteidladminTaskCreateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -472,6 +836,97 @@ func (a *AdminServiceApiService) CreateTaskEvent(ctx context.Context, body Admin
 }
 
 /* 
+AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param eventParentNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminTaskExecutionEventResponse
+*/
+func (a *AdminServiceApiService) CreateTaskEvent2(ctx context.Context, eventParentNodeExecutionIdExecutionIdOrg string, body AdminTaskExecutionEventRequest) (AdminTaskExecutionEventResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminTaskExecutionEventResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks"
+	localVarPath = strings.Replace(localVarPath, "{"+"event.parent_node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", eventParentNodeExecutionIdExecutionIdOrg), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminTaskExecutionEventResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
@@ -561,6 +1016,97 @@ func (a *AdminServiceApiService) CreateWorkflow(ctx context.Context, body AdminW
 }
 
 /* 
+AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminWorkflowCreateResponse
+*/
+func (a *AdminServiceApiService) CreateWorkflow2(ctx context.Context, idOrg string, body AdminWorkflowCreateRequest) (AdminWorkflowCreateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowCreateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowCreateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
@@ -578,6 +1124,97 @@ func (a *AdminServiceApiService) CreateWorkflowEvent(ctx context.Context, body A
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/events/workflows"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowExecutionEventResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param eventExecutionIdOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminWorkflowExecutionEventResponse
+*/
+func (a *AdminServiceApiService) CreateWorkflowEvent2(ctx context.Context, eventExecutionIdOrg string, body AdminWorkflowExecutionEventRequest) (AdminWorkflowExecutionEventResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowExecutionEventResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.execution_id.org}/workflows"
+	localVarPath = strings.Replace(localVarPath, "{"+"event.execution_id.org"+"}", fmt.Sprintf("%v", eventExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -743,6 +1380,99 @@ func (a *AdminServiceApiService) DeleteProjectAttributes(ctx context.Context, pr
 /* 
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the project.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param body
+
+@return AdminProjectAttributesDeleteResponse
+*/
+func (a *AdminServiceApiService) DeleteProjectAttributes2(ctx context.Context, org string, project string, body AdminProjectAttributesDeleteRequest) (AdminProjectAttributesDeleteResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Delete")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectAttributesDeleteResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectAttributesDeleteResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
  * @param body
@@ -760,6 +1490,101 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes(ctx context.Conte
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectDomainAttributesDeleteResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the attributes.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
+ * @param body
+
+@return AdminProjectDomainAttributesDeleteResponse
+*/
+func (a *AdminServiceApiService) DeleteProjectDomainAttributes2(ctx context.Context, org string, project string, domain string, body AdminProjectDomainAttributesDeleteRequest) (AdminProjectDomainAttributesDeleteResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Delete")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectDomainAttributesDeleteResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -929,15 +1754,119 @@ func (a *AdminServiceApiService) DeleteWorkflowAttributes(ctx context.Context, p
 }
 
 /* 
+AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the attributes.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
+ * @param workflow Workflow name which this set of attributes references. +required
+ * @param body
+
+@return AdminWorkflowAttributesDeleteResponse
+*/
+func (a *AdminServiceApiService) DeleteWorkflowAttributes2(ctx context.Context, org string, project string, domain string, workflow string, body AdminWorkflowAttributesDeleteRequest) (AdminWorkflowAttributesDeleteResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Delete")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowAttributesDeleteResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"workflow"+"}", fmt.Sprintf("%v", workflow), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowAttributesDeleteResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param optional nil or *GetActiveLaunchPlanOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminLaunchPlan
 */
-func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string) (AdminLaunchPlan, *http.Response, error) {
+
+type GetActiveLaunchPlanOpts struct { 
+	IdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetActiveLaunchPlanOpts) (AdminLaunchPlan, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -948,6 +1877,103 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProj
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlan
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+
+@return AdminLaunchPlan
+*/
+func (a *AdminServiceApiService) GetActiveLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminLaunchPlan, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlan
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -1028,10 +2054,17 @@ AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
+ * @param optional nil or *GetDescriptionEntityOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminDescriptionEntity
 */
-func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idResourceType string, idProject string, idDomain string, idName string, idVersion string) (AdminDescriptionEntity, *http.Response, error) {
+
+type GetDescriptionEntityOpts struct { 
+	IdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idResourceType string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetDescriptionEntityOpts) (AdminDescriptionEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1042,6 +2075,107 @@ func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idRes
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.resource_type"+"}", fmt.Sprintf("%v", idResourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.version"+"}", fmt.Sprintf("%v", idVersion), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminDescriptionEntity
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idResourceType Identifies the specific type of resource that this identifier corresponds to.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource.
+ * @param idVersion Specific version of the resource.
+
+@return AdminDescriptionEntity
+*/
+func (a *AdminServiceApiService) GetDescriptionEntity2(ctx context.Context, idOrg string, idResourceType string, idProject string, idDomain string, idName string, idVersion string) (AdminDescriptionEntity, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminDescriptionEntity
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.resource_type"+"}", fmt.Sprintf("%v", idResourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -1117,15 +2251,222 @@ func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idRes
 }
 
 /* 
+AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idExecutionIdProject Name of the project the resource belongs to.
+ * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idExecutionIdName User or system provided value for the resource.
+ * @param idNodeId
+ * @param optional nil or *GetDynamicNodeWorkflowOpts - Optional Parameters:
+     * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
+
+@return AdminDynamicNodeWorkflowResponse
+*/
+
+type GetDynamicNodeWorkflowOpts struct { 
+	IdExecutionIdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetDynamicNodeWorkflow(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetDynamicNodeWorkflowOpts) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminDynamicNodeWorkflowResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_id"+"}", fmt.Sprintf("%v", idNodeId), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("id.execution_id.org", parameterToString(localVarOptionals.IdExecutionIdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminDynamicNodeWorkflowResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idExecutionIdOrg Optional, org key applied to the resource.
+ * @param idExecutionIdProject Name of the project the resource belongs to.
+ * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idExecutionIdName User or system provided value for the resource.
+ * @param idNodeId
+
+@return AdminDynamicNodeWorkflowResponse
+*/
+func (a *AdminServiceApiService) GetDynamicNodeWorkflow2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminDynamicNodeWorkflowResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_id"+"}", fmt.Sprintf("%v", idNodeId), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminDynamicNodeWorkflowResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
+ * @param optional nil or *GetExecutionOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminExecution
 */
-func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject string, idDomain string, idName string) (AdminExecution, *http.Response, error) {
+
+type GetExecutionOpts struct { 
+	IdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionOpts) (AdminExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1136,6 +2477,103 @@ func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject str
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecution
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User or system provided value for the resource.
+
+@return AdminExecution
+*/
+func (a *AdminServiceApiService) GetExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminExecution, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecution
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -1214,10 +2652,17 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
+ * @param optional nil or *GetExecutionDataOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminWorkflowExecutionGetDataResponse
 */
-func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject string, idDomain string, idName string) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
+
+type GetExecutionDataOpts struct { 
+	IdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionDataOpts) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1228,6 +2673,103 @@ func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowExecutionGetDataResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User or system provided value for the resource.
+
+@return AdminWorkflowExecutionGetDataResponse
+*/
+func (a *AdminServiceApiService) GetExecutionData2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowExecutionGetDataResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -1307,12 +2849,14 @@ AdminServiceApiService Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.adm
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
  * @param optional nil or *GetExecutionMetricsOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Depth" (optional.Int32) -  depth defines the number of Flyte entity levels to traverse when breaking down execution details.
 
 @return AdminWorkflowExecutionGetMetricsResponse
 */
 
 type GetExecutionMetricsOpts struct { 
+	IdOrg optional.String
 	Depth optional.Int32
 }
 
@@ -1327,6 +2871,113 @@ func (a *AdminServiceApiService) GetExecutionMetrics(ctx context.Context, idProj
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Depth.IsSet() {
+		localVarQueryParams.Add("depth", parameterToString(localVarOptionals.Depth.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowExecutionGetMetricsResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User or system provided value for the resource.
+ * @param optional nil or *GetExecutionMetrics2Opts - Optional Parameters:
+     * @param "Depth" (optional.Int32) -  depth defines the number of Flyte entity levels to traverse when breaking down execution details.
+
+@return AdminWorkflowExecutionGetMetricsResponse
+*/
+
+type GetExecutionMetrics2Opts struct { 
+	Depth optional.Int32
+}
+
+func (a *AdminServiceApiService) GetExecutionMetrics2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionMetrics2Opts) (AdminWorkflowExecutionGetMetricsResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowExecutionGetMetricsResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -1411,12 +3062,14 @@ AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; de
  * @param idVersion Specific version of the resource.
  * @param optional nil or *GetLaunchPlanOpts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminLaunchPlan
 */
 
 type GetLaunchPlanOpts struct { 
 	IdResourceType optional.String
+	IdOrg optional.String
 }
 
 func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetLaunchPlanOpts) (AdminLaunchPlan, *http.Response, error) {
@@ -1430,6 +3083,115 @@ func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject st
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.version"+"}", fmt.Sprintf("%v", idVersion), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdResourceType.IsSet() {
+		localVarQueryParams.Add("id.resource_type", parameterToString(localVarOptionals.IdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlan
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource.
+ * @param idVersion Specific version of the resource.
+ * @param optional nil or *GetLaunchPlan2Opts - Optional Parameters:
+     * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+
+@return AdminLaunchPlan
+*/
+
+type GetLaunchPlan2Opts struct { 
+	IdResourceType optional.String
+}
+
+func (a *AdminServiceApiService) GetLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetLaunchPlan2Opts) (AdminLaunchPlan, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlan
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -1513,10 +3275,17 @@ AdminServiceApiService Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60;
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param optional nil or *GetNamedEntityOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntity
 */
-func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceType string, idProject string, idDomain string, idName string) (AdminNamedEntity, *http.Response, error) {
+
+type GetNamedEntityOpts struct { 
+	IdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, localVarOptionals *GetNamedEntityOpts) (AdminNamedEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1528,6 +3297,105 @@ func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceTyp
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNamedEntity
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param resourceType Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+
+@return AdminNamedEntity
+*/
+func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string) (AdminNamedEntity, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNamedEntity
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -1607,10 +3475,17 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x6
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
+ * @param optional nil or *GetNodeExecutionOpts - Optional Parameters:
+     * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return FlyteidladminNodeExecution
 */
-func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (FlyteidladminNodeExecution, *http.Response, error) {
+
+type GetNodeExecutionOpts struct { 
+	IdExecutionIdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetNodeExecutionOpts) (FlyteidladminNodeExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1621,6 +3496,105 @@ func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecuti
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_id"+"}", fmt.Sprintf("%v", idNodeId), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("id.execution_id.org", parameterToString(localVarOptionals.IdExecutionIdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v FlyteidladminNodeExecution
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idExecutionIdOrg Optional, org key applied to the resource.
+ * @param idExecutionIdProject Name of the project the resource belongs to.
+ * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idExecutionIdName User or system provided value for the resource.
+ * @param idNodeId
+
+@return FlyteidladminNodeExecution
+*/
+func (a *AdminServiceApiService) GetNodeExecution2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (FlyteidladminNodeExecution, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue FlyteidladminNodeExecution
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
@@ -1701,10 +3675,17 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
+ * @param optional nil or *GetNodeExecutionDataOpts - Optional Parameters:
+     * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNodeExecutionGetDataResponse
 */
-func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
+
+type GetNodeExecutionDataOpts struct { 
+	IdExecutionIdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetNodeExecutionDataOpts) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1715,6 +3696,105 @@ func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExe
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_id"+"}", fmt.Sprintf("%v", idNodeId), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("id.execution_id.org", parameterToString(localVarOptionals.IdExecutionIdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNodeExecutionGetDataResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idExecutionIdOrg Optional, org key applied to the resource.
+ * @param idExecutionIdProject Name of the project the resource belongs to.
+ * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idExecutionIdName User or system provided value for the resource.
+ * @param idNodeId
+
+@return AdminNodeExecutionGetDataResponse
+*/
+func (a *AdminServiceApiService) GetNodeExecutionData2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNodeExecutionGetDataResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
@@ -1794,12 +3874,14 @@ AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
  * @param project Unique project id which this set of attributes references. +required
  * @param optional nil or *GetProjectAttributesOpts - Optional Parameters:
      * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+     * @param "Org" (optional.String) -  Optional, org key applied to the project.
 
 @return AdminProjectAttributesGetResponse
 */
 
 type GetProjectAttributesOpts struct { 
 	ResourceType optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) GetProjectAttributes(ctx context.Context, project string, localVarOptionals *GetProjectAttributesOpts) (AdminProjectAttributesGetResponse, *http.Response, error) {
@@ -1813,6 +3895,109 @@ func (a *AdminServiceApiService) GetProjectAttributes(ctx context.Context, proje
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/project_attributes/{project}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.ResourceType.IsSet() {
+		localVarQueryParams.Add("resource_type", parameterToString(localVarOptionals.ResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectAttributesGetResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the project.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param optional nil or *GetProjectAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+
+@return AdminProjectAttributesGetResponse
+*/
+
+type GetProjectAttributes2Opts struct { 
+	ResourceType optional.String
+}
+
+func (a *AdminServiceApiService) GetProjectAttributes2(ctx context.Context, org string, project string, localVarOptionals *GetProjectAttributes2Opts) (AdminProjectAttributesGetResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectAttributesGetResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1893,12 +4078,14 @@ AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
  * @param domain Unique domain id which this set of attributes references. +required
  * @param optional nil or *GetProjectDomainAttributesOpts - Optional Parameters:
      * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+     * @param "Org" (optional.String) -  Optional, org key applied to the attributes.
 
 @return AdminProjectDomainAttributesGetResponse
 */
 
 type GetProjectDomainAttributesOpts struct { 
 	ResourceType optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) GetProjectDomainAttributes(ctx context.Context, project string, domain string, localVarOptionals *GetProjectDomainAttributesOpts) (AdminProjectDomainAttributesGetResponse, *http.Response, error) {
@@ -1912,6 +4099,111 @@ func (a *AdminServiceApiService) GetProjectDomainAttributes(ctx context.Context,
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.ResourceType.IsSet() {
+		localVarQueryParams.Add("resource_type", parameterToString(localVarOptionals.ResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectDomainAttributesGetResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the attributes.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
+ * @param optional nil or *GetProjectDomainAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+
+@return AdminProjectDomainAttributesGetResponse
+*/
+
+type GetProjectDomainAttributes2Opts struct { 
+	ResourceType optional.String
+}
+
+func (a *AdminServiceApiService) GetProjectDomainAttributes2(ctx context.Context, org string, project string, domain string, localVarOptionals *GetProjectDomainAttributes2Opts) (AdminProjectDomainAttributesGetResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectDomainAttributesGetResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -1995,12 +4287,14 @@ AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definiti
  * @param idVersion Specific version of the resource.
  * @param optional nil or *GetTaskOpts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminTask
 */
 
 type GetTaskOpts struct { 
 	IdResourceType optional.String
+	IdOrg optional.String
 }
 
 func (a *AdminServiceApiService) GetTask(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetTaskOpts) (AdminTask, *http.Response, error) {
@@ -2014,6 +4308,115 @@ func (a *AdminServiceApiService) GetTask(ctx context.Context, idProject string, 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.version"+"}", fmt.Sprintf("%v", idVersion), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdResourceType.IsSet() {
+		localVarQueryParams.Add("id.resource_type", parameterToString(localVarOptionals.IdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminTask
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource.
+ * @param idVersion Specific version of the resource.
+ * @param optional nil or *GetTask2Opts - Optional Parameters:
+     * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+
+@return AdminTask
+*/
+
+type GetTask2Opts struct { 
+	IdResourceType optional.String
+}
+
+func (a *AdminServiceApiService) GetTask2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetTask2Opts) (AdminTask, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminTask
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -2104,12 +4507,16 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x6
  * @param idRetryAttempt
  * @param optional nil or *GetTaskExecutionOpts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
+     * @param "IdNodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return FlyteidladminTaskExecution
 */
 
 type GetTaskExecutionOpts struct { 
 	IdTaskIdResourceType optional.String
+	IdTaskIdOrg optional.String
+	IdNodeExecutionIdExecutionIdOrg optional.String
 }
 
 func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionOpts) (FlyteidladminTaskExecution, *http.Response, error) {
@@ -2139,6 +4546,133 @@ func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExe
 
 	if localVarOptionals != nil && localVarOptionals.IdTaskIdResourceType.IsSet() {
 		localVarQueryParams.Add("id.task_id.resource_type", parameterToString(localVarOptionals.IdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdTaskIdOrg.IsSet() {
+		localVarQueryParams.Add("id.task_id.org", parameterToString(localVarOptionals.IdTaskIdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdNodeExecutionIdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("id.node_execution_id.execution_id.org", parameterToString(localVarOptionals.IdNodeExecutionIdExecutionIdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v FlyteidladminTaskExecution
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
+ * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
+ * @param idNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idNodeExecutionIdExecutionIdName User or system provided value for the resource.
+ * @param idNodeExecutionIdNodeId
+ * @param idTaskIdProject Name of the project the resource belongs to.
+ * @param idTaskIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idTaskIdName User provided value for the resource.
+ * @param idTaskIdVersion Specific version of the resource.
+ * @param idRetryAttempt
+ * @param optional nil or *GetTaskExecution2Opts - Optional Parameters:
+     * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
+
+@return FlyteidladminTaskExecution
+*/
+
+type GetTaskExecution2Opts struct { 
+	IdTaskIdResourceType optional.String
+	IdTaskIdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetTaskExecution2(ctx context.Context, idNodeExecutionIdExecutionIdOrg string, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecution2Opts) (FlyteidladminTaskExecution, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue FlyteidladminTaskExecution
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.name"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.node_id"+"}", fmt.Sprintf("%v", idNodeExecutionIdNodeId), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.project"+"}", fmt.Sprintf("%v", idTaskIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.domain"+"}", fmt.Sprintf("%v", idTaskIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.name"+"}", fmt.Sprintf("%v", idTaskIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.version"+"}", fmt.Sprintf("%v", idTaskIdVersion), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.retry_attempt"+"}", fmt.Sprintf("%v", idRetryAttempt), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdTaskIdResourceType.IsSet() {
+		localVarQueryParams.Add("id.task_id.resource_type", parameterToString(localVarOptionals.IdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdTaskIdOrg.IsSet() {
+		localVarQueryParams.Add("id.task_id.org", parameterToString(localVarOptionals.IdTaskIdOrg.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -2218,12 +4752,16 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idRetryAttempt
  * @param optional nil or *GetTaskExecutionDataOpts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
+     * @param "IdNodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminTaskExecutionGetDataResponse
 */
 
 type GetTaskExecutionDataOpts struct { 
 	IdTaskIdResourceType optional.String
+	IdTaskIdOrg optional.String
+	IdNodeExecutionIdExecutionIdOrg optional.String
 }
 
 func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionDataOpts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
@@ -2253,6 +4791,133 @@ func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNod
 
 	if localVarOptionals != nil && localVarOptionals.IdTaskIdResourceType.IsSet() {
 		localVarQueryParams.Add("id.task_id.resource_type", parameterToString(localVarOptionals.IdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdTaskIdOrg.IsSet() {
+		localVarQueryParams.Add("id.task_id.org", parameterToString(localVarOptionals.IdTaskIdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdNodeExecutionIdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("id.node_execution_id.execution_id.org", parameterToString(localVarOptionals.IdNodeExecutionIdExecutionIdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminTaskExecutionGetDataResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
+ * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
+ * @param idNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idNodeExecutionIdExecutionIdName User or system provided value for the resource.
+ * @param idNodeExecutionIdNodeId
+ * @param idTaskIdProject Name of the project the resource belongs to.
+ * @param idTaskIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idTaskIdName User provided value for the resource.
+ * @param idTaskIdVersion Specific version of the resource.
+ * @param idRetryAttempt
+ * @param optional nil or *GetTaskExecutionData2Opts - Optional Parameters:
+     * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
+
+@return AdminTaskExecutionGetDataResponse
+*/
+
+type GetTaskExecutionData2Opts struct { 
+	IdTaskIdResourceType optional.String
+	IdTaskIdOrg optional.String
+}
+
+func (a *AdminServiceApiService) GetTaskExecutionData2(ctx context.Context, idNodeExecutionIdExecutionIdOrg string, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionData2Opts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminTaskExecutionGetDataResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.name"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.node_id"+"}", fmt.Sprintf("%v", idNodeExecutionIdNodeId), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.project"+"}", fmt.Sprintf("%v", idTaskIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.domain"+"}", fmt.Sprintf("%v", idTaskIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.name"+"}", fmt.Sprintf("%v", idTaskIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.task_id.version"+"}", fmt.Sprintf("%v", idTaskIdVersion), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.retry_attempt"+"}", fmt.Sprintf("%v", idRetryAttempt), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdTaskIdResourceType.IsSet() {
+		localVarQueryParams.Add("id.task_id.resource_type", parameterToString(localVarOptionals.IdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdTaskIdOrg.IsSet() {
+		localVarQueryParams.Add("id.task_id.org", parameterToString(localVarOptionals.IdTaskIdOrg.Value(), ""))
 	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
@@ -2413,12 +5078,14 @@ AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; defi
  * @param idVersion Specific version of the resource.
  * @param optional nil or *GetWorkflowOpts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminWorkflow
 */
 
 type GetWorkflowOpts struct { 
 	IdResourceType optional.String
+	IdOrg optional.String
 }
 
 func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetWorkflowOpts) (AdminWorkflow, *http.Response, error) {
@@ -2432,6 +5099,115 @@ func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject stri
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.version"+"}", fmt.Sprintf("%v", idVersion), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdResourceType.IsSet() {
+		localVarQueryParams.Add("id.resource_type", parameterToString(localVarOptionals.IdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflow
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource.
+ * @param idVersion Specific version of the resource.
+ * @param optional nil or *GetWorkflow2Opts - Optional Parameters:
+     * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+
+@return AdminWorkflow
+*/
+
+type GetWorkflow2Opts struct { 
+	IdResourceType optional.String
+}
+
+func (a *AdminServiceApiService) GetWorkflow2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetWorkflow2Opts) (AdminWorkflow, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflow
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -2516,12 +5292,14 @@ AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
  * @param workflow Workflow name which this set of attributes references. +required
  * @param optional nil or *GetWorkflowAttributesOpts - Optional Parameters:
      * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+     * @param "Org" (optional.String) -  Optional, org key applied to the attributes.
 
 @return AdminWorkflowAttributesGetResponse
 */
 
 type GetWorkflowAttributesOpts struct { 
 	ResourceType optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) GetWorkflowAttributes(ctx context.Context, project string, domain string, workflow string, localVarOptionals *GetWorkflowAttributesOpts) (AdminWorkflowAttributesGetResponse, *http.Response, error) {
@@ -2535,6 +5313,113 @@ func (a *AdminServiceApiService) GetWorkflowAttributes(ctx context.Context, proj
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/{project}/{domain}/{workflow}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"workflow"+"}", fmt.Sprintf("%v", workflow), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.ResourceType.IsSet() {
+		localVarQueryParams.Add("resource_type", parameterToString(localVarOptionals.ResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowAttributesGetResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the attributes.
+ * @param project Unique project id which this set of attributes references. +required
+ * @param domain Unique domain id which this set of attributes references. +required
+ * @param workflow Workflow name which this set of attributes references. +required
+ * @param optional nil or *GetWorkflowAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+
+@return AdminWorkflowAttributesGetResponse
+*/
+
+type GetWorkflowAttributes2Opts struct { 
+	ResourceType optional.String
+}
+
+func (a *AdminServiceApiService) GetWorkflowAttributes2(ctx context.Context, org string, project string, domain string, workflow string, localVarOptionals *GetWorkflowAttributes2Opts) (AdminWorkflowAttributesGetResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowAttributesGetResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow"+"}", fmt.Sprintf("%v", workflow), -1)
@@ -2620,6 +5505,7 @@ AdminServiceApiService List active versions of :ref:&#x60;ref_flyteidl.admin.Lau
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminLaunchPlanList
 */
@@ -2629,6 +5515,7 @@ type ListActiveLaunchPlansOpts struct {
 	Token optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListActiveLaunchPlans(ctx context.Context, project string, domain string, localVarOptionals *ListActiveLaunchPlansOpts) (AdminLaunchPlanList, *http.Response, error) {
@@ -2642,6 +5529,126 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans(ctx context.Context, proj
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlanList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the resource.
+ * @param project Name of the project that contains the identifiers. +required.
+ * @param domain Name of the domain the identifiers belongs to within the project. +required.
+ * @param optional nil or *ListActiveLaunchPlans2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminLaunchPlanList
+*/
+
+type ListActiveLaunchPlans2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListActiveLaunchPlans2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListActiveLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlanList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -2733,6 +5740,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Description
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListDescriptionEntitiesOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -2743,6 +5751,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Description
 */
 
 type ListDescriptionEntitiesOpts struct { 
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -2762,6 +5771,135 @@ func (a *AdminServiceApiService) ListDescriptionEntities(ctx context.Context, re
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminDescriptionEntityList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param optional nil or *ListDescriptionEntities2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminDescriptionEntityList
+*/
+
+type ListDescriptionEntities2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListDescriptionEntities2Opts) (AdminDescriptionEntityList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminDescriptionEntityList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -2855,8 +5993,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Description
  * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListDescriptionEntities2Opts - Optional Parameters:
+ * @param optional nil or *ListDescriptionEntities3Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -2866,8 +6005,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Description
 @return AdminDescriptionEntityList
 */
 
-type ListDescriptionEntities2Opts struct { 
+type ListDescriptionEntities3Opts struct { 
 	IdName optional.String
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -2875,7 +6015,7 @@ type ListDescriptionEntities2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, resourceType string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities2Opts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) ListDescriptionEntities3(ctx context.Context, resourceType string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities3Opts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2887,6 +6027,138 @@ func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, r
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdName.IsSet() {
+		localVarQueryParams.Add("id.name", parameterToString(localVarOptionals.IdName.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminDescriptionEntityList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param optional nil or *ListDescriptionEntities4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminDescriptionEntityList
+*/
+
+type ListDescriptionEntities4Opts struct { 
+	IdName optional.String
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities4Opts) (AdminDescriptionEntityList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminDescriptionEntityList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 
@@ -2983,6 +6255,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param optional nil or *ListExecutionsOpts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -2994,6 +6267,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#
 
 type ListExecutionsOpts struct { 
 	IdName optional.String
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3012,6 +6286,136 @@ func (a *AdminServiceApiService) ListExecutions(ctx context.Context, idProject s
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdName.IsSet() {
+		localVarQueryParams.Add("id.name", parameterToString(localVarOptionals.IdName.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecutionList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param optional nil or *ListExecutions2Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminExecutionList
+*/
+
+type ListExecutions2Opts struct { 
+	IdName optional.String
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListExecutions2(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListExecutions2Opts) (AdminExecutionList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecutionList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 
@@ -3112,6 +6516,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+     * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityIdentifierList
 */
@@ -3122,6 +6527,7 @@ type ListLaunchPlanIdsOpts struct {
 	SortByKey optional.String
 	SortByDirection optional.String
 	Filters optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project string, domain string, localVarOptionals *ListLaunchPlanIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
@@ -3135,6 +6541,131 @@ func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plan_ids/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNamedEntityIdentifierList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the resource.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project. +required
+ * @param optional nil or *ListLaunchPlanIds2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+
+@return AdminNamedEntityIdentifierList
+*/
+
+type ListLaunchPlanIds2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+	Filters optional.String
+}
+
+func (a *AdminServiceApiService) ListLaunchPlanIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListLaunchPlanIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNamedEntityIdentifierList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plan_ids/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -3228,6 +6759,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListLaunchPlansOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -3238,6 +6770,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&
 */
 
 type ListLaunchPlansOpts struct { 
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3256,6 +6789,133 @@ func (a *AdminServiceApiService) ListLaunchPlans(ctx context.Context, idProject 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlanList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param optional nil or *ListLaunchPlans2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminLaunchPlanList
+*/
+
+type ListLaunchPlans2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlanList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -3348,8 +7008,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListLaunchPlans2Opts - Optional Parameters:
+ * @param optional nil or *ListLaunchPlans3Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -3359,8 +7020,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&
 @return AdminLaunchPlanList
 */
 
-type ListLaunchPlans2Opts struct { 
+type ListLaunchPlans3Opts struct { 
 	IdName optional.String
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3368,7 +7030,7 @@ type ListLaunchPlans2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) ListLaunchPlans3(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListLaunchPlans3Opts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3379,6 +7041,136 @@ func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idProject
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdName.IsSet() {
+		localVarQueryParams.Add("id.name", parameterToString(localVarOptionals.IdName.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlanList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param optional nil or *ListLaunchPlans4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminLaunchPlanList
+*/
+
+type ListLaunchPlans4Opts struct { 
+	IdName optional.String
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListLaunchPlans4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListLaunchPlans4Opts) (AdminLaunchPlanList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlanList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 
@@ -3473,12 +7265,14 @@ AdminServiceApiService Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttri
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param optional nil or *ListMatchableAttributesOpts - Optional Parameters:
      * @param "ResourceType" (optional.String) -  +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+     * @param "Org" (optional.String) -  Optional, org filter applied to list project requests.
 
 @return AdminListMatchableAttributesResponse
 */
 
 type ListMatchableAttributesOpts struct { 
 	ResourceType optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListMatchableAttributes(ctx context.Context, localVarOptionals *ListMatchableAttributesOpts) (AdminListMatchableAttributesResponse, *http.Response, error) {
@@ -3492,6 +7286,107 @@ func (a *AdminServiceApiService) ListMatchableAttributes(ctx context.Context, lo
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/matchable_attributes"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.ResourceType.IsSet() {
+		localVarQueryParams.Add("resource_type", parameterToString(localVarOptionals.ResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminListMatchableAttributesResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org filter applied to list project requests.
+ * @param optional nil or *ListMatchableAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+
+@return AdminListMatchableAttributesResponse
+*/
+
+type ListMatchableAttributes2Opts struct { 
+	ResourceType optional.String
+}
+
+func (a *AdminServiceApiService) ListMatchableAttributes2(ctx context.Context, org string, localVarOptionals *ListMatchableAttributes2Opts) (AdminListMatchableAttributesResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminListMatchableAttributesResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/matchable_attributes/org/{org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -3576,6 +7471,7 @@ AdminServiceApiService Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEnti
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+     * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityList
 */
@@ -3586,6 +7482,7 @@ type ListNamedEntitiesOpts struct {
 	SortByKey optional.String
 	SortByDirection optional.String
 	Filters optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resourceType string, project string, domain string, localVarOptionals *ListNamedEntitiesOpts) (AdminNamedEntityList, *http.Response, error) {
@@ -3600,6 +7497,133 @@ func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resource
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNamedEntityList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param resourceType Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required
+ * @param org Optional, org key applied to the resource.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project.
+ * @param optional nil or *ListNamedEntities2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+
+@return AdminNamedEntityList
+*/
+
+type ListNamedEntities2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+	Filters optional.String
+}
+
+func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, resourceType string, org string, project string, domain string, localVarOptionals *ListNamedEntities2Opts) (AdminNamedEntityList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNamedEntityList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -3693,6 +7717,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
  * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param workflowExecutionIdName User or system provided value for the resource.
  * @param optional nil or *ListNodeExecutionsOpts - Optional Parameters:
+     * @param "WorkflowExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) - 
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -3704,6 +7729,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
 */
 
 type ListNodeExecutionsOpts struct { 
+	WorkflowExecutionIdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3723,6 +7749,138 @@ func (a *AdminServiceApiService) ListNodeExecutions(ctx context.Context, workflo
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.project"+"}", fmt.Sprintf("%v", workflowExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.domain"+"}", fmt.Sprintf("%v", workflowExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.name"+"}", fmt.Sprintf("%v", workflowExecutionIdName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.WorkflowExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("workflow_execution_id.org", parameterToString(localVarOptionals.WorkflowExecutionIdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.UniqueParentId.IsSet() {
+		localVarQueryParams.Add("unique_parent_id", parameterToString(localVarOptionals.UniqueParentId.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNodeExecutionList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param workflowExecutionIdOrg Optional, org key applied to the resource.
+ * @param workflowExecutionIdProject Name of the project the resource belongs to.
+ * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param workflowExecutionIdName User or system provided value for the resource.
+ * @param optional nil or *ListNodeExecutions2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) - 
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "UniqueParentId" (optional.String) -  Unique identifier of the parent node in the execution +optional.
+
+@return AdminNodeExecutionList
+*/
+
+type ListNodeExecutions2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+	UniqueParentId optional.String
+}
+
+func (a *AdminServiceApiService) ListNodeExecutions2(ctx context.Context, workflowExecutionIdOrg string, workflowExecutionIdProject string, workflowExecutionIdDomain string, workflowExecutionIdName string, localVarOptionals *ListNodeExecutions2Opts) (AdminNodeExecutionList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNodeExecutionList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.org"+"}", fmt.Sprintf("%v", workflowExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.project"+"}", fmt.Sprintf("%v", workflowExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.domain"+"}", fmt.Sprintf("%v", workflowExecutionIdDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.name"+"}", fmt.Sprintf("%v", workflowExecutionIdName), -1)
@@ -3827,6 +7985,8 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
  * @param taskExecutionIdRetryAttempt
  * @param optional nil or *ListNodeExecutionsForTaskOpts - Optional Parameters:
      * @param "TaskExecutionIdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "TaskExecutionIdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
+     * @param "TaskExecutionIdNodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -3838,6 +7998,8 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
 
 type ListNodeExecutionsForTaskOpts struct { 
 	TaskExecutionIdTaskIdResourceType optional.String
+	TaskExecutionIdTaskIdOrg optional.String
+	TaskExecutionIdNodeExecutionIdExecutionIdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -3872,6 +8034,158 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, 
 
 	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdTaskIdResourceType.IsSet() {
 		localVarQueryParams.Add("task_execution_id.task_id.resource_type", parameterToString(localVarOptionals.TaskExecutionIdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdTaskIdOrg.IsSet() {
+		localVarQueryParams.Add("task_execution_id.task_id.org", parameterToString(localVarOptionals.TaskExecutionIdTaskIdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdNodeExecutionIdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("task_execution_id.node_execution_id.execution_id.org", parameterToString(localVarOptionals.TaskExecutionIdNodeExecutionIdExecutionIdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNodeExecutionList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param taskExecutionIdNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
+ * @param taskExecutionIdNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
+ * @param taskExecutionIdNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param taskExecutionIdNodeExecutionIdExecutionIdName User or system provided value for the resource.
+ * @param taskExecutionIdNodeExecutionIdNodeId
+ * @param taskExecutionIdTaskIdProject Name of the project the resource belongs to.
+ * @param taskExecutionIdTaskIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param taskExecutionIdTaskIdName User provided value for the resource.
+ * @param taskExecutionIdTaskIdVersion Specific version of the resource.
+ * @param taskExecutionIdRetryAttempt
+ * @param optional nil or *ListNodeExecutionsForTask2Opts - Optional Parameters:
+     * @param "TaskExecutionIdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "TaskExecutionIdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminNodeExecutionList
+*/
+
+type ListNodeExecutionsForTask2Opts struct { 
+	TaskExecutionIdTaskIdResourceType optional.String
+	TaskExecutionIdTaskIdOrg optional.String
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListNodeExecutionsForTask2(ctx context.Context, taskExecutionIdNodeExecutionIdExecutionIdOrg string, taskExecutionIdNodeExecutionIdExecutionIdProject string, taskExecutionIdNodeExecutionIdExecutionIdDomain string, taskExecutionIdNodeExecutionIdExecutionIdName string, taskExecutionIdNodeExecutionIdNodeId string, taskExecutionIdTaskIdProject string, taskExecutionIdTaskIdDomain string, taskExecutionIdTaskIdName string, taskExecutionIdTaskIdVersion string, taskExecutionIdRetryAttempt int64, localVarOptionals *ListNodeExecutionsForTask2Opts) (AdminNodeExecutionList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNodeExecutionList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.name"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.node_id"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdNodeId), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.task_id.project"+"}", fmt.Sprintf("%v", taskExecutionIdTaskIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.task_id.domain"+"}", fmt.Sprintf("%v", taskExecutionIdTaskIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.task_id.name"+"}", fmt.Sprintf("%v", taskExecutionIdTaskIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.task_id.version"+"}", fmt.Sprintf("%v", taskExecutionIdTaskIdVersion), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.retry_attempt"+"}", fmt.Sprintf("%v", taskExecutionIdRetryAttempt), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdTaskIdResourceType.IsSet() {
+		localVarQueryParams.Add("task_execution_id.task_id.resource_type", parameterToString(localVarOptionals.TaskExecutionIdTaskIdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.TaskExecutionIdTaskIdOrg.IsSet() {
+		localVarQueryParams.Add("task_execution_id.task_id.org", parameterToString(localVarOptionals.TaskExecutionIdTaskIdOrg.Value(), ""))
 	}
 	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
 		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
@@ -3961,6 +8275,7 @@ AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Org" (optional.String) -  Optional, org filter applied to list project requests.
 
 @return AdminProjects
 */
@@ -3971,6 +8286,7 @@ type ListProjectsOpts struct {
 	Filters optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListProjects(ctx context.Context, localVarOptionals *ListProjectsOpts) (AdminProjects, *http.Response, error) {
@@ -3984,6 +8300,127 @@ func (a *AdminServiceApiService) ListProjects(ctx context.Context, localVarOptio
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/projects"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjects
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org filter applied to list project requests.
+ * @param optional nil or *ListProjects2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminProjects
+*/
+
+type ListProjects2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListProjects2(ctx context.Context, org string, localVarOptionals *ListProjects2Opts) (AdminProjects, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjects
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -4076,6 +8513,7 @@ AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecu
  * @param nodeExecutionIdExecutionIdName User or system provided value for the resource.
  * @param nodeExecutionIdNodeId
  * @param optional nil or *ListTaskExecutionsOpts - Optional Parameters:
+     * @param "NodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -4086,6 +8524,7 @@ AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecu
 */
 
 type ListTaskExecutionsOpts struct { 
+	NodeExecutionIdExecutionIdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -4104,6 +8543,135 @@ func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExe
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.name"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.node_id"+"}", fmt.Sprintf("%v", nodeExecutionIdNodeId), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.NodeExecutionIdExecutionIdOrg.IsSet() {
+		localVarQueryParams.Add("node_execution_id.execution_id.org", parameterToString(localVarOptionals.NodeExecutionIdExecutionIdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminTaskExecutionList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param nodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
+ * @param nodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
+ * @param nodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param nodeExecutionIdExecutionIdName User or system provided value for the resource.
+ * @param nodeExecutionIdNodeId
+ * @param optional nil or *ListTaskExecutions2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminTaskExecutionList
+*/
+
+type ListTaskExecutions2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListTaskExecutions2(ctx context.Context, nodeExecutionIdExecutionIdOrg string, nodeExecutionIdExecutionIdProject string, nodeExecutionIdExecutionIdDomain string, nodeExecutionIdExecutionIdName string, nodeExecutionIdNodeId string, localVarOptionals *ListTaskExecutions2Opts) (AdminTaskExecutionList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminTaskExecutionList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.name"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdName), -1)
@@ -4203,6 +8771,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+     * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityIdentifierList
 */
@@ -4213,6 +8782,7 @@ type ListTaskIdsOpts struct {
 	SortByKey optional.String
 	SortByDirection optional.String
 	Filters optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string, domain string, localVarOptionals *ListTaskIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
@@ -4226,6 +8796,131 @@ func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/task_ids/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNamedEntityIdentifierList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the resource.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project. +required
+ * @param optional nil or *ListTaskIds2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+
+@return AdminNamedEntityIdentifierList
+*/
+
+type ListTaskIds2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+	Filters optional.String
+}
+
+func (a *AdminServiceApiService) ListTaskIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListTaskIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNamedEntityIdentifierList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -4319,6 +9014,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; 
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListTasksOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -4329,6 +9025,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; 
 */
 
 type ListTasksOpts struct { 
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -4347,6 +9044,133 @@ func (a *AdminServiceApiService) ListTasks(ctx context.Context, idProject string
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminTaskList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param optional nil or *ListTasks2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminTaskList
+*/
+
+type ListTasks2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListTasks2Opts) (AdminTaskList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminTaskList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -4439,8 +9263,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; 
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListTasks2Opts - Optional Parameters:
+ * @param optional nil or *ListTasks3Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -4450,8 +9275,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; 
 @return AdminTaskList
 */
 
-type ListTasks2Opts struct { 
+type ListTasks3Opts struct { 
 	IdName optional.String
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -4459,7 +9285,7 @@ type ListTasks2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListTasks2Opts) (AdminTaskList, *http.Response, error) {
+func (a *AdminServiceApiService) ListTasks3(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListTasks3Opts) (AdminTaskList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4470,6 +9296,136 @@ func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idProject strin
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdName.IsSet() {
+		localVarQueryParams.Add("id.name", parameterToString(localVarOptionals.IdName.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminTaskList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param optional nil or *ListTasks4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminTaskList
+*/
+
+type ListTasks4Opts struct { 
+	IdName optional.String
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListTasks4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListTasks4Opts) (AdminTaskList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminTaskList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 
@@ -4570,6 +9526,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity
      * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
      * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+     * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityIdentifierList
 */
@@ -4580,6 +9537,7 @@ type ListWorkflowIdsOpts struct {
 	SortByKey optional.String
 	SortByDirection optional.String
 	Filters optional.String
+	Org optional.String
 }
 
 func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project string, domain string, localVarOptionals *ListWorkflowIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
@@ -4593,6 +9551,131 @@ func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project st
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_ids/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Org.IsSet() {
+		localVarQueryParams.Add("org", parameterToString(localVarOptionals.Org.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNamedEntityIdentifierList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the resource.
+ * @param project Name of the project that contains the identifiers. +required
+ * @param domain Name of the domain the identifiers belongs to within the project. +required
+ * @param optional nil or *ListWorkflowIds2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+
+@return AdminNamedEntityIdentifierList
+*/
+
+type ListWorkflowIds2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+	Filters optional.String
+}
+
+func (a *AdminServiceApiService) ListWorkflowIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListWorkflowIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNamedEntityIdentifierList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{org}/{project}/{domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -4686,6 +9769,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
  * @param optional nil or *ListWorkflowsOpts - Optional Parameters:
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -4696,6 +9780,7 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x
 */
 
 type ListWorkflowsOpts struct { 
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -4714,6 +9799,133 @@ func (a *AdminServiceApiService) ListWorkflows(ctx context.Context, idProject st
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param optional nil or *ListWorkflows2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminWorkflowList
+*/
+
+type ListWorkflows2Opts struct { 
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListWorkflows2Opts) (AdminWorkflowList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -4806,8 +10018,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListWorkflows2Opts - Optional Parameters:
+ * @param optional nil or *ListWorkflows3Opts - Optional Parameters:
      * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
      * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
      * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
@@ -4817,8 +10030,9 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x
 @return AdminWorkflowList
 */
 
-type ListWorkflows2Opts struct { 
+type ListWorkflows3Opts struct { 
 	IdName optional.String
+	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -4826,7 +10040,7 @@ type ListWorkflows2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListWorkflows2Opts) (AdminWorkflowList, *http.Response, error) {
+func (a *AdminServiceApiService) ListWorkflows3(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListWorkflows3Opts) (AdminWorkflowList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4837,6 +10051,136 @@ func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idProject s
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	if localVarOptionals != nil && localVarOptionals.IdName.IsSet() {
+		localVarQueryParams.Add("id.name", parameterToString(localVarOptionals.IdName.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.IdOrg.IsSet() {
+		localVarQueryParams.Add("id.org", parameterToString(localVarOptionals.IdOrg.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Limit.IsSet() {
+		localVarQueryParams.Add("limit", parameterToString(localVarOptionals.Limit.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Token.IsSet() {
+		localVarQueryParams.Add("token", parameterToString(localVarOptionals.Token.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.Filters.IsSet() {
+		localVarQueryParams.Add("filters", parameterToString(localVarOptionals.Filters.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByKey.IsSet() {
+		localVarQueryParams.Add("sort_by.key", parameterToString(localVarOptionals.SortByKey.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.SortByDirection.IsSet() {
+		localVarQueryParams.Add("sort_by.direction", parameterToString(localVarOptionals.SortByDirection.Value(), ""))
+	}
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowList
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param optional nil or *ListWorkflows4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+
+@return AdminWorkflowList
+*/
+
+type ListWorkflows4Opts struct { 
+	IdName optional.String
+	Limit optional.Int64
+	Token optional.String
+	Filters optional.String
+	SortByKey optional.String
+	SortByDirection optional.String
+}
+
+func (a *AdminServiceApiService) ListWorkflows4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListWorkflows4Opts) (AdminWorkflowList, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Get")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowList
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 
@@ -5016,6 +10360,97 @@ func (a *AdminServiceApiService) RecoverExecution(ctx context.Context, body Admi
 }
 
 /* 
+AdminServiceApiService Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminExecutionCreateResponse
+*/
+func (a *AdminServiceApiService) RecoverExecution2(ctx context.Context, idOrg string, body AdminExecutionRecoverRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecutionCreateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/recover"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecutionCreateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
@@ -5105,6 +10540,97 @@ func (a *AdminServiceApiService) RegisterProject(ctx context.Context, body Admin
 }
 
 /* 
+AdminServiceApiService Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param projectOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminProjectRegisterResponse
+*/
+func (a *AdminServiceApiService) RegisterProject2(ctx context.Context, projectOrg string, body AdminProjectRegisterRequest) (AdminProjectRegisterResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectRegisterResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{project.org}"
+	localVarPath = strings.Replace(localVarPath, "{"+"project.org"+"}", fmt.Sprintf("%v", projectOrg), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectRegisterResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
@@ -5122,6 +10648,97 @@ func (a *AdminServiceApiService) RelaunchExecution(ctx context.Context, body Adm
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/relaunch"
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecutionCreateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param body
+
+@return AdminExecutionCreateResponse
+*/
+func (a *AdminServiceApiService) RelaunchExecution2(ctx context.Context, idOrg string, body AdminExecutionRelaunchRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Post")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecutionCreateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/relaunch"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
 	localVarQueryParams := url.Values{}
@@ -5289,6 +10906,103 @@ func (a *AdminServiceApiService) TerminateExecution(ctx context.Context, idProje
 }
 
 /* 
+AdminServiceApiService Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User or system provided value for the resource.
+ * @param body
+
+@return AdminExecutionTerminateResponse
+*/
+func (a *AdminServiceApiService) TerminateExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, body AdminExecutionTerminateRequest) (AdminExecutionTerminateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Delete")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecutionTerminateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecutionTerminateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
@@ -5309,6 +11023,103 @@ func (a *AdminServiceApiService) UpdateExecution(ctx context.Context, idProject 
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminExecutionUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User or system provided value for the resource.
+ * @param body
+
+@return AdminExecutionUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, body AdminExecutionUpdateRequest) (AdminExecutionUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminExecutionUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -5481,6 +11292,102 @@ func (a *AdminServiceApiService) UpdateLaunchPlan(ctx context.Context, idProject
 }
 
 /* 
+AdminServiceApiService Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource.
+ * @param idVersion Specific version of the resource.
+
+@return AdminLaunchPlanUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string) (AdminLaunchPlanUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminLaunchPlanUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.version"+"}", fmt.Sprintf("%v", idVersion), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminLaunchPlanUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to update +required
@@ -5578,7 +11485,106 @@ func (a *AdminServiceApiService) UpdateNamedEntity(ctx context.Context, resource
 }
 
 /* 
-AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60;  flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
+AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param resourceType Resource type of the metadata to update +required
+ * @param idOrg Optional, org key applied to the resource.
+ * @param idProject Name of the project the resource belongs to.
+ * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
+ * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+ * @param body
+
+@return AdminNamedEntityUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, body AdminNamedEntityUpdateRequest) (AdminNamedEntityUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminNamedEntityUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminNamedEntityUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param id Globally unique project name.
  * @param body
@@ -5596,6 +11602,99 @@ func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, b
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param org Optional, org key applied to the resource.
+ * @param id Globally unique project name.
+ * @param body
+
+@return AdminProjectUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, org string, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{org}/{id}"
+	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -5687,6 +11786,99 @@ func (a *AdminServiceApiService) UpdateProjectAttributes(ctx context.Context, at
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/project_attributes/{attributes.project}"
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectAttributesUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param attributesOrg Optional, org key applied to the project.
+ * @param attributesProject Unique project id for which this set of attributes will be applied.
+ * @param body
+
+@return AdminProjectAttributesUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateProjectAttributes2(ctx context.Context, attributesOrg string, attributesProject string, body AdminProjectAttributesUpdateRequest) (AdminProjectAttributesUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectAttributesUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}"
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.org"+"}", fmt.Sprintf("%v", attributesOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -5853,6 +12045,101 @@ func (a *AdminServiceApiService) UpdateProjectDomainAttributes(ctx context.Conte
 }
 
 /* 
+AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param attributesOrg Optional, org key applied to the attributes.
+ * @param attributesProject Unique project id for which this set of attributes will be applied.
+ * @param attributesDomain Unique domain id for which this set of attributes will be applied.
+ * @param body
+
+@return AdminProjectDomainAttributesUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateProjectDomainAttributes2(ctx context.Context, attributesOrg string, attributesProject string, attributesDomain string, body AdminProjectDomainAttributesUpdateRequest) (AdminProjectDomainAttributesUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminProjectDomainAttributesUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}"
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.org"+"}", fmt.Sprintf("%v", attributesOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.domain"+"}", fmt.Sprintf("%v", attributesDomain), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminProjectDomainAttributesUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesProject Unique project id for which this set of attributes will be applied.
@@ -5873,6 +12160,103 @@ func (a *AdminServiceApiService) UpdateWorkflowAttributes(ctx context.Context, a
 
 	// create path and map variables
 	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}"
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.domain"+"}", fmt.Sprintf("%v", attributesDomain), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.workflow"+"}", fmt.Sprintf("%v", attributesWorkflow), -1)
+
+	localVarHeaderParams := make(map[string]string)
+	localVarQueryParams := url.Values{}
+	localVarFormParams := url.Values{}
+
+	// to determine the Content-Type header
+	localVarHttpContentTypes := []string{"application/json"}
+
+	// set Content-Type header
+	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
+	if localVarHttpContentType != "" {
+		localVarHeaderParams["Content-Type"] = localVarHttpContentType
+	}
+
+	// to determine the Accept header
+	localVarHttpHeaderAccepts := []string{"application/json"}
+
+	// set Accept header
+	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
+	if localVarHttpHeaderAccept != "" {
+		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
+	}
+	// body params
+	localVarPostBody = &body
+	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
+	if err != nil {
+		return localVarReturnValue, nil, err
+	}
+
+	localVarHttpResponse, err := a.client.callAPI(r)
+	if err != nil || localVarHttpResponse == nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
+	localVarHttpResponse.Body.Close()
+	if err != nil {
+		return localVarReturnValue, localVarHttpResponse, err
+	}
+
+	if localVarHttpResponse.StatusCode < 300 {
+		// If we succeed, return the data, otherwise pass on to decode error.
+		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+		if err == nil { 
+			return localVarReturnValue, localVarHttpResponse, err
+		}
+	}
+
+	if localVarHttpResponse.StatusCode >= 300 {
+		newErr := GenericSwaggerError{
+			body: localVarBody,
+			error: localVarHttpResponse.Status,
+		}
+		
+		if localVarHttpResponse.StatusCode == 200 {
+			var v AdminWorkflowAttributesUpdateResponse
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		return localVarReturnValue, localVarHttpResponse, newErr
+	}
+
+	return localVarReturnValue, localVarHttpResponse, nil
+}
+
+/* 
+AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+ * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
+ * @param attributesOrg Optional, org key applied to the attributes.
+ * @param attributesProject Unique project id for which this set of attributes will be applied.
+ * @param attributesDomain Unique domain id for which this set of attributes will be applied.
+ * @param attributesWorkflow Workflow name for which this set of attributes will be applied.
+ * @param body
+
+@return AdminWorkflowAttributesUpdateResponse
+*/
+func (a *AdminServiceApiService) UpdateWorkflowAttributes2(ctx context.Context, attributesOrg string, attributesProject string, attributesDomain string, attributesWorkflow string, body AdminWorkflowAttributesUpdateRequest) (AdminWorkflowAttributesUpdateResponse, *http.Response, error) {
+	var (
+		localVarHttpMethod = strings.ToUpper("Put")
+		localVarPostBody   interface{}
+		localVarFileName   string
+		localVarFileBytes  []byte
+		localVarReturnValue AdminWorkflowAttributesUpdateResponse
+	)
+
+	// create path and map variables
+	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}"
+	localVarPath = strings.Replace(localVarPath, "{"+"attributes.org"+"}", fmt.Sprintf("%v", attributesOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.domain"+"}", fmt.Sprintf("%v", attributesDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.workflow"+"}", fmt.Sprintf("%v", attributesWorkflow), -1)
