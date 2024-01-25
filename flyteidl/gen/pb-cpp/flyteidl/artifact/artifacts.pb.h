@@ -37,6 +37,7 @@
 #include <google/protobuf/unknown_field_set.h>
 #include <google/protobuf/any.pb.h>
 #include "google/api/annotations.pb.h"
+#include <google/protobuf/timestamp.pb.h>
 #include "flyteidl/admin/launch_plan.pb.h"
 #include "flyteidl/core/literals.pb.h"
 #include "flyteidl/core/types.pb.h"
@@ -504,20 +505,6 @@ class CreateArtifactRequest final :
   ::std::string* release_version();
   void set_allocated_version(::std::string* version);
 
-  // string tag = 5;
-  void clear_tag();
-  static const int kTagFieldNumber = 5;
-  const ::std::string& tag() const;
-  void set_tag(const ::std::string& value);
-  #if LANG_CXX11
-  void set_tag(::std::string&& value);
-  #endif
-  void set_tag(const char* value);
-  void set_tag(const char* value, size_t size);
-  ::std::string* mutable_tag();
-  ::std::string* release_tag();
-  void set_allocated_tag(::std::string* tag);
-
   // .flyteidl.core.ArtifactKey artifact_key = 1;
   bool has_artifact_key() const;
   void clear_artifact_key();
@@ -535,6 +522,15 @@ class CreateArtifactRequest final :
   ::flyteidl::artifact::ArtifactSpec* release_spec();
   ::flyteidl::artifact::ArtifactSpec* mutable_spec();
   void set_allocated_spec(::flyteidl::artifact::ArtifactSpec* spec);
+
+  // .google.protobuf.Timestamp time_partition_value = 5;
+  bool has_time_partition_value() const;
+  void clear_time_partition_value();
+  static const int kTimePartitionValueFieldNumber = 5;
+  const ::google::protobuf::Timestamp& time_partition_value() const;
+  ::google::protobuf::Timestamp* release_time_partition_value();
+  ::google::protobuf::Timestamp* mutable_time_partition_value();
+  void set_allocated_time_partition_value(::google::protobuf::Timestamp* time_partition_value);
 
   // .flyteidl.artifact.ArtifactSource source = 6;
   bool has_source() const;
@@ -557,9 +553,9 @@ class CreateArtifactRequest final :
       ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
       0 > partitions_;
   ::google::protobuf::internal::ArenaStringPtr version_;
-  ::google::protobuf::internal::ArenaStringPtr tag_;
   ::flyteidl::core::ArtifactKey* artifact_key_;
   ::flyteidl::artifact::ArtifactSpec* spec_;
+  ::google::protobuf::Timestamp* time_partition_value_;
   ::flyteidl::artifact::ArtifactSource* source_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
@@ -851,6 +847,20 @@ class ArtifactSpec final :
   ::std::string* release_metadata_type();
   void set_allocated_metadata_type(::std::string* metadata_type);
 
+  // string file_format = 7;
+  void clear_file_format();
+  static const int kFileFormatFieldNumber = 7;
+  const ::std::string& file_format() const;
+  void set_file_format(const ::std::string& value);
+  #if LANG_CXX11
+  void set_file_format(::std::string&& value);
+  #endif
+  void set_file_format(const char* value);
+  void set_file_format(const char* value, size_t size);
+  ::std::string* mutable_file_format();
+  ::std::string* release_file_format();
+  void set_allocated_file_format(::std::string* file_format);
+
   // .flyteidl.core.Literal value = 1;
   bool has_value() const;
   void clear_value();
@@ -878,6 +888,15 @@ class ArtifactSpec final :
   ::google::protobuf::Any* mutable_user_metadata();
   void set_allocated_user_metadata(::google::protobuf::Any* user_metadata);
 
+  // .google.protobuf.Timestamp created_at = 6;
+  bool has_created_at() const;
+  void clear_created_at();
+  static const int kCreatedAtFieldNumber = 6;
+  const ::google::protobuf::Timestamp& created_at() const;
+  ::google::protobuf::Timestamp* release_created_at();
+  ::google::protobuf::Timestamp* mutable_created_at();
+  void set_allocated_created_at(::google::protobuf::Timestamp* created_at);
+
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.ArtifactSpec)
  private:
   class HasBitSetters;
@@ -885,9 +904,11 @@ class ArtifactSpec final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr short_description_;
   ::google::protobuf::internal::ArenaStringPtr metadata_type_;
+  ::google::protobuf::internal::ArenaStringPtr file_format_;
   ::flyteidl::core::Literal* value_;
   ::flyteidl::core::LiteralType* type_;
   ::google::protobuf::Any* user_metadata_;
+  ::google::protobuf::Timestamp* created_at_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifact_2fartifacts_2eproto;
 };
@@ -1459,9 +1480,9 @@ class SearchArtifactsRequest final :
 
   // accessors -------------------------------------------------------
 
-  // string principal = 3;
+  // string principal = 4;
   void clear_principal();
-  static const int kPrincipalFieldNumber = 3;
+  static const int kPrincipalFieldNumber = 4;
   const ::std::string& principal() const;
   void set_principal(const ::std::string& value);
   #if LANG_CXX11
@@ -1473,9 +1494,9 @@ class SearchArtifactsRequest final :
   ::std::string* release_principal();
   void set_allocated_principal(::std::string* principal);
 
-  // string version = 4;
+  // string version = 5;
   void clear_version();
-  static const int kVersionFieldNumber = 4;
+  static const int kVersionFieldNumber = 5;
   const ::std::string& version() const;
   void set_version(const ::std::string& value);
   #if LANG_CXX11
@@ -1487,9 +1508,9 @@ class SearchArtifactsRequest final :
   ::std::string* release_version();
   void set_allocated_version(::std::string* version);
 
-  // string token = 6;
+  // string token = 7;
   void clear_token();
-  static const int kTokenFieldNumber = 6;
+  static const int kTokenFieldNumber = 7;
   const ::std::string& token() const;
   void set_token(const ::std::string& value);
   #if LANG_CXX11
@@ -1519,18 +1540,27 @@ class SearchArtifactsRequest final :
   ::flyteidl::core::Partitions* mutable_partitions();
   void set_allocated_partitions(::flyteidl::core::Partitions* partitions);
 
-  // .flyteidl.artifact.SearchOptions options = 5;
+  // .google.protobuf.Timestamp time_partition_value = 3;
+  bool has_time_partition_value() const;
+  void clear_time_partition_value();
+  static const int kTimePartitionValueFieldNumber = 3;
+  const ::google::protobuf::Timestamp& time_partition_value() const;
+  ::google::protobuf::Timestamp* release_time_partition_value();
+  ::google::protobuf::Timestamp* mutable_time_partition_value();
+  void set_allocated_time_partition_value(::google::protobuf::Timestamp* time_partition_value);
+
+  // .flyteidl.artifact.SearchOptions options = 6;
   bool has_options() const;
   void clear_options();
-  static const int kOptionsFieldNumber = 5;
+  static const int kOptionsFieldNumber = 6;
   const ::flyteidl::artifact::SearchOptions& options() const;
   ::flyteidl::artifact::SearchOptions* release_options();
   ::flyteidl::artifact::SearchOptions* mutable_options();
   void set_allocated_options(::flyteidl::artifact::SearchOptions* options);
 
-  // int32 limit = 7;
+  // int32 limit = 8;
   void clear_limit();
-  static const int kLimitFieldNumber = 7;
+  static const int kLimitFieldNumber = 8;
   ::google::protobuf::int32 limit() const;
   void set_limit(::google::protobuf::int32 value);
 
@@ -1544,6 +1574,7 @@ class SearchArtifactsRequest final :
   ::google::protobuf::internal::ArenaStringPtr token_;
   ::flyteidl::core::ArtifactKey* artifact_key_;
   ::flyteidl::core::Partitions* partitions_;
+  ::google::protobuf::Timestamp* time_partition_value_;
   ::flyteidl::artifact::SearchOptions* options_;
   ::google::protobuf::int32 limit_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
@@ -3969,57 +4000,50 @@ CreateArtifactRequest::mutable_partitions() {
   return partitions_.MutableMap();
 }
 
-// string tag = 5;
-inline void CreateArtifactRequest::clear_tag() {
-  tag_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+// .google.protobuf.Timestamp time_partition_value = 5;
+inline bool CreateArtifactRequest::has_time_partition_value() const {
+  return this != internal_default_instance() && time_partition_value_ != nullptr;
 }
-inline const ::std::string& CreateArtifactRequest::tag() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.CreateArtifactRequest.tag)
-  return tag_.GetNoArena();
+inline const ::google::protobuf::Timestamp& CreateArtifactRequest::time_partition_value() const {
+  const ::google::protobuf::Timestamp* p = time_partition_value_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.CreateArtifactRequest.time_partition_value)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
 }
-inline void CreateArtifactRequest::set_tag(const ::std::string& value) {
+inline ::google::protobuf::Timestamp* CreateArtifactRequest::release_time_partition_value() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.CreateArtifactRequest.time_partition_value)
   
-  tag_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.artifact.CreateArtifactRequest.tag)
+  ::google::protobuf::Timestamp* temp = time_partition_value_;
+  time_partition_value_ = nullptr;
+  return temp;
 }
-#if LANG_CXX11
-inline void CreateArtifactRequest::set_tag(::std::string&& value) {
+inline ::google::protobuf::Timestamp* CreateArtifactRequest::mutable_time_partition_value() {
   
-  tag_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.artifact.CreateArtifactRequest.tag)
+  if (time_partition_value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    time_partition_value_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.CreateArtifactRequest.time_partition_value)
+  return time_partition_value_;
 }
-#endif
-inline void CreateArtifactRequest::set_tag(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  tag_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.artifact.CreateArtifactRequest.tag)
-}
-inline void CreateArtifactRequest::set_tag(const char* value, size_t size) {
-  
-  tag_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.artifact.CreateArtifactRequest.tag)
-}
-inline ::std::string* CreateArtifactRequest::mutable_tag() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.CreateArtifactRequest.tag)
-  return tag_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* CreateArtifactRequest::release_tag() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.CreateArtifactRequest.tag)
-  
-  return tag_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void CreateArtifactRequest::set_allocated_tag(::std::string* tag) {
-  if (tag != nullptr) {
+inline void CreateArtifactRequest::set_allocated_time_partition_value(::google::protobuf::Timestamp* time_partition_value) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(time_partition_value_);
+  }
+  if (time_partition_value) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(time_partition_value)->GetArena();
+    if (message_arena != submessage_arena) {
+      time_partition_value = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, time_partition_value, submessage_arena);
+    }
     
   } else {
     
   }
-  tag_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), tag);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.CreateArtifactRequest.tag)
+  time_partition_value_ = time_partition_value;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.CreateArtifactRequest.time_partition_value)
 }
 
 // .flyteidl.artifact.ArtifactSource source = 6;
@@ -4532,6 +4556,105 @@ inline void ArtifactSpec::set_allocated_metadata_type(::std::string* metadata_ty
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.metadata_type)
 }
 
+// .google.protobuf.Timestamp created_at = 6;
+inline bool ArtifactSpec::has_created_at() const {
+  return this != internal_default_instance() && created_at_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& ArtifactSpec::created_at() const {
+  const ::google::protobuf::Timestamp* p = created_at_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSpec.created_at)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* ArtifactSpec::release_created_at() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSpec.created_at)
+  
+  ::google::protobuf::Timestamp* temp = created_at_;
+  created_at_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* ArtifactSpec::mutable_created_at() {
+  
+  if (created_at_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    created_at_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSpec.created_at)
+  return created_at_;
+}
+inline void ArtifactSpec::set_allocated_created_at(::google::protobuf::Timestamp* created_at) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(created_at_);
+  }
+  if (created_at) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(created_at)->GetArena();
+    if (message_arena != submessage_arena) {
+      created_at = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, created_at, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  created_at_ = created_at;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.created_at)
+}
+
+// string file_format = 7;
+inline void ArtifactSpec::clear_file_format() {
+  file_format_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ArtifactSpec::file_format() const {
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSpec.file_format)
+  return file_format_.GetNoArena();
+}
+inline void ArtifactSpec::set_file_format(const ::std::string& value) {
+  
+  file_format_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.artifact.ArtifactSpec.file_format)
+}
+#if LANG_CXX11
+inline void ArtifactSpec::set_file_format(::std::string&& value) {
+  
+  file_format_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.artifact.ArtifactSpec.file_format)
+}
+#endif
+inline void ArtifactSpec::set_file_format(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  file_format_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.artifact.ArtifactSpec.file_format)
+}
+inline void ArtifactSpec::set_file_format(const char* value, size_t size) {
+  
+  file_format_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.artifact.ArtifactSpec.file_format)
+}
+inline ::std::string* ArtifactSpec::mutable_file_format() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSpec.file_format)
+  return file_format_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ArtifactSpec::release_file_format() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSpec.file_format)
+  
+  return file_format_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ArtifactSpec::set_allocated_file_format(::std::string* file_format) {
+  if (file_format != nullptr) {
+    
+  } else {
+    
+  }
+  file_format_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file_format);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.file_format)
+}
+
 // -------------------------------------------------------------------
 
 // CreateArtifactResponse
@@ -4831,7 +4954,53 @@ inline void SearchArtifactsRequest::set_allocated_partitions(::flyteidl::core::P
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.SearchArtifactsRequest.partitions)
 }
 
-// string principal = 3;
+// .google.protobuf.Timestamp time_partition_value = 3;
+inline bool SearchArtifactsRequest::has_time_partition_value() const {
+  return this != internal_default_instance() && time_partition_value_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& SearchArtifactsRequest::time_partition_value() const {
+  const ::google::protobuf::Timestamp* p = time_partition_value_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.SearchArtifactsRequest.time_partition_value)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* SearchArtifactsRequest::release_time_partition_value() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.SearchArtifactsRequest.time_partition_value)
+  
+  ::google::protobuf::Timestamp* temp = time_partition_value_;
+  time_partition_value_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* SearchArtifactsRequest::mutable_time_partition_value() {
+  
+  if (time_partition_value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    time_partition_value_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.SearchArtifactsRequest.time_partition_value)
+  return time_partition_value_;
+}
+inline void SearchArtifactsRequest::set_allocated_time_partition_value(::google::protobuf::Timestamp* time_partition_value) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(time_partition_value_);
+  }
+  if (time_partition_value) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(time_partition_value)->GetArena();
+    if (message_arena != submessage_arena) {
+      time_partition_value = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, time_partition_value, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  time_partition_value_ = time_partition_value;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.SearchArtifactsRequest.time_partition_value)
+}
+
+// string principal = 4;
 inline void SearchArtifactsRequest::clear_principal() {
   principal_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4884,7 +5053,7 @@ inline void SearchArtifactsRequest::set_allocated_principal(::std::string* princ
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.SearchArtifactsRequest.principal)
 }
 
-// string version = 4;
+// string version = 5;
 inline void SearchArtifactsRequest::clear_version() {
   version_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4937,7 +5106,7 @@ inline void SearchArtifactsRequest::set_allocated_version(::std::string* version
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.SearchArtifactsRequest.version)
 }
 
-// .flyteidl.artifact.SearchOptions options = 5;
+// .flyteidl.artifact.SearchOptions options = 6;
 inline bool SearchArtifactsRequest::has_options() const {
   return this != internal_default_instance() && options_ != nullptr;
 }
@@ -4988,7 +5157,7 @@ inline void SearchArtifactsRequest::set_allocated_options(::flyteidl::artifact::
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.SearchArtifactsRequest.options)
 }
 
-// string token = 6;
+// string token = 7;
 inline void SearchArtifactsRequest::clear_token() {
   token_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -5041,7 +5210,7 @@ inline void SearchArtifactsRequest::set_allocated_token(::std::string* token) {
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.SearchArtifactsRequest.token)
 }
 
-// int32 limit = 7;
+// int32 limit = 8;
 inline void SearchArtifactsRequest::clear_limit() {
   limit_ = 0;
 }

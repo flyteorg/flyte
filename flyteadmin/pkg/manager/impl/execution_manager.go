@@ -747,6 +747,7 @@ func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding 
 			strVal = p.GetStringValue()
 		case *core.Primitive_Datetime:
 			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
+			t = t.In(time.UTC)
 			strVal = t.Format("2006-01-02")
 		case *core.Primitive_StringValue:
 			strVal = p.GetStringValue()
@@ -781,46 +782,6 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 	if query.GetUri() != "" {
 		// If a query string, then just pass it through, nothing to fill in.
 		return query, nil
-	} else if query.GetArtifactTag() != nil {
-		t := query.GetArtifactTag()
-		ak := t.GetArtifactKey()
-		if ak == nil {
-			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "tag doesn't have key")
-		}
-		var project, domain string
-		if ak.GetProject() == "" {
-			project = contextutils.Value(ctx, contextutils.ProjectKey)
-		} else {
-			project = ak.GetProject()
-		}
-		if ak.GetDomain() == "" {
-			domain = contextutils.Value(ctx, contextutils.DomainKey)
-		} else {
-			domain = ak.GetDomain()
-		}
-		strValue, err := m.getLabelValue(ctx, t.GetValue(), inputs)
-		if err != nil {
-			logger.Errorf(ctx, "Failed to template input string [%s] [%v]", t.GetValue(), err)
-			return query, err
-		}
-
-		return core.ArtifactQuery{
-			Identifier: &core.ArtifactQuery_ArtifactTag{
-				ArtifactTag: &core.ArtifactTag{
-					ArtifactKey: &core.ArtifactKey{
-						Project: project,
-						Domain:  domain,
-						Name:    ak.GetName(),
-					},
-					Value: &core.LabelValue{
-						Value: &core.LabelValue_StaticValue{
-							StaticValue: strValue,
-						},
-					},
-				},
-			},
-		}, nil
-
 	} else if query.GetArtifactId() != nil {
 		artifactID := query.GetArtifactId()
 		ak := artifactID.GetArtifactKey()
@@ -841,7 +802,7 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 
 		var partitions map[string]*core.LabelValue
 
-		if artifactID.GetPartitions() != nil && artifactID.GetPartitions().GetValue() != nil {
+		if artifactID.GetPartitions().GetValue() != nil {
 			partitions = make(map[string]*core.LabelValue, len(artifactID.GetPartitions().Value))
 			for k, v := range artifactID.GetPartitions().GetValue() {
 				newValue, err := m.getLabelValue(ctx, v, inputs)
@@ -852,6 +813,36 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 				partitions[k] = &core.LabelValue{Value: &core.LabelValue_StaticValue{StaticValue: newValue}}
 			}
 		}
+
+		var timePartition *core.TimePartition
+		if artifactID.GetTimePartition().GetValue() != nil {
+			if artifactID.GetTimePartition().Value.GetTimeValue() != nil {
+				// If the time value is set, then just pass it through, nothing to fill in.
+				timePartition = artifactID.GetTimePartition()
+			} else if artifactID.GetTimePartition().Value.GetInputBinding() != nil {
+				// Evaluate the time partition input binding
+				lit, ok := inputs[artifactID.GetTimePartition().Value.GetInputBinding().GetVar()]
+				if !ok {
+					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "time partition input binding var [%s] not found in inputs %v", artifactID.GetTimePartition().Value.GetInputBinding().GetVar(), inputs)
+				}
+
+				if lit.GetScalar().GetPrimitive().GetDatetime() == nil {
+					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+						"time partition binding to input var [%s] failing because %v is not a datetime",
+						artifactID.GetTimePartition().Value.GetInputBinding().GetVar(), lit)
+				}
+				timePartition = &core.TimePartition{
+					Value: &core.LabelValue{
+						Value: &core.LabelValue_TimeValue{
+							TimeValue: lit.GetScalar().GetPrimitive().GetDatetime(),
+						},
+					},
+				}
+			} else {
+				return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "time partition value cannot be empty when evaluating query: %v", query)
+			}
+		}
+
 		return core.ArtifactQuery{
 			Identifier: &core.ArtifactQuery_ArtifactId{
 				ArtifactId: &core.ArtifactID{
@@ -860,11 +851,10 @@ func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.Ar
 						Domain:  domain,
 						Name:    ak.GetName(),
 					},
-					Dimensions: &core.ArtifactID_Partitions{
-						Partitions: &core.Partitions{
-							Value: partitions,
-						},
+					Partitions: &core.Partitions{
+						Value: partitions,
 					},
+					TimePartition: timePartition,
 				},
 			},
 		}, nil
