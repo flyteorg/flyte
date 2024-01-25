@@ -42,8 +42,8 @@ Flyte is made up of a user plane, control plane, and data plane.
 :hidden:
 
 Getting Started <self>
-User Guide <userguide>
-Tutorials <tutorials>
+User Guide <https://docs.flyte.org/en/latest/flytesnacks/userguide.html>
+Tutorials <https://docs.flyte.org/en/latest/flytesnacks/tutorials.html>
 Concepts <https://docs.flyte.org/en/latest/concepts/basics.html>
 Deployment <https://docs.flyte.org/en/latest/deployment/index.html>
 API Reference <https://docs.flyte.org/en/latest/reference/index.html>
