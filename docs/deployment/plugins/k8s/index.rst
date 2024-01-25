@@ -277,84 +277,86 @@ Spin up a cluster
 
     helm repo add flyteorg https://flyteorg.github.io/flyte
 
-  .. group-tab:: Flyte sandbox
+  .. tabs::
 
-    If you have installed Flyte using the `flyte-sandbox Helm chart
-    <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
+    .. group-tab:: Flyte sandbox
 
-    * You have the correct kubeconfig and have selected the correct Kubernetes context.
-    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
+      If you have installed Flyte using the `flyte-sandbox Helm chart
+      <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
 
-    .. tabs::
+      * You have the correct kubeconfig and have selected the correct Kubernetes context.
+      * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
 
-      .. group-tab:: Helm chart
+      .. tabs::
 
-        .. tabs::
+        .. group-tab:: Helm chart
 
-          .. group-tab:: Spark
+          .. tabs::
 
-            create the following four files and apply them using ``kubectl apply -f <filename>``:
+            .. group-tab:: Spark
 
-            1. ``serviceaccount.yaml``
+              create the following four files and apply them using ``kubectl apply -f <filename>``:
 
-            .. code-block:: yaml
+              1. ``serviceaccount.yaml``
 
-              apiVersion: v1
-              kind: ServiceAccount
-              metadata:
-                name: default
-                namespace: "{{ namespace }}"
-                annotations:
-                  eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
+              .. code-block:: yaml
 
-            2. ``spark_role.yaml``
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
+                  name: default
+                  namespace: "{{ namespace }}"
+                  annotations:
+                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
 
-            .. code-block:: yaml
+              2. ``spark_role.yaml``
 
-              apiVersion: rbac.authorization.k8s.io/v1
-              kind: Role
-              metadata:
-                name: spark-role
-                namespace: "{{ namespace }}"
-              rules:
-                - apiGroups:
-                    - ""
-                  resources:
-                    - pods
-                    - services
-                    - configmaps
-                  verbs:
-                    - "*"
+              .. code-block:: yaml
 
-            3. ``spark_service_account.yaml``
-
-            .. code-block:: yaml
-
-              apiVersion: v1
-              kind: ServiceAccount
-              metadata:
-                name: spark
-                namespace: "{{ namespace }}"
-                annotations:
-                  eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-
-            4. ``spark_role_binding.yaml``
-
-            .. code-block:: yaml
-
-              apiVersion: rbac.authorization.k8s.io/v1
-              kind: RoleBinding
-              metadata:
-                name: spark-role-binding
-                namespace: "{{ namespace }}"
-              roleRef:
-                apiGroup: rbac.authorization.k8s.io
+                apiVersion: rbac.authorization.k8s.io/v1
                 kind: Role
-                name: spark-role
-              subjects:
-                - kind: ServiceAccount
+                metadata:
+                  name: spark-role
+                  namespace: "{{ namespace }}"
+                rules:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods
+                      - services
+                      - configmaps
+                    verbs:
+                      - "*"
+
+              3. ``spark_service_account.yaml``
+
+              .. code-block:: yaml
+
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
                   name: spark
                   namespace: "{{ namespace }}"
+                  annotations:
+                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
+
+              4. ``spark_role_binding.yaml``
+
+              .. code-block:: yaml
+
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: RoleBinding
+                metadata:
+                  name: spark-role-binding
+                  namespace: "{{ namespace }}"
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: Role
+                  name: spark-role
+                subjects:
+                  - kind: ServiceAccount
+                    name: spark
+                    namespace: "{{ namespace }}"
 
 Install the Kubernetes operator
 -------------------------------
