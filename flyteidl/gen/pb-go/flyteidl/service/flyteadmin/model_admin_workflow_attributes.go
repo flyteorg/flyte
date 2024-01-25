@@ -15,7 +15,7 @@ type AdminWorkflowAttributes struct {
 	// Unique domain id for which this set of attributes will be applied.
 	Domain string `json:"domain,omitempty"`
 	// Workflow name for which this set of attributes will be applied.
-	Workflow           string                   `json:"workflow,omitempty"`
+	Workflow string `json:"workflow,omitempty"`
 	MatchingAttributes *AdminMatchingAttributes `json:"matching_attributes,omitempty"`
 	// Optional, org key applied to the attributes.
 	Org string `json:"org,omitempty"`

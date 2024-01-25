@@ -12,5 +12,6 @@ package flyteadmin
 type CoreArtifactBindingData struct {
 	Index int64 `json:"index,omitempty"`
 	PartitionKey string `json:"partition_key,omitempty"`
+	BindToTimePartition bool `json:"bind_to_time_partition,omitempty"`
 	Transform string `json:"transform,omitempty"`
 }

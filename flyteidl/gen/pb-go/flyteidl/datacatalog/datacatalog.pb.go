@@ -97,6 +97,7 @@ func (PaginationOptions_SortKey) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_275951237ff4368a, []int{36, 1}
 }
 
+//
 // Request message for creating a Dataset.
 type CreateDatasetRequest struct {
 	Dataset              *Dataset `protobuf:"bytes,1,opt,name=dataset,proto3" json:"dataset,omitempty"`
@@ -137,6 +138,7 @@ func (m *CreateDatasetRequest) GetDataset() *Dataset {
 	return nil
 }
 
+//
 // Response message for creating a Dataset
 type CreateDatasetResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -169,6 +171,7 @@ func (m *CreateDatasetResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateDatasetResponse proto.InternalMessageInfo
 
+//
 // Request message for retrieving a Dataset. The Dataset is retrieved by it's unique identifier
 // which is a combination of several fields.
 type GetDatasetRequest struct {
@@ -210,6 +213,7 @@ func (m *GetDatasetRequest) GetDataset() *DatasetID {
 	return nil
 }
 
+//
 // Response message for retrieving a Dataset. The response will include the metadata for the
 // Dataset.
 type GetDatasetResponse struct {
@@ -251,6 +255,7 @@ func (m *GetDatasetResponse) GetDataset() *Dataset {
 	return nil
 }
 
+//
 // Request message for retrieving an Artifact. Retrieve an artifact based on a query handle that
 // can be one of artifact_id or tag. The result returned will include the artifact data and metadata
 // associated with the artifact.
@@ -342,6 +347,7 @@ func (*GetArtifactRequest) XXX_OneofWrappers() []interface{} {
 	}
 }
 
+//
 // Response message for retrieving an Artifact. The result returned will include the artifact data
 // and metadata associated with the artifact.
 type GetArtifactResponse struct {
@@ -383,6 +389,7 @@ func (m *GetArtifactResponse) GetArtifact() *Artifact {
 	return nil
 }
 
+//
 // Request message for creating an Artifact and its associated artifact Data.
 type CreateArtifactRequest struct {
 	Artifact             *Artifact `protobuf:"bytes,1,opt,name=artifact,proto3" json:"artifact,omitempty"`
@@ -423,6 +430,7 @@ func (m *CreateArtifactRequest) GetArtifact() *Artifact {
 	return nil
 }
 
+//
 // Response message for creating an Artifact.
 type CreateArtifactResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -455,6 +463,7 @@ func (m *CreateArtifactResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_CreateArtifactResponse proto.InternalMessageInfo
 
+//
 // Request message for tagging an Artifact.
 type AddTagRequest struct {
 	Tag                  *Tag     `protobuf:"bytes,1,opt,name=tag,proto3" json:"tag,omitempty"`
@@ -495,6 +504,7 @@ func (m *AddTagRequest) GetTag() *Tag {
 	return nil
 }
 
+//
 // Response message for tagging an Artifact.
 type AddTagResponse struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
@@ -736,6 +746,7 @@ func (m *ListDatasetsResponse) GetNextToken() string {
 	return ""
 }
 
+//
 // Request message for updating an Artifact and overwriting its associated ArtifactData.
 type UpdateArtifactRequest struct {
 	// ID of dataset the artifact is associated with
@@ -847,6 +858,7 @@ func (*UpdateArtifactRequest) XXX_OneofWrappers() []interface{} {
 	}
 }
 
+//
 // Response message for updating an Artifact.
 type UpdateArtifactResponse struct {
 	// The unique ID of the artifact updated
@@ -888,6 +900,7 @@ func (m *UpdateArtifactResponse) GetArtifactId() string {
 	return ""
 }
 
+//
 // ReservationID message that is composed of several string fields.
 type ReservationID struct {
 	// The unique ID for the reserved dataset
@@ -1197,6 +1210,7 @@ func (m *ReleaseReservationResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ReleaseReservationResponse proto.InternalMessageInfo
 
+//
 // Dataset message. It is uniquely identified by DatasetID.
 type Dataset struct {
 	Id                   *DatasetID `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1253,6 +1267,7 @@ func (m *Dataset) GetPartitionKeys() []string {
 	return nil
 }
 
+//
 // An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair
 type Partition struct {
 	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
@@ -1301,6 +1316,7 @@ func (m *Partition) GetValue() string {
 	return ""
 }
 
+//
 // DatasetID message that is composed of several string fields.
 type DatasetID struct {
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
@@ -1382,6 +1398,7 @@ func (m *DatasetID) GetOrg() string {
 	return ""
 }
 
+//
 // Artifact message. It is composed of several string fields.
 type Artifact struct {
 	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -1470,6 +1487,7 @@ func (m *Artifact) GetCreatedAt() *timestamp.Timestamp {
 	return nil
 }
 
+//
 // ArtifactData that belongs to an artifact
 type ArtifactData struct {
 	Name                 string        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -1518,6 +1536,7 @@ func (m *ArtifactData) GetValue() *core.Literal {
 	return nil
 }
 
+//
 // Tag message that is unique to a Dataset. It is associated to a single artifact and
 // can be retrieved by name later.
 type Tag struct {
@@ -1575,6 +1594,7 @@ func (m *Tag) GetDataset() *DatasetID {
 	return nil
 }
 
+//
 // Metadata representation for artifacts and datasets
 type Metadata struct {
 	KeyMap               map[string]string `protobuf:"bytes,1,rep,name=key_map,json=keyMap,proto3" json:"key_map,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`

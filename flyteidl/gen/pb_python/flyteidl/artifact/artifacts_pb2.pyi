@@ -1,5 +1,6 @@
 from google.protobuf import any_pb2 as _any_pb2
 from google.api import annotations_pb2 as _annotations_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from flyteidl.admin import launch_plan_pb2 as _launch_plan_pb2
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import types_pb2 as _types_pb2
@@ -28,7 +29,7 @@ class Artifact(_message.Message):
     def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
 
 class CreateArtifactRequest(_message.Message):
-    __slots__ = ["artifact_key", "version", "spec", "partitions", "tag", "source"]
+    __slots__ = ["artifact_key", "version", "spec", "partitions", "time_partition_value", "source"]
     class PartitionsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -40,15 +41,15 @@ class CreateArtifactRequest(_message.Message):
     VERSION_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     PARTITIONS_FIELD_NUMBER: _ClassVar[int]
-    TAG_FIELD_NUMBER: _ClassVar[int]
+    TIME_PARTITION_VALUE_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
     artifact_key: _artifact_id_pb2.ArtifactKey
     version: str
     spec: ArtifactSpec
     partitions: _containers.ScalarMap[str, str]
-    tag: str
+    time_partition_value: _timestamp_pb2.Timestamp
     source: ArtifactSource
-    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., version: _Optional[str] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., partitions: _Optional[_Mapping[str, str]] = ..., tag: _Optional[str] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
+    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., version: _Optional[str] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., partitions: _Optional[_Mapping[str, str]] = ..., time_partition_value: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
 
 class ArtifactSource(_message.Message):
     __slots__ = ["workflow_execution", "node_id", "task_id", "retry_attempt", "principal"]
@@ -65,18 +66,22 @@ class ArtifactSource(_message.Message):
     def __init__(self, workflow_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., node_id: _Optional[str] = ..., task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "short_description", "user_metadata", "metadata_type"]
+    __slots__ = ["value", "type", "short_description", "user_metadata", "metadata_type", "created_at", "file_format"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SHORT_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     USER_METADATA_FIELD_NUMBER: _ClassVar[int]
     METADATA_TYPE_FIELD_NUMBER: _ClassVar[int]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    FILE_FORMAT_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
     short_description: str
     user_metadata: _any_pb2.Any
     metadata_type: str
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_any_pb2.Any, _Mapping]] = ..., metadata_type: _Optional[str] = ...) -> None: ...
+    created_at: _timestamp_pb2.Timestamp
+    file_format: str
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_any_pb2.Any, _Mapping]] = ..., metadata_type: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., file_format: _Optional[str] = ...) -> None: ...
 
 class CreateArtifactResponse(_message.Message):
     __slots__ = ["artifact"]
@@ -107,9 +112,10 @@ class SearchOptions(_message.Message):
     def __init__(self, strict_partitions: bool = ..., latest_by_key: bool = ...) -> None: ...
 
 class SearchArtifactsRequest(_message.Message):
-    __slots__ = ["artifact_key", "partitions", "principal", "version", "options", "token", "limit"]
+    __slots__ = ["artifact_key", "partitions", "time_partition_value", "principal", "version", "options", "token", "limit"]
     ARTIFACT_KEY_FIELD_NUMBER: _ClassVar[int]
     PARTITIONS_FIELD_NUMBER: _ClassVar[int]
+    TIME_PARTITION_VALUE_FIELD_NUMBER: _ClassVar[int]
     PRINCIPAL_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
@@ -117,12 +123,13 @@ class SearchArtifactsRequest(_message.Message):
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     artifact_key: _artifact_id_pb2.ArtifactKey
     partitions: _artifact_id_pb2.Partitions
+    time_partition_value: _timestamp_pb2.Timestamp
     principal: str
     version: str
     options: SearchOptions
     token: str
     limit: int
-    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., principal: _Optional[str] = ..., version: _Optional[str] = ..., options: _Optional[_Union[SearchOptions, _Mapping]] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
+    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., time_partition_value: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., principal: _Optional[str] = ..., version: _Optional[str] = ..., options: _Optional[_Union[SearchOptions, _Mapping]] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
 
 class SearchArtifactsResponse(_message.Message):
     __slots__ = ["artifacts", "token"]
