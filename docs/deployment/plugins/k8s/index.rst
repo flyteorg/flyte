@@ -267,6 +267,7 @@ Spin up a cluster
     <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__, please ensure:
 
     * You have the correct kubeconfig and have selected the correct Kubernetes context.
+
     * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
 
 .. note::
@@ -279,10 +280,11 @@ Spin up a cluster
 
   .. tabs::
 
-    .. group-tab:: Flyte sandbox
+    If you have installed Flyte using the `flyte-sandbox Helm chart<https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
 
-      If you have installed Flyte using the `flyte-sandbox Helm chart
-      <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
+    * You have the correct kubeconfig and have selected the correct Kubernetes context.
+
+    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
 
       * You have the correct kubeconfig and have selected the correct Kubernetes context.
       * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
@@ -948,7 +950,7 @@ Specify plugin configuration
                       sidecar: sidecar
                       container_array: k8s-array
                       spark: spark
-   
+
   .. group-tab:: Dask
    
     .. tabs::
@@ -1027,4 +1029,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
 .. code-block:: bash
 
-  kubectl get pods -n <namespace>
+  kubectl get pods -n flyte
