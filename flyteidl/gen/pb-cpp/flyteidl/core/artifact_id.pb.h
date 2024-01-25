@@ -46,7 +46,7 @@ struct TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[11]
+  static const ::google::protobuf::internal::ParseTable schema[10]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -85,9 +85,6 @@ extern Partitions_ValueEntry_DoNotUseDefaultTypeInternal _Partitions_ValueEntry_
 class TimePartition;
 class TimePartitionDefaultTypeInternal;
 extern TimePartitionDefaultTypeInternal _TimePartition_default_instance_;
-class Trigger;
-class TriggerDefaultTypeInternal;
-extern TriggerDefaultTypeInternal _Trigger_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
 namespace google {
@@ -102,7 +99,6 @@ template<> ::flyteidl::core::LabelValue* Arena::CreateMaybeMessage<::flyteidl::c
 template<> ::flyteidl::core::Partitions* Arena::CreateMaybeMessage<::flyteidl::core::Partitions>(Arena*);
 template<> ::flyteidl::core::Partitions_ValueEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::Partitions_ValueEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::core::TimePartition* Arena::CreateMaybeMessage<::flyteidl::core::TimePartition>(Arena*);
-template<> ::flyteidl::core::Trigger* Arena::CreateMaybeMessage<::flyteidl::core::Trigger>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -1436,134 +1432,6 @@ class ArtifactQuery final :
 
   friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
 };
-// -------------------------------------------------------------------
-
-class Trigger final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.Trigger) */ {
- public:
-  Trigger();
-  virtual ~Trigger();
-
-  Trigger(const Trigger& from);
-
-  inline Trigger& operator=(const Trigger& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Trigger(Trigger&& from) noexcept
-    : Trigger() {
-    *this = ::std::move(from);
-  }
-
-  inline Trigger& operator=(Trigger&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const Trigger& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Trigger* internal_default_instance() {
-    return reinterpret_cast<const Trigger*>(
-               &_Trigger_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    10;
-
-  void Swap(Trigger* other);
-  friend void swap(Trigger& a, Trigger& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Trigger* New() const final {
-    return CreateMaybeMessage<Trigger>(nullptr);
-  }
-
-  Trigger* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Trigger>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Trigger& from);
-  void MergeFrom(const Trigger& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Trigger* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // repeated .flyteidl.core.ArtifactID triggers = 2;
-  int triggers_size() const;
-  void clear_triggers();
-  static const int kTriggersFieldNumber = 2;
-  ::flyteidl::core::ArtifactID* mutable_triggers(int index);
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
-      mutable_triggers();
-  const ::flyteidl::core::ArtifactID& triggers(int index) const;
-  ::flyteidl::core::ArtifactID* add_triggers();
-  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
-      triggers() const;
-
-  // .flyteidl.core.Identifier trigger_id = 1;
-  bool has_trigger_id() const;
-  void clear_trigger_id();
-  static const int kTriggerIdFieldNumber = 1;
-  const ::flyteidl::core::Identifier& trigger_id() const;
-  ::flyteidl::core::Identifier* release_trigger_id();
-  ::flyteidl::core::Identifier* mutable_trigger_id();
-  void set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.core.Trigger)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > triggers_;
-  ::flyteidl::core::Identifier* trigger_id_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
-};
 // ===================================================================
 
 
@@ -2837,90 +2705,9 @@ inline void ArtifactQuery::clear_has_identifier() {
 inline ArtifactQuery::IdentifierCase ArtifactQuery::identifier_case() const {
   return ArtifactQuery::IdentifierCase(_oneof_case_[0]);
 }
-// -------------------------------------------------------------------
-
-// Trigger
-
-// .flyteidl.core.Identifier trigger_id = 1;
-inline bool Trigger::has_trigger_id() const {
-  return this != internal_default_instance() && trigger_id_ != nullptr;
-}
-inline const ::flyteidl::core::Identifier& Trigger::trigger_id() const {
-  const ::flyteidl::core::Identifier* p = trigger_id_;
-  // @@protoc_insertion_point(field_get:flyteidl.core.Trigger.trigger_id)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
-      &::flyteidl::core::_Identifier_default_instance_);
-}
-inline ::flyteidl::core::Identifier* Trigger::release_trigger_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.Trigger.trigger_id)
-  
-  ::flyteidl::core::Identifier* temp = trigger_id_;
-  trigger_id_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::Identifier* Trigger::mutable_trigger_id() {
-  
-  if (trigger_id_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
-    trigger_id_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.Trigger.trigger_id)
-  return trigger_id_;
-}
-inline void Trigger::set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(trigger_id_);
-  }
-  if (trigger_id) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      trigger_id = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, trigger_id, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  trigger_id_ = trigger_id;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Trigger.trigger_id)
-}
-
-// repeated .flyteidl.core.ArtifactID triggers = 2;
-inline int Trigger::triggers_size() const {
-  return triggers_.size();
-}
-inline void Trigger::clear_triggers() {
-  triggers_.Clear();
-}
-inline ::flyteidl::core::ArtifactID* Trigger::mutable_triggers(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.Trigger.triggers)
-  return triggers_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
-Trigger::mutable_triggers() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.core.Trigger.triggers)
-  return &triggers_;
-}
-inline const ::flyteidl::core::ArtifactID& Trigger::triggers(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.Trigger.triggers)
-  return triggers_.Get(index);
-}
-inline ::flyteidl::core::ArtifactID* Trigger::add_triggers() {
-  // @@protoc_insertion_point(field_add:flyteidl.core.Trigger.triggers)
-  return triggers_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
-Trigger::triggers() const {
-  // @@protoc_insertion_point(field_list:flyteidl.core.Trigger.triggers)
-  return triggers_;
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
-// -------------------------------------------------------------------
-
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
