@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"sort"
 	"testing"
 	"time"
 
@@ -188,7 +189,7 @@ func TestPlugin(t *testing.T) {
 func TestInitializeAgentRegistry(t *testing.T) {
 	agentClients := make(map[string]service.AsyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
-	agentClients["localhost:80"] = getMockServiceClient()
+	agentClients["localhost:80"] = &MockAsyncTask{}
 	agentMetadataClients["localhost:80"] = getMockMetadataServiceClient()
 
 	cs := &ClientSet{
@@ -199,9 +200,14 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	cfg := defaultConfig
 	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
+	err := SetConfig(&cfg)
+	assert.NoError(t, err)
 	agentRegistry, err := initializeAgentRegistry(cs)
 	assert.NoError(t, err)
 
+	// In golang, the order of keys in a map is random. So, we sort the keys before asserting.
 	agentRegistryKeys := maps.Keys(agentRegistry)
-	assert.Equal(t, agentRegistryKeys, []string{})
+	sort.Strings(agentRegistryKeys)
+
+	assert.Equal(t, agentRegistryKeys, []string{"task1", "task2", "task3"})
 }

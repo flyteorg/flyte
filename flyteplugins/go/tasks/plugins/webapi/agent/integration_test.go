@@ -100,18 +100,6 @@ func (m *MockSyncTask) DeleteTask(_ context.Context, _ *admin.DeleteTaskRequest,
 	return &admin.DeleteTaskResponse{}, nil
 }
 
-// func mockAsyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-// 	return &MockAsyncTask{}, nil
-// }
-
-// func mockSyncTaskClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-// 	return &MockSyncTask{}, nil
-// }
-
-// func mockGetBadAsyncClientFunc(_ context.Context, _ *Agent, _ map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-// 	return nil, fmt.Errorf("error")
-// }
-
 func TestEndToEnd(t *testing.T) {
 	iter := func(ctx context.Context, tCtx pluginCore.TaskExecutionContext) error {
 		return nil

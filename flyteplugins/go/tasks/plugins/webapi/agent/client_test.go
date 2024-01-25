@@ -27,23 +27,6 @@ func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
 	return mockMetadataServiceClient
 }
 
-// TODO, USE CREATE, GET DELETE FUNCTION TO MOCK THE OUTPUT
-func getMockServiceClient() *agentMocks.AsyncAgentServiceClient {
-	mockServiceClient := new(agentMocks.AsyncAgentServiceClient)
-	mockRequest := &admin.ListAgentsRequest{}
-	mockResponse := &admin.ListAgentsResponse{
-		Agents: []*admin.Agent{
-			{
-				Name:               "test-agent",
-				SupportedTaskTypes: []string{"task1", "task2", "task3"},
-			},
-		},
-	}
-
-	mockServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
-	return mockServiceClient
-}
-
 func mockGetBadAsyncClientFunc() *agentMocks.AsyncAgentServiceClient {
 	return nil
 }
