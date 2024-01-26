@@ -267,20 +267,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_logs.mixed.dynamic-log-links-enabled", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("logs.mixed.dynamic-log-links-enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("logs.mixed.dynamic-log-links-enabled"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.Mixed.IsDynamicLogLinksEnabled)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_logs.mixed.dynamic-log-links", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -443,20 +429,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.user.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.user.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.User.StackDriverTemplateURI)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_logs.user.dynamic-log-links-enabled", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("logs.user.dynamic-log-links-enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("logs.user.dynamic-log-links-enabled"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.User.IsDynamicLogLinksEnabled)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -631,20 +603,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_logs.system.dynamic-log-links-enabled", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("logs.system.dynamic-log-links-enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("logs.system.dynamic-log-links-enabled"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.System.IsDynamicLogLinksEnabled)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 	t.Run("Test_logs.system.dynamic-log-links", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -807,20 +765,6 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.all-user.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.all-user.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.AllUser.StackDriverTemplateURI)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_logs.all-user.dynamic-log-links-enabled", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("logs.all-user.dynamic-log-links-enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("logs.all-user.dynamic-log-links-enabled"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.AllUser.IsDynamicLogLinksEnabled)
 
 			} else {
 				assert.FailNow(t, err.Error())

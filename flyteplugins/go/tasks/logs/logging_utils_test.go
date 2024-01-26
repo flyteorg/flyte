@@ -361,7 +361,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 		{
 			"Flyin enabled but no task template",
 			&LogConfig{
-				IsDynamicLogLinksEnabled: true,
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
 					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
@@ -372,7 +371,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 		{
 			"Flyin enabled but config not found in task template",
 			&LogConfig{
-				IsDynamicLogLinksEnabled: true,
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
 					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
@@ -383,7 +381,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 		{
 			"Flyin enabled but no port in task template",
 			&LogConfig{
-				IsDynamicLogLinksEnabled: true,
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
 					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
@@ -404,7 +401,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 		{
 			"Flyin disabled but config present in TaskTemplate",
 			&LogConfig{
-				IsDynamicLogLinksEnabled: false,
 			},
 			&core.TaskTemplate{
 				Config: map[string]string{
@@ -419,7 +415,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 			&LogConfig{
 				IsKubernetesEnabled:      true,
 				KubernetesTemplateURI:    "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-				IsDynamicLogLinksEnabled: false,
 			},
 			&core.TaskTemplate{
 				Config: map[string]string{
@@ -440,7 +435,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 			&LogConfig{
 				IsKubernetesEnabled:      true,
 				KubernetesTemplateURI:    "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-				IsDynamicLogLinksEnabled: true,
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
 					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
