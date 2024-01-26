@@ -71,6 +71,8 @@ spec:
         helm.sh/chart: flyteagent-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        {}
       containers:
       - command:
         - pyflyte
@@ -84,6 +86,8 @@ spec:
         ports:
         - containerPort: 8000
           name: agent-grpc
+        securityContext:
+            allowPrivilegeEscalation: false
         resources:
           limits:
             cpu: 500m
