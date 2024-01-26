@@ -92,4 +92,5 @@ FlytePlugins
 -----------------
 
 Here is an overviw architecture of FlytePlugins:
+
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flytepropeller_plugins_architecture.png
