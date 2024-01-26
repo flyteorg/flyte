@@ -36,3 +36,16 @@ Flyte is made up of a user plane, control plane, and data plane.
 * To quickly try out Flyte on your machine, follow the {ref}`Quickstart guide <getting_started_quickstart_guide>`.
 * To create a Flyte project that can be used to package workflow code for deployment to a Flyte cluster, see {ref}`"Getting started with workflow development" <getting_started_workflow_development>`.
 * To set up a Flyte cluster, see the [Deployment documentation](https://docs.flyte.org/en/latest/deployment/index.html).
+
+
+```{toctree}
+:maxdepth: -1
+:caption: Getting Started
+:hidden:
+
+Introduction to Flyte <self>
+flytesnacks/getting_started/quickstart_guide
+flytesnacks/getting_started/getting_started_with_workflow_development
+flytesnacks/getting_started/flyte_fundamentals
+flytesnacks/getting_started/core_use_cases
+```
