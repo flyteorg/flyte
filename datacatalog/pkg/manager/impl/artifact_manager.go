@@ -48,9 +48,6 @@ type artifactMetrics struct {
 	deleteResponseTime       labeled.StopWatch
 	deleteSuccessCounter     labeled.Counter
 	deleteFailureCounter     labeled.Counter
-	bulkDeleteResponseTime   labeled.StopWatch
-	bulkDeleteSuccessCounter labeled.Counter
-	bulkDeleteFailureCounter labeled.Counter
 }
 
 type artifactManager struct {
@@ -513,9 +510,6 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		deleteResponseTime:       labeled.NewStopWatch("delete_duration", "The duration of the delete artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
 		deleteSuccessCounter:     labeled.NewCounter("delete_success_count", "The number of times delete artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
 		deleteFailureCounter:     labeled.NewCounter("delete_failure_count", "The number of times delete artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
-		bulkDeleteResponseTime:   labeled.NewStopWatch("bulk_delete_duration", "The duration of the bulk delete artifacts calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
-		bulkDeleteSuccessCounter: labeled.NewCounter("bulk_delete_success_count", "The number of times bulk delete artifacts succeeded", artifactScope, labeled.EmitUnlabeledMetric),
-		bulkDeleteFailureCounter: labeled.NewCounter("bulk_delete_failure_count", "The number of times bulk delete artifacts failed", artifactScope, labeled.EmitUnlabeledMetric),
 	}
 
 	return &artifactManager{
