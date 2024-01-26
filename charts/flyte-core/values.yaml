@@ -89,7 +89,7 @@ flyteadmin:
         - limitranges
       # -- Specifies the verbs (actions) that this ClusterRole can perform on the specified resources
       verbs:
-        - '*'
+        - "*"
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
   # -- nodeSelector for Flyteadmin deployment
@@ -357,7 +357,6 @@ flyteconsole:
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
 
-
 # It will enable the redoc route in ingress
 deployRedoc: false
 
@@ -489,37 +488,37 @@ db:
 configmap:
   clusters:
     labelClusterMap: {}
-#  labelClusterMap:
-#    team1:
-#      - id: testcluster
-#        weight: 1
-#    team2:
-#      - id: testcluster2
-#        weight: 0.5
-#      - id: testcluster3
-#        weight: 0.5
+    #  labelClusterMap:
+    #    team1:
+    #      - id: testcluster
+    #        weight: 1
+    #    team2:
+    #      - id: testcluster2
+    #        weight: 0.5
+    #      - id: testcluster3
+    #        weight: 0.5
     clusterConfigs: []
-#  clusterConfigs:
-#    - name: "testcluster"
-#      endpoint: "testcluster_endpoint"
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster/token"
-#        certPath: "/path/to/testcluster/cert"
-#    - name: "testcluster2"
-#      endpoint: "testcluster2_endpoint"
-#      enabled: true
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster2/token"
-#        certPath: "/path/to/testcluster2/cert"
-#    - name: "testcluster3"
-#      endpoint: "testcluster3_endpoint"
-#      enabled: true
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster3/token"
-#        certPath: "/path/to/testcluster3/cert"
+  #  clusterConfigs:
+  #    - name: "testcluster"
+  #      endpoint: "testcluster_endpoint"
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster/token"
+  #        certPath: "/path/to/testcluster/cert"
+  #    - name: "testcluster2"
+  #      endpoint: "testcluster2_endpoint"
+  #      enabled: true
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster2/token"
+  #        certPath: "/path/to/testcluster2/cert"
+  #    - name: "testcluster3"
+  #      endpoint: "testcluster3_endpoint"
+  #      enabled: true
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster3/token"
+  #        certPath: "/path/to/testcluster3/cert"
 
   # -- Configuration for Flyte console UI
   console:
@@ -571,7 +570,7 @@ configmap:
       eventVersion: 2
       testing:
         host: http://flyteadmin
-      
+
     # -- Authentication configuration
     auth:
       authorizedUris:
@@ -621,11 +620,11 @@ configmap:
       defaults:
         cpu: 100m
         memory: 500Mi
-        storage: 500Mi
+        ephemeralStorage: 500Mi
       limits:
         cpu: 2
         memory: 1Gi
-        storage: 20Mi
+        ephemeralStorage: 20Mi
         gpu: 1
 
   # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
