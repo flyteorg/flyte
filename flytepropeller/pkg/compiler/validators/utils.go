@@ -201,7 +201,6 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	for _, x := range literals {
 		otherType := LiteralTypeForLiteral(x)
 		otherTypeKey := otherType.String()
-		// TODO no need to check if noneType already set
 		if _, ok := x.GetValue().(*core.Literal_Collection); ok {
 			if x.GetCollection().GetLiterals() == nil {
 				noneType = otherType
