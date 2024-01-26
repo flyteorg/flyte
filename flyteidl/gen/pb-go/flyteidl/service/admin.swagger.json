@@ -3865,6 +3865,59 @@
         ]
       }
     },
+    "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.",
+        "operationId": "GetDynamicNodeWorkflow2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDynamicNodeWorkflowResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.",
@@ -3968,6 +4021,59 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/flyteidladminNodeExecution"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.",
+        "operationId": "GetDynamicNodeWorkflow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDynamicNodeWorkflowResponse"
             }
           }
         },
@@ -7564,6 +7670,14 @@
       },
       "description": "Namespace within a project commonly used to differentiate between different service instances.\ne.g. \"production\", \"development\", etc."
     },
+    "adminDynamicNodeWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "compiled_workflow": {
+          "$ref": "#/definitions/coreCompiledWorkflowClosure"
+        }
+      }
+    },
     "adminEmailNotification": {
       "type": "object",
       "properties": {
@@ -9543,11 +9657,15 @@
           "format": "int64"
         },
         "partition_key": {
-          "type": "string",
-          "title": "These two fields are only relevant in the partition value case"
+          "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "transform": {
-          "type": "string"
+          "type": "string",
+          "title": "This is only relevant in the time partition case"
         }
       },
       "title": "Only valid for triggers"
@@ -9562,7 +9680,12 @@
           "type": "string"
         },
         "partitions": {
-          "$ref": "#/definitions/corePartitions"
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
         }
       }
     },
@@ -10240,7 +10363,13 @@
       "type": "object",
       "properties": {
         "static_value": {
-          "type": "string"
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
         },
         "triggered_binding": {
           "$ref": "#/definitions/coreArtifactBindingData"
@@ -11158,6 +11287,14 @@
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
+    },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
     },
     "coreTypeAnnotation": {
       "type": "object",

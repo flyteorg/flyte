@@ -34,6 +34,7 @@
 #include <google/protobuf/map_entry.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
+#include <google/protobuf/timestamp.pb.h>
 #include "flyteidl/core/identifier.pb.h"
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
@@ -81,9 +82,9 @@ extern PartitionsDefaultTypeInternal _Partitions_default_instance_;
 class Partitions_ValueEntry_DoNotUse;
 class Partitions_ValueEntry_DoNotUseDefaultTypeInternal;
 extern Partitions_ValueEntry_DoNotUseDefaultTypeInternal _Partitions_ValueEntry_DoNotUse_default_instance_;
-class Trigger;
-class TriggerDefaultTypeInternal;
-extern TriggerDefaultTypeInternal _Trigger_default_instance_;
+class TimePartition;
+class TimePartitionDefaultTypeInternal;
+extern TimePartitionDefaultTypeInternal _TimePartition_default_instance_;
 }  // namespace core
 }  // namespace flyteidl
 namespace google {
@@ -97,7 +98,7 @@ template<> ::flyteidl::core::InputBindingData* Arena::CreateMaybeMessage<::flyte
 template<> ::flyteidl::core::LabelValue* Arena::CreateMaybeMessage<::flyteidl::core::LabelValue>(Arena*);
 template<> ::flyteidl::core::Partitions* Arena::CreateMaybeMessage<::flyteidl::core::Partitions>(Arena*);
 template<> ::flyteidl::core::Partitions_ValueEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::core::Partitions_ValueEntry_DoNotUse>(Arena*);
-template<> ::flyteidl::core::Trigger* Arena::CreateMaybeMessage<::flyteidl::core::Trigger>(Arena*);
+template<> ::flyteidl::core::TimePartition* Arena::CreateMaybeMessage<::flyteidl::core::TimePartition>(Arena*);
 }  // namespace protobuf
 }  // namespace google
 namespace flyteidl {
@@ -287,6 +288,12 @@ class ArtifactBindingData final :
   }
   static const ArtifactBindingData& default_instance();
 
+  enum PartitionDataCase {
+    kPartitionKey = 2,
+    kBindToTimePartition = 3,
+    PARTITION_DATA_NOT_SET = 0,
+  };
+
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const ArtifactBindingData* internal_default_instance() {
     return reinterpret_cast<const ArtifactBindingData*>(
@@ -350,23 +357,9 @@ class ArtifactBindingData final :
 
   // accessors -------------------------------------------------------
 
-  // string partition_key = 2;
-  void clear_partition_key();
-  static const int kPartitionKeyFieldNumber = 2;
-  const ::std::string& partition_key() const;
-  void set_partition_key(const ::std::string& value);
-  #if LANG_CXX11
-  void set_partition_key(::std::string&& value);
-  #endif
-  void set_partition_key(const char* value);
-  void set_partition_key(const char* value, size_t size);
-  ::std::string* mutable_partition_key();
-  ::std::string* release_partition_key();
-  void set_allocated_partition_key(::std::string* partition_key);
-
-  // string transform = 3;
+  // string transform = 4;
   void clear_transform();
-  static const int kTransformFieldNumber = 3;
+  static const int kTransformFieldNumber = 4;
   const ::std::string& transform() const;
   void set_transform(const ::std::string& value);
   #if LANG_CXX11
@@ -384,15 +377,54 @@ class ArtifactBindingData final :
   ::google::protobuf::uint32 index() const;
   void set_index(::google::protobuf::uint32 value);
 
+  // string partition_key = 2;
+  private:
+  bool has_partition_key() const;
+  public:
+  void clear_partition_key();
+  static const int kPartitionKeyFieldNumber = 2;
+  const ::std::string& partition_key() const;
+  void set_partition_key(const ::std::string& value);
+  #if LANG_CXX11
+  void set_partition_key(::std::string&& value);
+  #endif
+  void set_partition_key(const char* value);
+  void set_partition_key(const char* value, size_t size);
+  ::std::string* mutable_partition_key();
+  ::std::string* release_partition_key();
+  void set_allocated_partition_key(::std::string* partition_key);
+
+  // bool bind_to_time_partition = 3;
+  private:
+  bool has_bind_to_time_partition() const;
+  public:
+  void clear_bind_to_time_partition();
+  static const int kBindToTimePartitionFieldNumber = 3;
+  bool bind_to_time_partition() const;
+  void set_bind_to_time_partition(bool value);
+
+  void clear_partition_data();
+  PartitionDataCase partition_data_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.ArtifactBindingData)
  private:
   class HasBitSetters;
+  void set_has_partition_key();
+  void set_has_bind_to_time_partition();
+
+  inline bool has_partition_data() const;
+  inline void clear_has_partition_data();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::internal::ArenaStringPtr partition_key_;
   ::google::protobuf::internal::ArenaStringPtr transform_;
   ::google::protobuf::uint32 index_;
+  union PartitionDataUnion {
+    PartitionDataUnion() {}
+    ::google::protobuf::internal::ArenaStringPtr partition_key_;
+    bool bind_to_time_partition_;
+  } partition_data_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
   friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
 };
 // -------------------------------------------------------------------
@@ -551,8 +583,9 @@ class LabelValue final :
 
   enum ValueCase {
     kStaticValue = 1,
-    kTriggeredBinding = 2,
-    kInputBinding = 3,
+    kTimeValue = 2,
+    kTriggeredBinding = 3,
+    kInputBinding = 4,
     VALUE_NOT_SET = 0,
   };
 
@@ -636,19 +669,28 @@ class LabelValue final :
   ::std::string* release_static_value();
   void set_allocated_static_value(::std::string* static_value);
 
-  // .flyteidl.core.ArtifactBindingData triggered_binding = 2;
+  // .google.protobuf.Timestamp time_value = 2;
+  bool has_time_value() const;
+  void clear_time_value();
+  static const int kTimeValueFieldNumber = 2;
+  const ::google::protobuf::Timestamp& time_value() const;
+  ::google::protobuf::Timestamp* release_time_value();
+  ::google::protobuf::Timestamp* mutable_time_value();
+  void set_allocated_time_value(::google::protobuf::Timestamp* time_value);
+
+  // .flyteidl.core.ArtifactBindingData triggered_binding = 3;
   bool has_triggered_binding() const;
   void clear_triggered_binding();
-  static const int kTriggeredBindingFieldNumber = 2;
+  static const int kTriggeredBindingFieldNumber = 3;
   const ::flyteidl::core::ArtifactBindingData& triggered_binding() const;
   ::flyteidl::core::ArtifactBindingData* release_triggered_binding();
   ::flyteidl::core::ArtifactBindingData* mutable_triggered_binding();
   void set_allocated_triggered_binding(::flyteidl::core::ArtifactBindingData* triggered_binding);
 
-  // .flyteidl.core.InputBindingData input_binding = 3;
+  // .flyteidl.core.InputBindingData input_binding = 4;
   bool has_input_binding() const;
   void clear_input_binding();
-  static const int kInputBindingFieldNumber = 3;
+  static const int kInputBindingFieldNumber = 4;
   const ::flyteidl::core::InputBindingData& input_binding() const;
   ::flyteidl::core::InputBindingData* release_input_binding();
   ::flyteidl::core::InputBindingData* mutable_input_binding();
@@ -660,6 +702,7 @@ class LabelValue final :
  private:
   class HasBitSetters;
   void set_has_static_value();
+  void set_has_time_value();
   void set_has_triggered_binding();
   void set_has_input_binding();
 
@@ -670,6 +713,7 @@ class LabelValue final :
   union ValueUnion {
     ValueUnion() {}
     ::google::protobuf::internal::ArenaStringPtr static_value_;
+    ::google::protobuf::Timestamp* time_value_;
     ::flyteidl::core::ArtifactBindingData* triggered_binding_;
     ::flyteidl::core::InputBindingData* input_binding_;
   } value_;
@@ -825,6 +869,121 @@ class Partitions final :
 };
 // -------------------------------------------------------------------
 
+class TimePartition final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.TimePartition) */ {
+ public:
+  TimePartition();
+  virtual ~TimePartition();
+
+  TimePartition(const TimePartition& from);
+
+  inline TimePartition& operator=(const TimePartition& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  TimePartition(TimePartition&& from) noexcept
+    : TimePartition() {
+    *this = ::std::move(from);
+  }
+
+  inline TimePartition& operator=(TimePartition&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const TimePartition& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const TimePartition* internal_default_instance() {
+    return reinterpret_cast<const TimePartition*>(
+               &_TimePartition_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  void Swap(TimePartition* other);
+  friend void swap(TimePartition& a, TimePartition& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TimePartition* New() const final {
+    return CreateMaybeMessage<TimePartition>(nullptr);
+  }
+
+  TimePartition* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<TimePartition>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const TimePartition& from);
+  void MergeFrom(const TimePartition& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TimePartition* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.LabelValue value = 1;
+  bool has_value() const;
+  void clear_value();
+  static const int kValueFieldNumber = 1;
+  const ::flyteidl::core::LabelValue& value() const;
+  ::flyteidl::core::LabelValue* release_value();
+  ::flyteidl::core::LabelValue* mutable_value();
+  void set_allocated_value(::flyteidl::core::LabelValue* value);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.TimePartition)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::LabelValue* value_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
+};
+// -------------------------------------------------------------------
+
 class ArtifactID final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.ArtifactID) */ {
  public:
@@ -857,18 +1016,13 @@ class ArtifactID final :
   }
   static const ArtifactID& default_instance();
 
-  enum DimensionsCase {
-    kPartitions = 3,
-    DIMENSIONS_NOT_SET = 0,
-  };
-
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const ArtifactID* internal_default_instance() {
     return reinterpret_cast<const ArtifactID*>(
                &_ArtifactID_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(ArtifactID* other);
   friend void swap(ArtifactID& a, ArtifactID& b) {
@@ -957,26 +1111,25 @@ class ArtifactID final :
   ::flyteidl::core::Partitions* mutable_partitions();
   void set_allocated_partitions(::flyteidl::core::Partitions* partitions);
 
-  void clear_dimensions();
-  DimensionsCase dimensions_case() const;
+  // .flyteidl.core.TimePartition time_partition = 4;
+  bool has_time_partition() const;
+  void clear_time_partition();
+  static const int kTimePartitionFieldNumber = 4;
+  const ::flyteidl::core::TimePartition& time_partition() const;
+  ::flyteidl::core::TimePartition* release_time_partition();
+  ::flyteidl::core::TimePartition* mutable_time_partition();
+  void set_allocated_time_partition(::flyteidl::core::TimePartition* time_partition);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.ArtifactID)
  private:
   class HasBitSetters;
-  void set_has_partitions();
-
-  inline bool has_dimensions() const;
-  inline void clear_has_dimensions();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr version_;
   ::flyteidl::core::ArtifactKey* artifact_key_;
-  union DimensionsUnion {
-    DimensionsUnion() {}
-    ::flyteidl::core::Partitions* partitions_;
-  } dimensions_;
+  ::flyteidl::core::Partitions* partitions_;
+  ::flyteidl::core::TimePartition* time_partition_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
-
   friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
 };
 // -------------------------------------------------------------------
@@ -1019,7 +1172,7 @@ class ArtifactTag final :
                &_ArtifactTag_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(ArtifactTag* other);
   friend void swap(ArtifactTag& a, ArtifactTag& b) {
@@ -1152,7 +1305,7 @@ class ArtifactQuery final :
                &_ArtifactQuery_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(ArtifactQuery* other);
   friend void swap(ArtifactQuery& a, ArtifactQuery& b) {
@@ -1277,134 +1430,6 @@ class ArtifactQuery final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   ::google::protobuf::uint32 _oneof_case_[1];
 
-  friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
-};
-// -------------------------------------------------------------------
-
-class Trigger final :
-    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.Trigger) */ {
- public:
-  Trigger();
-  virtual ~Trigger();
-
-  Trigger(const Trigger& from);
-
-  inline Trigger& operator=(const Trigger& from) {
-    CopyFrom(from);
-    return *this;
-  }
-  #if LANG_CXX11
-  Trigger(Trigger&& from) noexcept
-    : Trigger() {
-    *this = ::std::move(from);
-  }
-
-  inline Trigger& operator=(Trigger&& from) noexcept {
-    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
-      if (this != &from) InternalSwap(&from);
-    } else {
-      CopyFrom(from);
-    }
-    return *this;
-  }
-  #endif
-  static const ::google::protobuf::Descriptor* descriptor() {
-    return default_instance().GetDescriptor();
-  }
-  static const Trigger& default_instance();
-
-  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const Trigger* internal_default_instance() {
-    return reinterpret_cast<const Trigger*>(
-               &_Trigger_default_instance_);
-  }
-  static constexpr int kIndexInFileMessages =
-    9;
-
-  void Swap(Trigger* other);
-  friend void swap(Trigger& a, Trigger& b) {
-    a.Swap(&b);
-  }
-
-  // implements Message ----------------------------------------------
-
-  inline Trigger* New() const final {
-    return CreateMaybeMessage<Trigger>(nullptr);
-  }
-
-  Trigger* New(::google::protobuf::Arena* arena) const final {
-    return CreateMaybeMessage<Trigger>(arena);
-  }
-  void CopyFrom(const ::google::protobuf::Message& from) final;
-  void MergeFrom(const ::google::protobuf::Message& from) final;
-  void CopyFrom(const Trigger& from);
-  void MergeFrom(const Trigger& from);
-  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
-  bool IsInitialized() const final;
-
-  size_t ByteSizeLong() const final;
-  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
-  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
-  #else
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input) final;
-  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const final;
-  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
-      ::google::protobuf::uint8* target) const final;
-  int GetCachedSize() const final { return _cached_size_.Get(); }
-
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const final;
-  void InternalSwap(Trigger* other);
-  private:
-  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
-    return nullptr;
-  }
-  inline void* MaybeArenaPtr() const {
-    return nullptr;
-  }
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const final;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // repeated .flyteidl.core.ArtifactID triggers = 2;
-  int triggers_size() const;
-  void clear_triggers();
-  static const int kTriggersFieldNumber = 2;
-  ::flyteidl::core::ArtifactID* mutable_triggers(int index);
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
-      mutable_triggers();
-  const ::flyteidl::core::ArtifactID& triggers(int index) const;
-  ::flyteidl::core::ArtifactID* add_triggers();
-  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
-      triggers() const;
-
-  // .flyteidl.core.Identifier trigger_id = 1;
-  bool has_trigger_id() const;
-  void clear_trigger_id();
-  static const int kTriggerIdFieldNumber = 1;
-  const ::flyteidl::core::Identifier& trigger_id() const;
-  ::flyteidl::core::Identifier* release_trigger_id();
-  ::flyteidl::core::Identifier* mutable_trigger_id();
-  void set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id);
-
-  // @@protoc_insertion_point(class_scope:flyteidl.core.Trigger)
- private:
-  class HasBitSetters;
-
-  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
-  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID > triggers_;
-  ::flyteidl::core::Identifier* trigger_id_;
-  mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fartifact_5fid_2eproto;
 };
 // ===================================================================
@@ -1596,59 +1621,127 @@ inline void ArtifactBindingData::set_index(::google::protobuf::uint32 value) {
 }
 
 // string partition_key = 2;
+inline bool ArtifactBindingData::has_partition_key() const {
+  return partition_data_case() == kPartitionKey;
+}
+inline void ArtifactBindingData::set_has_partition_key() {
+  _oneof_case_[0] = kPartitionKey;
+}
 inline void ArtifactBindingData::clear_partition_key() {
-  partition_key_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (has_partition_key()) {
+    partition_data_.partition_key_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_partition_data();
+  }
 }
 inline const ::std::string& ArtifactBindingData::partition_key() const {
   // @@protoc_insertion_point(field_get:flyteidl.core.ArtifactBindingData.partition_key)
-  return partition_key_.GetNoArena();
+  if (has_partition_key()) {
+    return partition_data_.partition_key_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
 }
 inline void ArtifactBindingData::set_partition_key(const ::std::string& value) {
-  
-  partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.ArtifactBindingData.partition_key)
+  if (!has_partition_key()) {
+    clear_partition_data();
+    set_has_partition_key();
+    partition_data_.partition_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  partition_data_.partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
   // @@protoc_insertion_point(field_set:flyteidl.core.ArtifactBindingData.partition_key)
 }
 #if LANG_CXX11
 inline void ArtifactBindingData::set_partition_key(::std::string&& value) {
-  
-  partition_key_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set:flyteidl.core.ArtifactBindingData.partition_key)
+  if (!has_partition_key()) {
+    clear_partition_data();
+    set_has_partition_key();
+    partition_data_.partition_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  partition_data_.partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
   // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.ArtifactBindingData.partition_key)
 }
 #endif
 inline void ArtifactBindingData::set_partition_key(const char* value) {
   GOOGLE_DCHECK(value != nullptr);
-  
-  partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  if (!has_partition_key()) {
+    clear_partition_data();
+    set_has_partition_key();
+    partition_data_.partition_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  partition_data_.partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
   // @@protoc_insertion_point(field_set_char:flyteidl.core.ArtifactBindingData.partition_key)
 }
 inline void ArtifactBindingData::set_partition_key(const char* value, size_t size) {
-  
-  partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
+  if (!has_partition_key()) {
+    clear_partition_data();
+    set_has_partition_key();
+    partition_data_.partition_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  partition_data_.partition_key_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
   // @@protoc_insertion_point(field_set_pointer:flyteidl.core.ArtifactBindingData.partition_key)
 }
 inline ::std::string* ArtifactBindingData::mutable_partition_key() {
-  
+  if (!has_partition_key()) {
+    clear_partition_data();
+    set_has_partition_key();
+    partition_data_.partition_key_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
   // @@protoc_insertion_point(field_mutable:flyteidl.core.ArtifactBindingData.partition_key)
-  return partition_key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  return partition_data_.partition_key_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
 inline ::std::string* ArtifactBindingData::release_partition_key() {
   // @@protoc_insertion_point(field_release:flyteidl.core.ArtifactBindingData.partition_key)
-  
-  return partition_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  if (has_partition_key()) {
+    clear_has_partition_data();
+    return partition_data_.partition_key_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
 }
 inline void ArtifactBindingData::set_allocated_partition_key(::std::string* partition_key) {
-  if (partition_key != nullptr) {
-    
-  } else {
-    
+  if (has_partition_data()) {
+    clear_partition_data();
   }
-  partition_key_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), partition_key);
+  if (partition_key != nullptr) {
+    set_has_partition_key();
+    partition_data_.partition_key_.UnsafeSetDefault(partition_key);
+  }
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ArtifactBindingData.partition_key)
 }
 
-// string transform = 3;
+// bool bind_to_time_partition = 3;
+inline bool ArtifactBindingData::has_bind_to_time_partition() const {
+  return partition_data_case() == kBindToTimePartition;
+}
+inline void ArtifactBindingData::set_has_bind_to_time_partition() {
+  _oneof_case_[0] = kBindToTimePartition;
+}
+inline void ArtifactBindingData::clear_bind_to_time_partition() {
+  if (has_bind_to_time_partition()) {
+    partition_data_.bind_to_time_partition_ = false;
+    clear_has_partition_data();
+  }
+}
+inline bool ArtifactBindingData::bind_to_time_partition() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.ArtifactBindingData.bind_to_time_partition)
+  if (has_bind_to_time_partition()) {
+    return partition_data_.bind_to_time_partition_;
+  }
+  return false;
+}
+inline void ArtifactBindingData::set_bind_to_time_partition(bool value) {
+  if (!has_bind_to_time_partition()) {
+    clear_partition_data();
+    set_has_bind_to_time_partition();
+  }
+  partition_data_.bind_to_time_partition_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.ArtifactBindingData.bind_to_time_partition)
+}
+
+// string transform = 4;
 inline void ArtifactBindingData::clear_transform() {
   transform_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -1701,6 +1794,15 @@ inline void ArtifactBindingData::set_allocated_transform(::std::string* transfor
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ArtifactBindingData.transform)
 }
 
+inline bool ArtifactBindingData::has_partition_data() const {
+  return partition_data_case() != PARTITION_DATA_NOT_SET;
+}
+inline void ArtifactBindingData::clear_has_partition_data() {
+  _oneof_case_[0] = PARTITION_DATA_NOT_SET;
+}
+inline ArtifactBindingData::PartitionDataCase ArtifactBindingData::partition_data_case() const {
+  return ArtifactBindingData::PartitionDataCase(_oneof_case_[0]);
+}
 // -------------------------------------------------------------------
 
 // InputBindingData
@@ -1854,7 +1956,42 @@ inline void LabelValue::set_allocated_static_value(::std::string* static_value) 
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.LabelValue.static_value)
 }
 
-// .flyteidl.core.ArtifactBindingData triggered_binding = 2;
+// .google.protobuf.Timestamp time_value = 2;
+inline bool LabelValue::has_time_value() const {
+  return value_case() == kTimeValue;
+}
+inline void LabelValue::set_has_time_value() {
+  _oneof_case_[0] = kTimeValue;
+}
+inline ::google::protobuf::Timestamp* LabelValue::release_time_value() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.LabelValue.time_value)
+  if (has_time_value()) {
+    clear_has_value();
+      ::google::protobuf::Timestamp* temp = value_.time_value_;
+    value_.time_value_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::google::protobuf::Timestamp& LabelValue::time_value() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.LabelValue.time_value)
+  return has_time_value()
+      ? *value_.time_value_
+      : *reinterpret_cast< ::google::protobuf::Timestamp*>(&::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* LabelValue::mutable_time_value() {
+  if (!has_time_value()) {
+    clear_value();
+    set_has_time_value();
+    value_.time_value_ = CreateMaybeMessage< ::google::protobuf::Timestamp >(
+        GetArenaNoVirtual());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.LabelValue.time_value)
+  return value_.time_value_;
+}
+
+// .flyteidl.core.ArtifactBindingData triggered_binding = 3;
 inline bool LabelValue::has_triggered_binding() const {
   return value_case() == kTriggeredBinding;
 }
@@ -1895,7 +2032,7 @@ inline ::flyteidl::core::ArtifactBindingData* LabelValue::mutable_triggered_bind
   return value_.triggered_binding_;
 }
 
-// .flyteidl.core.InputBindingData input_binding = 3;
+// .flyteidl.core.InputBindingData input_binding = 4;
 inline bool LabelValue::has_input_binding() const {
   return value_case() == kInputBinding;
 }
@@ -1967,6 +2104,61 @@ inline ::google::protobuf::Map< ::std::string, ::flyteidl::core::LabelValue >*
 Partitions::mutable_value() {
   // @@protoc_insertion_point(field_mutable_map:flyteidl.core.Partitions.value)
   return value_.MutableMap();
+}
+
+// -------------------------------------------------------------------
+
+// TimePartition
+
+// .flyteidl.core.LabelValue value = 1;
+inline bool TimePartition::has_value() const {
+  return this != internal_default_instance() && value_ != nullptr;
+}
+inline void TimePartition::clear_value() {
+  if (GetArenaNoVirtual() == nullptr && value_ != nullptr) {
+    delete value_;
+  }
+  value_ = nullptr;
+}
+inline const ::flyteidl::core::LabelValue& TimePartition::value() const {
+  const ::flyteidl::core::LabelValue* p = value_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.TimePartition.value)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LabelValue*>(
+      &::flyteidl::core::_LabelValue_default_instance_);
+}
+inline ::flyteidl::core::LabelValue* TimePartition::release_value() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.TimePartition.value)
+  
+  ::flyteidl::core::LabelValue* temp = value_;
+  value_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LabelValue* TimePartition::mutable_value() {
+  
+  if (value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LabelValue>(GetArenaNoVirtual());
+    value_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.TimePartition.value)
+  return value_;
+}
+inline void TimePartition::set_allocated_value(::flyteidl::core::LabelValue* value) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete value_;
+  }
+  if (value) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      value = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, value, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  value_ = value;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TimePartition.value)
 }
 
 // -------------------------------------------------------------------
@@ -2079,54 +2271,106 @@ inline void ArtifactID::set_allocated_version(::std::string* version) {
 
 // .flyteidl.core.Partitions partitions = 3;
 inline bool ArtifactID::has_partitions() const {
-  return dimensions_case() == kPartitions;
-}
-inline void ArtifactID::set_has_partitions() {
-  _oneof_case_[0] = kPartitions;
+  return this != internal_default_instance() && partitions_ != nullptr;
 }
 inline void ArtifactID::clear_partitions() {
-  if (has_partitions()) {
-    delete dimensions_.partitions_;
-    clear_has_dimensions();
+  if (GetArenaNoVirtual() == nullptr && partitions_ != nullptr) {
+    delete partitions_;
   }
+  partitions_ = nullptr;
+}
+inline const ::flyteidl::core::Partitions& ArtifactID::partitions() const {
+  const ::flyteidl::core::Partitions* p = partitions_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.ArtifactID.partitions)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Partitions*>(
+      &::flyteidl::core::_Partitions_default_instance_);
 }
 inline ::flyteidl::core::Partitions* ArtifactID::release_partitions() {
   // @@protoc_insertion_point(field_release:flyteidl.core.ArtifactID.partitions)
-  if (has_partitions()) {
-    clear_has_dimensions();
-      ::flyteidl::core::Partitions* temp = dimensions_.partitions_;
-    dimensions_.partitions_ = nullptr;
-    return temp;
-  } else {
-    return nullptr;
-  }
-}
-inline const ::flyteidl::core::Partitions& ArtifactID::partitions() const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.ArtifactID.partitions)
-  return has_partitions()
-      ? *dimensions_.partitions_
-      : *reinterpret_cast< ::flyteidl::core::Partitions*>(&::flyteidl::core::_Partitions_default_instance_);
+  
+  ::flyteidl::core::Partitions* temp = partitions_;
+  partitions_ = nullptr;
+  return temp;
 }
 inline ::flyteidl::core::Partitions* ArtifactID::mutable_partitions() {
-  if (!has_partitions()) {
-    clear_dimensions();
-    set_has_partitions();
-    dimensions_.partitions_ = CreateMaybeMessage< ::flyteidl::core::Partitions >(
-        GetArenaNoVirtual());
+  
+  if (partitions_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Partitions>(GetArenaNoVirtual());
+    partitions_ = p;
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.core.ArtifactID.partitions)
-  return dimensions_.partitions_;
+  return partitions_;
+}
+inline void ArtifactID::set_allocated_partitions(::flyteidl::core::Partitions* partitions) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete partitions_;
+  }
+  if (partitions) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      partitions = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, partitions, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  partitions_ = partitions;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ArtifactID.partitions)
 }
 
-inline bool ArtifactID::has_dimensions() const {
-  return dimensions_case() != DIMENSIONS_NOT_SET;
+// .flyteidl.core.TimePartition time_partition = 4;
+inline bool ArtifactID::has_time_partition() const {
+  return this != internal_default_instance() && time_partition_ != nullptr;
 }
-inline void ArtifactID::clear_has_dimensions() {
-  _oneof_case_[0] = DIMENSIONS_NOT_SET;
+inline void ArtifactID::clear_time_partition() {
+  if (GetArenaNoVirtual() == nullptr && time_partition_ != nullptr) {
+    delete time_partition_;
+  }
+  time_partition_ = nullptr;
 }
-inline ArtifactID::DimensionsCase ArtifactID::dimensions_case() const {
-  return ArtifactID::DimensionsCase(_oneof_case_[0]);
+inline const ::flyteidl::core::TimePartition& ArtifactID::time_partition() const {
+  const ::flyteidl::core::TimePartition* p = time_partition_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.ArtifactID.time_partition)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::TimePartition*>(
+      &::flyteidl::core::_TimePartition_default_instance_);
 }
+inline ::flyteidl::core::TimePartition* ArtifactID::release_time_partition() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.ArtifactID.time_partition)
+  
+  ::flyteidl::core::TimePartition* temp = time_partition_;
+  time_partition_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::TimePartition* ArtifactID::mutable_time_partition() {
+  
+  if (time_partition_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::TimePartition>(GetArenaNoVirtual());
+    time_partition_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.ArtifactID.time_partition)
+  return time_partition_;
+}
+inline void ArtifactID::set_allocated_time_partition(::flyteidl::core::TimePartition* time_partition) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete time_partition_;
+  }
+  if (time_partition) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      time_partition = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, time_partition, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  time_partition_ = time_partition;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.ArtifactID.time_partition)
+}
+
 // -------------------------------------------------------------------
 
 // ArtifactTag
@@ -2461,85 +2705,6 @@ inline void ArtifactQuery::clear_has_identifier() {
 inline ArtifactQuery::IdentifierCase ArtifactQuery::identifier_case() const {
   return ArtifactQuery::IdentifierCase(_oneof_case_[0]);
 }
-// -------------------------------------------------------------------
-
-// Trigger
-
-// .flyteidl.core.Identifier trigger_id = 1;
-inline bool Trigger::has_trigger_id() const {
-  return this != internal_default_instance() && trigger_id_ != nullptr;
-}
-inline const ::flyteidl::core::Identifier& Trigger::trigger_id() const {
-  const ::flyteidl::core::Identifier* p = trigger_id_;
-  // @@protoc_insertion_point(field_get:flyteidl.core.Trigger.trigger_id)
-  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
-      &::flyteidl::core::_Identifier_default_instance_);
-}
-inline ::flyteidl::core::Identifier* Trigger::release_trigger_id() {
-  // @@protoc_insertion_point(field_release:flyteidl.core.Trigger.trigger_id)
-  
-  ::flyteidl::core::Identifier* temp = trigger_id_;
-  trigger_id_ = nullptr;
-  return temp;
-}
-inline ::flyteidl::core::Identifier* Trigger::mutable_trigger_id() {
-  
-  if (trigger_id_ == nullptr) {
-    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
-    trigger_id_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.Trigger.trigger_id)
-  return trigger_id_;
-}
-inline void Trigger::set_allocated_trigger_id(::flyteidl::core::Identifier* trigger_id) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(trigger_id_);
-  }
-  if (trigger_id) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
-    if (message_arena != submessage_arena) {
-      trigger_id = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, trigger_id, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  trigger_id_ = trigger_id;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.Trigger.trigger_id)
-}
-
-// repeated .flyteidl.core.ArtifactID triggers = 2;
-inline int Trigger::triggers_size() const {
-  return triggers_.size();
-}
-inline void Trigger::clear_triggers() {
-  triggers_.Clear();
-}
-inline ::flyteidl::core::ArtifactID* Trigger::mutable_triggers(int index) {
-  // @@protoc_insertion_point(field_mutable:flyteidl.core.Trigger.triggers)
-  return triggers_.Mutable(index);
-}
-inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >*
-Trigger::mutable_triggers() {
-  // @@protoc_insertion_point(field_mutable_list:flyteidl.core.Trigger.triggers)
-  return &triggers_;
-}
-inline const ::flyteidl::core::ArtifactID& Trigger::triggers(int index) const {
-  // @@protoc_insertion_point(field_get:flyteidl.core.Trigger.triggers)
-  return triggers_.Get(index);
-}
-inline ::flyteidl::core::ArtifactID* Trigger::add_triggers() {
-  // @@protoc_insertion_point(field_add:flyteidl.core.Trigger.triggers)
-  return triggers_.Add();
-}
-inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::ArtifactID >&
-Trigger::triggers() const {
-  // @@protoc_insertion_point(field_list:flyteidl.core.Trigger.triggers)
-  return triggers_;
-}
-
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__

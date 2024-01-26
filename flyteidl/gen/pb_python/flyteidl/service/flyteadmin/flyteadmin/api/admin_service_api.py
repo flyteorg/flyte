@@ -2657,6 +2657,260 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def get_dynamic_node_workflow(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_dynamic_node_workflow(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_execution_id_project: Name of the project the resource belongs to. (required)
+        :param str id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_execution_id_name: User or system provided value for the resource. (required)
+        :param str id_node_id: (required)
+        :param str id_execution_id_org: Optional, org key applied to the resource.
+        :return: AdminDynamicNodeWorkflowResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return data
+
+    def get_dynamic_node_workflow_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_execution_id_project: Name of the project the resource belongs to. (required)
+        :param str id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_execution_id_name: User or system provided value for the resource. (required)
+        :param str id_node_id: (required)
+        :param str id_execution_id_org: Optional, org key applied to the resource.
+        :return: AdminDynamicNodeWorkflowResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_execution_id_project', 'id_execution_id_domain', 'id_execution_id_name', 'id_node_id', 'id_execution_id_org']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_dynamic_node_workflow" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_execution_id_project' is set
+        if ('id_execution_id_project' not in params or
+                params['id_execution_id_project'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        # verify the required parameter 'id_execution_id_domain' is set
+        if ('id_execution_id_domain' not in params or
+                params['id_execution_id_domain'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        # verify the required parameter 'id_execution_id_name' is set
+        if ('id_execution_id_name' not in params or
+                params['id_execution_id_name'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        # verify the required parameter 'id_node_id' is set
+        if ('id_node_id' not in params or
+                params['id_node_id'] is None):
+            raise ValueError("Missing the required parameter `id_node_id` when calling `get_dynamic_node_workflow`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_execution_id_project' in params:
+            path_params['id.execution_id.project'] = params['id_execution_id_project']  # noqa: E501
+        if 'id_execution_id_domain' in params:
+            path_params['id.execution_id.domain'] = params['id_execution_id_domain']  # noqa: E501
+        if 'id_execution_id_name' in params:
+            path_params['id.execution_id.name'] = params['id_execution_id_name']  # noqa: E501
+        if 'id_node_id' in params:
+            path_params['id.node_id'] = params['id_node_id']  # noqa: E501
+
+        query_params = []
+        if 'id_execution_id_org' in params:
+            query_params.append(('id.execution_id.org', params['id_execution_id_org']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminDynamicNodeWorkflowResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
+    def get_dynamic_node_workflow2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_dynamic_node_workflow2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_execution_id_org: Optional, org key applied to the resource. (required)
+        :param str id_execution_id_project: Name of the project the resource belongs to. (required)
+        :param str id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_execution_id_name: User or system provided value for the resource. (required)
+        :param str id_node_id: (required)
+        :return: AdminDynamicNodeWorkflowResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return data
+
+    def get_dynamic_node_workflow2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+        """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str id_execution_id_org: Optional, org key applied to the resource. (required)
+        :param str id_execution_id_project: Name of the project the resource belongs to. (required)
+        :param str id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
+        :param str id_execution_id_name: User or system provided value for the resource. (required)
+        :param str id_node_id: (required)
+        :return: AdminDynamicNodeWorkflowResponse
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['id_execution_id_org', 'id_execution_id_project', 'id_execution_id_domain', 'id_execution_id_name', 'id_node_id']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_dynamic_node_workflow2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'id_execution_id_org' is set
+        if ('id_execution_id_org' not in params or
+                params['id_execution_id_org'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        # verify the required parameter 'id_execution_id_project' is set
+        if ('id_execution_id_project' not in params or
+                params['id_execution_id_project'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        # verify the required parameter 'id_execution_id_domain' is set
+        if ('id_execution_id_domain' not in params or
+                params['id_execution_id_domain'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        # verify the required parameter 'id_execution_id_name' is set
+        if ('id_execution_id_name' not in params or
+                params['id_execution_id_name'] is None):
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        # verify the required parameter 'id_node_id' is set
+        if ('id_node_id' not in params or
+                params['id_node_id'] is None):
+            raise ValueError("Missing the required parameter `id_node_id` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'id_execution_id_org' in params:
+            path_params['id.execution_id.org'] = params['id_execution_id_org']  # noqa: E501
+        if 'id_execution_id_project' in params:
+            path_params['id.execution_id.project'] = params['id_execution_id_project']  # noqa: E501
+        if 'id_execution_id_domain' in params:
+            path_params['id.execution_id.domain'] = params['id_execution_id_domain']  # noqa: E501
+        if 'id_execution_id_name' in params:
+            path_params['id.execution_id.name'] = params['id_execution_id_name']  # noqa: E501
+        if 'id_node_id' in params:
+            path_params['id.node_id'] = params['id_node_id']  # noqa: E501
+
+        query_params = []
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminDynamicNodeWorkflowResponse',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def get_execution(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 

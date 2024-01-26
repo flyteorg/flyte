@@ -12,5 +12,8 @@ package flyteadmin
 type CoreArtifactId struct {
 	ArtifactKey *CoreArtifactKey `json:"artifact_key,omitempty"`
 	Version string `json:"version,omitempty"`
+	// Think of a partition as a tag on an Artifact, except it's a key-value pair. Different partitions naturally have different versions (execution ids).
 	Partitions *CorePartitions `json:"partitions,omitempty"`
+	// There is no such thing as an empty time partition - if it's not set, then there is no time partition.
+	TimePartition *CoreTimePartition `json:"time_partition,omitempty"`
 }

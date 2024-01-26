@@ -78,6 +78,9 @@ export namespace flyteidl {
             /** ArtifactBindingData partitionKey */
             partitionKey?: (string|null);
 
+            /** ArtifactBindingData bindToTimePartition */
+            bindToTimePartition?: (boolean|null);
+
             /** ArtifactBindingData transform */
             transform?: (string|null);
         }
@@ -97,8 +100,14 @@ export namespace flyteidl {
             /** ArtifactBindingData partitionKey. */
             public partitionKey: string;
 
+            /** ArtifactBindingData bindToTimePartition. */
+            public bindToTimePartition: boolean;
+
             /** ArtifactBindingData transform. */
             public transform: string;
+
+            /** ArtifactBindingData partitionData. */
+            public partitionData?: ("partitionKey"|"bindToTimePartition");
 
             /**
              * Creates a new ArtifactBindingData instance using the specified properties.
@@ -191,6 +200,9 @@ export namespace flyteidl {
             /** LabelValue staticValue */
             staticValue?: (string|null);
 
+            /** LabelValue timeValue */
+            timeValue?: (google.protobuf.ITimestamp|null);
+
             /** LabelValue triggeredBinding */
             triggeredBinding?: (flyteidl.core.IArtifactBindingData|null);
 
@@ -210,6 +222,9 @@ export namespace flyteidl {
             /** LabelValue staticValue. */
             public staticValue: string;
 
+            /** LabelValue timeValue. */
+            public timeValue?: (google.protobuf.ITimestamp|null);
+
             /** LabelValue triggeredBinding. */
             public triggeredBinding?: (flyteidl.core.IArtifactBindingData|null);
 
@@ -217,7 +232,7 @@ export namespace flyteidl {
             public inputBinding?: (flyteidl.core.IInputBindingData|null);
 
             /** LabelValue value. */
-            public value?: ("staticValue"|"triggeredBinding"|"inputBinding");
+            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding");
 
             /**
              * Creates a new LabelValue instance using the specified properties.
@@ -304,6 +319,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TimePartition. */
+        interface ITimePartition {
+
+            /** TimePartition value */
+            value?: (flyteidl.core.ILabelValue|null);
+        }
+
+        /** Represents a TimePartition. */
+        class TimePartition implements ITimePartition {
+
+            /**
+             * Constructs a new TimePartition.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITimePartition);
+
+            /** TimePartition value. */
+            public value?: (flyteidl.core.ILabelValue|null);
+
+            /**
+             * Creates a new TimePartition instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TimePartition instance
+             */
+            public static create(properties?: flyteidl.core.ITimePartition): flyteidl.core.TimePartition;
+
+            /**
+             * Encodes the specified TimePartition message. Does not implicitly {@link flyteidl.core.TimePartition.verify|verify} messages.
+             * @param message TimePartition message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITimePartition, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TimePartition message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TimePartition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TimePartition;
+
+            /**
+             * Verifies a TimePartition message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an ArtifactID. */
         interface IArtifactID {
 
@@ -315,6 +382,9 @@ export namespace flyteidl {
 
             /** ArtifactID partitions */
             partitions?: (flyteidl.core.IPartitions|null);
+
+            /** ArtifactID timePartition */
+            timePartition?: (flyteidl.core.ITimePartition|null);
         }
 
         /** Represents an ArtifactID. */
@@ -335,8 +405,8 @@ export namespace flyteidl {
             /** ArtifactID partitions. */
             public partitions?: (flyteidl.core.IPartitions|null);
 
-            /** ArtifactID dimensions. */
-            public dimensions?: "partitions";
+            /** ArtifactID timePartition. */
+            public timePartition?: (flyteidl.core.ITimePartition|null);
 
             /**
              * Creates a new ArtifactID instance using the specified properties.
@@ -496,64 +566,6 @@ export namespace flyteidl {
 
             /**
              * Verifies an ArtifactQuery message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
-        /** Properties of a Trigger. */
-        interface ITrigger {
-
-            /** Trigger triggerId */
-            triggerId?: (flyteidl.core.IIdentifier|null);
-
-            /** Trigger triggers */
-            triggers?: (flyteidl.core.IArtifactID[]|null);
-        }
-
-        /** Represents a Trigger. */
-        class Trigger implements ITrigger {
-
-            /**
-             * Constructs a new Trigger.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.ITrigger);
-
-            /** Trigger triggerId. */
-            public triggerId?: (flyteidl.core.IIdentifier|null);
-
-            /** Trigger triggers. */
-            public triggers: flyteidl.core.IArtifactID[];
-
-            /**
-             * Creates a new Trigger instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Trigger instance
-             */
-            public static create(properties?: flyteidl.core.ITrigger): flyteidl.core.Trigger;
-
-            /**
-             * Encodes the specified Trigger message. Does not implicitly {@link flyteidl.core.Trigger.verify|verify} messages.
-             * @param message Trigger message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.ITrigger, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Trigger message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Trigger
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Trigger;
-
-            /**
-             * Verifies a Trigger message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -9168,6 +9180,9 @@ export namespace flyteidl {
 
             /** Resource logLinks */
             logLinks?: (flyteidl.core.ITaskLog[]|null);
+
+            /** Resource phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
         }
 
         /** Represents a Resource. */
@@ -9190,6 +9205,9 @@ export namespace flyteidl {
 
             /** Resource logLinks. */
             public logLinks: flyteidl.core.ITaskLog[];
+
+            /** Resource phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -16439,6 +16457,110 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a GetDynamicNodeWorkflowRequest. */
+        interface IGetDynamicNodeWorkflowRequest {
+
+            /** GetDynamicNodeWorkflowRequest id */
+            id?: (flyteidl.core.INodeExecutionIdentifier|null);
+        }
+
+        /** Represents a GetDynamicNodeWorkflowRequest. */
+        class GetDynamicNodeWorkflowRequest implements IGetDynamicNodeWorkflowRequest {
+
+            /**
+             * Constructs a new GetDynamicNodeWorkflowRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetDynamicNodeWorkflowRequest);
+
+            /** GetDynamicNodeWorkflowRequest id. */
+            public id?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /**
+             * Creates a new GetDynamicNodeWorkflowRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetDynamicNodeWorkflowRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IGetDynamicNodeWorkflowRequest): flyteidl.admin.GetDynamicNodeWorkflowRequest;
+
+            /**
+             * Encodes the specified GetDynamicNodeWorkflowRequest message. Does not implicitly {@link flyteidl.admin.GetDynamicNodeWorkflowRequest.verify|verify} messages.
+             * @param message GetDynamicNodeWorkflowRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetDynamicNodeWorkflowRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetDynamicNodeWorkflowRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetDynamicNodeWorkflowRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetDynamicNodeWorkflowRequest;
+
+            /**
+             * Verifies a GetDynamicNodeWorkflowRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DynamicNodeWorkflowResponse. */
+        interface IDynamicNodeWorkflowResponse {
+
+            /** DynamicNodeWorkflowResponse compiledWorkflow */
+            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+        }
+
+        /** Represents a DynamicNodeWorkflowResponse. */
+        class DynamicNodeWorkflowResponse implements IDynamicNodeWorkflowResponse {
+
+            /**
+             * Constructs a new DynamicNodeWorkflowResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IDynamicNodeWorkflowResponse);
+
+            /** DynamicNodeWorkflowResponse compiledWorkflow. */
+            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /**
+             * Creates a new DynamicNodeWorkflowResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DynamicNodeWorkflowResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IDynamicNodeWorkflowResponse): flyteidl.admin.DynamicNodeWorkflowResponse;
+
+            /**
+             * Encodes the specified DynamicNodeWorkflowResponse message. Does not implicitly {@link flyteidl.admin.DynamicNodeWorkflowResponse.verify|verify} messages.
+             * @param message DynamicNodeWorkflowResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IDynamicNodeWorkflowResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DynamicNodeWorkflowResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DynamicNodeWorkflowResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DynamicNodeWorkflowResponse;
+
+            /**
+             * Verifies a DynamicNodeWorkflowResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an EmailMessage. */
         interface IEmailMessage {
 
@@ -20480,6 +20602,20 @@ export namespace flyteidl {
             public getNodeExecution(request: flyteidl.admin.INodeExecutionGetRequest): Promise<flyteidl.admin.NodeExecution>;
 
             /**
+             * Calls GetDynamicNodeWorkflow.
+             * @param request GetDynamicNodeWorkflowRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and DynamicNodeWorkflowResponse
+             */
+            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest, callback: flyteidl.service.AdminService.GetDynamicNodeWorkflowCallback): void;
+
+            /**
+             * Calls GetDynamicNodeWorkflow.
+             * @param request GetDynamicNodeWorkflowRequest message or plain object
+             * @returns Promise
+             */
+            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest): Promise<flyteidl.admin.DynamicNodeWorkflowResponse>;
+
+            /**
              * Calls ListNodeExecutions.
              * @param request NodeExecutionListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and NodeExecutionList
@@ -21055,6 +21191,13 @@ export namespace flyteidl {
              * @param [response] NodeExecution
              */
             type GetNodeExecutionCallback = (error: (Error|null), response?: flyteidl.admin.NodeExecution) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getDynamicNodeWorkflow}.
+             * @param error Error, if any
+             * @param [response] DynamicNodeWorkflowResponse
+             */
+            type GetDynamicNodeWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.DynamicNodeWorkflowResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNodeExecutions}.

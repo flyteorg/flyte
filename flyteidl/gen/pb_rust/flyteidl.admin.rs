@@ -87,7 +87,8 @@ pub struct GetTaskResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Resource {
-    /// The state of the execution is used to control its visibility in the UI/CLI.
+    /// DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
+    #[deprecated]
     #[prost(enumeration="State", tag="1")]
     pub state: i32,
     /// The outputs of the execution. It's typically used by sql task. Agent service will create a
@@ -101,6 +102,9 @@ pub struct Resource {
     /// log information for the task execution.
     #[prost(message, repeated, tag="4")]
     pub log_links: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    /// The phase of the execution is used to determine the phase of the plugin's execution.
+    #[prost(enumeration="super::core::task_execution::Phase", tag="5")]
+    pub phase: i32,
 }
 /// A message used to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2275,6 +2279,18 @@ pub struct NodeExecutionGetDataResponse {
     pub dynamic_workflow: ::core::option::Option<DynamicWorkflowNodeMetadata>,
     #[prost(message, optional, tag="17")]
     pub flyte_urls: ::core::option::Option<FlyteUrLs>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetDynamicNodeWorkflowRequest {
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<super::core::NodeExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DynamicNodeWorkflowResponse {
+    #[prost(message, optional, tag="1")]
+    pub compiled_workflow: ::core::option::Option<super::core::CompiledWorkflowClosure>,
 }
 /// Represents the Email object that is sent to a publisher/subscriber
 /// to forward the notification.

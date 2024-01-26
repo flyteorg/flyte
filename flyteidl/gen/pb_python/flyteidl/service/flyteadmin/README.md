@@ -94,6 +94,8 @@ Class | Method | HTTP request | Description
 *AdminServiceApi* | [**get_active_launch_plan2**](docs/AdminServiceApi.md#get_active_launch_plan2) | **GET** /api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
 *AdminServiceApi* | [**get_description_entity**](docs/AdminServiceApi.md#get_description_entity) | **GET** /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
 *AdminServiceApi* | [**get_description_entity2**](docs/AdminServiceApi.md#get_description_entity2) | **GET** /api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+*AdminServiceApi* | [**get_dynamic_node_workflow**](docs/AdminServiceApi.md#get_dynamic_node_workflow) | **GET** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
+*AdminServiceApi* | [**get_dynamic_node_workflow2**](docs/AdminServiceApi.md#get_dynamic_node_workflow2) | **GET** /api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
 *AdminServiceApi* | [**get_execution**](docs/AdminServiceApi.md#get_execution) | **GET** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**get_execution2**](docs/AdminServiceApi.md#get_execution2) | **GET** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 *AdminServiceApi* | [**get_execution_data**](docs/AdminServiceApi.md#get_execution_data) | **GET** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
@@ -199,6 +201,7 @@ Class | Method | HTTP request | Description
  - [AdminDescriptionEntityList](docs/AdminDescriptionEntityList.md)
  - [AdminDescriptionFormat](docs/AdminDescriptionFormat.md)
  - [AdminDomain](docs/AdminDomain.md)
+ - [AdminDynamicNodeWorkflowResponse](docs/AdminDynamicNodeWorkflowResponse.md)
  - [AdminEmailNotification](docs/AdminEmailNotification.md)
  - [AdminEnvs](docs/AdminEnvs.md)
  - [AdminExecution](docs/AdminExecution.md)
@@ -407,6 +410,7 @@ Class | Method | HTTP request | Description
  - [CoreTaskNode](docs/CoreTaskNode.md)
  - [CoreTaskNodeOverrides](docs/CoreTaskNodeOverrides.md)
  - [CoreTaskTemplate](docs/CoreTaskTemplate.md)
+ - [CoreTimePartition](docs/CoreTimePartition.md)
  - [CoreTypeAnnotation](docs/CoreTypeAnnotation.md)
  - [CoreTypeStructure](docs/CoreTypeStructure.md)
  - [CoreTypedInterface](docs/CoreTypedInterface.md)
