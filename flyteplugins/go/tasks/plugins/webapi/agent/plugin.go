@@ -85,7 +85,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	client := p.cs.agentClients[agent.Endpoint]
 	if client == nil {
-		return nil, nil, fmt.Errorf("default agent:[%v] is not connected, please check if it is up and running", agent)
+		return nil, nil, fmt.Errorf("default agent is not connected, please check if endpoint:[%v] is up and running", agent.Endpoint)
 	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)

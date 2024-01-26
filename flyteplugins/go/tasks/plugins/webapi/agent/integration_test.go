@@ -25,6 +25,7 @@ import (
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -160,9 +161,8 @@ func TestEndToEnd(t *testing.T) {
 					metricScope: iCtx.MetricsScope(),
 					cfg:         GetConfig(),
 					cs: &ClientSet{
-						agentClients: map[string]service.AsyncAgentServiceClient{
-							"localhost:80": mockGetBadAsyncClientFunc(),
-						},
+						agentClients:         map[string]service.AsyncAgentServiceClient{},
+						agentMetadataClients: map[string]service.AgentMetadataServiceClient{},
 					},
 				},
 			}, nil
@@ -296,6 +296,44 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 
 func newMockAgentPlugin() webapi.PluginEntry {
 
+	agentClient := new(agentMocks.AsyncAgentServiceClient)
+	// mockCreateRequest := &admin.CreateTaskRequest{}
+	// agentClient.On("CreateTask", mock.Anything, mockCreateRequest).Return(
+	// 	&admin.CreateTaskResponse{
+	// 		Res: &admin.CreateTaskResponse_ResourceMeta{
+	// 			ResourceMeta: []byte{1, 2, 3, 4},
+	// 		}}, nil)
+
+	agentClient.On("CreateTask", mock.Anything, mock.MatchedBy(func(req *admin.CreateTaskRequest) bool {
+		// Your custom logic to decide if the condition is met
+		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "fake://bucket/prefix/nhv"}
+		return slices.Equal(req.Template.GetContainer().Args, expectedArgs)
+	})).Run(func(args mock.Arguments) {
+		req := args.Get(1).(*admin.CreateTaskRequest)
+		// Extract the mock.Call object
+		call := args.Get(0).(mock.Call)
+
+		if slices.Equal(req.Template.GetContainer().Args, []string{"pyflyte-fast-execute", "--output-prefix", "fake://bucket/prefix/nhv"}) {
+			// If condition is met, return a specific response
+			call.Return(&admin.CreateTaskResponse{
+				Res: &admin.CreateTaskResponse_ResourceMeta{
+					ResourceMeta: []byte{1, 2, 3, 4},
+				},
+			}, nil)
+		} else {
+			// Else, return a different response or error
+			call.Return(nil, fmt.Errorf("unexpected arguments"))
+		}
+	}).Maybe()
+
+	mockGetRequest := &admin.GetTaskRequest{}
+	agentClient.On("GetTask", mock.Anything, mockGetRequest).Return(
+		&admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil)
+
+	mockDeleteRequest := &admin.DeleteTaskRequest{}
+	agentClient.On("DeleteTask", mock.Anything, mockDeleteRequest).Return(
+		&admin.DeleteTaskResponse{}, nil)
+
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark_job", "api_task"},
@@ -306,7 +344,7 @@ func newMockAgentPlugin() webapi.PluginEntry {
 					cfg:         GetConfig(),
 					cs: &ClientSet{
 						agentClients: map[string]service.AsyncAgentServiceClient{
-							"": &MockAsyncTask{},
+							"": agentClient,
 						},
 					},
 				},

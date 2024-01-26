@@ -6,10 +6,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"golang.org/x/exp/maps"
-
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -19,10 +15,14 @@ import (
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
+	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/exp/maps"
 )
 
 func TestSyncTask(t *testing.T) {
@@ -184,6 +184,22 @@ func TestPlugin(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, pluginsCore.PhaseUndefined, phase.Phase())
 	})
+}
+
+func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
+	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
+	mockRequest := &admin.ListAgentsRequest{}
+	mockResponse := &admin.ListAgentsResponse{
+		Agents: []*admin.Agent{
+			{
+				Name:               "test-agent",
+				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+			},
+		},
+	}
+
+	mockMetadataServiceClient.On("ListAgents", mock.Anything, mockRequest).Return(mockResponse, nil)
+	return mockMetadataServiceClient
 }
 
 func TestInitializeAgentRegistry(t *testing.T) {
