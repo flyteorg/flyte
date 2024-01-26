@@ -49,7 +49,7 @@ func CheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionContext, job
 
 	// If job isn't currently being monitored (recovering from a restart?), add it to the sync-cache and return
 	if job == nil {
-		logger.Info(ctx, "Job not found in cache, adding it. [%v]", jobName)
+		logger.Infof(ctx, "Job not found in cache, adding it. [%v]", jobName)
 
 		_, err = jobStore.GetOrCreate(jobName, &Job{
 			ID:             *currentState.ExternalJobID,

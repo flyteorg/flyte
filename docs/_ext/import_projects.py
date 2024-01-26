@@ -26,6 +26,7 @@ class ImportProjectsConfig:
     flytekit_api_dir: str
     source_regex_mapping: dict = field(default_factory=dict)
     list_table_toc: List[str] = field(default_factory=list)
+    dev_build: bool = False
 
 
 @dataclass
@@ -104,7 +105,7 @@ def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
 
 
 def update_html_context(project: Project, tag: str, commit: str, config: Config):
-    tag_url = f"{project.source}/releases/tag/{tag}"
+    tag_url = "#" if tag == "dev" else f"{project.source}/releases/tag/{tag}"
     commit_url = f"{project.source}/tree/{commit}"
 
     config.html_context[f"{project.name}_tag"] = tag
@@ -152,9 +153,10 @@ def import_projects(app: Sphinx, config: Config):
                 [t for t in repo.tags if re.match(VERSION_PATTERN, t.name)],
                 key=lambda t: t.commit.committed_datetime
             )
-            if not tags:
-                # If tags don't exist just use the current commit. This occurs
-                # when the git repo is a shallow clone.
+            if not tags or import_projects_config.dev_build:
+                # If dev_build is specified or the tags don't exist just use the
+                # current commit. This occurs when the git repo is a shallow
+                # clone.
                 tag_str = "dev"
                 commit = str(repo.head.commit)[:7]
             else:

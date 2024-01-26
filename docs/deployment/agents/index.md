@@ -16,6 +16,8 @@ Discover the process of setting up Agents for Flyte.
   - Guide to setting up the MMCloud agent.
 * - {ref}`Sensor Agent <deployment-agent-setup-sensor>`
   - Guide to setting up the Sensor agent.
+* - {ref}`Databricks Agent <deployment-agent-setup-databricks>`
+  - Guide to setting up the Databricks agent.
 ```
 
 ```{toctree}
@@ -25,5 +27,6 @@ Discover the process of setting up Agents for Flyte.
 
 bigquery
 mmcloud
+databricks
 sensor
 ```

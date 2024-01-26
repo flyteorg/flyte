@@ -138,7 +138,7 @@ Join the likes of LinkedIn, Spotify, Freenome, Pachama, Warner Bros. and many ot
 
 ## How to stay involved
 📆 [Weekly office hours](https://calendly.com/flyte-office-hours-01/30min): Live informal sessions with the Flyte team held every week. Book a 30-minute slot and get your questions answered. <br>
-👥 [Biweekly community sync](https://www.addevent.com/event/EA7823958): A biweekly event where the Flyte team provides updates on the project and community members can share their progress and ask questions. <br>
+👥 [Monthly community sync](https://www.addevent.com/event/EA7823958): Happening the first Tuesday of every month, this is where the Flyte team provides updates on the project, and community members can share their progress and ask questions. <br>
 💬 [Slack](https://slack.flyte.org/): Join the Flyte community on Slack to chat with other users, ask questions, and get help. <br>
 ⚠️ [Newsletter](https://lists.lfaidata.foundation/g/flyte-announce/join): join this group to receive the Flyte Monthly newsletter. <br>
 📹 [Youtube](https://www.youtube.com/channel/UCNduEoLOToNo3nFVly-vUTQ): Tune into panel discussions, customer success stories, community updates and feature deep dives. <br>

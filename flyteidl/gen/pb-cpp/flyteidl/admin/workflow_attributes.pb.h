@@ -227,6 +227,20 @@ class WorkflowAttributes final :
   ::std::string* release_workflow();
   void set_allocated_workflow(::std::string* workflow);
 
+  // string org = 5;
+  void clear_org();
+  static const int kOrgFieldNumber = 5;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchingAttributes matching_attributes = 4;
   bool has_matching_attributes() const;
   void clear_matching_attributes();
@@ -244,6 +258,7 @@ class WorkflowAttributes final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr workflow_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   ::flyteidl::admin::MatchingAttributes* matching_attributes_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto;
@@ -607,6 +622,20 @@ class WorkflowAttributesGetRequest final :
   ::std::string* release_workflow();
   void set_allocated_workflow(::std::string* workflow);
 
+  // string org = 5;
+  void clear_org();
+  static const int kOrgFieldNumber = 5;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchableResource resource_type = 4;
   void clear_resource_type();
   static const int kResourceTypeFieldNumber = 4;
@@ -621,6 +650,7 @@ class WorkflowAttributesGetRequest final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr workflow_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   int resource_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto;
@@ -879,6 +909,20 @@ class WorkflowAttributesDeleteRequest final :
   ::std::string* release_workflow();
   void set_allocated_workflow(::std::string* workflow);
 
+  // string org = 5;
+  void clear_org();
+  static const int kOrgFieldNumber = 5;
+  const ::std::string& org() const;
+  void set_org(const ::std::string& value);
+  #if LANG_CXX11
+  void set_org(::std::string&& value);
+  #endif
+  void set_org(const char* value);
+  void set_org(const char* value, size_t size);
+  ::std::string* mutable_org();
+  ::std::string* release_org();
+  void set_allocated_org(::std::string* org);
+
   // .flyteidl.admin.MatchableResource resource_type = 4;
   void clear_resource_type();
   static const int kResourceTypeFieldNumber = 4;
@@ -893,6 +937,7 @@ class WorkflowAttributesDeleteRequest final :
   ::google::protobuf::internal::ArenaStringPtr project_;
   ::google::protobuf::internal::ArenaStringPtr domain_;
   ::google::protobuf::internal::ArenaStringPtr workflow_;
+  ::google::protobuf::internal::ArenaStringPtr org_;
   int resource_type_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fworkflow_5fattributes_2eproto;
@@ -1217,6 +1262,59 @@ inline void WorkflowAttributes::set_allocated_matching_attributes(::flyteidl::ad
   // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowAttributes.matching_attributes)
 }
 
+// string org = 5;
+inline void WorkflowAttributes::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& WorkflowAttributes::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowAttributes.org)
+  return org_.GetNoArena();
+}
+inline void WorkflowAttributes::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowAttributes.org)
+}
+#if LANG_CXX11
+inline void WorkflowAttributes::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.WorkflowAttributes.org)
+}
+#endif
+inline void WorkflowAttributes::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.WorkflowAttributes.org)
+}
+inline void WorkflowAttributes::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.WorkflowAttributes.org)
+}
+inline ::std::string* WorkflowAttributes::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowAttributes.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* WorkflowAttributes::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowAttributes.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void WorkflowAttributes::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowAttributes.org)
+}
+
 // -------------------------------------------------------------------
 
 // WorkflowAttributesUpdateRequest
@@ -1453,6 +1551,59 @@ inline void WorkflowAttributesGetRequest::set_resource_type(::flyteidl::admin::M
   // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowAttributesGetRequest.resource_type)
 }
 
+// string org = 5;
+inline void WorkflowAttributesGetRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& WorkflowAttributesGetRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowAttributesGetRequest.org)
+  return org_.GetNoArena();
+}
+inline void WorkflowAttributesGetRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowAttributesGetRequest.org)
+}
+#if LANG_CXX11
+inline void WorkflowAttributesGetRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.WorkflowAttributesGetRequest.org)
+}
+#endif
+inline void WorkflowAttributesGetRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.WorkflowAttributesGetRequest.org)
+}
+inline void WorkflowAttributesGetRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.WorkflowAttributesGetRequest.org)
+}
+inline ::std::string* WorkflowAttributesGetRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowAttributesGetRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* WorkflowAttributesGetRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowAttributesGetRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void WorkflowAttributesGetRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowAttributesGetRequest.org)
+}
+
 // -------------------------------------------------------------------
 
 // WorkflowAttributesGetResponse
@@ -1683,6 +1834,59 @@ inline void WorkflowAttributesDeleteRequest::set_resource_type(::flyteidl::admin
   
   resource_type_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowAttributesDeleteRequest.resource_type)
+}
+
+// string org = 5;
+inline void WorkflowAttributesDeleteRequest::clear_org() {
+  org_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& WorkflowAttributesDeleteRequest::org() const {
+  // @@protoc_insertion_point(field_get:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+  return org_.GetNoArena();
+}
+inline void WorkflowAttributesDeleteRequest::set_org(const ::std::string& value) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+}
+#if LANG_CXX11
+inline void WorkflowAttributesDeleteRequest::set_org(::std::string&& value) {
+  
+  org_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+}
+#endif
+inline void WorkflowAttributesDeleteRequest::set_org(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+}
+inline void WorkflowAttributesDeleteRequest::set_org(const char* value, size_t size) {
+  
+  org_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+}
+inline ::std::string* WorkflowAttributesDeleteRequest::mutable_org() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+  return org_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* WorkflowAttributesDeleteRequest::release_org() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
+  
+  return org_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void WorkflowAttributesDeleteRequest::set_allocated_org(::std::string* org) {
+  if (org != nullptr) {
+    
+  } else {
+    
+  }
+  org_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), org);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.WorkflowAttributesDeleteRequest.org)
 }
 
 // -------------------------------------------------------------------

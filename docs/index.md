@@ -57,7 +57,7 @@ learning and analytics.
 
 Created at [Lyft](https://www.lyft.com/) in collaboration with Spotify,
 Freenome, and many others, Flyte provides first-class support for
-{doc}`Python <reference_flytekit>`,
+{doc}`Python <api/flytekit/docs_index>`,
 [Java, and Scala](https://github.com/flyteorg/flytekit-java). Data Scientists
 and ML Engineers in the industry use Flyte to create:
 
@@ -102,11 +102,11 @@ Below are the API reference to the different components of Flyte:
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Flytekit <reference_flytekit>`
+* - {doc}`Flytekit <api/flytekit/docs_index>`
   - Flyte's official Python SDK.
-* - {doc}`FlyteCTL <reference_flytectl>`
+* - {doc}`FlyteCTL <flytectl/docs_index>`
   - Flyte's command-line interface for interacting with a Flyte cluster.
-* - {doc}`FlyteIDL <reference_flyteidl>`
+* - {doc}`FlyteIDL <flytectl/docs_index>`
   - Flyte's core specification language.
 ```
 
@@ -135,6 +135,7 @@ Have questions or need support? The best way to reach us is through Slack:
 :hidden:
 
 Introduction <introduction>
+Getting started with workflow development <flytesnacks/getting_started/getting_started_with_workflow_development>
 Flyte Fundamentals <flytesnacks/getting_started/flyte_fundamentals>
 Core Use Cases <flytesnacks/getting_started/core_use_cases>
 ```
@@ -172,8 +173,8 @@ reference/swagger
 :name: apitoc
 :hidden:
 
-flytekit <reference_flytekit>
-flytectl <reference_flytectl>
+flytekit <api/flytekit/docs_index>
+flytectl <flytectl/docs_index>
 flyteidl <reference_flyteidl>
 ```
 
