@@ -23,9 +23,7 @@ type reservationMetrics struct {
 	reservationReleased          labeled.Counter
 	reservationAlreadyInProgress labeled.Counter
 	acquireReservationFailure    labeled.Counter
-	acquireReservationsFailure   labeled.Counter
 	releaseReservationFailure    labeled.Counter
-	releaseReservationsFailure   labeled.Counter
 	reservationDoesNotExist      labeled.Counter
 }
 
@@ -67,19 +65,9 @@ func NewReservationManager(
 			"Number of times we failed to acquire reservation",
 			reservationScope,
 		),
-		acquireReservationsFailure: labeled.NewCounter(
-			"acquire_reservations_failure",
-			"Number of times we failed to acquire multiple reservations",
-			reservationScope,
-		),
 		releaseReservationFailure: labeled.NewCounter(
 			"release_reservation_failure",
 			"Number of times we failed to release a reservation",
-			reservationScope,
-		),
-		releaseReservationsFailure: labeled.NewCounter(
-			"release_reservations_failure",
-			"Number of times we failed to release multiple reservations",
 			reservationScope,
 		),
 		reservationDoesNotExist: labeled.NewCounter(
@@ -124,36 +112,6 @@ func (r *reservationManager) GetOrExtendReservation(ctx context.Context, request
 
 	return &datacatalog.GetOrExtendReservationResponse{
 		Reservation: &reservation,
-	}, nil
-}
-
-// GetOrExtendReservations attempts to get or extend reservations for multiple artifacts in a single operation.
-func (r *reservationManager) GetOrExtendReservations(ctx context.Context, request *datacatalog.GetOrExtendReservationsRequest) (*datacatalog.GetOrExtendReservationsResponse, error) {
-	if err := validators.ValidateGetOrExtendReservationsRequest(request); err != nil {
-		r.systemMetrics.acquireReservationsFailure.Inc(ctx)
-		return nil, err
-	}
-
-	var reservations []*datacatalog.Reservation
-	for _, req := range request.GetReservations() {
-		// Use minimum of maxHeartbeatInterval and requested heartbeat interval
-		heartbeatInterval := r.maxHeartbeatInterval
-		requestHeartbeatInterval := req.GetHeartbeatInterval()
-		if requestHeartbeatInterval != nil && requestHeartbeatInterval.AsDuration() < heartbeatInterval {
-			heartbeatInterval = requestHeartbeatInterval.AsDuration()
-		}
-
-		reservation, err := r.tryAcquireReservation(ctx, req.ReservationId, req.OwnerId, heartbeatInterval)
-		if err != nil {
-			r.systemMetrics.acquireReservationsFailure.Inc(ctx)
-			return nil, err
-		}
-
-		reservations = append(reservations, &reservation)
-	}
-
-	return &datacatalog.GetOrExtendReservationsResponse{
-		Reservations: reservations,
 	}, nil
 }
 
@@ -244,24 +202,6 @@ func (r *reservationManager) ReleaseReservation(ctx context.Context, request *da
 	if err := r.releaseReservation(ctx, request.ReservationId, request.OwnerId); err != nil {
 		r.systemMetrics.releaseReservationFailure.Inc(ctx)
 		return nil, err
-	}
-
-	return &datacatalog.ReleaseReservationResponse{}, nil
-}
-
-// ReleaseReservations releases reservations for multiple artifacts in a single operation.
-// This is an idempotent operation, releasing reservations multiple times or trying to release an unknown reservation
-// will not result in an error being returned.
-func (r *reservationManager) ReleaseReservations(ctx context.Context, request *datacatalog.ReleaseReservationsRequest) (*datacatalog.ReleaseReservationResponse, error) {
-	if err := validators.ValidateReleaseReservationsRequest(request); err != nil {
-		return nil, err
-	}
-
-	for _, req := range request.GetReservations() {
-		if err := r.releaseReservation(ctx, req.ReservationId, req.OwnerId); err != nil {
-			r.systemMetrics.releaseReservationsFailure.Inc(ctx)
-			return nil, err
-		}
 	}
 
 	return &datacatalog.ReleaseReservationResponse{}, nil

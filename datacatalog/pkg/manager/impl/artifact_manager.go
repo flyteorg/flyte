@@ -486,35 +486,6 @@ func (m *artifactManager) DeleteArtifact(ctx context.Context, request *datacatal
 	return &datacatalog.DeleteArtifactResponse{}, nil
 }
 
-// DeleteArtifacts deletes the given artifacts, removing all stored artifact data from the underlying blob storage.
-func (m *artifactManager) DeleteArtifacts(ctx context.Context, request *datacatalog.DeleteArtifactsRequest) (*datacatalog.DeleteArtifactResponse, error) {
-	timer := m.systemMetrics.bulkDeleteResponseTime.Start(ctx)
-	defer timer.Stop()
-
-	err := validators.ValidateDeleteArtifactsRequest(request)
-	if err != nil {
-		logger.Warningf(ctx, "Invalid delete artifacts request %v, err: %v", request, err)
-		m.systemMetrics.validationErrorCounter.Inc(ctx)
-		m.systemMetrics.bulkDeleteFailureCounter.Inc(ctx)
-		return nil, err
-	}
-
-	for _, deleteArtifactReq := range request.Artifacts {
-		if err := m.deleteArtifact(ctx, deleteArtifactReq.GetDataset(), deleteArtifactReq); err != nil {
-			// bulk delete endpoint is idempotent, ignore errors regarding missing artifacts as they might've already
-			// been deleted by a previous call.
-			if errors.IsDoesNotExistError(err) {
-				continue
-			}
-			m.systemMetrics.bulkDeleteFailureCounter.Inc(ctx)
-			return nil, err
-		}
-	}
-
-	m.systemMetrics.bulkDeleteSuccessCounter.Inc(ctx)
-	return &datacatalog.DeleteArtifactResponse{}, nil
-}
-
 func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,

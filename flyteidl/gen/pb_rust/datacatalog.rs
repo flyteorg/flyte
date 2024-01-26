@@ -202,14 +202,6 @@ pub mod delete_artifact_request {
         TagName(::prost::alloc::string::String),
     }
 }
-/// Request message for deleting multiple Artifacts and their associated ArtifactData.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct DeleteArtifactsRequest {
-    /// List of deletion requests for artifacts to remove
-    #[prost(message, repeated, tag="1")]
-    pub artifacts: ::prost::alloc::vec::Vec<DeleteArtifactRequest>,
-}
 ///
 /// Response message for deleting an Artifact.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -242,14 +234,6 @@ pub struct GetOrExtendReservationRequest {
     #[prost(message, optional, tag="3")]
     pub heartbeat_interval: ::core::option::Option<::prost_types::Duration>,
 }
-/// Request message for acquiring or extending reservations for multiple artifacts in a single operation.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetOrExtendReservationsRequest {
-    /// List of reservation requests for artifacts to acquire
-    #[prost(message, repeated, tag="1")]
-    pub reservations: ::prost::alloc::vec::Vec<GetOrExtendReservationRequest>,
-}
 /// A reservation including owner, heartbeat interval, expiration timestamp, and various metadata.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -278,14 +262,6 @@ pub struct GetOrExtendReservationResponse {
     #[prost(message, optional, tag="1")]
     pub reservation: ::core::option::Option<Reservation>,
 }
-/// List of reservations acquired for multiple artifacts in a single operation.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct GetOrExtendReservationsResponse {
-    /// List of (newly created or existing) reservations for artifacts requested
-    #[prost(message, repeated, tag="1")]
-    pub reservations: ::prost::alloc::vec::Vec<Reservation>,
-}
 /// Request to release reservation
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -296,14 +272,6 @@ pub struct ReleaseReservationRequest {
     /// The unique ID of the owner for the reservation
     #[prost(string, tag="2")]
     pub owner_id: ::prost::alloc::string::String,
-}
-/// Request message for releasing reservations for multiple artifacts in a single operation.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ReleaseReservationsRequest {
-    /// List of reservation requests for artifacts to release
-    #[prost(message, repeated, tag="1")]
-    pub reservations: ::prost::alloc::vec::Vec<ReleaseReservationRequest>,
 }
 /// Response to release reservation
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -3,10 +3,7 @@ package validators
 import (
 	"fmt"
 
-	"google.golang.org/grpc/codes"
-
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
@@ -169,25 +166,6 @@ func ValidateDeleteArtifactRequest(request *datacatalog.DeleteArtifactRequest) e
 		}
 	default:
 		return NewInvalidArgumentError("QueryHandle", "invalid type")
-	}
-
-	return nil
-}
-
-func ValidateDeleteArtifactsRequest(request *datacatalog.DeleteArtifactsRequest) error {
-	if request.GetArtifacts() == nil {
-		return NewMissingArgumentError("artifacts")
-	}
-
-	var errs []error
-	for _, deleteArtifactReq := range request.GetArtifacts() {
-		if err := ValidateDeleteArtifactRequest(deleteArtifactReq); err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	if len(errs) > 0 {
-		return errors.NewCollectedErrors(codes.InvalidArgument, errs)
 	}
 
 	return nil

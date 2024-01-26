@@ -1,9 +1,6 @@
 package validators
 
 import (
-	"google.golang.org/grpc/codes"
-
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
@@ -29,25 +26,6 @@ func ValidateGetOrExtendReservationRequest(request *datacatalog.GetOrExtendReser
 	return nil
 }
 
-func ValidateGetOrExtendReservationsRequest(request *datacatalog.GetOrExtendReservationsRequest) error {
-	if request.GetReservations() == nil {
-		return NewMissingArgumentError("reservations")
-	}
-
-	var errs []error
-	for _, req := range request.GetReservations() {
-		if err := ValidateGetOrExtendReservationRequest(req); err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	if len(errs) > 0 {
-		return errors.NewCollectedErrors(codes.InvalidArgument, errs)
-	}
-
-	return nil
-}
-
 func ValidateReleaseReservationRequest(request *datacatalog.ReleaseReservationRequest) error {
 	if request.GetReservationId() == nil {
 		return NewMissingArgumentError("reservationID")
@@ -61,25 +39,6 @@ func ValidateReleaseReservationRequest(request *datacatalog.ReleaseReservationRe
 
 	if err := ValidateEmptyStringField(request.GetOwnerId(), "ownerID"); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-func ValidateReleaseReservationsRequest(request *datacatalog.ReleaseReservationsRequest) error {
-	if request.GetReservations() == nil {
-		return NewMissingArgumentError("reservations")
-	}
-
-	var errs []error
-	for _, req := range request.GetReservations() {
-		if err := ValidateReleaseReservationRequest(req); err != nil {
-			errs = append(errs, err)
-		}
-	}
-
-	if len(errs) > 0 {
-		return errors.NewCollectedErrors(codes.InvalidArgument, errs)
 	}
 
 	return nil
