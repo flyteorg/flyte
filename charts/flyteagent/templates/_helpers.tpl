@@ -28,6 +28,13 @@ helm.sh/chart: {{ include "flyte.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end -}}
 
+{{- define "flyteagent.podLabels" -}}
+{{ include "flyteagent.labels" . }}
+{{- with .Values.podLabels }}
+{{- toYaml . }}
+{{- end }}
+{{- end -}}
+
 # Optional blocks for secret mount
 
 {{- define "agentSecret.volume" -}}
