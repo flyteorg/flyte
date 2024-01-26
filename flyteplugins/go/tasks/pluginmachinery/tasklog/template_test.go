@@ -548,8 +548,9 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"flyin",
 			TemplateLogPlugin{
+				Name:                "vscode",
 				Scheme:              TemplateSchemeDynamic,
-				DynamicTemplateURIs: []DynamicTemplateURI{{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}", "flyin"}},
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 			},
 			args{
@@ -575,9 +576,10 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"flyin - default port",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeDynamic,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
+				Name:                "vscode",
+				Scheme:              TemplateSchemeDynamic,
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat:       core.TaskLog_JSON,
 			},
 			args{
 				input: Input{
@@ -601,8 +603,9 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"flyin - no link_type in task template",
 			TemplateLogPlugin{
+				Name:                "vscode",
 				Scheme:              TemplateSchemeDynamic,
-				DynamicTemplateURIs: []DynamicTemplateURI{{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}", "flyin"}},
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 				DisplayName:         "Flyin Logs",
 			},

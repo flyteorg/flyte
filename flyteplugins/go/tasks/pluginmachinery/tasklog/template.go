@@ -212,17 +212,7 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 	if linkType == "" {
 		return nil
 	}
-	dynamicLogLinkTypes := []string{}
-	for _, linkType := range strings.Split(linkType, ",") {
-		// NB: we are going to grandfather in flyin.
-		if linkType == "vscode" {
-			dynamicLogLinkTypes = append(dynamicLogLinkTypes, "flyin")
-		} else {
-			dynamicLogLinkTypes = append(dynamicLogLinkTypes, linkType)
-		}
-	}
-
-	return dynamicLogLinkTypes
+	return strings.Split(linkType, ",")
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
@@ -238,9 +228,9 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 
 	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
-			if dynamicTemplateURI.Kind == dynamicLogLinkType {
+			if p.Name == dynamicLogLinkType {
 				taskLogs = append(taskLogs, &core.TaskLog{
-					Uri:           replaceAll(dynamicTemplateURI.TemplateURI, templateVars),
+					Uri:           replaceAll(dynamicTemplateURI, templateVars),
 					Name:          p.DisplayName + input.LogName,
 					MessageFormat: p.MessageFormat,
 				})

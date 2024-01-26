@@ -20,11 +20,6 @@ const (
 // TemplateURI is a URI that accepts templates. See: go/tasks/pluginmachinery/tasklog/template.go for available templates.
 type TemplateURI = string
 
-type DynamicTemplateURI struct {
-	TemplateURI TemplateURI
-	Kind        string // Kind describes the kind of the dynamic template. Currently only "flyin" is supported.
-}
-
 type TemplateVar struct {
 	Regex *regexp.Regexp
 	Value string
@@ -69,9 +64,10 @@ type Plugin interface {
 }
 
 type TemplateLogPlugin struct {
+	Name                string                     `json:"name" pflag:",Name of the plugin."`
 	DisplayName         string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
 	TemplateURIs        []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`
-	DynamicTemplateURIs []DynamicTemplateURI       `json:"dynamicTemplateUris" pflag:",Dynamic URI Templates for generating task log links."`
+	DynamicTemplateURIs []TemplateURI              `json:"dynamictemplateUris" pflag:",URI Templates for generating dynamic task log links."`
 	MessageFormat       core.TaskLog_MessageFormat `json:"messageFormat" pflag:",Log Message Format."`
 	Scheme              TemplateScheme             `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 }

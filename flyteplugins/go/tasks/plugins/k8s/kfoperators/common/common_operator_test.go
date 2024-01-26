@@ -211,8 +211,9 @@ func TestGetLogsTemplateUri(t *testing.T) {
 
 	taskCtx := dummyTaskContext()
 	pytorchJobObjectMeta := meta_v1.ObjectMeta{
-		Name:      "test",
-		Namespace: "pytorch-namespace",
+		Name: "test",
+		Namespace: "pytorch-" +
+			"namespace",
 		CreationTimestamp: meta_v1.Time{
 			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
 		},

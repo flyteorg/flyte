@@ -362,7 +362,7 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 			"Flyin enabled but no task template",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+					"vscode": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
 			},
 			nil,
@@ -372,7 +372,7 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 			"Flyin enabled but config not found in task template",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+					"vscode": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
 			},
 			&core.TaskTemplate{},
@@ -382,7 +382,7 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 			"Flyin enabled but no port in task template",
 			&LogConfig{
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+					"vscode": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
 			},
 			&core.TaskTemplate{
@@ -394,14 +394,13 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 				{
 					Uri:           "https://flyin.mydomain.com:8080/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "flyin logs my-Suffix",
+					Name:          "vscode logs my-Suffix",
 				},
 			},
 		},
 		{
 			"Flyin disabled but config present in TaskTemplate",
-			&LogConfig{
-			},
+			&LogConfig{},
 			&core.TaskTemplate{
 				Config: map[string]string{
 					"link_type": "vscode",
@@ -413,8 +412,8 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 		{
 			"Flyin disabled and K8s enabled and flyin config present in TaskTemplate",
 			&LogConfig{
-				IsKubernetesEnabled:      true,
-				KubernetesTemplateURI:    "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				IsKubernetesEnabled:   true,
+				KubernetesTemplateURI: "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 			},
 			&core.TaskTemplate{
 				Config: map[string]string{
@@ -433,10 +432,10 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 		{
 			"Flyin and K8s enabled",
 			&LogConfig{
-				IsKubernetesEnabled:      true,
-				KubernetesTemplateURI:    "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				IsKubernetesEnabled:   true,
+				KubernetesTemplateURI: "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"flyin": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+					"vscode": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
 				},
 			},
 			&core.TaskTemplate{
@@ -454,7 +453,7 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 				{
 					Uri:           "https://flyin.mydomain.com:65535/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "flyin logs my-Suffix",
+					Name:          "vscode logs my-Suffix",
 				},
 			},
 		},
