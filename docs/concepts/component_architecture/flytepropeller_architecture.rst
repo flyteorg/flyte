@@ -33,7 +33,7 @@ Components
 FlyteWorkflow CRD / K8s Integration
 -----------------------------------
 
-Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CR (Custom Resource) which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status' (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
+Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CR (Custom Resource) which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
 
 K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the FlyteWorkflow CR is created/updated, the FlytePropeller instance is notified. FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions. However, it is conceivable to manually create FlyteWorkflow CRs, but this will have limited visibility and usability.
 
@@ -91,6 +91,6 @@ It should be noted that the WorkflowExecutor, NodeExecutor, and TaskHandlers sen
 FlytePlugins
 ------------
 
-Here is an overviw architecture of FlytePlugins:
+Here is an overview architecture of FlytePlugins:
 
 .. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flytepropeller_plugins_architecture.png
