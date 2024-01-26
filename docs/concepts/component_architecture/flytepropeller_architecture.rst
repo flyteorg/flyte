@@ -89,7 +89,7 @@ FlyteAdmin Events
 It should be noted that the WorkflowExecutor, NodeExecutor, and TaskHandlers send events to FlyteAdmin, enabling it to track workflows in near real-time.
 
 FlytePlugins
------------------
+------------
 
 Here is an overviw architecture of FlytePlugins:
 
