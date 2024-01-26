@@ -92,38 +92,34 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 		vars = append(vars, input.ExtraTemplateVarsByScheme.Common...)
 	}
 
-	switch scheme {
-	case TemplateSchemeDynamic:
-		port := input.TaskTemplate.GetConfig()["port"]
-		if port == "" {
-			port = "8080"
-		}
+	port := input.TaskTemplate.GetConfig()["port"]
+	if port != "" {
 		vars = append(
 			vars,
 			TemplateVar{defaultRegexes.Port, port},
 		)
-		fallthrough
-	case TemplateSchemePod:
-		// Container IDs are prefixed with docker://, cri-o://, etc. which is stripped by fluentd before pushing to a log
-		// stream. Therefore, we must also strip the prefix.
-		containerID := input.ContainerID
-		stripDelimiter := "://"
-		if split := strings.Split(input.ContainerID, stripDelimiter); len(split) > 1 {
-			containerID = split[1]
-		}
-		vars = append(
-			vars,
-			TemplateVar{defaultRegexes.PodName, input.PodName},
-			TemplateVar{defaultRegexes.PodUID, input.PodUID},
-			TemplateVar{defaultRegexes.Namespace, input.Namespace},
-			TemplateVar{defaultRegexes.ContainerName, input.ContainerName},
-			TemplateVar{defaultRegexes.ContainerID, containerID},
-			TemplateVar{defaultRegexes.Hostname, input.HostName},
-		)
-		if gotExtraTemplateVars {
-			vars = append(vars, input.ExtraTemplateVarsByScheme.Pod...)
-		}
-	case TemplateSchemeTaskExecution:
+	}
+
+	// Container IDs are prefixed with docker://, cri-o://, etc. which is stripped by fluentd before pushing to a log
+	// stream. Therefore, we must also strip the prefix.
+	containerID := input.ContainerID
+	stripDelimiter := "://"
+	if split := strings.Split(input.ContainerID, stripDelimiter); len(split) > 1 {
+		containerID = split[1]
+	}
+	vars = append(
+		vars,
+		TemplateVar{defaultRegexes.PodName, input.PodName},
+		TemplateVar{defaultRegexes.PodUID, input.PodUID},
+		TemplateVar{defaultRegexes.Namespace, input.Namespace},
+		TemplateVar{defaultRegexes.ContainerName, input.ContainerName},
+		TemplateVar{defaultRegexes.ContainerID, containerID},
+		TemplateVar{defaultRegexes.Hostname, input.HostName},
+	)
+	if gotExtraTemplateVars {
+		vars = append(vars, input.ExtraTemplateVarsByScheme.Pod...)
+	}
+	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
 		vars = append(
 			vars,
@@ -178,9 +174,9 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 				},
 			)
 		}
-		if gotExtraTemplateVars {
-			vars = append(vars, input.ExtraTemplateVarsByScheme.TaskExecution...)
-		}
+	}
+	if gotExtraTemplateVars {
+		vars = append(vars, input.ExtraTemplateVarsByScheme.TaskExecution...)
 	}
 
 	vars = append(

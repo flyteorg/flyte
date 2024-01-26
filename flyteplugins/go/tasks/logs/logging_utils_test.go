@@ -379,26 +379,6 @@ func TestGetLogsForContainerInPod_Flyin(t *testing.T) {
 			nil,
 		},
 		{
-			"Flyin enabled but no port in task template",
-			&LogConfig{
-				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"vscode": "https://flyin.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-				},
-			},
-			&core.TaskTemplate{
-				Config: map[string]string{
-					"link_type": "vscode",
-				},
-			},
-			[]*core.TaskLog{
-				{
-					Uri:           "https://flyin.mydomain.com:8080/my-namespace/my-pod/ContainerName/ContainerID",
-					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode logs my-Suffix",
-				},
-			},
-		},
-		{
 			"Flyin disabled but config present in TaskTemplate",
 			&LogConfig{},
 			&core.TaskTemplate{

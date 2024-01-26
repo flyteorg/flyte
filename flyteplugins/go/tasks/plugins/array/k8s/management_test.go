@@ -67,6 +67,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetGeneratedName().Return("notfound")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	tID.OnGetID().Return(core2.TaskExecutionIdentifier{
 		TaskId: &core2.Identifier{
 			ResourceType: core2.ResourceType_TASK,

@@ -318,6 +318,8 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 		},
 		RetryAttempt: 0,
 	})
+	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)

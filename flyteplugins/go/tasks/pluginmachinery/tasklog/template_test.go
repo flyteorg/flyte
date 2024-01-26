@@ -150,29 +150,18 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			nil,
 		},
 		{
-			"pod with unused extra vars",
-			TemplateSchemePod,
-			podBase,
-			&TemplateVarsByScheme{
-				TaskExecution: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
-			},
-			nil,
-			nil,
-			TemplateVars{
-				{testRegexes.Bar, "bar"},
-				{testRegexes.Baz, "baz"},
-			},
-		},
-		{
 			"task execution happy path",
 			TemplateSchemeTaskExecution,
 			taskExecutionBase,
 			nil,
 			TemplateVars{
 				{defaultRegexes.LogName, "main_logs"},
+				{defaultRegexes.PodName, ""},
+				{defaultRegexes.PodUID, ""},
+				{defaultRegexes.Namespace, ""},
+				{defaultRegexes.ContainerName, ""},
+				{defaultRegexes.ContainerID, ""},
+				{defaultRegexes.Hostname, ""},
 				{defaultRegexes.NodeID, "n0-0-n0"},
 				{defaultRegexes.GeneratedName, "generated-name"},
 				{defaultRegexes.TaskRetryAttempt, "1"},
@@ -212,23 +201,23 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			},
 			nil,
 		},
-		{
-			"task execution with unused extra vars",
-			TemplateSchemeTaskExecution,
-			taskExecutionBase,
-			&TemplateVarsByScheme{
-				Pod: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
-			},
-			nil,
-			nil,
-			TemplateVars{
-				{testRegexes.Bar, "bar"},
-				{testRegexes.Baz, "baz"},
-			},
-		},
+		// {
+		// 	"task execution with unused extra vars",
+		// 	TemplateSchemeTaskExecution,
+		// 	taskExecutionBase,
+		// 	&TemplateVarsByScheme{
+		// 		Pod: TemplateVars{
+		// 			{testRegexes.Bar, "bar"},
+		// 			{testRegexes.Baz, "baz"},
+		// 		},
+		// 	},
+		// 	nil,
+		// 	nil,
+		// 	TemplateVars{
+		// 		{testRegexes.Bar, "bar"},
+		// 		{testRegexes.Baz, "baz"},
+		// 	},
+		// },
 		{
 			"flyin happy path",
 			TemplateSchemeDynamic,
@@ -573,33 +562,33 @@ func TestTemplateLogPlugin(t *testing.T) {
 				},
 			},
 		},
-		{
-			"flyin - default port",
-			TemplateLogPlugin{
-				Name:                "vscode",
-				Scheme:              TemplateSchemeDynamic,
-				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
-				MessageFormat:       core.TaskLog_JSON,
-			},
-			args{
-				input: Input{
-					PodName: "my-pod-name",
-					TaskTemplate: &core.TaskTemplate{
-						Config: map[string]string{
-							"link_type": "vscode",
-						},
-					},
-				},
-			},
-			Output{
-				TaskLogs: []*core.TaskLog{
-					{
-						Uri:           "vscode://flyin:8080/my-pod-name",
-						MessageFormat: core.TaskLog_JSON,
-					},
-				},
-			},
-		},
+		// {
+		// 	"flyin - default port",
+		// 	TemplateLogPlugin{
+		// 		Name:                "vscode",
+		// 		Scheme:              TemplateSchemeDynamic,
+		// 		DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
+		// 		MessageFormat:       core.TaskLog_JSON,
+		// 	},
+		// 	args{
+		// 		input: Input{
+		// 			PodName: "my-pod-name",
+		// 			TaskTemplate: &core.TaskTemplate{
+		// 				Config: map[string]string{
+		// 					"link_type": "vscode",
+		// 				},
+		// 			},
+		// 		},
+		// 	},
+		// 	Output{
+		// 		TaskLogs: []*core.TaskLog{
+		// 			{
+		// 				Uri:           "vscode://flyin:8080/my-pod-name",
+		// 				MessageFormat: core.TaskLog_JSON,
+		// 			},
+		// 		},
+		// 	},
+		// },
 		{
 			"flyin - no link_type in task template",
 			TemplateLogPlugin{
