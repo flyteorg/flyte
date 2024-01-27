@@ -100,19 +100,17 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		scheme      TemplateScheme
 		baseVars    Input
-		extraVars   *TemplateVarsByScheme
-		exact       TemplateVars
-		contains    TemplateVars
-		notContains TemplateVars
+		extraVars   []TemplateVar
+		exact       []TemplateVar
+		contains    []TemplateVar
+		notContains []TemplateVar
 	}{
 		{
 			"pod happy path",
-			TemplateSchemePod,
 			podBase,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.LogName, "main_logs"},
 				{defaultRegexes.PodName, "my-pod"},
 				{defaultRegexes.PodUID, "my-pod-uid"},
@@ -130,19 +128,14 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		},
 		{
 			"pod with extra vars",
-			TemplateSchemePod,
 			podBase,
-			&TemplateVarsByScheme{
-				Common: TemplateVars{
-					{testRegexes.Foo, "foo"},
-				},
-				Pod: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
+			[]TemplateVar{
+				{testRegexes.Foo, "foo"},
+				{testRegexes.Bar, "bar"},
+				{testRegexes.Baz, "baz"},
 			},
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{testRegexes.Foo, "foo"},
 				{testRegexes.Bar, "bar"},
 				{testRegexes.Baz, "baz"},
@@ -151,10 +144,9 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		},
 		{
 			"task execution happy path",
-			TemplateSchemeTaskExecution,
 			taskExecutionBase,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.LogName, "main_logs"},
 				{defaultRegexes.PodName, ""},
 				{defaultRegexes.PodUID, ""},
@@ -182,19 +174,14 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		},
 		{
 			"task execution with extra vars",
-			TemplateSchemeTaskExecution,
 			taskExecutionBase,
-			&TemplateVarsByScheme{
-				Common: TemplateVars{
-					{testRegexes.Foo, "foo"},
-				},
-				TaskExecution: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
+			[]TemplateVar{
+				{testRegexes.Foo, "foo"},
+				{testRegexes.Bar, "bar"},
+				{testRegexes.Baz, "baz"},
 			},
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{testRegexes.Foo, "foo"},
 				{testRegexes.Bar, "bar"},
 				{testRegexes.Baz, "baz"},
@@ -220,21 +207,19 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		// },
 		{
 			"flyin happy path",
-			TemplateSchemeDynamic,
 			flyinBase,
 			nil,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.Port, "1234"},
 			},
 			nil,
 		},
 		{
 			"flyin and pod happy path",
-			TemplateSchemeDynamic,
 			flyinBase,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.LogName, "main_logs"},
 				{defaultRegexes.Port, "1234"},
 				{defaultRegexes.PodName, "my-pod"},
@@ -253,12 +238,11 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		},
 		{
 			"pod with port not affected",
-			TemplateSchemePod,
 			podBase,
 			nil,
 			nil,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.Port, "1234"},
 			},
 		},
@@ -266,8 +250,8 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			base := tt.baseVars
-			base.ExtraTemplateVarsByScheme = tt.extraVars
-			got := base.templateVarsForScheme(tt.scheme)
+			base.ExtraTemplateVars = tt.extraVars
+			got := base.templateVarsForScheme()
 			if tt.exact != nil {
 				assert.Equal(t, got, tt.exact)
 			}
@@ -466,7 +450,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"task-with-task-execution-identifier",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeTaskExecution,
 				TemplateURIs:  []TemplateURI{"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs"},
 				MessageFormat: core.TaskLog_JSON,
 			},
@@ -498,7 +481,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"mapped-task-with-task-execution-identifier",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeTaskExecution,
 				TemplateURIs:  []TemplateURI{"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .subtaskParentRetryAttempt }}/mappedIndex/{{ .subtaskExecutionIndex }}/mappedAttempt/{{ .subtaskRetryAttempt }}/view/logs"},
 				MessageFormat: core.TaskLog_JSON,
 			},
@@ -515,12 +497,10 @@ func TestTemplateLogPlugin(t *testing.T) {
 					PodUnixStartTime:     123,
 					PodUnixFinishTime:    12345,
 					TaskExecutionID:      dummyTaskExecID(),
-					ExtraTemplateVarsByScheme: &TemplateVarsByScheme{
-						TaskExecution: TemplateVars{
-							{MustCreateRegex("subtaskExecutionIndex"), "1"},
-							{MustCreateRegex("subtaskRetryAttempt"), "1"},
-							{MustCreateRegex("subtaskParentRetryAttempt"), "0"},
-						},
+					ExtraTemplateVars: []TemplateVar{
+						{MustCreateRegex("subtaskExecutionIndex"), "1"},
+						{MustCreateRegex("subtaskRetryAttempt"), "1"},
+						{MustCreateRegex("subtaskParentRetryAttempt"), "0"},
 					},
 				},
 			},
@@ -538,7 +518,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 			"flyin",
 			TemplateLogPlugin{
 				Name:                "vscode",
-				Scheme:              TemplateSchemeDynamic,
 				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 			},
@@ -593,7 +572,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 			"flyin - no link_type in task template",
 			TemplateLogPlugin{
 				Name:                "vscode",
-				Scheme:              TemplateSchemeDynamic,
 				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 				DisplayName:         "Flyin Logs",

@@ -457,13 +457,13 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	input := tasklog.Input{
-		Namespace:                 rayJob.Namespace,
-		TaskExecutionID:           taskExecID,
-		ExtraTemplateVarsByScheme: &tasklog.TemplateVarsByScheme{},
+		Namespace:         rayJob.Namespace,
+		TaskExecutionID:   taskExecID,
+		ExtraTemplateVars: []tasklog.TemplateVar{},
 	}
 	if rayJob.Status.JobId != "" {
-		input.ExtraTemplateVarsByScheme.Common = append(
-			input.ExtraTemplateVarsByScheme.Common,
+		input.ExtraTemplateVars = append(
+			input.ExtraTemplateVars,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayJobID,
 				Value: rayJob.Status.JobId,
@@ -471,8 +471,8 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		)
 	}
 	if rayJob.Status.RayClusterName != "" {
-		input.ExtraTemplateVarsByScheme.Common = append(
-			input.ExtraTemplateVarsByScheme.Common,
+		input.ExtraTemplateVars = append(
+			input.ExtraTemplateVars,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayClusterName,
 				Value: rayJob.Status.RayClusterName,

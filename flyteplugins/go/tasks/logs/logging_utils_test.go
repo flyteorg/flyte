@@ -334,7 +334,6 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 					"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs",
 				},
 				MessageFormat: core.TaskLog_JSON,
-				Scheme:        tasklog.TemplateSchemeTaskExecution,
 			},
 		},
 	}, nil, []*core.TaskLog{

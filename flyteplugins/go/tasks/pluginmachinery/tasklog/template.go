@@ -73,7 +73,7 @@ func initDefaultRegexes() templateRegexes {
 
 var defaultRegexes = initDefaultRegexes()
 
-func replaceAll(template string, vars TemplateVars) string {
+func replaceAll(template string, vars []TemplateVar) string {
 	for _, v := range vars {
 		if len(v.Value) > 0 {
 			template = v.Regex.ReplaceAllLiteralString(template, v.Value)
@@ -82,14 +82,14 @@ func replaceAll(template string, vars TemplateVars) string {
 	return template
 }
 
-func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
-	vars := TemplateVars{
-		{defaultRegexes.LogName, input.LogName},
+func (input Input) templateVarsForScheme() []TemplateVar {
+	vars := []TemplateVar{
+		TemplateVar{defaultRegexes.LogName, input.LogName},
 	}
 
-	gotExtraTemplateVars := input.ExtraTemplateVarsByScheme != nil
+	gotExtraTemplateVars := input.ExtraTemplateVars != nil
 	if gotExtraTemplateVars {
-		vars = append(vars, input.ExtraTemplateVarsByScheme.Common...)
+		vars = append(vars, input.ExtraTemplateVars...)
 	}
 
 	port := input.TaskTemplate.GetConfig()["port"]
@@ -117,7 +117,7 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 		TemplateVar{defaultRegexes.Hostname, input.HostName},
 	)
 	if gotExtraTemplateVars {
-		vars = append(vars, input.ExtraTemplateVarsByScheme.Pod...)
+		vars = append(vars, input.ExtraTemplateVars...)
 	}
 	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
@@ -176,7 +176,7 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 		}
 	}
 	if gotExtraTemplateVars {
-		vars = append(vars, input.ExtraTemplateVarsByScheme.TaskExecution...)
+		vars = append(vars, input.ExtraTemplateVars...)
 	}
 
 	vars = append(
@@ -212,7 +212,7 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
-	templateVars := input.templateVarsForScheme(p.Scheme)
+	templateVars := input.templateVarsForScheme()
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
