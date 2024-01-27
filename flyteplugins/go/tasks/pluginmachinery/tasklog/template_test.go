@@ -43,19 +43,23 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 	return tID
 }
 
-func Test_Input_templateVarsForScheme(t *testing.T) {
+func Test_Input_templateVars(t *testing.T) {
 	testRegexes := struct {
-		Foo  *regexp.Regexp
-		Bar  *regexp.Regexp
-		Baz  *regexp.Regexp
-		Ham  *regexp.Regexp
-		Spam *regexp.Regexp
+		Foo      *regexp.Regexp
+		Bar      *regexp.Regexp
+		Baz      *regexp.Regexp
+		Ham      *regexp.Regexp
+		Spam     *regexp.Regexp
+		LinkType *regexp.Regexp
+		Port     *regexp.Regexp
 	}{
 		MustCreateRegex("foo"),
 		MustCreateRegex("bar"),
 		MustCreateRegex("baz"),
 		MustCreateRegex("ham"),
 		MustCreateRegex("spam"),
+		MustCreateDynamicLogRegex("link_type"),
+		MustCreateDynamicLogRegex("port"),
 	}
 	podBase := Input{
 		HostName:             "my-host",
@@ -93,7 +97,8 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		PodUnixFinishTime:    12345,
 		TaskTemplate: &core.TaskTemplate{
 			Config: map[string]string{
-				"port": "1234",
+				"link_type": "vscode",
+				"port":      "1234",
 			},
 		},
 	}
@@ -188,30 +193,13 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			},
 			nil,
 		},
-		// {
-		// 	"task execution with unused extra vars",
-		// 	TemplateSchemeTaskExecution,
-		// 	taskExecutionBase,
-		// 	&TemplateVarsByScheme{
-		// 		Pod: TemplateVars{
-		// 			{testRegexes.Bar, "bar"},
-		// 			{testRegexes.Baz, "baz"},
-		// 		},
-		// 	},
-		// 	nil,
-		// 	nil,
-		// 	TemplateVars{
-		// 		{testRegexes.Bar, "bar"},
-		// 		{testRegexes.Baz, "baz"},
-		// 	},
-		// },
 		{
 			"flyin happy path",
 			flyinBase,
 			nil,
 			nil,
 			[]TemplateVar{
-				{defaultRegexes.Port, "1234"},
+				{testRegexes.Port, "1234"},
 			},
 			nil,
 		},
@@ -221,7 +209,6 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			nil,
 			[]TemplateVar{
 				{defaultRegexes.LogName, "main_logs"},
-				{defaultRegexes.Port, "1234"},
 				{defaultRegexes.PodName, "my-pod"},
 				{defaultRegexes.PodUID, "my-pod-uid"},
 				{defaultRegexes.Namespace, "my-namespace"},
@@ -232,6 +219,8 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
 				{defaultRegexes.PodUnixStartTime, "123"},
 				{defaultRegexes.PodUnixFinishTime, "12345"},
+				{testRegexes.LinkType, "vscode"},
+				{testRegexes.Port, "1234"},
 			},
 			nil,
 			nil,
@@ -243,7 +232,7 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			nil,
 			nil,
 			[]TemplateVar{
-				{defaultRegexes.Port, "1234"},
+				{testRegexes.Port, "1234"},
 			},
 		},
 	}
@@ -251,7 +240,7 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			base := tt.baseVars
 			base.ExtraTemplateVars = tt.extraVars
-			got := base.templateVarsForScheme()
+			got := base.templateVars()
 			if tt.exact != nil {
 				assert.Equal(t, got, tt.exact)
 			}

@@ -41,7 +41,6 @@ type templateRegexes struct {
 	ExecutionProject     *regexp.Regexp
 	ExecutionDomain      *regexp.Regexp
 	GeneratedName        *regexp.Regexp
-	Port                 *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -67,7 +66,6 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionProject"),
 		MustCreateRegex("executionDomain"),
 		MustCreateRegex("generatedName"),
-		MustCreateDynamicLogRegex("port"),
 	}
 }
 
@@ -82,7 +80,7 @@ func replaceAll(template string, vars []TemplateVar) string {
 	return template
 }
 
-func (input Input) templateVarsForScheme() []TemplateVar {
+func (input Input) templateVars() []TemplateVar {
 	vars := []TemplateVar{
 		TemplateVar{defaultRegexes.LogName, input.LogName},
 	}
@@ -90,14 +88,6 @@ func (input Input) templateVarsForScheme() []TemplateVar {
 	gotExtraTemplateVars := input.ExtraTemplateVars != nil
 	if gotExtraTemplateVars {
 		vars = append(vars, input.ExtraTemplateVars...)
-	}
-
-	port := input.TaskTemplate.GetConfig()["port"]
-	if port != "" {
-		vars = append(
-			vars,
-			TemplateVar{defaultRegexes.Port, port},
-		)
 	}
 
 	// Container IDs are prefixed with docker://, cri-o://, etc. which is stripped by fluentd before pushing to a log
@@ -193,6 +183,13 @@ func (input Input) templateVarsForScheme() []TemplateVar {
 		},
 	)
 
+	// Add values from task template config as dynamic regexes (i.e. templates prefixed by .taskConfig)
+	for key, value := range input.TaskTemplate.GetConfig() {
+		if value != "" {
+			vars = append(vars, TemplateVar{MustCreateDynamicLogRegex(key), value})
+		}
+	}
+
 	return vars
 }
 
@@ -212,7 +209,7 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 }
 
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
-	templateVars := input.templateVarsForScheme()
+	templateVars := input.templateVars()
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
