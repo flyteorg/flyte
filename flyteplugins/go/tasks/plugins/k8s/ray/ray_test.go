@@ -738,7 +738,6 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 				TemplateURIs: []tasklog.TemplateURI{
 					"http://test/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}",
 				},
-				Scheme: tasklog.TemplateSchemeTaskExecution,
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
@@ -823,7 +822,6 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 			dashboardURLTemplate: tasklog.TemplateLogPlugin{
 				DisplayName:  "Ray Dashboard",
 				TemplateURIs: []tasklog.TemplateURI{"http://test/{{.generatedName}}"},
-				Scheme:       tasklog.TemplateSchemeTaskExecution,
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
