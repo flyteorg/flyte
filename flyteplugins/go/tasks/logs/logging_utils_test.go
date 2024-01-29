@@ -389,6 +389,27 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 			nil,
 		},
 		{
+			"Flyteinteractive - multiple uses of the template (invalid use of ports in a URI)",
+			&LogConfig{
+				DynamicLogLinks: map[string]tasklog.TemplateURI{
+					"vscode": "https://abc.com:{{ .taskConfig.port }}:{{ .taskConfig.port}}",
+				},
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type": "vscode",
+					"port":      "65535",
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "https://abc.com:65535:65535",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "vscode logs my-Suffix",
+				},
+			},
+		},
+		{
 			"Flyteinteractive disabled and K8s enabled and flyteinteractive config present in TaskTemplate",
 			&LogConfig{
 				IsKubernetesEnabled:   true,
