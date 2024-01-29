@@ -452,10 +452,10 @@ func TestTemplateLogPlugin(t *testing.T) {
 			},
 		},
 		{
-			"flyin",
+			"flyteinteractive",
 			TemplateLogPlugin{
 				Name:                "vscode",
-				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
 			},
 			args{
@@ -472,19 +472,19 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "vscode://flyin:1234/my-pod-name",
+						Uri:           "vscode://flyteinteractive:1234/my-pod-name",
 						MessageFormat: core.TaskLog_JSON,
 					},
 				},
 			},
 		},
 		{
-			"flyin - no link_type in task template",
+			"flyteinteractive - no link_type in task template",
 			TemplateLogPlugin{
 				Name:                "vscode",
-				DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
 				MessageFormat:       core.TaskLog_JSON,
-				DisplayName:         "Flyin Logs",
+				DisplayName:         "Flyteinteractive Logs",
 			},
 			args{
 				input: Input{

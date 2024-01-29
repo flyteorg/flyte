@@ -15,6 +15,8 @@ func MustCreateRegex(varName string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*[\.$]%s\s*}}`, varName))
 }
 
+var dynamicLogRegex = regexp.MustCompile(`(?i){{\s*.taskConfig[\.$]([a-zA-Z_]+)\s*}}`)
+
 func MustCreateDynamicLogRegex(varName string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*.taskConfig[\.$]%s\s*}}`, varName))
 }
@@ -106,9 +108,6 @@ func (input Input) templateVars() []TemplateVar {
 		TemplateVar{defaultRegexes.ContainerID, containerID},
 		TemplateVar{defaultRegexes.Hostname, input.HostName},
 	)
-	if gotExtraTemplateVars {
-		vars = append(vars, input.ExtraTemplateVars...)
-	}
 	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
 		vars = append(
@@ -165,9 +164,6 @@ func (input Input) templateVars() []TemplateVar {
 			)
 		}
 	}
-	if gotExtraTemplateVars {
-		vars = append(vars, input.ExtraTemplateVars...)
-	}
 
 	vars = append(
 		vars,
@@ -211,9 +207,6 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			MessageFormat: p.MessageFormat,
 		})
 	}
-
-	// Compile the potential dynamic log links
-    dynamicLogRegex := regexp.MustCompile(`(?i){{\s*.taskConfig[\.$]([a-zA-Z_]+)\s*}}`)
 
 	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
