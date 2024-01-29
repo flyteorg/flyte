@@ -183,13 +183,6 @@ func (input Input) templateVars() []TemplateVar {
 		},
 	)
 
-	// Add values from task template config as dynamic regexes (i.e. templates prefixed by .taskConfig)
-	for key, value := range input.TaskTemplate.GetConfig() {
-		if value != "" {
-			vars = append(vars, TemplateVar{MustCreateDynamicLogRegex(key), value})
-		}
-	}
-
 	return vars
 }
 
@@ -219,9 +212,20 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 		})
 	}
 
+	// Compile the potential dynamic log links
+    dynamicLogRegex := regexp.MustCompile(`(?i){{\s*.taskConfig[\.$]([a-zA-Z_]+)\s*}}`)
+
 	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
 			if p.Name == dynamicLogLinkType {
+				for _, match := range dynamicLogRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
+					if len(match) > 1 {
+						value := input.TaskTemplate.GetConfig()[match[1]]
+						if value != "" {
+							templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
+						}
+					}
+				}
 				taskLogs = append(taskLogs, &core.TaskLog{
 					Uri:           replaceAll(dynamicTemplateURI, templateVars),
 					Name:          p.DisplayName + input.LogName,

@@ -83,26 +83,6 @@ func Test_Input_templateVars(t *testing.T) {
 		PodUnixFinishTime:    12345,
 	}
 
-	flyinBase := Input{
-		HostName:             "my-host",
-		PodName:              "my-pod",
-		PodUID:               "my-pod-uid",
-		Namespace:            "my-namespace",
-		ContainerName:        "my-container",
-		ContainerID:          "docker://containerID",
-		LogName:              "main_logs",
-		PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
-		PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
-		PodUnixStartTime:     123,
-		PodUnixFinishTime:    12345,
-		TaskTemplate: &core.TaskTemplate{
-			Config: map[string]string{
-				"link_type": "vscode",
-				"port":      "1234",
-			},
-		},
-	}
-
 	tests := []struct {
 		name        string
 		baseVars    Input
@@ -191,38 +171,6 @@ func Test_Input_templateVars(t *testing.T) {
 				{testRegexes.Bar, "bar"},
 				{testRegexes.Baz, "baz"},
 			},
-			nil,
-		},
-		{
-			"flyin happy path",
-			flyinBase,
-			nil,
-			nil,
-			[]TemplateVar{
-				{testRegexes.Port, "1234"},
-			},
-			nil,
-		},
-		{
-			"flyin and pod happy path",
-			flyinBase,
-			nil,
-			[]TemplateVar{
-				{defaultRegexes.LogName, "main_logs"},
-				{defaultRegexes.PodName, "my-pod"},
-				{defaultRegexes.PodUID, "my-pod-uid"},
-				{defaultRegexes.Namespace, "my-namespace"},
-				{defaultRegexes.ContainerName, "my-container"},
-				{defaultRegexes.ContainerID, "containerID"},
-				{defaultRegexes.Hostname, "my-host"},
-				{defaultRegexes.PodRFC3339StartTime, "1970-01-01T01:02:03+01:00"},
-				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
-				{defaultRegexes.PodUnixStartTime, "123"},
-				{defaultRegexes.PodUnixFinishTime, "12345"},
-				{testRegexes.LinkType, "vscode"},
-				{testRegexes.Port, "1234"},
-			},
-			nil,
 			nil,
 		},
 		{
@@ -530,33 +478,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 				},
 			},
 		},
-		// {
-		// 	"flyin - default port",
-		// 	TemplateLogPlugin{
-		// 		Name:                "vscode",
-		// 		Scheme:              TemplateSchemeDynamic,
-		// 		DynamicTemplateURIs: []TemplateURI{"vscode://flyin:{{ .taskConfig.port }}/{{ .podName }}"},
-		// 		MessageFormat:       core.TaskLog_JSON,
-		// 	},
-		// 	args{
-		// 		input: Input{
-		// 			PodName: "my-pod-name",
-		// 			TaskTemplate: &core.TaskTemplate{
-		// 				Config: map[string]string{
-		// 					"link_type": "vscode",
-		// 				},
-		// 			},
-		// 		},
-		// 	},
-		// 	Output{
-		// 		TaskLogs: []*core.TaskLog{
-		// 			{
-		// 				Uri:           "vscode://flyin:8080/my-pod-name",
-		// 				MessageFormat: core.TaskLog_JSON,
-		// 			},
-		// 		},
-		// 	},
-		// },
 		{
 			"flyin - no link_type in task template",
 			TemplateLogPlugin{
@@ -573,6 +494,32 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{},
 			},
+		},
+		{
+			"kubernetes",
+			TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://dashboard.k8s.net/#!/log/{{.namespace}}/{{.podName}}/pod?namespace={{.namespace}}"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					PodName:              "flyteexamples-development-task-name",
+					PodUID:               "pod-uid",
+					Namespace:            "flyteexamples-development",
+					ContainerName:        "ignore",
+					ContainerID:          "ignore",
+					LogName:              "main_logs",
+					PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+					PodUnixStartTime:     123,
+					PodUnixFinishTime:    12345,
+				},
+			},
+			Output{TaskLogs: []*core.TaskLog{{
+				Uri:           "https://dashboard.k8s.net/#!/log/flyteexamples-development/flyteexamples-development-task-name/pod?namespace=flyteexamples-development",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "main_logs",
+			}}},
 		},
 	}
 	for _, tt := range tests {
