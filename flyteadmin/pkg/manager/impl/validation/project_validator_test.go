@@ -291,7 +291,7 @@ func TestValidateProjectAndDomainError(t *testing.T) {
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project-id", "domain", "org")
 	assert.EqualError(t, err,
-		"failed to validate that project [flyte-project-id] and domain [domain] are registered, err: [foo]")
+		"failed to validate that project [flyte-project-id] and domain [domain] and org 'org' are registered, err: [foo]")
 }
 
 func TestValidateProjectAndDomainNotFound(t *testing.T) {
@@ -302,7 +302,7 @@ func TestValidateProjectAndDomainNotFound(t *testing.T) {
 	}
 	err := ValidateProjectAndDomain(context.Background(), mockRepo, testutils.GetApplicationConfigWithDefaultDomains(),
 		"flyte-project", "domain", "org")
-	assert.EqualError(t, err, "failed to validate that project [flyte-project] and domain [domain] are registered, err: [project [flyte-project] not found]")
+	assert.EqualError(t, err, "failed to validate that project [flyte-project] and domain [domain] and org 'org' are registered, err: [project [flyte-project] not found]")
 }
 
 func TestValidateProjectDb(t *testing.T) {

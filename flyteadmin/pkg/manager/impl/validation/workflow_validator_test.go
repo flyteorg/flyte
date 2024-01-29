@@ -27,7 +27,7 @@ func TestValidatWorkflowInvalidProjectAndDomain(t *testing.T) {
 	request := testutils.GetWorkflowRequest()
 	err := ValidateWorkflow(context.Background(), request, testutils.GetRepoWithDefaultProjectAndErr(errors.New("foo")),
 		workflowConfig)
-	assert.EqualError(t, err, "failed to validate that project [project] and domain [domain] are registered, err: [foo]")
+	assert.EqualError(t, err, "failed to validate that project [project] and domain [domain] and org 'org' are registered, err: [foo]")
 }
 
 func TestValidateWorkflowEmptyDomain(t *testing.T) {

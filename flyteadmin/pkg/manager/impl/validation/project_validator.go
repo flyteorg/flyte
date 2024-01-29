@@ -2,6 +2,7 @@ package validation
 
 import (
 	"context"
+	"fmt"
 
 	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/validation"
@@ -19,6 +20,15 @@ const projectDescription = "project_description"
 const maxNameLength = 64
 const maxDescriptionLength = 300
 const maxLabelArrayLength = 16
+
+const orgErrorMsg = " and org '%s'"
+
+func getOrgForErrorMsg(org string) string {
+	if len(org) == 0 {
+		return ""
+	}
+	return fmt.Sprintf(orgErrorMsg, org)
+}
 
 func ValidateProjectRegisterRequest(request admin.ProjectRegisterRequest) error {
 	if request.Project == nil {
@@ -60,8 +70,8 @@ func ValidateProjectAndDomain(
 	project, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"failed to validate that project [%s] and domain [%s] are registered, err: [%+v]",
-			projectID, domainID, err)
+			"failed to validate that project [%s] and domain [%s]%s are registered, err: [%+v]",
+			projectID, domainID, getOrgForErrorMsg(org), err)
 	}
 	if *project.State != int32(admin.Project_ACTIVE) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
@@ -87,8 +97,8 @@ func ValidateProjectForUpdate(
 	project, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"failed to validate that project [%s] is registered, err: [%+v]",
-			projectID, err)
+			"failed to validate that project [%s]%s is registered, err: [%+v]",
+			projectID, getOrgForErrorMsg(org), err)
 	}
 	if *project.State != int32(admin.Project_ACTIVE) {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
@@ -105,8 +115,8 @@ func ValidateProjectExists(
 	_, err := db.ProjectRepo().Get(ctx, projectID, org)
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"failed to validate that project [%s] exists, err: [%+v]",
-			projectID, err)
+			"failed to validate that project [%s]%s exists, err: [%+v]",
+			projectID, getOrgForErrorMsg(org), err)
 	}
 	return nil
 }
