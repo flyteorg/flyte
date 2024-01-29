@@ -10,12 +10,10 @@ import (
 )
 
 func MustCreateRegex(varName string) *regexp.Regexp {
-	// TODO: Is this regex correct? Why are we allowing $? Shouldn't it be {{\s*\.%s\s*}}?
-	// Also, case insensitive matching is enabled. Is this correct?
 	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*[\.$]%s\s*}}`, varName))
 }
 
-var dynamicLogRegex = regexp.MustCompile(`(?i){{\s*.taskConfig[\.$]([a-zA-Z_]+)\s*}}`)
+var taskConfigVarRegex = regexp.MustCompile(`(?i){{\s*.taskConfig[\.$]([a-zA-Z_]+)\s*}}`)
 
 func MustCreateDynamicLogRegex(varName string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*.taskConfig[\.$]%s\s*}}`, varName))
@@ -211,7 +209,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
 			if p.Name == dynamicLogLinkType {
-				for _, match := range dynamicLogRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
+				for _, match := range taskConfigVarRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
 					if len(match) > 1 {
 						if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {
 							templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
