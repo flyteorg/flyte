@@ -406,7 +406,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				{
 					Uri:           "https://abc.com:65535/a-route",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode logs my-Suffix",
+					Name:          "vscode my-Suffix",
 				},
 			},
 		},
@@ -427,7 +427,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				{
 					Uri:           "https://abc.com:65535:65535",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode logs my-Suffix",
+					Name:          "vscode my-Suffix",
 				},
 			},
 		},
@@ -475,7 +475,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				{
 					Uri:           "https://flyteinteractive.mydomain.com:65535/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode logs my-Suffix",
+					Name:          "vscode my-Suffix",
 				},
 			},
 		},
