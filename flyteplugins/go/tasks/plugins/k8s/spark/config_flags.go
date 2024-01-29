@@ -62,7 +62,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.mixed.gcp-project"), defaultConfig.LogConfig.Mixed.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.mixed.stackdriver-logresourcename"), defaultConfig.LogConfig.Mixed.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.mixed.stackdriver-template-uri"), defaultConfig.LogConfig.Mixed.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
-	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "logs.mixed.dynamic-log-links"), defaultConfig.LogConfig.Mixed.DynamicLogLinks, "Map of dynamic log links")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "logs.user.cloudwatch-enabled"), defaultConfig.LogConfig.User.IsCloudwatchEnabled, "Enable Cloudwatch Logging")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.user.cloudwatch-region"), defaultConfig.LogConfig.User.CloudwatchRegion, "AWS region in which Cloudwatch logs are stored.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.user.cloudwatch-log-group"), defaultConfig.LogConfig.User.CloudwatchLogGroup, "Log group to which streams are associated.")
@@ -74,7 +73,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.user.gcp-project"), defaultConfig.LogConfig.User.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.user.stackdriver-logresourcename"), defaultConfig.LogConfig.User.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.user.stackdriver-template-uri"), defaultConfig.LogConfig.User.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
-	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "logs.user.dynamic-log-links"), defaultConfig.LogConfig.User.DynamicLogLinks, "Map of dynamic log links")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "logs.system.cloudwatch-enabled"), defaultConfig.LogConfig.System.IsCloudwatchEnabled, "Enable Cloudwatch Logging")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.system.cloudwatch-region"), defaultConfig.LogConfig.System.CloudwatchRegion, "AWS region in which Cloudwatch logs are stored.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.system.cloudwatch-log-group"), defaultConfig.LogConfig.System.CloudwatchLogGroup, "Log group to which streams are associated.")
@@ -86,7 +84,6 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.system.gcp-project"), defaultConfig.LogConfig.System.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.system.stackdriver-logresourcename"), defaultConfig.LogConfig.System.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.system.stackdriver-template-uri"), defaultConfig.LogConfig.System.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
-	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "logs.system.dynamic-log-links"), defaultConfig.LogConfig.System.DynamicLogLinks, "Map of dynamic log links")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "logs.all-user.cloudwatch-enabled"), defaultConfig.LogConfig.AllUser.IsCloudwatchEnabled, "Enable Cloudwatch Logging")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.all-user.cloudwatch-region"), defaultConfig.LogConfig.AllUser.CloudwatchRegion, "AWS region in which Cloudwatch logs are stored.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.all-user.cloudwatch-log-group"), defaultConfig.LogConfig.AllUser.CloudwatchLogGroup, "Log group to which streams are associated.")
@@ -98,6 +95,5 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.all-user.gcp-project"), defaultConfig.LogConfig.AllUser.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.all-user.stackdriver-logresourcename"), defaultConfig.LogConfig.AllUser.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "logs.all-user.stackdriver-template-uri"), defaultConfig.LogConfig.AllUser.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
-	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "logs.all-user.dynamic-log-links"), defaultConfig.LogConfig.AllUser.DynamicLogLinks, "Map of dynamic log links")
 	return cmdFlags
 }

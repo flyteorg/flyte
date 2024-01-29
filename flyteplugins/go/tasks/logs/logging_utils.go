@@ -115,12 +115,10 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 		dynamicPlugins = append(
 			dynamicPlugins,
 			tasklog.TemplateLogPlugin{
-				Name:        logLinkType,
-				DisplayName: logLinkType,
-				DynamicTemplateURIs: []tasklog.TemplateURI{
-					dynamicLogLink,
-				},
-				MessageFormat: core.TaskLog_JSON,
+				Name:                logLinkType,
+				DisplayName:         dynamicLogLink.DisplayName,
+				DynamicTemplateURIs: dynamicLogLink.TemplateURIs,
+				MessageFormat:       core.TaskLog_JSON,
 			})
 	}
 

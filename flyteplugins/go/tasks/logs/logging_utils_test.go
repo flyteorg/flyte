@@ -360,8 +360,13 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 		{
 			"Flyteinteractive enabled but no task template",
 			&LogConfig{
-				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"vscode": "https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": tasklog.TemplateLogPlugin{
+						DisplayName: "vscode link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+						},
+					},
 				},
 			},
 			nil,
@@ -370,8 +375,13 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 		{
 			"Flyteinteractive enabled but config not found in task template",
 			&LogConfig{
-				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"vscode": "https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": tasklog.TemplateLogPlugin{
+						DisplayName: "vscode link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+						},
+					},
 				},
 			},
 			&core.TaskTemplate{},
@@ -391,8 +401,13 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 		{
 			"Flyteinteractive - multiple dynamic options",
 			&LogConfig{
-				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"vscode": "https://abc.com:{{ .taskConfig.port }}/{{ .taskConfig.route }}",
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": tasklog.TemplateLogPlugin{
+						DisplayName: "vscode link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"https://abc.com:{{ .taskConfig.port }}/{{ .taskConfig.route }}",
+						},
+					},
 				},
 			},
 			&core.TaskTemplate{
@@ -406,15 +421,20 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				{
 					Uri:           "https://abc.com:65535/a-route",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode my-Suffix",
+					Name:          "vscode link my-Suffix",
 				},
 			},
 		},
 		{
 			"Flyteinteractive - multiple uses of the template (invalid use of ports in a URI)",
 			&LogConfig{
-				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"vscode": "https://abc.com:{{ .taskConfig.port }}:{{ .taskConfig.port}}",
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": tasklog.TemplateLogPlugin{
+						DisplayName: "vscode link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"https://abc.com:{{ .taskConfig.port }}:{{ .taskConfig.port}}",
+						},
+					},
 				},
 			},
 			&core.TaskTemplate{
@@ -427,7 +447,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				{
 					Uri:           "https://abc.com:65535:65535",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode my-Suffix",
+					Name:          "vscode link my-Suffix",
 				},
 			},
 		},
@@ -456,8 +476,13 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 			&LogConfig{
 				IsKubernetesEnabled:   true,
 				KubernetesTemplateURI: "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
-				DynamicLogLinks: map[string]tasklog.TemplateURI{
-					"vscode": "https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": tasklog.TemplateLogPlugin{
+						DisplayName: "vscode link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"https://flyteinteractive.mydomain.com:{{ .taskConfig.port }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+						},
+					},
 				},
 			},
 			&core.TaskTemplate{
@@ -475,7 +500,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 				{
 					Uri:           "https://flyteinteractive.mydomain.com:65535/my-namespace/my-pod/ContainerName/ContainerID",
 					MessageFormat: core.TaskLog_JSON,
-					Name:          "vscode my-Suffix",
+					Name:          "vscode link my-Suffix",
 				},
 			},
 		},

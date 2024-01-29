@@ -46,7 +46,6 @@ type Plugin interface {
 }
 
 type TemplateLogPlugin struct {
-	// TODO: these don't need pflags anymore?
 	Name                string                     `json:"name" pflag:",Name of the plugin."`
 	DisplayName         string                     `json:"displayName" pflag:",Display name for the generated log when displayed in the console."`
 	TemplateURIs        []TemplateURI              `json:"templateUris" pflag:",URI Templates for generating task log links."`

@@ -61,6 +61,5 @@ func (cfg LogConfig) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "gcp-project"), DefaultConfig.GCPProjectName, "Name of the project in GCP")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stackdriver-logresourcename"), DefaultConfig.StackdriverLogResourceName, "Name of the logresource in stackdriver")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "stackdriver-template-uri"), DefaultConfig.StackDriverTemplateURI, "Template Uri to use when building stackdriver log links")
-	cmdFlags.StringToString(fmt.Sprintf("%v%v", prefix, "dynamic-log-links"), DefaultConfig.DynamicLogLinks, "Map of dynamic log links")
 	return cmdFlags
 }
