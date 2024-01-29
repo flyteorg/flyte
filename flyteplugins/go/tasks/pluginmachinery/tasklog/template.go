@@ -213,8 +213,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			if p.Name == dynamicLogLinkType {
 				for _, match := range dynamicLogRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
 					if len(match) > 1 {
-						value := input.TaskTemplate.GetConfig()[match[1]]
-						if value != "" {
+						if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {
 							templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
 						}
 					}
