@@ -1434,11 +1434,11 @@ pub struct LaunchPlanSpec {
     #[prost(message, optional, tag="2")]
     pub entity_metadata: ::core::option::Option<LaunchPlanMetadata>,
     /// Input values to be passed for the execution.
-    /// These can be overriden when an execution is created with this launch plan.
+    /// These can be overridden when an execution is created with this launch plan.
     #[prost(message, optional, tag="3")]
     pub default_inputs: ::core::option::Option<super::core::ParameterMap>,
     /// Fixed, non-overridable inputs for the Launch Plan.
-    /// These can not be overriden when an execution is created with this launch plan.
+    /// These can not be overridden when an execution is created with this launch plan.
     #[prost(message, optional, tag="4")]
     pub fixed_inputs: ::core::option::Option<super::core::LiteralMap>,
     /// String to indicate the role to use to execute the workflow underneath
@@ -2412,7 +2412,7 @@ pub struct ProjectDomainAttributesDeleteRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ProjectDomainAttributesDeleteResponse {
 }
-/// SignalGetOrCreateRequest represents a request structure to retrive or create a signal.
+/// SignalGetOrCreateRequest represents a request structure to retrieve or create a signal.
 /// See :ref:`ref_flyteidl.admin.Signal` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2871,7 +2871,7 @@ pub struct WorkflowErrorExistsIdenticalStructure {
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<super::core::Identifier>,
 }
-/// When a CreateWorkflowRequest failes due to matching id
+/// When a CreateWorkflowRequest fails due to matching id
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateWorkflowFailureReason {

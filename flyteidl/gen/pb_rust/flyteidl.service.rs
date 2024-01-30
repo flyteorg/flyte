@@ -204,7 +204,7 @@ pub struct PreSignedUrLs {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetDataRequest {
     /// A unique identifier in the form of flyte://<something> that uniquely, for a given Flyte
-    /// backend, identifies a Flyte artifact (\[i\]nput, \[o\]utput, flyte \[d\]eck, etc.).
+    /// backend, identifies a Flyte artifact (\[i\]nput, \[o\]output, flyte \[d\]eck, etc.).
     /// e.g. flyte://v1/proj/development/execid/n2/0/i (for 0th task execution attempt input)
     ///       flyte://v1/proj/development/execid/n2/i (for node execution input)
     ///       flyte://v1/proj/development/execid/n2/o/o3 (the o3 output of the second node)

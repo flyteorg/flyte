@@ -187,7 +187,7 @@ pub struct ReservationId {
     #[prost(string, tag="2")]
     pub tag_name: ::prost::alloc::string::String,
 }
-/// Try to acquire or extend an artifact reservation. If an active reservation exists, retreive that instance.
+/// Try to acquire or extend an artifact reservation. If an active reservation exists, retrieve that instance.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetOrExtendReservationRequest {

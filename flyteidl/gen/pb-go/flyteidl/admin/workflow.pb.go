@@ -410,7 +410,7 @@ func (m *WorkflowErrorExistsIdenticalStructure) GetId() *core.Identifier {
 	return nil
 }
 
-// When a CreateWorkflowRequest failes due to matching id
+// When a CreateWorkflowRequest fails due to matching id
 type CreateWorkflowFailureReason struct {
 	// Types that are valid to be assigned to Reason:
 	//	*CreateWorkflowFailureReason_ExistsDifferentStructure

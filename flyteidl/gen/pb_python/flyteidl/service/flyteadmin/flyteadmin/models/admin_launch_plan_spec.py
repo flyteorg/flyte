@@ -181,7 +181,7 @@ class AdminLaunchPlanSpec(object):
     def default_inputs(self):
         """Gets the default_inputs of this AdminLaunchPlanSpec.  # noqa: E501
 
-        Input values to be passed for the execution. These can be overriden when an execution is created with this launch plan.  # noqa: E501
+        Input values to be passed for the execution. These can be overridden when an execution is created with this launch plan.  # noqa: E501
 
         :return: The default_inputs of this AdminLaunchPlanSpec.  # noqa: E501
         :rtype: CoreParameterMap
@@ -192,7 +192,7 @@ class AdminLaunchPlanSpec(object):
     def default_inputs(self, default_inputs):
         """Sets the default_inputs of this AdminLaunchPlanSpec.
 
-        Input values to be passed for the execution. These can be overriden when an execution is created with this launch plan.  # noqa: E501
+        Input values to be passed for the execution. These can be overridden when an execution is created with this launch plan.  # noqa: E501
 
         :param default_inputs: The default_inputs of this AdminLaunchPlanSpec.  # noqa: E501
         :type: CoreParameterMap
@@ -204,7 +204,7 @@ class AdminLaunchPlanSpec(object):
     def fixed_inputs(self):
         """Gets the fixed_inputs of this AdminLaunchPlanSpec.  # noqa: E501
 
-        Fixed, non-overridable inputs for the Launch Plan. These can not be overriden when an execution is created with this launch plan.  # noqa: E501
+        Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.  # noqa: E501
 
         :return: The fixed_inputs of this AdminLaunchPlanSpec.  # noqa: E501
         :rtype: CoreLiteralMap
@@ -215,7 +215,7 @@ class AdminLaunchPlanSpec(object):
     def fixed_inputs(self, fixed_inputs):
         """Sets the fixed_inputs of this AdminLaunchPlanSpec.
 
-        Fixed, non-overridable inputs for the Launch Plan. These can not be overriden when an execution is created with this launch plan.  # noqa: E501
+        Fixed, non-overridable inputs for the Launch Plan. These can not be overridden when an execution is created with this launch plan.  # noqa: E501
 
         :param fixed_inputs: The fixed_inputs of this AdminLaunchPlanSpec.  # noqa: E501
         :type: CoreLiteralMap
