@@ -160,8 +160,6 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
 	// https://github.com/kubernetes/enhancements/issues/362
-	delete(resources.Requests, v1.ResourceStorage)
-	delete(resources.Limits, v1.ResourceStorage)
 
 	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
 	shouldAdjustGPU := false

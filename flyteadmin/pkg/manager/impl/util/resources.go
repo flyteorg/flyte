@@ -66,10 +66,6 @@ func fromAdminProtoTaskResourceSpec(ctx context.Context, spec *admin.TaskResourc
 		result.Memory = parseQuantityNoError(ctx, "project", "memory", spec.Memory)
 	}
 
-	if len(spec.Storage) > 0 {
-		result.Storage = parseQuantityNoError(ctx, "project", "storage", spec.Storage)
-	}
-
 	if len(spec.EphemeralStorage) > 0 {
 		result.EphemeralStorage = parseQuantityNoError(ctx, "project", "ephemeral storage", spec.EphemeralStorage)
 	}
