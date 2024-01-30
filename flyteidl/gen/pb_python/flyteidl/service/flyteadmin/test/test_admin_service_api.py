@@ -197,20 +197,6 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
-    def test_get_dynamic_node_workflow(self):
-        """Test case for get_dynamic_node_workflow
-
-        Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
-        """
-        pass
-
-    def test_get_dynamic_node_workflow2(self):
-        """Test case for get_dynamic_node_workflow2
-
-        Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
-        """
-        pass
-
     def test_get_execution(self):
         """Test case for get_execution
 

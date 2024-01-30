@@ -49358,39 +49358,6 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AdminService#getDynamicNodeWorkflow}.
-                 * @memberof flyteidl.service.AdminService
-                 * @typedef GetDynamicNodeWorkflowCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.DynamicNodeWorkflowResponse} [response] DynamicNodeWorkflowResponse
-                 */
-    
-                /**
-                 * Calls GetDynamicNodeWorkflow.
-                 * @function getDynamicNodeWorkflow
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest} request GetDynamicNodeWorkflowRequest message or plain object
-                 * @param {flyteidl.service.AdminService.GetDynamicNodeWorkflowCallback} callback Node-style callback called with the error, if any, and DynamicNodeWorkflowResponse
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(AdminService.prototype.getDynamicNodeWorkflow = function getDynamicNodeWorkflow(request, callback) {
-                    return this.rpcCall(getDynamicNodeWorkflow, $root.flyteidl.admin.GetDynamicNodeWorkflowRequest, $root.flyteidl.admin.DynamicNodeWorkflowResponse, request, callback);
-                }, "name", { value: "GetDynamicNodeWorkflow" });
-    
-                /**
-                 * Calls GetDynamicNodeWorkflow.
-                 * @function getDynamicNodeWorkflow
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IGetDynamicNodeWorkflowRequest} request GetDynamicNodeWorkflowRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.DynamicNodeWorkflowResponse>} Promise
-                 * @variation 2
-                 */
-    
-                /**
                  * Callback as used by {@link flyteidl.service.AdminService#listNodeExecutions}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef ListNodeExecutionsCallback

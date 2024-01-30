@@ -2251,206 +2251,6 @@ func (a *AdminServiceApiService) GetDescriptionEntity2(ctx context.Context, idOr
 }
 
 /* 
-AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
- * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param idExecutionIdProject Name of the project the resource belongs to.
- * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param idExecutionIdName User or system provided value for the resource.
- * @param idNodeId
- * @param optional nil or *GetDynamicNodeWorkflowOpts - Optional Parameters:
-     * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
-
-@return AdminDynamicNodeWorkflowResponse
-*/
-
-type GetDynamicNodeWorkflowOpts struct { 
-	IdExecutionIdOrg optional.String
-}
-
-func (a *AdminServiceApiService) GetDynamicNodeWorkflow(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetDynamicNodeWorkflowOpts) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
-	var (
-		localVarHttpMethod = strings.ToUpper("Get")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
-		localVarReturnValue AdminDynamicNodeWorkflowResponse
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow"
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.node_id"+"}", fmt.Sprintf("%v", idNodeId), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	if localVarOptionals != nil && localVarOptionals.IdExecutionIdOrg.IsSet() {
-		localVarQueryParams.Add("id.execution_id.org", parameterToString(localVarOptionals.IdExecutionIdOrg.Value(), ""))
-	}
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHttpResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHttpResponse == nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
-	localVarHttpResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	if localVarHttpResponse.StatusCode < 300 {
-		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
-	}
-
-	if localVarHttpResponse.StatusCode >= 300 {
-		newErr := GenericSwaggerError{
-			body: localVarBody,
-			error: localVarHttpResponse.Status,
-		}
-		
-		if localVarHttpResponse.StatusCode == 200 {
-			var v AdminDynamicNodeWorkflowResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		return localVarReturnValue, localVarHttpResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHttpResponse, nil
-}
-
-/* 
-AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
- * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param idExecutionIdOrg Optional, org key applied to the resource.
- * @param idExecutionIdProject Name of the project the resource belongs to.
- * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param idExecutionIdName User or system provided value for the resource.
- * @param idNodeId
-
-@return AdminDynamicNodeWorkflowResponse
-*/
-func (a *AdminServiceApiService) GetDynamicNodeWorkflow2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
-	var (
-		localVarHttpMethod = strings.ToUpper("Get")
-		localVarPostBody   interface{}
-		localVarFileName   string
-		localVarFileBytes  []byte
-		localVarReturnValue AdminDynamicNodeWorkflowResponse
-	)
-
-	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow"
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.name"+"}", fmt.Sprintf("%v", idExecutionIdName), -1)
-	localVarPath = strings.Replace(localVarPath, "{"+"id.node_id"+"}", fmt.Sprintf("%v", idNodeId), -1)
-
-	localVarHeaderParams := make(map[string]string)
-	localVarQueryParams := url.Values{}
-	localVarFormParams := url.Values{}
-
-	// to determine the Content-Type header
-	localVarHttpContentTypes := []string{"application/json"}
-
-	// set Content-Type header
-	localVarHttpContentType := selectHeaderContentType(localVarHttpContentTypes)
-	if localVarHttpContentType != "" {
-		localVarHeaderParams["Content-Type"] = localVarHttpContentType
-	}
-
-	// to determine the Accept header
-	localVarHttpHeaderAccepts := []string{"application/json"}
-
-	// set Accept header
-	localVarHttpHeaderAccept := selectHeaderAccept(localVarHttpHeaderAccepts)
-	if localVarHttpHeaderAccept != "" {
-		localVarHeaderParams["Accept"] = localVarHttpHeaderAccept
-	}
-	r, err := a.client.prepareRequest(ctx, localVarPath, localVarHttpMethod, localVarPostBody, localVarHeaderParams, localVarQueryParams, localVarFormParams, localVarFileName, localVarFileBytes)
-	if err != nil {
-		return localVarReturnValue, nil, err
-	}
-
-	localVarHttpResponse, err := a.client.callAPI(r)
-	if err != nil || localVarHttpResponse == nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	localVarBody, err := ioutil.ReadAll(localVarHttpResponse.Body)
-	localVarHttpResponse.Body.Close()
-	if err != nil {
-		return localVarReturnValue, localVarHttpResponse, err
-	}
-
-	if localVarHttpResponse.StatusCode < 300 {
-		// If we succeed, return the data, otherwise pass on to decode error.
-		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
-	}
-
-	if localVarHttpResponse.StatusCode >= 300 {
-		newErr := GenericSwaggerError{
-			body: localVarBody,
-			error: localVarHttpResponse.Status,
-		}
-		
-		if localVarHttpResponse.StatusCode == 200 {
-			var v AdminDynamicNodeWorkflowResponse
-			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-				if err != nil {
-					newErr.error = err.Error()
-					return localVarReturnValue, localVarHttpResponse, newErr
-				}
-				newErr.model = v
-				return localVarReturnValue, localVarHttpResponse, newErr
-		}
-		
-		return localVarReturnValue, localVarHttpResponse, newErr
-	}
-
-	return localVarReturnValue, localVarHttpResponse, nil
-}
-
-/* 
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
@@ -3375,15 +3175,15 @@ func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceTyp
 /* 
 AdminServiceApiService Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required
  * @param idOrg Optional, org key applied to the resource.
+ * @param resourceType Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
 
 @return AdminNamedEntity
 */
-func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string) (AdminNamedEntity, *http.Response, error) {
+func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, idOrg string, resourceType string, idProject string, idDomain string, idName string) (AdminNamedEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3393,9 +3193,9 @@ func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, resourceTy
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"
-	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -3793,7 +3593,7 @@ func (a *AdminServiceApiService) GetNodeExecutionData2(ctx context.Context, idEx
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
@@ -4897,7 +4697,7 @@ func (a *AdminServiceApiService) GetTaskExecutionData2(ctx context.Context, idNo
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdDomain), -1)
@@ -5864,8 +5664,8 @@ func (a *AdminServiceApiService) ListDescriptionEntities(ctx context.Context, re
 /* 
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idOrg Optional, org key applied to the resource.
+ * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
@@ -5887,7 +5687,7 @@ type ListDescriptionEntities2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListDescriptionEntities2Opts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, idOrg string, resourceType string, idProject string, idDomain string, idName string, localVarOptionals *ListDescriptionEntities2Opts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5897,9 +5697,9 @@ func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, r
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"
-	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)
@@ -6122,8 +5922,8 @@ func (a *AdminServiceApiService) ListDescriptionEntities3(ctx context.Context, r
 /* 
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idOrg Optional, org key applied to the resource.
+ * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param optional nil or *ListDescriptionEntities4Opts - Optional Parameters:
@@ -6146,7 +5946,7 @@ type ListDescriptionEntities4Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities4Opts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, idOrg string, resourceType string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities4Opts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6156,9 +5956,9 @@ func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, r
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}"
-	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 
@@ -7589,8 +7389,8 @@ func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resource
 /* 
 AdminServiceApiService Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required
  * @param org Optional, org key applied to the resource.
+ * @param resourceType Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project.
  * @param optional nil or *ListNamedEntities2Opts - Optional Parameters:
@@ -7611,7 +7411,7 @@ type ListNamedEntities2Opts struct {
 	Filters optional.String
 }
 
-func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, resourceType string, org string, project string, domain string, localVarOptionals *ListNamedEntities2Opts) (AdminNamedEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, org string, resourceType string, project string, domain string, localVarOptionals *ListNamedEntities2Opts) (AdminNamedEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7621,9 +7421,9 @@ func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, resourc
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}"
-	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
 
@@ -8165,7 +7965,7 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask2(ctx context.Context,
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
 	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdDomain), -1)
@@ -11487,8 +11287,8 @@ func (a *AdminServiceApiService) UpdateNamedEntity(ctx context.Context, resource
 /* 
 AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param resourceType Resource type of the metadata to update +required
  * @param idOrg Optional, org key applied to the resource.
+ * @param resourceType Resource type of the metadata to update +required
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
@@ -11496,7 +11296,7 @@ AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60;
 
 @return AdminNamedEntityUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, body AdminNamedEntityUpdateRequest) (AdminNamedEntityUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, idOrg string, resourceType string, idProject string, idDomain string, idName string, body AdminNamedEntityUpdateRequest) (AdminNamedEntityUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11506,9 +11306,9 @@ func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourc
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"
-	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
+	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
+	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.name"+"}", fmt.Sprintf("%v", idName), -1)

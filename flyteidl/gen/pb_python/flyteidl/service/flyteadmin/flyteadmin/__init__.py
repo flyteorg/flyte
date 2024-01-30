@@ -34,7 +34,6 @@ from flyteadmin.models.admin_description_entity import AdminDescriptionEntity
 from flyteadmin.models.admin_description_entity_list import AdminDescriptionEntityList
 from flyteadmin.models.admin_description_format import AdminDescriptionFormat
 from flyteadmin.models.admin_domain import AdminDomain
-from flyteadmin.models.admin_dynamic_node_workflow_response import AdminDynamicNodeWorkflowResponse
 from flyteadmin.models.admin_email_notification import AdminEmailNotification
 from flyteadmin.models.admin_envs import AdminEnvs
 from flyteadmin.models.admin_execution import AdminExecution
