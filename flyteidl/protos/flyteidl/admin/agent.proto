@@ -5,6 +5,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
+import "flyteidl/core/workflow.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/metrics.proto";
@@ -18,12 +19,6 @@ enum State {
   PENDING = 2;
   RUNNING = 3;
   SUCCEEDED = 4;
-}
-
-// TaskOverrides is a set of overrides that can be applied to a task.
-message TaskOverrides {
-  core.Resources resources = 1;
-  core.ExtendedResources extended_resources = 2;
 }
 
 // Represents a subset of runtime task execution metadata that are relevant to external plugins.
@@ -43,18 +38,27 @@ message TaskExecutionMetadata {
   int32 max_attempts = 7;
   bool interruptible = 8;
   int32 interruptible_failure_threshold = 9;
-  TaskOverrides overrides = 10;
+  core.TaskNodeOverrides overrides = 10;
 }
 
 // Represents a request structure to create task.
 message CreateTaskRequest {
-  oneof part {
-    CreateRequestHeader header = 1;
-    // The inputs required to start the execution. All required inputs must be
-    // included in this map. If not required and not provided, defaults apply.
-    // +optional
-    core.LiteralMap inputs = 2;
-  }
+  // The inputs required to start the execution. All required inputs must be
+  // included in this map. If not required and not provided, defaults apply.
+  // +optional
+  core.LiteralMap inputs = 1;
+  // Template of the task that encapsulates all the metadata of the task.
+  core.TaskTemplate template = 2;
+  // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+  string output_prefix = 3;
+  // subset of runtime task execution metadata.
+  TaskExecutionMetadata task_execution_metadata = 4;
+}
+
+// Represents a create response structure.
+message CreateTaskResponse {
+  // ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  bytes resource_meta = 1;
 }
 
 message CreateRequestHeader {
@@ -68,11 +72,6 @@ message CreateRequestHeader {
   int64 max_dataset_size_bytes = 4;
 }
 
-// Represents a create response structure.
-message CreateTaskResponse {
-  // ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-  bytes resource_meta = 1;
-}
 
 message ExecuteTaskSyncRequest {
   oneof part {
@@ -94,7 +93,6 @@ message ExecuteTaskSyncResponse {
   }
 }
 
-
 // A message used to fetch a job resource from flyte agent server.
 message GetTaskRequest {
   // A predefined yet extensible Task type identifier.
@@ -105,14 +103,10 @@ message GetTaskRequest {
 
 // Response to get an individual task resource.
 message GetTaskResponse {
-  oneof part {
-    GetTaskResponseHeader header = 1;
-    core.LiteralMap outputs = 2;
-  }
-}
-
-message GetTaskResponseHeader {
   Resource resource = 1;
+
+  // log information for the task execution
+  repeated core.TaskLog log_links = 2;
 }
 
 message Resource {
