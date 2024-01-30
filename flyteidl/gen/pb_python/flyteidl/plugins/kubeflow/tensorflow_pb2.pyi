@@ -7,16 +7,18 @@ from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Opti
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class DistributedTensorflowTrainingTask(_message.Message):
-    __slots__ = ["worker_replicas", "ps_replicas", "chief_replicas", "run_policy"]
+    __slots__ = ["worker_replicas", "ps_replicas", "chief_replicas", "run_policy", "evaluator_replicas"]
     WORKER_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     PS_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     CHIEF_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     RUN_POLICY_FIELD_NUMBER: _ClassVar[int]
+    EVALUATOR_REPLICAS_FIELD_NUMBER: _ClassVar[int]
     worker_replicas: DistributedTensorflowTrainingReplicaSpec
     ps_replicas: DistributedTensorflowTrainingReplicaSpec
     chief_replicas: DistributedTensorflowTrainingReplicaSpec
     run_policy: _common_pb2.RunPolicy
-    def __init__(self, worker_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ..., ps_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ..., chief_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ..., run_policy: _Optional[_Union[_common_pb2.RunPolicy, _Mapping]] = ...) -> None: ...
+    evaluator_replicas: DistributedTensorflowTrainingReplicaSpec
+    def __init__(self, worker_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ..., ps_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ..., chief_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ..., run_policy: _Optional[_Union[_common_pb2.RunPolicy, _Mapping]] = ..., evaluator_replicas: _Optional[_Union[DistributedTensorflowTrainingReplicaSpec, _Mapping]] = ...) -> None: ...
 
 class DistributedTensorflowTrainingReplicaSpec(_message.Message):
     __slots__ = ["replicas", "image", "resources", "restart_policy"]

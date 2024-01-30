@@ -9,14 +9,14 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 const project, domain, name = "project", "domain", "execution name"
@@ -49,7 +49,7 @@ func insertTasksForTests(t *testing.T, client service.AdminServiceClient) {
 					}
 
 					_, err := client.CreateTask(ctx, &req)
-					assert.Nil(t, err)
+					require.NoError(t, err)
 				}
 			}
 		}
@@ -106,7 +106,7 @@ func insertWorkflowsForTests(t *testing.T, client service.AdminServiceClient) {
 					}
 
 					_, err := client.CreateWorkflow(ctx, &req)
-					assert.Nil(t, err, "Failed to create workflow test data with err %v", err)
+					require.NoError(t, err, "Failed to create workflow test data with err %v", err)
 				}
 			}
 		}

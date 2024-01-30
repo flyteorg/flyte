@@ -41,6 +41,22 @@ class Resources(_message.Message):
     limits: _containers.RepeatedCompositeFieldContainer[Resources.ResourceEntry]
     def __init__(self, requests: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ..., limits: _Optional[_Iterable[_Union[Resources.ResourceEntry, _Mapping]]] = ...) -> None: ...
 
+class GPUAccelerator(_message.Message):
+    __slots__ = ["device", "unpartitioned", "partition_size"]
+    DEVICE_FIELD_NUMBER: _ClassVar[int]
+    UNPARTITIONED_FIELD_NUMBER: _ClassVar[int]
+    PARTITION_SIZE_FIELD_NUMBER: _ClassVar[int]
+    device: str
+    unpartitioned: bool
+    partition_size: str
+    def __init__(self, device: _Optional[str] = ..., unpartitioned: bool = ..., partition_size: _Optional[str] = ...) -> None: ...
+
+class ExtendedResources(_message.Message):
+    __slots__ = ["gpu_accelerator"]
+    GPU_ACCELERATOR_FIELD_NUMBER: _ClassVar[int]
+    gpu_accelerator: GPUAccelerator
+    def __init__(self, gpu_accelerator: _Optional[_Union[GPUAccelerator, _Mapping]] = ...) -> None: ...
+
 class RuntimeMetadata(_message.Message):
     __slots__ = ["type", "version", "flavor"]
     class RuntimeType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
@@ -58,7 +74,7 @@ class RuntimeMetadata(_message.Message):
     def __init__(self, type: _Optional[_Union[RuntimeMetadata.RuntimeType, str]] = ..., version: _Optional[str] = ..., flavor: _Optional[str] = ...) -> None: ...
 
 class TaskMetadata(_message.Message):
-    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "generates_deck", "tags", "pod_template_name"]
+    __slots__ = ["discoverable", "runtime", "timeout", "retries", "discovery_version", "deprecated_error_message", "interruptible", "cache_serializable", "generates_deck", "tags", "pod_template_name", "cache_ignore_input_vars"]
     class TagsEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -77,6 +93,7 @@ class TaskMetadata(_message.Message):
     GENERATES_DECK_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
     POD_TEMPLATE_NAME_FIELD_NUMBER: _ClassVar[int]
+    CACHE_IGNORE_INPUT_VARS_FIELD_NUMBER: _ClassVar[int]
     discoverable: bool
     runtime: RuntimeMetadata
     timeout: _duration_pb2.Duration
@@ -88,10 +105,11 @@ class TaskMetadata(_message.Message):
     generates_deck: bool
     tags: _containers.ScalarMap[str, str]
     pod_template_name: str
-    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., generates_deck: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ...) -> None: ...
+    cache_ignore_input_vars: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, discoverable: bool = ..., runtime: _Optional[_Union[RuntimeMetadata, _Mapping]] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., discovery_version: _Optional[str] = ..., deprecated_error_message: _Optional[str] = ..., interruptible: bool = ..., cache_serializable: bool = ..., generates_deck: bool = ..., tags: _Optional[_Mapping[str, str]] = ..., pod_template_name: _Optional[str] = ..., cache_ignore_input_vars: _Optional[_Iterable[str]] = ...) -> None: ...
 
 class TaskTemplate(_message.Message):
-    __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "config"]
+    __slots__ = ["id", "type", "metadata", "interface", "custom", "container", "k8s_pod", "sql", "task_type_version", "security_context", "extended_resources", "config"]
     class ConfigEntry(_message.Message):
         __slots__ = ["key", "value"]
         KEY_FIELD_NUMBER: _ClassVar[int]
@@ -109,6 +127,7 @@ class TaskTemplate(_message.Message):
     SQL_FIELD_NUMBER: _ClassVar[int]
     TASK_TYPE_VERSION_FIELD_NUMBER: _ClassVar[int]
     SECURITY_CONTEXT_FIELD_NUMBER: _ClassVar[int]
+    EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
     CONFIG_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.Identifier
     type: str
@@ -120,8 +139,9 @@ class TaskTemplate(_message.Message):
     sql: Sql
     task_type_version: int
     security_context: _security_pb2.SecurityContext
+    extended_resources: ExtendedResources
     config: _containers.ScalarMap[str, str]
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., type: _Optional[str] = ..., metadata: _Optional[_Union[TaskMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., custom: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., container: _Optional[_Union[Container, _Mapping]] = ..., k8s_pod: _Optional[_Union[K8sPod, _Mapping]] = ..., sql: _Optional[_Union[Sql, _Mapping]] = ..., task_type_version: _Optional[int] = ..., security_context: _Optional[_Union[_security_pb2.SecurityContext, _Mapping]] = ..., extended_resources: _Optional[_Union[ExtendedResources, _Mapping]] = ..., config: _Optional[_Mapping[str, str]] = ...) -> None: ...
 
 class ContainerPort(_message.Message):
     __slots__ = ["container_port"]

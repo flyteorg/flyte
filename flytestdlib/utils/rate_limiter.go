@@ -3,8 +3,9 @@ package utils
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"golang.org/x/time/rate"
+
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // Interface to use rate limiter

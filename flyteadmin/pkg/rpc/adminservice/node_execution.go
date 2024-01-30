@@ -3,13 +3,13 @@ package adminservice
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice/util"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 func (m *AdminService) CreateNodeEvent(
@@ -45,6 +45,24 @@ func (m *AdminService) GetNodeExecution(
 		return nil, util.TransformAndRecordError(err, &m.Metrics.nodeExecutionEndpointMetrics.get)
 	}
 	m.Metrics.nodeExecutionEndpointMetrics.get.Success()
+	return response, nil
+}
+
+func (m *AdminService) GetDynamicNodeWorkflow(ctx context.Context, request *admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+
+	var response *admin.DynamicNodeWorkflowResponse
+	var err error
+	m.Metrics.nodeExecutionEndpointMetrics.getDynamicNodeWorkflow.Time(func() {
+		response, err = m.NodeExecutionManager.GetDynamicNodeWorkflow(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.workflowEndpointMetrics.get)
+	}
+	m.Metrics.nodeExecutionEndpointMetrics.getDynamicNodeWorkflow.Success()
 	return response, nil
 }
 

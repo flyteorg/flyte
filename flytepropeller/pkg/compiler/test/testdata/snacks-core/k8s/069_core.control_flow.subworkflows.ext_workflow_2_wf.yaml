@@ -80,8 +80,6 @@ spec:
       kind: task
       name: count_freq_words
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.subworkflows.count_freq_words" '
     start-node:
       id: start-node

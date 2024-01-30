@@ -115,13 +115,14 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fidentity_2eproto[] =
   "protobuf.Struct2q\n\017IdentityService\022^\n\010Us"
   "erInfo\022!.flyteidl.service.UserInfoReques"
   "t\032\".flyteidl.service.UserInfoResponse\"\013\202"
-  "\323\344\223\002\005\022\003/meB9Z7github.com/flyteorg/flytei"
-  "dl/gen/pb-go/flyteidl/serviceb\006proto3"
+  "\323\344\223\002\005\022\003/meB\?Z=github.com/flyteorg/flyte/"
+  "flyteidl/gen/pb-go/flyteidl/serviceb\006pro"
+  "to3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fservice_2fidentity_2eproto = {
   false, InitDefaults_flyteidl_2fservice_2fidentity_2eproto, 
   descriptor_table_protodef_flyteidl_2fservice_2fidentity_2eproto,
-  "flyteidl/service/identity.proto", &assign_descriptors_table_flyteidl_2fservice_2fidentity_2eproto, 517,
+  "flyteidl/service/identity.proto", &assign_descriptors_table_flyteidl_2fservice_2fidentity_2eproto, 523,
 };
 
 void AddDescriptors_flyteidl_2fservice_2fidentity_2eproto() {

@@ -5,8 +5,8 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // transform to snake case to make lower case
@@ -136,6 +136,23 @@ func FlyteURLsFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier, 
 	if deck {
 		res.Deck = fmt.Sprintf("%s/%s", base, ArtifactTypeD)
 	}
+	return res
+}
+
+// FlyteURLKeyFromNodeExecutionID is a modified version of the function above.
+// This constructs a fully unique prefix, and when post-pended with the output name, forms a fully unique name for
+// the artifact service (including the project/domain of course, which the artifact service will add).
+func FlyteURLKeyFromNodeExecutionID(nodeExecutionID core.NodeExecutionIdentifier) string {
+	res := fmt.Sprintf("%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId)
+
+	return res
+}
+
+// FlyteURLKeyFromNodeExecutionIDRetry is a modified version of the function above.
+// See the uniqueness comment above.
+func FlyteURLKeyFromNodeExecutionIDRetry(nodeExecutionID core.NodeExecutionIdentifier, retry int) string {
+	res := fmt.Sprintf("%s/%s/%s", nodeExecutionID.ExecutionId.Name, nodeExecutionID.NodeId, strconv.Itoa(retry))
+
 	return res
 }
 

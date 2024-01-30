@@ -1,6 +1,6 @@
 package nodes
 
-import "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+import "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 // IsTerminalNodePhase returns true if node phase is one of the terminal phases, else false
 func IsTerminalNodePhase(p core.NodeExecution_Phase) bool {

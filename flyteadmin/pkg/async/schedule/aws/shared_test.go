@@ -3,9 +3,9 @@ package aws
 import (
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
 	"github.com/magiconair/properties/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestHashIdentifier(t *testing.T) {

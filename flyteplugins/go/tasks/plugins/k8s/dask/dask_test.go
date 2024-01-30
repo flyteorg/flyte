@@ -6,24 +6,24 @@ import (
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/golang/protobuf/jsonpb"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 const (
@@ -147,7 +147,7 @@ func dummyDaskTaskTemplate(customImage string, resources *core.Resources, podTem
 	}
 }
 
-func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, isInterruptible bool) pluginsCore.TaskExecutionContext {
+func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, isInterruptible bool) pluginsCore.TaskExecutionContext {
 	taskCtx := &mocks.TaskExecutionContext{}
 
 	inputReader := &pluginIOMocks.InputReader{}
@@ -179,6 +179,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 		},
 	})
 	tID.On("GetGeneratedName").Return(testTaskID)
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)
@@ -192,6 +193,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 	taskExecutionMetadata.OnGetNamespace().Return(defaultNamespace)
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
+	overrides.OnGetExtendedResources().Return(extendedResources)
 	taskExecutionMetadata.OnGetOverrides().Return(overrides)
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
@@ -201,7 +203,7 @@ func TestBuildResourceDaskHappyPath(t *testing.T) {
 	daskResourceHandler := daskResourceHandler{}
 
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	taskContext := dummyDaskTaskContext(taskTemplate, &defaultResources, false)
+	taskContext := dummyDaskTaskContext(taskTemplate, &defaultResources, nil, false)
 	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
 	assert.Nil(t, err)
 	assert.NotNil(t, r)
@@ -312,7 +314,7 @@ func TestBuildResourceDaskCustomImages(t *testing.T) {
 
 	daskResourceHandler := daskResourceHandler{}
 	taskTemplate := dummyDaskTaskTemplate(customImage, nil, "")
-	taskContext := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, false)
+	taskContext := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, nil, false)
 	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
 	assert.Nil(t, err)
 	assert.NotNil(t, r)
@@ -345,7 +347,7 @@ func TestBuildResourceDaskDefaultResoureRequirements(t *testing.T) {
 
 	daskResourceHandler := daskResourceHandler{}
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	taskContext := dummyDaskTaskContext(taskTemplate, &flyteWorkflowResources, false)
+	taskContext := dummyDaskTaskContext(taskTemplate, &flyteWorkflowResources, nil, false)
 	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
 	assert.Nil(t, err)
 	assert.NotNil(t, r)
@@ -402,7 +404,7 @@ func TestBuildResourcesDaskCustomResoureRequirements(t *testing.T) {
 
 	daskResourceHandler := daskResourceHandler{}
 	taskTemplate := dummyDaskTaskTemplate("", &protobufResources, "")
-	taskContext := dummyDaskTaskContext(taskTemplate, &flyteWorkflowResources, false)
+	taskContext := dummyDaskTaskContext(taskTemplate, &flyteWorkflowResources, nil, false)
 	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
 	assert.Nil(t, err)
 	assert.NotNil(t, r)
@@ -457,7 +459,7 @@ func TestBuildResourceDaskInterruptible(t *testing.T) {
 	daskResourceHandler := daskResourceHandler{}
 
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	taskContext := dummyDaskTaskContext(taskTemplate, &defaultResources, true)
+	taskContext := dummyDaskTaskContext(taskTemplate, &defaultResources, nil, true)
 	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
 	assert.Nil(t, err)
 	assert.NotNil(t, r)
@@ -491,7 +493,7 @@ func TestBuildResouceDaskUsePodTemplate(t *testing.T) {
 	flytek8s.DefaultPodTemplateStore.Store(podTemplate)
 	daskResourceHandler := daskResourceHandler{}
 	taskTemplate := dummyDaskTaskTemplate("", nil, podTemplateName)
-	taskContext := dummyDaskTaskContext(taskTemplate, &defaultResources, false)
+	taskContext := dummyDaskTaskContext(taskTemplate, &defaultResources, nil, false)
 	r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
 	assert.Nil(t, err)
 	assert.NotNil(t, r)
@@ -504,6 +506,161 @@ func TestBuildResouceDaskUsePodTemplate(t *testing.T) {
 
 	// Cleanup
 	flytek8s.DefaultPodTemplateStore.Delete(podTemplate)
+}
+
+func TestBuildResourceDaskExtendedResources(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *v1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []v1.NodeSelectorTerm
+		expectedTol               []v1.Toleration
+	}{
+		{
+			"without overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]v1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-partition-size",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			[]v1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+		},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			taskTemplate := dummyDaskTaskTemplate("", nil, "")
+			taskTemplate.ExtendedResources = f.extendedResourcesBase
+			taskContext := dummyDaskTaskContext(taskTemplate, f.resources, f.extendedResourcesOverride, false)
+			daskResourceHandler := daskResourceHandler{}
+			r, err := daskResourceHandler.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			daskJob, ok := r.(*daskAPI.DaskJob)
+			assert.True(t, ok)
+
+			// Job pod
+			jobSpec := daskJob.Spec.Job.Spec
+			assert.EqualValues(
+				t,
+				f.expectedNsr,
+				jobSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+			)
+			assert.EqualValues(
+				t,
+				f.expectedTol,
+				jobSpec.Tolerations,
+			)
+
+			// Scheduler
+			schedulerSpec := daskJob.Spec.Cluster.Spec.Scheduler.Spec
+			assert.EqualValues(
+				t,
+				f.expectedNsr,
+				schedulerSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+			)
+			assert.EqualValues(
+				t,
+				f.expectedTol,
+				schedulerSpec.Tolerations,
+			)
+
+			// Default Workers
+			workerSpec := daskJob.Spec.Cluster.Spec.Worker.Spec
+			assert.EqualValues(
+				t,
+				f.expectedNsr,
+				workerSpec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+			)
+			assert.EqualValues(
+				t,
+				f.expectedTol,
+				workerSpec.Tolerations,
+			)
+		})
+	}
 }
 
 func TestGetPropertiesDask(t *testing.T) {
@@ -522,7 +679,7 @@ func TestBuildIdentityResourceDask(t *testing.T) {
 	}
 
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	taskContext := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, false)
+	taskContext := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, nil, false)
 	identityResources, err := daskResourceHandler.BuildIdentityResource(context.TODO(), taskContext.TaskExecutionMetadata())
 	if err != nil {
 		panic(err)
@@ -535,7 +692,7 @@ func TestGetTaskPhaseDask(t *testing.T) {
 	ctx := context.TODO()
 
 	taskTemplate := dummyDaskTaskTemplate("", nil, "")
-	taskCtx := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, false)
+	taskCtx := dummyDaskTaskContext(taskTemplate, &v1.ResourceRequirements{}, nil, false)
 
 	taskPhase, err := daskResourceHandler.GetTaskPhase(ctx, taskCtx, dummyDaskJob(""))
 	assert.NoError(t, err)

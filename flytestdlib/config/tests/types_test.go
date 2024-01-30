@@ -1,13 +1,13 @@
 package tests
 
 import (
+	"encoding/json"
 	"fmt"
 
-	"encoding/json"
+	"github.com/spf13/pflag"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/spf13/pflag"
 )
 
 const testNameFormatter = "[%v] %v"

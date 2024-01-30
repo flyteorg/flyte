@@ -1,12 +1,21 @@
 package transformers
 
 import (
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
+
+func SerializedMetadata(metadata *datacatalog.Metadata) ([]byte, error) {
+	serializedMetadata, err := marshalMetadata(metadata)
+	if err != nil {
+		return []byte{}, err
+	}
+	return serializedMetadata, nil
+}
 
 func CreateArtifactModel(request *datacatalog.CreateArtifactRequest, artifactData []models.ArtifactData, dataset models.Dataset) (models.Artifact, error) {
 	datasetID := request.Artifact.Dataset

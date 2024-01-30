@@ -323,4 +323,18 @@ func TestK8sPluginConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_send-object-events", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("send-object-events", testValue)
+			if vBool, err := cmdFlags.GetBool("send-object-events"); err == nil {
+				testDecodeJson_K8sPluginConfig(t, fmt.Sprintf("%v", vBool), &actual.SendObjectEvents)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

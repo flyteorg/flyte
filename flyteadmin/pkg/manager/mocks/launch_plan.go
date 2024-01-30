@@ -4,8 +4,7 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type CreateLaunchPlanFunc func(ctx context.Context, request admin.LaunchPlanCreateRequest) (

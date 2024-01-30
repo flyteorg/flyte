@@ -1,9 +1,9 @@
 package compiler
 
 import (
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 type TaskIdentifier = common.Identifier
@@ -59,6 +59,9 @@ func updateWorkflowRequirements(workflow *core.WorkflowTemplate, subWfs common.W
 
 	for _, node := range workflow.Nodes {
 		updateNodeRequirements(node, subWfs, taskIds, workflowIds, followSubworkflows, errs)
+	}
+	if workflow.FailureNode != nil {
+		updateNodeRequirements(workflow.FailureNode, subWfs, taskIds, workflowIds, followSubworkflows, errs)
 	}
 }
 

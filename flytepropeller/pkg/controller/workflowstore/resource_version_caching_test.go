@@ -5,22 +5,19 @@ import (
 	"fmt"
 	"testing"
 
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
+	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
+	"github.com/stretchr/testify/assert"
+	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
-
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	testing2 "k8s.io/client-go/testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	goObjectHash "github.com/benlaurie/objecthash/go/objecthash"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned/fake"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
-	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
 const (

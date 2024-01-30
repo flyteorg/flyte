@@ -20,7 +20,7 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fevent_2eproto ::google::proto
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fadmin_2fevent_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_EventErrorIncompatibleCluster_flyteidl_2fadmin_2fevent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<4> scc_info_WorkflowExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_NodeExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<8> scc_info_TaskExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fevent_2fevent_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_TaskExecutionEvent_flyteidl_2fevent_2fevent_2eproto;
 namespace flyteidl {
 namespace admin {
 class EventErrorAlreadyInTerminalStateDefaultTypeInternal {
@@ -318,14 +318,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fevent_2eproto[] =
   "ventResponse\"b\n\031TaskExecutionEventReques"
   "t\022\022\n\nrequest_id\030\001 \001(\t\0221\n\005event\030\002 \001(\0132\".f"
   "lyteidl.event.TaskExecutionEvent\"\034\n\032Task"
-  "ExecutionEventResponseB7Z5github.com/fly"
-  "teorg/flyteidl/gen/pb-go/flyteidl/adminb"
-  "\006proto3"
+  "ExecutionEventResponseB=Z;github.com/fly"
+  "teorg/flyte/flyteidl/gen/pb-go/flyteidl/"
+  "adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fevent_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fevent_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fevent_2eproto,
-  "flyteidl/admin/event.proto", &assign_descriptors_table_flyteidl_2fadmin_2fevent_2eproto, 847,
+  "flyteidl/admin/event.proto", &assign_descriptors_table_flyteidl_2fadmin_2fevent_2eproto, 853,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fevent_2eproto() {

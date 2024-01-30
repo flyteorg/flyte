@@ -109,14 +109,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto[] =
   "l.core.ExecutionError.ErrorKind\",\n\004Kind\022"
   "\023\n\017NON_RECOVERABLE\020\000\022\017\n\013RECOVERABLE\020\001\"=\n"
   "\rErrorDocument\022,\n\005error\030\001 \001(\0132\035.flyteidl"
-  ".core.ContainerErrorB6Z4github.com/flyte"
-  "org/flyteidl/gen/pb-go/flyteidl/coreb\006pr"
-  "oto3"
+  ".core.ContainerErrorB<Z:github.com/flyte"
+  "org/flyte/flyteidl/gen/pb-go/flyteidl/co"
+  "reb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2ferrors_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2ferrors_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2ferrors_2eproto,
-  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 404,
+  "flyteidl/core/errors.proto", &assign_descriptors_table_flyteidl_2fcore_2ferrors_2eproto, 410,
 };
 
 void AddDescriptors_flyteidl_2fcore_2ferrors_2eproto() {

@@ -4,18 +4,16 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	managerMocks "github.com/flyteorg/flyte/flyteadmin/pkg/manager/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/stretchr/testify/assert"
-
-	"k8s.io/apimachinery/pkg/api/resource"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var workflowIdentifier = core.Identifier{
@@ -33,14 +31,12 @@ func TestGetTaskResources(t *testing.T) {
 		GPU:              resource.MustParse("8"),
 		Memory:           resource.MustParse("200Gi"),
 		EphemeralStorage: resource.MustParse("500Mi"),
-		Storage:          resource.MustParse("400Mi"),
 	}
 	taskConfig.Limits = runtimeInterfaces.TaskResourceSet{
 		CPU:              resource.MustParse("300m"),
 		GPU:              resource.MustParse("8"),
 		Memory:           resource.MustParse("500Gi"),
 		EphemeralStorage: resource.MustParse("501Mi"),
-		Storage:          resource.MustParse("450Mi"),
 	}
 
 	t.Run("use runtime application values", func(t *testing.T) {
@@ -63,14 +59,12 @@ func TestGetTaskResources(t *testing.T) {
 				GPU:              resource.MustParse("8"),
 				Memory:           resource.MustParse("200Gi"),
 				EphemeralStorage: resource.MustParse("500Mi"),
-				Storage:          resource.MustParse("400Mi"),
 			},
 			Limits: runtimeInterfaces.TaskResourceSet{
 				CPU:              resource.MustParse("300m"),
 				GPU:              resource.MustParse("8"),
 				Memory:           resource.MustParse("500Gi"),
 				EphemeralStorage: resource.MustParse("501Mi"),
-				Storage:          resource.MustParse("450Mi"),
 			},
 		})
 	})
@@ -93,14 +87,12 @@ func TestGetTaskResources(t *testing.T) {
 								Gpu:              "18",
 								Memory:           "1200Gi",
 								EphemeralStorage: "1500Mi",
-								Storage:          "1400Mi",
 							},
 							Limits: &admin.TaskResourceSpec{
 								Cpu:              "300m",
 								Gpu:              "8",
 								Memory:           "500Gi",
 								EphemeralStorage: "501Mi",
-								Storage:          "450Mi",
 							},
 						},
 					},
@@ -114,14 +106,12 @@ func TestGetTaskResources(t *testing.T) {
 				GPU:              resource.MustParse("18"),
 				Memory:           resource.MustParse("1200Gi"),
 				EphemeralStorage: resource.MustParse("1500Mi"),
-				Storage:          resource.MustParse("1400Mi"),
 			},
 			Limits: runtimeInterfaces.TaskResourceSet{
 				CPU:              resource.MustParse("300m"),
 				GPU:              resource.MustParse("8"),
 				Memory:           resource.MustParse("500Gi"),
 				EphemeralStorage: resource.MustParse("501Mi"),
-				Storage:          resource.MustParse("450Mi"),
 			},
 		})
 	})
@@ -131,14 +121,12 @@ func TestFromAdminProtoTaskResourceSpec(t *testing.T) {
 	taskResourceSet := fromAdminProtoTaskResourceSpec(context.TODO(), &admin.TaskResourceSpec{
 		Cpu:              "1",
 		Memory:           "100",
-		Storage:          "200",
 		EphemeralStorage: "300",
 		Gpu:              "2",
 	})
 	assert.EqualValues(t, runtimeInterfaces.TaskResourceSet{
 		CPU:              resource.MustParse("1"),
 		Memory:           resource.MustParse("100"),
-		Storage:          resource.MustParse("200"),
 		EphemeralStorage: resource.MustParse("300"),
 		GPU:              resource.MustParse("2"),
 	}, taskResourceSet)

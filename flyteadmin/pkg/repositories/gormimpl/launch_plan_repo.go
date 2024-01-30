@@ -5,15 +5,14 @@ import (
 	"errors"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"gorm.io/gorm"
 
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const launchPlanTableName = "launch_plans"
@@ -32,7 +31,7 @@ type LaunchPlanRepo struct {
 
 func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -42,7 +41,7 @@ func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) er
 
 func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.Model(&input).Updates(input)
+	tx := r.db.WithContext(ctx).Model(&input).Updates(input)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -53,7 +52,7 @@ func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) er
 func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (models.LaunchPlan, error) {
 	var launchPlan models.LaunchPlan
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.LaunchPlan{
+	tx := r.db.WithContext(ctx).Where(&models.LaunchPlan{
 		LaunchPlanKey: models.LaunchPlanKey{
 			Project: input.Project,
 			Domain:  input.Domain,
@@ -85,7 +84,7 @@ func (r *LaunchPlanRepo) SetActive(
 	timer := r.launchPlanMetrics.SetActiveDuration.Start()
 	defer timer.Stop()
 	// Use a transaction to guarantee no partial updates.
-	tx := r.db.Begin()
+	tx := r.db.WithContext(ctx).Begin()
 
 	// There is a launch plan to disable as part of this transaction
 	if toDisable != nil {
@@ -115,7 +114,7 @@ func (r *LaunchPlanRepo) List(ctx context.Context, input interfaces.ListResource
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}
 	var launchPlans []models.LaunchPlan
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 
 	// Add join conditions
 	tx = tx.Joins("inner join workflows on launch_plans.workflow_id = workflows.id")
@@ -152,7 +151,7 @@ func (r *LaunchPlanRepo) ListLaunchPlanIdentifiers(ctx context.Context, input in
 		return interfaces.LaunchPlanCollectionOutput{}, err
 	}
 
-	tx := r.db.Model(models.LaunchPlan{}).Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Model(models.LaunchPlan{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)

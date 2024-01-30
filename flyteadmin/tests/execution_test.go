@@ -9,16 +9,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var workflowExecutionID = &core.WorkflowExecutionIdentifier{
@@ -161,7 +160,7 @@ func populateWorkflowExecutionsForTestingOnly() {
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
-		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
+		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)
 	}
 	sqlDB, err := db.DB()
 	if err != nil {

@@ -1,8 +1,8 @@
 package events
 
 import (
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 var inlineEventConfig = &config.EventConfig{

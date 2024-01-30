@@ -49,7 +49,7 @@ struct TableStruct_flyteidl_2fevent_2fevent_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[11]
+  static const ::google::protobuf::internal::ParseTable schema[12]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -61,6 +61,9 @@ namespace event {
 class DynamicWorkflowNodeMetadata;
 class DynamicWorkflowNodeMetadataDefaultTypeInternal;
 extern DynamicWorkflowNodeMetadataDefaultTypeInternal _DynamicWorkflowNodeMetadata_default_instance_;
+class EventReason;
+class EventReasonDefaultTypeInternal;
+extern EventReasonDefaultTypeInternal _EventReason_default_instance_;
 class ExternalResourceInfo;
 class ExternalResourceInfoDefaultTypeInternal;
 extern ExternalResourceInfoDefaultTypeInternal _ExternalResourceInfo_default_instance_;
@@ -96,6 +99,7 @@ extern WorkflowNodeMetadataDefaultTypeInternal _WorkflowNodeMetadata_default_ins
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::event::DynamicWorkflowNodeMetadata* Arena::CreateMaybeMessage<::flyteidl::event::DynamicWorkflowNodeMetadata>(Arena*);
+template<> ::flyteidl::event::EventReason* Arena::CreateMaybeMessage<::flyteidl::event::EventReason>(Arena*);
 template<> ::flyteidl::event::ExternalResourceInfo* Arena::CreateMaybeMessage<::flyteidl::event::ExternalResourceInfo>(Arena*);
 template<> ::flyteidl::event::NodeExecutionEvent* Arena::CreateMaybeMessage<::flyteidl::event::NodeExecutionEvent>(Arena*);
 template<> ::flyteidl::event::ParentNodeExecutionMetadata* Arena::CreateMaybeMessage<::flyteidl::event::ParentNodeExecutionMetadata>(Arena*);
@@ -592,6 +596,12 @@ class NodeExecutionEvent final :
   bool is_dynamic() const;
   void set_is_dynamic(bool value);
 
+  // bool is_array = 22;
+  void clear_is_array();
+  static const int kIsArrayFieldNumber = 22;
+  bool is_array() const;
+  void set_is_array(bool value);
+
   // string input_uri = 5;
   private:
   bool has_input_uri() const;
@@ -712,6 +722,7 @@ class NodeExecutionEvent final :
   ::google::protobuf::int32 event_version_;
   bool is_parent_;
   bool is_dynamic_;
+  bool is_array_;
   union InputValueUnion {
     InputValueUnion() {}
     ::google::protobuf::internal::ArenaStringPtr input_uri_;
@@ -1379,6 +1390,136 @@ class ParentNodeExecutionMetadata final :
 };
 // -------------------------------------------------------------------
 
+class EventReason final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.event.EventReason) */ {
+ public:
+  EventReason();
+  virtual ~EventReason();
+
+  EventReason(const EventReason& from);
+
+  inline EventReason& operator=(const EventReason& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  EventReason(EventReason&& from) noexcept
+    : EventReason() {
+    *this = ::std::move(from);
+  }
+
+  inline EventReason& operator=(EventReason&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const EventReason& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const EventReason* internal_default_instance() {
+    return reinterpret_cast<const EventReason*>(
+               &_EventReason_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(EventReason* other);
+  friend void swap(EventReason& a, EventReason& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline EventReason* New() const final {
+    return CreateMaybeMessage<EventReason>(nullptr);
+  }
+
+  EventReason* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<EventReason>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const EventReason& from);
+  void MergeFrom(const EventReason& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(EventReason* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string reason = 1;
+  void clear_reason();
+  static const int kReasonFieldNumber = 1;
+  const ::std::string& reason() const;
+  void set_reason(const ::std::string& value);
+  #if LANG_CXX11
+  void set_reason(::std::string&& value);
+  #endif
+  void set_reason(const char* value);
+  void set_reason(const char* value, size_t size);
+  ::std::string* mutable_reason();
+  ::std::string* release_reason();
+  void set_allocated_reason(::std::string* reason);
+
+  // .google.protobuf.Timestamp occurred_at = 2;
+  bool has_occurred_at() const;
+  void clear_occurred_at();
+  static const int kOccurredAtFieldNumber = 2;
+  const ::google::protobuf::Timestamp& occurred_at() const;
+  ::google::protobuf::Timestamp* release_occurred_at();
+  ::google::protobuf::Timestamp* mutable_occurred_at();
+  void set_allocated_occurred_at(::google::protobuf::Timestamp* occurred_at);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.event.EventReason)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr reason_;
+  ::google::protobuf::Timestamp* occurred_at_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fevent_2fevent_2eproto;
+};
+// -------------------------------------------------------------------
+
 class TaskExecutionEvent final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.event.TaskExecutionEvent) */ {
  public:
@@ -1430,7 +1571,7 @@ class TaskExecutionEvent final :
                &_TaskExecutionEvent_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(TaskExecutionEvent* other);
   friend void swap(TaskExecutionEvent& a, TaskExecutionEvent& b) {
@@ -1499,6 +1640,18 @@ class TaskExecutionEvent final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog >&
       logs() const;
 
+  // repeated .flyteidl.event.EventReason reasons = 21;
+  int reasons_size() const;
+  void clear_reasons();
+  static const int kReasonsFieldNumber = 21;
+  ::flyteidl::event::EventReason* mutable_reasons(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::event::EventReason >*
+      mutable_reasons();
+  const ::flyteidl::event::EventReason& reasons(int index) const;
+  ::flyteidl::event::EventReason* add_reasons();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::event::EventReason >&
+      reasons() const;
+
   // string producer_id = 5;
   void clear_producer_id();
   static const int kProducerIdFieldNumber = 5;
@@ -1513,19 +1666,19 @@ class TaskExecutionEvent final :
   ::std::string* release_producer_id();
   void set_allocated_producer_id(::std::string* producer_id);
 
-  // string reason = 13;
-  void clear_reason();
-  static const int kReasonFieldNumber = 13;
-  const ::std::string& reason() const;
-  void set_reason(const ::std::string& value);
+  // string reason = 13 [deprecated = true];
+  PROTOBUF_DEPRECATED void clear_reason();
+  PROTOBUF_DEPRECATED static const int kReasonFieldNumber = 13;
+  PROTOBUF_DEPRECATED const ::std::string& reason() const;
+  PROTOBUF_DEPRECATED void set_reason(const ::std::string& value);
   #if LANG_CXX11
-  void set_reason(::std::string&& value);
+  PROTOBUF_DEPRECATED void set_reason(::std::string&& value);
   #endif
-  void set_reason(const char* value);
-  void set_reason(const char* value, size_t size);
-  ::std::string* mutable_reason();
-  ::std::string* release_reason();
-  void set_allocated_reason(::std::string* reason);
+  PROTOBUF_DEPRECATED void set_reason(const char* value);
+  PROTOBUF_DEPRECATED void set_reason(const char* value, size_t size);
+  PROTOBUF_DEPRECATED ::std::string* mutable_reason();
+  PROTOBUF_DEPRECATED ::std::string* release_reason();
+  PROTOBUF_DEPRECATED void set_allocated_reason(::std::string* reason);
 
   // string task_type = 14;
   void clear_task_type();
@@ -1701,6 +1854,7 @@ class TaskExecutionEvent final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::TaskLog > logs_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::event::EventReason > reasons_;
   ::google::protobuf::internal::ArenaStringPtr producer_id_;
   ::google::protobuf::internal::ArenaStringPtr reason_;
   ::google::protobuf::internal::ArenaStringPtr task_type_;
@@ -1770,7 +1924,7 @@ class ExternalResourceInfo final :
                &_ExternalResourceInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(ExternalResourceInfo* other);
   friend void swap(ExternalResourceInfo& a, ExternalResourceInfo& b) {
@@ -1931,7 +2085,7 @@ class ResourcePoolInfo final :
                &_ResourcePoolInfo_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(ResourcePoolInfo* other);
   friend void swap(ResourcePoolInfo& a, ResourcePoolInfo& b) {
@@ -2066,7 +2220,7 @@ class TaskExecutionMetadata final :
                &_TaskExecutionMetadata_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(TaskExecutionMetadata* other);
   friend void swap(TaskExecutionMetadata& a, TaskExecutionMetadata& b) {
@@ -3495,6 +3649,20 @@ inline void NodeExecutionEvent::set_allocated_reported_at(::google::protobuf::Ti
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.NodeExecutionEvent.reported_at)
 }
 
+// bool is_array = 22;
+inline void NodeExecutionEvent::clear_is_array() {
+  is_array_ = false;
+}
+inline bool NodeExecutionEvent::is_array() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.NodeExecutionEvent.is_array)
+  return is_array_;
+}
+inline void NodeExecutionEvent::set_is_array(bool value) {
+  
+  is_array_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.event.NodeExecutionEvent.is_array)
+}
+
 inline bool NodeExecutionEvent::has_input_value() const {
   return input_value_case() != INPUT_VALUE_NOT_SET;
 }
@@ -4003,6 +4171,109 @@ inline void ParentNodeExecutionMetadata::set_allocated_node_id(::std::string* no
   }
   node_id_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), node_id);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.ParentNodeExecutionMetadata.node_id)
+}
+
+// -------------------------------------------------------------------
+
+// EventReason
+
+// string reason = 1;
+inline void EventReason::clear_reason() {
+  reason_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& EventReason::reason() const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.EventReason.reason)
+  return reason_.GetNoArena();
+}
+inline void EventReason::set_reason(const ::std::string& value) {
+  
+  reason_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.event.EventReason.reason)
+}
+#if LANG_CXX11
+inline void EventReason::set_reason(::std::string&& value) {
+  
+  reason_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.event.EventReason.reason)
+}
+#endif
+inline void EventReason::set_reason(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  reason_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.event.EventReason.reason)
+}
+inline void EventReason::set_reason(const char* value, size_t size) {
+  
+  reason_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.event.EventReason.reason)
+}
+inline ::std::string* EventReason::mutable_reason() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.EventReason.reason)
+  return reason_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* EventReason::release_reason() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.EventReason.reason)
+  
+  return reason_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void EventReason::set_allocated_reason(::std::string* reason) {
+  if (reason != nullptr) {
+    
+  } else {
+    
+  }
+  reason_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reason);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.EventReason.reason)
+}
+
+// .google.protobuf.Timestamp occurred_at = 2;
+inline bool EventReason::has_occurred_at() const {
+  return this != internal_default_instance() && occurred_at_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& EventReason::occurred_at() const {
+  const ::google::protobuf::Timestamp* p = occurred_at_;
+  // @@protoc_insertion_point(field_get:flyteidl.event.EventReason.occurred_at)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* EventReason::release_occurred_at() {
+  // @@protoc_insertion_point(field_release:flyteidl.event.EventReason.occurred_at)
+  
+  ::google::protobuf::Timestamp* temp = occurred_at_;
+  occurred_at_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* EventReason::mutable_occurred_at() {
+  
+  if (occurred_at_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    occurred_at_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.EventReason.occurred_at)
+  return occurred_at_;
+}
+inline void EventReason::set_allocated_occurred_at(::google::protobuf::Timestamp* occurred_at) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(occurred_at_);
+  }
+  if (occurred_at) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(occurred_at)->GetArena();
+    if (message_arena != submessage_arena) {
+      occurred_at = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, occurred_at, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  occurred_at_ = occurred_at;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.event.EventReason.occurred_at)
 }
 
 // -------------------------------------------------------------------
@@ -4602,7 +4873,7 @@ inline void TaskExecutionEvent::set_phase_version(::google::protobuf::uint32 val
   // @@protoc_insertion_point(field_set:flyteidl.event.TaskExecutionEvent.phase_version)
 }
 
-// string reason = 13;
+// string reason = 13 [deprecated = true];
 inline void TaskExecutionEvent::clear_reason() {
   reason_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
 }
@@ -4653,6 +4924,36 @@ inline void TaskExecutionEvent::set_allocated_reason(::std::string* reason) {
   }
   reason_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), reason);
   // @@protoc_insertion_point(field_set_allocated:flyteidl.event.TaskExecutionEvent.reason)
+}
+
+// repeated .flyteidl.event.EventReason reasons = 21;
+inline int TaskExecutionEvent::reasons_size() const {
+  return reasons_.size();
+}
+inline void TaskExecutionEvent::clear_reasons() {
+  reasons_.Clear();
+}
+inline ::flyteidl::event::EventReason* TaskExecutionEvent::mutable_reasons(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.event.TaskExecutionEvent.reasons)
+  return reasons_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::event::EventReason >*
+TaskExecutionEvent::mutable_reasons() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.event.TaskExecutionEvent.reasons)
+  return &reasons_;
+}
+inline const ::flyteidl::event::EventReason& TaskExecutionEvent::reasons(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.event.TaskExecutionEvent.reasons)
+  return reasons_.Get(index);
+}
+inline ::flyteidl::event::EventReason* TaskExecutionEvent::add_reasons() {
+  // @@protoc_insertion_point(field_add:flyteidl.event.TaskExecutionEvent.reasons)
+  return reasons_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::event::EventReason >&
+TaskExecutionEvent::reasons() const {
+  // @@protoc_insertion_point(field_list:flyteidl.event.TaskExecutionEvent.reasons)
+  return reasons_;
 }
 
 // string task_type = 14;
@@ -5274,6 +5575,8 @@ inline void TaskExecutionMetadata::set_instance_class(::flyteidl::event::TaskExe
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

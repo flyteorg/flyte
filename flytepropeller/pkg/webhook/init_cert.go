@@ -14,14 +14,15 @@ import (
 	"path"
 	"time"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	corev1 "k8s.io/api/core/v1"
 	kubeErrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type webhookCerts struct {
@@ -77,21 +78,22 @@ func createWebhookSecret(ctx context.Context, namespace string, cfg *webhookConf
 	}
 
 	if cfg.LocalCert {
-		if _, err := os.Stat(cfg.CertDir); os.IsNotExist(err) {
-			if err := os.Mkdir(cfg.CertDir, folderPerm); err != nil {
+		certPath := cfg.ExpandCertDir()
+		if _, err := os.Stat(certPath); os.IsNotExist(err) {
+			if err := os.Mkdir(certPath, folderPerm); err != nil {
 				return err
 			}
 		}
 
-		if err := os.WriteFile(path.Join(cfg.CertDir, CaCertKey), certs.CaPEM.Bytes(), permission); err != nil {
+		if err := os.WriteFile(path.Join(certPath, CaCertKey), certs.CaPEM.Bytes(), permission); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(path.Join(cfg.CertDir, ServerCertKey), certs.ServerPEM.Bytes(), permission); err != nil {
+		if err := os.WriteFile(path.Join(certPath, ServerCertKey), certs.ServerPEM.Bytes(), permission); err != nil {
 			return err
 		}
 
-		if err := os.WriteFile(path.Join(cfg.CertDir, ServerCertPrivateKey), certs.PrivateKeyPEM.Bytes(), permission); err != nil {
+		if err := os.WriteFile(path.Join(certPath, ServerCertPrivateKey), certs.PrivateKeyPEM.Bytes(), permission); err != nil {
 			return err
 		}
 	}

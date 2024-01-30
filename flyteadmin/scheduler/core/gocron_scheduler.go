@@ -6,17 +6,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/robfig/cron/v3"
+	"golang.org/x/time/rate"
+
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/executor"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/robfig/cron/v3"
-	"golang.org/x/time/rate"
 )
 
 // goCronMetrics mertrics recorded for go cron.
@@ -54,23 +54,26 @@ func (g *GoCronScheduler) GetTimedFuncWithSchedule() TimedFuncWithSchedule {
 func (g *GoCronScheduler) BootStrapSchedulesFromSnapShot(ctx context.Context, schedules []models.SchedulableEntity,
 	snapshot snapshoter.Snapshot) {
 	for _, s := range schedules {
+		// Copy the object to save to a new pointer since the pointer is saved later
+		// Issue due to https://github.com/golang/go/discussions/56010
+		schedule := s
 		if *s.Active {
 			funcRef := g.GetTimedFuncWithSchedule()
 			nameOfSchedule := identifier.GetScheduleName(ctx, s)
 			// Initialize the lastExectime as the updatedAt time
 			// Assumption here that schedule was activated and that the 0th execution of the schedule
 			// which will be used as a reference
-			lastExecTime := &s.UpdatedAt
+			lastExecTime := &schedule.UpdatedAt
 
 			fromSnapshot := snapshot.GetLastExecutionTime(nameOfSchedule)
 			// Use the latest time if available in the snapshot
-			if fromSnapshot != nil && fromSnapshot.After(s.UpdatedAt) {
+			if fromSnapshot != nil && fromSnapshot.After(schedule.UpdatedAt) {
 				lastExecTime = fromSnapshot
 			}
-			err := g.ScheduleJob(ctx, s, funcRef, lastExecTime)
+			err := g.ScheduleJob(ctx, schedule, funcRef, lastExecTime)
 			if err != nil {
 				g.metrics.JobScheduledFailedCounter.Inc()
-				logger.Errorf(ctx, "unable to register the schedule %+v due to %v", s, err)
+				logger.Errorf(ctx, "unable to register the schedule %+v due to %v", schedule, err)
 			}
 		}
 	}

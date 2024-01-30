@@ -10,17 +10,15 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/coreos/go-oidc/v3/oidc"
 	jwtgo "github.com/golang-jwt/jwt/v4"
-
+	"golang.org/x/oauth2"
 	"k8s.io/apimachinery/pkg/util/sets"
 
-	"github.com/flyteorg/flyte/flytestdlib/config"
-
-	"github.com/coreos/go-oidc"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-	"golang.org/x/oauth2"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 // External auth server implementation

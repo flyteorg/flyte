@@ -2,47 +2,14 @@ package array
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
 )
-
-type arrayEventRecorder struct {
-	nodeEvents []*event.NodeExecutionEvent
-	taskEvents []*event.TaskExecutionEvent
-}
-
-func (a *arrayEventRecorder) RecordNodeEvent(ctx context.Context, event *event.NodeExecutionEvent, eventConfig *config.EventConfig) error {
-	a.nodeEvents = append(a.nodeEvents, event)
-	return nil
-}
-
-func (a *arrayEventRecorder) RecordTaskEvent(ctx context.Context, event *event.TaskExecutionEvent, eventConfig *config.EventConfig) error {
-	a.taskEvents = append(a.taskEvents, event)
-	return nil
-}
-
-func (a *arrayEventRecorder) NodeEvents() []*event.NodeExecutionEvent {
-	return a.nodeEvents
-}
-
-func (a *arrayEventRecorder) TaskEvents() []*event.TaskExecutionEvent {
-	return a.taskEvents
-}
-
-func newArrayEventRecorder() *arrayEventRecorder {
-	return &arrayEventRecorder{
-		nodeEvents: make([]*event.NodeExecutionEvent, 0),
-		taskEvents: make([]*event.TaskExecutionEvent, 0),
-	}
-}
 
 type staticInputReader struct {
 	io.InputFilePaths
@@ -60,16 +27,16 @@ func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) 
 	}
 }
 
-func constructLiteralMap(ctx context.Context, inputReader io.InputReader, index int) (*core.LiteralMap, error) {
-	inputs, err := inputReader.Get(ctx)
-	if err != nil {
-		return nil, err
-	}
-
+func constructLiteralMap(inputs *core.LiteralMap, index int) (*core.LiteralMap, error) {
 	literals := make(map[string]*core.Literal)
 	for name, literal := range inputs.Literals {
 		if literalCollection := literal.GetCollection(); literalCollection != nil {
+			if index >= len(literalCollection.Literals) {
+				return nil, fmt.Errorf("index %v out of bounds for literal collection %v", index, name)
+			}
 			literals[name] = literalCollection.Literals[index]
+		} else {
+			literals[name] = literal
 		}
 	}
 
@@ -110,7 +77,7 @@ func (a *arrayTaskReader) Read(ctx context.Context) (*core.TaskTemplate, error) 
 
 type arrayNodeExecutionContext struct {
 	interfaces.NodeExecutionContext
-	eventRecorder    interfaces.EventRecorder
+	eventRecorder    arrayEventRecorder
 	executionContext executors.ExecutionContext
 	inputReader      io.InputReader
 	nodeStatus       *v1alpha1.NodeStatus
@@ -137,8 +104,10 @@ func (a *arrayNodeExecutionContext) TaskReader() interfaces.TaskReader {
 	return a.taskReader
 }
 
-func newArrayNodeExecutionContext(nodeExecutionContext interfaces.NodeExecutionContext, inputReader io.InputReader, eventRecorder interfaces.EventRecorder, subNodeIndex int, nodeStatus *v1alpha1.NodeStatus, currentParallelism *uint32, maxParallelism uint32) *arrayNodeExecutionContext {
-	arrayExecutionContext := newArrayExecutionContext(nodeExecutionContext.ExecutionContext(), subNodeIndex, currentParallelism, maxParallelism)
+func newArrayNodeExecutionContext(nodeExecutionContext interfaces.NodeExecutionContext, inputReader io.InputReader,
+	eventRecorder arrayEventRecorder, subNodeIndex int, nodeStatus *v1alpha1.NodeStatus) *arrayNodeExecutionContext {
+
+	arrayExecutionContext := newArrayExecutionContext(nodeExecutionContext.ExecutionContext(), subNodeIndex)
 	return &arrayNodeExecutionContext{
 		NodeExecutionContext: nodeExecutionContext,
 		eventRecorder:        eventRecorder,

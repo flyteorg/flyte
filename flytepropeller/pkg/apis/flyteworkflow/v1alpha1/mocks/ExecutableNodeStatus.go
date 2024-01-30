@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	core "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mock "github.com/stretchr/testify/mock"
 
 	storage "github.com/flyteorg/flyte/flytestdlib/storage"
@@ -1187,9 +1187,9 @@ func (_m *ExecutableNodeStatus) SetParentTaskID(t *core.TaskExecutionIdentifier)
 	_m.Called(t)
 }
 
-// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason, err
-func (_m *ExecutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string, err *core.ExecutionError) {
-	_m.Called(phase, occurredAt, reason, err)
+// UpdatePhase provides a mock function with given fields: phase, occurredAt, reason, enableCRDebugMetadata, err
+func (_m *ExecutableNodeStatus) UpdatePhase(phase v1alpha1.NodePhase, occurredAt v1.Time, reason string, enableCRDebugMetadata bool, err *core.ExecutionError) {
+	_m.Called(phase, occurredAt, reason, enableCRDebugMetadata, err)
 }
 
 // VisitNodeStatuses provides a mock function with given fields: visitor

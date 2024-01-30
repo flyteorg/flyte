@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/ory/fosite"
 
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )

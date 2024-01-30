@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 const (

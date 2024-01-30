@@ -18,6 +18,8 @@ flyte:
 .PHONY: manifests
 manifests:
 	mkdir -p manifests
+	helm dependency update ../../charts/flyteagent
+	helm dependency update ../../charts/flyte-binary
 	helm dependency update ../../charts/flyte-sandbox
 	kustomize build \
 		--enable-helm \
@@ -27,6 +29,10 @@ manifests:
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
 		kustomize/dev > manifests/dev.yaml
+	kustomize build \
+		--enable-helm \
+		--load-restrictor=LoadRestrictionsNone \
+		kustomize/complete-agent > manifests/complete-agent.yaml
 
 .PHONY: build
 build: flyte manifests

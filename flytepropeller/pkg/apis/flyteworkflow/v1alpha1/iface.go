@@ -7,14 +7,13 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 // The intention of these interfaces is to decouple the algorithm and usage from the actual CRD definition.
@@ -319,7 +318,7 @@ type MutableNodeStatus interface {
 	SetOutputDir(d DataReference)
 	SetParentNodeID(n *NodeID)
 	SetParentTaskID(t *core.TaskExecutionIdentifier)
-	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string, err *core.ExecutionError)
+	UpdatePhase(phase NodePhase, occurredAt metav1.Time, reason string, enableCRDebugMetadata bool, err *core.ExecutionError)
 	IncrementAttempts() uint32
 	IncrementSystemFailures() uint32
 	SetCached()
@@ -436,6 +435,7 @@ type ExecutableNode interface {
 	GetOutputAlias() []Alias
 	GetInputBindings() []*Binding
 	GetResources() *v1.ResourceRequirements
+	GetExtendedResources() *core.ExtendedResources
 	GetConfig() *v1.ConfigMap
 	GetRetryStrategy() *RetryStrategy
 	GetExecutionDeadline() *time.Duration

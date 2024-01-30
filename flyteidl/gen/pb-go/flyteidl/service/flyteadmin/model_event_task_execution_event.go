@@ -37,8 +37,10 @@ type EventTaskExecutionEvent struct {
 	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`
 	// Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc) that should be recorded regardless of the lack of phase change. The version field should be incremented when metadata changes across the duration of an individual phase.
 	PhaseVersion int64 `json:"phase_version,omitempty"`
-	// An optional explanation for the phase transition.
+	// An optional explanation for the phase transition. Deprecated: Use reasons instead.
 	Reason string `json:"reason,omitempty"`
+	// An optional list of explanations for the phase transition.
+	Reasons []EventEventReason `json:"reasons,omitempty"`
 	// A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin this type will be identical, but not all task executions necessarily use pre-registered definitions and this type is useful to render the task in the UI, filter task executions, etc.
 	TaskType string `json:"task_type,omitempty"`
 	// Metadata around how a task was executed.

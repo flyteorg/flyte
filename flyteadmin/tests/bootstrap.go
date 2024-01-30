@@ -7,11 +7,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/database"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
 	"gorm.io/gorm"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -77,7 +76,7 @@ func truncateAllTablesForTestingOnly() {
 	ctx := context.Background()
 	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	if err != nil {
-		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
+		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)
 	}
 	sqlDB, err := db.DB()
 	if err != nil {
@@ -111,7 +110,7 @@ func populateWorkflowExecutionForTestingOnly(project, domain, name string) {
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
-		logger.Fatal(ctx, "Failed to open DB connection due to %v", err)
+		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)
 	}
 	sqlDB, err := db.DB()
 	if err != nil {

@@ -5,15 +5,14 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 // Creates a ComparisonExpression, comparing 2 literals
@@ -673,10 +672,8 @@ func TestDecideBranch(t *testing.T) {
 					ThenNode: &n2,
 				},
 			},
-			ElseFail: &v1alpha1.Error{
-				Error: &core.Error{
-					Message: userError,
-				},
+			ElseFail: &core.Error{
+				Message: userError,
 			},
 		}
 

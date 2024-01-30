@@ -113,8 +113,6 @@ spec:
       kind: task
       name: normalize_columns
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.files.normalize_columns" '
     start-node:
       id: start-node

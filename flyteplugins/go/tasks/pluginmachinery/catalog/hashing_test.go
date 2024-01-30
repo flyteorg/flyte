@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestHashLiteralMap_LiteralsWithHashSet(t *testing.T) {
@@ -616,7 +617,7 @@ func TestHashLiteralMap_LiteralsWithHashSet(t *testing.T) {
 
 			// Double-check that generating a tag is successful
 			literalMap := &core.LiteralMap{Literals: map[string]*core.Literal{"o0": tt.literal}}
-			hash, err := HashLiteralMap(context.TODO(), literalMap)
+			hash, err := HashLiteralMap(context.TODO(), literalMap, nil)
 			assert.NoError(t, err)
 			assert.NotEmpty(t, hash)
 		})
@@ -628,26 +629,43 @@ func TestInputValueSorted(t *testing.T) {
 	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
 	assert.NoError(t, err)
 
-	hash, err := HashLiteralMap(context.TODO(), literalMap)
+	hash, err := HashLiteralMap(context.TODO(), literalMap, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", hash)
 
 	literalMap, err = coreutils.MakeLiteralMap(map[string]interface{}{"2": 2, "1": 1})
 	assert.NoError(t, err)
 
-	hashDupe, err := HashLiteralMap(context.TODO(), literalMap)
+	hashDupe, err := HashLiteralMap(context.TODO(), literalMap, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, hashDupe, hash)
 }
 
 // Ensure that empty inputs are hashed the same way
 func TestNoInputValues(t *testing.T) {
-	hash, err := HashLiteralMap(context.TODO(), nil)
+	hash, err := HashLiteralMap(context.TODO(), nil, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", hash)
 
-	hashDupe, err := HashLiteralMap(context.TODO(), &core.LiteralMap{Literals: nil})
+	hashDupe, err := HashLiteralMap(context.TODO(), &core.LiteralMap{Literals: nil}, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, "GKw-c0PwFokMUQ6T-TUmEWnZ4_VlQ2Qpgw-vCTT0-OQ", hashDupe)
+	assert.Equal(t, hashDupe, hash)
+}
+
+// Ensure that empty inputs are hashed the same way
+func TestCacheIgnoreInputVars(t *testing.T) {
+	literalMap, err := coreutils.MakeLiteralMap(map[string]interface{}{"1": 1, "2": 2})
+	assert.NoError(t, err)
+
+	hash, err := HashLiteralMap(context.TODO(), literalMap, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "GQid5LjHbakcW68DS3P2jp80QLbiF0olFHF2hTh5bg8", hash)
+
+	literalMap, err = coreutils.MakeLiteralMap(map[string]interface{}{"2": 2, "1": 1, "3": 3})
+	assert.NoError(t, err)
+
+	hashDupe, err := HashLiteralMap(context.TODO(), literalMap, []string{"3"})
+	assert.NoError(t, err)
 	assert.Equal(t, hashDupe, hash)
 }

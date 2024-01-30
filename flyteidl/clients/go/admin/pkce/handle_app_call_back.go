@@ -7,11 +7,11 @@ import (
 
 	"golang.org/x/oauth2"
 
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 )
 
 func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenChannel chan *oauth2.Token,
-	errorChannel chan error, stateString string) func(rw http.ResponseWriter, req *http.Request) {
+	errorChannel chan error, stateString string, client *http.Client) func(rw http.ResponseWriter, req *http.Request) {
 
 	return func(rw http.ResponseWriter, req *http.Request) {
 		_, _ = rw.Write([]byte(`<h1>Flyte Authentication</h1>`))
@@ -43,7 +43,8 @@ func getAuthServerCallbackHandler(c *oauth.Config, codeVerifier string, tokenCha
 		var opts []oauth2.AuthCodeOption
 		opts = append(opts, oauth2.SetAuthURLParam("code_verifier", codeVerifier))
 
-		token, err := c.Exchange(context.Background(), req.URL.Query().Get("code"), opts...)
+		ctx := context.WithValue(context.Background(), oauth2.HTTPClient, client)
+		token, err := c.Exchange(ctx, req.URL.Query().Get("code"), opts...)
 		if err != nil {
 			errorChannel <- fmt.Errorf("error while exchanging auth code due to %v", err)
 			_, _ = rw.Write([]byte(fmt.Sprintf(`<p>Couldn't get access token due to error: %s</p>`, err.Error())))

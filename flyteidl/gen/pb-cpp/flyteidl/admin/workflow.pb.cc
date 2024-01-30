@@ -349,13 +349,14 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_2eproto[] =
   "ErrorExistsDifferentStructureH\000\022[\n\032exist"
   "s_identical_structure\030\002 \001(\01325.flyteidl.a"
   "dmin.WorkflowErrorExistsIdenticalStructu"
-  "reH\000B\010\n\006reasonB7Z5github.com/flyteorg/fl"
-  "yteidl/gen/pb-go/flyteidl/adminb\006proto3"
+  "reH\000B\010\n\006reasonB=Z;github.com/flyteorg/fl"
+  "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p"
+  "roto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fworkflow_2eproto,
-  "flyteidl/admin/workflow.proto", &assign_descriptors_table_flyteidl_2fadmin_2fworkflow_2eproto, 1319,
+  "flyteidl/admin/workflow.proto", &assign_descriptors_table_flyteidl_2fadmin_2fworkflow_2eproto, 1325,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fworkflow_2eproto() {

@@ -40,10 +40,13 @@ var (
 			},
 		},
 		DefaultAgent: Agent{
-			Endpoint:       "dns:///flyteagent.flyte.svc.cluster.local:80",
+			Endpoint:       "",
 			Insecure:       true,
 			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
 		},
+		// AsyncPlugin should be registered to at least one task type.
+		// Reference: https://github.com/flyteorg/flyte/blob/master/flyteplugins/go/tasks/pluginmachinery/registry.go#L27
+		SupportedTaskTypes: []string{"task_type_1", "task_type_2"},
 	}
 
 	configSection = pluginsConfig.MustRegisterSubSection("agent-service", &defaultConfig)
@@ -65,6 +68,9 @@ type Config struct {
 
 	// Maps task types to their agents. {TaskType: AgentId}
 	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
+
+	// SupportedTaskTypes is a list of task types that are supported by this plugin.
+	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 }
 
 type Agent struct {

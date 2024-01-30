@@ -12,30 +12,22 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"google.golang.org/grpc/codes"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"google.golang.org/protobuf/types/known/durationpb"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
-
 	"google.golang.org/protobuf/types/known/timestamppb"
-
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/stow"
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/stow"
 )
 
 type Service struct {
@@ -89,10 +81,10 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 			base32Digest := base32.StdEncoding.EncodeToString(req.ContentMd5)
 			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
 			if hexDigest != metadata.Etag() && base32Digest != metadata.Etag() && base64Digest != metadata.Etag() {
-				logger.Debug(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
+				logger.Debugf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
-			logger.Debug(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
+			logger.Debugf(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
 		}
 	}
 

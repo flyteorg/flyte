@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 )
 
 func TestRemoteError(t *testing.T) {

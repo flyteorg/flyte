@@ -1,7 +1,10 @@
 # This is a sample configuration file for running single-binary Flyte locally against
 # a sandbox.
 admin:
-  endpoint: localhost:8089
+  # This endpoint is used by flytepropeller to talk to admin
+  # and artifacts to talk to admin,
+  # and _also_, admin to talk to artifacts
+  endpoint: localhost:30080
   insecure: true
 
 catalog-cache:
@@ -11,11 +14,11 @@ catalog-cache:
 
 cluster_resources:
   standaloneDeployment: false
-  templatePath: $HOME/.flyte/cluster-resource-templates
+  templatePath: $HOME/.flyte/sandbox/cluster-resource-templates
 
 logger:
   show-source: true
-  level: 6
+  level: 5
 
 propeller:
   create-flyteworkflow-crd: true
@@ -50,9 +53,9 @@ plugins:
     stackdriver-enabled: false
   k8s:
     default-env-vars:
-    - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
-    - FLYTE_AWS_ACCESS_KEY_ID: minio
-    - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+      - FLYTE_AWS_ENDPOINT: http://flyte-sandbox-minio.flyte:9000
+      - FLYTE_AWS_ACCESS_KEY_ID: minio
+      - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
   k8s-array:
     logs:
       config:
@@ -69,7 +72,6 @@ database:
     port: 30001
     dbname: flyte
     options: "sslmode=disable"
-
 storage:
   type: stow
   stow:

@@ -6,42 +6,31 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/api/core/v1"
+	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 
-	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
-
-	pluginK8sMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
-
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	pluginCatalogMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	v1 "k8s.io/api/core/v1"
-	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-
+	pluginK8sMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s/mocks"
+	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	flyteMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -49,7 +38,12 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/codex"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/fakeplugins"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager"
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 var eventConfig = &controllerConfig.EventConfig{
@@ -242,12 +236,13 @@ func Test_task_Setup(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			sCtx := &nodeMocks.SetupContext{}
 			fakeKubeClient := mocks.NewFakeKubeClient()
+			mockClientset := k8sfake.NewSimpleClientset()
 			sCtx.On("KubeClient").Return(fakeKubeClient)
 			sCtx.On("OwnerKind").Return("test")
 			sCtx.On("EnqueueOwner").Return(pluginCore.EnqueueOwner(func(name types.NamespacedName) error { return nil }))
 			sCtx.On("MetricsScope").Return(promutils.NewTestScope())
 
-			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), &pluginCatalogMocks.Client{}, eventConfig, testClusterID, promutils.NewTestScope())
+			tk, err := New(context.TODO(), fakeKubeClient, mockClientset, &pluginCatalogMocks.Client{}, eventConfig, testClusterID, promutils.NewTestScope())
 			tk.cfg.TaskPlugins.EnabledPlugins = tt.enabledPlugins
 			tk.cfg.TaskPlugins.DefaultForTaskTypes = tt.defaultForTaskTypes
 			assert.NoError(t, err)
@@ -535,13 +530,12 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 		expectedState              fakeplugins.NextPhaseState
 	}
 	type want struct {
-		handlerPhase    handler.EPhase
-		wantErr         bool
-		event           bool
-		eventPhase      core.TaskExecution_Phase
-		skipStateUpdate bool
-		incrParallel    bool
-		checkpoint      bool
+		handlerPhase handler.EPhase
+		wantErr      bool
+		event        bool
+		eventPhase   core.TaskExecution_Phase
+		incrParallel bool
+		checkpoint   bool
 	}
 	tests := []struct {
 		name string
@@ -671,10 +665,9 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 				},
 			},
 			want{
-				handlerPhase:    handler.EPhaseRunning,
-				event:           false,
-				skipStateUpdate: true,
-				incrParallel:    true,
+				handlerPhase: handler.EPhaseRunning,
+				event:        false,
+				incrParallel: true,
 			},
 		},
 		{
@@ -743,13 +736,8 @@ func Test_task_Handle_NoCatalog(t *testing.T) {
 						expectedPhase = pluginCore.PhasePermanentFailure
 					}
 				}
-				if tt.want.skipStateUpdate {
-					assert.Equal(t, pluginCore.PhaseUndefined, state.s.PluginPhase)
-					assert.Equal(t, uint32(0), state.s.PluginPhaseVersion)
-				} else {
-					assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
-					assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
-				}
+				assert.Equal(t, expectedPhase.String(), state.s.PluginPhase.String())
+				assert.Equal(t, tt.args.expectedState.PhaseVersion, state.s.PluginPhaseVersion)
 				if tt.want.checkpoint {
 					assert.Equal(t, "s3://sandbox/x/name-n1-1/_flytecheckpoints",
 						got.Info().GetInfo().TaskNodeInfo.TaskNodeMetadata.CheckpointUri)
@@ -1226,7 +1214,8 @@ func Test_task_Finalize(t *testing.T) {
 
 			catalog := &pluginCatalogMocks.Client{}
 			m := tt.fields.defaultPluginCallback()
-			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), catalog, eventConfig, testClusterID, promutils.NewTestScope())
+			mockClientset := k8sfake.NewSimpleClientset()
+			tk, err := New(context.TODO(), mocks.NewFakeKubeClient(), mockClientset, catalog, eventConfig, testClusterID, promutils.NewTestScope())
 			assert.NoError(t, err)
 			tk.defaultPlugin = m
 			tk.resourceManager = noopRm
@@ -1245,7 +1234,8 @@ func Test_task_Finalize(t *testing.T) {
 }
 
 func TestNew(t *testing.T) {
-	got, err := New(context.TODO(), mocks.NewFakeKubeClient(), &pluginCatalogMocks.Client{}, eventConfig, testClusterID, promutils.NewTestScope())
+	mockClientset := k8sfake.NewSimpleClientset()
+	got, err := New(context.TODO(), mocks.NewFakeKubeClient(), mockClientset, &pluginCatalogMocks.Client{}, eventConfig, testClusterID, promutils.NewTestScope())
 	assert.NoError(t, err)
 	assert.NotNil(t, got)
 	assert.NotNil(t, got.defaultPlugins)

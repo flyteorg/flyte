@@ -182,6 +182,9 @@ pub struct DistributedTensorflowTrainingTask {
     /// active.
     #[prost(message, optional, tag="4")]
     pub run_policy: ::core::option::Option<RunPolicy>,
+    /// Evaluator replicas spec
+    #[prost(message, optional, tag="5")]
+    pub evaluator_replicas: ::core::option::Option<DistributedTensorflowTrainingReplicaSpec>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

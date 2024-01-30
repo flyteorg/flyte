@@ -20,7 +20,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/executor/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/snapshoter"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 

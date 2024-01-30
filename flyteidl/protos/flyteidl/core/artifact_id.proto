@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package flyteidl.core;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
+
+import "google/protobuf/timestamp.proto";
+import "flyteidl/core/identifier.proto";
+
+
+message ArtifactKey {
+  // Project and domain and suffix needs to be unique across a given artifact store.
+  string project = 1;
+  string domain = 2;
+  string name = 3;
+}
+
+// Only valid for triggers
+message ArtifactBindingData {
+  uint32 index = 1;
+
+  // These two fields are only relevant in the partition value case
+  oneof partition_data {
+    string partition_key = 2;
+    bool bind_to_time_partition = 3;
+  }
+
+  // This is only relevant in the time partition case
+  string transform = 4;
+}
+
+message InputBindingData {
+  string var = 1;
+}
+
+message LabelValue {
+  oneof value {
+    // The string static value is for use in the Partitions object
+    string static_value = 1;
+
+    // The time value is for use in the TimePartition case
+    google.protobuf.Timestamp time_value = 2;
+    ArtifactBindingData triggered_binding = 3;
+    InputBindingData input_binding = 4;
+  }
+}
+
+message Partitions {
+  map<string, LabelValue> value = 1;
+}
+
+message TimePartition {
+  LabelValue value = 1;
+}
+
+message ArtifactID {
+  ArtifactKey artifact_key = 1;
+
+  string version = 2;
+
+  // Think of a partition as a tag on an Artifact, except it's a key-value pair.
+  // Different partitions naturally have different versions (execution ids).
+  Partitions partitions = 3;
+
+  // There is no such thing as an empty time partition - if it's not set, then there is no time partition.
+  TimePartition time_partition = 4;
+}
+
+message ArtifactTag {
+  ArtifactKey artifact_key = 1;
+
+  LabelValue value = 2;
+}
+
+// Uniqueness constraints for Artifacts
+//  - project, domain, name, version, partitions
+// Option 2 (tags are standalone, point to an individual artifact id):
+//  - project, domain, name, alias (points to one partition if partitioned)
+//  - project, domain, name, partition key, partition value
+message ArtifactQuery {
+  oneof identifier {
+    ArtifactID artifact_id = 1;
+    ArtifactTag artifact_tag = 2;
+    string uri = 3;
+
+    // This is used in the trigger case, where a user specifies a value for an input that is one of the triggering
+    // artifacts, or a partition value derived from a triggering artifact.
+    ArtifactBindingData binding = 4;
+  }
+}

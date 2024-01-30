@@ -6,13 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/client-go/tools/cache"
+
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var pods = []interface{}{

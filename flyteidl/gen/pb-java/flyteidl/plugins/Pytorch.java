@@ -1618,8 +1618,8 @@ public final class Pytorch {
       "\014max_restarts\030\005 \001(\005\"j\n\036DistributedPyTorc" +
       "hTrainingTask\022\017\n\007workers\030\001 \001(\005\0227\n\016elasti" +
       "c_config\030\002 \001(\0132\037.flyteidl.plugins.Elasti" +
-      "cConfigB9Z7github.com/flyteorg/flyteidl/" +
-      "gen/pb-go/flyteidl/pluginsb\006proto3"
+      "cConfigB?Z=github.com/flyteorg/flyte/fly" +
+      "teidl/gen/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

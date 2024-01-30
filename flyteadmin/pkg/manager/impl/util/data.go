@@ -3,14 +3,15 @@ package util
 import (
 	"context"
 
+	"github.com/golang/protobuf/proto"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/golang/protobuf/proto"
 )
 
 const (

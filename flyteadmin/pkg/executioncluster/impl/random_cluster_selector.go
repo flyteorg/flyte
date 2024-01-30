@@ -6,23 +6,16 @@ import (
 	"hash/fnv"
 	"math/rand"
 
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
-	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
-	"google.golang.org/grpc/codes"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
-
-	"github.com/flyteorg/flyte/flytestdlib/random"
-
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
+	managerInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtime "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/random"
 )
 
 // Implementation of Random cluster selector
@@ -107,10 +100,8 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 		LaunchPlan:   spec.LaunchPlan,
 		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
 	})
-	if err != nil {
-		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		return nil, err
 	}
 
 	var weightedRandomList random.WeightedRandomList

@@ -175,6 +175,12 @@ pub struct RayJob {
     /// Ray runtime environments: <https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments>
     #[prost(string, tag="2")]
     pub runtime_env: ::prost::alloc::string::String,
+    /// shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+    #[prost(bool, tag="3")]
+    pub shutdown_after_job_finishes: bool,
+    /// ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+    #[prost(int32, tag="4")]
+    pub ttl_seconds_after_finished: i32,
 }
 /// Define Ray cluster defines the desired state of RayCluster
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -186,6 +192,9 @@ pub struct RayCluster {
     /// WorkerGroupSpecs are the specs for the worker pods
     #[prost(message, repeated, tag="2")]
     pub worker_group_spec: ::prost::alloc::vec::Vec<WorkerGroupSpec>,
+    /// Whether to enable autoscaling.
+    #[prost(bool, tag="3")]
+    pub enable_autoscaling: bool,
 }
 /// HeadGroupSpec are the spec for the head pod
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -290,14 +299,19 @@ pub struct SparkJob {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DistributedTensorflowTrainingTask {
-    /// number of worker, ps, chief replicas spawned in the cluster for this job
+    /// number of worker replicas spawned in the cluster for this job
     #[prost(int32, tag="1")]
     pub workers: i32,
     /// PS -> Parameter server
+    /// number of ps replicas spawned in the cluster for this job
     #[prost(int32, tag="2")]
     pub ps_replicas: i32,
+    /// number of chief replicas spawned in the cluster for this job
     #[prost(int32, tag="3")]
     pub chief_replicas: i32,
+    /// number of evaluator replicas spawned in the cluster for this job
+    #[prost(int32, tag="4")]
+    pub evaluator_replicas: i32,
 }
 /// Represents an Execution that was launched and could be waited on.
 #[allow(clippy::derive_partial_eq_without_eq)]

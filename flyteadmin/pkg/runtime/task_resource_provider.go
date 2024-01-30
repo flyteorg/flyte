@@ -1,9 +1,10 @@
 package runtime
 
 import (
+	"k8s.io/apimachinery/pkg/api/resource"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/config"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 const taskResourceKey = "task_resources"

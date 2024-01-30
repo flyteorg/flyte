@@ -79,6 +79,10 @@ var (
 			},
 		},
 		AppAuth: OAuth2Options{
+			ExternalAuthServer: ExternalAuthorizationServer{
+				RetryAttempts: 5,
+				RetryDelay:    config.Duration{Duration: 1 * time.Second},
+			},
 			AuthServerType: AuthorizationServerTypeSelf,
 			ThirdParty: ThirdPartyConfigOptions{
 				FlyteClientConfig: FlyteClientConfig{
@@ -191,7 +195,9 @@ type ExternalAuthorizationServer struct {
 	AllowedAudience     []string   `json:"allowedAudience" pflag:",Optional: A list of allowed audiences. If not provided, the audience is expected to be the public Uri of the service."`
 	MetadataEndpointURL config.URL `json:"metadataUrl" pflag:",Optional: If the server doesn't support /.well-known/oauth-authorization-server, you can set a custom metadata url here.'"`
 	// HTTPProxyURL allows operators to access external OAuth2 servers using an external HTTP Proxy
-	HTTPProxyURL config.URL `json:"httpProxyURL" pflag:",OPTIONAL: HTTP Proxy to be used for OAuth requests."`
+	HTTPProxyURL  config.URL      `json:"httpProxyURL" pflag:",OPTIONAL: HTTP Proxy to be used for OAuth requests."`
+	RetryAttempts int             `json:"retryAttempts" pflag:", Optional: The number of attempted retries on a transient failure to get the OAuth metadata"`
+	RetryDelay    config.Duration `json:"retryDelay" pflag:", Optional, Duration to wait between retries"`
 }
 
 // OAuth2Options defines settings for app auth.

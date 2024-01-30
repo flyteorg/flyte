@@ -4,14 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
 
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 func TestInvertBitSet(t *testing.T) {
@@ -292,7 +291,7 @@ func TestSummaryToPhase(t *testing.T) {
 	}{
 		{
 			"FailOnTooFewTasks",
-			PhaseWriteToDiscoveryThenFail,
+			PhaseAbortSubTasks,
 			map[core.Phase]int64{},
 		},
 		{
@@ -305,7 +304,7 @@ func TestSummaryToPhase(t *testing.T) {
 		},
 		{
 			"FailOnTooManyPermanentFailures",
-			PhaseWriteToDiscoveryThenFail,
+			PhaseAbortSubTasks,
 			map[core.Phase]int64{
 				core.PhasePermanentFailure: 1,
 				core.PhaseSuccess:          9,
@@ -336,7 +335,7 @@ func TestSummaryToPhase(t *testing.T) {
 		},
 		{
 			"FailedToRetry",
-			PhaseWriteToDiscoveryThenFail,
+			PhaseAbortSubTasks,
 			map[core.Phase]int64{
 				core.PhaseSuccess:          5,
 				core.PhasePermanentFailure: 5,
@@ -348,6 +347,24 @@ func TestSummaryToPhase(t *testing.T) {
 			map[core.Phase]int64{
 				core.PhaseSuccess:          5,
 				core.PhaseRetryableFailure: 5,
+			},
+		},
+		{
+			// complete retry even though minSuccesses is achieved
+			"RetryMinSuccessRatio",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseSuccess:          10,
+				core.PhaseRetryableFailure: 1,
+			},
+		},
+		{
+			// ensure all tasks are executed even if minSuccesses is achieved
+			"ExecuteAllMinSuccessRatio",
+			PhaseCheckingSubTaskExecutions,
+			map[core.Phase]int64{
+				core.PhaseSuccess:   10,
+				core.PhaseUndefined: 1,
 			},
 		},
 	}

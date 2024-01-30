@@ -22,18 +22,19 @@ extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fidentifier_2eproto ::google::p
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2finterface_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TypedInterface_flyteidl_2fcore_2finterface_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_RetryStrategy_flyteidl_2fcore_2fliterals_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fliterals_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Binding_flyteidl_2fcore_2fliterals_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ExtendedResources_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Error_flyteidl_2fcore_2ftypes_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftypes_2eproto ::google::protobuf::internal::SCCInfo<5> scc_info_LiteralType_flyteidl_2fcore_2ftypes_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_Alias_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ApproveCondition_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowMetadataDefaults_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_WorkflowMetadata_TagsEntry_DoNotUse_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_SignalCondition_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_SleepCondition_flyteidl_2fcore_2fworkflow_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_WorkflowNode_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_NodeMetadata_flyteidl_2fcore_2fworkflow_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_TaskNode_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_WorkflowMetadata_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<3> scc_info_GateNode_flyteidl_2fcore_2fworkflow_2eproto;
@@ -373,9 +374,10 @@ static void InitDefaultsTaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto() {
   ::flyteidl::core::TaskNodeOverrides::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsTaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto}, {
-      &scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsTaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto}, {
+      &scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto.base,
+      &scc_info_ExtendedResources_flyteidl_2fcore_2ftasks_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fcore_2fworkflow_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_TaskNode_flyteidl_2fcore_2fworkflow_2eproto.base);
@@ -551,6 +553,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fworkflow_2eproto:
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskNodeOverrides, resources_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::TaskNodeOverrides, extended_resources_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::IfBlock)},
@@ -672,15 +675,16 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto[] =
   "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte"
   "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013"
   "2\'.flyteidl.core.WorkflowMetadataDefault"
-  "s\"@\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001("
-  "\0132\030.flyteidl.core.ResourcesB6Z4github.co"
-  "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c"
-  "oreb\006proto3"
+  "s\"~\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001("
+  "\0132\030.flyteidl.core.Resources\022<\n\022extended_"
+  "resources\030\002 \001(\0132 .flyteidl.core.Extended"
+  "ResourcesB<Z:github.com/flyteorg/flyte/f"
+  "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_2eproto,
-  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 2971,
+  "flyteidl/core/workflow.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_2eproto, 3039,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto() {
@@ -8106,15 +8110,22 @@ void WorkflowTemplate::InternalSwap(WorkflowTemplate* other) {
 void TaskNodeOverrides::InitAsDefaultInstance() {
   ::flyteidl::core::_TaskNodeOverrides_default_instance_._instance.get_mutable()->resources_ = const_cast< ::flyteidl::core::Resources*>(
       ::flyteidl::core::Resources::internal_default_instance());
+  ::flyteidl::core::_TaskNodeOverrides_default_instance_._instance.get_mutable()->extended_resources_ = const_cast< ::flyteidl::core::ExtendedResources*>(
+      ::flyteidl::core::ExtendedResources::internal_default_instance());
 }
 class TaskNodeOverrides::HasBitSetters {
  public:
   static const ::flyteidl::core::Resources& resources(const TaskNodeOverrides* msg);
+  static const ::flyteidl::core::ExtendedResources& extended_resources(const TaskNodeOverrides* msg);
 };
 
 const ::flyteidl::core::Resources&
 TaskNodeOverrides::HasBitSetters::resources(const TaskNodeOverrides* msg) {
   return *msg->resources_;
+}
+const ::flyteidl::core::ExtendedResources&
+TaskNodeOverrides::HasBitSetters::extended_resources(const TaskNodeOverrides* msg) {
+  return *msg->extended_resources_;
 }
 void TaskNodeOverrides::clear_resources() {
   if (GetArenaNoVirtual() == nullptr && resources_ != nullptr) {
@@ -8122,8 +8133,15 @@ void TaskNodeOverrides::clear_resources() {
   }
   resources_ = nullptr;
 }
+void TaskNodeOverrides::clear_extended_resources() {
+  if (GetArenaNoVirtual() == nullptr && extended_resources_ != nullptr) {
+    delete extended_resources_;
+  }
+  extended_resources_ = nullptr;
+}
 #if !defined(_MSC_VER) || _MSC_VER >= 1900
 const int TaskNodeOverrides::kResourcesFieldNumber;
+const int TaskNodeOverrides::kExtendedResourcesFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 TaskNodeOverrides::TaskNodeOverrides()
@@ -8140,13 +8158,20 @@ TaskNodeOverrides::TaskNodeOverrides(const TaskNodeOverrides& from)
   } else {
     resources_ = nullptr;
   }
+  if (from.has_extended_resources()) {
+    extended_resources_ = new ::flyteidl::core::ExtendedResources(*from.extended_resources_);
+  } else {
+    extended_resources_ = nullptr;
+  }
   // @@protoc_insertion_point(copy_constructor:flyteidl.core.TaskNodeOverrides)
 }
 
 void TaskNodeOverrides::SharedCtor() {
   ::google::protobuf::internal::InitSCC(
       &scc_info_TaskNodeOverrides_flyteidl_2fcore_2fworkflow_2eproto.base);
-  resources_ = nullptr;
+  ::memset(&resources_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&extended_resources_) -
+      reinterpret_cast<char*>(&resources_)) + sizeof(extended_resources_));
 }
 
 TaskNodeOverrides::~TaskNodeOverrides() {
@@ -8156,6 +8181,7 @@ TaskNodeOverrides::~TaskNodeOverrides() {
 
 void TaskNodeOverrides::SharedDtor() {
   if (this != internal_default_instance()) delete resources_;
+  if (this != internal_default_instance()) delete extended_resources_;
 }
 
 void TaskNodeOverrides::SetCachedSize(int size) const {
@@ -8177,6 +8203,10 @@ void TaskNodeOverrides::Clear() {
     delete resources_;
   }
   resources_ = nullptr;
+  if (GetArenaNoVirtual() == nullptr && extended_resources_ != nullptr) {
+    delete extended_resources_;
+  }
+  extended_resources_ = nullptr;
   _internal_metadata_.Clear();
 }
 
@@ -8200,6 +8230,19 @@ const char* TaskNodeOverrides::_InternalParse(const char* begin, const char* end
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
         parser_till_end = ::flyteidl::core::Resources::_InternalParse;
         object = msg->mutable_resources();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      // .flyteidl.core.ExtendedResources extended_resources = 2;
+      case 2: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 18) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::ExtendedResources::_InternalParse;
+        object = msg->mutable_extended_resources();
         if (size > end - ptr) goto len_delim_till_end;
         ptr += size;
         GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
@@ -8247,6 +8290,17 @@ bool TaskNodeOverrides::MergePartialFromCodedStream(
         break;
       }
 
+      // .flyteidl.core.ExtendedResources extended_resources = 2;
+      case 2: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (18 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_extended_resources()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -8280,6 +8334,12 @@ void TaskNodeOverrides::SerializeWithCachedSizes(
       1, HasBitSetters::resources(this), output);
   }
 
+  // .flyteidl.core.ExtendedResources extended_resources = 2;
+  if (this->has_extended_resources()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      2, HasBitSetters::extended_resources(this), output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -8298,6 +8358,13 @@ void TaskNodeOverrides::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         1, HasBitSetters::resources(this), target);
+  }
+
+  // .flyteidl.core.ExtendedResources extended_resources = 2;
+  if (this->has_extended_resources()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        2, HasBitSetters::extended_resources(this), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -8326,6 +8393,13 @@ size_t TaskNodeOverrides::ByteSizeLong() const {
     total_size += 1 +
       ::google::protobuf::internal::WireFormatLite::MessageSize(
         *resources_);
+  }
+
+  // .flyteidl.core.ExtendedResources extended_resources = 2;
+  if (this->has_extended_resources()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *extended_resources_);
   }
 
   int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
@@ -8358,6 +8432,9 @@ void TaskNodeOverrides::MergeFrom(const TaskNodeOverrides& from) {
   if (from.has_resources()) {
     mutable_resources()->::flyteidl::core::Resources::MergeFrom(from.resources());
   }
+  if (from.has_extended_resources()) {
+    mutable_extended_resources()->::flyteidl::core::ExtendedResources::MergeFrom(from.extended_resources());
+  }
 }
 
 void TaskNodeOverrides::CopyFrom(const ::google::protobuf::Message& from) {
@@ -8386,6 +8463,7 @@ void TaskNodeOverrides::InternalSwap(TaskNodeOverrides* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   swap(resources_, other->resources_);
+  swap(extended_resources_, other->extended_resources_);
 }
 
 ::google::protobuf::Metadata TaskNodeOverrides::GetMetadata() const {

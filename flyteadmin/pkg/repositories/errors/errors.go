@@ -2,9 +2,10 @@
 package errors
 
 import (
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 )
 
 const (

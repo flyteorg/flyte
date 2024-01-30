@@ -16,7 +16,7 @@
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
 
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<9> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_WorkflowTemplate_flyteidl_2fcore_2fworkflow_2eproto;
 namespace flyteidl {
 namespace core {
@@ -79,14 +79,14 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fworkflow_5fclosure_2eprot
   "oto\032\031flyteidl/core/tasks.proto\"p\n\017Workfl"
   "owClosure\0221\n\010workflow\030\001 \001(\0132\037.flyteidl.c"
   "ore.WorkflowTemplate\022*\n\005tasks\030\002 \003(\0132\033.fl"
-  "yteidl.core.TaskTemplateB6Z4github.com/f"
-  "lyteorg/flyteidl/gen/pb-go/flyteidl/core"
-  "b\006proto3"
+  "yteidl.core.TaskTemplateB<Z:github.com/f"
+  "lyteorg/flyte/flyteidl/gen/pb-go/flyteid"
+  "l/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fworkflow_5fclosure_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fworkflow_5fclosure_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fworkflow_5fclosure_2eproto,
-  "flyteidl/core/workflow_closure.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_5fclosure_2eproto, 288,
+  "flyteidl/core/workflow_closure.proto", &assign_descriptors_table_flyteidl_2fcore_2fworkflow_5fclosure_2eproto, 294,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fworkflow_5fclosure_2eproto() {

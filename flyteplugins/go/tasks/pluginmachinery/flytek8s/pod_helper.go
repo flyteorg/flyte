@@ -7,30 +7,74 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/golang/protobuf/proto"
+	"github.com/imdario/mergo"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginserrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/imdario/mergo"
-
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const PodKind = "pod"
 const OOMKilled = "OOMKilled"
 const Interrupted = "Interrupted"
+const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
 
 const defaultContainerTemplateName = "default"
 const primaryContainerTemplateName = "primary"
 const PrimaryContainerKey = "primary_container_name"
+
+// AddRequiredNodeSelectorRequirements adds the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object. If there are no existing required
+// node selectors, the new v1.NodeSelectorRequirement will be added as-is.
+// However, if there are existing required node selectors, we iterate over all existing
+// node selector terms and append the node selector requirement. Note that multiple node
+// selector terms are OR'd, and match expressions within a single node selector term
+// are AND'd during scheduling.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity
+func AddRequiredNodeSelectorRequirements(base *v1.Affinity, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	if base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
+	}
+	if len(base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
+		nodeSelectorTerms := base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
+		for i := range nodeSelectorTerms {
+			nst := &nodeSelectorTerms[i]
+			nst.MatchExpressions = append(nst.MatchExpressions, new...)
+		}
+	} else {
+		base.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{v1.NodeSelectorTerm{MatchExpressions: new}}
+	}
+}
+
+// AddPreferredNodeSelectorRequirements appends the provided v1.NodeSelectorRequirement
+// objects to an existing v1.Affinity object's list of preferred scheduling terms.
+// See: https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity-weight
+// for how weights are used during scheduling.
+func AddPreferredNodeSelectorRequirements(base *v1.Affinity, weight int32, new ...v1.NodeSelectorRequirement) {
+	if base.NodeAffinity == nil {
+		base.NodeAffinity = &v1.NodeAffinity{}
+	}
+	base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution = append(
+		base.NodeAffinity.PreferredDuringSchedulingIgnoredDuringExecution,
+		v1.PreferredSchedulingTerm{
+			Weight: weight,
+			Preference: v1.NodeSelectorTerm{
+				MatchExpressions: new,
+			},
+		},
+	)
+}
 
 // ApplyInterruptibleNodeSelectorRequirement configures the node selector requirement of the node-affinity using the configuration specified.
 func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.Affinity) {
@@ -48,22 +92,7 @@ func ApplyInterruptibleNodeSelectorRequirement(interruptible bool, affinity *v1.
 		nodeSelectorRequirement = *config.GetK8sPluginConfig().NonInterruptibleNodeSelectorRequirement
 	}
 
-	if affinity.NodeAffinity == nil {
-		affinity.NodeAffinity = &v1.NodeAffinity{}
-	}
-	if affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution == nil {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution = &v1.NodeSelector{}
-	}
-	if len(affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms) > 0 {
-		nodeSelectorTerms := affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms
-		for i := range nodeSelectorTerms {
-			nst := &nodeSelectorTerms[i]
-			nst.MatchExpressions = append(nst.MatchExpressions, nodeSelectorRequirement)
-		}
-	} else {
-		affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms = []v1.NodeSelectorTerm{{MatchExpressions: []v1.NodeSelectorRequirement{nodeSelectorRequirement}}}
-	}
-
+	AddRequiredNodeSelectorRequirements(affinity, nodeSelectorRequirement)
 }
 
 // ApplyInterruptibleNodeAffinity configures the node-affinity for the pod using the configuration specified.
@@ -73,6 +102,115 @@ func ApplyInterruptibleNodeAffinity(interruptible bool, podSpec *v1.PodSpec) {
 	}
 
 	ApplyInterruptibleNodeSelectorRequirement(interruptible, podSpec.Affinity)
+}
+
+// Specialized merging of overrides into a base *core.ExtendedResources object. Note
+// that doing a nested merge may not be the intended behavior all the time, so we
+// handle each field separately here.
+func applyExtendedResourcesOverrides(base, overrides *core.ExtendedResources) *core.ExtendedResources {
+	// Handle case where base might be nil
+	var new *core.ExtendedResources
+	if base == nil {
+		new = &core.ExtendedResources{}
+	} else {
+		new = proto.Clone(base).(*core.ExtendedResources)
+	}
+
+	// No overrides found
+	if overrides == nil {
+		return new
+	}
+
+	// GPU Accelerator
+	if overrides.GetGpuAccelerator() != nil {
+		new.GpuAccelerator = overrides.GetGpuAccelerator()
+	}
+
+	return new
+}
+
+func ApplyGPUNodeSelectors(podSpec *v1.PodSpec, gpuAccelerator *core.GPUAccelerator) {
+	// Short circuit if pod spec does not contain any containers that use GPUs
+	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
+	requiresGPUs := false
+	for _, cnt := range podSpec.Containers {
+		if _, ok := cnt.Resources.Limits[gpuResourceName]; ok {
+			requiresGPUs = true
+			break
+		}
+	}
+	if !requiresGPUs {
+		return
+	}
+
+	if podSpec.Affinity == nil {
+		podSpec.Affinity = &v1.Affinity{}
+	}
+
+	// Apply changes for GPU device
+	device := gpuAccelerator.GetDevice()
+	if len(device) > 0 {
+		// Add node selector requirement for GPU device
+		deviceNsr := v1.NodeSelectorRequirement{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{device},
+		}
+		AddRequiredNodeSelectorRequirements(podSpec.Affinity, deviceNsr)
+		// Add toleration for GPU device
+		deviceTol := v1.Toleration{
+			Key:      config.GetK8sPluginConfig().GpuDeviceNodeLabel,
+			Value:    device,
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+		podSpec.Tolerations = append(podSpec.Tolerations, deviceTol)
+	}
+
+	// Short circuit if a partition size preference is not specified
+	partitionSizeValue := gpuAccelerator.GetPartitionSizeValue()
+	if partitionSizeValue == nil {
+		return
+	}
+
+	// Apply changes for GPU partition size, if applicable
+	var partitionSizeNsr *v1.NodeSelectorRequirement
+	var partitionSizeTol *v1.Toleration
+	switch p := partitionSizeValue.(type) {
+	case *core.GPUAccelerator_Unpartitioned:
+		if !p.Unpartitioned {
+			break
+		}
+		if config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement != nil {
+			partitionSizeNsr = config.GetK8sPluginConfig().GpuUnpartitionedNodeSelectorRequirement
+		} else {
+			partitionSizeNsr = &v1.NodeSelectorRequirement{
+				Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+				Operator: v1.NodeSelectorOpDoesNotExist,
+			}
+		}
+		if config.GetK8sPluginConfig().GpuUnpartitionedToleration != nil {
+			partitionSizeTol = config.GetK8sPluginConfig().GpuUnpartitionedToleration
+		}
+	case *core.GPUAccelerator_PartitionSize:
+		partitionSizeNsr = &v1.NodeSelectorRequirement{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Operator: v1.NodeSelectorOpIn,
+			Values:   []string{p.PartitionSize},
+		}
+		partitionSizeTol = &v1.Toleration{
+			Key:      config.GetK8sPluginConfig().GpuPartitionSizeNodeLabel,
+			Value:    p.PartitionSize,
+			Operator: v1.TolerationOpEqual,
+			Effect:   v1.TaintEffectNoSchedule,
+		}
+	}
+	if partitionSizeNsr != nil {
+		AddRequiredNodeSelectorRequirements(podSpec.Affinity, *partitionSizeNsr)
+	}
+	if partitionSizeTol != nil {
+		podSpec.Tolerations = append(podSpec.Tolerations, *partitionSizeTol)
+	}
 }
 
 // UpdatePod updates the base pod spec used to execute tasks. This is configured with plugins and task metadata-specific options
@@ -250,6 +388,18 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
+	// handling for extended resources
+	// Merge overrides with base extended resources
+	extendedResources := applyExtendedResourcesOverrides(
+		taskTemplate.GetExtendedResources(),
+		tCtx.TaskExecutionMetadata().GetOverrides().GetExtendedResources(),
+	)
+
+	// GPU accelerator
+	if extendedResources.GetGpuAccelerator() != nil {
+		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
+	}
+
 	return podSpec, objectMeta, nil
 }
 
@@ -269,6 +419,15 @@ func ToK8sPodSpec(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*
 	}
 
 	return podSpec, objectMeta, primaryContainerName, nil
+}
+
+func GetContainer(podSpec *v1.PodSpec, name string) (*v1.Container, error) {
+	for _, container := range podSpec.Containers {
+		if container.Name == name {
+			return &container, nil
+		}
+	}
+	return nil, pluginserrors.Errorf(pluginserrors.BadTaskSpecification, "invalid TaskSpecification, container [%s] not defined", name)
 }
 
 // getBasePodTemplate attempts to retrieve the PodTemplate to use as the base for k8s Pod configuration. This value can
@@ -413,14 +572,38 @@ func BuildIdentityPod() *v1.Pod {
 //	and hence input gates. We should not allow bad requests that Request for large number of resource through.
 //	In the case it makes through, we will fail after timeout
 func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
+	phaseInfo, t := demystifyPendingHelper(status)
+
+	if phaseInfo.Phase().IsTerminal() {
+		return phaseInfo, nil
+	}
+
+	podPendingTimeout := config.GetK8sPluginConfig().PodPendingTimeout.Duration
+	if podPendingTimeout > 0 && time.Since(t) >= podPendingTimeout {
+		return pluginsCore.PhaseInfoRetryableFailureWithCleanup("PodPendingTimeout", phaseInfo.Reason(), &pluginsCore.TaskInfo{
+			OccurredAt: &t,
+		}), nil
+	}
+
+	if phaseInfo.Phase() != pluginsCore.PhaseUndefined {
+		return phaseInfo, nil
+	}
+
+	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+}
+
+func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
+	phaseInfo := pluginsCore.PhaseInfoUndefined
+	t := time.Now()
 	for _, c := range status.Conditions {
+		t = c.LastTransitionTime.Time
 		switch c.Type {
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {
 				// Waiting to be scheduled. This usually refers to inability to acquire resources.
-				return pluginsCore.PhaseInfoQueued(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), nil
+				return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
 			}
 
 		case v1.PodReasonUnschedulable:
@@ -433,7 +616,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 			//  reason: Unschedulable
 			// 	status: "False"
 			// 	type: PodScheduled
-			return pluginsCore.PhaseInfoQueued(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), nil
+			return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
 
 		case v1.PodReady:
 			if c.Status == v1.ConditionFalse {
@@ -478,7 +661,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// ErrImagePull -> Transitionary phase to ImagePullBackOff
 								// ContainerCreating -> Image is being downloaded
 								// PodInitializing -> Init containers are running
-								return pluginsCore.PhaseInfoInitializing(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), nil
+								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
 
 							case "CreateContainerError":
 								// This may consist of:
@@ -500,31 +683,45 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// synced, and therefore, only provides an
 								// approximation of the elapsed time since the last
 								// transition.
-								t := c.LastTransitionTime.Time
-								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
-									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), nil
+									}), t
 								}
 								return pluginsCore.PhaseInfoInitializing(
 									t,
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), nil
+								), t
 
-							case "CreateContainerConfigError", "InvalidImageName":
-								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+							case "CreateContainerConfigError":
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+										OccurredAt: &t,
+									}), t
+								}
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), t
+
+							case "InvalidImageName":
+								return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
-								}), nil
+								}), t
 
 							case "ImagePullBackOff":
-								t := c.LastTransitionTime.Time
-								if time.Since(t) >= config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration {
-									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), nil
+									}), t
 								}
 
 								return pluginsCore.PhaseInfoInitializing(
@@ -532,7 +729,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), nil
+								), t
 
 							default:
 								// Since we are not checking for all error states, we may end up perpetually
@@ -540,12 +737,10 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// by K8s and we get elusive 'pod not found' errors
 								// So be default if the container is not waiting with the PodInitializing/ContainerCreating
 								// reasons, then we will assume a failure reason, and fail instantly
-								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoSystemRetryableFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
-								}), nil
+								}), t
 							}
-
 						}
 					}
 				}
@@ -553,14 +748,18 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 		}
 	}
 
-	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+	return phaseInfo, t
+}
+
+func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
+	return fmt.Sprintf("Grace period [%s] exceeded|%s", gracePeriod, message)
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	for _, status := range append(
 		append(status.InitContainerStatuses, status.ContainerStatuses...), status.EphemeralContainerStatuses...) {
 		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
-			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
+			return pluginsCore.PhaseInfoRetryableFailure(OOMKilled,
 				"Pod reported success despite being OOMKilled", &info), nil
 		}
 	}
@@ -578,9 +777,14 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 			}
 
 			if s.State.Terminated != nil {
-				if s.State.Terminated.ExitCode != 0 {
+				if s.State.Terminated.ExitCode != 0 || strings.Contains(s.State.Terminated.Reason, OOMKilled) {
+					message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
+						s.Name,
+						s.State.Terminated.ExitCode,
+						s.State.Terminated.Reason,
+						s.State.Terminated.Message)
 					return pluginsCore.PhaseInfoRetryableFailure(
-						s.State.Terminated.Reason, s.State.Terminated.Message, info)
+						s.State.Terminated.Reason, message, info)
 				}
 				return pluginsCore.PhaseInfoSuccess(info)
 			}
@@ -588,7 +792,7 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 	}
 
 	// If for some reason we can't find the primary container, always just return a permanent failure
-	return pluginsCore.PhaseInfoFailure("PrimaryContainerMissing",
+	return pluginsCore.PhaseInfoFailure(PrimaryContainerNotFound,
 		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
 }
 

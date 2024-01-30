@@ -6,21 +6,18 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/golang/protobuf/ptypes"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/golang/protobuf/ptypes"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // This is used by flyteadmin to indicate that the events will now contain populated IsParent and IsDynamic bits.
@@ -72,6 +69,8 @@ func ToNodeExecEventPhase(p handler.EPhase) core.NodeExecution_Phase {
 		return core.NodeExecution_FAILED
 	case handler.EPhaseRecovered:
 		return core.NodeExecution_RECOVERED
+	case handler.EPhaseTimedout:
+		return core.NodeExecution_TIMED_OUT
 	default:
 		return core.NodeExecution_UNDEFINED
 	}
@@ -178,6 +177,9 @@ func ToNodeExecutionEvent(nodeExecID *core.NodeExecutionIdentifier,
 	}
 	if node.GetKind() == v1alpha1.NodeKindWorkflow && node.GetWorkflowNode() != nil && node.GetWorkflowNode().GetSubWorkflowRef() != nil {
 		nev.IsParent = true
+	} else if node.GetKind() == v1alpha1.NodeKindArray {
+		nev.IsParent = true
+		nev.IsArray = true
 	} else if dynamicNodePhase != v1alpha1.DynamicNodePhaseNone {
 		nev.IsDynamic = true
 		if nev.GetTaskNodeMetadata() != nil && nev.GetTaskNodeMetadata().DynamicWorkflow != nil {
@@ -228,10 +230,10 @@ func ToK8sTime(t time.Time) v1.Time {
 	return v1.Time{Time: t}
 }
 
-func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus) {
+func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus, enableCRDebugMetadata bool) {
 	// We update the phase and / or reason only if they are not already updated
 	if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
-		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), p.GetErr())
+		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), enableCRDebugMetadata, p.GetErr())
 	}
 	// Update TaskStatus
 	if n.HasTaskNodeState() {

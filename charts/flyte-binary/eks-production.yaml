@@ -1,35 +1,42 @@
 configuration:
   database:
+    username: postgres
     password: <DB_PASSWORD>
     host: <RDS_HOST_DNS>
-    dbname: app
+    dbname: flyte
   storage:
+    #Learn more about how Flyte handles data: https://docs.flyte.org/en/latest/concepts/data_management.html
     metadataContainer: <BUCKET_NAME>
     userDataContainer: <USER_DATA_BUCKET_NAME>
     provider: s3
     providerConfig:
       s3:
-        region: "us-east-2"
+        region: "<AWS-REGION-CODE>"
         authType: "iam"
+  #For logging to work, you need to setup an agent. 
+  # Learn more: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Container-Insights-EKS-logs.html
   logging:
     level: 5
     plugins:
       cloudwatch:
         enabled: true
         templateUri: |-
-          https://console.aws.amazon.com/cloudwatch/home?region=<AWS_REGION>#logEventViewer:group=/eks/opta-development/cluster;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log
+          https://console.aws.amazon.com/cloudwatch/home?region=<AWS_REGION>#logEventViewer:group=/aws/eks/<EKS_CLUSTER_NAME>/cluster;stream=var.log.containers.{{ .podName }}_{{ .namespace }}_{{ .containerName }}-{{ .containerId }}.log
+  # To configure auth, refer to https://docs.flyte.org/en/latest/deployment/configuration/auth_setup.html
   auth:
-    enabled: true
+    enabled: false
     oidc:
-      baseUrl: https://signin.hosted.unionai.cloud/oauth2/default
+      baseUrl: <YOUR_IDP_BASE_URL>
       clientId: <IDP_CLIENT_ID>
       clientSecret: <IDP_CLIENT_SECRET>
     internal:
       clientSecret: <CC_PASSWD>
       clientSecretHash: <HASHED_CC_PASSWD>
     authorizedUris:
-    - https://flyte.company.com
+    - https://flyte.company.com #change to your authorized URI
   inline:
+    #This section automates the IAM Role annotation for the default KSA on each project namespace to enable IRSA
+    #Learn more: https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html
     cluster_resources:
       customData:
       - production:
@@ -49,22 +56,8 @@ configuration:
         default-env-vars:
           - AWS_METADATA_SERVICE_TIMEOUT: 5
           - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
-      spark:
-        spark-config-default:
-          - spark.hadoop.fs.s3a.aws.credentials.provider: com.amazonaws.auth.DefaultAWSCredentialsProviderChain
-          - spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version: "2"
-          - spark.kubernetes.allocation.batch.size: "50"
-          - spark.hadoop.fs.s3a.acl.default: BucketOwnerFullControl
-          - spark.hadoop.fs.s3n.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: org.apache.hadoop.fs.s3a.S3A
-          - spark.hadoop.fs.s3.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-          - spark.hadoop.fs.AbstractFileSystem.s3.impl: org.apache.hadoop.fs.s3a.S3A
-          - spark.hadoop.fs.s3a.impl: org.apache.hadoop.fs.s3a.S3AFileSystem
-          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: org.apache.hadoop.fs.s3a.S3A
-          - spark.hadoop.fs.s3a.multipart.threshold: "536870912"
-          - spark.blacklist.enabled: "true"
-          - spark.blacklist.timeout: 5m
-          - spark.task.maxfailures: "8"
+    # Configuration for the Datacatalog engine, used when caching is enabled
+    # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html  
     storage:
       cache:
         max_size_mbs: 10
@@ -74,102 +67,55 @@ configuration:
         enabled-plugins:
           - container
           - sidecar
-          - K8S-ARRAY
-          - spark
+          - K8S-ARRAY #used for MapTasks
         default-for-task-types:
           - container: container
           - container_array: K8S-ARRAY
-          - spark: spark
 clusterResourceTemplates:
   inline:
+    #This section automates the creation of the project-domain namespaces
     001_namespace.yaml: |
       apiVersion: v1
       kind: Namespace
       metadata:
         name: '{{ namespace }}'
-    010_spark_role.yaml: |
-      apiVersion: rbac.authorization.k8s.io/v1
-      kind: Role
-      metadata:
-        name: spark-role
-        namespace: '{{ namespace }}'
-      rules:
-      - apiGroups:
-        - ""
-        resources:
-        - pods
-        - services
-        - configmaps
-        verbs:
-        - '*'
-    011_spark_service_account.yaml: |
+    # This block performs the automated annotation of KSAs across all project-domain namespaces
+    002_serviceaccount.yaml: |
       apiVersion: v1
       kind: ServiceAccount
       metadata:
-        name: spark
+        name: default
         namespace: '{{ namespace }}'
         annotations:
           eks.amazonaws.com/role-arn: '{{ defaultIamRole }}'
-    012_spark_role_binding.yaml: |
-      apiVersion: rbac.authorization.k8s.io/v1
-      kind: RoleBinding
-      metadata:
-        name: spark-role-binding
-        namespace: '{{ namespace }}'
-      roleRef:
-        apiGroup: rbac.authorization.k8s.io
-        kind: Role
-        name: spark-role
-      subjects:
-      - kind: ServiceAccount
-        name: spark
-        namespace: '{{ namespace }}'
 ingress:
   create: true
+  ##-- Uncomment the following section if you plan to use NGINX Ingress Controller
+  #ingressClassName: nginx
+  #commonAnnotations:
+  #  ingress.kubernetes.io/rewrite-target: /
+  #  nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  #httpAnnotations:
+  #  nginx.ingress.kubernetes.io/app-root: /console
+  #grpcAnnotations:
+  #  nginx.ingress.kubernetes.io/backend-protocol: GRPC
+  #host: <your-Flyte-URL> # change for the URL you'll use to connect to Flyte
+  ## ---
+  
+  #This section assumes you are using the ALB Ingress controller.
+  ingressClassName: alb
   commonAnnotations:
-    kubernetes.io/ingress.class: nginx
+    alb.ingress.kubernetes.io/certificate-arn: 'arn:aws:acm:<AWS-REGION>:<AWS-ACCOUNT-ID>:certificate/<CERTIFICATE-ID>'
+    alb.ingress.kubernetes.io/group.name: flyte
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-redirect: '443'
+    alb.ingress.kubernetes.io/target-type: ip
   httpAnnotations:
-    nginx.ingress.kubernetes.io/app-root: /console
+    alb.ingress.kubernetes.io/actions.app-root: '{"Type": "redirect", "RedirectConfig": {"Path": "/console", "StatusCode": "HTTP_302"}}'
   grpcAnnotations:
-    nginx.ingress.kubernetes.io/backend-protocol: GRPC
-  host: development.uniondemo.run
-rbac:
-  extraRules:
-    - apiGroups:
-      - ""
-      resources:
-      - pods
-      - services
-      - configmaps
-      verbs:
-      - "*"
-    - apiGroups:
-      - ""
-      resources:
-      - serviceaccounts
-      verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
-    - apiGroups:
-      - rbac.authorization.k8s.io
-      resources:
-      - rolebindings
-      - roles
-      verbs:
-      - create
-      - get
-      - list
-      - patch
-      - update
-    - apiGroups:
-      - sparkoperator.k8s.io
-      resources:
-      - sparkapplications
-      verbs:
-      - "*"
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC 
+  host: flyte.mydomain.com #replace with your fully-qualified domain name
 serviceAccount:
   create: true
   annotations:

@@ -449,6 +449,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_proxyCommand", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := join_Config(defaultConfig.ProxyCommand, ",")
+
+			cmdFlags.Set("proxyCommand", testValue)
+			if vStringSlice, err := cmdFlags.GetStringSlice("proxyCommand"); err == nil {
+				testDecodeRaw_Config(t, join_Config(vStringSlice, ","), &actual.ProxyCommand)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_defaultServiceConfig", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

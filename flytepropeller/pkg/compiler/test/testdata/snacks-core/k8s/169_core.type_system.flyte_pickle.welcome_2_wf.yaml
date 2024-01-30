@@ -80,8 +80,6 @@ spec:
       kind: task
       name: greet
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.flyte_pickle.greet" '
     start-node:
       id: start-node

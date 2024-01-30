@@ -8,34 +8,29 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
+	"golang.org/x/sync/errgroup"
+	"k8s.io/klog"
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller"
 	config2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/signals"
-
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/version"
-
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
-
-	"golang.org/x/sync/errgroup"
-
-	"k8s.io/client-go/rest"
-	"k8s.io/klog"
-
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const (
@@ -123,19 +118,37 @@ func executeRootCmd(baseCtx context.Context, cfg *config2.Config) error {
 		labeled.SetMetricKeys(keys...)
 	}
 
+	// register opentelementry tracer providers
+	for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.BlobstoreClientTracer,
+		otelutils.DataCatalogClientTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+		if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+			logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+			return err
+		}
+	}
+
 	// Add the propeller subscope because the MetricsPrefix only has "flyte:" to get uniform collection of metrics.
 	propellerScope := promutils.NewScope(cfg.MetricsPrefix).NewSubScope("propeller").NewSubScope(cfg.LimitNamespace)
 	limitNamespace := ""
+	var namespaceConfigs map[string]cache.Config
 	if cfg.LimitNamespace != defaultNamespace {
 		limitNamespace = cfg.LimitNamespace
+		namespaceConfigs = map[string]cache.Config{
+			limitNamespace: {},
+		}
 	}
+
 	options := manager.Options{
-		Namespace:  limitNamespace,
-		SyncPeriod: &cfg.DownstreamEval.Duration,
-		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
+		Cache: cache.Options{
+			SyncPeriod:        &cfg.DownstreamEval.Duration,
+			DefaultNamespaces: namespaceConfigs,
 		},
-		MetricsBindAddress: "0",
+		NewCache:  executors.NewCache,
+		NewClient: executors.BuildNewClientFunc(propellerScope),
+		Metrics: metricsserver.Options{
+			// Disable metrics serving
+			BindAddress: "0",
+		},
 	}
 
 	mgr, err := controller.CreateControllerManager(ctx, cfg, options)

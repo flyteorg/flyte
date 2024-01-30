@@ -1,11 +1,12 @@
 package flytek8s
 
 import (
-	pluginmachinery_core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/pkg/errors"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginmachinery_core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 func ToK8sEnvVar(env []*core.KeyValuePair) []v1.EnvVar {
@@ -34,10 +35,6 @@ func ToK8sResourceList(resources []*core.Resources_ResourceEntry) (v1.ResourceLi
 		case core.Resources_MEMORY:
 			if !v.IsZero() {
 				k8sResources[v1.ResourceMemory] = v
-			}
-		case core.Resources_STORAGE:
-			if !v.IsZero() {
-				k8sResources[v1.ResourceStorage] = v
 			}
 		case core.Resources_GPU:
 			if !v.IsZero() {

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package flyteidl.admin;
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
 
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/execution.proto";
@@ -114,6 +114,10 @@ message NodeExecutionMetaData {
     // Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes.
     // This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
     bool is_dynamic = 4;
+
+    // Boolean flag indicating if the node is an array node. This is intended to uniquely identify
+    // array nodes from other nodes which can have is_parent_node as true.
+    bool is_array = 5;
 }
 
 // Request structure to retrieve a list of node execution entities.
@@ -230,4 +234,12 @@ message NodeExecutionGetDataResponse {
 
     FlyteURLs flyte_urls = 17;
 
+}
+
+message GetDynamicNodeWorkflowRequest {
+    core.NodeExecutionIdentifier id = 1;
+}
+
+message DynamicNodeWorkflowResponse {
+    core.CompiledWorkflowClosure compiled_workflow = 1;
 }

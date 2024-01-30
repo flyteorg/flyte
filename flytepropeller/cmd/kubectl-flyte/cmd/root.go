@@ -8,23 +8,23 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
 	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
-	"github.com/spf13/cobra"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/version"
 )
 
 func init() {
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	err := flag.CommandLine.Parse([]string{})
 	if err != nil {
-		logger.Error(context.TODO(), "Error in initializing: %v", err)
+		logger.Errorf(context.TODO(), "Error in initializing: %v", err)
 		os.Exit(-1)
 	}
 }

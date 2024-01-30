@@ -499,7 +499,7 @@ metadata:
 ---
 apiVersion: v1
 data:
-  haSharedSecret: S3hhYmcwb1E0enNmZXpHQw==
+  haSharedSecret: cDQ2bUZZQkg4bjg2Y2hGRQ==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -910,6 +910,7 @@ spec:
           periodSeconds: 30
         securityContext:
           privileged: true
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
 ---
 apiVersion: apps/v1
@@ -933,7 +934,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: 32e8e4864e56d8e05e03763b1e04dc6c1821c30c5079087b39a02c1348560d34
+        checksum/secret: e65c1b8ed75e538fd09b9d94538d1a99a986534b18625406a2bc9cce8aeffe1a
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1221,10 +1222,17 @@ spec:
       containers:
       - image: envoyproxy/envoy:sandbox
         imagePullPolicy: Never
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: http
         name: proxy
         ports:
         - containerPort: 8000
           name: http
+        readinessProbe:
+          tcpSocket:
+            port: http
         volumeMounts:
         - mountPath: /etc/envoy
           name: config

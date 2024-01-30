@@ -7,13 +7,8 @@ define PIP_COMPILE
 pip-compile $(1) --upgrade --verbose
 endef
 
-.PHONY: update_boilerplate
-update_boilerplate:
-	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
-	@boilerplate/update.sh
-
 .PHONY: generate
-generate: update_boilerplate install doc_gen_deps # get latest boiler plate, install tools, generate protos, mock, pflags and  get doc dependencies
+generate: install doc_gen_deps # install tools, generate protos, mock, pflags and  get doc dependencies
 	./generate_protos.sh
 	./generate_mocks.sh
 	go generate ./...
@@ -60,3 +55,7 @@ update_pyversion:
 update_npmversion:
 	grep "$(PLACEHOLDER_NPM)" "package.json"
 	sed -i "s/$(PLACEHOLDER_NPM)/\"version\":  \"${VERSION}\"/g" "package.json"
+
+.PHONY: go-tidy
+go-tidy:
+	go mod tidy

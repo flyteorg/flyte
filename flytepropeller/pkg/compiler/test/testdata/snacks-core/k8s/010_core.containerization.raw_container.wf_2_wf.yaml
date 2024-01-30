@@ -125,8 +125,6 @@ spec:
       kind: task
       name: ellipse-area-metadata-shell
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"ellipse-area-metadata-shell" '
     n1:
       id: n1
@@ -144,8 +142,6 @@ spec:
       kind: task
       name: ellipse-area-metadata-python
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"ellipse-area-metadata-python" '
     n2:
       id: n2
@@ -163,8 +159,6 @@ spec:
       kind: task
       name: ellipse-area-metadata-r
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"ellipse-area-metadata-r" '
     n3:
       id: n3
@@ -182,8 +176,6 @@ spec:
       kind: task
       name: ellipse-area-metadata-haskell
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"ellipse-area-metadata-haskell" '
     n4:
       id: n4
@@ -201,8 +193,6 @@ spec:
       kind: task
       name: ellipse-area-metadata-julia
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"ellipse-area-metadata-julia" '
     n5:
       id: n5
@@ -260,8 +250,6 @@ spec:
       kind: task
       name: report_all_calculated_areas
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.containerization.raw_container.report_all_calculated_areas" '
     start-node:
       id: start-node

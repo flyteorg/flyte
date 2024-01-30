@@ -108,6 +108,7 @@ data:
         - container
         - sidecar
         - k8s-array
+        - agent-service
     plugins:
       logs:
         kubernetes-enabled: false
@@ -115,7 +116,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.9.4"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b2"
       k8s-array:
         logs:
           config:
@@ -357,7 +358,7 @@ spec:
         app.kubernetes.io/instance: flyte
         app.kubernetes.io/component: flyte-binary
       annotations:
-        checksum/configuration: 528ce4a42638a7810c99802dfd49525967db2a99dbc1019544b7799de2490b61
+        checksum/configuration: 4566d9bb7575f535ccf8481c719474e72b926b8029d83e3b6318549e3cdd2f14
         checksum/configuration-secret: d5d93f4e67780b21593dc3799f0f6682aab0765e708e4020939975d14d44f929
         checksum/cluster-resource-templates: 7dfa59f3d447e9c099b8f8ffad3af466fecbc9cf9f8c97295d9634254a55d4ae
     spec:
@@ -407,10 +408,12 @@ spec:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           readinessProbe:
             httpGet:
               path: /healthcheck
               port: http
+            initialDelaySeconds: 30
           volumeMounts:
             - name: cluster-resource-templates
               mountPath: /etc/flyte/cluster-resource-templates

@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	structpb "github.com/golang/protobuf/ptypes/struct"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const DefaultPhaseVersion = uint32(0)
@@ -35,6 +36,8 @@ const (
 	PhasePermanentFailure
 	// Indicates the task is waiting for the cache to be populated so it can reuse results
 	PhaseWaitingForCache
+	// Indicate the task has been aborted
+	PhaseAborted
 )
 
 var Phases = []Phase{
@@ -48,11 +51,12 @@ var Phases = []Phase{
 	PhaseRetryableFailure,
 	PhasePermanentFailure,
 	PhaseWaitingForCache,
+	PhaseAborted,
 }
 
 // Returns true if the given phase is failure, retryable failure or success
 func (p Phase) IsTerminal() bool {
-	return p.IsFailure() || p.IsSuccess()
+	return p.IsFailure() || p.IsSuccess() || p.IsAborted()
 }
 
 func (p Phase) IsFailure() bool {
@@ -61,6 +65,10 @@ func (p Phase) IsFailure() bool {
 
 func (p Phase) IsSuccess() bool {
 	return p == PhaseSuccess
+}
+
+func (p Phase) IsAborted() bool {
+	return p == PhaseAborted
 }
 
 func (p Phase) IsWaitingForResources() bool {
@@ -83,6 +91,11 @@ type ExternalResource struct {
 	Phase Phase
 }
 
+type ReasonInfo struct {
+	Reason     string
+	OccurredAt *time.Time
+}
+
 type TaskInfo struct {
 	// log information for the task execution
 	Logs []*core.TaskLog
@@ -96,6 +109,8 @@ type TaskInfo struct {
 	CustomInfo *structpb.Struct
 	// A collection of information about external resources launched by this task
 	ExternalResources []*ExternalResource
+	// Additional reasons for this case. Note, these are not included in the phase state.
+	AdditionalReasons []ReasonInfo
 }
 
 func (t *TaskInfo) String() string {
@@ -218,7 +233,6 @@ func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) 
 }
 
 func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
-
 	pi := phaseInfo(PhaseInitializing, version, nil, info, false)
 	pi.reason = reason
 	return pi
@@ -247,15 +261,23 @@ func PhaseInfoSuccess(info *TaskInfo) PhaseInfo {
 }
 
 func PhaseInfoSystemFailure(code, reason string, info *TaskInfo) PhaseInfo {
-	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info)
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info, false)
+}
+
+func PhaseInfoSystemFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info, true)
 }
 
 func PhaseInfoFailure(code, reason string, info *TaskInfo) PhaseInfo {
-	return PhaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, false)
+}
+
+func PhaseInfoFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhasePermanentFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, true)
 }
 
 func PhaseInfoRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
-	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info)
+	return phaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_USER}, info, false)
 }
 
 func PhaseInfoRetryableFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
@@ -263,7 +285,11 @@ func PhaseInfoRetryableFailureWithCleanup(code, reason string, info *TaskInfo) P
 }
 
 func PhaseInfoSystemRetryableFailure(code, reason string, info *TaskInfo) PhaseInfo {
-	return PhaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info)
+	return phaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info, false)
+}
+
+func PhaseInfoSystemRetryableFailureWithCleanup(code, reason string, info *TaskInfo) PhaseInfo {
+	return phaseInfoFailed(PhaseRetryableFailure, &core.ExecutionError{Code: code, Message: reason, Kind: core.ExecutionError_SYSTEM}, info, true)
 }
 
 // Creates a new PhaseInfo with phase set to PhaseWaitingForCache

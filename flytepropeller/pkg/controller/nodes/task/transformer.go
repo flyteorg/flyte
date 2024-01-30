@@ -3,7 +3,12 @@ package task
 import (
 	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -11,11 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/handler"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
-	"github.com/golang/protobuf/ptypes"
-	timestamppb "github.com/golang/protobuf/ptypes/timestamp"
 )
 
 // This is used by flyteadmin to indicate that map tasks now report subtask metadata individually.
@@ -44,6 +44,8 @@ func ToTaskEventPhase(p pluginCore.Phase) core.TaskExecution_Phase {
 		return core.TaskExecution_FAILED
 	case pluginCore.PhaseRetryableFailure:
 		return core.TaskExecution_FAILED
+	case pluginCore.PhaseAborted:
+		return core.TaskExecution_ABORTED
 	case pluginCore.PhaseNotReady:
 		fallthrough
 	case pluginCore.PhaseUndefined:
@@ -88,24 +90,16 @@ type ToTaskExecutionEventInputs struct {
 func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutionEvent, error) {
 	// Transitions to a new phase
 
-	var err error
 	var occurredAt *timestamppb.Timestamp
 	if i := input.Info.Info(); i != nil && i.OccurredAt != nil {
-		occurredAt, err = ptypes.TimestampProto(*i.OccurredAt)
+		occurredAt = timestamppb.New(*i.OccurredAt)
 	} else {
-		occurredAt, err = ptypes.TimestampProto(input.OccurredAt)
+		occurredAt = timestamppb.New(input.OccurredAt)
 	}
 
-	if err != nil {
-		return nil, err
-	}
-
-	reportedAt := ptypes.TimestampNow()
+	reportedAt := timestamppb.Now()
 	if i := input.Info.Info(); i != nil && i.ReportedAt != nil {
-		occurredAt, err = ptypes.TimestampProto(*i.ReportedAt)
-		if err != nil {
-			return nil, err
-		}
+		occurredAt = timestamppb.New(*i.ReportedAt)
 	}
 
 	taskExecID := input.TaskExecContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
@@ -125,17 +119,31 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 
 		metadata.ExternalResources = make([]*event.ExternalResourceInfo, len(externalResources))
 		for idx, e := range input.Info.Info().ExternalResources {
+			phase := ToTaskEventPhase(e.Phase)
 			metadata.ExternalResources[idx] = &event.ExternalResourceInfo{
 				ExternalId:   e.ExternalID,
 				CacheStatus:  e.CacheStatus,
 				Index:        e.Index,
 				Logs:         e.Logs,
 				RetryAttempt: e.RetryAttempt,
-				Phase:        ToTaskEventPhase(e.Phase),
+				Phase:        phase,
 			}
 		}
 	}
 
+	var reasons []*event.EventReason
+	if len(input.Info.Reason()) > 0 {
+		reasons = append(reasons, &event.EventReason{
+			Reason:     input.Info.Reason(),
+			OccurredAt: occurredAt,
+		})
+	}
+	for _, reasonInfo := range input.Info.Info().AdditionalReasons {
+		reasons = append(reasons, &event.EventReason{
+			Reason:     reasonInfo.Reason,
+			OccurredAt: timestamppb.New(*reasonInfo.OccurredAt),
+		})
+	}
 	tev := &event.TaskExecutionEvent{
 		TaskId:                taskExecID.TaskId,
 		ParentNodeExecutionId: nodeExecutionID,
@@ -145,10 +153,15 @@ func ToTaskExecutionEvent(input ToTaskExecutionEventInputs) (*event.TaskExecutio
 		ProducerId:            input.ClusterID,
 		OccurredAt:            occurredAt,
 		TaskType:              input.TaskType,
-		Reason:                input.Info.Reason(),
+		Reasons:               reasons,
 		Metadata:              metadata,
 		EventVersion:          taskExecutionEventVersion,
 		ReportedAt:            reportedAt,
+	}
+	if !flytek8sConfig.GetK8sPluginConfig().SendObjectEvents {
+		// For back compat with old versions of flyteadmin, populate the deprecated reason field.
+		// Setting SendObjectEvents to true assumes that flyteadmin is using the new reasons field.
+		tev.Reason = input.Info.Reason()
 	}
 
 	if input.Info.Phase().IsSuccess() && input.OutputWriter != nil {

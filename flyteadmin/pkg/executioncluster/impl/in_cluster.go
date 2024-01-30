@@ -4,14 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/client-go/dynamic"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/flytek8s"
-	"github.com/pkg/errors"
-	"k8s.io/client-go/dynamic"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // DO NOT USE: only for backwards compatibility

@@ -5,20 +5,20 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
-	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/client-go/util/retry"
+
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/identifier"
+	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // executor allows to call the admin with scheduled execution
@@ -62,7 +62,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 	}, scheduledTime)
 
 	if err != nil {
-		logger.Error(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
+		logger.Errorf(ctx, "failed to generate execution identifier for schedule %+v due to %v", s, err)
 		return err
 	}
 
@@ -107,7 +107,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 				return false
 			}
 			w.metrics.FailedExecutionCounter.Inc()
-			logger.Error(ctx, "failed to create execution create request %+v due to %v", executionRequest, err)
+			logger.Errorf(ctx, "failed to create execution create request %+v due to %v", executionRequest, err)
 			// TODO: Handle the case when admin launch plan state is archived but the schedule is active.
 			// After this bug is fixed in admin https://github.com/flyteorg/flyte/issues/1354
 			return true
@@ -118,7 +118,7 @@ func (w *executor) Execute(ctx context.Context, scheduledTime time.Time, s model
 		},
 	)
 	if err != nil && status.Code(err) != codes.AlreadyExists {
-		logger.Error(ctx, "failed to create execution create request %+v due to %v after all retries", executionRequest, err)
+		logger.Errorf(ctx, "failed to create execution create request %+v due to %v after all retries", executionRequest, err)
 		return err
 	}
 	w.metrics.SuccessfulExecutionCounter.Inc()

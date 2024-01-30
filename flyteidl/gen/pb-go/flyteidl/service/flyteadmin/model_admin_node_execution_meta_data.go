@@ -17,4 +17,6 @@ type AdminNodeExecutionMetaData struct {
 	SpecNodeId string `json:"spec_node_id,omitempty"`
 	// Boolean flag indicating if the node has contains a dynamic workflow which then produces child nodes. This is to distinguish between subworkflows and dynamic workflows which can both have is_parent_node as true.
 	IsDynamic bool `json:"is_dynamic,omitempty"`
+	// Boolean flag indicating if the node is an array node. This is intended to uniquely identify array nodes from other nodes which can have is_parent_node as true.
+	IsArray bool `json:"is_array,omitempty"`
 }

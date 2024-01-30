@@ -8,9 +8,8 @@ import (
 	"google.golang.org/grpc/codes"
 	grpcStatus "google.golang.org/grpc/status"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 )
 
@@ -25,10 +24,11 @@ type Metadata struct {
 
 // An identifier for a catalog object.
 type Key struct {
-	Identifier     core.Identifier
-	CacheVersion   string
-	TypedInterface core.TypedInterface
-	InputReader    io.InputReader
+	Identifier           core.Identifier
+	CacheVersion         string
+	CacheIgnoreInputVars []string
+	TypedInterface       core.TypedInterface
+	InputReader          io.InputReader
 }
 
 func (k Key) String() string {

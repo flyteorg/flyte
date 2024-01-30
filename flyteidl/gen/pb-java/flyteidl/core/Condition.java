@@ -4301,8 +4301,8 @@ public final class Condition {
       "yteidl.core.BooleanExpression\022:\n\020right_e" +
       "xpression\030\003 \001(\0132 .flyteidl.core.BooleanE" +
       "xpression\"\"\n\017LogicalOperator\022\007\n\003AND\020\000\022\006\n" +
-      "\002OR\020\001B6Z4github.com/flyteorg/flyteidl/ge" +
-      "n/pb-go/flyteidl/coreb\006proto3"
+      "\002OR\020\001B<Z:github.com/flyteorg/flyte/flyte" +
+      "idl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

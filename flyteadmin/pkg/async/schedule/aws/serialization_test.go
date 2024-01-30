@@ -5,12 +5,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
-
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const testKickoffTimeArg = "kickoff time arg"

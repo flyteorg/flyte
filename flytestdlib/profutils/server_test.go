@@ -6,11 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/version"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flytestdlib/internal/utils"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/version"
 )
 
 type MockResponseWriter struct {

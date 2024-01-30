@@ -20,7 +20,7 @@ public final class Tensorflow {
 
     /**
      * <pre>
-     * number of worker, ps, chief replicas spawned in the cluster for this job
+     * number of worker replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 workers = 1;</code>
@@ -30,6 +30,7 @@ public final class Tensorflow {
     /**
      * <pre>
      * PS -&gt; Parameter server
+     * number of ps replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 ps_replicas = 2;</code>
@@ -37,9 +38,22 @@ public final class Tensorflow {
     int getPsReplicas();
 
     /**
+     * <pre>
+     * number of chief replicas spawned in the cluster for this job
+     * </pre>
+     *
      * <code>int32 chief_replicas = 3;</code>
      */
     int getChiefReplicas();
+
+    /**
+     * <pre>
+     * number of evaluator replicas spawned in the cluster for this job
+     * </pre>
+     *
+     * <code>int32 evaluator_replicas = 4;</code>
+     */
+    int getEvaluatorReplicas();
   }
   /**
    * <pre>
@@ -99,6 +113,11 @@ public final class Tensorflow {
               chiefReplicas_ = input.readInt32();
               break;
             }
+            case 32: {
+
+              evaluatorReplicas_ = input.readInt32();
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -135,7 +154,7 @@ public final class Tensorflow {
     private int workers_;
     /**
      * <pre>
-     * number of worker, ps, chief replicas spawned in the cluster for this job
+     * number of worker replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 workers = 1;</code>
@@ -149,6 +168,7 @@ public final class Tensorflow {
     /**
      * <pre>
      * PS -&gt; Parameter server
+     * number of ps replicas spawned in the cluster for this job
      * </pre>
      *
      * <code>int32 ps_replicas = 2;</code>
@@ -160,10 +180,27 @@ public final class Tensorflow {
     public static final int CHIEF_REPLICAS_FIELD_NUMBER = 3;
     private int chiefReplicas_;
     /**
+     * <pre>
+     * number of chief replicas spawned in the cluster for this job
+     * </pre>
+     *
      * <code>int32 chief_replicas = 3;</code>
      */
     public int getChiefReplicas() {
       return chiefReplicas_;
+    }
+
+    public static final int EVALUATOR_REPLICAS_FIELD_NUMBER = 4;
+    private int evaluatorReplicas_;
+    /**
+     * <pre>
+     * number of evaluator replicas spawned in the cluster for this job
+     * </pre>
+     *
+     * <code>int32 evaluator_replicas = 4;</code>
+     */
+    public int getEvaluatorReplicas() {
+      return evaluatorReplicas_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -189,6 +226,9 @@ public final class Tensorflow {
       if (chiefReplicas_ != 0) {
         output.writeInt32(3, chiefReplicas_);
       }
+      if (evaluatorReplicas_ != 0) {
+        output.writeInt32(4, evaluatorReplicas_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -209,6 +249,10 @@ public final class Tensorflow {
       if (chiefReplicas_ != 0) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(3, chiefReplicas_);
+      }
+      if (evaluatorReplicas_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, evaluatorReplicas_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -231,6 +275,8 @@ public final class Tensorflow {
           != other.getPsReplicas()) return false;
       if (getChiefReplicas()
           != other.getChiefReplicas()) return false;
+      if (getEvaluatorReplicas()
+          != other.getEvaluatorReplicas()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -248,6 +294,8 @@ public final class Tensorflow {
       hash = (53 * hash) + getPsReplicas();
       hash = (37 * hash) + CHIEF_REPLICAS_FIELD_NUMBER;
       hash = (53 * hash) + getChiefReplicas();
+      hash = (37 * hash) + EVALUATOR_REPLICAS_FIELD_NUMBER;
+      hash = (53 * hash) + getEvaluatorReplicas();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -391,6 +439,8 @@ public final class Tensorflow {
 
         chiefReplicas_ = 0;
 
+        evaluatorReplicas_ = 0;
+
         return this;
       }
 
@@ -420,6 +470,7 @@ public final class Tensorflow {
         result.workers_ = workers_;
         result.psReplicas_ = psReplicas_;
         result.chiefReplicas_ = chiefReplicas_;
+        result.evaluatorReplicas_ = evaluatorReplicas_;
         onBuilt();
         return result;
       }
@@ -477,6 +528,9 @@ public final class Tensorflow {
         if (other.getChiefReplicas() != 0) {
           setChiefReplicas(other.getChiefReplicas());
         }
+        if (other.getEvaluatorReplicas() != 0) {
+          setEvaluatorReplicas(other.getEvaluatorReplicas());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -509,7 +563,7 @@ public final class Tensorflow {
       private int workers_ ;
       /**
        * <pre>
-       * number of worker, ps, chief replicas spawned in the cluster for this job
+       * number of worker replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 workers = 1;</code>
@@ -519,7 +573,7 @@ public final class Tensorflow {
       }
       /**
        * <pre>
-       * number of worker, ps, chief replicas spawned in the cluster for this job
+       * number of worker replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 workers = 1;</code>
@@ -532,7 +586,7 @@ public final class Tensorflow {
       }
       /**
        * <pre>
-       * number of worker, ps, chief replicas spawned in the cluster for this job
+       * number of worker replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 workers = 1;</code>
@@ -548,6 +602,7 @@ public final class Tensorflow {
       /**
        * <pre>
        * PS -&gt; Parameter server
+       * number of ps replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 ps_replicas = 2;</code>
@@ -558,6 +613,7 @@ public final class Tensorflow {
       /**
        * <pre>
        * PS -&gt; Parameter server
+       * number of ps replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 ps_replicas = 2;</code>
@@ -571,6 +627,7 @@ public final class Tensorflow {
       /**
        * <pre>
        * PS -&gt; Parameter server
+       * number of ps replicas spawned in the cluster for this job
        * </pre>
        *
        * <code>int32 ps_replicas = 2;</code>
@@ -584,12 +641,20 @@ public final class Tensorflow {
 
       private int chiefReplicas_ ;
       /**
+       * <pre>
+       * number of chief replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 chief_replicas = 3;</code>
        */
       public int getChiefReplicas() {
         return chiefReplicas_;
       }
       /**
+       * <pre>
+       * number of chief replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 chief_replicas = 3;</code>
        */
       public Builder setChiefReplicas(int value) {
@@ -599,11 +664,53 @@ public final class Tensorflow {
         return this;
       }
       /**
+       * <pre>
+       * number of chief replicas spawned in the cluster for this job
+       * </pre>
+       *
        * <code>int32 chief_replicas = 3;</code>
        */
       public Builder clearChiefReplicas() {
         
         chiefReplicas_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private int evaluatorReplicas_ ;
+      /**
+       * <pre>
+       * number of evaluator replicas spawned in the cluster for this job
+       * </pre>
+       *
+       * <code>int32 evaluator_replicas = 4;</code>
+       */
+      public int getEvaluatorReplicas() {
+        return evaluatorReplicas_;
+      }
+      /**
+       * <pre>
+       * number of evaluator replicas spawned in the cluster for this job
+       * </pre>
+       *
+       * <code>int32 evaluator_replicas = 4;</code>
+       */
+      public Builder setEvaluatorReplicas(int value) {
+        
+        evaluatorReplicas_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * number of evaluator replicas spawned in the cluster for this job
+       * </pre>
+       *
+       * <code>int32 evaluator_replicas = 4;</code>
+       */
+      public Builder clearEvaluatorReplicas() {
+        
+        evaluatorReplicas_ = 0;
         onChanged();
         return this;
       }
@@ -675,11 +782,12 @@ public final class Tensorflow {
   static {
     java.lang.String[] descriptorData = {
       "\n!flyteidl/plugins/tensorflow.proto\022\020fly" +
-      "teidl.plugins\"a\n!DistributedTensorflowTr" +
+      "teidl.plugins\"}\n!DistributedTensorflowTr" +
       "ainingTask\022\017\n\007workers\030\001 \001(\005\022\023\n\013ps_replic" +
-      "as\030\002 \001(\005\022\026\n\016chief_replicas\030\003 \001(\005B9Z7gith" +
-      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
-      "idl/pluginsb\006proto3"
+      "as\030\002 \001(\005\022\026\n\016chief_replicas\030\003 \001(\005\022\032\n\022eval" +
+      "uator_replicas\030\004 \001(\005B?Z=github.com/flyte" +
+      "org/flyte/flyteidl/gen/pb-go/flyteidl/pl" +
+      "uginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -698,7 +806,7 @@ public final class Tensorflow {
     internal_static_flyteidl_plugins_DistributedTensorflowTrainingTask_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_DistributedTensorflowTrainingTask_descriptor,
-        new java.lang.String[] { "Workers", "PsReplicas", "ChiefReplicas", });
+        new java.lang.String[] { "Workers", "PsReplicas", "ChiefReplicas", "EvaluatorReplicas", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

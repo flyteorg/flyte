@@ -5,14 +5,14 @@ import (
 	"testing"
 
 	mocket "github.com/Selvatico/go-mocket"
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var alphabeticalSortParam, _ = common.NewSortParameter(&admin.Sort{
@@ -27,7 +27,7 @@ func TestCreateProject(t *testing.T) {
 	query := GlobalMock.NewMock()
 	GlobalMock.Logging = true
 	query.WithQuery(
-		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","name","description","labels","state","identifier") VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`)
+		`INSERT INTO "projects" ("created_at","updated_at","deleted_at","identifier","name","description","labels","state") VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING "id"`)
 
 	activeState := int32(admin.Project_ACTIVE)
 	err := projectRepo.Create(context.Background(), models.Project{

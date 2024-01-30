@@ -3,19 +3,16 @@ package interfaces
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 type TaskReader interface {
@@ -39,7 +36,7 @@ type NodeExecutionMetadata interface {
 	GetK8sServiceAccount() string
 	GetSecurityContext() core.SecurityContext
 	IsInterruptible() bool
-	GetInterruptibleFailureThreshold() uint32
+	GetInterruptibleFailureThreshold() int32
 }
 
 type NodeExecutionContext interface {

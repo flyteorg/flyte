@@ -4,19 +4,18 @@ import (
 	"context"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	"k8s.io/apimachinery/pkg/util/validation"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/util/validation"
 )
 
 var zeroQuantity = resource.MustParse("0")
@@ -212,13 +211,11 @@ func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 	requestedResourceQuantity := resource.MustParse("1")
 	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceCPU:              requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
@@ -262,7 +259,6 @@ func TestMergeResources_EmptyIn(t *testing.T) {
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
@@ -281,7 +277,6 @@ func TestMergeResources_EmptyOut(t *testing.T) {
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},

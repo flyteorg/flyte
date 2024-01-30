@@ -5,15 +5,16 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	"github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/golang/protobuf/proto"
 )
 
-const MaxErrorMessageLength = 104857600 //100KB
+const MaxErrorMessageLength = 102400 //100KB
 const truncationIndicator = "... <Message Truncated> ..."
 
 type recordingMetrics struct {

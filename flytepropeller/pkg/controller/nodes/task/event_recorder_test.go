@@ -5,8 +5,9 @@ import (
 	"testing"
 	"time"
 
-	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/stretchr/testify/assert"
+
+	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 )
 
 func TestBufferedEventRecorder(t *testing.T) {

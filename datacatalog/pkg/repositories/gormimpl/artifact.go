@@ -3,15 +3,15 @@ package gormimpl
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type artifactRepo struct {
@@ -33,7 +33,7 @@ func (h *artifactRepo) Create(ctx context.Context, artifact models.Artifact) err
 	timer := h.repoMetrics.CreateDuration.Start(ctx)
 	defer timer.Stop()
 
-	tx := h.db.Begin()
+	tx := h.db.WithContext(ctx).Begin()
 
 	tx = tx.Create(&artifact)
 
@@ -55,9 +55,9 @@ func (h *artifactRepo) Get(ctx context.Context, in models.ArtifactKey) (models.A
 	defer timer.Stop()
 
 	var artifact models.Artifact
-	result := h.db.Preload("ArtifactData").
+	result := h.db.WithContext(ctx).Preload("ArtifactData").
 		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
-			return db.Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
 		}).
 		Preload("Tags").
 		Order("artifacts.created_at DESC").
@@ -111,7 +111,7 @@ func (h *artifactRepo) List(ctx context.Context, datasetKey models.DatasetKey, i
 
 	tx = tx.Preload("ArtifactData").
 		Preload("Partitions", func(db *gorm.DB) *gorm.DB {
-			return db.Order("partitions.created_at ASC") // preserve the order in which the partitions were created
+			return db.WithContext(ctx).Order("partitions.created_at ASC") // preserve the order in which the partitions were created
 		}).
 		Preload("Tags").Find(&artifacts)
 	if tx.Error != nil {
@@ -126,7 +126,7 @@ func (h *artifactRepo) Update(ctx context.Context, artifact models.Artifact) err
 	timer := h.repoMetrics.UpdateDuration.Start(ctx)
 	defer timer.Stop()
 
-	tx := h.db.Begin()
+	tx := h.db.WithContext(ctx).Begin()
 	defer func() {
 		if r := recover(); r != nil {
 			tx.Rollback()

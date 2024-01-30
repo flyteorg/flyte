@@ -8,16 +8,20 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/golang/protobuf/proto"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	pluginscatalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	catalogmocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog/mocks"
 	mocks3 "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	eventMocks "github.com/flyteorg/flyte/flytepropeller/events/mocks"
@@ -34,21 +38,11 @@ import (
 	recoveryMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	flyteassert "github.com/flyteorg/flyte/flytepropeller/pkg/utils/assert"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	storageMocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-
-	"github.com/golang/protobuf/proto"
-
-	"github.com/prometheus/client_golang/prometheus"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 var fakeKubeClient = mocks4.NewFakeKubeClient()
@@ -571,7 +565,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 			},
 		}
 
-		setupNodePhase := func(n0Phase, n2Phase, expectedN2Phase v1alpha1.NodePhase) (*mocks.ExecutableWorkflow, *mocks.ExecutableNodeStatus) {
+		setupNodePhase := func(n0Phase, n2Phase, expectedN2Phase v1alpha1.NodePhase, expectedClearStateOnAnyTermination bool) (*mocks.ExecutableWorkflow, *mocks.ExecutableNodeStatus) {
 			taskID := "id"
 			taskID0 := "id1"
 			// Setup
@@ -588,7 +582,7 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 
 			mockN2Status.OnGetStoppedAt().Return(nil)
 			var ee *core.ExecutionError
-			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), ee)
+			mockN2Status.On("UpdatePhase", expectedN2Phase, mock.Anything, mock.AnythingOfType("string"), expectedClearStateOnAnyTermination, ee)
 			mockN2Status.OnIsDirty().Return(false)
 			mockN2Status.OnGetTaskNodeStatus().Return(nil)
 			mockN2Status.On("ClearDynamicNodeStatus").Return(nil)
@@ -665,17 +659,21 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 		}
 
 		tests := []struct {
-			name              string
-			currentNodePhase  v1alpha1.NodePhase
-			parentNodePhase   v1alpha1.NodePhase
-			expectedNodePhase v1alpha1.NodePhase
-			expectedPhase     interfaces.NodePhase
-			expectedError     bool
-			updateCalled      bool
+			name                  string
+			currentNodePhase      v1alpha1.NodePhase
+			parentNodePhase       v1alpha1.NodePhase
+			enableCRDebugMetadata bool
+			expectedNodePhase     v1alpha1.NodePhase
+			expectedPhase         interfaces.NodePhase
+			expectedError         bool
+			updateCalled          bool
 		}{
-			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
-			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
-			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, false, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, false, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
+			{"notYetStarted->queued", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, false, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
+			{"notYetStarted->skipped enableCRDebugMetadata", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseFailed, true, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseFailed, false, false},
+			{"notYetStarted->skipped enableCRDebugMetadata", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSkipped, true, v1alpha1.NodePhaseSkipped, interfaces.NodePhaseSuccess, false, true},
+			{"notYetStarted->queued enableCRDebugMetadata", v1alpha1.NodePhaseNotYetStarted, v1alpha1.NodePhaseSucceeded, true, v1alpha1.NodePhaseQueued, interfaces.NodePhasePending, false, true},
 		}
 		for _, test := range tests {
 			t.Run(test.name, func(t *testing.T) {
@@ -690,12 +688,14 @@ func TestNodeExecutor_RecursiveNodeHandler_Recurse(t *testing.T) {
 				h.OnFinalizeRequired().Return(false)
 				hf.OnGetHandler(v1alpha1.NodeKindTask).Return(h, nil)
 
-				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase)
+				mockWf, _ := setupNodePhase(test.parentNodePhase, test.currentNodePhase, test.expectedNodePhase, test.enableCRDebugMetadata)
 				startNode := mockWf.StartNode()
 				store := createInmemoryDataStore(t, promutils.NewTestScope())
 
 				adminClient := launchplan.NewFailFastLaunchPlanExecutor()
-				execIface, err := NewExecutor(ctx, config.GetConfig().NodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
+				nodeConfig := config.GetConfig().NodeConfig
+				nodeConfig.EnableCRDebugMetadata = test.enableCRDebugMetadata
+				execIface, err := NewExecutor(ctx, nodeConfig, store, enQWf, mockEventSink, adminClient, adminClient,
 					10, "s3://bucket", fakeKubeClient, catalogClient, recoveryClient, eventConfig, testClusterID, signalClient, hf, promutils.NewTestScope())
 				assert.NoError(t, err)
 				exec := execIface.(*recursiveNodeExecutor)
@@ -1335,7 +1335,7 @@ func TestNodeExecutor_RecursiveNodeHandler_BranchNode(t *testing.T) {
 
 				if test.phaseUpdateExpected {
 					var ee *core.ExecutionError
-					branchTakeNodeStatus.On("UpdatePhase", v1alpha1.NodePhaseQueued, mock.Anything, mock.Anything, ee).Return()
+					branchTakeNodeStatus.On("UpdatePhase", v1alpha1.NodePhaseQueued, mock.Anything, mock.Anything, false, ee).Return()
 				}
 
 				leafDag := executors.NewLeafNodeDAGStructure(branchTakenNodeID, parentBranchNodeID)
@@ -2764,4 +2764,56 @@ func TestNodeExecutor_RecursiveNodeHandler_Cache(t *testing.T) {
 			assert.Equal(t, test.nextDownstreamNodePhase, downstreamNodeStatus.Phase)
 		})
 	}
+}
+
+func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
+	tests := []struct {
+		name                string
+		ignoreRetryCause    bool
+		attempts            uint32
+		systemFailures      uint32
+		maxAttempts         int32
+		maxSystemFailures   uint32
+		errorKind           core.ExecutionError_ErrorKind
+		expectedEligibility bool
+	}{
+		{"EligibleUserRetries", false, 0, 0, 2, 0, core.ExecutionError_USER, true},
+		{"IneligibleUserRetries", false, 1, 0, 2, 0, core.ExecutionError_USER, false},
+		{"EligibleSystemRetries", false, 0, 0, 1, 1, core.ExecutionError_SYSTEM, true},
+		{"IneligibleSystemRetries", false, 1, 1, 1, 1, core.ExecutionError_SYSTEM, false},
+		{"IgnoreCauseEligibleUserRetries", true, 0, 0, 2, 0, core.ExecutionError_USER, true},
+		{"IgnoreCauseIneligibleUserRetries", true, 1, 0, 2, 0, core.ExecutionError_USER, false},
+		{"IgnoreCauseEligibleSystemRetries", true, 0, 0, 2, 0, core.ExecutionError_SYSTEM, true},
+		{"IgnoreCauseIneligibleSystemRetries", true, 1, 1, 2, 0, core.ExecutionError_SYSTEM, false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// mock all inputs
+			nodeExecutor := &nodeExecutor{
+				maxNodeRetriesForSystemFailures: test.maxSystemFailures,
+			}
+
+			config.GetConfig().NodeConfig.IgnoreRetryCause = test.ignoreRetryCause
+			config.GetConfig().NodeConfig.DefaultMaxAttempts = test.maxAttempts
+
+			node := &mocks.ExecutableNode{}
+			node.OnGetRetryStrategy().Return(nil)
+			nCtx := &nodeExecContext{node: node}
+
+			nodeStatus := &mocks.ExecutableNodeStatus{}
+			nodeStatus.OnGetAttempts().Return(test.attempts)
+			nodeStatus.OnGetSystemFailures().Return(test.systemFailures)
+
+			err := &core.ExecutionError{
+				Kind: test.errorKind,
+			}
+
+			// validate eligibility
+			currentAttempt, maxAttempts, isEligible := nodeExecutor.isEligibleForRetry(nCtx, nodeStatus, err)
+			fmt.Println(currentAttempt, maxAttempts, isEligible)
+			assert.Equal(t, test.expectedEligibility, isEligible)
+		})
+	}
+
 }

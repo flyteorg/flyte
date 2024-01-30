@@ -8,11 +8,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytestdlib/pbhash"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 const cachedTaskTag = "flyte_cached"
@@ -114,9 +114,9 @@ func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInte
 	return fmt.Sprintf("%v-%v", inputHashString, outputHashString), nil
 }
 
-// Generate a tag by hashing the input values
-func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap) (string, error) {
-	hashString, err := catalog.HashLiteralMap(ctx, inputs)
+// Generate a tag by hashing the input values which are not in cacheIgnoreInputVars
+func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cacheIgnoreInputVars []string) (string, error) {
+	hashString, err := catalog.HashLiteralMap(ctx, inputs, cacheIgnoreInputVars)
 	if err != nil {
 		return "", err
 	}

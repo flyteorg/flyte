@@ -36,9 +36,10 @@ package config
 import (
 	"time"
 
+	"k8s.io/apimachinery/pkg/types"
+
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"k8s.io/apimachinery/pkg/types"
 )
 
 //go:generate pflags Config --default-var=defaultConfig
@@ -94,7 +95,10 @@ var (
 		},
 		NodeConfig: NodeConfig{
 			MaxNodeRetriesOnSystemFailures: 3,
-			InterruptibleFailureThreshold:  1,
+			InterruptibleFailureThreshold:  -1,
+			DefaultMaxAttempts:             1,
+			IgnoreRetryCause:               false,
+			EnableCRDebugMetadata:          false,
 		},
 		MaxStreakLength: 8, // Turbo mode is enabled by default
 		ProfilerPort: config.Port{
@@ -109,8 +113,10 @@ var (
 		EventConfig: EventConfig{
 			RawOutputPolicy: RawOutputPolicyReference,
 		},
-		ClusterID:              "propeller",
-		CreateFlyteWorkflowCRD: false,
+		ClusterID:                "propeller",
+		CreateFlyteWorkflowCRD:   false,
+		ArrayNodeEventVersion:    0,
+		NodeExecutionWorkerCount: 8,
 	}
 )
 
@@ -150,6 +156,8 @@ type Config struct {
 	ExcludeDomainLabel       []string             `json:"exclude-domain-label" pflag:",Exclude the specified domain label from the k8s FlyteWorkflow CRD label selector"`
 	ClusterID                string               `json:"cluster-id" pflag:",Unique cluster id running this flytepropeller instance with which to annotate execution events"`
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
+	ArrayNodeEventVersion    int                  `json:"array-node-event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
+	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.
@@ -203,7 +211,10 @@ type WorkqueueConfig struct {
 type NodeConfig struct {
 	DefaultDeadlines               DefaultDeadlines `json:"default-deadlines,omitempty" pflag:",Default value for timeouts"`
 	MaxNodeRetriesOnSystemFailures int64            `json:"max-node-retries-system-failures" pflag:"2,Maximum number of retries per node for node failure due to infra issues"`
-	InterruptibleFailureThreshold  int64            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible'"`
+	InterruptibleFailureThreshold  int32            `json:"interruptible-failure-threshold" pflag:"1,number of failures for a node to be still considered interruptible. Negative numbers are treated as complementary (ex. -1 means last attempt is non-interruptible).'"`
+	DefaultMaxAttempts             int32            `json:"default-max-attempts" pflag:"3,Default maximum number of attempts for a node"`
+	IgnoreRetryCause               bool             `json:"ignore-retry-cause" pflag:",Ignore retry cause and count all attempts toward a node's max attempts"`
+	EnableCRDebugMetadata          bool             `json:"enable-cr-debug-metadata" pflag:",Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd."`
 }
 
 // DefaultDeadlines contains default values for timeouts

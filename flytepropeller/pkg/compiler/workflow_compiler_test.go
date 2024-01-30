@@ -5,16 +5,16 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
+	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/util/sets"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common/mocks"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	v "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-	"k8s.io/apimachinery/pkg/util/sets"
 )
 
 func createEmptyVariableMap() *core.VariableMap {
@@ -112,6 +112,90 @@ func ExampleCompileWorkflow_basic() {
 	// Needed Tasks: [task_123], Needed Workflows []
 	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo" "];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "FirstNode()" [label="execution",style="dashed"];"FirstNode()" -> "end-node(end)" [label="execution",style="dashed"];}
 	// Compile Errors: <nil>
+}
+
+func TestCompileWorkflowWithFailureNode(t *testing.T) {
+	inputWorkflow := &core.WorkflowTemplate{
+		Id: &core.Identifier{Name: "repo"},
+		Interface: &core.TypedInterface{
+			Inputs:  createEmptyVariableMap(),
+			Outputs: createEmptyVariableMap(),
+		},
+		Nodes: []*core.Node{
+			{
+				Id: "FirstNode",
+				Target: &core.Node_TaskNode{
+					TaskNode: &core.TaskNode{
+						Reference: &core.TaskNode_ReferenceId{
+							ReferenceId: &core.Identifier{Name: "task_123"},
+						},
+					},
+				},
+			},
+		},
+		FailureNode: &core.Node{
+			Id: "FailureNode",
+			Target: &core.Node_TaskNode{
+				TaskNode: &core.TaskNode{
+					Reference: &core.TaskNode_ReferenceId{
+						ReferenceId: &core.Identifier{Name: "cleanup"},
+					},
+				},
+			},
+		},
+	}
+
+	// Detect what other workflows/tasks does this coreWorkflow reference
+	subWorkflows := make([]*core.WorkflowTemplate, 0)
+	reqs, err := GetRequirements(inputWorkflow, subWorkflows)
+	assert.Nil(t, err)
+	assert.Equal(t, reqs.taskIds, []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}})
+
+	// Replace with logic to satisfy the requirements
+	workflows := make([]common.InterfaceProvider, 0)
+	tasks := []*core.TaskTemplate{
+		{
+			Id: &core.Identifier{Name: "task_123"},
+			Interface: &core.TypedInterface{
+				Inputs:  createEmptyVariableMap(),
+				Outputs: createEmptyVariableMap(),
+			},
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Image:   "image://",
+					Command: []string{"cmd"},
+					Args:    []string{"args"},
+				},
+			},
+		},
+		{
+			Id: &core.Identifier{Name: "cleanup"},
+			Interface: &core.TypedInterface{
+				Inputs:  createEmptyVariableMap(),
+				Outputs: createEmptyVariableMap(),
+			},
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Image:   "image://",
+					Command: []string{"cmd"},
+					Args:    []string{"args"},
+				},
+			},
+		},
+	}
+
+	compiledTasks := make([]*core.CompiledTask, 0, len(tasks))
+	for _, task := range tasks {
+		compiledTask, err := CompileTask(task)
+		assert.Nil(t, err)
+
+		compiledTasks = append(compiledTasks, compiledTask)
+	}
+
+	output, errs := CompileWorkflow(inputWorkflow, subWorkflows, compiledTasks, workflows)
+	assert.Equal(t, output.Primary.Template.FailureNode.Id, "FailureNode")
+	assert.NotNil(t, output.Primary.Template.FailureNode.GetTaskNode())
+	assert.Nil(t, errs)
 }
 
 func ExampleCompileWorkflow_inputsOutputsBinding() {

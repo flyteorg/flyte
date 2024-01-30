@@ -5,16 +5,14 @@ import (
 	"fmt"
 	"os"
 
-	v12 "k8s.io/client-go/kubernetes/typed/coordination/v1"
-
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
 	"k8s.io/apimachinery/pkg/util/rand"
-
+	v12 "k8s.io/client-go/kubernetes/typed/coordination/v1"
 	v1 "k8s.io/client-go/kubernetes/typed/core/v1"
 	"k8s.io/client-go/tools/leaderelection"
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 	"k8s.io/client-go/tools/record"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 )
 
 const (
@@ -41,7 +39,8 @@ func NewResourceLock(corev1 v1.CoreV1Interface, coordinationV1 v12.CoordinationV
 	}
 
 	// Leader id, needs to be unique
-	return resourcelock.New(resourcelock.ConfigMapsLeasesResourceLock,
+	return resourcelock.New(
+		resourcelock.LeasesResourceLock,
 		options.LockConfigMap.Namespace,
 		options.LockConfigMap.Name,
 		corev1,

@@ -6,7 +6,7 @@ import (
 	core "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	corev1 "k8s.io/api/core/v1"
 
-	flyteidlcore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	flyteidlcore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -92,7 +92,7 @@ type TaskExecutionMetadata_GetInterruptibleFailureThreshold struct {
 	*mock.Call
 }
 
-func (_m TaskExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 uint32) *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
+func (_m TaskExecutionMetadata_GetInterruptibleFailureThreshold) Return(_a0 int32) *TaskExecutionMetadata_GetInterruptibleFailureThreshold {
 	return &TaskExecutionMetadata_GetInterruptibleFailureThreshold{Call: _m.Call.Return(_a0)}
 }
 
@@ -107,14 +107,14 @@ func (_m *TaskExecutionMetadata) OnGetInterruptibleFailureThresholdMatch(matcher
 }
 
 // GetInterruptibleFailureThreshold provides a mock function with given fields:
-func (_m *TaskExecutionMetadata) GetInterruptibleFailureThreshold() uint32 {
+func (_m *TaskExecutionMetadata) GetInterruptibleFailureThreshold() int32 {
 	ret := _m.Called()
 
-	var r0 uint32
-	if rf, ok := ret.Get(0).(func() uint32); ok {
+	var r0 int32
+	if rf, ok := ret.Get(0).(func() int32); ok {
 		r0 = rf()
 	} else {
-		r0 = ret.Get(0).(uint32)
+		r0 = ret.Get(0).(int32)
 	}
 
 	return r0

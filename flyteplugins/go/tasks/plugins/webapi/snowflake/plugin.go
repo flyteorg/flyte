@@ -10,19 +10,17 @@ import (
 	"net/http"
 	"time"
 
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const (
@@ -139,12 +137,12 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	queryID := fmt.Sprintf("%v", data["statementHandle"])
 	message := fmt.Sprintf("%v", data["message"])
 
-	return &ResourceMetaWrapper{queryID, queryInfo.Account, token},
-		&ResourceWrapper{StatusCode: resp.StatusCode, Message: message}, nil
+	return ResourceMetaWrapper{queryID, queryInfo.Account, token},
+		ResourceWrapper{StatusCode: resp.StatusCode, Message: message}, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	req, err := buildRequest(get, QueryInfo{}, p.cfg.snowflakeEndpoint,
 		exec.Account, exec.Token, exec.QueryID, false)
 	if err != nil {
@@ -160,7 +158,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		return nil, err
 	}
 	message := fmt.Sprintf("%v", data["message"])
-	return &ResourceWrapper{
+	return ResourceWrapper{
 		StatusCode: resp.StatusCode,
 		Message:    message,
 	}, nil
@@ -170,7 +168,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	if taskCtx.ResourceMeta() == nil {
 		return nil
 	}
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	req, err := buildRequest(post, QueryInfo{}, p.cfg.snowflakeEndpoint,
 		exec.Account, exec.Token, exec.QueryID, true)
 	if err != nil {
@@ -181,14 +179,14 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return err
 	}
 	defer resp.Body.Close()
-	logger.Info(ctx, "Deleted query execution [%v]", resp)
+	logger.Infof(ctx, "Deleted query execution [%v]", resp)
 
 	return nil
 }
 
 func (p Plugin) Status(_ context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
-	exec := taskCtx.ResourceMeta().(*ResourceMetaWrapper)
-	statusCode := taskCtx.Resource().(*ResourceWrapper).StatusCode
+	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	statusCode := taskCtx.Resource().(ResourceWrapper).StatusCode
 	if statusCode == 0 {
 		return core.PhaseInfoUndefined, errors.Errorf(ErrSystem, "No Status field set.")
 	}
@@ -276,7 +274,7 @@ func newSnowflakeJobTaskPlugin() webapi.PluginEntry {
 		ID:                 "snowflake",
 		SupportedTaskTypes: []core.TaskType{"snowflake"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return &Plugin{
+			return Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),
 				client:      &http.Client{},

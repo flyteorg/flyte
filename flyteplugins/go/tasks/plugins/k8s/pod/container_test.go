@@ -5,32 +5,81 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-
 	v1 "k8s.io/api/core/v1"
-
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	flytek8sConfig "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 var containerResourceRequirements = &v1.ResourceRequirements{
 	Limits: v1.ResourceList{
-		v1.ResourceCPU:     resource.MustParse("1024m"),
-		v1.ResourceStorage: resource.MustParse("100M"),
+		v1.ResourceCPU: resource.MustParse("1024m"),
 	},
 }
 
-func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.TaskExecutionMetadata {
+var (
+	serviceAccount                = "service-account"
+	podTemplateServiceAccount     = "test-service-account"
+	securityContextServiceAccount = "security-context-service-account"
+)
+
+func dummyContainerTaskTemplate(command []string, args []string) *core.TaskTemplate {
+	return &core.TaskTemplate{
+		Type: "test",
+		Target: &core.TaskTemplate_Container{
+			Container: &core.Container{
+				Command: command,
+				Args:    args,
+			},
+		},
+	}
+}
+
+func dummyContainerTaskTemplateWithPodSpec(command []string, args []string) *core.TaskTemplate {
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			v1.Container{
+				Name:    "test-image",
+				Command: command,
+				Args:    args,
+			},
+		},
+		ServiceAccountName: podTemplateServiceAccount,
+	}
+
+	podSpecPb, err := utils.MarshalObjToStruct(podSpec)
+	if err != nil {
+		panic(err)
+	}
+
+	taskTemplate := &core.TaskTemplate{
+		Type: "test",
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				PodSpec: podSpecPb,
+			},
+		},
+		Config: map[string]string{
+			"primary_container_name": "test-image",
+		},
+	}
+
+	return taskTemplate
+}
+
+func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources, returnsServiceAccount bool) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -39,9 +88,13 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 		Kind: "node",
 		Name: "blah",
 	})
-	taskMetadata.On("GetK8sServiceAccount").Return("service-account")
+	if returnsServiceAccount {
+		taskMetadata.On("GetK8sServiceAccount").Return(serviceAccount)
+	} else {
+		taskMetadata.On("GetK8sServiceAccount").Return("")
+	}
 	taskMetadata.On("GetSecurityContext").Return(core.SecurityContext{
-		RunAs: &core.Identity{K8SServiceAccount: "service-account"},
+		RunAs: &core.Identity{K8SServiceAccount: securityContextServiceAccount},
 	})
 	taskMetadata.On("GetOwnerID").Return(types.NamespacedName{
 		Namespace: "test-namespace",
@@ -64,24 +117,14 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.
 
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
+	to.On("GetExtendedResources").Return(extendedResources)
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
 	return taskMetadata
 }
 
-func dummyContainerTaskContext(resources *v1.ResourceRequirements, command []string, args []string) pluginsCore.TaskExecutionContext {
-	task := &core.TaskTemplate{
-		Type: "test",
-		Target: &core.TaskTemplate_Container{
-			Container: &core.Container{
-				Command: command,
-				Args:    args,
-			},
-		},
-	}
-
-	dummyTaskMetadata := dummyContainerTaskMetadata(resources)
+func dummyContainerTaskContext(taskTemplate *core.TaskTemplate, taskMetadata pluginsCore.TaskExecutionMetadata) pluginsCore.TaskExecutionContext {
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
 	inputReader := &pluginsIOMock.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("test-data-reference")
@@ -99,10 +142,10 @@ func dummyContainerTaskContext(resources *v1.ResourceRequirements, command []str
 	taskCtx.OnOutputWriter().Return(outputReader)
 
 	taskReader := &pluginsCoreMock.TaskReader{}
-	taskReader.OnReadMatch(mock.Anything).Return(task, nil)
+	taskReader.OnReadMatch(mock.Anything).Return(taskTemplate, nil)
 	taskCtx.OnTaskReader().Return(taskReader)
 
-	taskCtx.OnTaskExecutionMetadata().Return(dummyTaskMetadata)
+	taskCtx.OnTaskExecutionMetadata().Return(taskMetadata)
 
 	pluginStateReader := &pluginsCoreMock.PluginStateReader{}
 	pluginStateReader.OnGetMatch(mock.Anything).Return(0, nil)
@@ -124,31 +167,188 @@ func TestContainerTaskExecutor_BuildIdentityResource(t *testing.T) {
 func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
-	taskCtx := dummyContainerTaskContext(containerResourceRequirements, command, args)
+	testCases := []struct {
+		name                 string
+		taskTemplate         *core.TaskTemplate
+		taskMetadata         pluginsCore.TaskExecutionMetadata
+		expectServiceAccount string
+	}{
+		{
+			name:                 "BuildResource",
+			taskTemplate:         dummyContainerTaskTemplate(command, args),
+			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true),
+			expectServiceAccount: serviceAccount,
+		},
+		{
+			name:                 "BuildResource_PodTemplate",
+			taskTemplate:         dummyContainerTaskTemplateWithPodSpec(command, args),
+			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, true),
+			expectServiceAccount: podTemplateServiceAccount,
+		},
+		{
+			name:                 "BuildResource_SecurityContext",
+			taskTemplate:         dummyContainerTaskTemplate(command, args),
+			taskMetadata:         dummyContainerTaskMetadata(containerResourceRequirements, nil, false),
+			expectServiceAccount: securityContextServiceAccount,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			taskCtx := dummyContainerTaskContext(tc.taskTemplate, tc.taskMetadata)
 
-	r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
-	assert.NoError(t, err)
-	assert.NotNil(t, r)
-	j, ok := r.(*v1.Pod)
-	assert.True(t, ok)
+			r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
+			assert.NoError(t, err)
+			assert.NotNil(t, r)
+			j, ok := r.(*v1.Pod)
+			assert.True(t, ok)
 
-	assert.NotEmpty(t, j.Spec.Containers)
-	assert.Equal(t, containerResourceRequirements.Limits[v1.ResourceCPU], j.Spec.Containers[0].Resources.Limits[v1.ResourceCPU])
+			assert.NotEmpty(t, j.Spec.Containers)
+			assert.Equal(t, containerResourceRequirements.Limits[v1.ResourceCPU], j.Spec.Containers[0].Resources.Limits[v1.ResourceCPU])
 
-	// TODO: Once configurable, test when setting storage is supported on the cluster vs not.
-	storageRes := j.Spec.Containers[0].Resources.Limits[v1.ResourceStorage]
-	assert.Equal(t, int64(0), (&storageRes).Value())
+			ephemeralStorageRes := j.Spec.Containers[0].Resources.Limits[v1.ResourceEphemeralStorage]
+			assert.Equal(t, int64(0), (&ephemeralStorageRes).Value())
 
-	assert.Equal(t, command, j.Spec.Containers[0].Command)
-	assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
+			assert.Equal(t, command, j.Spec.Containers[0].Command)
+			assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)
 
-	assert.Equal(t, "service-account", j.Spec.ServiceAccountName)
+			assert.Equal(t, tc.expectServiceAccount, j.Spec.ServiceAccountName)
+		})
+	}
+}
+
+func TestContainerTaskExecutor_BuildResource_ExtendedResources(t *testing.T) {
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *v1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []v1.NodeSelectorTerm
+		expectedTol               []v1.Toleration
+	}{
+		{
+			"without overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]v1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-partition-size",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			[]v1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+		},
+	}
+
+	for _, f := range fixtures {
+		t.Run(f.name, func(t *testing.T) {
+			taskTemplate := dummyContainerTaskTemplate([]string{"command"}, []string{"{{.Input}}"})
+			taskTemplate.ExtendedResources = f.extendedResourcesBase
+			taskMetadata := dummyContainerTaskMetadata(f.resources, f.extendedResourcesOverride, true)
+			taskContext := dummyContainerTaskContext(taskTemplate, taskMetadata)
+			r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskContext)
+			assert.Nil(t, err)
+			assert.NotNil(t, r)
+			pod, ok := r.(*v1.Pod)
+			assert.True(t, ok)
+
+			assert.EqualValues(
+				t,
+				f.expectedNsr,
+				pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+			)
+			assert.EqualValues(
+				t,
+				f.expectedTol,
+				pod.Spec.Tolerations,
+			)
+		})
+	}
 }
 
 func TestContainerTaskExecutor_GetTaskStatus(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
-	taskCtx := dummyContainerTaskContext(containerResourceRequirements, command, args)
+	taskTemplate := dummyContainerTaskTemplate(command, args)
+	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true)
+	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
 
 	j := &v1.Pod{
 		Status: v1.PodStatus{},
@@ -236,7 +436,9 @@ func TestContainerTaskExecutor_GetProperties(t *testing.T) {
 func TestContainerTaskExecutor_GetTaskStatus_InvalidImageName(t *testing.T) {
 	command := []string{"command"}
 	args := []string{"{{.Input}}"}
-	taskCtx := dummyContainerTaskContext(containerResourceRequirements, command, args)
+	taskTemplate := dummyContainerTaskTemplate(command, args)
+	taskMetadata := dummyContainerTaskMetadata(containerResourceRequirements, nil, true)
+	taskCtx := dummyContainerTaskContext(taskTemplate, taskMetadata)
 
 	ctx := context.TODO()
 	reason := "InvalidImageName"

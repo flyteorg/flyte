@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/oauth2"
 
-	tokenCacheMocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
-	adminMocks "github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	tokenCacheMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
+	adminMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 func TestNewTokenSourceProvider(t *testing.T) {

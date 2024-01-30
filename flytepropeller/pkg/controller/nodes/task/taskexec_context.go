@@ -6,12 +6,17 @@ import (
 	"strconv"
 	"strings"
 
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginCatalog "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/encoding"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	controllerconfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -19,9 +24,6 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 var (
@@ -29,15 +31,19 @@ var (
 )
 
 const IDMaxLength = 50
-const DefaultMaxAttempts = 1
 
 type taskExecutionID struct {
-	execName string
-	id       *core.TaskExecutionIdentifier
+	execName     string
+	id           *core.TaskExecutionIdentifier
+	uniqueNodeID string
 }
 
 func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
 	return *te.id
+}
+
+func (te taskExecutionID) GetUniqueNodeID() string {
+	return te.uniqueNodeID
 }
 
 func (te taskExecutionID) GetGeneratedName() string {
@@ -191,14 +197,12 @@ func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v
 			v1.ResourceCPU:              taskResources.Requests.CPU,
 			v1.ResourceMemory:           taskResources.Requests.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Requests.EphemeralStorage,
-			v1.ResourceStorage:          taskResources.Requests.Storage,
 			utils.ResourceNvidiaGPU:     taskResources.Requests.GPU,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceCPU:              taskResources.Limits.CPU,
 			v1.ResourceMemory:           taskResources.Limits.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Limits.EphemeralStorage,
-			v1.ResourceStorage:          taskResources.Limits.Storage,
 			utils.ResourceNvidiaGPU:     taskResources.Limits.GPU,
 		},
 	}
@@ -276,7 +280,7 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 	}
 
 	resourceNamespacePrefix := pluginCore.ResourceNamespace(t.resourceManager.GetID()).CreateSubNamespace(pluginCore.ResourceNamespace(plugin.GetID()))
-	maxAttempts := uint32(DefaultMaxAttempts)
+	maxAttempts := uint32(controllerconfig.GetConfig().NodeConfig.DefaultMaxAttempts)
 	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
 		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
 	}
@@ -290,11 +294,15 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
 			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
-			taskExecID:            taskExecutionID{execName: uniqueID, id: id},
-			o:                     nCtx.Node(),
-			maxAttempts:           maxAttempts,
-			platformResources:     convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
-			environmentVariables:  nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+			taskExecID: taskExecutionID{
+				execName:     uniqueID,
+				id:           id,
+				uniqueNodeID: currentNodeUniqueID,
+			},
+			o:                    nCtx.Node(),
+			maxAttempts:          maxAttempts,
+			platformResources:    convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
+			environmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 		},
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),

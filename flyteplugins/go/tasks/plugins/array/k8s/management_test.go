@@ -4,8 +4,15 @@ import (
 	"fmt"
 	"testing"
 
-	core2 "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"golang.org/x/net/context"
+	structpb "google.golang.org/protobuf/types/known/structpb"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	core2 "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -14,21 +21,9 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
 	arrayCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/core"
-
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	stdmocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	"golang.org/x/net/context"
-
-	structpb "google.golang.org/protobuf/types/known/structpb"
-
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type metadata struct {
@@ -72,6 +67,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetGeneratedName().Return("notfound")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	tID.OnGetID().Return(core2.TaskExecutionIdentifier{
 		TaskId: &core2.Identifier{
 			ResourceType: core2.ResourceType_TASK,
@@ -97,6 +93,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 			v1.ResourceCPU: resource.MustParse("10"),
 		},
 	})
+	overrides.OnGetExtendedResources().Return(nil)
 
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
@@ -303,7 +300,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		// validate results
 		assert.Nil(t, err)
 		p, _ := newState.GetPhase()
-		assert.Equal(t, arrayCore.PhaseWaitingForResources.String(), p.String())
+		assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), p.String())
 		resourceManager.AssertNumberOfCalls(t, "AllocateResource", subtaskCount)
 		for _, subtaskPhaseIndex := range newState.GetArrayStatus().Detailed.GetItems() {
 			assert.Equal(t, core.PhaseWaitingForResources, core.Phases[subtaskPhaseIndex])
@@ -535,10 +532,160 @@ func TestCheckSubTasksState(t *testing.T) {
 		// validate results
 		assert.Nil(t, err)
 		p, _ := newState.GetPhase()
-		assert.Equal(t, arrayCore.PhaseWriteToDiscoveryThenFail.String(), p.String())
+		assert.Equal(t, arrayCore.PhaseAbortSubTasks.String(), p.String())
 		resourceManager.AssertNumberOfCalls(t, "ReleaseResource", subtaskCount)
 		for _, subtaskPhaseIndex := range newState.GetArrayStatus().Detailed.GetItems() {
 			assert.Equal(t, core.PhasePermanentFailure, core.Phases[subtaskPhaseIndex])
 		}
 	})
+}
+
+func TestTerminateSubTasksOnAbort(t *testing.T) {
+	ctx := context.Background()
+	subtaskCount := 3
+	config := Config{
+		MaxArrayJobSize: int64(subtaskCount * 10),
+		ResourceConfig: ResourceConfig{
+			PrimaryLabel: "p",
+			Limit:        subtaskCount,
+		},
+	}
+	kubeClient := mocks.KubeClient{}
+	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+
+	compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+	for i := 0; i < subtaskCount; i++ {
+		compactArray.SetItem(i, 5)
+	}
+
+	currentState := &arrayCore.State{
+		CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
+		ExecutionArraySize:   subtaskCount,
+		OriginalArraySize:    int64(subtaskCount),
+		OriginalMinSuccesses: int64(subtaskCount),
+		ArrayStatus: arraystatus.ArrayStatus{
+			Detailed: compactArray,
+		},
+		IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
+	}
+
+	t.Run("SuccessfulTermination", func(t *testing.T) {
+		eventRecorder := mocks.EventsRecorder{}
+		eventRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
+		tCtx := getMockTaskExecutionContext(ctx, 0)
+		tCtx.OnEventsRecorder().Return(&eventRecorder)
+
+		mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
+			return nil
+		}
+
+		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+
+		assert.Nil(t, err)
+		eventRecorder.AssertCalled(t, "RecordRaw", mock.Anything, mock.Anything)
+	})
+
+	t.Run("TerminationWithError", func(t *testing.T) {
+		eventRecorder := mocks.EventsRecorder{}
+		eventRecorder.OnRecordRawMatch(mock.Anything, mock.Anything).Return(nil)
+		tCtx := getMockTaskExecutionContext(ctx, 0)
+		tCtx.OnEventsRecorder().Return(&eventRecorder)
+
+		mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
+			return fmt.Errorf("termination error")
+		}
+
+		err := TerminateSubTasksOnAbort(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+
+		assert.NotNil(t, err)
+		eventRecorder.AssertNotCalled(t, "RecordRaw", mock.Anything, mock.Anything)
+	})
+}
+
+func TestTerminateSubTasks(t *testing.T) {
+	ctx := context.Background()
+	subtaskCount := 3
+	config := Config{
+		MaxArrayJobSize: int64(subtaskCount * 10),
+		ResourceConfig: ResourceConfig{
+			PrimaryLabel: "p",
+			Limit:        subtaskCount,
+		},
+	}
+	kubeClient := mocks.KubeClient{}
+	kubeClient.OnGetClient().Return(mocks.NewFakeKubeClient())
+	kubeClient.OnGetCache().Return(mocks.NewFakeKubeCache())
+
+	tests := []struct {
+		name                string
+		initialPhaseIndices []int
+		expectedAbortCount  int
+		terminateError      error
+	}{
+		{
+			name:                "AllSubTasksRunning",
+			initialPhaseIndices: []int{5, 5, 5},
+			expectedAbortCount:  3,
+			terminateError:      nil,
+		},
+		{
+			name:                "MixedSubTaskStates",
+			initialPhaseIndices: []int{8, 0, 5},
+			expectedAbortCount:  1,
+			terminateError:      nil,
+		},
+		{
+			name:                "TerminateFunctionFails",
+			initialPhaseIndices: []int{5, 5, 5},
+			expectedAbortCount:  3,
+			terminateError:      fmt.Errorf("error"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			compactArray := arrayCore.NewPhasesCompactArray(uint(subtaskCount))
+			for i, phaseIdx := range test.initialPhaseIndices {
+				compactArray.SetItem(i, bitarray.Item(phaseIdx))
+			}
+			currentState := &arrayCore.State{
+				CurrentPhase:         arrayCore.PhaseCheckingSubTaskExecutions,
+				PhaseVersion:         0,
+				ExecutionArraySize:   subtaskCount,
+				OriginalArraySize:    int64(subtaskCount),
+				OriginalMinSuccesses: int64(subtaskCount),
+				ArrayStatus: arraystatus.ArrayStatus{
+					Detailed: compactArray,
+				},
+				IndexesToCache: arrayCore.InvertBitSet(bitarray.NewBitSet(uint(subtaskCount)), uint(subtaskCount)),
+			}
+
+			tCtx := getMockTaskExecutionContext(ctx, 0)
+			terminateCounter := 0
+			mockTerminateFunction := func(ctx context.Context, subTaskCtx SubTaskExecutionContext, cfg *Config, kubeClient core.KubeClient) error {
+				terminateCounter++
+				return test.terminateError
+			}
+
+			nextState, externalResources, err := TerminateSubTasks(ctx, tCtx, &kubeClient, &config, mockTerminateFunction, currentState)
+
+			assert.Equal(t, test.expectedAbortCount, terminateCounter)
+
+			if test.terminateError != nil {
+				assert.NotNil(t, err)
+				return
+			}
+
+			assert.Nil(t, err)
+			assert.Equal(t, uint32(1), nextState.PhaseVersion)
+			assert.Equal(t, arrayCore.PhaseWriteToDiscoveryThenFail, nextState.CurrentPhase)
+			assert.Len(t, externalResources, terminateCounter)
+
+			for _, externalResource := range externalResources {
+				phase := core.Phases[externalResource.Phase]
+				assert.True(t, phase.IsAborted())
+			}
+		})
+	}
 }

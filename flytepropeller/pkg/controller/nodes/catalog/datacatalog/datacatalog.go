@@ -6,22 +6,25 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/golang/protobuf/ptypes"
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/golang/protobuf/ptypes"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
+	"go.opentelemetry.io/otel/propagation"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 	"k8s.io/apimachinery/pkg/util/uuid"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 )
 
 var (
@@ -108,7 +111,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 		inputs = retInputs
 	}
 
-	tag, err := GenerateArtifactTagName(ctx, inputs)
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		logger.Errorf(ctx, "DataCatalog failed to generate tag for inputs %+v, err: %+v", inputs, err)
 		return catalog.Entry{}, err
@@ -233,7 +236,7 @@ func (m *CatalogClient) CreateArtifact(ctx context.Context, key catalog.Key, dat
 	logger.Debugf(ctx, "Created artifact: %v, with %v outputs from execution %+v", cachedArtifact.Id, len(artifactDataList), metadata)
 
 	// Tag the artifact since it is the cached artifact
-	tagName, err := GenerateArtifactTagName(ctx, inputs)
+	tagName, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to generate tag for artifact %+v, err: %+v", cachedArtifact.Id, err)
 		return catalog.Status{}, err
@@ -273,7 +276,7 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 		artifactDataList = append(artifactDataList, artifactData)
 	}
 
-	tagName, err := GenerateArtifactTagName(ctx, inputs)
+	tagName, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to generate artifact tag name for key %+v, dataset %+v and execution %+v, err: %+v", key, datasetID, metadata, err)
 		return catalog.Status{}, err
@@ -283,6 +286,7 @@ func (m *CatalogClient) UpdateArtifact(ctx context.Context, key catalog.Key, dat
 		Dataset:     datasetID,
 		QueryHandle: &datacatalog.UpdateArtifactRequest_TagName{TagName: tagName},
 		Data:        artifactDataList,
+		Metadata:    GetArtifactMetadataForSource(metadata.TaskExecutionIdentifier),
 	}
 	resp, err := m.client.UpdateArtifact(ctx, updateArtifactRequest)
 	if err != nil {
@@ -378,7 +382,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 		inputs = retInputs
 	}
 
-	tag, err := GenerateArtifactTagName(ctx, inputs)
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		return nil, err
 	}
@@ -418,7 +422,7 @@ func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key,
 		inputs = retInputs
 	}
 
-	tag, err := GenerateArtifactTagName(ctx, inputs)
+	tag, err := GenerateArtifactTagName(ctx, inputs, key.CacheIgnoreInputVars)
 	if err != nil {
 		return err
 	}
@@ -472,7 +476,13 @@ func NewDataCatalog(ctx context.Context, endpoint string, insecureConnection boo
 
 	retryInterceptor := grpcRetry.UnaryClientInterceptor(grpcOptions...)
 
-	opts = append(opts, grpc.WithChainUnaryInterceptor(grpcPrometheus.UnaryClientInterceptor,
+	tracerProvider := otelutils.GetTracerProvider(otelutils.DataCatalogClientTracer)
+	opts = append(opts, grpc.WithChainUnaryInterceptor(
+		grpcPrometheus.UnaryClientInterceptor,
+		otelgrpc.UnaryClientInterceptor(
+			otelgrpc.WithTracerProvider(tracerProvider),
+			otelgrpc.WithPropagators(propagation.TraceContext{}),
+		),
 		retryInterceptor))
 	clientConn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {

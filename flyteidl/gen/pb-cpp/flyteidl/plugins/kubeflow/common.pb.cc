@@ -85,13 +85,13 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fcommon_2epr
   "RESTART_POLICY_ALWAYS\020\002*`\n\016CleanPodPolic"
   "y\022\030\n\024CLEANPOD_POLICY_NONE\020\000\022\033\n\027CLEANPOD_"
   "POLICY_RUNNING\020\001\022\027\n\023CLEANPOD_POLICY_ALL\020"
-  "\002B9Z7github.com/flyteorg/flyteidl/gen/pb"
-  "-go/flyteidl/pluginsb\006proto3"
+  "\002B\?Z=github.com/flyteorg/flyte/flyteidl/"
+  "gen/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto,
-  "flyteidl/plugins/kubeflow/common.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto, 508,
+  "flyteidl/plugins/kubeflow/common.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto, 514,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto() {

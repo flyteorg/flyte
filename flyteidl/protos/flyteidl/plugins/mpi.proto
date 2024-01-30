@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.plugins;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
 // MPI operator proposal https://github.com/kubeflow/community/blob/master/proposals/mpi-operator-proposal.md
 // Custom proto for plugin that enables distributed training using https://github.com/kubeflow/mpi-operator

@@ -87,8 +87,6 @@ spec:
       kind: task
       name: uncached_data_reading_task
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.task_cache.uncached_data_reading_task" '
     n1:
       id: n1
@@ -101,8 +99,6 @@ spec:
       kind: task
       name: cached_data_processing_task
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.task_cache.cached_data_processing_task" '
     n2:
       id: n2
@@ -115,8 +111,6 @@ spec:
       kind: task
       name: cached_data_processing_task
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.task_cache.cached_data_processing_task" '
     n3:
       id: n3
@@ -134,8 +128,6 @@ spec:
       kind: task
       name: compare_dataframes
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.task_cache.compare_dataframes" '
     start-node:
       id: start-node

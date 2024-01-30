@@ -90,8 +90,6 @@ spec:
       kind: task
       name: add_data
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.documented_workflow.add_data" '
     start-node:
       id: start-node

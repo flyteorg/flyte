@@ -1,12 +1,15 @@
 from flyteidl.core import literals_pb2 as _literals_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
-from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import execution_pb2 as _execution_pb2
+from flyteidl.core import metrics_pb2 as _metrics_pb2
+from google.protobuf import duration_pb2 as _duration_pb2
+from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -73,10 +76,12 @@ class CreateTaskRequest(_message.Message):
     def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., task_execution_metadata: _Optional[_Union[TaskExecutionMetadata, _Mapping]] = ...) -> None: ...
 
 class CreateTaskResponse(_message.Message):
-    __slots__ = ["resource_meta"]
+    __slots__ = ["resource_meta", "resource"]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    RESOURCE_FIELD_NUMBER: _ClassVar[int]
     resource_meta: bytes
-    def __init__(self, resource_meta: _Optional[bytes] = ...) -> None: ...
+    resource: Resource
+    def __init__(self, resource_meta: _Optional[bytes] = ..., resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
 
 class GetTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]
@@ -87,18 +92,26 @@ class GetTaskRequest(_message.Message):
     def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
-    __slots__ = ["resource"]
+    __slots__ = ["resource", "log_links"]
     RESOURCE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
     resource: Resource
-    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ...) -> None: ...
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    def __init__(self, resource: _Optional[_Union[Resource, _Mapping]] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ...) -> None: ...
 
 class Resource(_message.Message):
-    __slots__ = ["state", "outputs"]
+    __slots__ = ["state", "outputs", "message", "log_links", "phase"]
     STATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    MESSAGE_FIELD_NUMBER: _ClassVar[int]
+    LOG_LINKS_FIELD_NUMBER: _ClassVar[int]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
     state: State
     outputs: _literals_pb2.LiteralMap
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    message: str
+    log_links: _containers.RepeatedCompositeFieldContainer[_execution_pb2.TaskLog]
+    phase: _execution_pb2.TaskExecution.Phase
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
     __slots__ = ["task_type", "resource_meta"]
@@ -111,3 +124,75 @@ class DeleteTaskRequest(_message.Message):
 class DeleteTaskResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
+
+class Agent(_message.Message):
+    __slots__ = ["name", "supported_task_types"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    supported_task_types: _containers.RepeatedScalarFieldContainer[str]
+    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ...) -> None: ...
+
+class GetAgentRequest(_message.Message):
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
+
+class GetAgentResponse(_message.Message):
+    __slots__ = ["agent"]
+    AGENT_FIELD_NUMBER: _ClassVar[int]
+    agent: Agent
+    def __init__(self, agent: _Optional[_Union[Agent, _Mapping]] = ...) -> None: ...
+
+class ListAgentsRequest(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ListAgentsResponse(_message.Message):
+    __slots__ = ["agents"]
+    AGENTS_FIELD_NUMBER: _ClassVar[int]
+    agents: _containers.RepeatedCompositeFieldContainer[Agent]
+    def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...
+
+class GetTaskMetricsRequest(_message.Message):
+    __slots__ = ["task_type", "resource_meta", "queries", "start_time", "end_time", "step"]
+    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    QUERIES_FIELD_NUMBER: _ClassVar[int]
+    START_TIME_FIELD_NUMBER: _ClassVar[int]
+    END_TIME_FIELD_NUMBER: _ClassVar[int]
+    STEP_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
+    resource_meta: bytes
+    queries: _containers.RepeatedScalarFieldContainer[str]
+    start_time: _timestamp_pb2.Timestamp
+    end_time: _timestamp_pb2.Timestamp
+    step: _duration_pb2.Duration
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., queries: _Optional[_Iterable[str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., step: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ...) -> None: ...
+
+class GetTaskMetricsResponse(_message.Message):
+    __slots__ = ["results"]
+    RESULTS_FIELD_NUMBER: _ClassVar[int]
+    results: _containers.RepeatedCompositeFieldContainer[_metrics_pb2.ExecutionMetricResult]
+    def __init__(self, results: _Optional[_Iterable[_Union[_metrics_pb2.ExecutionMetricResult, _Mapping]]] = ...) -> None: ...
+
+class GetTaskLogsRequest(_message.Message):
+    __slots__ = ["task_type", "resource_meta", "lines", "token"]
+    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    LINES_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
+    resource_meta: bytes
+    lines: int
+    token: str
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., lines: _Optional[int] = ..., token: _Optional[str] = ...) -> None: ...
+
+class GetTaskLogsResponse(_message.Message):
+    __slots__ = ["results", "token"]
+    RESULTS_FIELD_NUMBER: _ClassVar[int]
+    TOKEN_FIELD_NUMBER: _ClassVar[int]
+    results: _containers.RepeatedScalarFieldContainer[str]
+    token: str
+    def __init__(self, results: _Optional[_Iterable[str]] = ..., token: _Optional[str] = ...) -> None: ...

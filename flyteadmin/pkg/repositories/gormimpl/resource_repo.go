@@ -5,14 +5,14 @@ import (
 	"errors"
 	"fmt"
 
-	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"google.golang.org/grpc/codes"
 	"gorm.io/gorm"
 
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 type ResourceRepo struct {
@@ -62,7 +62,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 	}
 	timer := r.metrics.GetDuration.Start()
 	var record models.Resource
-	tx := r.db.FirstOrCreate(&record, models.Resource{
+	tx := r.db.WithContext(ctx).FirstOrCreate(&record, models.Resource{
 		Project:      input.Project,
 		Domain:       input.Domain,
 		Workflow:     input.Workflow,
@@ -77,7 +77,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 
 	timer = r.metrics.UpdateDuration.Start()
 	record.Attributes = input.Attributes
-	tx = r.db.Save(&record)
+	tx = r.db.WithContext(ctx).Save(&record)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -114,7 +114,7 @@ func (r *ResourceRepo) Get(ctx context.Context, ID interfaces.ResourceID) (model
 		launchPlan = append(launchPlan, ID.LaunchPlan)
 	}
 
-	tx := r.db.Where(txWhereClause, ID.ResourceType, domain, project, workflow, launchPlan)
+	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, domain, project, workflow, launchPlan)
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -140,7 +140,7 @@ func (r *ResourceRepo) GetProjectLevel(ctx context.Context, ID interfaces.Resour
 
 	txWhereClause := "resource_type = ? AND domain = '' AND project = ? AND workflow = '' AND launch_plan = ''"
 
-	tx := r.db.Where(txWhereClause, ID.ResourceType, ID.Project)
+	tx := r.db.WithContext(ctx).Where(txWhereClause, ID.ResourceType, ID.Project)
 	tx.Order(priorityDescending).First(&resources)
 	timer.Stop()
 
@@ -159,7 +159,7 @@ func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (mo
 	}
 	var model models.Resource
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Resource{
+	tx := r.db.WithContext(ctx).Where(&models.Resource{
 		Project:      ID.Project,
 		Domain:       ID.Domain,
 		Workflow:     ID.Workflow,
@@ -181,7 +181,7 @@ func (r *ResourceRepo) ListAll(ctx context.Context, resourceType string) ([]mode
 	var resources []models.Resource
 	timer := r.metrics.ListDuration.Start()
 
-	tx := r.db.Where(&models.Resource{ResourceType: resourceType}).Order(priorityDescending).Find(&resources)
+	tx := r.db.WithContext(ctx).Where(&models.Resource{ResourceType: resourceType}).Order(priorityDescending).Find(&resources)
 	timer.Stop()
 
 	if tx.Error != nil {
@@ -193,7 +193,7 @@ func (r *ResourceRepo) ListAll(ctx context.Context, resourceType string) ([]mode
 func (r *ResourceRepo) Delete(ctx context.Context, ID interfaces.ResourceID) error {
 	var tx *gorm.DB
 	r.metrics.DeleteDuration.Time(func() {
-		tx = r.db.Where(&models.Resource{
+		tx = r.db.WithContext(ctx).Where(&models.Resource{
 			Project:      ID.Project,
 			Domain:       ID.Domain,
 			Workflow:     ID.Workflow,

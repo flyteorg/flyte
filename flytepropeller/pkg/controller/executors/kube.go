@@ -4,14 +4,16 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"k8s.io/client-go/rest"
-
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/flyteorg/flyte/flytestdlib/fastcheck"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
+
+//go:generate mockery -name Client -case=underscore
 
 // Client is a friendlier controller-runtime client that gets passed to executors
 type Client interface {
@@ -22,130 +24,104 @@ type Client interface {
 	GetCache() cache.Cache
 }
 
-// fallbackClientReader reads from the cache first and if not found then reads from the configured reader, which
-// directly reads from the API
-type fallbackClientReader struct {
-	orderedClients []client.Reader
-}
-
-func (c fallbackClientReader) Get(ctx context.Context, key client.ObjectKey, out client.Object) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.Get(ctx, key, out); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
-func (c fallbackClientReader) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (err error) {
-	for _, k8sClient := range c.orderedClients {
-		if err = k8sClient.List(ctx, list, opts...); err == nil {
-			return nil
-		}
-	}
-
-	return
-}
-
-// ClientBuilder builder is the interface for the client builder.
-type ClientBuilder interface {
-	// WithUncached takes a list of runtime objects (plain or lists) that users don't want to cache
-	// for this client. This function can be called multiple times, it should append to an internal slice.
-	WithUncached(objs ...client.Object) ClientBuilder
-
-	// Build returns a new client.
-	Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error)
-}
-
-type FallbackClientBuilder struct {
-	uncached []client.Object
-	scope    promutils.Scope
-}
-
-func (f *FallbackClientBuilder) WithUncached(objs ...client.Object) ClientBuilder {
-	f.uncached = append(f.uncached, objs...)
-	return f
-}
-
-func (f FallbackClientBuilder) Build(cache cache.Cache, config *rest.Config, options client.Options) (client.Client, error) {
-	c, err := client.New(config, options)
+var NewCache = func(config *rest.Config, options cache.Options) (cache.Cache, error) {
+	k8sCache, err := cache.New(config, options)
 	if err != nil {
-		return nil, err
+		return k8sCache, err
 	}
 
-	c, err = newWriteThroughCachingWriter(c, 50000, f.scope)
-	if err != nil {
-		return nil, err
-	}
-
-	return client.NewDelegatingClient(client.NewDelegatingClientInput{
-		Client: c,
-		CacheReader: fallbackClientReader{
-			orderedClients: []client.Reader{cache, c},
-		},
-		UncachedObjects: f.uncached,
-		// TODO figure out if this should be true?
-		// CacheUnstructured: true,
-	})
+	return otelutils.WrapK8sCache(k8sCache), nil
 }
 
-// NewFallbackClientBuilder Creates a new k8s client that uses the cached client for reads and falls back to making API
-// calls if it failed. Write calls will always go to raw client directly.
-func NewFallbackClientBuilder(scope promutils.Scope) *FallbackClientBuilder {
-	return &FallbackClientBuilder{
-		scope: scope,
+func BuildNewClientFunc(scope promutils.Scope) func(config *rest.Config, options client.Options) (client.Client, error) {
+	return func(config *rest.Config, options client.Options) (client.Client, error) {
+		var cacheReader client.Reader
+		cachelessOptions := options
+		if options.Cache != nil && options.Cache.Reader != nil {
+			cacheReader = options.Cache.Reader
+			cachelessOptions.Cache = nil
+		}
+
+		kubeClient, err := client.New(config, cachelessOptions)
+		if err != nil {
+			return nil, err
+		}
+
+		return newFlyteK8sClient(kubeClient, cacheReader, scope)
 	}
 }
 
-type writeThroughCachingWriter struct {
+type flyteK8sClient struct {
 	client.Client
-	filter fastcheck.Filter
+	cacheReader client.Reader
+	writeFilter fastcheck.Filter
 }
 
-func IDFromObject(obj client.Object, op string) []byte {
-	return []byte(fmt.Sprintf("%s:%s:%s:%s", obj.GetObjectKind().GroupVersionKind().String(), obj.GetNamespace(), obj.GetName(), op))
+func (f flyteK8sClient) Get(ctx context.Context, key client.ObjectKey, out client.Object, opts ...client.GetOption) (err error) {
+	if f.cacheReader != nil {
+		if err = f.cacheReader.Get(ctx, key, out, opts...); err == nil {
+			return nil
+		}
+	}
+
+	return f.Client.Get(ctx, key, out, opts...)
+}
+
+func (f flyteK8sClient) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) (err error) {
+	if f.cacheReader != nil {
+		if err = f.cacheReader.List(ctx, list, opts...); err == nil {
+			return nil
+		}
+	}
+
+	return f.Client.List(ctx, list, opts...)
 }
 
 // Create first checks the local cache if the object with id was previously successfully saved, if not then
 // saves the object obj in the Kubernetes cluster
-func (w writeThroughCachingWriter) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+func (f flyteK8sClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
 	// "c" represents create
-	id := IDFromObject(obj, "c")
-	if w.filter.Contains(ctx, id) {
+	id := idFromObject(obj, "c")
+	if f.writeFilter.Contains(ctx, id) {
 		return nil
 	}
-	err := w.Client.Create(ctx, obj, opts...)
+	err := f.Client.Create(ctx, obj, opts...)
 	if err != nil {
 		return err
 	}
-	w.filter.Add(ctx, id)
+	f.writeFilter.Add(ctx, id)
 	return nil
 }
 
 // Delete first checks the local cache if the object with id was previously successfully deleted, if not then
 // deletes the given obj from Kubernetes cluster.
-func (w writeThroughCachingWriter) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+func (f flyteK8sClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
 	// "d" represents delete
-	id := IDFromObject(obj, "d")
-	if w.filter.Contains(ctx, id) {
+	id := idFromObject(obj, "d")
+	if f.writeFilter.Contains(ctx, id) {
 		return nil
 	}
-	err := w.Client.Delete(ctx, obj, opts...)
+	err := f.Client.Delete(ctx, obj, opts...)
 	if err != nil {
 		return err
 	}
-	w.filter.Add(ctx, id)
+	f.writeFilter.Add(ctx, id)
 	return nil
 }
 
-func newWriteThroughCachingWriter(c client.Client, cacheSize int, scope promutils.Scope) (writeThroughCachingWriter, error) {
-	filter, err := fastcheck.NewOppoBloomFilter(cacheSize, scope.NewSubScope("kube_filter"))
+func idFromObject(obj client.Object, op string) []byte {
+	return []byte(fmt.Sprintf("%s:%s:%s:%s", obj.GetObjectKind().GroupVersionKind().String(), obj.GetNamespace(), obj.GetName(), op))
+}
+
+func newFlyteK8sClient(kubeClient client.Client, cacheReader client.Reader, scope promutils.Scope) (flyteK8sClient, error) {
+	writeFilter, err := fastcheck.NewOppoBloomFilter(50000, scope.NewSubScope("kube_filter"))
 	if err != nil {
-		return writeThroughCachingWriter{}, err
+		return flyteK8sClient{}, err
 	}
-	return writeThroughCachingWriter{
-		Client: c,
-		filter: filter,
+
+	return flyteK8sClient{
+		Client:      kubeClient,
+		cacheReader: cacheReader,
+		writeFilter: writeFilter,
 	}, nil
 }

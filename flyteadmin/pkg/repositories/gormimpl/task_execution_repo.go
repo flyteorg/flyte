@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"gorm.io/gorm"
 
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // Implementation of TaskExecutionInterface.
@@ -22,7 +22,7 @@ type TaskExecutionRepo struct {
 
 func (r *TaskExecutionRepo) Create(ctx context.Context, input models.TaskExecution) error {
 	timer := r.metrics.CreateDuration.Start()
-	tx := r.db.Omit("id").Create(&input)
+	tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -33,7 +33,7 @@ func (r *TaskExecutionRepo) Create(ctx context.Context, input models.TaskExecuti
 func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExecutionInput) (models.TaskExecution, error) {
 	var taskExecution models.TaskExecution
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.TaskExecution{
+	tx := r.db.WithContext(ctx).Where(&models.TaskExecution{
 		TaskExecutionKey: models.TaskExecutionKey{
 			TaskKey: models.TaskKey{
 				Project: input.TaskExecutionID.TaskId.Project,
@@ -80,7 +80,7 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.Save(&execution)
+	tx := r.db.WithContext(ctx).WithContext(ctx).Save(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
 	timer.Stop()
 
 	if err := tx.Error; err != nil {
@@ -95,7 +95,7 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 	}
 
 	var taskExecutions []models.TaskExecution
-	tx := r.db.Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecution")
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset).Preload("ChildNodeExecution")
 
 	// And add three join conditions (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// We are joining on task -> taskExec -> NodeExec -> Exec.
@@ -130,7 +130,7 @@ func (r *TaskExecutionRepo) List(ctx context.Context, input interfaces.ListResou
 
 func (r *TaskExecutionRepo) Count(ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
 	var err error
-	tx := r.db.Model(&models.TaskExecution{})
+	tx := r.db.WithContext(ctx).Model(&models.TaskExecution{})
 
 	// Add three join conditions (joining multiple tables is fine even we only filter on a subset of table attributes).
 	// We are joining on task -> taskExec -> NodeExec -> Exec.

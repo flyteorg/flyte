@@ -3,25 +3,20 @@ package transformers
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-
-	"github.com/golang/protobuf/proto"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/golang/protobuf/ptypes"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	genModel "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gen/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"google.golang.org/grpc/codes"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type ToNodeExecutionModelInput struct {
@@ -131,6 +126,7 @@ func CreateNodeExecutionModel(ctx context.Context, input ToNodeExecutionModelInp
 		SpecNodeId:   input.Request.Event.SpecNodeId,
 		IsParentNode: input.Request.Event.IsParent,
 		IsDynamic:    input.Request.Event.IsDynamic,
+		IsArray:      input.Request.Event.IsArray,
 	}
 	err := handleNodeExecutionInputs(ctx, nodeExecution, input.Request, input.StorageClient)
 	if err != nil {
@@ -303,6 +299,9 @@ func UpdateNodeExecutionModel(
 		}
 		if request.Event.IsDynamic {
 			nodeExecutionMetadata.IsDynamic = true
+		}
+		if request.Event.IsArray {
+			nodeExecutionMetadata.IsArray = true
 		}
 		nodeExecMetadataBytes, err := proto.Marshal(&nodeExecutionMetadata)
 		if err != nil {

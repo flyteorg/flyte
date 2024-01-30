@@ -173,6 +173,13 @@ pub struct TypeStructure {
     /// Must exactly match for types to be castable
     #[prost(string, tag="1")]
     pub tag: ::prost::alloc::string::String,
+    /// dataclass_type only exists for dataclasses.
+    /// This is used to resolve the type of the fields of dataclass
+    /// The key is the field name, and the value is the literal type of the field
+    /// e.g. For dataclass Foo, with fields a, and a is a string
+    /// Foo.a will be resolved as a literal type of string from dataclass_type
+    #[prost(map="string, message", tag="2")]
+    pub dataclass_type: ::std::collections::HashMap<::prost::alloc::string::String, LiteralType>,
 }
 /// TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -478,6 +485,9 @@ pub struct Literal {
     /// (<https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md>)
     #[prost(string, tag="4")]
     pub hash: ::prost::alloc::string::String,
+    /// Additional metadata for literals.
+    #[prost(map="string, string", tag="5")]
+    pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
     #[prost(oneof="literal::Value", tags="1, 2, 3")]
     pub value: ::core::option::Option<literal::Value>,
 }
@@ -611,6 +621,9 @@ pub struct Identifier {
     /// Specific version of the resource.
     #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that uniquely identifies a Flyte workflow execution
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -626,6 +639,9 @@ pub struct WorkflowExecutionIdentifier {
     /// User or system provided value for the resource.
     #[prost(string, tag="4")]
     pub name: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that identify a Flyte node execution entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -697,6 +713,134 @@ impl ResourceType {
         }
     }
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactKey {
+    /// Project and domain and suffix needs to be unique across a given artifact store.
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub name: ::prost::alloc::string::String,
+}
+/// Only valid for triggers
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactBindingData {
+    #[prost(uint32, tag="1")]
+    pub index: u32,
+    /// This is only relevant in the time partition case
+    #[prost(string, tag="4")]
+    pub transform: ::prost::alloc::string::String,
+    /// These two fields are only relevant in the partition value case
+    #[prost(oneof="artifact_binding_data::PartitionData", tags="2, 3")]
+    pub partition_data: ::core::option::Option<artifact_binding_data::PartitionData>,
+}
+/// Nested message and enum types in `ArtifactBindingData`.
+pub mod artifact_binding_data {
+    /// These two fields are only relevant in the partition value case
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum PartitionData {
+        #[prost(string, tag="2")]
+        PartitionKey(::prost::alloc::string::String),
+        #[prost(bool, tag="3")]
+        BindToTimePartition(bool),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct InputBindingData {
+    #[prost(string, tag="1")]
+    pub var: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LabelValue {
+    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4")]
+    pub value: ::core::option::Option<label_value::Value>,
+}
+/// Nested message and enum types in `LabelValue`.
+pub mod label_value {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Value {
+        /// The string static value is for use in the Partitions object
+        #[prost(string, tag="1")]
+        StaticValue(::prost::alloc::string::String),
+        /// The time value is for use in the TimePartition case
+        #[prost(message, tag="2")]
+        TimeValue(::prost_types::Timestamp),
+        #[prost(message, tag="3")]
+        TriggeredBinding(super::ArtifactBindingData),
+        #[prost(message, tag="4")]
+        InputBinding(super::InputBindingData),
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Partitions {
+    #[prost(map="string, message", tag="1")]
+    pub value: ::std::collections::HashMap<::prost::alloc::string::String, LabelValue>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TimePartition {
+    #[prost(message, optional, tag="1")]
+    pub value: ::core::option::Option<LabelValue>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactId {
+    #[prost(message, optional, tag="1")]
+    pub artifact_key: ::core::option::Option<ArtifactKey>,
+    #[prost(string, tag="2")]
+    pub version: ::prost::alloc::string::String,
+    /// Think of a partition as a tag on an Artifact, except it's a key-value pair.
+    /// Different partitions naturally have different versions (execution ids).
+    #[prost(message, optional, tag="3")]
+    pub partitions: ::core::option::Option<Partitions>,
+    /// There is no such thing as an empty time partition - if it's not set, then there is no time partition.
+    #[prost(message, optional, tag="4")]
+    pub time_partition: ::core::option::Option<TimePartition>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactTag {
+    #[prost(message, optional, tag="1")]
+    pub artifact_key: ::core::option::Option<ArtifactKey>,
+    #[prost(message, optional, tag="2")]
+    pub value: ::core::option::Option<LabelValue>,
+}
+/// Uniqueness constraints for Artifacts
+///   - project, domain, name, version, partitions
+/// Option 2 (tags are standalone, point to an individual artifact id):
+///   - project, domain, name, alias (points to one partition if partitioned)
+///   - project, domain, name, partition key, partition value
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactQuery {
+    #[prost(oneof="artifact_query::Identifier", tags="1, 2, 3, 4")]
+    pub identifier: ::core::option::Option<artifact_query::Identifier>,
+}
+/// Nested message and enum types in `ArtifactQuery`.
+pub mod artifact_query {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Identifier {
+        #[prost(message, tag="1")]
+        ArtifactId(super::ArtifactId),
+        #[prost(message, tag="2")]
+        ArtifactTag(super::ArtifactTag),
+        #[prost(string, tag="3")]
+        Uri(::prost::alloc::string::String),
+        /// This is used in the trigger case, where a user specifies a value for an input that is one of the triggering
+        /// artifacts, or a partition value derived from a triggering artifact.
+        #[prost(message, tag="4")]
+        Binding(super::ArtifactBindingData),
+    }
+}
 /// Defines a strongly typed variable.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -707,6 +851,12 @@ pub struct Variable {
     /// +optional string describing input variable
     #[prost(string, tag="2")]
     pub description: ::prost::alloc::string::String,
+    /// +optional This object allows the user to specify how Artifacts are created.
+    /// name, tag, partitions can be specified. The other fields (version and project/domain) are ignored.
+    #[prost(message, optional, tag="3")]
+    pub artifact_partial_id: ::core::option::Option<ArtifactId>,
+    #[prost(message, optional, tag="4")]
+    pub artifact_tag: ::core::option::Option<ArtifactTag>,
 }
 /// A map of Variables
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -734,7 +884,7 @@ pub struct Parameter {
     #[prost(message, optional, tag="1")]
     pub var: ::core::option::Option<Variable>,
     /// +optional
-    #[prost(oneof="parameter::Behavior", tags="2, 3")]
+    #[prost(oneof="parameter::Behavior", tags="2, 3, 4, 5")]
     pub behavior: ::core::option::Option<parameter::Behavior>,
 }
 /// Nested message and enum types in `Parameter`.
@@ -749,6 +899,12 @@ pub mod parameter {
         /// +optional, is this value required to be filled.
         #[prost(bool, tag="3")]
         Required(bool),
+        /// This is an execution time search basically that should result in exactly one Artifact with a Type that
+        /// matches the type of the variable.
+        #[prost(message, tag="4")]
+        ArtifactQuery(super::ArtifactQuery),
+        #[prost(message, tag="5")]
+        ArtifactId(super::ArtifactId),
     }
 }
 /// A map of Parameters.
@@ -1008,6 +1164,44 @@ pub mod resources {
         }
     }
 }
+/// Metadata associated with the GPU accelerator to allocate to a task. Contains
+/// information about device type, and for multi-instance GPUs, the partition size to
+/// use.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GpuAccelerator {
+    /// This can be any arbitrary string, and should be informed by the labels or taints
+    /// associated with the nodes in question. Default cloud provider labels typically
+    /// use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+    #[prost(string, tag="1")]
+    pub device: ::prost::alloc::string::String,
+    #[prost(oneof="gpu_accelerator::PartitionSizeValue", tags="2, 3")]
+    pub partition_size_value: ::core::option::Option<gpu_accelerator::PartitionSizeValue>,
+}
+/// Nested message and enum types in `GPUAccelerator`.
+pub mod gpu_accelerator {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum PartitionSizeValue {
+        #[prost(bool, tag="2")]
+        Unpartitioned(bool),
+        /// Like `device`, this can be any arbitrary string, and should be informed by
+        /// the labels or taints associated with the nodes in question. Default cloud
+        /// provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+        #[prost(string, tag="3")]
+        PartitionSize(::prost::alloc::string::String),
+    }
+}
+/// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
+/// allocate to a task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExtendedResources {
+    /// GPU accelerator to select for task. Contains information about device type, and
+    /// for multi-instance GPUs, the partition size to use.
+    #[prost(message, optional, tag="1")]
+    pub gpu_accelerator: ::core::option::Option<GpuAccelerator>,
+}
 /// Runtime information. This is loosely defined to allow for extensibility.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1089,6 +1283,9 @@ pub struct TaskMetadata {
     /// identically as, the default PodTemplate configured in FlytePropeller.
     #[prost(string, tag="12")]
     pub pod_template_name: ::prost::alloc::string::String,
+    /// cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+    #[prost(string, repeated, tag="13")]
+    pub cache_ignore_input_vars: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     // For interruptible we will populate it at the node level but require it be part of TaskMetadata
     // for a user to set the value.
     // We are using oneof instead of bool because otherwise we would be unable to distinguish between value being
@@ -1144,6 +1341,10 @@ pub struct TaskTemplate {
     /// security_context encapsulates security attributes requested to run this task.
     #[prost(message, optional, tag="8")]
     pub security_context: ::core::option::Option<SecurityContext>,
+    /// Encapsulates all non-standard resources, not captured by
+    /// v1.ResourceRequirements, to allocate to a task.
+    #[prost(message, optional, tag="9")]
+    pub extended_resources: ::core::option::Option<ExtendedResources>,
     /// Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
     /// to use as required.
     /// reserve the field numbers 1 through 15 for very frequently occurring message elements
@@ -1829,6 +2030,58 @@ pub mod quality_of_service {
         Spec(super::QualityOfServiceSpec),
     }
 }
+/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
+/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
+/// precise definitions.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Span {
+    /// start_time defines the instance this span began.
+    #[prost(message, optional, tag="1")]
+    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// end_time defines the instance this span completed.
+    #[prost(message, optional, tag="2")]
+    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// spans defines a collection of Spans that breakdown this execution.
+    #[prost(message, repeated, tag="7")]
+    pub spans: ::prost::alloc::vec::Vec<Span>,
+    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
+    pub id: ::core::option::Option<span::Id>,
+}
+/// Nested message and enum types in `Span`.
+pub mod span {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Id {
+        /// workflow_id is the id of the workflow execution this Span represents.
+        #[prost(message, tag="3")]
+        WorkflowId(super::WorkflowExecutionIdentifier),
+        /// node_id is the id of the node execution this Span represents.
+        #[prost(message, tag="4")]
+        NodeId(super::NodeExecutionIdentifier),
+        /// task_id is the id of the task execution this Span represents.
+        #[prost(message, tag="5")]
+        TaskId(super::TaskExecutionIdentifier),
+        /// operation_id is the id of a unique operation that this Span represents.
+        #[prost(string, tag="6")]
+        OperationId(::prost::alloc::string::String),
+    }
+}
+/// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionMetricResult {
+    /// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+    #[prost(string, tag="1")]
+    pub metric: ::prost::alloc::string::String,
+    /// The result data in prometheus range query result format
+    /// <https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.>
+    /// This may include multiple time series, differentiated by their metric labels.
+    /// Start time is greater of (execution attempt start, 48h ago)
+    /// End time is lesser of (execution attempt end, now)
+    #[prost(message, optional, tag="2")]
+    pub data: ::core::option::Option<::prost_types::Struct>,
+}
 /// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
 /// Each expression results in a boolean result.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2345,6 +2598,10 @@ pub struct TaskNodeOverrides {
     /// A customizable interface to convey resources requested for a task container. 
     #[prost(message, optional, tag="1")]
     pub resources: ::core::option::Option<Resources>,
+    /// Overrides for all non-standard resources, not captured by
+    /// v1.ResourceRequirements, to allocate to a task.
+    #[prost(message, optional, tag="2")]
+    pub extended_resources: ::core::option::Option<ExtendedResources>,
 }
 /// Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
 /// step uses this created ConnectionSet
@@ -2508,6 +2765,8 @@ pub enum CatalogCacheStatus {
     CachePutFailure = 5,
     /// Used to indicate the cache lookup was skipped
     CacheSkipped = 6,
+    /// Used to indicate that the cache was evicted
+    CacheEvicted = 7,
 }
 impl CatalogCacheStatus {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -2523,6 +2782,7 @@ impl CatalogCacheStatus {
             CatalogCacheStatus::CacheLookupFailure => "CACHE_LOOKUP_FAILURE",
             CatalogCacheStatus::CachePutFailure => "CACHE_PUT_FAILURE",
             CatalogCacheStatus::CacheSkipped => "CACHE_SKIPPED",
+            CatalogCacheStatus::CacheEvicted => "CACHE_EVICTED",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2535,45 +2795,9 @@ impl CatalogCacheStatus {
             "CACHE_LOOKUP_FAILURE" => Some(Self::CacheLookupFailure),
             "CACHE_PUT_FAILURE" => Some(Self::CachePutFailure),
             "CACHE_SKIPPED" => Some(Self::CacheSkipped),
+            "CACHE_EVICTED" => Some(Self::CacheEvicted),
             _ => None,
         }
-    }
-}
-/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
-/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
-/// precise definitions.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Span {
-    /// start_time defines the instance this span began.
-    #[prost(message, optional, tag="1")]
-    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// end_time defines the instance this span completed.
-    #[prost(message, optional, tag="2")]
-    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// spans defines a collection of Spans that breakdown this execution.
-    #[prost(message, repeated, tag="7")]
-    pub spans: ::prost::alloc::vec::Vec<Span>,
-    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
-    pub id: ::core::option::Option<span::Id>,
-}
-/// Nested message and enum types in `Span`.
-pub mod span {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Id {
-        /// workflow_id is the id of the workflow execution this Span represents.
-        #[prost(message, tag="3")]
-        WorkflowId(super::WorkflowExecutionIdentifier),
-        /// node_id is the id of the node execution this Span represents.
-        #[prost(message, tag="4")]
-        NodeId(super::NodeExecutionIdentifier),
-        /// task_id is the id of the task execution this Span represents.
-        #[prost(message, tag="5")]
-        TaskId(super::TaskExecutionIdentifier),
-        /// operation_id is the id of a unique operation that this Span represents.
-        #[prost(string, tag="6")]
-        OperationId(::prost::alloc::string::String),
     }
 }
 /// Describes a set of tasks to execute and how the final outputs are produced.

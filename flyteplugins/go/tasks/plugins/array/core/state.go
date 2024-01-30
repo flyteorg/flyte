@@ -5,17 +5,16 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
+	structpb "github.com/golang/protobuf/ptypes/struct"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-
+	idlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	idlPlugins "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/arraystatus"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	idlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	idlPlugins "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	structpb "github.com/golang/protobuf/ptypes/struct"
 )
 
 //go:generate mockery -all -case=underscore
@@ -36,6 +35,7 @@ const (
 	PhaseAssembleFinalError
 	PhaseRetryableFailure
 	PhasePermanentFailure
+	PhaseAbortSubTasks
 )
 
 type State struct {
@@ -205,6 +205,9 @@ func MapArrayStateToPluginPhase(_ context.Context, state *State, logLinks []*idl
 	case PhaseAssembleFinalError:
 		fallthrough
 
+	case PhaseAbortSubTasks:
+		fallthrough
+
 	case PhaseWriteToDiscoveryThenFail:
 		fallthrough
 
@@ -260,21 +263,24 @@ func SummaryToPhase(ctx context.Context, minSuccesses int64, summary arraystatus
 
 	if totalCount < minSuccesses {
 		logger.Infof(ctx, "Array failed because totalCount[%v] < minSuccesses[%v]", totalCount, minSuccesses)
-		return PhaseWriteToDiscoveryThenFail
+		return PhaseAbortSubTasks
 	}
 
 	// No chance to reach the required success numbers.
 	if totalRunning+totalSuccesses+totalWaitingForResources+totalRetryableFailures < minSuccesses {
 		logger.Infof(ctx, "Array failed early because total failures > minSuccesses[%v]. Snapshot totalRunning[%v] + totalSuccesses[%v] + totalWaitingForResource[%v] + totalRetryableFailures[%v]",
 			minSuccesses, totalRunning, totalSuccesses, totalWaitingForResources, totalRetryableFailures)
-		return PhaseWriteToDiscoveryThenFail
+		return PhaseAbortSubTasks
 	}
 
 	if totalWaitingForResources > 0 {
 		logger.Infof(ctx, "Array is still running and waiting for resources totalWaitingForResources[%v]", totalWaitingForResources)
 		return PhaseWaitingForResources
 	}
-	if totalSuccesses >= minSuccesses && totalRunning == 0 {
+
+	// if we have enough successes, ensure all tasks are in a terminal phase (success or failure)
+	// before transitioning to the next phase.
+	if totalSuccesses >= minSuccesses && totalSuccesses+totalPermanentFailures == totalCount {
 		logger.Infof(ctx, "Array succeeded because totalSuccesses[%v] >= minSuccesses[%v]", totalSuccesses, minSuccesses)
 		return PhaseWriteToDiscovery
 	}

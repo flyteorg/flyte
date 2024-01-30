@@ -20389,6 +20389,34 @@ public final class Workflow {
      * <code>.flyteidl.core.Resources resources = 1;</code>
      */
     flyteidl.core.Tasks.ResourcesOrBuilder getResourcesOrBuilder();
+
+    /**
+     * <pre>
+     * Overrides for all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+     */
+    boolean hasExtendedResources();
+    /**
+     * <pre>
+     * Overrides for all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+     */
+    flyteidl.core.Tasks.ExtendedResources getExtendedResources();
+    /**
+     * <pre>
+     * Overrides for all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+     */
+    flyteidl.core.Tasks.ExtendedResourcesOrBuilder getExtendedResourcesOrBuilder();
   }
   /**
    * <pre>
@@ -20442,6 +20470,19 @@ public final class Workflow {
               if (subBuilder != null) {
                 subBuilder.mergeFrom(resources_);
                 resources_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              flyteidl.core.Tasks.ExtendedResources.Builder subBuilder = null;
+              if (extendedResources_ != null) {
+                subBuilder = extendedResources_.toBuilder();
+              }
+              extendedResources_ = input.readMessage(flyteidl.core.Tasks.ExtendedResources.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(extendedResources_);
+                extendedResources_ = subBuilder.buildPartial();
               }
 
               break;
@@ -20511,6 +20552,42 @@ public final class Workflow {
       return getResources();
     }
 
+    public static final int EXTENDED_RESOURCES_FIELD_NUMBER = 2;
+    private flyteidl.core.Tasks.ExtendedResources extendedResources_;
+    /**
+     * <pre>
+     * Overrides for all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+     */
+    public boolean hasExtendedResources() {
+      return extendedResources_ != null;
+    }
+    /**
+     * <pre>
+     * Overrides for all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+     */
+    public flyteidl.core.Tasks.ExtendedResources getExtendedResources() {
+      return extendedResources_ == null ? flyteidl.core.Tasks.ExtendedResources.getDefaultInstance() : extendedResources_;
+    }
+    /**
+     * <pre>
+     * Overrides for all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+     */
+    public flyteidl.core.Tasks.ExtendedResourcesOrBuilder getExtendedResourcesOrBuilder() {
+      return getExtendedResources();
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -20528,6 +20605,9 @@ public final class Workflow {
       if (resources_ != null) {
         output.writeMessage(1, getResources());
       }
+      if (extendedResources_ != null) {
+        output.writeMessage(2, getExtendedResources());
+      }
       unknownFields.writeTo(output);
     }
 
@@ -20540,6 +20620,10 @@ public final class Workflow {
       if (resources_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getResources());
+      }
+      if (extendedResources_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getExtendedResources());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -20561,6 +20645,11 @@ public final class Workflow {
         if (!getResources()
             .equals(other.getResources())) return false;
       }
+      if (hasExtendedResources() != other.hasExtendedResources()) return false;
+      if (hasExtendedResources()) {
+        if (!getExtendedResources()
+            .equals(other.getExtendedResources())) return false;
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -20575,6 +20664,10 @@ public final class Workflow {
       if (hasResources()) {
         hash = (37 * hash) + RESOURCES_FIELD_NUMBER;
         hash = (53 * hash) + getResources().hashCode();
+      }
+      if (hasExtendedResources()) {
+        hash = (37 * hash) + EXTENDED_RESOURCES_FIELD_NUMBER;
+        hash = (53 * hash) + getExtendedResources().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -20719,6 +20812,12 @@ public final class Workflow {
           resources_ = null;
           resourcesBuilder_ = null;
         }
+        if (extendedResourcesBuilder_ == null) {
+          extendedResources_ = null;
+        } else {
+          extendedResources_ = null;
+          extendedResourcesBuilder_ = null;
+        }
         return this;
       }
 
@@ -20749,6 +20848,11 @@ public final class Workflow {
           result.resources_ = resources_;
         } else {
           result.resources_ = resourcesBuilder_.build();
+        }
+        if (extendedResourcesBuilder_ == null) {
+          result.extendedResources_ = extendedResources_;
+        } else {
+          result.extendedResources_ = extendedResourcesBuilder_.build();
         }
         onBuilt();
         return result;
@@ -20800,6 +20904,9 @@ public final class Workflow {
         if (other == flyteidl.core.Workflow.TaskNodeOverrides.getDefaultInstance()) return this;
         if (other.hasResources()) {
           mergeResources(other.getResources());
+        }
+        if (other.hasExtendedResources()) {
+          mergeExtendedResources(other.getExtendedResources());
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -20981,6 +21088,168 @@ public final class Workflow {
           resources_ = null;
         }
         return resourcesBuilder_;
+      }
+
+      private flyteidl.core.Tasks.ExtendedResources extendedResources_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.ExtendedResources, flyteidl.core.Tasks.ExtendedResources.Builder, flyteidl.core.Tasks.ExtendedResourcesOrBuilder> extendedResourcesBuilder_;
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public boolean hasExtendedResources() {
+        return extendedResourcesBuilder_ != null || extendedResources_ != null;
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public flyteidl.core.Tasks.ExtendedResources getExtendedResources() {
+        if (extendedResourcesBuilder_ == null) {
+          return extendedResources_ == null ? flyteidl.core.Tasks.ExtendedResources.getDefaultInstance() : extendedResources_;
+        } else {
+          return extendedResourcesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public Builder setExtendedResources(flyteidl.core.Tasks.ExtendedResources value) {
+        if (extendedResourcesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          extendedResources_ = value;
+          onChanged();
+        } else {
+          extendedResourcesBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public Builder setExtendedResources(
+          flyteidl.core.Tasks.ExtendedResources.Builder builderForValue) {
+        if (extendedResourcesBuilder_ == null) {
+          extendedResources_ = builderForValue.build();
+          onChanged();
+        } else {
+          extendedResourcesBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public Builder mergeExtendedResources(flyteidl.core.Tasks.ExtendedResources value) {
+        if (extendedResourcesBuilder_ == null) {
+          if (extendedResources_ != null) {
+            extendedResources_ =
+              flyteidl.core.Tasks.ExtendedResources.newBuilder(extendedResources_).mergeFrom(value).buildPartial();
+          } else {
+            extendedResources_ = value;
+          }
+          onChanged();
+        } else {
+          extendedResourcesBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public Builder clearExtendedResources() {
+        if (extendedResourcesBuilder_ == null) {
+          extendedResources_ = null;
+          onChanged();
+        } else {
+          extendedResources_ = null;
+          extendedResourcesBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public flyteidl.core.Tasks.ExtendedResources.Builder getExtendedResourcesBuilder() {
+        
+        onChanged();
+        return getExtendedResourcesFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      public flyteidl.core.Tasks.ExtendedResourcesOrBuilder getExtendedResourcesOrBuilder() {
+        if (extendedResourcesBuilder_ != null) {
+          return extendedResourcesBuilder_.getMessageOrBuilder();
+        } else {
+          return extendedResources_ == null ?
+              flyteidl.core.Tasks.ExtendedResources.getDefaultInstance() : extendedResources_;
+        }
+      }
+      /**
+       * <pre>
+       * Overrides for all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.ExtendedResources, flyteidl.core.Tasks.ExtendedResources.Builder, flyteidl.core.Tasks.ExtendedResourcesOrBuilder> 
+          getExtendedResourcesFieldBuilder() {
+        if (extendedResourcesBuilder_ == null) {
+          extendedResourcesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.ExtendedResources, flyteidl.core.Tasks.ExtendedResources.Builder, flyteidl.core.Tasks.ExtendedResourcesOrBuilder>(
+                  getExtendedResources(),
+                  getParentForChildren(),
+                  isClean());
+          extendedResources_ = null;
+        }
+        return extendedResourcesBuilder_;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -21205,10 +21474,11 @@ public final class Workflow {
       "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte" +
       "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013" +
       "2\'.flyteidl.core.WorkflowMetadataDefault" +
-      "s\"@\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
-      "\0132\030.flyteidl.core.ResourcesB6Z4github.co" +
-      "m/flyteorg/flyteidl/gen/pb-go/flyteidl/c" +
-      "oreb\006proto3"
+      "s\"~\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
+      "\0132\030.flyteidl.core.Resources\022<\n\022extended_" +
+      "resources\030\002 \001(\0132 .flyteidl.core.Extended" +
+      "ResourcesB<Z:github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21338,7 +21608,7 @@ public final class Workflow {
     internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskNodeOverrides_descriptor,
-        new java.lang.String[] { "Resources", });
+        new java.lang.String[] { "Resources", "ExtendedResources", });
     flyteidl.core.Condition.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();

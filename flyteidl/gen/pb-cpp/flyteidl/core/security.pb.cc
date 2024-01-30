@@ -220,13 +220,13 @@ const char descriptor_table_protodef_flyteidl_2fcore_2fsecurity_2eproto[] =
   "\006run_as\030\001 \001(\0132\027.flyteidl.core.Identity\022&"
   "\n\007secrets\030\002 \003(\0132\025.flyteidl.core.Secret\0221"
   "\n\006tokens\030\003 \003(\0132!.flyteidl.core.OAuth2Tok"
-  "enRequestB6Z4github.com/flyteorg/flyteid"
-  "l/gen/pb-go/flyteidl/coreb\006proto3"
+  "enRequestB<Z:github.com/flyteorg/flyte/f"
+  "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fsecurity_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fsecurity_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fsecurity_2eproto,
-  "flyteidl/core/security.proto", &assign_descriptors_table_flyteidl_2fcore_2fsecurity_2eproto, 873,
+  "flyteidl/core/security.proto", &assign_descriptors_table_flyteidl_2fcore_2fsecurity_2eproto, 879,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fsecurity_2eproto() {

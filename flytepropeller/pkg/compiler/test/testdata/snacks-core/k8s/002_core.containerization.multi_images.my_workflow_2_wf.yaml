@@ -75,8 +75,6 @@ spec:
       kind: task
       name: svm_trainer
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.containerization.multi_images.svm_trainer" '
     n1:
       id: n1
@@ -104,8 +102,6 @@ spec:
       kind: task
       name: svm_predictor
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.containerization.multi_images.svm_predictor" '
     start-node:
       id: start-node

@@ -3,13 +3,12 @@ package transformers
 import (
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-
-	"github.com/golang/protobuf/ptypes"
-
-	"google.golang.org/grpc/codes"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 func FromReservationID(reservationID *datacatalog.ReservationID) models.ReservationKey {

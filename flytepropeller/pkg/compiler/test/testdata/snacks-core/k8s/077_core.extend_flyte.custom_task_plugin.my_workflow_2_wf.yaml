@@ -102,8 +102,6 @@ spec:
       kind: task
       name: print_file
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.extend_flyte.custom_task_plugin.print_file" '
     start-node:
       id: start-node

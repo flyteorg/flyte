@@ -9,7 +9,7 @@ import "google/protobuf/struct.proto";
 
 package flyteidl.core;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
 // A customizable interface to convey resources requested for a container. This can be interpreted differently for different
 // container engines.
@@ -41,6 +41,31 @@ message Resources {
     // Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique
     // within the list.
     repeated ResourceEntry limits = 2;
+}
+
+// Metadata associated with the GPU accelerator to allocate to a task. Contains
+// information about device type, and for multi-instance GPUs, the partition size to
+// use.
+message GPUAccelerator {
+    // This can be any arbitrary string, and should be informed by the labels or taints
+    // associated with the nodes in question. Default cloud provider labels typically
+    // use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+    string device = 1;
+    oneof partition_size_value {
+        bool unpartitioned = 2;
+        // Like `device`, this can be any arbitrary string, and should be informed by
+        // the labels or taints associated with the nodes in question. Default cloud
+        // provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+        string partition_size = 3;
+    }
+}
+
+// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
+// allocate to a task.
+message ExtendedResources {
+    // GPU accelerator to select for task. Contains information about device type, and
+    // for multi-instance GPUs, the partition size to use.
+    GPUAccelerator gpu_accelerator = 1;
 }
 
 // Runtime information. This is loosely defined to allow for extensibility.
@@ -106,6 +131,9 @@ message TaskMetadata {
     // task creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied
     // identically as, the default PodTemplate configured in FlytePropeller.
     string pod_template_name = 12;
+
+    // cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+    repeated string cache_ignore_input_vars  = 13;
 }
 
 // A Task structure that uniquely identifies a task in the system
@@ -143,6 +171,10 @@ message TaskTemplate {
 
     // security_context encapsulates security attributes requested to run this task.
     SecurityContext security_context = 8;
+
+    // Encapsulates all non-standard resources, not captured by
+    // v1.ResourceRequirements, to allocate to a task.
+    ExtendedResources extended_resources = 9;
 
     // Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
     // to use as required.

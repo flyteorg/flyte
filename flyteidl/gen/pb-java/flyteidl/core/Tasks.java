@@ -2302,6 +2302,1676 @@ public final class Tasks {
 
   }
 
+  public interface GPUAcceleratorOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.GPUAccelerator)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
+     * <code>string device = 1;</code>
+     */
+    java.lang.String getDevice();
+    /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
+     * <code>string device = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getDeviceBytes();
+
+    /**
+     * <code>bool unpartitioned = 2;</code>
+     */
+    boolean getUnpartitioned();
+
+    /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
+     * <code>string partition_size = 3;</code>
+     */
+    java.lang.String getPartitionSize();
+    /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
+     * <code>string partition_size = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getPartitionSizeBytes();
+
+    public flyteidl.core.Tasks.GPUAccelerator.PartitionSizeValueCase getPartitionSizeValueCase();
+  }
+  /**
+   * <pre>
+   * Metadata associated with the GPU accelerator to allocate to a task. Contains
+   * information about device type, and for multi-instance GPUs, the partition size to
+   * use.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.GPUAccelerator}
+   */
+  public  static final class GPUAccelerator extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.GPUAccelerator)
+      GPUAcceleratorOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GPUAccelerator.newBuilder() to construct.
+    private GPUAccelerator(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GPUAccelerator() {
+      device_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GPUAccelerator(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              device_ = s;
+              break;
+            }
+            case 16: {
+              partitionSizeValueCase_ = 2;
+              partitionSizeValue_ = input.readBool();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+              partitionSizeValueCase_ = 3;
+              partitionSizeValue_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_GPUAccelerator_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_GPUAccelerator_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.GPUAccelerator.class, flyteidl.core.Tasks.GPUAccelerator.Builder.class);
+    }
+
+    private int partitionSizeValueCase_ = 0;
+    private java.lang.Object partitionSizeValue_;
+    public enum PartitionSizeValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      UNPARTITIONED(2),
+      PARTITION_SIZE(3),
+      PARTITIONSIZEVALUE_NOT_SET(0);
+      private final int value;
+      private PartitionSizeValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static PartitionSizeValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static PartitionSizeValueCase forNumber(int value) {
+        switch (value) {
+          case 2: return UNPARTITIONED;
+          case 3: return PARTITION_SIZE;
+          case 0: return PARTITIONSIZEVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public PartitionSizeValueCase
+    getPartitionSizeValueCase() {
+      return PartitionSizeValueCase.forNumber(
+          partitionSizeValueCase_);
+    }
+
+    public static final int DEVICE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object device_;
+    /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
+     * <code>string device = 1;</code>
+     */
+    public java.lang.String getDevice() {
+      java.lang.Object ref = device_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        device_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * This can be any arbitrary string, and should be informed by the labels or taints
+     * associated with the nodes in question. Default cloud provider labels typically
+     * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+     * </pre>
+     *
+     * <code>string device = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDeviceBytes() {
+      java.lang.Object ref = device_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        device_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int UNPARTITIONED_FIELD_NUMBER = 2;
+    /**
+     * <code>bool unpartitioned = 2;</code>
+     */
+    public boolean getUnpartitioned() {
+      if (partitionSizeValueCase_ == 2) {
+        return (java.lang.Boolean) partitionSizeValue_;
+      }
+      return false;
+    }
+
+    public static final int PARTITION_SIZE_FIELD_NUMBER = 3;
+    /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
+     * <code>string partition_size = 3;</code>
+     */
+    public java.lang.String getPartitionSize() {
+      java.lang.Object ref = "";
+      if (partitionSizeValueCase_ == 3) {
+        ref = partitionSizeValue_;
+      }
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (partitionSizeValueCase_ == 3) {
+          partitionSizeValue_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Like `device`, this can be any arbitrary string, and should be informed by
+     * the labels or taints associated with the nodes in question. Default cloud
+     * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+     * </pre>
+     *
+     * <code>string partition_size = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getPartitionSizeBytes() {
+      java.lang.Object ref = "";
+      if (partitionSizeValueCase_ == 3) {
+        ref = partitionSizeValue_;
+      }
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        if (partitionSizeValueCase_ == 3) {
+          partitionSizeValue_ = b;
+        }
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getDeviceBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, device_);
+      }
+      if (partitionSizeValueCase_ == 2) {
+        output.writeBool(
+            2, (boolean)((java.lang.Boolean) partitionSizeValue_));
+      }
+      if (partitionSizeValueCase_ == 3) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, partitionSizeValue_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getDeviceBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, device_);
+      }
+      if (partitionSizeValueCase_ == 2) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              2, (boolean)((java.lang.Boolean) partitionSizeValue_));
+      }
+      if (partitionSizeValueCase_ == 3) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, partitionSizeValue_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.GPUAccelerator)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.GPUAccelerator other = (flyteidl.core.Tasks.GPUAccelerator) obj;
+
+      if (!getDevice()
+          .equals(other.getDevice())) return false;
+      if (!getPartitionSizeValueCase().equals(other.getPartitionSizeValueCase())) return false;
+      switch (partitionSizeValueCase_) {
+        case 2:
+          if (getUnpartitioned()
+              != other.getUnpartitioned()) return false;
+          break;
+        case 3:
+          if (!getPartitionSize()
+              .equals(other.getPartitionSize())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + DEVICE_FIELD_NUMBER;
+      hash = (53 * hash) + getDevice().hashCode();
+      switch (partitionSizeValueCase_) {
+        case 2:
+          hash = (37 * hash) + UNPARTITIONED_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getUnpartitioned());
+          break;
+        case 3:
+          hash = (37 * hash) + PARTITION_SIZE_FIELD_NUMBER;
+          hash = (53 * hash) + getPartitionSize().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.GPUAccelerator parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.GPUAccelerator prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Metadata associated with the GPU accelerator to allocate to a task. Contains
+     * information about device type, and for multi-instance GPUs, the partition size to
+     * use.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.GPUAccelerator}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.GPUAccelerator)
+        flyteidl.core.Tasks.GPUAcceleratorOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_GPUAccelerator_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_GPUAccelerator_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.GPUAccelerator.class, flyteidl.core.Tasks.GPUAccelerator.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.GPUAccelerator.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        device_ = "";
+
+        partitionSizeValueCase_ = 0;
+        partitionSizeValue_ = null;
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_GPUAccelerator_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.GPUAccelerator getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.GPUAccelerator.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.GPUAccelerator build() {
+        flyteidl.core.Tasks.GPUAccelerator result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.GPUAccelerator buildPartial() {
+        flyteidl.core.Tasks.GPUAccelerator result = new flyteidl.core.Tasks.GPUAccelerator(this);
+        result.device_ = device_;
+        if (partitionSizeValueCase_ == 2) {
+          result.partitionSizeValue_ = partitionSizeValue_;
+        }
+        if (partitionSizeValueCase_ == 3) {
+          result.partitionSizeValue_ = partitionSizeValue_;
+        }
+        result.partitionSizeValueCase_ = partitionSizeValueCase_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.GPUAccelerator) {
+          return mergeFrom((flyteidl.core.Tasks.GPUAccelerator)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.GPUAccelerator other) {
+        if (other == flyteidl.core.Tasks.GPUAccelerator.getDefaultInstance()) return this;
+        if (!other.getDevice().isEmpty()) {
+          device_ = other.device_;
+          onChanged();
+        }
+        switch (other.getPartitionSizeValueCase()) {
+          case UNPARTITIONED: {
+            setUnpartitioned(other.getUnpartitioned());
+            break;
+          }
+          case PARTITION_SIZE: {
+            partitionSizeValueCase_ = 3;
+            partitionSizeValue_ = other.partitionSizeValue_;
+            onChanged();
+            break;
+          }
+          case PARTITIONSIZEVALUE_NOT_SET: {
+            break;
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.GPUAccelerator parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.GPUAccelerator) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int partitionSizeValueCase_ = 0;
+      private java.lang.Object partitionSizeValue_;
+      public PartitionSizeValueCase
+          getPartitionSizeValueCase() {
+        return PartitionSizeValueCase.forNumber(
+            partitionSizeValueCase_);
+      }
+
+      public Builder clearPartitionSizeValue() {
+        partitionSizeValueCase_ = 0;
+        partitionSizeValue_ = null;
+        onChanged();
+        return this;
+      }
+
+
+      private java.lang.Object device_ = "";
+      /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
+       * <code>string device = 1;</code>
+       */
+      public java.lang.String getDevice() {
+        java.lang.Object ref = device_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          device_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
+       * <code>string device = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDeviceBytes() {
+        java.lang.Object ref = device_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          device_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
+       * <code>string device = 1;</code>
+       */
+      public Builder setDevice(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        device_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
+       * <code>string device = 1;</code>
+       */
+      public Builder clearDevice() {
+        
+        device_ = getDefaultInstance().getDevice();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * This can be any arbitrary string, and should be informed by the labels or taints
+       * associated with the nodes in question. Default cloud provider labels typically
+       * use the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc.
+       * </pre>
+       *
+       * <code>string device = 1;</code>
+       */
+      public Builder setDeviceBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        device_ = value;
+        onChanged();
+        return this;
+      }
+
+      /**
+       * <code>bool unpartitioned = 2;</code>
+       */
+      public boolean getUnpartitioned() {
+        if (partitionSizeValueCase_ == 2) {
+          return (java.lang.Boolean) partitionSizeValue_;
+        }
+        return false;
+      }
+      /**
+       * <code>bool unpartitioned = 2;</code>
+       */
+      public Builder setUnpartitioned(boolean value) {
+        partitionSizeValueCase_ = 2;
+        partitionSizeValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool unpartitioned = 2;</code>
+       */
+      public Builder clearUnpartitioned() {
+        if (partitionSizeValueCase_ == 2) {
+          partitionSizeValueCase_ = 0;
+          partitionSizeValue_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
+       * <code>string partition_size = 3;</code>
+       */
+      public java.lang.String getPartitionSize() {
+        java.lang.Object ref = "";
+        if (partitionSizeValueCase_ == 3) {
+          ref = partitionSizeValue_;
+        }
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (partitionSizeValueCase_ == 3) {
+            partitionSizeValue_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
+       * <code>string partition_size = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getPartitionSizeBytes() {
+        java.lang.Object ref = "";
+        if (partitionSizeValueCase_ == 3) {
+          ref = partitionSizeValue_;
+        }
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          if (partitionSizeValueCase_ == 3) {
+            partitionSizeValue_ = b;
+          }
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
+       * <code>string partition_size = 3;</code>
+       */
+      public Builder setPartitionSize(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  partitionSizeValueCase_ = 3;
+        partitionSizeValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
+       * <code>string partition_size = 3;</code>
+       */
+      public Builder clearPartitionSize() {
+        if (partitionSizeValueCase_ == 3) {
+          partitionSizeValueCase_ = 0;
+          partitionSizeValue_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * Like `device`, this can be any arbitrary string, and should be informed by
+       * the labels or taints associated with the nodes in question. Default cloud
+       * provider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc.
+       * </pre>
+       *
+       * <code>string partition_size = 3;</code>
+       */
+      public Builder setPartitionSizeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        partitionSizeValueCase_ = 3;
+        partitionSizeValue_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.GPUAccelerator)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.GPUAccelerator)
+    private static final flyteidl.core.Tasks.GPUAccelerator DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.GPUAccelerator();
+    }
+
+    public static flyteidl.core.Tasks.GPUAccelerator getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GPUAccelerator>
+        PARSER = new com.google.protobuf.AbstractParser<GPUAccelerator>() {
+      @java.lang.Override
+      public GPUAccelerator parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GPUAccelerator(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GPUAccelerator> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GPUAccelerator> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.GPUAccelerator getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface ExtendedResourcesOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.ExtendedResources)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * GPU accelerator to select for task. Contains information about device type, and
+     * for multi-instance GPUs, the partition size to use.
+     * </pre>
+     *
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+     */
+    boolean hasGpuAccelerator();
+    /**
+     * <pre>
+     * GPU accelerator to select for task. Contains information about device type, and
+     * for multi-instance GPUs, the partition size to use.
+     * </pre>
+     *
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+     */
+    flyteidl.core.Tasks.GPUAccelerator getGpuAccelerator();
+    /**
+     * <pre>
+     * GPU accelerator to select for task. Contains information about device type, and
+     * for multi-instance GPUs, the partition size to use.
+     * </pre>
+     *
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+     */
+    flyteidl.core.Tasks.GPUAcceleratorOrBuilder getGpuAcceleratorOrBuilder();
+  }
+  /**
+   * <pre>
+   * Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
+   * allocate to a task.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.ExtendedResources}
+   */
+  public  static final class ExtendedResources extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.ExtendedResources)
+      ExtendedResourcesOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use ExtendedResources.newBuilder() to construct.
+    private ExtendedResources(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private ExtendedResources() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private ExtendedResources(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Tasks.GPUAccelerator.Builder subBuilder = null;
+              if (gpuAccelerator_ != null) {
+                subBuilder = gpuAccelerator_.toBuilder();
+              }
+              gpuAccelerator_ = input.readMessage(flyteidl.core.Tasks.GPUAccelerator.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(gpuAccelerator_);
+                gpuAccelerator_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_ExtendedResources_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Tasks.internal_static_flyteidl_core_ExtendedResources_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Tasks.ExtendedResources.class, flyteidl.core.Tasks.ExtendedResources.Builder.class);
+    }
+
+    public static final int GPU_ACCELERATOR_FIELD_NUMBER = 1;
+    private flyteidl.core.Tasks.GPUAccelerator gpuAccelerator_;
+    /**
+     * <pre>
+     * GPU accelerator to select for task. Contains information about device type, and
+     * for multi-instance GPUs, the partition size to use.
+     * </pre>
+     *
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+     */
+    public boolean hasGpuAccelerator() {
+      return gpuAccelerator_ != null;
+    }
+    /**
+     * <pre>
+     * GPU accelerator to select for task. Contains information about device type, and
+     * for multi-instance GPUs, the partition size to use.
+     * </pre>
+     *
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+     */
+    public flyteidl.core.Tasks.GPUAccelerator getGpuAccelerator() {
+      return gpuAccelerator_ == null ? flyteidl.core.Tasks.GPUAccelerator.getDefaultInstance() : gpuAccelerator_;
+    }
+    /**
+     * <pre>
+     * GPU accelerator to select for task. Contains information about device type, and
+     * for multi-instance GPUs, the partition size to use.
+     * </pre>
+     *
+     * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+     */
+    public flyteidl.core.Tasks.GPUAcceleratorOrBuilder getGpuAcceleratorOrBuilder() {
+      return getGpuAccelerator();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (gpuAccelerator_ != null) {
+        output.writeMessage(1, getGpuAccelerator());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (gpuAccelerator_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getGpuAccelerator());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Tasks.ExtendedResources)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Tasks.ExtendedResources other = (flyteidl.core.Tasks.ExtendedResources) obj;
+
+      if (hasGpuAccelerator() != other.hasGpuAccelerator()) return false;
+      if (hasGpuAccelerator()) {
+        if (!getGpuAccelerator()
+            .equals(other.getGpuAccelerator())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasGpuAccelerator()) {
+        hash = (37 * hash) + GPU_ACCELERATOR_FIELD_NUMBER;
+        hash = (53 * hash) + getGpuAccelerator().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Tasks.ExtendedResources parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Tasks.ExtendedResources prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to
+     * allocate to a task.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.ExtendedResources}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.ExtendedResources)
+        flyteidl.core.Tasks.ExtendedResourcesOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_ExtendedResources_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_ExtendedResources_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Tasks.ExtendedResources.class, flyteidl.core.Tasks.ExtendedResources.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Tasks.ExtendedResources.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (gpuAcceleratorBuilder_ == null) {
+          gpuAccelerator_ = null;
+        } else {
+          gpuAccelerator_ = null;
+          gpuAcceleratorBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Tasks.internal_static_flyteidl_core_ExtendedResources_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.ExtendedResources getDefaultInstanceForType() {
+        return flyteidl.core.Tasks.ExtendedResources.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.ExtendedResources build() {
+        flyteidl.core.Tasks.ExtendedResources result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Tasks.ExtendedResources buildPartial() {
+        flyteidl.core.Tasks.ExtendedResources result = new flyteidl.core.Tasks.ExtendedResources(this);
+        if (gpuAcceleratorBuilder_ == null) {
+          result.gpuAccelerator_ = gpuAccelerator_;
+        } else {
+          result.gpuAccelerator_ = gpuAcceleratorBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Tasks.ExtendedResources) {
+          return mergeFrom((flyteidl.core.Tasks.ExtendedResources)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Tasks.ExtendedResources other) {
+        if (other == flyteidl.core.Tasks.ExtendedResources.getDefaultInstance()) return this;
+        if (other.hasGpuAccelerator()) {
+          mergeGpuAccelerator(other.getGpuAccelerator());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Tasks.ExtendedResources parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Tasks.ExtendedResources) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Tasks.GPUAccelerator gpuAccelerator_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.GPUAccelerator, flyteidl.core.Tasks.GPUAccelerator.Builder, flyteidl.core.Tasks.GPUAcceleratorOrBuilder> gpuAcceleratorBuilder_;
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public boolean hasGpuAccelerator() {
+        return gpuAcceleratorBuilder_ != null || gpuAccelerator_ != null;
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public flyteidl.core.Tasks.GPUAccelerator getGpuAccelerator() {
+        if (gpuAcceleratorBuilder_ == null) {
+          return gpuAccelerator_ == null ? flyteidl.core.Tasks.GPUAccelerator.getDefaultInstance() : gpuAccelerator_;
+        } else {
+          return gpuAcceleratorBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public Builder setGpuAccelerator(flyteidl.core.Tasks.GPUAccelerator value) {
+        if (gpuAcceleratorBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          gpuAccelerator_ = value;
+          onChanged();
+        } else {
+          gpuAcceleratorBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public Builder setGpuAccelerator(
+          flyteidl.core.Tasks.GPUAccelerator.Builder builderForValue) {
+        if (gpuAcceleratorBuilder_ == null) {
+          gpuAccelerator_ = builderForValue.build();
+          onChanged();
+        } else {
+          gpuAcceleratorBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public Builder mergeGpuAccelerator(flyteidl.core.Tasks.GPUAccelerator value) {
+        if (gpuAcceleratorBuilder_ == null) {
+          if (gpuAccelerator_ != null) {
+            gpuAccelerator_ =
+              flyteidl.core.Tasks.GPUAccelerator.newBuilder(gpuAccelerator_).mergeFrom(value).buildPartial();
+          } else {
+            gpuAccelerator_ = value;
+          }
+          onChanged();
+        } else {
+          gpuAcceleratorBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public Builder clearGpuAccelerator() {
+        if (gpuAcceleratorBuilder_ == null) {
+          gpuAccelerator_ = null;
+          onChanged();
+        } else {
+          gpuAccelerator_ = null;
+          gpuAcceleratorBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public flyteidl.core.Tasks.GPUAccelerator.Builder getGpuAcceleratorBuilder() {
+        
+        onChanged();
+        return getGpuAcceleratorFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      public flyteidl.core.Tasks.GPUAcceleratorOrBuilder getGpuAcceleratorOrBuilder() {
+        if (gpuAcceleratorBuilder_ != null) {
+          return gpuAcceleratorBuilder_.getMessageOrBuilder();
+        } else {
+          return gpuAccelerator_ == null ?
+              flyteidl.core.Tasks.GPUAccelerator.getDefaultInstance() : gpuAccelerator_;
+        }
+      }
+      /**
+       * <pre>
+       * GPU accelerator to select for task. Contains information about device type, and
+       * for multi-instance GPUs, the partition size to use.
+       * </pre>
+       *
+       * <code>.flyteidl.core.GPUAccelerator gpu_accelerator = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.GPUAccelerator, flyteidl.core.Tasks.GPUAccelerator.Builder, flyteidl.core.Tasks.GPUAcceleratorOrBuilder> 
+          getGpuAcceleratorFieldBuilder() {
+        if (gpuAcceleratorBuilder_ == null) {
+          gpuAcceleratorBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.GPUAccelerator, flyteidl.core.Tasks.GPUAccelerator.Builder, flyteidl.core.Tasks.GPUAcceleratorOrBuilder>(
+                  getGpuAccelerator(),
+                  getParentForChildren(),
+                  isClean());
+          gpuAccelerator_ = null;
+        }
+        return gpuAcceleratorBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.ExtendedResources)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.ExtendedResources)
+    private static final flyteidl.core.Tasks.ExtendedResources DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Tasks.ExtendedResources();
+    }
+
+    public static flyteidl.core.Tasks.ExtendedResources getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<ExtendedResources>
+        PARSER = new com.google.protobuf.AbstractParser<ExtendedResources>() {
+      @java.lang.Override
+      public ExtendedResources parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new ExtendedResources(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<ExtendedResources> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<ExtendedResources> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Tasks.ExtendedResources getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface RuntimeMetadataOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.RuntimeMetadata)
       com.google.protobuf.MessageOrBuilder {
@@ -3530,6 +5200,41 @@ public final class Tasks {
     com.google.protobuf.ByteString
         getPodTemplateNameBytes();
 
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    java.util.List<java.lang.String>
+        getCacheIgnoreInputVarsList();
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    int getCacheIgnoreInputVarsCount();
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    java.lang.String getCacheIgnoreInputVars(int index);
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    com.google.protobuf.ByteString
+        getCacheIgnoreInputVarsBytes(int index);
+
     public flyteidl.core.Tasks.TaskMetadata.InterruptibleValueCase getInterruptibleValueCase();
   }
   /**
@@ -3552,6 +5257,7 @@ public final class Tasks {
       discoveryVersion_ = "";
       deprecatedErrorMessage_ = "";
       podTemplateName_ = "";
+      cacheIgnoreInputVars_ = com.google.protobuf.LazyStringArrayList.EMPTY;
     }
 
     @java.lang.Override
@@ -3668,6 +5374,15 @@ public final class Tasks {
               podTemplateName_ = s;
               break;
             }
+            case 106: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000800) != 0)) {
+                cacheIgnoreInputVars_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000800;
+              }
+              cacheIgnoreInputVars_.add(s);
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3683,6 +5398,9 @@ public final class Tasks {
         throw new com.google.protobuf.InvalidProtocolBufferException(
             e).setUnfinishedMessage(this);
       } finally {
+        if (((mutable_bitField0_ & 0x00000800) != 0)) {
+          cacheIgnoreInputVars_ = cacheIgnoreInputVars_.getUnmodifiableView();
+        }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
       }
@@ -4122,6 +5840,51 @@ public final class Tasks {
       }
     }
 
+    public static final int CACHE_IGNORE_INPUT_VARS_FIELD_NUMBER = 13;
+    private com.google.protobuf.LazyStringList cacheIgnoreInputVars_;
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getCacheIgnoreInputVarsList() {
+      return cacheIgnoreInputVars_;
+    }
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    public int getCacheIgnoreInputVarsCount() {
+      return cacheIgnoreInputVars_.size();
+    }
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    public java.lang.String getCacheIgnoreInputVars(int index) {
+      return cacheIgnoreInputVars_.get(index);
+    }
+    /**
+     * <pre>
+     * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+     * </pre>
+     *
+     * <code>repeated string cache_ignore_input_vars = 13;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCacheIgnoreInputVarsBytes(int index) {
+      return cacheIgnoreInputVars_.getByteString(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -4172,6 +5935,9 @@ public final class Tasks {
           11);
       if (!getPodTemplateNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 12, podTemplateName_);
+      }
+      for (int i = 0; i < cacheIgnoreInputVars_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 13, cacheIgnoreInputVars_.getRaw(i));
       }
       unknownFields.writeTo(output);
     }
@@ -4230,6 +5996,14 @@ public final class Tasks {
       if (!getPodTemplateNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(12, podTemplateName_);
       }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < cacheIgnoreInputVars_.size(); i++) {
+          dataSize += computeStringSizeNoTag(cacheIgnoreInputVars_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getCacheIgnoreInputVarsList().size();
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -4274,6 +6048,8 @@ public final class Tasks {
           other.internalGetTags())) return false;
       if (!getPodTemplateName()
           .equals(other.getPodTemplateName())) return false;
+      if (!getCacheIgnoreInputVarsList()
+          .equals(other.getCacheIgnoreInputVarsList())) return false;
       if (!getInterruptibleValueCase().equals(other.getInterruptibleValueCase())) return false;
       switch (interruptibleValueCase_) {
         case 8:
@@ -4325,6 +6101,10 @@ public final class Tasks {
       }
       hash = (37 * hash) + POD_TEMPLATE_NAME_FIELD_NUMBER;
       hash = (53 * hash) + getPodTemplateName().hashCode();
+      if (getCacheIgnoreInputVarsCount() > 0) {
+        hash = (37 * hash) + CACHE_IGNORE_INPUT_VARS_FIELD_NUMBER;
+        hash = (53 * hash) + getCacheIgnoreInputVarsList().hashCode();
+      }
       switch (interruptibleValueCase_) {
         case 8:
           hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
@@ -4524,6 +6304,8 @@ public final class Tasks {
         internalGetMutableTags().clear();
         podTemplateName_ = "";
 
+        cacheIgnoreInputVars_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000800);
         interruptibleValueCase_ = 0;
         interruptibleValue_ = null;
         return this;
@@ -4580,6 +6362,11 @@ public final class Tasks {
         result.tags_ = internalGetTags();
         result.tags_.makeImmutable();
         result.podTemplateName_ = podTemplateName_;
+        if (((bitField0_ & 0x00000800) != 0)) {
+          cacheIgnoreInputVars_ = cacheIgnoreInputVars_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000800);
+        }
+        result.cacheIgnoreInputVars_ = cacheIgnoreInputVars_;
         result.bitField0_ = to_bitField0_;
         result.interruptibleValueCase_ = interruptibleValueCase_;
         onBuilt();
@@ -4660,6 +6447,16 @@ public final class Tasks {
             other.internalGetTags());
         if (!other.getPodTemplateName().isEmpty()) {
           podTemplateName_ = other.podTemplateName_;
+          onChanged();
+        }
+        if (!other.cacheIgnoreInputVars_.isEmpty()) {
+          if (cacheIgnoreInputVars_.isEmpty()) {
+            cacheIgnoreInputVars_ = other.cacheIgnoreInputVars_;
+            bitField0_ = (bitField0_ & ~0x00000800);
+          } else {
+            ensureCacheIgnoreInputVarsIsMutable();
+            cacheIgnoreInputVars_.addAll(other.cacheIgnoreInputVars_);
+          }
           onChanged();
         }
         switch (other.getInterruptibleValueCase()) {
@@ -5751,6 +7548,136 @@ public final class Tasks {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.LazyStringList cacheIgnoreInputVars_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureCacheIgnoreInputVarsIsMutable() {
+        if (!((bitField0_ & 0x00000800) != 0)) {
+          cacheIgnoreInputVars_ = new com.google.protobuf.LazyStringArrayList(cacheIgnoreInputVars_);
+          bitField0_ |= 0x00000800;
+         }
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getCacheIgnoreInputVarsList() {
+        return cacheIgnoreInputVars_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public int getCacheIgnoreInputVarsCount() {
+        return cacheIgnoreInputVars_.size();
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public java.lang.String getCacheIgnoreInputVars(int index) {
+        return cacheIgnoreInputVars_.get(index);
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCacheIgnoreInputVarsBytes(int index) {
+        return cacheIgnoreInputVars_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public Builder setCacheIgnoreInputVars(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureCacheIgnoreInputVarsIsMutable();
+        cacheIgnoreInputVars_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public Builder addCacheIgnoreInputVars(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureCacheIgnoreInputVarsIsMutable();
+        cacheIgnoreInputVars_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public Builder addAllCacheIgnoreInputVars(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureCacheIgnoreInputVarsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, cacheIgnoreInputVars_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public Builder clearCacheIgnoreInputVars() {
+        cacheIgnoreInputVars_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000800);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache.
+       * </pre>
+       *
+       * <code>repeated string cache_ignore_input_vars = 13;</code>
+       */
+      public Builder addCacheIgnoreInputVarsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureCacheIgnoreInputVarsIsMutable();
+        cacheIgnoreInputVars_.add(value);
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -6008,6 +7935,34 @@ public final class Tasks {
 
     /**
      * <pre>
+     * Encapsulates all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+     */
+    boolean hasExtendedResources();
+    /**
+     * <pre>
+     * Encapsulates all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+     */
+    flyteidl.core.Tasks.ExtendedResources getExtendedResources();
+    /**
+     * <pre>
+     * Encapsulates all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+     */
+    flyteidl.core.Tasks.ExtendedResourcesOrBuilder getExtendedResourcesOrBuilder();
+
+    /**
+     * <pre>
      * Metadata about the custom defined for this task. This is extensible to allow various plugins in the system
      * to use as required.
      * reserve the field numbers 1 through 15 for very frequently occurring message elements
@@ -6207,11 +8162,24 @@ public final class Tasks {
 
               break;
             }
+            case 74: {
+              flyteidl.core.Tasks.ExtendedResources.Builder subBuilder = null;
+              if (extendedResources_ != null) {
+                subBuilder = extendedResources_.toBuilder();
+              }
+              extendedResources_ = input.readMessage(flyteidl.core.Tasks.ExtendedResources.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(extendedResources_);
+                extendedResources_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             case 130: {
-              if (!((mutable_bitField0_ & 0x00000400) != 0)) {
+              if (!((mutable_bitField0_ & 0x00000800) != 0)) {
                 config_ = com.google.protobuf.MapField.newMapField(
                     ConfigDefaultEntryHolder.defaultEntry);
-                mutable_bitField0_ |= 0x00000400;
+                mutable_bitField0_ |= 0x00000800;
               }
               com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
               config__ = input.readMessage(
@@ -6638,6 +8606,42 @@ public final class Tasks {
       return getSecurityContext();
     }
 
+    public static final int EXTENDED_RESOURCES_FIELD_NUMBER = 9;
+    private flyteidl.core.Tasks.ExtendedResources extendedResources_;
+    /**
+     * <pre>
+     * Encapsulates all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+     */
+    public boolean hasExtendedResources() {
+      return extendedResources_ != null;
+    }
+    /**
+     * <pre>
+     * Encapsulates all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+     */
+    public flyteidl.core.Tasks.ExtendedResources getExtendedResources() {
+      return extendedResources_ == null ? flyteidl.core.Tasks.ExtendedResources.getDefaultInstance() : extendedResources_;
+    }
+    /**
+     * <pre>
+     * Encapsulates all non-standard resources, not captured by
+     * v1.ResourceRequirements, to allocate to a task.
+     * </pre>
+     *
+     * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+     */
+    public flyteidl.core.Tasks.ExtendedResourcesOrBuilder getExtendedResourcesOrBuilder() {
+      return getExtendedResources();
+    }
+
     public static final int CONFIG_FIELD_NUMBER = 16;
     private static final class ConfigDefaultEntryHolder {
       static final com.google.protobuf.MapEntry<
@@ -6776,6 +8780,9 @@ public final class Tasks {
       if (securityContext_ != null) {
         output.writeMessage(8, getSecurityContext());
       }
+      if (extendedResources_ != null) {
+        output.writeMessage(9, getExtendedResources());
+      }
       com.google.protobuf.GeneratedMessageV3
         .serializeStringMapTo(
           output,
@@ -6827,6 +8834,10 @@ public final class Tasks {
       if (securityContext_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(8, getSecurityContext());
+      }
+      if (extendedResources_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(9, getExtendedResources());
       }
       for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
            : internalGetConfig().getMap().entrySet()) {
@@ -6890,6 +8901,11 @@ public final class Tasks {
         if (!getSecurityContext()
             .equals(other.getSecurityContext())) return false;
       }
+      if (hasExtendedResources() != other.hasExtendedResources()) return false;
+      if (hasExtendedResources()) {
+        if (!getExtendedResources()
+            .equals(other.getExtendedResources())) return false;
+      }
       if (!internalGetConfig().equals(
           other.internalGetConfig())) return false;
       if (!getTargetCase().equals(other.getTargetCase())) return false;
@@ -6943,6 +8959,10 @@ public final class Tasks {
       if (hasSecurityContext()) {
         hash = (37 * hash) + SECURITY_CONTEXT_FIELD_NUMBER;
         hash = (53 * hash) + getSecurityContext().hashCode();
+      }
+      if (hasExtendedResources()) {
+        hash = (37 * hash) + EXTENDED_RESOURCES_FIELD_NUMBER;
+        hash = (53 * hash) + getExtendedResources().hashCode();
       }
       if (!internalGetConfig().getMap().isEmpty()) {
         hash = (37 * hash) + CONFIG_FIELD_NUMBER;
@@ -7158,6 +9178,12 @@ public final class Tasks {
           securityContext_ = null;
           securityContextBuilder_ = null;
         }
+        if (extendedResourcesBuilder_ == null) {
+          extendedResources_ = null;
+        } else {
+          extendedResources_ = null;
+          extendedResourcesBuilder_ = null;
+        }
         internalGetMutableConfig().clear();
         targetCase_ = 0;
         target_ = null;
@@ -7237,6 +9263,11 @@ public final class Tasks {
         } else {
           result.securityContext_ = securityContextBuilder_.build();
         }
+        if (extendedResourcesBuilder_ == null) {
+          result.extendedResources_ = extendedResources_;
+        } else {
+          result.extendedResources_ = extendedResourcesBuilder_.build();
+        }
         result.config_ = internalGetConfig();
         result.config_.makeImmutable();
         result.bitField0_ = to_bitField0_;
@@ -7310,6 +9341,9 @@ public final class Tasks {
         }
         if (other.hasSecurityContext()) {
           mergeSecurityContext(other.getSecurityContext());
+        }
+        if (other.hasExtendedResources()) {
+          mergeExtendedResources(other.getExtendedResources());
         }
         internalGetMutableConfig().mergeFrom(
             other.internalGetConfig());
@@ -8692,6 +10726,168 @@ public final class Tasks {
           securityContext_ = null;
         }
         return securityContextBuilder_;
+      }
+
+      private flyteidl.core.Tasks.ExtendedResources extendedResources_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.ExtendedResources, flyteidl.core.Tasks.ExtendedResources.Builder, flyteidl.core.Tasks.ExtendedResourcesOrBuilder> extendedResourcesBuilder_;
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public boolean hasExtendedResources() {
+        return extendedResourcesBuilder_ != null || extendedResources_ != null;
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public flyteidl.core.Tasks.ExtendedResources getExtendedResources() {
+        if (extendedResourcesBuilder_ == null) {
+          return extendedResources_ == null ? flyteidl.core.Tasks.ExtendedResources.getDefaultInstance() : extendedResources_;
+        } else {
+          return extendedResourcesBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public Builder setExtendedResources(flyteidl.core.Tasks.ExtendedResources value) {
+        if (extendedResourcesBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          extendedResources_ = value;
+          onChanged();
+        } else {
+          extendedResourcesBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public Builder setExtendedResources(
+          flyteidl.core.Tasks.ExtendedResources.Builder builderForValue) {
+        if (extendedResourcesBuilder_ == null) {
+          extendedResources_ = builderForValue.build();
+          onChanged();
+        } else {
+          extendedResourcesBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public Builder mergeExtendedResources(flyteidl.core.Tasks.ExtendedResources value) {
+        if (extendedResourcesBuilder_ == null) {
+          if (extendedResources_ != null) {
+            extendedResources_ =
+              flyteidl.core.Tasks.ExtendedResources.newBuilder(extendedResources_).mergeFrom(value).buildPartial();
+          } else {
+            extendedResources_ = value;
+          }
+          onChanged();
+        } else {
+          extendedResourcesBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public Builder clearExtendedResources() {
+        if (extendedResourcesBuilder_ == null) {
+          extendedResources_ = null;
+          onChanged();
+        } else {
+          extendedResources_ = null;
+          extendedResourcesBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public flyteidl.core.Tasks.ExtendedResources.Builder getExtendedResourcesBuilder() {
+        
+        onChanged();
+        return getExtendedResourcesFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      public flyteidl.core.Tasks.ExtendedResourcesOrBuilder getExtendedResourcesOrBuilder() {
+        if (extendedResourcesBuilder_ != null) {
+          return extendedResourcesBuilder_.getMessageOrBuilder();
+        } else {
+          return extendedResources_ == null ?
+              flyteidl.core.Tasks.ExtendedResources.getDefaultInstance() : extendedResources_;
+        }
+      }
+      /**
+       * <pre>
+       * Encapsulates all non-standard resources, not captured by
+       * v1.ResourceRequirements, to allocate to a task.
+       * </pre>
+       *
+       * <code>.flyteidl.core.ExtendedResources extended_resources = 9;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Tasks.ExtendedResources, flyteidl.core.Tasks.ExtendedResources.Builder, flyteidl.core.Tasks.ExtendedResourcesOrBuilder> 
+          getExtendedResourcesFieldBuilder() {
+        if (extendedResourcesBuilder_ == null) {
+          extendedResourcesBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Tasks.ExtendedResources, flyteidl.core.Tasks.ExtendedResources.Builder, flyteidl.core.Tasks.ExtendedResourcesOrBuilder>(
+                  getExtendedResources(),
+                  getParentForChildren(),
+                  isClean());
+          extendedResources_ = null;
+        }
+        return extendedResourcesBuilder_;
       }
 
       private com.google.protobuf.MapField<
@@ -18591,6 +20787,16 @@ public final class Tasks {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_Resources_ResourceEntry_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_GPUAccelerator_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_GPUAccelerator_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_ExtendedResources_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_ExtendedResources_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_RuntimeMetadata_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -18682,76 +20888,83 @@ public final class Tasks {
       "re.Resources.ResourceName\022\r\n\005value\030\002 \001(\t" +
       "\"]\n\014ResourceName\022\013\n\007UNKNOWN\020\000\022\007\n\003CPU\020\001\022\007" +
       "\n\003GPU\020\002\022\n\n\006MEMORY\020\003\022\013\n\007STORAGE\020\004\022\025\n\021EPHE" +
-      "MERAL_STORAGE\020\005\"\225\001\n\017RuntimeMetadata\0228\n\004t" +
-      "ype\030\001 \001(\0162*.flyteidl.core.RuntimeMetadat" +
-      "a.RuntimeType\022\017\n\007version\030\002 \001(\t\022\016\n\006flavor" +
-      "\030\003 \001(\t\"\'\n\013RuntimeType\022\t\n\005OTHER\020\000\022\r\n\tFLYT" +
-      "E_SDK\020\001\"\316\003\n\014TaskMetadata\022\024\n\014discoverable" +
-      "\030\001 \001(\010\022/\n\007runtime\030\002 \001(\0132\036.flyteidl.core." +
-      "RuntimeMetadata\022*\n\007timeout\030\004 \001(\0132\031.googl" +
-      "e.protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.f" +
-      "lyteidl.core.RetryStrategy\022\031\n\021discovery_" +
-      "version\030\006 \001(\t\022 \n\030deprecated_error_messag" +
-      "e\030\007 \001(\t\022\027\n\rinterruptible\030\010 \001(\010H\000\022\032\n\022cach" +
-      "e_serializable\030\t \001(\010\022\026\n\016generates_deck\030\n" +
-      " \001(\010\0223\n\004tags\030\013 \003(\0132%.flyteidl.core.TaskM" +
-      "etadata.TagsEntry\022\031\n\021pod_template_name\030\014" +
-      " \001(\t\032+\n\tTagsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
-      "\002 \001(\t:\0028\001B\025\n\023interruptible_value\"\220\004\n\014Tas" +
-      "kTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Id" +
-      "entifier\022\014\n\004type\030\002 \001(\t\022-\n\010metadata\030\003 \001(\013" +
-      "2\033.flyteidl.core.TaskMetadata\0220\n\tinterfa" +
-      "ce\030\004 \001(\0132\035.flyteidl.core.TypedInterface\022" +
-      "\'\n\006custom\030\005 \001(\0132\027.google.protobuf.Struct" +
-      "\022-\n\tcontainer\030\006 \001(\0132\030.flyteidl.core.Cont" +
-      "ainerH\000\022(\n\007k8s_pod\030\021 \001(\0132\025.flyteidl.core" +
-      ".K8sPodH\000\022!\n\003sql\030\022 \001(\0132\022.flyteidl.core.S" +
-      "qlH\000\022\031\n\021task_type_version\030\007 \001(\005\0228\n\020secur" +
-      "ity_context\030\010 \001(\0132\036.flyteidl.core.Securi" +
-      "tyContext\0227\n\006config\030\020 \003(\0132\'.flyteidl.cor" +
-      "e.TaskTemplate.ConfigEntry\032-\n\013ConfigEntr" +
-      "y\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006tar" +
-      "get\"\'\n\rContainerPort\022\026\n\016container_port\030\001" +
-      " \001(\r\"\255\003\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007com" +
-      "mand\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources\030\004 " +
-      "\001(\0132\030.flyteidl.core.Resources\022(\n\003env\030\005 \003" +
-      "(\0132\033.flyteidl.core.KeyValuePair\022/\n\006confi" +
-      "g\030\006 \003(\0132\033.flyteidl.core.KeyValuePairB\002\030\001" +
-      "\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Containe" +
-      "rPort\0225\n\013data_config\030\t \001(\0132 .flyteidl.co" +
-      "re.DataLoadingConfig\022;\n\014architecture\030\n \001" +
-      "(\0162%.flyteidl.core.Container.Architectur" +
-      "e\"I\n\014Architecture\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64\020" +
-      "\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002\n" +
-      "\nIOStrategy\022=\n\rdownload_mode\030\001 \001(\0162&.fly" +
-      "teidl.core.IOStrategy.DownloadMode\0229\n\013up" +
-      "load_mode\030\002 \001(\0162$.flyteidl.core.IOStrate" +
-      "gy.UploadMode\"L\n\014DownloadMode\022\022\n\016DOWNLOA" +
-      "D_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NOT" +
-      "_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_E" +
-      "XIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOAD" +
-      "\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabled\030\001 \001(" +
-      "\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_path\030\003 \001" +
-      "(\t\022A\n\006format\030\004 \001(\01621.flyteidl.core.DataL" +
-      "oadingConfig.LiteralMapFormat\022.\n\013io_stra" +
-      "tegy\030\005 \001(\0132\031.flyteidl.core.IOStrategy\"1\n" +
-      "\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t\n" +
-      "\005PROTO\020\002\"\236\001\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 ." +
-      "flyteidl.core.K8sObjectMetadata\022)\n\010pod_s" +
-      "pec\030\002 \001(\0132\027.google.protobuf.Struct\0225\n\013da" +
-      "ta_config\030\003 \001(\0132 .flyteidl.core.DataLoad" +
-      "ingConfig\"\374\001\n\021K8sObjectMetadata\022<\n\006label" +
-      "s\030\001 \003(\0132,.flyteidl.core.K8sObjectMetadat" +
-      "a.LabelsEntry\022F\n\013annotations\030\002 \003(\01321.fly" +
-      "teidl.core.K8sObjectMetadata.Annotations" +
-      "Entry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005val" +
-      "ue\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030" +
-      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstate" +
-      "ment\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl.c" +
-      "ore.Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED\020" +
-      "\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B6Z4gith" +
-      "ub.com/flyteorg/flyteidl/gen/pb-go/flyte" +
-      "idl/coreb\006proto3"
+      "MERAL_STORAGE\020\005\"k\n\016GPUAccelerator\022\016\n\006dev" +
+      "ice\030\001 \001(\t\022\027\n\runpartitioned\030\002 \001(\010H\000\022\030\n\016pa" +
+      "rtition_size\030\003 \001(\tH\000B\026\n\024partition_size_v" +
+      "alue\"K\n\021ExtendedResources\0226\n\017gpu_acceler" +
+      "ator\030\001 \001(\0132\035.flyteidl.core.GPUAccelerato" +
+      "r\"\225\001\n\017RuntimeMetadata\0228\n\004type\030\001 \001(\0162*.fl" +
+      "yteidl.core.RuntimeMetadata.RuntimeType\022" +
+      "\017\n\007version\030\002 \001(\t\022\016\n\006flavor\030\003 \001(\t\"\'\n\013Runt" +
+      "imeType\022\t\n\005OTHER\020\000\022\r\n\tFLYTE_SDK\020\001\"\357\003\n\014Ta" +
+      "skMetadata\022\024\n\014discoverable\030\001 \001(\010\022/\n\007runt" +
+      "ime\030\002 \001(\0132\036.flyteidl.core.RuntimeMetadat" +
+      "a\022*\n\007timeout\030\004 \001(\0132\031.google.protobuf.Dur" +
+      "ation\022-\n\007retries\030\005 \001(\0132\034.flyteidl.core.R" +
+      "etryStrategy\022\031\n\021discovery_version\030\006 \001(\t\022" +
+      " \n\030deprecated_error_message\030\007 \001(\t\022\027\n\rint" +
+      "erruptible\030\010 \001(\010H\000\022\032\n\022cache_serializable" +
+      "\030\t \001(\010\022\026\n\016generates_deck\030\n \001(\010\0223\n\004tags\030\013" +
+      " \003(\0132%.flyteidl.core.TaskMetadata.TagsEn" +
+      "try\022\031\n\021pod_template_name\030\014 \001(\t\022\037\n\027cache_" +
+      "ignore_input_vars\030\r \003(\t\032+\n\tTagsEntry\022\013\n\003" +
+      "key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\025\n\023interrup" +
+      "tible_value\"\316\004\n\014TaskTemplate\022%\n\002id\030\001 \001(\013" +
+      "2\031.flyteidl.core.Identifier\022\014\n\004type\030\002 \001(" +
+      "\t\022-\n\010metadata\030\003 \001(\0132\033.flyteidl.core.Task" +
+      "Metadata\0220\n\tinterface\030\004 \001(\0132\035.flyteidl.c" +
+      "ore.TypedInterface\022\'\n\006custom\030\005 \001(\0132\027.goo" +
+      "gle.protobuf.Struct\022-\n\tcontainer\030\006 \001(\0132\030" +
+      ".flyteidl.core.ContainerH\000\022(\n\007k8s_pod\030\021 " +
+      "\001(\0132\025.flyteidl.core.K8sPodH\000\022!\n\003sql\030\022 \001(" +
+      "\0132\022.flyteidl.core.SqlH\000\022\031\n\021task_type_ver" +
+      "sion\030\007 \001(\005\0228\n\020security_context\030\010 \001(\0132\036.f" +
+      "lyteidl.core.SecurityContext\022<\n\022extended" +
+      "_resources\030\t \001(\0132 .flyteidl.core.Extende" +
+      "dResources\0227\n\006config\030\020 \003(\0132\'.flyteidl.co" +
+      "re.TaskTemplate.ConfigEntry\032-\n\013ConfigEnt" +
+      "ry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001B\010\n\006ta" +
+      "rget\"\'\n\rContainerPort\022\026\n\016container_port\030" +
+      "\001 \001(\r\"\255\003\n\tContainer\022\r\n\005image\030\001 \001(\t\022\017\n\007co" +
+      "mmand\030\002 \003(\t\022\014\n\004args\030\003 \003(\t\022+\n\tresources\030\004" +
+      " \001(\0132\030.flyteidl.core.Resources\022(\n\003env\030\005 " +
+      "\003(\0132\033.flyteidl.core.KeyValuePair\022/\n\006conf" +
+      "ig\030\006 \003(\0132\033.flyteidl.core.KeyValuePairB\002\030" +
+      "\001\022+\n\005ports\030\007 \003(\0132\034.flyteidl.core.Contain" +
+      "erPort\0225\n\013data_config\030\t \001(\0132 .flyteidl.c" +
+      "ore.DataLoadingConfig\022;\n\014architecture\030\n " +
+      "\001(\0162%.flyteidl.core.Container.Architectu" +
+      "re\"I\n\014Architecture\022\013\n\007UNKNOWN\020\000\022\t\n\005AMD64" +
+      "\020\001\022\t\n\005ARM64\020\002\022\n\n\006ARM_V6\020\003\022\n\n\006ARM_V7\020\004\"\233\002" +
+      "\n\nIOStrategy\022=\n\rdownload_mode\030\001 \001(\0162&.fl" +
+      "yteidl.core.IOStrategy.DownloadMode\0229\n\013u" +
+      "pload_mode\030\002 \001(\0162$.flyteidl.core.IOStrat" +
+      "egy.UploadMode\"L\n\014DownloadMode\022\022\n\016DOWNLO" +
+      "AD_EAGER\020\000\022\023\n\017DOWNLOAD_STREAM\020\001\022\023\n\017DO_NO" +
+      "T_DOWNLOAD\020\002\"E\n\nUploadMode\022\022\n\016UPLOAD_ON_" +
+      "EXIT\020\000\022\020\n\014UPLOAD_EAGER\020\001\022\021\n\rDO_NOT_UPLOA" +
+      "D\020\002\"\363\001\n\021DataLoadingConfig\022\017\n\007enabled\030\001 \001" +
+      "(\010\022\022\n\ninput_path\030\002 \001(\t\022\023\n\013output_path\030\003 " +
+      "\001(\t\022A\n\006format\030\004 \001(\01621.flyteidl.core.Data" +
+      "LoadingConfig.LiteralMapFormat\022.\n\013io_str" +
+      "ategy\030\005 \001(\0132\031.flyteidl.core.IOStrategy\"1" +
+      "\n\020LiteralMapFormat\022\010\n\004JSON\020\000\022\010\n\004YAML\020\001\022\t" +
+      "\n\005PROTO\020\002\"\236\001\n\006K8sPod\0222\n\010metadata\030\001 \001(\0132 " +
+      ".flyteidl.core.K8sObjectMetadata\022)\n\010pod_" +
+      "spec\030\002 \001(\0132\027.google.protobuf.Struct\0225\n\013d" +
+      "ata_config\030\003 \001(\0132 .flyteidl.core.DataLoa" +
+      "dingConfig\"\374\001\n\021K8sObjectMetadata\022<\n\006labe" +
+      "ls\030\001 \003(\0132,.flyteidl.core.K8sObjectMetada" +
+      "ta.LabelsEntry\022F\n\013annotations\030\002 \003(\01321.fl" +
+      "yteidl.core.K8sObjectMetadata.Annotation" +
+      "sEntry\032-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005va" +
+      "lue\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key" +
+      "\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"~\n\003Sql\022\021\n\tstat" +
+      "ement\030\001 \001(\t\022+\n\007dialect\030\002 \001(\0162\032.flyteidl." +
+      "core.Sql.Dialect\"7\n\007Dialect\022\r\n\tUNDEFINED" +
+      "\020\000\022\010\n\004ANSI\020\001\022\010\n\004HIVE\020\002\022\t\n\005OTHER\020\003B<Z:git" +
+      "hub.com/flyteorg/flyte/flyteidl/gen/pb-g" +
+      "o/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -18783,18 +20996,30 @@ public final class Tasks {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Resources_ResourceEntry_descriptor,
         new java.lang.String[] { "Name", "Value", });
-    internal_static_flyteidl_core_RuntimeMetadata_descriptor =
+    internal_static_flyteidl_core_GPUAccelerator_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_flyteidl_core_GPUAccelerator_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_GPUAccelerator_descriptor,
+        new java.lang.String[] { "Device", "Unpartitioned", "PartitionSize", "PartitionSizeValue", });
+    internal_static_flyteidl_core_ExtendedResources_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_flyteidl_core_ExtendedResources_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_ExtendedResources_descriptor,
+        new java.lang.String[] { "GpuAccelerator", });
+    internal_static_flyteidl_core_RuntimeMetadata_descriptor =
+      getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_core_RuntimeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_RuntimeMetadata_descriptor,
         new java.lang.String[] { "Type", "Version", "Flavor", });
     internal_static_flyteidl_core_TaskMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_TaskMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskMetadata_descriptor,
-        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "GeneratesDeck", "Tags", "PodTemplateName", "InterruptibleValue", });
+        new java.lang.String[] { "Discoverable", "Runtime", "Timeout", "Retries", "DiscoveryVersion", "DeprecatedErrorMessage", "Interruptible", "CacheSerializable", "GeneratesDeck", "Tags", "PodTemplateName", "CacheIgnoreInputVars", "InterruptibleValue", });
     internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor =
       internal_static_flyteidl_core_TaskMetadata_descriptor.getNestedTypes().get(0);
     internal_static_flyteidl_core_TaskMetadata_TagsEntry_fieldAccessorTable = new
@@ -18802,11 +21027,11 @@ public final class Tasks {
         internal_static_flyteidl_core_TaskMetadata_TagsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_TaskTemplate_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(5);
     internal_static_flyteidl_core_TaskTemplate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskTemplate_descriptor,
-        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "K8SPod", "Sql", "TaskTypeVersion", "SecurityContext", "Config", "Target", });
+        new java.lang.String[] { "Id", "Type", "Metadata", "Interface", "Custom", "Container", "K8SPod", "Sql", "TaskTypeVersion", "SecurityContext", "ExtendedResources", "Config", "Target", });
     internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor =
       internal_static_flyteidl_core_TaskTemplate_descriptor.getNestedTypes().get(0);
     internal_static_flyteidl_core_TaskTemplate_ConfigEntry_fieldAccessorTable = new
@@ -18814,37 +21039,37 @@ public final class Tasks {
         internal_static_flyteidl_core_TaskTemplate_ConfigEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_ContainerPort_descriptor =
-      getDescriptor().getMessageTypes().get(4);
+      getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_core_ContainerPort_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ContainerPort_descriptor,
         new java.lang.String[] { "ContainerPort", });
     internal_static_flyteidl_core_Container_descriptor =
-      getDescriptor().getMessageTypes().get(5);
+      getDescriptor().getMessageTypes().get(7);
     internal_static_flyteidl_core_Container_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Container_descriptor,
         new java.lang.String[] { "Image", "Command", "Args", "Resources", "Env", "Config", "Ports", "DataConfig", "Architecture", });
     internal_static_flyteidl_core_IOStrategy_descriptor =
-      getDescriptor().getMessageTypes().get(6);
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_core_IOStrategy_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_IOStrategy_descriptor,
         new java.lang.String[] { "DownloadMode", "UploadMode", });
     internal_static_flyteidl_core_DataLoadingConfig_descriptor =
-      getDescriptor().getMessageTypes().get(7);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_core_DataLoadingConfig_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_DataLoadingConfig_descriptor,
         new java.lang.String[] { "Enabled", "InputPath", "OutputPath", "Format", "IoStrategy", });
     internal_static_flyteidl_core_K8sPod_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_core_K8sPod_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sPod_descriptor,
         new java.lang.String[] { "Metadata", "PodSpec", "DataConfig", });
     internal_static_flyteidl_core_K8sObjectMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_core_K8sObjectMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_K8sObjectMetadata_descriptor,
@@ -18862,7 +21087,7 @@ public final class Tasks {
         internal_static_flyteidl_core_K8sObjectMetadata_AnnotationsEntry_descriptor,
         new java.lang.String[] { "Key", "Value", });
     internal_static_flyteidl_core_Sql_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(12);
     internal_static_flyteidl_core_Sql_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_Sql_descriptor,

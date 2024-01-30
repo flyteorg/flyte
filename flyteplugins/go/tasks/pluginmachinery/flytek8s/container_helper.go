@@ -3,17 +3,16 @@ package flytek8s
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/apimachinery/pkg/util/validation"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	pluginscore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 const resourceGPU = "gpu"
@@ -161,8 +160,6 @@ func ApplyResourceOverrides(resources, platformResources v1.ResourceRequirements
 
 	// TODO: Make configurable. 1/15/2019 Flyte Cluster doesn't support setting storage requests/limits.
 	// https://github.com/kubernetes/enhancements/issues/362
-	delete(resources.Requests, v1.ResourceStorage)
-	delete(resources.Limits, v1.ResourceStorage)
 
 	gpuResourceName := config.GetK8sPluginConfig().GpuResourceName
 	shouldAdjustGPU := false

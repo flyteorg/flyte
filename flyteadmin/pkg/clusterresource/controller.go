@@ -47,10 +47,10 @@ import (
 	errors2 "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	admin2 "github.com/flyteorg/flyteidl/clients/go/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 const namespaceVariable = "namespace"

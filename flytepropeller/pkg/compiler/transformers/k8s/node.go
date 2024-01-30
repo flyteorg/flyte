@@ -3,13 +3,14 @@ package k8s
 import (
 	"strings"
 
+	"github.com/go-test/deep"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/go-test/deep"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // Gets the compiled subgraph if this node contains an inline-declared coreWorkflow. Otherwise nil.
@@ -28,6 +29,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 
 	var task *core.TaskTemplate
 	var resources *core.Resources
+	var extendedResources *v1alpha1.ExtendedResources
 	if n.GetTaskNode() != nil {
 		taskID := n.GetTaskNode().GetReferenceId().String()
 		// TODO: Use task index for quick lookup
@@ -43,8 +45,16 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 			return nil, !errs.HasErrors()
 		}
 
-		if n.GetTaskNode().Overrides != nil && n.GetTaskNode().Overrides.Resources != nil {
-			resources = n.GetTaskNode().Overrides.Resources
+		if overrides := n.GetTaskNode().Overrides; overrides != nil {
+			if overrides.GetResources() != nil {
+				resources = overrides.GetResources()
+			}
+
+			if overrides.GetExtendedResources() != nil {
+				extendedResources = &v1alpha1.ExtendedResources{
+					ExtendedResources: overrides.GetExtendedResources(),
+				}
+			}
 		}
 	}
 
@@ -81,6 +91,7 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		RetryStrategy:     computeRetryStrategy(n, task),
 		ExecutionDeadline: timeout,
 		Resources:         res,
+		ExtendedResources: extendedResources,
 		OutputAliases:     toAliasValueArray(n.GetOutputAliases()),
 		InputBindings:     toBindingValueArray(n.GetInputs()),
 		ActiveDeadline:    activeDeadline,
@@ -218,7 +229,7 @@ func buildBranchNodeSpec(branch *core.BranchNode, tasks []*core.CompiledTask, er
 		childNodes = append(childNodes, ns...)
 		res.Else = refStr(branch.IfElse.GetElseNode().Id)
 	case *core.IfElseBlock_Error:
-		res.ElseFail = &v1alpha1.Error{Error: branch.IfElse.GetError()}
+		res.ElseFail = branch.IfElse.GetError()
 	}
 
 	other := make([]*v1alpha1.IfBlock, 0, len(branch.IfElse.Other))

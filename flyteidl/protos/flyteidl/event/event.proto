@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package flyteidl.event;
 
-option go_package = "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event";
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event";
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/compiler.proto";
@@ -11,6 +11,7 @@ import "flyteidl/core/identifier.proto";
 import "flyteidl/core/catalog.proto";
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/struct.proto";
+
 
 message WorkflowExecutionEvent {
     // Workflow execution id
@@ -110,6 +111,9 @@ message NodeExecutionEvent {
     // literal inputs are initially copied. The event however will not be sent until after the copy completes.
     // Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
     google.protobuf.Timestamp reported_at = 21;
+
+    // Indicates if this node is an ArrayNode.
+    bool is_array = 22;
 }
 
 // For Workflow Nodes we need to send information about the workflow that's launched
@@ -154,6 +158,14 @@ message ParentNodeExecutionMetadata {
     string node_id = 1;
 }
 
+message EventReason {
+    // An explanation for this event
+    string reason = 1;
+
+    // The time this reason occurred
+    google.protobuf.Timestamp occurred_at = 2;
+}
+
 // Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob.
 message TaskExecutionEvent {
     // ID of the task. In combination with the retryAttempt this will indicate
@@ -179,7 +191,6 @@ message TaskExecutionEvent {
     // This timestamp represents when the original event occurred, it is generated
     // by the executor of the task.
     google.protobuf.Timestamp occurred_at = 7;
-
 
     oneof input_value {
       // URI of the input file, it encodes all the information
@@ -211,8 +222,11 @@ message TaskExecutionEvent {
     uint32 phase_version = 12;
 
     // An optional explanation for the phase transition.
-    string reason = 13;
+    // Deprecated: Use reasons instead.
+    string reason = 13 [deprecated = true];
 
+    // An optional list of explanations for the phase transition.
+    repeated EventReason reasons = 21;
 
     // A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin
     // this type will be identical, but not all task executions necessarily use pre-registered definitions and this

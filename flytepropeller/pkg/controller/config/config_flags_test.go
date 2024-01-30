@@ -707,8 +707,50 @@ func TestConfig_SetFlags(t *testing.T) {
 			testValue := "1"
 
 			cmdFlags.Set("node-config.interruptible-failure-threshold", testValue)
-			if vInt64, err := cmdFlags.GetInt64("node-config.interruptible-failure-threshold"); err == nil {
-				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt64), &actual.NodeConfig.InterruptibleFailureThreshold)
+			if vInt32, err := cmdFlags.GetInt32("node-config.interruptible-failure-threshold"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.NodeConfig.InterruptibleFailureThreshold)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_node-config.default-max-attempts", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.default-max-attempts", testValue)
+			if vInt32, err := cmdFlags.GetInt32("node-config.default-max-attempts"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt32), &actual.NodeConfig.DefaultMaxAttempts)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_node-config.ignore-retry-cause", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.ignore-retry-cause", testValue)
+			if vBool, err := cmdFlags.GetBool("node-config.ignore-retry-cause"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.NodeConfig.IgnoreRetryCause)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_node-config.enable-cr-debug-metadata", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-config.enable-cr-debug-metadata", testValue)
+			if vBool, err := cmdFlags.GetBool("node-config.enable-cr-debug-metadata"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.NodeConfig.EnableCRDebugMetadata)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -863,6 +905,34 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("create-flyteworkflow-crd", testValue)
 			if vBool, err := cmdFlags.GetBool("create-flyteworkflow-crd"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.CreateFlyteWorkflowCRD)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_array-node-event-version", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("array-node-event-version", testValue)
+			if vInt, err := cmdFlags.GetInt("array-node-event-version"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.ArrayNodeEventVersion)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_node-execution-worker-count", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("node-execution-worker-count", testValue)
+			if vInt, err := cmdFlags.GetInt("node-execution-worker-count"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.NodeExecutionWorkerCount)
 
 			} else {
 				assert.FailNow(t, err.Error())

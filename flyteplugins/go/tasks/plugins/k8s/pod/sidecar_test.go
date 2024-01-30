@@ -9,8 +9,16 @@ import (
 	"path"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	errors2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginsCoreMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
@@ -18,18 +26,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
-	structpb "github.com/golang/protobuf/ptypes/struct"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
-
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const ResourceNvidiaGPU = "nvidia.com/gpu"
@@ -58,7 +54,7 @@ func getSidecarTaskTemplateForTest(sideCarJob sidecarJob) *core.TaskTemplate {
 	}
 }
 
-func dummySidecarTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.TaskExecutionMetadata {
+func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionMetadata {
 	taskMetadata := &pluginsCoreMock.TaskExecutionMetadata{}
 	taskMetadata.On("GetNamespace").Return("test-namespace")
 	taskMetadata.On("GetAnnotations").Return(map[string]string{"annotation-1": "val1"})
@@ -88,19 +84,21 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements) pluginsCore.Ta
 		},
 	})
 	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	taskMetadata.On("GetTaskExecutionID").Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
+	to.On("GetExtendedResources").Return(extendedResources)
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
 
 	return taskMetadata
 }
 
-func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements) pluginsCore.TaskExecutionContext {
+func getDummySidecarTaskContext(taskTemplate *core.TaskTemplate, resources *v1.ResourceRequirements, extendedResources *core.ExtendedResources) pluginsCore.TaskExecutionContext {
 	taskCtx := &pluginsCoreMock.TaskExecutionContext{}
-	dummyTaskMetadata := dummySidecarTaskMetadata(resources)
+	dummyTaskMetadata := dummySidecarTaskMetadata(resources, extendedResources)
 	inputReader := &pluginsIOMock.InputReader{}
 	inputReader.OnGetInputPrefixPath().Return("test-data-prefix")
 	inputReader.OnGetInputPath().Return("test-data-reference")
@@ -233,22 +231,22 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 		GpuResourceName:      ResourceNvidiaGPU,
 	}))
-	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
@@ -309,7 +307,7 @@ func TestBuildSidecarResource_TaskType2_Invalid_Spec(t *testing.T) {
 		},
 	}
 
-	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	_, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] Pod tasks with task type version > 1 should specify their target as a K8sPod with a defined pod spec")
 }
@@ -343,21 +341,21 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
@@ -422,14 +420,14 @@ func TestBuildSideResource_TaskType1_InvalidSpec(t *testing.T) {
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	_, err = DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config needs to be non-empty and include missing [primary_container_name] key")
 
 	task.Config = map[string]string{
 		"foo": "bar",
 	}
-	taskCtx = getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	taskCtx = getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	_, err = DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.EqualError(t, err, "[BadTaskSpecification] invalid TaskSpecification, config missing [primary_container_name] key in [map[foo:bar]]")
 
@@ -460,21 +458,21 @@ func TestBuildSidecarResource(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
 	}))
-	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&task, sidecarResourceRequirements, nil)
 	res, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.Nil(t, err)
 	assert.EqualValues(t, map[string]string{
@@ -524,7 +522,7 @@ func TestBuildSidecarReosurceMissingAnnotationsAndLabels(t *testing.T) {
 
 	task := getSidecarTaskTemplateForTest(sideCarJob)
 
-	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
 	resp, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.NoError(t, err)
 	assert.EqualValues(t, map[string]string{}, resp.GetLabels())
@@ -545,9 +543,191 @@ func TestBuildSidecarResourceMissingPrimary(t *testing.T) {
 
 	task := getSidecarTaskTemplateForTest(sideCarJob)
 
-	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
 	_, err := DefaultPodPlugin.BuildResource(context.TODO(), taskCtx)
 	assert.True(t, errors.Is(err, errors2.Errorf("BadTaskSpecification", "")))
+}
+
+func TestBuildSidecarResource_ExtendedResources(t *testing.T) {
+	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+		GpuDeviceNodeLabel:        "gpu-node-label",
+		GpuPartitionSizeNodeLabel: "gpu-partition-size",
+		GpuResourceName:           flytek8s.ResourceNvidiaGPU,
+	}))
+
+	fixtures := []struct {
+		name                      string
+		resources                 *v1.ResourceRequirements
+		extendedResourcesBase     *core.ExtendedResources
+		extendedResourcesOverride *core.ExtendedResources
+		expectedNsr               []v1.NodeSelectorTerm
+		expectedTol               []v1.Toleration
+	}{
+		{
+			"without overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			nil,
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-t4"},
+						},
+					},
+				},
+			},
+			[]v1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-t4",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+		},
+		{
+			"with overrides",
+			&v1.ResourceRequirements{
+				Limits: v1.ResourceList{
+					flytek8s.ResourceNvidiaGPU: resource.MustParse("1"),
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-t4",
+				},
+			},
+			&core.ExtendedResources{
+				GpuAccelerator: &core.GPUAccelerator{
+					Device: "nvidia-tesla-a100",
+					PartitionSizeValue: &core.GPUAccelerator_PartitionSize{
+						PartitionSize: "1g.5gb",
+					},
+				},
+			},
+			[]v1.NodeSelectorTerm{
+				{
+					MatchExpressions: []v1.NodeSelectorRequirement{
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-node-label",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"nvidia-tesla-a100"},
+						},
+						v1.NodeSelectorRequirement{
+							Key:      "gpu-partition-size",
+							Operator: v1.NodeSelectorOpIn,
+							Values:   []string{"1g.5gb"},
+						},
+					},
+				},
+			},
+			[]v1.Toleration{
+				{
+					Key:      "gpu-node-label",
+					Value:    "nvidia-tesla-a100",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+				{
+					Key:      "gpu-partition-size",
+					Value:    "1g.5gb",
+					Operator: v1.TolerationOpEqual,
+					Effect:   v1.TaintEffectNoSchedule,
+				},
+			},
+		},
+	}
+
+	podSpec := v1.PodSpec{
+		Containers: []v1.Container{
+			{
+				Name: "primary container",
+			},
+		},
+	}
+	b, err := json.Marshal(podSpec)
+	if err != nil {
+		t.Fatal(err)
+	}
+	structObj := &structpb.Struct{}
+	if err := json.Unmarshal(b, structObj); err != nil {
+		t.Fatal(err)
+	}
+	testConfigs := []struct {
+		name         string
+		taskTemplate core.TaskTemplate
+	}{
+		{
+			"v0",
+			*getSidecarTaskTemplateForTest(sidecarJob{
+				PrimaryContainerName: podSpec.Containers[0].Name,
+				PodSpec:              &podSpec,
+			}),
+		},
+		{
+			"v1",
+			core.TaskTemplate{
+				Type:            SidecarTaskType,
+				Custom:          structObj,
+				TaskTypeVersion: 1,
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: podSpec.Containers[0].Name,
+				},
+			},
+		},
+		{
+			"v2",
+			core.TaskTemplate{
+				Type:            SidecarTaskType,
+				TaskTypeVersion: 2,
+				Config: map[string]string{
+					flytek8s.PrimaryContainerKey: podSpec.Containers[0].Name,
+				},
+				Target: &core.TaskTemplate_K8SPod{
+					K8SPod: &core.K8SPod{
+						PodSpec: structObj,
+					},
+				},
+			},
+		},
+	}
+
+	for _, tCfg := range testConfigs {
+		for _, f := range fixtures {
+			t.Run(tCfg.name+" "+f.name, func(t *testing.T) {
+				taskTemplate := tCfg.taskTemplate
+				taskTemplate.ExtendedResources = f.extendedResourcesBase
+				taskContext := getDummySidecarTaskContext(&taskTemplate, f.resources, f.extendedResourcesOverride)
+				r, err := DefaultPodPlugin.BuildResource(context.TODO(), taskContext)
+				assert.Nil(t, err)
+				assert.NotNil(t, r)
+				pod, ok := r.(*v1.Pod)
+				assert.True(t, ok)
+
+				assert.EqualValues(
+					t,
+					f.expectedNsr,
+					pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms,
+				)
+				assert.EqualValues(
+					t,
+					f.expectedTol,
+					pod.Spec.Tolerations,
+				)
+			})
+		}
+	}
 }
 
 func TestGetTaskSidecarStatus(t *testing.T) {
@@ -580,7 +760,7 @@ func TestGetTaskSidecarStatus(t *testing.T) {
 		res.SetAnnotations(map[string]string{
 			flytek8s.PrimaryContainerKey: "PrimaryContainer",
 		})
-		taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements)
+		taskCtx := getDummySidecarTaskContext(task, sidecarResourceRequirements, nil)
 		phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 		assert.Nil(t, err)
 		assert.Equal(t, expectedTaskPhase, phaseInfo.Phase(),
@@ -607,7 +787,7 @@ func TestDemystifiedSidecarStatus_PrimaryFailed(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
@@ -632,7 +812,7 @@ func TestDemystifiedSidecarStatus_PrimarySucceeded(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseSuccess, phaseInfo.Phase())
@@ -657,7 +837,7 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
@@ -665,6 +845,13 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 
 func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
 			ContainerStatuses: []v1.ContainerStatus{
@@ -677,10 +864,37 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res.SetAnnotations(map[string]string{
 		flytek8s.PrimaryContainerKey: "Primary",
 	})
-	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements)
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+}
+
+func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
+	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Primary",
+				},
+			},
+		},
+		Status: v1.PodStatus{
+			Phase: v1.PodRunning,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
+	}
+	res.SetAnnotations(map[string]string{
+		flytek8s.PrimaryContainerKey: "Primary",
+	})
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	assert.Nil(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
 
 func TestGetProperties(t *testing.T) {

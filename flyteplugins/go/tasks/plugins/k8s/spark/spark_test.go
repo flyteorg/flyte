@@ -6,28 +6,25 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
-	"github.com/stretchr/testify/mock"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
-
-	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
-
-	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
-
 	sj "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
+	sparkOp "github.com/GoogleCloudPlatform/spark-on-k8s-operator/pkg/apis/sparkoperator.k8s.io/v1beta2"
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	corev1 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
+	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	pluginIOMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
 )
 
 const sparkMainClass = "MainClass"
@@ -50,6 +47,18 @@ var (
 
 	dummyEnvVars = []*core.KeyValuePair{
 		{Key: "Env_Var", Value: "Env_Val"},
+	}
+
+	dummyEnvVarsWithSecretRef = []corev1.EnvVar{
+		{Name: "Env_Var", Value: "Env_Val"},
+		{Name: "SECRET", ValueFrom: &corev1.EnvVarSource{
+			SecretKeyRef: &corev1.SecretKeySelector{
+				Key: "key",
+				LocalObjectReference: corev1.LocalObjectReference{
+					Name: "secret-name",
+				},
+			},
+		}},
 	}
 
 	testArgs = []string{
@@ -87,7 +96,7 @@ func TestGetEventInfo(t *testing.T) {
 			},
 		},
 	}))
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplate("blah-1", dummySparkConf), false)
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("blah-1", dummySparkConf), false)
 	info, err := getEventInfoForSpark(taskCtx, dummySparkApplication(sj.RunningState))
 	assert.NoError(t, err)
 	assert.Len(t, info.Logs, 6)
@@ -157,7 +166,7 @@ func TestGetTaskPhase(t *testing.T) {
 	sparkResourceHandler := sparkResourceHandler{}
 
 	ctx := context.TODO()
-	taskCtx := dummySparkTaskContext(dummySparkTaskTemplate("", dummySparkConf), false)
+	taskCtx := dummySparkTaskContext(dummySparkTaskTemplateContainer("", dummySparkConf), false)
 	taskPhase, err := sparkResourceHandler.GetTaskPhase(ctx, taskCtx, dummySparkApplication(sj.NewState))
 	assert.NoError(t, err)
 	assert.Equal(t, taskPhase.Phase(), pluginsCore.PhaseQueued)
@@ -250,8 +259,33 @@ func dummySparkCustomObj(sparkConf map[string]string) *plugins.SparkJob {
 	return &sparkJob
 }
 
-func dummySparkTaskTemplate(id string, sparkConf map[string]string) *core.TaskTemplate {
+func dummyPodSpec() *corev1.PodSpec {
+	return &corev1.PodSpec{
+		InitContainers: []corev1.Container{
+			{
+				Name:  "init",
+				Image: testImage,
+				Args:  testArgs,
+			},
+		},
+		Containers: []corev1.Container{
+			{
+				Name:  "primary",
+				Image: testImage,
+				Args:  testArgs,
+				Env:   dummyEnvVarsWithSecretRef,
+			},
+			{
+				Name:  "secondary",
+				Image: testImage,
+				Args:  testArgs,
+				Env:   flytek8s.ToK8sEnvVar(dummyEnvVars),
+			},
+		},
+	}
+}
 
+func dummySparkTaskTemplateContainer(id string, sparkConf map[string]string) *core.TaskTemplate {
 	sparkJob := dummySparkCustomObj(sparkConf)
 	sparkJobJSON, err := utils.MarshalToString(sparkJob)
 	if err != nil {
@@ -274,6 +308,40 @@ func dummySparkTaskTemplate(id string, sparkConf map[string]string) *core.TaskTe
 				Args:  testArgs,
 				Env:   dummyEnvVars,
 			},
+		},
+		Custom: &structObj,
+	}
+}
+
+func dummySparkTaskTemplatePod(id string, sparkConf map[string]string, podSpec *corev1.PodSpec) *core.TaskTemplate {
+	sparkJob := dummySparkCustomObj(sparkConf)
+	sparkJobJSON, err := utils.MarshalToString(sparkJob)
+	if err != nil {
+		panic(err)
+	}
+
+	structObj := structpb.Struct{}
+
+	err = jsonpb.UnmarshalString(sparkJobJSON, &structObj)
+	if err != nil {
+		panic(err)
+	}
+
+	podSpecPb, err := utils.MarshalObjToStruct(podSpec)
+	if err != nil {
+		panic(err)
+	}
+
+	return &core.TaskTemplate{
+		Id:   &core.Identifier{Name: id},
+		Type: "k8s_pod",
+		Target: &core.TaskTemplate_K8SPod{
+			K8SPod: &core.K8SPod{
+				PodSpec: podSpecPb,
+			},
+		},
+		Config: map[string]string{
+			flytek8s.PrimaryContainerKey: "primary",
 		},
 		Custom: &structObj,
 	}
@@ -311,6 +379,12 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 		},
 	})
 	tID.On("GetGeneratedName").Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
+
+	overrides := &mocks.TaskOverrides{}
+	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})
+	// No support for GPUs, and consequently, ExtendedResources on Spark plugin.
+	overrides.On("GetExtendedResources").Return(nil)
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.On("GetTaskExecutionID").Return(tID)
@@ -327,30 +401,14 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 	taskExecutionMetadata.On("IsInterruptible").Return(interruptible)
 	taskExecutionMetadata.On("GetMaxAttempts").Return(uint32(1))
 	taskExecutionMetadata.On("GetEnvironmentVariables").Return(nil)
+	taskExecutionMetadata.On("GetPlatformResources").Return(nil)
+	taskExecutionMetadata.On("GetOverrides").Return(overrides)
+	taskExecutionMetadata.On("GetK8sServiceAccount").Return("new-val")
 	taskCtx.On("TaskExecutionMetadata").Return(taskExecutionMetadata)
 	return taskCtx
 }
 
-func TestBuildResourceSpark(t *testing.T) {
-	sparkResourceHandler := sparkResourceHandler{}
-
-	// Case1: Valid Spark Task-Template
-	taskTemplate := dummySparkTaskTemplate("blah-1", dummySparkConf)
-
-	// Set spark custom feature config.
-	assert.NoError(t, setSparkConfig(&Config{
-		Features: []Feature{
-			{
-				Name:        "feature1",
-				SparkConfig: map[string]string{"spark.hadoop.feature1": "true"},
-			},
-			{
-				Name:        "feature2",
-				SparkConfig: map[string]string{"spark.hadoop.feature2": "true"},
-			},
-		},
-	}))
-
+func defaultPluginConfig() *config.K8sPluginConfig {
 	// Set Interruptible Config
 	runAsUser := int64(1000)
 	dnsOptVal1 := "1"
@@ -400,7 +458,7 @@ func TestBuildResourceSpark(t *testing.T) {
 		},
 	}
 
-	// interruptible/non-interruptible nodeselector requirement
+	// Interruptible/non-interruptible nodeselector requirement
 	interruptibleNodeSelectorRequirement := &corev1.NodeSelectorRequirement{
 		Key:      "x/interruptible",
 		Operator: corev1.NodeSelectorOpIn,
@@ -413,9 +471,7 @@ func TestBuildResourceSpark(t *testing.T) {
 		Values:   []string{"true"},
 	}
 
-	// NonInterruptibleNodeSelectorRequirement
-
-	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
+	config := &config.K8sPluginConfig{
 		DefaultAffinity: defaultAffinity,
 		DefaultPodSecurityContext: &corev1.PodSecurityContext{
 			RunAsUser: &runAsUser,
@@ -465,8 +521,41 @@ func TestBuildResourceSpark(t *testing.T) {
 		EnableHostNetworkingPod:                 &defaultPodHostNetwork,
 		DefaultEnvVars:                          defaultEnvVars,
 		DefaultEnvVarsFromEnv:                   defaultEnvVarsFromEnv,
-	}),
-	)
+	}
+	return config
+}
+
+func findEnvVarByName(envVars []corev1.EnvVar, name string) *corev1.EnvVar {
+	for _, envVar := range envVars {
+		if envVar.Name == name {
+			return &envVar
+		}
+	}
+	return nil
+}
+
+func TestBuildResourceContainer(t *testing.T) {
+	sparkResourceHandler := sparkResourceHandler{}
+
+	// Case1: Valid Spark Task-Template
+	taskTemplate := dummySparkTaskTemplateContainer("blah-1", dummySparkConf)
+
+	// Set spark custom feature config.
+	assert.NoError(t, setSparkConfig(&Config{
+		Features: []Feature{
+			{
+				Name:        "feature1",
+				SparkConfig: map[string]string{"spark.hadoop.feature1": "true"},
+			},
+			{
+				Name:        "feature2",
+				SparkConfig: map[string]string{"spark.hadoop.feature2": "true"},
+			},
+		},
+	}))
+
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
 	resource, err := sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, true))
 	assert.Nil(t, err)
 
@@ -479,28 +568,16 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
 	assert.Equal(t, testImage, *sparkApp.Spec.Image)
 	assert.NotNil(t, sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt)
-	assert.Equal(t, *sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt.RunAsUser, runAsUser)
+	assert.Equal(t, *sparkApp.Spec.Driver.SparkPodSpec.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
 	assert.NotNil(t, sparkApp.Spec.Driver.DNSConfig)
 	assert.Equal(t, []string{"8.8.8.8", "8.8.4.4"}, sparkApp.Spec.Driver.DNSConfig.Nameservers)
-	assert.Equal(t, "ndots", sparkApp.Spec.Driver.DNSConfig.Options[0].Name)
-	assert.Equal(t, dnsOptVal1, *sparkApp.Spec.Driver.DNSConfig.Options[0].Value)
-	assert.Equal(t, "single-request-reopen", sparkApp.Spec.Driver.DNSConfig.Options[1].Name)
-	assert.Equal(t, "timeout", sparkApp.Spec.Driver.DNSConfig.Options[2].Name)
-	assert.Equal(t, dnsOptVal2, *sparkApp.Spec.Driver.DNSConfig.Options[2].Value)
-	assert.Equal(t, "attempts", sparkApp.Spec.Driver.DNSConfig.Options[3].Name)
-	assert.Equal(t, dnsOptVal3, *sparkApp.Spec.Driver.DNSConfig.Options[3].Value)
+	assert.ElementsMatch(t, defaultConfig.DefaultPodDNSConfig.Options, sparkApp.Spec.Driver.DNSConfig.Options)
 	assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, sparkApp.Spec.Driver.DNSConfig.Searches)
 	assert.NotNil(t, sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt)
-	assert.Equal(t, *sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt.RunAsUser, runAsUser)
+	assert.Equal(t, *sparkApp.Spec.Executor.SparkPodSpec.SecurityContenxt.RunAsUser, *defaultConfig.DefaultPodSecurityContext.RunAsUser)
 	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
 	assert.NotNil(t, sparkApp.Spec.Executor.DNSConfig)
-	assert.Equal(t, "ndots", sparkApp.Spec.Executor.DNSConfig.Options[0].Name)
-	assert.Equal(t, dnsOptVal1, *sparkApp.Spec.Executor.DNSConfig.Options[0].Value)
-	assert.Equal(t, "single-request-reopen", sparkApp.Spec.Executor.DNSConfig.Options[1].Name)
-	assert.Equal(t, "timeout", sparkApp.Spec.Executor.DNSConfig.Options[2].Name)
-	assert.Equal(t, dnsOptVal2, *sparkApp.Spec.Executor.DNSConfig.Options[2].Value)
-	assert.Equal(t, "attempts", sparkApp.Spec.Executor.DNSConfig.Options[3].Name)
-	assert.Equal(t, dnsOptVal3, *sparkApp.Spec.Executor.DNSConfig.Options[3].Value)
+	assert.ElementsMatch(t, defaultConfig.DefaultPodDNSConfig.Options, sparkApp.Spec.Executor.DNSConfig.Options)
 	assert.Equal(t, []string{"ns1.svc.cluster-domain.example", "my.dns.search.suffix"}, sparkApp.Spec.Executor.DNSConfig.Searches)
 
 	//Validate Driver/Executor Spec.
@@ -515,19 +592,19 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
 	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
 	assert.Equal(t, dummySparkConf["spark.batchScheduler"], *sparkApp.Spec.BatchScheduler)
-	assert.Equal(t, schedulerName, *sparkApp.Spec.Executor.SchedulerName)
-	assert.Equal(t, schedulerName, *sparkApp.Spec.Driver.SchedulerName)
-	assert.Equal(t, defaultPodHostNetwork, *sparkApp.Spec.Executor.HostNetwork)
-	assert.Equal(t, defaultPodHostNetwork, *sparkApp.Spec.Driver.HostNetwork)
+	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Executor.SchedulerName)
+	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Driver.SchedulerName)
+	assert.Equal(t, *defaultConfig.EnableHostNetworkingPod, *sparkApp.Spec.Executor.HostNetwork)
+	assert.Equal(t, *defaultConfig.EnableHostNetworkingPod, *sparkApp.Spec.Driver.HostNetwork)
 
 	// Validate
-	// * Interruptible Toleration and NodeSelector set for Executor but not Driver.
-	// * Validate Default NodeSelector set for Driver but overwritten with Interruptible NodeSelector for Executor.
-	// * Default Tolerations set for both Driver and Executor.
-	// * Interruptible/Non-Interruptible NodeSelectorRequirements set for Executor Affinity but not Driver Affinity.
+	// * Default tolerations set for both Driver and Executor.
+	// * Interruptible tolerations and node selector set for Executor but not Driver.
+	// * Default node selector set for both Driver and Executor.
+	// * Interruptible node selector requirements set for Executor Affinity, non-interruptiblefir Driver Affinity.
 	assert.Equal(t, 1, len(sparkApp.Spec.Driver.Tolerations))
 	assert.Equal(t, 1, len(sparkApp.Spec.Driver.NodeSelector))
-	assert.Equal(t, defaultNodeSelector, sparkApp.Spec.Driver.NodeSelector)
+	assert.Equal(t, defaultConfig.DefaultNodeSelector, sparkApp.Spec.Driver.NodeSelector)
 	tolDriverDefault := sparkApp.Spec.Driver.Tolerations[0]
 	assert.Equal(t, tolDriverDefault.Key, "x/flyte")
 	assert.Equal(t, tolDriverDefault.Value, "default")
@@ -535,21 +612,23 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Equal(t, tolDriverDefault.Effect, corev1.TaintEffect("NoSchedule"))
 
 	assert.Equal(t, 2, len(sparkApp.Spec.Executor.Tolerations))
-	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
-	assert.Equal(t, interruptibleNodeSelector, sparkApp.Spec.Executor.NodeSelector)
+	assert.Equal(t, 2, len(sparkApp.Spec.Executor.NodeSelector))
+	assert.Equal(t, map[string]string{
+		"x/default":       "true",
+		"x/interruptible": "true",
+	}, sparkApp.Spec.Executor.NodeSelector)
 
-	tolExecDefault := sparkApp.Spec.Executor.Tolerations[0]
-	assert.Equal(t, tolExecDefault.Key, "x/flyte")
-	assert.Equal(t, tolExecDefault.Value, "default")
-	assert.Equal(t, tolExecDefault.Operator, corev1.TolerationOperator("Equal"))
-	assert.Equal(t, tolExecDefault.Effect, corev1.TaintEffect("NoSchedule"))
-
-	tolExecInterrupt := sparkApp.Spec.Executor.Tolerations[1]
+	tolExecInterrupt := sparkApp.Spec.Executor.Tolerations[0]
 	assert.Equal(t, tolExecInterrupt.Key, "x/flyte")
 	assert.Equal(t, tolExecInterrupt.Value, "interruptible")
 	assert.Equal(t, tolExecInterrupt.Operator, corev1.TolerationOperator("Equal"))
 	assert.Equal(t, tolExecInterrupt.Effect, corev1.TaintEffect("NoSchedule"))
-	assert.Equal(t, "true", sparkApp.Spec.Executor.NodeSelector["x/interruptible"])
+
+	tolExecDefault := sparkApp.Spec.Executor.Tolerations[1]
+	assert.Equal(t, tolExecDefault.Key, "x/flyte")
+	assert.Equal(t, tolExecDefault.Value, "default")
+	assert.Equal(t, tolExecDefault.Operator, corev1.TolerationOperator("Equal"))
+	assert.Equal(t, tolExecDefault.Effect, corev1.TaintEffect("NoSchedule"))
 
 	for confKey, confVal := range dummySparkConf {
 		exists := false
@@ -582,32 +661,37 @@ func TestBuildResourceSpark(t *testing.T) {
 	assert.Greater(t, len(sparkApp.Spec.SparkConf["spark.kubernetes.driverEnv.FLYTE_START_TIME"]), 1)
 	assert.Equal(t, dummySparkConf["spark.flyteorg.feature3.enabled"], sparkApp.Spec.SparkConf["spark.flyteorg.feature3.enabled"])
 
-	assert.Equal(t, len(sparkApp.Spec.Driver.EnvVars["FLYTE_MAX_ATTEMPTS"]), 1)
-	assert.Equal(t, sparkApp.Spec.Driver.EnvVars["foo"], defaultEnvVars["foo"])
-	assert.Equal(t, sparkApp.Spec.Executor.EnvVars["foo"], defaultEnvVars["foo"])
-	assert.Equal(t, sparkApp.Spec.Driver.EnvVars["fooEnv"], targetValueFromEnv)
-	assert.Equal(t, sparkApp.Spec.Executor.EnvVars["fooEnv"], targetValueFromEnv)
+	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
 
-	assert.Equal(
-		t,
-		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-	)
-	assert.Equal(
-		t,
-		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
-		*nonInterruptibleNodeSelectorRequirement,
-	)
-	assert.Equal(
-		t,
-		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-	)
-	assert.Equal(
-		t,
-		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
-		*interruptibleNodeSelectorRequirement,
-	)
+	assert.Equal(t, &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+						*defaultConfig.NonInterruptibleNodeSelectorRequirement,
+					},
+				},
+			},
+		},
+	}, sparkApp.Spec.Driver.Affinity.NodeAffinity)
+
+	assert.Equal(t, &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+						*defaultConfig.InterruptibleNodeSelectorRequirement,
+					},
+				},
+			},
+		},
+	}, sparkApp.Spec.Executor.Affinity.NodeAffinity)
 
 	// Case 2: Driver/Executor request cores set.
 	dummyConfWithRequest := make(map[string]string)
@@ -619,7 +703,7 @@ func TestBuildResourceSpark(t *testing.T) {
 	dummyConfWithRequest["spark.kubernetes.driver.request.cores"] = "3"
 	dummyConfWithRequest["spark.kubernetes.executor.request.cores"] = "4"
 
-	taskTemplate = dummySparkTaskTemplate("blah-1", dummyConfWithRequest)
+	taskTemplate = dummySparkTaskTemplateContainer("blah-1", dummyConfWithRequest)
 	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.Nil(t, err)
 	assert.NotNil(t, resource)
@@ -640,42 +724,167 @@ func TestBuildResourceSpark(t *testing.T) {
 	// Validate that the default Toleration and NodeSelector are set for both Driver and Executors.
 	assert.Equal(t, 1, len(sparkApp.Spec.Driver.Tolerations))
 	assert.Equal(t, 1, len(sparkApp.Spec.Driver.NodeSelector))
-	assert.Equal(t, defaultNodeSelector, sparkApp.Spec.Driver.NodeSelector)
+	assert.Equal(t, defaultConfig.DefaultNodeSelector, sparkApp.Spec.Driver.NodeSelector)
 	assert.Equal(t, 1, len(sparkApp.Spec.Executor.Tolerations))
 	assert.Equal(t, 1, len(sparkApp.Spec.Executor.NodeSelector))
-	assert.Equal(t, defaultNodeSelector, sparkApp.Spec.Executor.NodeSelector)
+	assert.Equal(t, defaultConfig.DefaultNodeSelector, sparkApp.Spec.Executor.NodeSelector)
 	assert.Equal(t, sparkApp.Spec.Executor.Tolerations[0].Key, "x/flyte")
 	assert.Equal(t, sparkApp.Spec.Executor.Tolerations[0].Value, "default")
 	assert.Equal(t, sparkApp.Spec.Driver.Tolerations[0].Key, "x/flyte")
 	assert.Equal(t, sparkApp.Spec.Driver.Tolerations[0].Value, "default")
 
 	// Validate correct affinity and nodeselector requirements are set for both Driver and Executors.
-	assert.Equal(
-		t,
-		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-	)
-	assert.Equal(
-		t,
-		sparkApp.Spec.Driver.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
-		*nonInterruptibleNodeSelectorRequirement,
-	)
-	assert.Equal(
-		t,
-		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-		defaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
-	)
-	assert.Equal(
-		t,
-		sparkApp.Spec.Executor.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[1],
-		*nonInterruptibleNodeSelectorRequirement,
-	)
+	assert.Equal(t, &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+						*defaultConfig.NonInterruptibleNodeSelectorRequirement,
+					},
+				},
+			},
+		},
+	}, sparkApp.Spec.Driver.Affinity.NodeAffinity)
+
+	assert.Equal(t, &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+						*defaultConfig.NonInterruptibleNodeSelectorRequirement,
+					},
+				},
+			},
+		},
+	}, sparkApp.Spec.Executor.Affinity.NodeAffinity)
 
 	// Case 4: Invalid Spark Task-Template
 	taskTemplate.Custom = nil
 	resource, err = sparkResourceHandler.BuildResource(context.TODO(), dummySparkTaskContext(taskTemplate, false))
 	assert.NotNil(t, err)
 	assert.Nil(t, resource)
+}
+
+func TestBuildResourcePodTemplate(t *testing.T) {
+	defaultConfig := defaultPluginConfig()
+	assert.NoError(t, config.SetK8sPluginConfig(defaultConfig))
+	extraToleration := corev1.Toleration{
+		Key:      "x/flyte",
+		Value:    "extra",
+		Operator: "Equal",
+	}
+	podSpec := dummyPodSpec()
+	podSpec.Tolerations = append(podSpec.Tolerations, extraToleration)
+	podSpec.NodeSelector = map[string]string{"x/custom": "foo"}
+	taskTemplate := dummySparkTaskTemplatePod("blah-1", dummySparkConf, podSpec)
+	taskTemplate.GetK8SPod()
+	sparkResourceHandler := sparkResourceHandler{}
+
+	taskCtx := dummySparkTaskContext(taskTemplate, true)
+	resource, err := sparkResourceHandler.BuildResource(context.TODO(), taskCtx)
+
+	assert.Nil(t, err)
+	assert.NotNil(t, resource)
+	sparkApp, ok := resource.(*sj.SparkApplication)
+	assert.True(t, ok)
+
+	// Application
+	assert.Equal(t, v1.TypeMeta{
+		Kind:       KindSparkApplication,
+		APIVersion: sparkOp.SchemeGroupVersion.String(),
+	}, sparkApp.TypeMeta)
+
+	// Application spec
+	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.ServiceAccount)
+	assert.Equal(t, sparkOp.PythonApplicationType, sparkApp.Spec.Type)
+	assert.Equal(t, testImage, *sparkApp.Spec.Image)
+	assert.Equal(t, testArgs, sparkApp.Spec.Arguments)
+	assert.Equal(t, sparkOp.RestartPolicy{
+		Type:                       sparkOp.OnFailure,
+		OnSubmissionFailureRetries: intPtr(int32(14)),
+	}, sparkApp.Spec.RestartPolicy)
+	assert.Equal(t, sparkMainClass, *sparkApp.Spec.MainClass)
+	assert.Equal(t, sparkApplicationFile, *sparkApp.Spec.MainApplicationFile)
+
+	// Driver
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Driver.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Driver.Labels)
+	assert.Equal(t, len(findEnvVarByName(sparkApp.Spec.Driver.Env, "FLYTE_MAX_ATTEMPTS").Value), 1)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Driver.Env, "foo").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Driver.Env, "fooEnv").Value)
+	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Driver.Env, "SECRET"))
+	assert.Equal(t, 9, len(sparkApp.Spec.Driver.Env))
+	assert.Equal(t, testImage, *sparkApp.Spec.Driver.Image)
+	assert.Equal(t, flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata()), *sparkApp.Spec.Driver.ServiceAccount)
+	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Driver.SecurityContenxt)
+	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Driver.DNSConfig)
+	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Driver.HostNetwork)
+	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Driver.SchedulerName)
+	assert.Equal(t, []corev1.Toleration{
+		defaultConfig.DefaultTolerations[0],
+		extraToleration,
+	}, sparkApp.Spec.Driver.Tolerations)
+	assert.Equal(t, map[string]string{
+		"x/default": "true",
+		"x/custom":  "foo",
+	}, sparkApp.Spec.Driver.NodeSelector)
+	assert.Equal(t, &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+						*defaultConfig.NonInterruptibleNodeSelectorRequirement,
+					},
+				},
+			},
+		},
+	}, sparkApp.Spec.Driver.Affinity.NodeAffinity)
+	cores, _ := strconv.ParseInt(dummySparkConf["spark.driver.cores"], 10, 32)
+	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Driver.Cores)
+	assert.Equal(t, dummySparkConf["spark.driver.memory"], *sparkApp.Spec.Driver.Memory)
+
+	// Executor
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultAnnotations, map[string]string{"annotation-1": "val1"}), sparkApp.Spec.Executor.Annotations)
+	assert.Equal(t, utils.UnionMaps(defaultConfig.DefaultLabels, map[string]string{"label-1": "val1"}), sparkApp.Spec.Executor.Labels)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["foo"], findEnvVarByName(sparkApp.Spec.Executor.Env, "foo").Value)
+	assert.Equal(t, defaultConfig.DefaultEnvVars["fooEnv"], findEnvVarByName(sparkApp.Spec.Executor.Env, "fooEnv").Value)
+	assert.Equal(t, findEnvVarByName(dummyEnvVarsWithSecretRef, "SECRET"), findEnvVarByName(sparkApp.Spec.Executor.Env, "SECRET"))
+	assert.Equal(t, 9, len(sparkApp.Spec.Executor.Env))
+	assert.Equal(t, testImage, *sparkApp.Spec.Executor.Image)
+	assert.Equal(t, defaultConfig.DefaultPodSecurityContext, sparkApp.Spec.Executor.SecurityContenxt)
+	assert.Equal(t, defaultConfig.DefaultPodDNSConfig, sparkApp.Spec.Executor.DNSConfig)
+	assert.Equal(t, defaultConfig.EnableHostNetworkingPod, sparkApp.Spec.Executor.HostNetwork)
+	assert.Equal(t, defaultConfig.SchedulerName, *sparkApp.Spec.Executor.SchedulerName)
+	assert.ElementsMatch(t, []corev1.Toleration{
+		defaultConfig.DefaultTolerations[0],
+		extraToleration,
+		defaultConfig.InterruptibleTolerations[0],
+	}, sparkApp.Spec.Executor.Tolerations)
+	assert.Equal(t, map[string]string{
+		"x/default":       "true",
+		"x/custom":        "foo",
+		"x/interruptible": "true",
+	}, sparkApp.Spec.Executor.NodeSelector)
+	assert.Equal(t, &corev1.NodeAffinity{
+		RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+			NodeSelectorTerms: []corev1.NodeSelectorTerm{
+				{
+					MatchExpressions: []corev1.NodeSelectorRequirement{
+						defaultConfig.DefaultAffinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0],
+						*defaultConfig.InterruptibleNodeSelectorRequirement,
+					},
+				},
+			},
+		},
+	}, sparkApp.Spec.Executor.Affinity.NodeAffinity)
+	cores, _ = strconv.ParseInt(dummySparkConf["spark.executor.cores"], 10, 32)
+	instances, _ := strconv.ParseInt(dummySparkConf["spark.executor.instances"], 10, 32)
+	assert.Equal(t, intPtr(int32(instances)), sparkApp.Spec.Executor.Instances)
+	assert.Equal(t, intPtr(int32(cores)), sparkApp.Spec.Executor.Cores)
+	assert.Equal(t, dummySparkConf["spark.executor.memory"], *sparkApp.Spec.Executor.Memory)
 }
 
 func TestGetPropertiesSpark(t *testing.T) {

@@ -3,29 +3,30 @@ package impl
 import (
 	"context"
 	stdErrors "errors"
+	"fmt"
 	"os"
 	"testing"
 	"time"
+	"reflect"
 
-	"fmt"
-
-	"github.com/flyteorg/flyte/datacatalog/pkg/common"
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
-	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
+	"github.com/flyteorg/flyte/datacatalog/pkg/common"
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 func init() {
@@ -639,6 +640,12 @@ func TestUpdateArtifact(t *testing.T) {
 					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
 			})).Return(mockArtifactModel, nil)
 
+		metaData := &datacatalog.Metadata{
+			KeyMap: map[string]string{"key2": "value2"},
+		}
+		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
+
 		dcRepo.MockArtifactRepo.On("Update",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
@@ -646,8 +653,10 @@ func TestUpdateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
-					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
+					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
+
 
 		request := &datacatalog.UpdateArtifactRequest{
 			Dataset: expectedDataset.Id,
@@ -664,6 +673,9 @@ func TestUpdateArtifact(t *testing.T) {
 					Value: getTestStringLiteralWithValue("value3"),
 				},
 			},
+			Metadata: &datacatalog.Metadata{
+				KeyMap: map[string]string{"key2": "value2"},
+			},
 		}
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
@@ -671,6 +683,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
 		assert.Equal(t, expectedArtifact.Id, artifactResponse.GetArtifactId())
+		dcRepo.MockArtifactRepo.AssertExpectations(t)
 
 		// check that the datastore has the updated artifactData available
 		// data1 should contain updated value
@@ -701,6 +714,12 @@ func TestUpdateArtifact(t *testing.T) {
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
 		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
 
+		metaData := &datacatalog.Metadata{
+			KeyMap: map[string]string{"key2": "value2"},
+		}
+		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
+
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockArtifactRepo.On("Update",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
@@ -709,7 +728,8 @@ func TestUpdateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
-					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
+					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
 
 		dcRepo.MockTagRepo.On("Get", mock.Anything,
@@ -747,6 +767,9 @@ func TestUpdateArtifact(t *testing.T) {
 					Value: getTestStringLiteralWithValue("value3"),
 				},
 			},
+			Metadata: &datacatalog.Metadata{
+				KeyMap: map[string]string{"key2": "value2"},
+			},
 		}
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
@@ -754,6 +777,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
 		assert.Equal(t, expectedArtifact.Id, artifactResponse.GetArtifactId())
+		dcRepo.MockArtifactRepo.AssertExpectations(t)
 
 		// check that the datastore has the updated artifactData available
 		// data1 should contain updated value

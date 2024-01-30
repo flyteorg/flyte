@@ -6243,9 +6243,9 @@ public final class DescriptionEntityOuterClass {
       "n.Sort*\215\001\n\021DescriptionFormat\022\036\n\032DESCRIPT" +
       "ION_FORMAT_UNKNOWN\020\000\022\037\n\033DESCRIPTION_FORM" +
       "AT_MARKDOWN\020\001\022\033\n\027DESCRIPTION_FORMAT_HTML" +
-      "\020\002\022\032\n\026DESCRIPTION_FORMAT_RST\020\003B7Z5github" +
-      ".com/flyteorg/flyteidl/gen/pb-go/flyteid" +
-      "l/adminb\006proto3"
+      "\020\002\022\032\n\026DESCRIPTION_FORMAT_RST\020\003B=Z;github" +
+      ".com/flyteorg/flyte/flyteidl/gen/pb-go/f" +
+      "lyteidl/adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -7,8 +7,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type NopCloser struct {

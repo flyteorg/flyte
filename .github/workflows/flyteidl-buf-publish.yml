@@ -1,0 +1,20 @@
+name: Publish flyteidl Buf Package
+
+on:
+  push:
+    branches:
+      - artifacts-shell-2
+      - artifacts
+      - master
+    paths:
+      - 'flyteidl/**'
+jobs:
+  buf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: bufbuild/buf-setup-action@v1
+      - uses: bufbuild/buf-push-action@v1
+        with:
+          buf_token: ${{ secrets.BUF_TOKEN }}
+          input: 'flyteidl/protos'

@@ -2349,8 +2349,9 @@ public final class Identity {
       "protobuf.Struct2q\n\017IdentityService\022^\n\010Us" +
       "erInfo\022!.flyteidl.service.UserInfoReques" +
       "t\032\".flyteidl.service.UserInfoResponse\"\013\202" +
-      "\323\344\223\002\005\022\003/meB9Z7github.com/flyteorg/flytei" +
-      "dl/gen/pb-go/flyteidl/serviceb\006proto3"
+      "\323\344\223\002\005\022\003/meB?Z=github.com/flyteorg/flyte/" +
+      "flyteidl/gen/pb-go/flyteidl/serviceb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

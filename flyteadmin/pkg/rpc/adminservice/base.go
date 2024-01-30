@@ -5,31 +5,26 @@ import (
 	"fmt"
 	"runtime/debug"
 
-	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/golang/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
-	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
-
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-
-	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
-
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/data"
 	executionCluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
+	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineImpl "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/golang/protobuf/proto"
 )
 
 type AdminService struct {
@@ -101,7 +96,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
-	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
@@ -116,6 +110,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	})
 
 	eventScheduler := workflowScheduler.GetEventScheduler()
+
 	launchPlanManager := manager.NewLaunchPlanManager(
 		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
 
@@ -129,6 +124,8 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		Retries:                  defaultRetries,
 		RemoteDataStoreClient:    dataStorageClient,
 	}).GetRemoteURLInterface()
+
+	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, repo, dataStorageClient, urlData, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), *configuration.ApplicationConfiguration().GetRemoteDataConfig(), adminScope)
 
 	workflowManager := manager.NewWorkflowManager(
 		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),

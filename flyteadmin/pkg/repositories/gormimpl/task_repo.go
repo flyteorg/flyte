@@ -4,13 +4,13 @@ import (
 	"context"
 	"errors"
 
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"gorm.io/gorm"
 
 	flyteAdminDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 // Implementation of TaskRepoInterface.
@@ -20,22 +20,22 @@ type TaskRepo struct {
 	metrics          gormMetrics
 }
 
-func (r *TaskRepo) Create(_ context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
+func (r *TaskRepo) Create(ctx context.Context, input models.Task, descriptionEntity *models.DescriptionEntity) error {
 	timer := r.metrics.CreateDuration.Start()
-	err := r.db.Transaction(func(_ *gorm.DB) error {
+	err := r.db.WithContext(ctx).Transaction(func(_ *gorm.DB) error {
 		if descriptionEntity == nil {
-			tx := r.db.Omit("id").Create(&input)
+			tx := r.db.WithContext(ctx).Omit("id").Create(&input)
 			if tx.Error != nil {
 				return r.errorTransformer.ToFlyteAdminError(tx.Error)
 			}
 			return nil
 		}
-		tx := r.db.Omit("id").Create(descriptionEntity)
+		tx := r.db.WithContext(ctx).Omit("id").Create(descriptionEntity)
 		if tx.Error != nil {
 			return r.errorTransformer.ToFlyteAdminError(tx.Error)
 		}
 
-		tx = r.db.Omit("id").Create(&input)
+		tx = r.db.WithContext(ctx).Omit("id").Create(&input)
 		if tx.Error != nil {
 			return r.errorTransformer.ToFlyteAdminError(tx.Error)
 		}
@@ -49,7 +49,7 @@ func (r *TaskRepo) Create(_ context.Context, input models.Task, descriptionEntit
 func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models.Task, error) {
 	var task models.Task
 	timer := r.metrics.GetDuration.Start()
-	tx := r.db.Where(&models.Task{
+	tx := r.db.WithContext(ctx).Where(&models.Task{
 		TaskKey: models.TaskKey{
 			Project: input.Project,
 			Domain:  input.Domain,
@@ -80,7 +80,7 @@ func (r *TaskRepo) List(
 		return interfaces.TaskCollectionOutput{}, err
 	}
 	var tasks []models.Task
-	tx := r.db.Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)
 	if err != nil {
@@ -110,7 +110,7 @@ func (r *TaskRepo) ListTaskIdentifiers(ctx context.Context, input interfaces.Lis
 		return interfaces.TaskCollectionOutput{}, err
 	}
 
-	tx := r.db.Model(models.Task{}).Limit(input.Limit).Offset(input.Offset)
+	tx := r.db.WithContext(ctx).Model(models.Task{}).Limit(input.Limit).Offset(input.Offset)
 
 	// Apply filters
 	tx, err := applyFilters(tx, input.InlineFilters, input.MapFilters)

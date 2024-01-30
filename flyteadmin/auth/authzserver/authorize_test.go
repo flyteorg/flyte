@@ -8,18 +8,14 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
-
-	"github.com/flyteorg/flyte/flyteadmin/auth"
+	"github.com/ory/fosite"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
-
+	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
-
-	"github.com/ory/fosite"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func TestAuthEndpoint(t *testing.T) {

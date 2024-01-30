@@ -3,10 +3,10 @@ package entrypoints
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
-
 	"github.com/spf13/cobra"
 	_ "gorm.io/driver/postgres" // Required to import database driver.
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
 )
 
 var parentMigrateCmd = &cobra.Command{

@@ -3,15 +3,16 @@ package entrypoints
 import (
 	"context"
 
+	"github.com/spf13/cobra"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/config"
 	"github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
 	"github.com/flyteorg/flyte/datacatalog/pkg/runtime"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-
-	"github.com/spf13/cobra"
 )
 
 var serveCmd = &cobra.Command{
@@ -41,6 +42,14 @@ var serveCmd = &cobra.Command{
 
 		// Set Keys
 		labeled.SetMetricKeys(contextutils.AppNameKey, contextutils.ProjectKey, contextutils.DomainKey)
+
+		// register otel tracer providers
+		for _, serviceName := range []string{otelutils.DataCatalogGormTracer, otelutils.DataCatalogServerTracer} {
+			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+				return err
+			}
+		}
 
 		return datacatalogservice.ServeInsecure(ctx, cfg)
 	},

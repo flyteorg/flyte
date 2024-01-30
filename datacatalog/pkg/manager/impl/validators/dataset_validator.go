@@ -2,7 +2,7 @@ package validators
 
 import (
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 const (

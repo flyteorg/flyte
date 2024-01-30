@@ -7,13 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
 	v1 "k8s.io/api/core/v1"
 	apiErrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
-	"k8s.io/apimachinery/pkg/util/clock"
+	"k8s.io/utils/clock"
+
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	stdAtomic "github.com/flyteorg/flyte/flytestdlib/atomic"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var (
@@ -48,7 +49,7 @@ func (b *SimpleBackOffBlocker) reset() {
 }
 
 func (b *SimpleBackOffBlocker) backOff(ctx context.Context) time.Duration {
-	logger.Debug(ctx, "BackOff params [BackOffBaseSecond: %v] [BackOffExponent: %v] [MaxBackOffDuration: %v]",
+	logger.Debugf(ctx, "BackOff params [BackOffBaseSecond: %v] [BackOffExponent: %v] [MaxBackOffDuration: %v]",
 		b.BackOffBaseSecond, b.BackOffExponent, b.MaxBackOffDuration)
 
 	backOffDuration := time.Duration(time.Second.Nanoseconds() * int64(math.Pow(float64(b.BackOffBaseSecond),

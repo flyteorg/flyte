@@ -28,5 +28,7 @@ type CoreTaskTemplate struct {
 	TaskTypeVersion int32 `json:"task_type_version,omitempty"`
 	// security_context encapsulates security attributes requested to run this task.
 	SecurityContext *CoreSecurityContext `json:"security_context,omitempty"`
+	// Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to allocate to a task.
+	ExtendedResources *CoreExtendedResources `json:"extended_resources,omitempty"`
 	Config map[string]string `json:"config,omitempty"`
 }

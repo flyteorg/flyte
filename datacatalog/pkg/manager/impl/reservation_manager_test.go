@@ -3,21 +3,20 @@ package impl
 import (
 	"context"
 	"fmt"
-
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-
 	"testing"
 	"time"
+
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/codes"
 
 	errors2 "github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	errors3 "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/grpc/codes"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var tagName = "tag"

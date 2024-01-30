@@ -9796,9 +9796,9 @@ public final class Dataproxy {
       "Response\"*\202\323\344\223\002$\"\037/api/v1/dataproxy/arti" +
       "fact_link:\001*\022d\n\007GetData\022 .flyteidl.servi" +
       "ce.GetDataRequest\032!.flyteidl.service.Get" +
-      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB9Z7gi" +
-      "thub.com/flyteorg/flyteidl/gen/pb-go/fly" +
-      "teidl/serviceb\006proto3"
+      "DataResponse\"\024\202\323\344\223\002\016\022\014/api/v1/dataB?Z=gi" +
+      "thub.com/flyteorg/flyte/flyteidl/gen/pb-" +
+      "go/flyteidl/serviceb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

@@ -1,10 +1,11 @@
 package mocks
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	sIface "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	sMocks "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/mocks"
-	"gorm.io/gorm"
 )
 
 type MockRepository struct {

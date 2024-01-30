@@ -92,8 +92,6 @@ spec:
       kind: task
       name: get_schema_df
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.structured_dataset.get_schema_df" '
     n1:
       id: n1
@@ -106,8 +104,6 @@ spec:
       kind: task
       name: get_subset_df
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.structured_dataset.get_subset_df" '
     n2:
       id: n2
@@ -120,8 +116,6 @@ spec:
       kind: task
       name: to_numpy
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.type_system.structured_dataset.to_numpy" '
     start-node:
       id: start-node

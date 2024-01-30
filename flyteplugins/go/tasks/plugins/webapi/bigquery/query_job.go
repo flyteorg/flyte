@@ -3,13 +3,13 @@ package bigquery
 import (
 	"strconv"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
+	"google.golang.org/api/bigquery/v2"
 
+	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	pluginUtils "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	flyteIdlCore "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	structpb "github.com/golang/protobuf/ptypes/struct"
-	"google.golang.org/api/bigquery/v2"
 )
 
 type QueryJobConfig struct {

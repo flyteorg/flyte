@@ -12,4 +12,5 @@ package flyteadmin
 // Hints to improve type matching e.g. allows distinguishing output from custom type transformers even if the underlying IDL serialization matches.
 type CoreTypeStructure struct {
 	Tag string `json:"tag,omitempty"`
+	DataclassType map[string]CoreLiteralType `json:"dataclass_type,omitempty"`
 }

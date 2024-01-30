@@ -5,15 +5,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	_ "net/http/pprof" // #nosec G108 Import for pprof server
 	"time"
+
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/version"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-
-	// #nosec G108
-	_ "net/http/pprof" // Import for pprof server
 )
 
 const (
@@ -101,13 +100,14 @@ func StartProfilingServer(ctx context.Context, pprofPort int) error {
 		Addr:         fmt.Sprintf(":%d", pprofPort),
 	}
 
-	e := srv.ListenAndServe()
-	if e != nil {
-		logger.Errorf(ctx, "Failed to start profiling server. Error: %v", e)
-		return fmt.Errorf("failed to start profiling server, %s", e)
-	}
+	go func() {
+		<-ctx.Done()
+		if err := srv.Shutdown(context.Background()); err != nil {
+			logger.Errorf(ctx, "Failed to gracefully shutdown profiling server. Error: %v", err)
+		}
+	}()
 
-	return nil
+	return srv.ListenAndServe()
 }
 
 func configureGlobalHTTPHandler(handlers map[string]http.Handler) error {

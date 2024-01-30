@@ -6,15 +6,15 @@ import (
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"google.golang.org/grpc/codes"
 	"k8s.io/apimachinery/pkg/util/validation"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"google.golang.org/grpc/codes"
 )
 
 var entityToResourceType = map[common.Entity]core.ResourceType{
@@ -245,6 +245,22 @@ func validateLiteralMap(inputMap *core.LiteralMap, fieldName string) error {
 	return nil
 }
 
+// TODO: Artifact feature gate, remove when ready
+func validateParameterMapAllowArtifacts(inputMap *core.ParameterMap, fieldName string) error {
+	return validateParameterMap(inputMap, fieldName)
+}
+
+func validateParameterMapDisableArtifacts(inputMap *core.ParameterMap, fieldName string) error {
+	if inputMap != nil && len(inputMap.Parameters) > 0 {
+		for name, defaultInput := range inputMap.Parameters {
+			if defaultInput.GetArtifactQuery() != nil {
+				return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "artifact mode not enabled but query found %s %s", fieldName, name)
+			}
+		}
+	}
+	return validateParameterMap(inputMap, fieldName)
+}
+
 func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 	if inputMap != nil && len(inputMap.Parameters) > 0 {
 		for name, defaultInput := range inputMap.Parameters {
@@ -256,7 +272,9 @@ func validateParameterMap(inputMap *core.ParameterMap, fieldName string) error {
 					"The Variable component of the Parameter %s in %s either is missing, or has a missing Type",
 					name, fieldName)
 			}
-			if defaultInput.GetDefault() == nil && !defaultInput.GetRequired() {
+			// if artifacts not enabled, then we know all GetArtifactQuery()s are nil, so the middle condition disappears
+			// if artifacts are enabled, then this is the valid check that we want to do
+			if defaultInput.GetDefault() == nil && defaultInput.GetArtifactQuery() == nil && !defaultInput.GetRequired() {
 				return errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 					"Invalid variable %s in %s - variable has neither default, nor is required. "+
 						"One must be specified", name, fieldName)

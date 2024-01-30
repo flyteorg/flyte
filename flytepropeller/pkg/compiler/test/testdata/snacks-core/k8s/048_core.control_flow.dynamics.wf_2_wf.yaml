@@ -89,8 +89,6 @@ spec:
       kind: task
       name: count_characters
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.dynamics.count_characters" '
     start-node:
       id: start-node

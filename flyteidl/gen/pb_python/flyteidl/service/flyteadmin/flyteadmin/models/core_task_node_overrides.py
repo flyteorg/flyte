@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_extended_resources import CoreExtendedResources  # noqa: F401,E501
 from flyteadmin.models.core_resources import CoreResources  # noqa: F401,E501
 
 
@@ -33,21 +34,26 @@ class CoreTaskNodeOverrides(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'resources': 'CoreResources'
+        'resources': 'CoreResources',
+        'extended_resources': 'CoreExtendedResources'
     }
 
     attribute_map = {
-        'resources': 'resources'
+        'resources': 'resources',
+        'extended_resources': 'extended_resources'
     }
 
-    def __init__(self, resources=None):  # noqa: E501
+    def __init__(self, resources=None, extended_resources=None):  # noqa: E501
         """CoreTaskNodeOverrides - a model defined in Swagger"""  # noqa: E501
 
         self._resources = None
+        self._extended_resources = None
         self.discriminator = None
 
         if resources is not None:
             self.resources = resources
+        if extended_resources is not None:
+            self.extended_resources = extended_resources
 
     @property
     def resources(self):
@@ -71,6 +77,29 @@ class CoreTaskNodeOverrides(object):
         """
 
         self._resources = resources
+
+    @property
+    def extended_resources(self):
+        """Gets the extended_resources of this CoreTaskNodeOverrides.  # noqa: E501
+
+        Overrides for all non-standard resources, not captured by v1.ResourceRequirements, to allocate to a task.  # noqa: E501
+
+        :return: The extended_resources of this CoreTaskNodeOverrides.  # noqa: E501
+        :rtype: CoreExtendedResources
+        """
+        return self._extended_resources
+
+    @extended_resources.setter
+    def extended_resources(self, extended_resources):
+        """Sets the extended_resources of this CoreTaskNodeOverrides.
+
+        Overrides for all non-standard resources, not captured by v1.ResourceRequirements, to allocate to a task.  # noqa: E501
+
+        :param extended_resources: The extended_resources of this CoreTaskNodeOverrides.  # noqa: E501
+        :type: CoreExtendedResources
+        """
+
+        self._extended_resources = extended_resources
 
     def to_dict(self):
         """Returns the model properties as a dict"""

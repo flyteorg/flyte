@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	kubeerrors "k8s.io/apimachinery/pkg/api/errors"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 type InmemoryWorkflowStore struct {

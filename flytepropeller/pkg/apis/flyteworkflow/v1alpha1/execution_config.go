@@ -1,8 +1,9 @@
 package v1alpha1
 
 import (
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 // This contains an OutputLocationPrefix. When running against AWS, this should be something of the form

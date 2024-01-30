@@ -6,25 +6,22 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/pkg/errors"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	eventErrors "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	workflowErrors "github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflow/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore/mocks"
-
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 	storagemocks "github.com/flyteorg/flyte/flytestdlib/storage/mocks"
-
-	"github.com/pkg/errors"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
-
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 type mockExecutor struct {
@@ -818,8 +815,36 @@ func TestNewPropellerHandler_UpdateFailure(t *testing.T) {
 		}
 		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
 		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
-		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, nil).Once()
+		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailing
+		}), mock.Anything).Return(nil, nil).Once()
+		err := p.Handle(ctx, namespace, name)
+		assert.NoError(t, err)
+	})
 
+	t.Run("too-large-terminal", func(t *testing.T) {
+		scope := promutils.NewTestScope()
+		s := &mocks.FlyteWorkflow{}
+		exec := &mockExecutor{}
+		p := NewPropellerHandler(ctx, cfg, nil, s, exec, scope)
+		wf := &v1alpha1.FlyteWorkflow{
+			ObjectMeta: v1.ObjectMeta{
+				Name:      name,
+				Namespace: namespace,
+			},
+			WorkflowSpec: &v1alpha1.WorkflowSpec{
+				ID: "w1",
+			},
+		}
+		exec.HandleCb = func(ctx context.Context, w *v1alpha1.FlyteWorkflow) error {
+			w.GetExecutionStatus().UpdatePhase(v1alpha1.WorkflowPhaseFailed, "done", nil)
+			return nil
+		}
+		s.OnGetMatch(mock.Anything, mock.Anything, mock.Anything).Return(wf, nil)
+		s.On("Update", mock.Anything, mock.Anything, mock.Anything).Return(nil, errors.Wrap(workflowstore.ErrWorkflowToLarge, "too large")).Once()
+		s.On("Update", mock.Anything, mock.MatchedBy(func(w *v1alpha1.FlyteWorkflow) bool {
+			return w.Status.Phase == v1alpha1.WorkflowPhaseFailed && !HasFinalizer(w) && HasCompletedLabel(w)
+		}), mock.Anything).Return(nil, nil).Once()
 		err := p.Handle(ctx, namespace, name)
 		assert.NoError(t, err)
 	})

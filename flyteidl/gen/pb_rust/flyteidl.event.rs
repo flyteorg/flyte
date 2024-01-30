@@ -83,6 +83,9 @@ pub struct NodeExecutionEvent {
     /// Extracting both of these timestamps facilitates a more accurate portrayal of the evaluation time-series.
     #[prost(message, optional, tag="21")]
     pub reported_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Indicates if this node is an ArrayNode.
+    #[prost(bool, tag="22")]
+    pub is_array: bool,
     #[prost(oneof="node_execution_event::InputValue", tags="5, 20")]
     pub input_value: ::core::option::Option<node_execution_event::InputValue>,
     #[prost(oneof="node_execution_event::OutputResult", tags="6, 7, 15")]
@@ -183,6 +186,16 @@ pub struct ParentNodeExecutionMetadata {
     #[prost(string, tag="1")]
     pub node_id: ::prost::alloc::string::String,
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct EventReason {
+    /// An explanation for this event
+    #[prost(string, tag="1")]
+    pub reason: ::prost::alloc::string::String,
+    /// The time this reason occurred
+    #[prost(message, optional, tag="2")]
+    pub occurred_at: ::core::option::Option<::prost_types::Timestamp>,
+}
 /// Plugin specific execution event information. For tasks like Python, Hive, Spark, DynamicJob.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -220,8 +233,13 @@ pub struct TaskExecutionEvent {
     #[prost(uint32, tag="12")]
     pub phase_version: u32,
     /// An optional explanation for the phase transition.
+    /// Deprecated: Use reasons instead.
+    #[deprecated]
     #[prost(string, tag="13")]
     pub reason: ::prost::alloc::string::String,
+    /// An optional list of explanations for the phase transition.
+    #[prost(message, repeated, tag="21")]
+    pub reasons: ::prost::alloc::vec::Vec<EventReason>,
     /// A predefined yet extensible Task type identifier. If the task definition is already registered in flyte admin
     /// this type will be identical, but not all task executions necessarily use pre-registered definitions and this
     /// type is useful to render the task in the UI, filter task executions, etc.
@@ -366,5 +384,78 @@ pub mod task_execution_metadata {
             }
         }
     }
+}
+/// This is the cloud event parallel to the raw WorkflowExecutionEvent message. It's filled in with additional
+/// information that downstream consumers may find useful.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventWorkflowExecution {
+    #[prost(message, optional, tag="1")]
+    pub raw_event: ::core::option::Option<WorkflowExecutionEvent>,
+    #[prost(message, optional, tag="2")]
+    pub output_interface: ::core::option::Option<super::core::TypedInterface>,
+    /// The following are ExecutionMetadata fields
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(message, repeated, tag="3")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    #[prost(message, optional, tag="4")]
+    pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(string, tag="5")]
+    pub principal: ::prost::alloc::string::String,
+    /// The ID of the LP that generated the execution that generated the Artifact.
+    /// Here for provenance information.
+    /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+    #[prost(message, optional, tag="6")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventNodeExecution {
+    #[prost(message, optional, tag="1")]
+    pub raw_event: ::core::option::Option<NodeExecutionEvent>,
+    /// The relevant task execution if applicable
+    #[prost(message, optional, tag="2")]
+    pub task_exec_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
+    /// The typed interface for the task that produced the event.
+    #[prost(message, optional, tag="3")]
+    pub output_interface: ::core::option::Option<super::core::TypedInterface>,
+    /// The following are ExecutionMetadata fields
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(message, repeated, tag="4")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    #[prost(string, tag="5")]
+    pub principal: ::prost::alloc::string::String,
+    /// The ID of the LP that generated the execution that generated the Artifact.
+    /// Here for provenance information.
+    /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+    #[prost(message, optional, tag="6")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventTaskExecution {
+    #[prost(message, optional, tag="1")]
+    pub raw_event: ::core::option::Option<TaskExecutionEvent>,
+}
+/// This event is to be sent by Admin after it creates an execution.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventExecutionStart {
+    /// The execution created.
+    #[prost(message, optional, tag="1")]
+    pub execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// The launch plan used.
+    #[prost(message, optional, tag="2")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    #[prost(message, optional, tag="3")]
+    pub workflow_id: ::core::option::Option<super::core::Identifier>,
+    /// Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
+    #[prost(message, repeated, tag="4")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    /// Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
+    #[prost(string, repeated, tag="5")]
+    pub artifact_trackers: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag="6")]
+    pub principal: ::prost::alloc::string::String,
 }
 // @@protoc_insertion_point(module)

@@ -2,8 +2,8 @@
 
 ## Platform
 - Oauth2 support with SingleSignOn and configuration examples for popular IDP's now available in Flyte.
-  Please see the updated [information and description of the feature](https://github.com/flyteorg/flyte/blob/master/rsts/howto/authentication/index.rst), and the [setup information](https://github.com/flyteorg/flyte/blob/master/rsts/howto/authentication/setup.rst)
-  **Attention: If using Auth already - this is a BREAKING change**. refer to the [migration guide](https://github.com/flyteorg/flyte/blob/master/rsts/howto/authentication/migration.rst) to update configuration to ensure Admin continues to work. (No migration needed if auth is not turned on.)
+  Please see the updated [information and description of the feature](https://github.com/flyteorg/flyte/blob/master/docs/howto/authentication/index.rst), and the [setup information](https://github.com/flyteorg/flyte/blob/master/docs/howto/authentication/setup.rst)
+  **Attention: If using Auth already - this is a BREAKING change**. refer to the [migration guide](https://github.com/flyteorg/flyte/blob/master/docs/howto/authentication/migration.rst) to update configuration to ensure Admin continues to work. (No migration needed if auth is not turned on.)
 
 * Backend improvements to support dynamic workflow visualization (in future releases).
 * Lot of features added to [flytectl](https://flytectl.readthedocs.io/en/latest/) .

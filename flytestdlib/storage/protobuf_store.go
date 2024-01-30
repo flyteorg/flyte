@@ -12,6 +12,7 @@ import (
 
 	"github.com/flyteorg/flyte/flytestdlib/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -32,6 +33,9 @@ type DefaultProtobufStore struct {
 }
 
 func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataReference, msg proto.Message) error {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.DefaultProtobufStore/ReadProtobuf")
+	defer span.End()
+
 	rc, err := s.ReadRaw(ctx, reference)
 	if err != nil && !IsFailedWriteToCache(err) {
 		logger.Errorf(ctx, "Failed to read from the raw store [%s] Error: %v", reference, err)
@@ -42,7 +46,7 @@ func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataRe
 	defer func() {
 		err = rc.Close()
 		if err != nil {
-			logger.Warn(ctx, "Failed to close reference [%v]. Error: %v", reference, err)
+			logger.Warnf(ctx, "Failed to close reference [%v]. Error: %v", reference, err)
 		}
 	}()
 
@@ -63,6 +67,9 @@ func (s DefaultProtobufStore) ReadProtobuf(ctx context.Context, reference DataRe
 }
 
 func (s DefaultProtobufStore) WriteProtobuf(ctx context.Context, reference DataReference, opts Options, msg proto.Message) error {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.DefaultProtobufStore/WriteProtobuf")
+	defer span.End()
+
 	t := s.metrics.MarshalTime.Start()
 	raw, err := proto.Marshal(msg)
 	t.Stop()

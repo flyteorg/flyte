@@ -14,7 +14,51 @@
   "produces": [
     "application/json"
   ],
-  "paths": {},
+  "paths": {
+    "/api/v1/agent/{name}": {
+      "get": {
+        "summary": "Send a task create request to the agent server.",
+        "operationId": "GetAgent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminGetAgentResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "name",
+            "description": "The name of the agent.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "summary": "Get job status.",
+        "operationId": "ListAgents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminListAgentsResponse"
+            }
+          }
+        },
+        "tags": [
+          "AgentMetadataService"
+        ]
+      }
+    }
+  },
   "definitions": {
     "BlobTypeBlobDimensionality": {
       "type": "string",
@@ -163,13 +207,41 @@
         }
       }
     },
+    "TaskLogMessageFormat": {
+      "type": "string",
+      "enum": [
+        "UNKNOWN",
+        "CSV",
+        "JSON"
+      ],
+      "default": "UNKNOWN"
+    },
+    "adminAgent": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name is the developer-assigned name of the agent."
+        },
+        "supported_task_types": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
+        }
+      },
+      "description": "A message containing the agent metadata."
+    },
     "adminCreateTaskResponse": {
       "type": "object",
       "properties": {
         "resource_meta": {
           "type": "string",
-          "format": "byte",
-          "description": "Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata)."
+          "format": "byte"
+        },
+        "resource": {
+          "$ref": "#/definitions/adminResource"
         }
       },
       "description": "Represents a create response structure."
@@ -178,25 +250,164 @@
       "type": "object",
       "description": "Response to delete a task."
     },
+    "adminGetAgentResponse": {
+      "type": "object",
+      "properties": {
+        "agent": {
+          "$ref": "#/definitions/adminAgent"
+        }
+      },
+      "description": "A response containing an agent."
+    },
+    "adminGetTaskLogsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The execution log results."
+        },
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
+        }
+      },
+      "description": "A response containing the logs for a task execution."
+    },
+    "adminGetTaskMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreExecutionMetricResult"
+          },
+          "description": "The execution metric results."
+        }
+      },
+      "description": "A response containing a list of metrics for a task execution."
+    },
     "adminGetTaskResponse": {
       "type": "object",
       "properties": {
         "resource": {
           "$ref": "#/definitions/adminResource"
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "title": "log information for the task execution"
         }
       },
       "description": "Response to get an individual task resource."
+    },
+    "adminListAgentsResponse": {
+      "type": "object",
+      "properties": {
+        "agents": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/adminAgent"
+          }
+        }
+      },
+      "description": "A response containing a list of agents."
     },
     "adminResource": {
       "type": "object",
       "properties": {
         "state": {
           "$ref": "#/definitions/flyteidladminState",
-          "description": "The state of the execution is used to control its visibility in the UI/CLI."
+          "description": "DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI."
         },
         "outputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
+        },
+        "message": {
+          "type": "string",
+          "description": "A descriptive message for the current state. e.g. waiting for cluster."
+        },
+        "log_links": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreTaskLog"
+          },
+          "description": "log information for the task execution."
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
+        }
+      }
+    },
+    "coreArtifactBindingData": {
+      "type": "object",
+      "properties": {
+        "index": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "partition_key": {
+          "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "transform": {
+          "type": "string",
+          "title": "This is only relevant in the time partition case"
+        }
+      },
+      "title": "Only valid for triggers"
+    },
+    "coreArtifactID": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "version": {
+          "type": "string"
+        },
+        "partitions": {
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
+        }
+      }
+    },
+    "coreArtifactKey": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "description": "Project and domain and suffix needs to be unique across a given artifact store."
+        },
+        "domain": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "coreArtifactTag": {
+      "type": "object",
+      "properties": {
+        "artifact_key": {
+          "$ref": "#/definitions/coreArtifactKey"
+        },
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
         }
       }
     },
@@ -365,6 +576,48 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreExecutionMetricResult": {
+      "type": "object",
+      "properties": {
+        "metric": {
+          "type": "string",
+          "description": "The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG."
+        },
+        "data": {
+          "$ref": "#/definitions/protobufStruct",
+          "title": "The result data in prometheus range query result format\nhttps://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.\nThis may include multiple time series, differentiated by their metric labels.\nStart time is greater of (execution attempt start, 48h ago)\nEnd time is lesser of (execution attempt end, now)"
+        }
+      },
+      "description": "ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task."
+    },
+    "coreExtendedResources": {
+      "type": "object",
+      "properties": {
+        "gpu_accelerator": {
+          "$ref": "#/definitions/coreGPUAccelerator",
+          "description": "GPU accelerator to select for task. Contains information about device type, and\nfor multi-instance GPUs, the partition size to use."
+        }
+      },
+      "description": "Encapsulates all non-standard resources, not captured by v1.ResourceRequirements, to\nallocate to a task."
+    },
+    "coreGPUAccelerator": {
+      "type": "object",
+      "properties": {
+        "device": {
+          "type": "string",
+          "description": "This can be any arbitrary string, and should be informed by the labels or taints\nassociated with the nodes in question. Default cloud provider labels typically\nuse the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc."
+        },
+        "unpartitioned": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "partition_size": {
+          "type": "string",
+          "description": "Like `device`, this can be any arbitrary string, and should be informed by\nthe labels or taints associated with the nodes in question. Default cloud\nprovider labels typically use the following values: `1g.5gb`, `2g.10gb`, etc."
+        }
+      },
+      "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
     "coreIOStrategy": {
       "type": "object",
       "properties": {
@@ -401,6 +654,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -426,6 +683,14 @@
         }
       },
       "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
+    },
+    "coreInputBindingData": {
+      "type": "object",
+      "properties": {
+        "var": {
+          "type": "string"
+        }
+      }
     },
     "coreK8sObjectMetadata": {
       "type": "object",
@@ -479,6 +744,26 @@
       },
       "description": "A generic key value pair."
     },
+    "coreLabelValue": {
+      "type": "object",
+      "properties": {
+        "static_value": {
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
+        },
+        "triggered_binding": {
+          "$ref": "#/definitions/coreArtifactBindingData"
+        },
+        "input_binding": {
+          "$ref": "#/definitions/coreInputBindingData"
+        }
+      }
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -497,6 +782,13 @@
         "hash": {
           "type": "string",
           "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional metadata for literals."
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
@@ -634,6 +926,17 @@
       ],
       "default": "CLIENT_CREDENTIALS",
       "description": "Type of the token requested.\n\n - CLIENT_CREDENTIALS: CLIENT_CREDENTIALS indicates a 2-legged OAuth token requested using client credentials."
+    },
+    "corePartitions": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLabelValue"
+          }
+        }
+      }
     },
     "corePrimitive": {
       "type": "object",
@@ -919,6 +1222,39 @@
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
     },
+    "coreTaskExecutionPhase": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "ABORTED",
+        "FAILED",
+        "INITIALIZING",
+        "WAITING_FOR_RESOURCES"
+      ],
+      "default": "UNDEFINED",
+      "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
+    },
+    "coreTaskLog": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "message_format": {
+          "$ref": "#/definitions/TaskLogMessageFormat"
+        },
+        "ttl": {
+          "type": "string"
+        }
+      },
+      "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
+    },
     "coreTaskMetadata": {
       "type": "object",
       "properties": {
@@ -971,6 +1307,13 @@
         "pod_template_name": {
           "type": "string",
           "description": "pod_template_name is the unique name of a PodTemplate k8s resource to be used as the base configuration if this\ntask creates a k8s Pod. If this value is set, the specified PodTemplate will be used instead of, but applied\nidentically as, the default PodTemplate configured in FlytePropeller."
+        },
+        "cache_ignore_input_vars": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "cache_ignore_input_vars is the input variables that should not be included when calculating hash for cache."
         }
       },
       "title": "Task Metadata"
@@ -1016,6 +1359,10 @@
           "$ref": "#/definitions/coreSecurityContext",
           "description": "security_context encapsulates security attributes requested to run this task."
         },
+        "extended_resources": {
+          "$ref": "#/definitions/coreExtendedResources",
+          "description": "Encapsulates all non-standard resources, not captured by\nv1.ResourceRequirements, to allocate to a task."
+        },
         "config": {
           "type": "object",
           "additionalProperties": {
@@ -1025,6 +1372,14 @@
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
+    },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
     },
     "coreTypeAnnotation": {
       "type": "object",
@@ -1042,6 +1397,13 @@
         "tag": {
           "type": "string",
           "title": "Must exactly match for types to be castable"
+        },
+        "dataclass_type": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "title": "dataclass_type only exists for dataclasses.\nThis is used to resolve the type of the fields of dataclass\nThe key is the field name, and the value is the literal type of the field\ne.g. For dataclass Foo, with fields a, and a is a string\nFoo.a will be resolved as a literal type of string from dataclass_type"
         }
       },
       "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."
@@ -1093,6 +1455,13 @@
         "description": {
           "type": "string",
           "title": "+optional string describing input variable"
+        },
+        "artifact_partial_id": {
+          "$ref": "#/definitions/coreArtifactID",
+          "description": "+optional This object allows the user to specify how Artifacts are created.\nname, tag, partitions can be specified. The other fields (version and project/domain) are ignored."
+        },
+        "artifact_tag": {
+          "$ref": "#/definitions/coreArtifactTag"
         }
       },
       "description": "Defines a strongly typed variable."
@@ -1128,6 +1497,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

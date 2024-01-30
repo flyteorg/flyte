@@ -6,14 +6,13 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/flyteorg/flyte/flyteadmin/plugins"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
+
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flytestdlib/config"
+	"github.com/flyteorg/flyte/flytestdlib/config/viper"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 var (
@@ -76,7 +75,7 @@ func init() {
 
 func initConfig(flags *pflag.FlagSet) error {
 	configAccessor = viper.NewAccessor(config.Options{
-		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyteadmin"},
+		SearchPaths: []string{cfgFile, ".", "/etc/flyte/config", "$GOPATH/src/github.com/flyteorg/flyte/flyteadmin"},
 		StrictMode:  false,
 	})
 

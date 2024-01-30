@@ -6,6 +6,13 @@ import (
 	"time"
 
 	daskAPI "github.com/dask/dask-kubernetes/v2023/dask_kubernetes/operator/go_client/pkg/apis/kubernetes.dask.org/v1"
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/client-go/kubernetes/scheme"
+	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/logs"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
@@ -14,12 +21,6 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/tasklog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/plugins"
-	v1 "k8s.io/api/core/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/util/intstr"
-	"k8s.io/client-go/kubernetes/scheme"
-	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 const (
@@ -27,40 +28,10 @@ const (
 	KindDaskJob  = "DaskJob"
 )
 
-// Wraps a regular TaskExecutionMetadata and overrides the IsInterruptible method to always return false
-// This is useful as the runner and the scheduler pods should never be interruptible
-type nonInterruptibleTaskExecutionMetadata struct {
-	pluginsCore.TaskExecutionMetadata
-}
-
-func (n nonInterruptibleTaskExecutionMetadata) IsInterruptible() bool {
-	return false
-}
-
-// A wrapper around a regular TaskExecutionContext allowing to inject a custom TaskExecutionMetadata which is
-// non-interruptible
-type nonInterruptibleTaskExecutionContext struct {
-	pluginsCore.TaskExecutionContext
-	metadata nonInterruptibleTaskExecutionMetadata
-}
-
-func (n nonInterruptibleTaskExecutionContext) TaskExecutionMetadata() pluginsCore.TaskExecutionMetadata {
-	return n.metadata
-}
-
 func mergeMapInto(src map[string]string, dst map[string]string) {
 	for key, value := range src {
 		dst[key] = value
 	}
-}
-
-func getPrimaryContainer(spec *v1.PodSpec, primaryContainerName string) (*v1.Container, error) {
-	for _, container := range spec.Containers {
-		if container.Name == primaryContainerName {
-			return &container, nil
-		}
-	}
-	return nil, errors.Errorf(errors.BadTaskSpecification, "primary container [%v] not found in pod spec", primaryContainerName)
 }
 
 func replacePrimaryContainer(spec *v1.PodSpec, primaryContainerName string, container v1.Container) error {
@@ -104,8 +75,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	if err != nil {
 		return nil, err
 	}
-	nonInterruptibleTaskMetadata := nonInterruptibleTaskExecutionMetadata{taskCtx.TaskExecutionMetadata()}
-	nonInterruptibleTaskCtx := nonInterruptibleTaskExecutionContext{taskCtx, nonInterruptibleTaskMetadata}
+	nonInterruptibleTaskCtx := flytek8s.NewPluginTaskExecutionContext(taskCtx, flytek8s.WithInterruptible(false))
 	nonInterruptiblePodSpec, _, _, err := flytek8s.ToK8sPodSpec(ctx, nonInterruptibleTaskCtx)
 	if err != nil {
 		return nil, err
@@ -144,7 +114,7 @@ func (p daskResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 
 func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.WorkerSpec, error) {
 	workerPodSpec := podSpec.DeepCopy()
-	primaryContainer, err := getPrimaryContainer(workerPodSpec, primaryContainerName)
+	primaryContainer, err := flytek8s.GetContainer(workerPodSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
@@ -206,7 +176,7 @@ func createWorkerSpec(cluster plugins.DaskWorkerGroup, podSpec *v1.PodSpec, prim
 
 func createSchedulerSpec(scheduler plugins.DaskScheduler, clusterName string, podSpec *v1.PodSpec, primaryContainerName string) (*daskAPI.SchedulerSpec, error) {
 	schedulerPodSpec := podSpec.DeepCopy()
-	primaryContainer, err := getPrimaryContainer(schedulerPodSpec, primaryContainerName)
+	primaryContainer, err := flytek8s.GetContainer(schedulerPodSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
@@ -283,7 +253,7 @@ func createJobSpec(workerSpec daskAPI.WorkerSpec, schedulerSpec daskAPI.Schedule
 	jobPodSpec := podSpec.DeepCopy()
 	jobPodSpec.RestartPolicy = v1.RestartPolicyNever
 
-	primaryContainer, err := getPrimaryContainer(jobPodSpec, primaryContainerName)
+	primaryContainer, err := flytek8s.GetContainer(jobPodSpec, primaryContainerName)
 	if err != nil {
 		return nil, err
 	}
@@ -328,13 +298,13 @@ func (p daskResourceHandler) GetTaskPhase(ctx context.Context, pluginContext k8s
 		status == daskAPI.DaskJobClusterCreated
 
 	if !isQueued {
-		taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+		taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 		o, err := logPlugin.GetTaskLogs(
 			tasklog.Input{
-				Namespace:               job.ObjectMeta.Namespace,
-				PodName:                 job.Status.JobRunnerPodName,
-				LogName:                 "(User logs)",
-				TaskExecutionIdentifier: &taskExecID,
+				Namespace:       job.ObjectMeta.Namespace,
+				PodName:         job.Status.JobRunnerPodName,
+				LogName:         "(User logs)",
+				TaskExecutionID: taskExecID,
 			},
 		)
 		if err != nil {

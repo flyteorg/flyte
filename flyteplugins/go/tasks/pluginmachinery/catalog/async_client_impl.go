@@ -7,11 +7,11 @@ import (
 	"hash/fnv"
 	"reflect"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/workqueue"
 	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const specialEncoderKey = "abcdefghijklmnopqrstuvwxyz123456"
@@ -48,7 +48,7 @@ func hashInputs(ctx context.Context, key Key) (string, error) {
 		}
 		inputs = retInputs
 	}
-	return HashLiteralMap(ctx, inputs)
+	return HashLiteralMap(ctx, inputs, key.CacheIgnoreInputVars)
 }
 
 func (c AsyncClientImpl) Download(ctx context.Context, requests ...DownloadRequest) (outputFuture DownloadFuture, err error) {

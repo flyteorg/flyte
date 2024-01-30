@@ -8,8 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	coreIdl "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
+	coreIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 

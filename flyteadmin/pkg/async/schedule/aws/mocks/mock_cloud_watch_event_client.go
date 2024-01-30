@@ -2,6 +2,7 @@ package mocks
 
 import (
 	"github.com/aws/aws-sdk-go/service/cloudwatchevents"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/aws/interfaces"
 )
 

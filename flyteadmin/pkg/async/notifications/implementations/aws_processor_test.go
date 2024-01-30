@@ -2,16 +2,15 @@ package implementations
 
 import (
 	"context"
+	"encoding/base64"
 	"errors"
 	"testing"
 
-	"encoding/base64"
-
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/mocks"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 var mockEmailer mocks.MockEmailer

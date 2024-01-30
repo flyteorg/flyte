@@ -6,16 +6,14 @@ import (
 	"testing"
 	"time"
 
+	mocket "github.com/Selvatico/go-mocket"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	mocket "github.com/Selvatico/go-mocket"
-
-	"github.com/stretchr/testify/assert"
 )
 
 var (

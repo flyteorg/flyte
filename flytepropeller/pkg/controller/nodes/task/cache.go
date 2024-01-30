@@ -5,10 +5,8 @@ import (
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	errors2 "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -28,10 +26,11 @@ func (t *Handler) GetCatalogKey(ctx context.Context, nCtx interfaces.NodeExecuti
 	}
 
 	return catalog.Key{
-		Identifier:     *taskTemplate.Id,
-		CacheVersion:   taskTemplate.Metadata.DiscoveryVersion,
-		TypedInterface: *taskTemplate.Interface,
-		InputReader:    nCtx.InputReader(),
+		Identifier:           *taskTemplate.Id,
+		CacheVersion:         taskTemplate.Metadata.DiscoveryVersion,
+		CacheIgnoreInputVars: taskTemplate.Metadata.CacheIgnoreInputVars,
+		TypedInterface:       *taskTemplate.Interface,
+		InputReader:          nCtx.InputReader(),
 	}, nil
 }
 

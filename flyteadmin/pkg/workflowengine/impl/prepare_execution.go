@@ -1,13 +1,14 @@
 package impl
 
 import (
-	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"google.golang.org/grpc/codes"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 func addMapValues(overrides map[string]string, defaultValues map[string]string) map[string]string {
@@ -84,9 +85,6 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		if !taskResources.Defaults.EphemeralStorage.IsZero() {
 			requests.EphemeralStorage = taskResources.Defaults.EphemeralStorage
 		}
-		if !taskResources.Defaults.Storage.IsZero() {
-			requests.Storage = taskResources.Defaults.Storage
-		}
 		if !taskResources.Defaults.GPU.IsZero() {
 			requests.GPU = taskResources.Defaults.GPU
 		}
@@ -100,9 +98,6 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		}
 		if !taskResources.Limits.EphemeralStorage.IsZero() {
 			limits.EphemeralStorage = taskResources.Limits.EphemeralStorage
-		}
-		if !taskResources.Limits.Storage.IsZero() {
-			limits.Storage = taskResources.Limits.Storage
 		}
 		if !taskResources.Limits.GPU.IsZero() {
 			limits.GPU = taskResources.Limits.GPU

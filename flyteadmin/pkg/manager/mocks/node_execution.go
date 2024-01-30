@@ -3,7 +3,7 @@ package mocks
 import (
 	"context"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
 type CreateNodeEventFunc func(ctx context.Context, request admin.NodeExecutionEventRequest) (
@@ -82,5 +82,9 @@ func (m *MockNodeExecutionManager) GetNodeExecutionData(
 	if m.getNodeExecutionDataFunc != nil {
 		return m.getNodeExecutionDataFunc(ctx, request)
 	}
+	return nil, nil
+}
+
+func (m *MockNodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
 	return nil, nil
 }

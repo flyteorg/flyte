@@ -193,7 +193,9 @@ class WorkflowTemplate(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., metadata: _Optional[_Union[WorkflowMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ..., outputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., failure_node: _Optional[_Union[Node, _Mapping]] = ..., metadata_defaults: _Optional[_Union[WorkflowMetadataDefaults, _Mapping]] = ...) -> None: ...
 
 class TaskNodeOverrides(_message.Message):
-    __slots__ = ["resources"]
+    __slots__ = ["resources", "extended_resources"]
     RESOURCES_FIELD_NUMBER: _ClassVar[int]
+    EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
     resources: _tasks_pb2.Resources
-    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ...) -> None: ...
+    extended_resources: _tasks_pb2.ExtendedResources
+    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...

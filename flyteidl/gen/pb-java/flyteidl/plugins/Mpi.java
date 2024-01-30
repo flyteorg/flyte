@@ -709,9 +709,9 @@ public final class Mpi {
       "\n\032flyteidl/plugins/mpi.proto\022\020flyteidl.p" +
       "lugins\"_\n\032DistributedMPITrainingTask\022\023\n\013" +
       "num_workers\030\001 \001(\005\022\035\n\025num_launcher_replic" +
-      "as\030\002 \001(\005\022\r\n\005slots\030\003 \001(\005B9Z7github.com/fl" +
-      "yteorg/flyteidl/gen/pb-go/flyteidl/plugi" +
-      "nsb\006proto3"
+      "as\030\002 \001(\005\022\r\n\005slots\030\003 \001(\005B?Z=github.com/fl" +
+      "yteorg/flyte/flyteidl/gen/pb-go/flyteidl" +
+      "/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

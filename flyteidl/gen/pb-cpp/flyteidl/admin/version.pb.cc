@@ -131,13 +131,13 @@ const char descriptor_table_protodef_flyteidl_2fadmin_2fversion_2eproto[] =
   "plane_version\030\001 \001(\0132\027.flyteidl.admin.Ver"
   "sion\"<\n\007Version\022\r\n\005Build\030\001 \001(\t\022\017\n\007Versio"
   "n\030\002 \001(\t\022\021\n\tBuildTime\030\003 \001(\t\"\023\n\021GetVersion"
-  "RequestB7Z5github.com/flyteorg/flyteidl/"
-  "gen/pb-go/flyteidl/adminb\006proto3"
+  "RequestB=Z;github.com/flyteorg/flyte/fly"
+  "teidl/gen/pb-go/flyteidl/adminb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fadmin_2fversion_2eproto = {
   false, InitDefaults_flyteidl_2fadmin_2fversion_2eproto, 
   descriptor_table_protodef_flyteidl_2fadmin_2fversion_2eproto,
-  "flyteidl/admin/version.proto", &assign_descriptors_table_flyteidl_2fadmin_2fversion_2eproto, 272,
+  "flyteidl/admin/version.proto", &assign_descriptors_table_flyteidl_2fadmin_2fversion_2eproto, 278,
 };
 
 void AddDescriptors_flyteidl_2fadmin_2fversion_2eproto() {

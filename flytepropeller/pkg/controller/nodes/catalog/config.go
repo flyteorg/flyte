@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	"google.golang.org/grpc"
 
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/catalog/datacatalog"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 //go:generate pflags Config --default-var defaultConfig

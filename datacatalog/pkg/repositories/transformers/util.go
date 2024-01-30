@@ -1,10 +1,11 @@
 package transformers
 
 import (
-	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc/codes"
+
+	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 )
 
 func marshalMetadata(metadata *datacatalog.Metadata) ([]byte, error) {

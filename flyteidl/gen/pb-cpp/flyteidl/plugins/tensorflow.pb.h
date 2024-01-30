@@ -178,6 +178,12 @@ class DistributedTensorflowTrainingTask final :
   ::google::protobuf::int32 chief_replicas() const;
   void set_chief_replicas(::google::protobuf::int32 value);
 
+  // int32 evaluator_replicas = 4;
+  void clear_evaluator_replicas();
+  static const int kEvaluatorReplicasFieldNumber = 4;
+  ::google::protobuf::int32 evaluator_replicas() const;
+  void set_evaluator_replicas(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:flyteidl.plugins.DistributedTensorflowTrainingTask)
  private:
   class HasBitSetters;
@@ -186,6 +192,7 @@ class DistributedTensorflowTrainingTask final :
   ::google::protobuf::int32 workers_;
   ::google::protobuf::int32 ps_replicas_;
   ::google::protobuf::int32 chief_replicas_;
+  ::google::protobuf::int32 evaluator_replicas_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fplugins_2ftensorflow_2eproto;
 };
@@ -240,6 +247,20 @@ inline void DistributedTensorflowTrainingTask::set_chief_replicas(::google::prot
   
   chief_replicas_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.plugins.DistributedTensorflowTrainingTask.chief_replicas)
+}
+
+// int32 evaluator_replicas = 4;
+inline void DistributedTensorflowTrainingTask::clear_evaluator_replicas() {
+  evaluator_replicas_ = 0;
+}
+inline ::google::protobuf::int32 DistributedTensorflowTrainingTask::evaluator_replicas() const {
+  // @@protoc_insertion_point(field_get:flyteidl.plugins.DistributedTensorflowTrainingTask.evaluator_replicas)
+  return evaluator_replicas_;
+}
+inline void DistributedTensorflowTrainingTask::set_evaluator_replicas(::google::protobuf::int32 value) {
+  
+  evaluator_replicas_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.plugins.DistributedTensorflowTrainingTask.evaluator_replicas)
 }
 
 #ifdef __GNUC__

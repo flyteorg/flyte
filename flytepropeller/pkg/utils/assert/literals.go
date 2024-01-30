@@ -4,8 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func EqualPrimitive(t *testing.T, p1 *core.Primitive, p2 *core.Primitive) {

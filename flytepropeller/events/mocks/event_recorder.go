@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	event "github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 
 	mock "github.com/stretchr/testify/mock"
 )

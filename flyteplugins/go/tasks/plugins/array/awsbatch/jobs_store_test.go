@@ -11,20 +11,15 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/service/batch"
-
-	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
-	mocks3 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
-	config2 "github.com/flyteorg/flyte/flytestdlib/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/cache"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-
+	mocks2 "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	mocks3 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	config2 "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func createJobWithID(id JobID) *Job {

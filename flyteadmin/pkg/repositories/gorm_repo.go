@@ -1,13 +1,14 @@
 package repositories
 
 import (
+	"gorm.io/gorm"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gormimpl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	schedulerGormImpl "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/gormimpl"
 	schedulerInterfaces "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"gorm.io/gorm"
 )
 
 type GormRepo struct {

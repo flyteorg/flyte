@@ -18,15 +18,15 @@ import (
 	"golang.org/x/oauth2"
 	_ "google.golang.org/grpc/balancer/roundrobin" //nolint
 
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
+	cachemocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/pkce"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyteidl/clients/go/admin/cache"
-	cachemocks "github.com/flyteorg/flyteidl/clients/go/admin/cache/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/mocks"
-	"github.com/flyteorg/flyteidl/clients/go/admin/oauth"
-	"github.com/flyteorg/flyteidl/clients/go/admin/pkce"
-	"github.com/flyteorg/flyteidl/clients/go/admin/tokenorchestrator"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 func TestInitializeAndGetAdminClient(t *testing.T) {
@@ -77,7 +77,8 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 	})
 
 	t.Run("legal-from-config", func(t *testing.T) {
-		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true}, nil)
+		u, _ := url.Parse("localhost:8089")
+		clientSet, err := initializeClients(ctx, &Config{InsecureSkipVerify: true, Endpoint: config.URL{URL: *u}}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
@@ -85,12 +86,14 @@ func TestGetAdditionalAdminClientConfigOptions(t *testing.T) {
 		assert.NotNil(t, clientSet.HealthServiceClient())
 	})
 	t.Run("legal-from-config-with-cacerts", func(t *testing.T) {
-		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem"}, nil)
+		u, _ := url.Parse("localhost:8089")
+		clientSet, err := initializeClients(ctx, &Config{CACertFilePath: "testdata/root.pem", Endpoint: config.URL{URL: *u}}, nil)
 		assert.NoError(t, err)
 		assert.NotNil(t, clientSet)
 		assert.NotNil(t, clientSet.AuthMetadataClient())
 		assert.NotNil(t, clientSet.AdminClient())
 	})
+
 	t.Run("legal-from-config-with-invalid-cacerts", func(t *testing.T) {
 		defer func() {
 			if r := recover(); r == nil {

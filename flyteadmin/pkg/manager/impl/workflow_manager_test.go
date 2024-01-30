@@ -6,28 +6,29 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
+	"github.com/stretchr/testify/assert"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	repositoryMocks "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/golang/protobuf/proto"
-
-	flyteErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	workflowengineMocks "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	engine "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/codes"
 )
 
 const remoteClosureIdentifier = "s3://flyte/metadata/admin/remote closure id"
@@ -243,10 +244,13 @@ func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 		getMockWorkflowConfigProvider(), mockCompiler, getMockStorage(), storagePrefix, mockScope.NewTestScope())
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
+	assert.Nil(t, response)
+	s, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, s.Code())
 	assert.EqualError(t, err, fmt.Sprintf(
 		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
 			"name:\"name\" version:\"version\" ] with err %v", expectedErr.Error()))
-	assert.Nil(t, response)
 }
 
 func TestCreateWorkflow_DatabaseError(t *testing.T) {
@@ -454,6 +458,13 @@ func TestListWorkflows(t *testing.T) {
 		assert.Equal(t, fmt.Sprintf("version %v", idx), workflow.Id.Version)
 		assert.True(t, proto.Equal(&admin.WorkflowClosure{
 			CreatedAt: testutils.MockCreatedAtProto,
+			CompiledWorkflow: &core.CompiledWorkflowClosure{
+				Primary: &core.CompiledWorkflow{
+					Template: &core.WorkflowTemplate{
+						Interface: &core.TypedInterface{},
+					},
+				},
+			},
 		}, workflow.Closure))
 	}
 	assert.Empty(t, workflowList.Token)

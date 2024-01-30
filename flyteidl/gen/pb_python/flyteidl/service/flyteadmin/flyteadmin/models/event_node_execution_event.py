@@ -60,7 +60,8 @@ class EventNodeExecutionEvent(object):
         'is_parent': 'bool',
         'is_dynamic': 'bool',
         'deck_uri': 'str',
-        'reported_at': 'datetime'
+        'reported_at': 'datetime',
+        'is_array': 'bool'
     }
 
     attribute_map = {
@@ -84,10 +85,11 @@ class EventNodeExecutionEvent(object):
         'is_parent': 'is_parent',
         'is_dynamic': 'is_dynamic',
         'deck_uri': 'deck_uri',
-        'reported_at': 'reported_at'
+        'reported_at': 'reported_at',
+        'is_array': 'is_array'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None, reported_at=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None, reported_at=None, is_array=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
@@ -111,6 +113,7 @@ class EventNodeExecutionEvent(object):
         self._is_dynamic = None
         self._deck_uri = None
         self._reported_at = None
+        self._is_array = None
         self.discriminator = None
 
         if id is not None:
@@ -155,6 +158,8 @@ class EventNodeExecutionEvent(object):
             self.deck_uri = deck_uri
         if reported_at is not None:
             self.reported_at = reported_at
+        if is_array is not None:
+            self.is_array = is_array
 
     @property
     def id(self):
@@ -614,6 +619,29 @@ class EventNodeExecutionEvent(object):
         """
 
         self._reported_at = reported_at
+
+    @property
+    def is_array(self):
+        """Gets the is_array of this EventNodeExecutionEvent.  # noqa: E501
+
+        Indicates if this node is an ArrayNode.  # noqa: E501
+
+        :return: The is_array of this EventNodeExecutionEvent.  # noqa: E501
+        :rtype: bool
+        """
+        return self._is_array
+
+    @is_array.setter
+    def is_array(self, is_array):
+        """Sets the is_array of this EventNodeExecutionEvent.
+
+        Indicates if this node is an ArrayNode.  # noqa: E501
+
+        :param is_array: The is_array of this EventNodeExecutionEvent.  # noqa: E501
+        :type: bool
+        """
+
+        self._is_array = is_array
 
     def to_dict(self):
         """Returns the model properties as a dict"""

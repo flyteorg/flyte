@@ -3,11 +3,10 @@ package storage
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/pkg/errors"
-
-	"net/url"
 
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )

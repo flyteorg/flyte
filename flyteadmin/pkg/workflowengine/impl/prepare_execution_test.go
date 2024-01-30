@@ -4,16 +4,16 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
-
-	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/api/resource"
+
+	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
 const testRole = "role"
@@ -131,7 +131,6 @@ func TestAddExecutionOverrides(t *testing.T) {
 			Limits: runtimeInterfaces.TaskResourceSet{
 				CPU:              resource.MustParse("2"),
 				Memory:           resource.MustParse("200Gi"),
-				Storage:          resource.MustParse("5Gi"),
 				EphemeralStorage: resource.MustParse("1Gi"),
 				GPU:              resource.MustParse("1"),
 			},
@@ -144,7 +143,6 @@ func TestAddExecutionOverrides(t *testing.T) {
 		assert.EqualValues(t, v1alpha1.TaskResourceSpec{
 			CPU:              resource.MustParse("2"),
 			Memory:           resource.MustParse("200Gi"),
-			Storage:          resource.MustParse("5Gi"),
 			EphemeralStorage: resource.MustParse("1Gi"),
 			GPU:              resource.MustParse("1"),
 		}, workflow.ExecutionConfig.TaskResources.Limits)

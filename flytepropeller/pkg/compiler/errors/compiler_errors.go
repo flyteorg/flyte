@@ -93,6 +93,9 @@ const (
 
 	// A gate node is missing a condition.
 	NoConditionFound ErrorCode = "NoConditionFound"
+
+	// Field not found in the dataclass
+	FieldNotFoundError ErrorCode = "FieldNotFound"
 )
 
 func NewBranchNodeNotSpecified(branchNodeID string) *CompileError {
@@ -212,6 +215,14 @@ func NewMismatchingBindingsErr(nodeID, sinkParam, expectedType, receivedType str
 	return newError(
 		MismatchingBindings,
 		fmt.Sprintf("Input [%v] on node [%v] expects bindings of type [%v].  Received [%v]", sinkParam, nodeID, expectedType, receivedType),
+		nodeID,
+	)
+}
+
+func NewFieldNotFoundErr(nodeID, fromVar, fromType, key string) *CompileError {
+	return newError(
+		FieldNotFoundError,
+		fmt.Sprintf("Variable [%v] (type [%v]) doesn't have field [%v].", fromVar, fromType, key),
 		nodeID,
 	)
 }

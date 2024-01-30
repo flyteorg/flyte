@@ -3,6 +3,19 @@ package single
 import (
 	"context"
 	"net/http"
+	"os"
+
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	_ "github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
 
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
@@ -21,23 +34,15 @@ import (
 	webhookConfig "github.com/flyteorg/flyte/flytepropeller/pkg/webhook/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	_ "github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
-	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"k8s.io/client-go/rest"
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
 )
 
 const defaultNamespace = "all"
+const propellerDefaultNamespace = "flyte"
 
 func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	if err := datacatalogRepo.Migrate(ctx); err != nil {
@@ -105,18 +110,29 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 	propellerCfg := propellerConfig.GetConfig()
 	propellerScope := promutils.NewScope(propellerConfig.GetConfig().MetricsPrefix).NewSubScope("propeller").NewSubScope(propellerCfg.LimitNamespace)
 	limitNamespace := ""
+	var namespaceConfigs map[string]cache.Config
 	if propellerCfg.LimitNamespace != defaultNamespace {
 		limitNamespace = propellerCfg.LimitNamespace
+		namespaceConfigs = map[string]cache.Config{
+			limitNamespace: {},
+		}
 	}
 
 	options := manager.Options{
-		Namespace:  limitNamespace,
-		SyncPeriod: &propellerCfg.DownstreamEval.Duration,
-		NewClient: func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
-			return executors.NewFallbackClientBuilder(propellerScope.NewSubScope("kube")).Build(cache, config, options)
+		Cache: cache.Options{
+			SyncPeriod:        &propellerCfg.DownstreamEval.Duration,
+			DefaultNamespaces: namespaceConfigs,
 		},
-		CertDir: webhookConfig.GetConfig().CertDir,
-		Port:    webhookConfig.GetConfig().ListenPort,
+		NewCache:  executors.NewCache,
+		NewClient: executors.BuildNewClientFunc(propellerScope),
+		Metrics: metricsserver.Options{
+			// Disable metrics serving
+			BindAddress: "0",
+		},
+		WebhookServer: ctrlWebhook.NewServer(ctrlWebhook.Options{
+			CertDir: webhookConfig.GetConfig().ExpandCertDir(),
+			Port:    webhookConfig.GetConfig().ListenPort,
+		}),
 	}
 
 	mgr, err := propellerEntrypoint.CreateControllerManager(ctx, propellerCfg, options)
@@ -135,7 +151,13 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 				return err
 			}
 			logger.Infof(childCtx, "Starting Webhook server...")
-			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), defaultNamespace, &propellerScope, mgr)
+			// set default namespace for pod template store
+			podNamespace, found := os.LookupEnv(webhookEntrypoint.PodNamespaceEnvVar)
+			if !found {
+				podNamespace = propellerDefaultNamespace
+			}
+
+			return webhookEntrypoint.Run(signals.SetupSignalHandler(childCtx), propellerCfg, webhookConfig.GetConfig(), podNamespace, &propellerScope, mgr)
 		})
 	}
 
@@ -154,11 +176,7 @@ func startPropeller(ctx context.Context, cfg Propeller) error {
 		}
 
 		g.Go(func() error {
-			err := profutils.StartProfilingServerWithDefaultHandlers(childCtx, propellerCfg.ProfilerPort.Port, handlers)
-			if err != nil {
-				logger.Fatalf(childCtx, "Failed to Start profiling and metrics server. Error: %v", err)
-			}
-			return err
+			return profutils.StartProfilingServerWithDefaultHandlers(childCtx, propellerCfg.ProfilerPort.Port, handlers)
 		})
 
 		g.Go(func() error {
@@ -180,6 +198,15 @@ var startCmd = &cobra.Command{
 		ctx := context.Background()
 		g, childCtx := errgroup.WithContext(ctx)
 		cfg := GetConfig()
+
+		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.AdminGormTracer, otelutils.AdminServerTracer,
+			otelutils.BlobstoreClientTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
+			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+				return err
+			}
+		}
 
 		if !cfg.Admin.Disabled {
 			g.Go(func() error {

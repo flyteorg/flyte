@@ -21,11 +21,17 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/golang/protobuf/ptypes"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -38,23 +44,13 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/recovery"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/subworkflow/launchplan"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	errors2 "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/ptypes"
-
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const cacheSerializedReason = "waiting on serialized cache"
@@ -479,12 +475,13 @@ func (c *recursiveNodeExecutor) WithNodeExecutionContextBuilder(nCtxBuilder inte
 type nodeExecutor struct {
 	catalog                         catalog.Client
 	clusterID                       string
+	enableCRDebugMetadata           bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
 	defaultExecutionDeadline        time.Duration
 	enqueueWorkflow                 v1alpha1.EnqueueWorkflow
 	eventConfig                     *config.EventConfig
-	interruptibleFailureThreshold   uint32
+	interruptibleFailureThreshold   int32
 	maxDatasetSizeBytes             int64
 	maxNodeRetriesForSystemFailures uint32
 	metrics                         *nodeMetrics
@@ -586,7 +583,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 			state.PreviousNodeExecutionCheckpointURI = storage.DataReference(metadata.TaskNodeMetadata.CheckpointUri)
 			err = nCtx.NodeStateWriter().PutTaskNodeState(state)
 			if err != nil {
-				logger.Warn(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
+				logger.Warnf(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
 					nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
 			}
 		}
@@ -795,15 +792,20 @@ func isTimeoutExpired(queuedAt *metav1.Time, timeout time.Duration) bool {
 }
 
 func (c *nodeExecutor) isEligibleForRetry(nCtx interfaces.NodeExecutionContext, nodeStatus v1alpha1.ExecutableNodeStatus, err *core.ExecutionError) (currentAttempt, maxAttempts uint32, isEligible bool) {
-	if err.Kind == core.ExecutionError_SYSTEM {
-		currentAttempt = nodeStatus.GetSystemFailures()
-		maxAttempts = c.maxNodeRetriesForSystemFailures
-		isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
-		return
-	}
+	if config.GetConfig().NodeConfig.IgnoreRetryCause {
+		currentAttempt = nodeStatus.GetAttempts() + 1
+	} else {
+		if err.Kind == core.ExecutionError_SYSTEM {
+			currentAttempt = nodeStatus.GetSystemFailures()
+			maxAttempts = c.maxNodeRetriesForSystemFailures
+			isEligible = currentAttempt < c.maxNodeRetriesForSystemFailures
+			return
+		}
 
-	currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
-	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil {
+		currentAttempt = (nodeStatus.GetAttempts() + 1) - nodeStatus.GetSystemFailures()
+	}
+	maxAttempts = uint32(config.GetConfig().NodeConfig.DefaultMaxAttempts)
+	if nCtx.Node().GetRetryStrategy() != nil && nCtx.Node().GetRetryStrategy().MinAttempts != nil && *nCtx.Node().GetRetryStrategy().MinAttempts != 1 {
 		maxAttempts = uint32(*nCtx.Node().GetRetryStrategy().MinAttempts)
 	}
 	isEligible = currentAttempt < maxAttempts
@@ -940,7 +942,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 	}
 
 	var cacheStatus *catalog.Status
-	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); ok {
+	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && ok {
 		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
@@ -1004,7 +1006,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
 		}
-		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.enableCRDebugMetadata)
 		c.RecordTransitionLatency(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node(), nodeStatus)
 	}
 
@@ -1270,7 +1272,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 	}
 
-	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.enableCRDebugMetadata)
 	return finalStatus, nil
 }
 
@@ -1284,7 +1286,7 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 	// NOTE: It is important to increment attempts only after abort has been called. Increment attempt mutates the state
 	// Attempt is used throughout the system to determine the idempotent resource version.
 	nodeStatus.IncrementAttempts()
-	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", nil)
+	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", c.enableCRDebugMetadata, nil)
 	// We are going to retry in the next round, so we should clear all current state
 	nodeStatus.ClearSubNodeStatus()
 	nodeStatus.ClearTaskStatus()
@@ -1296,6 +1298,9 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 }
 
 func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructure, nCtx interfaces.NodeExecutionContext, h interfaces.NodeHandler) (interfaces.NodeStatus, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.NodeExecutor/handleNode")
+	defer span.End()
+
 	logger.Debugf(ctx, "Handling Node [%s]", nCtx.NodeID())
 	defer logger.Debugf(ctx, "Completed node [%s]", nCtx.NodeID())
 
@@ -1320,8 +1325,14 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.Abort(ctx, h, nCtx, "node failing", false); err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
-		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+		t := metav1.Now()
+
+		startedAt := nodeStatus.GetStartedAt()
+		if startedAt == nil {
+			startedAt = &t
+		}
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, t, nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
+		c.metrics.FailureDuration.Observe(ctx, startedAt.Time, nodeStatus.GetStoppedAt().Time)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
@@ -1334,8 +1345,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 			return interfaces.NodeStatusUndefined, err
 		}
 
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
 		c.metrics.TimedOutFailure.Inc(ctx)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
@@ -1359,8 +1369,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 			stopped = &t
 		}
 		c.metrics.SuccessDuration.Observe(ctx, started.Time, stopped.Time)
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", nil)
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", c.enableCRDebugMetadata, nil)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
@@ -1427,12 +1436,13 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	nodeExecutor := &nodeExecutor{
 		catalog:                         catalogClient,
 		clusterID:                       clusterID,
+		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,
 		enqueueWorkflow:                 enQWorkflow,
 		eventConfig:                     eventConfig,
-		interruptibleFailureThreshold:   uint32(nodeConfig.InterruptibleFailureThreshold),
+		interruptibleFailureThreshold:   nodeConfig.InterruptibleFailureThreshold,
 		maxDatasetSizeBytes:             maxDatasetSize,
 		maxNodeRetriesForSystemFailures: uint32(nodeConfig.MaxNodeRetriesOnSystemFailures),
 		metrics:                         metrics,

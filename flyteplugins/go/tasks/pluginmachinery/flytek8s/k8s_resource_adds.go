@@ -5,14 +5,12 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
-
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	v1 "k8s.io/api/core/v1"
-
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 )
 
 func GetContextEnvVars(ownerCtx context.Context) []v1.EnvVar {

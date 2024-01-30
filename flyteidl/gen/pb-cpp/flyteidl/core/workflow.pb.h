@@ -2691,12 +2691,22 @@ class TaskNodeOverrides final :
   ::flyteidl::core::Resources* mutable_resources();
   void set_allocated_resources(::flyteidl::core::Resources* resources);
 
+  // .flyteidl.core.ExtendedResources extended_resources = 2;
+  bool has_extended_resources() const;
+  void clear_extended_resources();
+  static const int kExtendedResourcesFieldNumber = 2;
+  const ::flyteidl::core::ExtendedResources& extended_resources() const;
+  ::flyteidl::core::ExtendedResources* release_extended_resources();
+  ::flyteidl::core::ExtendedResources* mutable_extended_resources();
+  void set_allocated_extended_resources(::flyteidl::core::ExtendedResources* extended_resources);
+
   // @@protoc_insertion_point(class_scope:flyteidl.core.TaskNodeOverrides)
  private:
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::core::Resources* resources_;
+  ::flyteidl::core::ExtendedResources* extended_resources_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fworkflow_2eproto;
 };
@@ -4944,6 +4954,51 @@ inline void TaskNodeOverrides::set_allocated_resources(::flyteidl::core::Resourc
   }
   resources_ = resources;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskNodeOverrides.resources)
+}
+
+// .flyteidl.core.ExtendedResources extended_resources = 2;
+inline bool TaskNodeOverrides::has_extended_resources() const {
+  return this != internal_default_instance() && extended_resources_ != nullptr;
+}
+inline const ::flyteidl::core::ExtendedResources& TaskNodeOverrides::extended_resources() const {
+  const ::flyteidl::core::ExtendedResources* p = extended_resources_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.TaskNodeOverrides.extended_resources)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::ExtendedResources*>(
+      &::flyteidl::core::_ExtendedResources_default_instance_);
+}
+inline ::flyteidl::core::ExtendedResources* TaskNodeOverrides::release_extended_resources() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.TaskNodeOverrides.extended_resources)
+  
+  ::flyteidl::core::ExtendedResources* temp = extended_resources_;
+  extended_resources_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::ExtendedResources* TaskNodeOverrides::mutable_extended_resources() {
+  
+  if (extended_resources_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::ExtendedResources>(GetArenaNoVirtual());
+    extended_resources_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.TaskNodeOverrides.extended_resources)
+  return extended_resources_;
+}
+inline void TaskNodeOverrides::set_allocated_extended_resources(::flyteidl::core::ExtendedResources* extended_resources) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(extended_resources_);
+  }
+  if (extended_resources) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      extended_resources = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, extended_resources, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  extended_resources_ = extended_resources;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskNodeOverrides.extended_resources)
 }
 
 #ifdef __GNUC__

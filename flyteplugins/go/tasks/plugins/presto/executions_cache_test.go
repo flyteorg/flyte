@@ -4,18 +4,16 @@ import (
 	"context"
 	"testing"
 
-	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
-
-	"github.com/flyteorg/flyte/flytestdlib/cache"
-	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client"
+	prestoMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/client/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/presto/config"
-
+	"github.com/flyteorg/flyte/flytestdlib/cache"
+	cacheMocks "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestPrestoExecutionsCache_SyncQuboleQuery(t *testing.T) {

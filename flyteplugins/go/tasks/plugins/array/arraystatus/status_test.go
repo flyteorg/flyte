@@ -7,11 +7,10 @@ package arraystatus
 import (
 	"testing"
 
-	types "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-
-	"github.com/flyteorg/flyte/flytestdlib/bitarray"
-
 	"github.com/stretchr/testify/assert"
+
+	types "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
+	"github.com/flyteorg/flyte/flytestdlib/bitarray"
 )
 
 func TestArrayStatus_HashCode(t *testing.T) {

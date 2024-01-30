@@ -4,15 +4,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/stretchr/testify/assert"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 const remoteClosureIdentifier = "remote closure id"
@@ -72,8 +71,20 @@ func TestFromWorkflowModel(t *testing.T) {
 		Name:         "name",
 		Version:      "version",
 	}, workflow.Id))
+
+	var workflowInterface core.TypedInterface
+	err = proto.Unmarshal(workflowModel.TypedInterface, &workflowInterface)
+	assert.NoError(t, err)
+
 	assert.True(t, proto.Equal(&admin.WorkflowClosure{
 		CreatedAt: createdAtProto,
+		CompiledWorkflow: &core.CompiledWorkflowClosure{
+			Primary: &core.CompiledWorkflow{
+				Template: &core.WorkflowTemplate{
+					Interface: &workflowInterface,
+				},
+			},
+		},
 	}, workflow.Closure))
 }
 
@@ -122,8 +133,18 @@ func TestFromWorkflowModels(t *testing.T) {
 		Version:      "version a",
 	}, workflowList[0].Id))
 
+	workflowInterface := testutils.GetWorkflowRequestInterface()
+	assert.NoError(t, err)
+
 	assert.True(t, proto.Equal(&admin.WorkflowClosure{
 		CreatedAt: createdAtAProto,
+		CompiledWorkflow: &core.CompiledWorkflowClosure{
+			Primary: &core.CompiledWorkflow{
+				Template: &core.WorkflowTemplate{
+					Interface: workflowInterface,
+				},
+			},
+		},
 	}, workflowList[0].Closure))
 
 	assert.True(t, proto.Equal(&core.Identifier{
@@ -133,7 +154,15 @@ func TestFromWorkflowModels(t *testing.T) {
 		Name:         "name b",
 		Version:      "version b",
 	}, workflowList[1].Id))
+
 	assert.True(t, proto.Equal(&admin.WorkflowClosure{
 		CreatedAt: createdAtBProto,
+		CompiledWorkflow: &core.CompiledWorkflowClosure{
+			Primary: &core.CompiledWorkflow{
+				Template: &core.WorkflowTemplate{
+					Interface: &core.TypedInterface{},
+				},
+			},
+		},
 	}, workflowList[1].Closure))
 }

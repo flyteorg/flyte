@@ -7,13 +7,13 @@ import (
 	"strings"
 
 	gotree "github.com/DiSiqueira/GoTree"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 	"github.com/spf13/cobra"
 	v12 "k8s.io/api/core/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flytepropeller/cmd/kubectl-flyte/cmd/printers"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 type GetOpts struct {

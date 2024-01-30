@@ -6008,9 +6008,9 @@ public final class Event {
       "ventResponse\"b\n\031TaskExecutionEventReques" +
       "t\022\022\n\nrequest_id\030\001 \001(\t\0221\n\005event\030\002 \001(\0132\".f" +
       "lyteidl.event.TaskExecutionEvent\"\034\n\032Task" +
-      "ExecutionEventResponseB7Z5github.com/fly" +
-      "teorg/flyteidl/gen/pb-go/flyteidl/adminb" +
-      "\006proto3"
+      "ExecutionEventResponseB=Z;github.com/fly" +
+      "teorg/flyte/flyteidl/gen/pb-go/flyteidl/" +
+      "adminb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {

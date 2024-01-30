@@ -14,13 +14,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/golang-jwt/jwt/v4"
-
+	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/lestrrat-go/jwx/jwk"
-
-	"github.com/coreos/go-oidc"
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	authConfig "github.com/flyteorg/flyte/flyteadmin/auth/config"
 	stdlibConfig "github.com/flyteorg/flyte/flytestdlib/config"

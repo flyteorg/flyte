@@ -1,10 +1,11 @@
 package testutils
 
 import (
-	"github.com/flyteorg/flyteidl/clients/go/coreutils"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/golang/protobuf/proto"
+
+	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func GetValidTaskRequest() admin.TaskCreateRequest {
@@ -163,11 +164,24 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 	}
 }
 
-func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+func GetLaunchPlanRequestWithDeprecatedCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
 	lpRequest := GetLaunchPlanRequest()
 	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
 		Schedule: &admin.Schedule{
 			ScheduleExpression:  &admin.Schedule_CronExpression{CronExpression: testCronExpr},
+			KickoffTimeInputArg: "",
+		},
+	}
+	return lpRequest
+}
+
+func GetLaunchPlanRequestWithCronSchedule(testCronExpr string) admin.LaunchPlanCreateRequest {
+	lpRequest := GetLaunchPlanRequest()
+	lpRequest.Spec.EntityMetadata = &admin.LaunchPlanMetadata{
+		Schedule: &admin.Schedule{
+			ScheduleExpression: &admin.Schedule_CronSchedule{CronSchedule: &admin.CronSchedule{
+				Schedule: testCronExpr,
+			}},
 			KickoffTimeInputArg: "",
 		},
 	}
@@ -299,4 +313,8 @@ func GetSampleLpSpecForTest() admin.LaunchPlanSpec {
 func GetWorkflowRequestInterfaceBytes() []byte {
 	bytes, _ := proto.Marshal(GetWorkflowRequest().Spec.Template.Interface)
 	return bytes
+}
+
+func GetWorkflowRequestInterface() *core.TypedInterface {
+	return GetWorkflowRequest().Spec.Template.Interface
 }

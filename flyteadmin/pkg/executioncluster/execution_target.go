@@ -1,12 +1,12 @@
 package executioncluster
 
 import (
-	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
-	"github.com/flyteorg/flyte/flytestdlib/random"
 	"k8s.io/client-go/dynamic"
 	restclient "k8s.io/client-go/rest"
-
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	flyteclient "github.com/flyteorg/flyte/flytepropeller/pkg/client/clientset/versioned"
+	"github.com/flyteorg/flyte/flytestdlib/random"
 )
 
 // Spec to determine the execution target

@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/storage"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/go-gormigrate/gormigrate/v2"
+	"gorm.io/gorm"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	schedulerModels "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
-	"github.com/go-gormigrate/gormigrate/v2"
-	"gorm.io/gorm"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 // TODO: add a way to get these list of tables directly from the gorm loaded models

@@ -74,8 +74,6 @@ spec:
       kind: task
       name: be_positive
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.scheduled_workflows.lp_schedules.be_positive" '
     start-node:
       id: start-node

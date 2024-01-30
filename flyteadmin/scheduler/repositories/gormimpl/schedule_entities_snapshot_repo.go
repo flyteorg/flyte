@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 
+	"gorm.io/gorm"
+
 	flyteSchedulerDbErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	interfaces2 "github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/scheduler/repositories/models"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"gorm.io/gorm"
 )
 
 // ScheduleEntitiesSnapshotRepo Implementation of ScheduleEntitiesSnapshotRepoInterface.

@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/informers"
@@ -41,11 +40,12 @@ func TestPodTemplateStore(t *testing.T) {
 	informerFactory := informers.NewSharedInformerFactoryWithOptions(kubeClient, 30*time.Second)
 
 	updateHandler := GetPodTemplateUpdatesHandler(&store)
-	informerFactory.Core().V1().PodTemplates().Informer().AddEventHandler(updateHandler)
+	_, err := informerFactory.Core().V1().PodTemplates().Informer().AddEventHandler(updateHandler)
+	assert.NoError(t, err)
 	go informerFactory.Start(ctx.Done())
 
 	// create the podTemplate
-	_, err := kubeClient.CoreV1().PodTemplates(podTemplate.Namespace).Create(ctx, podTemplate, metav1.CreateOptions{})
+	_, err = kubeClient.CoreV1().PodTemplates(podTemplate.Namespace).Create(ctx, podTemplate, metav1.CreateOptions{})
 	assert.NoError(t, err)
 
 	time.Sleep(50 * time.Millisecond)

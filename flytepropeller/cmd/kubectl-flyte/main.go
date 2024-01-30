@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+
 	"github.com/flyteorg/flyte/flytepropeller/cmd/kubectl-flyte/cmd"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
 func init() {

@@ -6,17 +6,19 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/golang/protobuf/ptypes"
+	regErrors "github.com/pkg/errors"
+	"k8s.io/client-go/kubernetes"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	pluginMachinery "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	pluginK8s "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/k8s"
-
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	controllerConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
@@ -29,16 +31,12 @@ import (
 	rmConfig "github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/resourcemanager/config"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
-
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-
-	"github.com/golang/protobuf/ptypes"
-
-	regErrors "github.com/pkg/errors"
 )
 
 const pluginContextKey = contextutils.Key("plugin")
@@ -195,6 +193,7 @@ type Handler struct {
 	metrics         *metrics
 	pluginRegistry  PluginRegistryIface
 	kubeClient      pluginCore.KubeClient
+	kubeClientset   kubernetes.Interface
 	secretManager   pluginCore.SecretManager
 	resourceManager resourcemanager.BaseResourceManager
 	cfg             *config.Config
@@ -229,7 +228,7 @@ func (t *Handler) Setup(ctx context.Context, sCtx interfaces.SetupContext) error
 
 	// Create the resource negotiator here
 	// and then convert it to proxies later and pass them to plugins
-	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry)
+	enabledPlugins, defaultForTaskTypes, err := WranglePluginsAndGenerateFinalList(ctx, &t.cfg.TaskPlugins, t.pluginRegistry, t.kubeClientset)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to finalize enabled plugins. Error: %s", err)
 		return err
@@ -518,6 +517,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 }
 
 func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContext) (handler.Transition, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.FlytePropellerTracer, "pkg.controller.nodes.task.Handler/HandleTask")
+	defer span.End()
+
 	ttype := nCtx.TaskReader().GetTaskType()
 	ctx = contextutils.WithTaskType(ctx, ttype)
 	p, err := t.ResolvePlugin(ctx, ttype, nCtx.ExecutionContext().GetExecutionConfig())
@@ -533,13 +535,6 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	ts := nCtx.NodeStateReader().GetTaskNodeState()
 
 	pluginTrns := &pluginRequestedTransition{}
-	defer func() {
-		// increment parallelism if the final pluginTrns is not in a terminal state
-		if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
-			eCtx := nCtx.ExecutionContext()
-			logger.Infof(ctx, "Parallelism now set to [%d].", eCtx.IncrementParallelism())
-		}
-	}()
 
 	// We will start with the assumption that catalog is disabled
 	pluginTrns.PopulateCacheInfo(catalog.NewFailedCatalogEntry(catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil)))
@@ -579,6 +574,12 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		}
 		if pluginTrns.IsPreviouslyObserved() {
 			logger.Debugf(ctx, "No state change for Task, previously observed same transition. Short circuiting.")
+			logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+
+			// This is a hack to ensure that we do not re-evaluate the same node again in the same round.
+			if err := nCtx.NodeStateWriter().PutTaskNodeState(ts); err != nil {
+				return handler.UnknownTransition, err
+			}
 			return pluginTrns.FinalTransition(ctx)
 		}
 	}
@@ -664,6 +665,10 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		return handler.UnknownTransition, err
 	}
 
+	// increment parallelism if the final pluginTrns is not in a terminal state
+	if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
+		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
+	}
 	return pluginTrns.FinalTransition(ctx)
 }
 
@@ -748,6 +753,7 @@ func (t *Handler) ValidateOutput(ctx context.Context, nodeID v1alpha1.NodeID, i 
 func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext, reason string) error {
 	taskNodeState := nCtx.NodeStateReader().GetTaskNodeState()
 	currentPhase := taskNodeState.PluginPhase
+	currentPhaseVersion := taskNodeState.PluginPhaseVersion
 	logger.Debugf(ctx, "Abort invoked with phase [%v]", currentPhase)
 
 	if currentPhase.IsTerminal() && !(currentPhase.IsFailure() && taskNodeState.CleanupOnFailure) {
@@ -785,8 +791,40 @@ func (t Handler) Abort(ctx context.Context, nCtx interfaces.NodeExecutionContext
 		logger.Errorf(ctx, "Abort failed when calling plugin abort.")
 		return err
 	}
-	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+
 	evRecorder := nCtx.EventsRecorder()
+	logger.Debugf(ctx, "Sending buffered Task events.")
+	for _, ev := range tCtx.ber.GetAll(ctx) {
+		evInfo, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
+			TaskExecContext:       tCtx,
+			InputReader:           nCtx.InputReader(),
+			EventConfig:           t.eventConfig,
+			OutputWriter:          tCtx.ow,
+			Info:                  ev.WithVersion(currentPhaseVersion + 1),
+			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
+			ExecContext:           nCtx.ExecutionContext(),
+			TaskType:              ttype,
+			PluginID:              p.GetID(),
+			ResourcePoolInfo:      tCtx.rm.GetResourcePoolInfo(),
+			ClusterID:             t.clusterID,
+		})
+		if err != nil {
+			return err
+		}
+		if currentPhase.IsFailure() {
+			evInfo.Phase = core.TaskExecution_FAILED
+		} else {
+			evInfo.Phase = core.TaskExecution_ABORTED
+		}
+		if err := evRecorder.RecordTaskEvent(ctx, evInfo, t.eventConfig); err != nil {
+			logger.Errorf(ctx, "Event recording failed for Plugin [%s], eventPhase [%s], error :%s", p.GetID(), evInfo.Phase.String(), err.Error())
+			// Check for idempotency
+			// Check for terminate state error
+			return err
+		}
+	}
+
+	taskExecID := tCtx.TaskExecutionMetadata().GetTaskExecutionID().GetID()
 	nodeExecutionID, err := getParentNodeExecIDForTask(&taskExecID, nCtx.ExecutionContext())
 	if err != nil {
 		return err
@@ -840,7 +878,8 @@ func (t Handler) Finalize(ctx context.Context, nCtx interfaces.NodeExecutionCont
 	}()
 }
 
-func New(ctx context.Context, kubeClient executors.Client, client catalog.Client, eventConfig *controllerConfig.EventConfig, clusterID string, scope promutils.Scope) (*Handler, error) {
+func New(ctx context.Context, kubeClient executors.Client, kubeClientset kubernetes.Interface, client catalog.Client,
+	eventConfig *controllerConfig.EventConfig, clusterID string, scope promutils.Scope) (*Handler, error) {
 	// TODO New should take a pointer
 	async, err := catalog.NewAsyncClient(client, *catalog.GetConfig(), scope.NewSubScope("async_catalog"))
 	if err != nil {
@@ -866,6 +905,7 @@ func New(ctx context.Context, kubeClient executors.Client, client catalog.Client
 		},
 		pluginScope:     scope.NewSubScope("plugin"),
 		kubeClient:      kubeClient,
+		kubeClientset:   kubeClientset,
 		catalog:         client,
 		asyncCatalog:    async,
 		resourceManager: nil,

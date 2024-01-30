@@ -2445,6 +2445,15 @@ public final class Event {
      */
     com.google.protobuf.TimestampOrBuilder getReportedAtOrBuilder();
 
+    /**
+     * <pre>
+     * Indicates if this node is an ArrayNode.
+     * </pre>
+     *
+     * <code>bool is_array = 22;</code>
+     */
+    boolean getIsArray();
+
     public flyteidl.event.Event.NodeExecutionEvent.InputValueCase getInputValueCase();
 
     public flyteidl.event.Event.NodeExecutionEvent.OutputResultCase getOutputResultCase();
@@ -2692,6 +2701,11 @@ public final class Event {
                 reportedAt_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 176: {
+
+              isArray_ = input.readBool();
               break;
             }
             default: {
@@ -3547,6 +3561,19 @@ public final class Event {
       return getReportedAt();
     }
 
+    public static final int IS_ARRAY_FIELD_NUMBER = 22;
+    private boolean isArray_;
+    /**
+     * <pre>
+     * Indicates if this node is an ArrayNode.
+     * </pre>
+     *
+     * <code>bool is_array = 22;</code>
+     */
+    public boolean getIsArray() {
+      return isArray_;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3623,6 +3650,9 @@ public final class Event {
       }
       if (reportedAt_ != null) {
         output.writeMessage(21, getReportedAt());
+      }
+      if (isArray_ != false) {
+        output.writeBool(22, isArray_);
       }
       unknownFields.writeTo(output);
     }
@@ -3710,6 +3740,10 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(21, getReportedAt());
       }
+      if (isArray_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(22, isArray_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -3767,6 +3801,8 @@ public final class Event {
         if (!getReportedAt()
             .equals(other.getReportedAt())) return false;
       }
+      if (getIsArray()
+          != other.getIsArray()) return false;
       if (!getInputValueCase().equals(other.getInputValueCase())) return false;
       switch (inputValueCase_) {
         case 5:
@@ -3861,6 +3897,9 @@ public final class Event {
         hash = (37 * hash) + REPORTED_AT_FIELD_NUMBER;
         hash = (53 * hash) + getReportedAt().hashCode();
       }
+      hash = (37 * hash) + IS_ARRAY_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getIsArray());
       switch (inputValueCase_) {
         case 5:
           hash = (37 * hash) + INPUT_URI_FIELD_NUMBER;
@@ -4082,6 +4121,8 @@ public final class Event {
           reportedAt_ = null;
           reportedAtBuilder_ = null;
         }
+        isArray_ = false;
+
         inputValueCase_ = 0;
         inputValue_ = null;
         outputResultCase_ = 0;
@@ -4189,6 +4230,7 @@ public final class Event {
         } else {
           result.reportedAt_ = reportedAtBuilder_.build();
         }
+        result.isArray_ = isArray_;
         result.inputValueCase_ = inputValueCase_;
         result.outputResultCase_ = outputResultCase_;
         result.targetMetadataCase_ = targetMetadataCase_;
@@ -4286,6 +4328,9 @@ public final class Event {
         }
         if (other.hasReportedAt()) {
           mergeReportedAt(other.getReportedAt());
+        }
+        if (other.getIsArray() != false) {
+          setIsArray(other.getIsArray());
         }
         switch (other.getInputValueCase()) {
           case INPUT_URI: {
@@ -6782,6 +6827,44 @@ public final class Event {
           reportedAt_ = null;
         }
         return reportedAtBuilder_;
+      }
+
+      private boolean isArray_ ;
+      /**
+       * <pre>
+       * Indicates if this node is an ArrayNode.
+       * </pre>
+       *
+       * <code>bool is_array = 22;</code>
+       */
+      public boolean getIsArray() {
+        return isArray_;
+      }
+      /**
+       * <pre>
+       * Indicates if this node is an ArrayNode.
+       * </pre>
+       *
+       * <code>bool is_array = 22;</code>
+       */
+      public Builder setIsArray(boolean value) {
+        
+        isArray_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Indicates if this node is an ArrayNode.
+       * </pre>
+       *
+       * <code>bool is_array = 22;</code>
+       */
+      public Builder clearIsArray() {
+        
+        isArray_ = false;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -11113,6 +11196,845 @@ public final class Event {
 
   }
 
+  public interface EventReasonOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.event.EventReason)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    java.lang.String getReason();
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getReasonBytes();
+
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    boolean hasOccurredAt();
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    com.google.protobuf.Timestamp getOccurredAt();
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder();
+  }
+  /**
+   * Protobuf type {@code flyteidl.event.EventReason}
+   */
+  public  static final class EventReason extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.event.EventReason)
+      EventReasonOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use EventReason.newBuilder() to construct.
+    private EventReason(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private EventReason() {
+      reason_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private EventReason(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              reason_ = s;
+              break;
+            }
+            case 18: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (occurredAt_ != null) {
+                subBuilder = occurredAt_.toBuilder();
+              }
+              occurredAt_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(occurredAt_);
+                occurredAt_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.event.Event.EventReason.class, flyteidl.event.Event.EventReason.Builder.class);
+    }
+
+    public static final int REASON_FIELD_NUMBER = 1;
+    private volatile java.lang.Object reason_;
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    public java.lang.String getReason() {
+      java.lang.Object ref = reason_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        reason_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * An explanation for this event
+     * </pre>
+     *
+     * <code>string reason = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getReasonBytes() {
+      java.lang.Object ref = reason_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        reason_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OCCURRED_AT_FIELD_NUMBER = 2;
+    private com.google.protobuf.Timestamp occurredAt_;
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    public boolean hasOccurredAt() {
+      return occurredAt_ != null;
+    }
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    public com.google.protobuf.Timestamp getOccurredAt() {
+      return occurredAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+    }
+    /**
+     * <pre>
+     * The time this reason occurred
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder() {
+      return getOccurredAt();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getReasonBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, reason_);
+      }
+      if (occurredAt_ != null) {
+        output.writeMessage(2, getOccurredAt());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getReasonBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, reason_);
+      }
+      if (occurredAt_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getOccurredAt());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.event.Event.EventReason)) {
+        return super.equals(obj);
+      }
+      flyteidl.event.Event.EventReason other = (flyteidl.event.Event.EventReason) obj;
+
+      if (!getReason()
+          .equals(other.getReason())) return false;
+      if (hasOccurredAt() != other.hasOccurredAt()) return false;
+      if (hasOccurredAt()) {
+        if (!getOccurredAt()
+            .equals(other.getOccurredAt())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + REASON_FIELD_NUMBER;
+      hash = (53 * hash) + getReason().hashCode();
+      if (hasOccurredAt()) {
+        hash = (37 * hash) + OCCURRED_AT_FIELD_NUMBER;
+        hash = (53 * hash) + getOccurredAt().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.event.Event.EventReason parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.EventReason parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.event.Event.EventReason parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.event.Event.EventReason prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code flyteidl.event.EventReason}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.event.EventReason)
+        flyteidl.event.Event.EventReasonOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.event.Event.EventReason.class, flyteidl.event.Event.EventReason.Builder.class);
+      }
+
+      // Construct using flyteidl.event.Event.EventReason.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        reason_ = "";
+
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = null;
+        } else {
+          occurredAt_ = null;
+          occurredAtBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.event.Event.internal_static_flyteidl_event_EventReason_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.EventReason getDefaultInstanceForType() {
+        return flyteidl.event.Event.EventReason.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.EventReason build() {
+        flyteidl.event.Event.EventReason result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.event.Event.EventReason buildPartial() {
+        flyteidl.event.Event.EventReason result = new flyteidl.event.Event.EventReason(this);
+        result.reason_ = reason_;
+        if (occurredAtBuilder_ == null) {
+          result.occurredAt_ = occurredAt_;
+        } else {
+          result.occurredAt_ = occurredAtBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.event.Event.EventReason) {
+          return mergeFrom((flyteidl.event.Event.EventReason)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.event.Event.EventReason other) {
+        if (other == flyteidl.event.Event.EventReason.getDefaultInstance()) return this;
+        if (!other.getReason().isEmpty()) {
+          reason_ = other.reason_;
+          onChanged();
+        }
+        if (other.hasOccurredAt()) {
+          mergeOccurredAt(other.getOccurredAt());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.event.Event.EventReason parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.event.Event.EventReason) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object reason_ = "";
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public java.lang.String getReason() {
+        java.lang.Object ref = reason_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          reason_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getReasonBytes() {
+        java.lang.Object ref = reason_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          reason_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public Builder setReason(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        reason_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public Builder clearReason() {
+        
+        reason_ = getDefaultInstance().getReason();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * An explanation for this event
+       * </pre>
+       *
+       * <code>string reason = 1;</code>
+       */
+      public Builder setReasonBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        reason_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Timestamp occurredAt_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> occurredAtBuilder_;
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public boolean hasOccurredAt() {
+        return occurredAtBuilder_ != null || occurredAt_ != null;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public com.google.protobuf.Timestamp getOccurredAt() {
+        if (occurredAtBuilder_ == null) {
+          return occurredAt_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+        } else {
+          return occurredAtBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder setOccurredAt(com.google.protobuf.Timestamp value) {
+        if (occurredAtBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          occurredAt_ = value;
+          onChanged();
+        } else {
+          occurredAtBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder setOccurredAt(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = builderForValue.build();
+          onChanged();
+        } else {
+          occurredAtBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder mergeOccurredAt(com.google.protobuf.Timestamp value) {
+        if (occurredAtBuilder_ == null) {
+          if (occurredAt_ != null) {
+            occurredAt_ =
+              com.google.protobuf.Timestamp.newBuilder(occurredAt_).mergeFrom(value).buildPartial();
+          } else {
+            occurredAt_ = value;
+          }
+          onChanged();
+        } else {
+          occurredAtBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public Builder clearOccurredAt() {
+        if (occurredAtBuilder_ == null) {
+          occurredAt_ = null;
+          onChanged();
+        } else {
+          occurredAt_ = null;
+          occurredAtBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getOccurredAtBuilder() {
+        
+        onChanged();
+        return getOccurredAtFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getOccurredAtOrBuilder() {
+        if (occurredAtBuilder_ != null) {
+          return occurredAtBuilder_.getMessageOrBuilder();
+        } else {
+          return occurredAt_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : occurredAt_;
+        }
+      }
+      /**
+       * <pre>
+       * The time this reason occurred
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp occurred_at = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getOccurredAtFieldBuilder() {
+        if (occurredAtBuilder_ == null) {
+          occurredAtBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getOccurredAt(),
+                  getParentForChildren(),
+                  isClean());
+          occurredAt_ = null;
+        }
+        return occurredAtBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.event.EventReason)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.event.EventReason)
+    private static final flyteidl.event.Event.EventReason DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.event.Event.EventReason();
+    }
+
+    public static flyteidl.event.Event.EventReason getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<EventReason>
+        PARSER = new com.google.protobuf.AbstractParser<EventReason>() {
+      @java.lang.Override
+      public EventReason parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EventReason(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<EventReason> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EventReason> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.event.Event.EventReason getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface TaskExecutionEventOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.event.TaskExecutionEvent)
       com.google.protobuf.MessageOrBuilder {
@@ -11443,20 +12365,66 @@ public final class Event {
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    java.lang.String getReason();
+    @java.lang.Deprecated java.lang.String getReason();
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    com.google.protobuf.ByteString
+    @java.lang.Deprecated com.google.protobuf.ByteString
         getReasonBytes();
+
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    java.util.List<flyteidl.event.Event.EventReason> 
+        getReasonsList();
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    flyteidl.event.Event.EventReason getReasons(int index);
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    int getReasonsCount();
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    java.util.List<? extends flyteidl.event.Event.EventReasonOrBuilder> 
+        getReasonsOrBuilderList();
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    flyteidl.event.Event.EventReasonOrBuilder getReasonsOrBuilder(
+        int index);
 
     /**
      * <pre>
@@ -11576,6 +12544,7 @@ public final class Event {
       producerId_ = "";
       logs_ = java.util.Collections.emptyList();
       reason_ = "";
+      reasons_ = java.util.Collections.emptyList();
       taskType_ = "";
     }
 
@@ -11783,6 +12752,15 @@ public final class Event {
 
               break;
             }
+            case 170: {
+              if (!((mutable_bitField0_ & 0x00008000) != 0)) {
+                reasons_ = new java.util.ArrayList<flyteidl.event.Event.EventReason>();
+                mutable_bitField0_ |= 0x00008000;
+              }
+              reasons_.add(
+                  input.readMessage(flyteidl.event.Event.EventReason.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -11800,6 +12778,9 @@ public final class Event {
       } finally {
         if (((mutable_bitField0_ & 0x00000020) != 0)) {
           logs_ = java.util.Collections.unmodifiableList(logs_);
+        }
+        if (((mutable_bitField0_ & 0x00008000) != 0)) {
+          reasons_ = java.util.Collections.unmodifiableList(reasons_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -12413,11 +13394,12 @@ public final class Event {
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    public java.lang.String getReason() {
+    @java.lang.Deprecated public java.lang.String getReason() {
       java.lang.Object ref = reason_;
       if (ref instanceof java.lang.String) {
         return (java.lang.String) ref;
@@ -12432,11 +13414,12 @@ public final class Event {
     /**
      * <pre>
      * An optional explanation for the phase transition.
+     * Deprecated: Use reasons instead.
      * </pre>
      *
-     * <code>string reason = 13;</code>
+     * <code>string reason = 13 [deprecated = true];</code>
      */
-    public com.google.protobuf.ByteString
+    @java.lang.Deprecated public com.google.protobuf.ByteString
         getReasonBytes() {
       java.lang.Object ref = reason_;
       if (ref instanceof java.lang.String) {
@@ -12448,6 +13431,61 @@ public final class Event {
       } else {
         return (com.google.protobuf.ByteString) ref;
       }
+    }
+
+    public static final int REASONS_FIELD_NUMBER = 21;
+    private java.util.List<flyteidl.event.Event.EventReason> reasons_;
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public java.util.List<flyteidl.event.Event.EventReason> getReasonsList() {
+      return reasons_;
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public java.util.List<? extends flyteidl.event.Event.EventReasonOrBuilder> 
+        getReasonsOrBuilderList() {
+      return reasons_;
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public int getReasonsCount() {
+      return reasons_.size();
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public flyteidl.event.Event.EventReason getReasons(int index) {
+      return reasons_.get(index);
+    }
+    /**
+     * <pre>
+     * An optional list of explanations for the phase transition.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+     */
+    public flyteidl.event.Event.EventReasonOrBuilder getReasonsOrBuilder(
+        int index) {
+      return reasons_.get(index);
     }
 
     public static final int TASK_TYPE_FIELD_NUMBER = 14;
@@ -12658,6 +13696,9 @@ public final class Event {
       if (reportedAt_ != null) {
         output.writeMessage(20, getReportedAt());
       }
+      for (int i = 0; i < reasons_.size(); i++) {
+        output.writeMessage(21, reasons_.get(i));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -12738,6 +13779,10 @@ public final class Event {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(20, getReportedAt());
       }
+      for (int i = 0; i < reasons_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(21, reasons_.get(i));
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -12784,6 +13829,8 @@ public final class Event {
           != other.getPhaseVersion()) return false;
       if (!getReason()
           .equals(other.getReason())) return false;
+      if (!getReasonsList()
+          .equals(other.getReasonsList())) return false;
       if (!getTaskType()
           .equals(other.getTaskType())) return false;
       if (hasMetadata() != other.hasMetadata()) return false;
@@ -12869,6 +13916,10 @@ public final class Event {
       hash = (53 * hash) + getPhaseVersion();
       hash = (37 * hash) + REASON_FIELD_NUMBER;
       hash = (53 * hash) + getReason().hashCode();
+      if (getReasonsCount() > 0) {
+        hash = (37 * hash) + REASONS_FIELD_NUMBER;
+        hash = (53 * hash) + getReasonsList().hashCode();
+      }
       hash = (37 * hash) + TASK_TYPE_FIELD_NUMBER;
       hash = (53 * hash) + getTaskType().hashCode();
       if (hasMetadata()) {
@@ -13042,6 +14093,7 @@ public final class Event {
         if (com.google.protobuf.GeneratedMessageV3
                 .alwaysUseFieldBuilders) {
           getLogsFieldBuilder();
+          getReasonsFieldBuilder();
         }
       }
       @java.lang.Override
@@ -13087,6 +14139,12 @@ public final class Event {
 
         reason_ = "";
 
+        if (reasonsBuilder_ == null) {
+          reasons_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00008000);
+        } else {
+          reasonsBuilder_.clear();
+        }
         taskType_ = "";
 
         if (metadataBuilder_ == null) {
@@ -13196,6 +14254,15 @@ public final class Event {
         }
         result.phaseVersion_ = phaseVersion_;
         result.reason_ = reason_;
+        if (reasonsBuilder_ == null) {
+          if (((bitField0_ & 0x00008000) != 0)) {
+            reasons_ = java.util.Collections.unmodifiableList(reasons_);
+            bitField0_ = (bitField0_ & ~0x00008000);
+          }
+          result.reasons_ = reasons_;
+        } else {
+          result.reasons_ = reasonsBuilder_.build();
+        }
         result.taskType_ = taskType_;
         if (metadataBuilder_ == null) {
           result.metadata_ = metadata_;
@@ -13313,6 +14380,32 @@ public final class Event {
         if (!other.getReason().isEmpty()) {
           reason_ = other.reason_;
           onChanged();
+        }
+        if (reasonsBuilder_ == null) {
+          if (!other.reasons_.isEmpty()) {
+            if (reasons_.isEmpty()) {
+              reasons_ = other.reasons_;
+              bitField0_ = (bitField0_ & ~0x00008000);
+            } else {
+              ensureReasonsIsMutable();
+              reasons_.addAll(other.reasons_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.reasons_.isEmpty()) {
+            if (reasonsBuilder_.isEmpty()) {
+              reasonsBuilder_.dispose();
+              reasonsBuilder_ = null;
+              reasons_ = other.reasons_;
+              bitField0_ = (bitField0_ & ~0x00008000);
+              reasonsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getReasonsFieldBuilder() : null;
+            } else {
+              reasonsBuilder_.addAllMessages(other.reasons_);
+            }
+          }
         }
         if (!other.getTaskType().isEmpty()) {
           taskType_ = other.taskType_;
@@ -15338,11 +16431,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public java.lang.String getReason() {
+      @java.lang.Deprecated public java.lang.String getReason() {
         java.lang.Object ref = reason_;
         if (!(ref instanceof java.lang.String)) {
           com.google.protobuf.ByteString bs =
@@ -15357,11 +16451,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public com.google.protobuf.ByteString
+      @java.lang.Deprecated public com.google.protobuf.ByteString
           getReasonBytes() {
         java.lang.Object ref = reason_;
         if (ref instanceof String) {
@@ -15377,11 +16472,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public Builder setReason(
+      @java.lang.Deprecated public Builder setReason(
           java.lang.String value) {
         if (value == null) {
     throw new NullPointerException();
@@ -15394,11 +16490,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public Builder clearReason() {
+      @java.lang.Deprecated public Builder clearReason() {
         
         reason_ = getDefaultInstance().getReason();
         onChanged();
@@ -15407,11 +16504,12 @@ public final class Event {
       /**
        * <pre>
        * An optional explanation for the phase transition.
+       * Deprecated: Use reasons instead.
        * </pre>
        *
-       * <code>string reason = 13;</code>
+       * <code>string reason = 13 [deprecated = true];</code>
        */
-      public Builder setReasonBytes(
+      @java.lang.Deprecated public Builder setReasonBytes(
           com.google.protobuf.ByteString value) {
         if (value == null) {
     throw new NullPointerException();
@@ -15421,6 +16519,318 @@ public final class Event {
         reason_ = value;
         onChanged();
         return this;
+      }
+
+      private java.util.List<flyteidl.event.Event.EventReason> reasons_ =
+        java.util.Collections.emptyList();
+      private void ensureReasonsIsMutable() {
+        if (!((bitField0_ & 0x00008000) != 0)) {
+          reasons_ = new java.util.ArrayList<flyteidl.event.Event.EventReason>(reasons_);
+          bitField0_ |= 0x00008000;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder> reasonsBuilder_;
+
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public java.util.List<flyteidl.event.Event.EventReason> getReasonsList() {
+        if (reasonsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(reasons_);
+        } else {
+          return reasonsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public int getReasonsCount() {
+        if (reasonsBuilder_ == null) {
+          return reasons_.size();
+        } else {
+          return reasonsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason getReasons(int index) {
+        if (reasonsBuilder_ == null) {
+          return reasons_.get(index);
+        } else {
+          return reasonsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder setReasons(
+          int index, flyteidl.event.Event.EventReason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.set(index, value);
+          onChanged();
+        } else {
+          reasonsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder setReasons(
+          int index, flyteidl.event.Event.EventReason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(flyteidl.event.Event.EventReason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.add(value);
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(
+          int index, flyteidl.event.Event.EventReason value) {
+        if (reasonsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureReasonsIsMutable();
+          reasons_.add(index, value);
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(
+          flyteidl.event.Event.EventReason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.add(builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addReasons(
+          int index, flyteidl.event.Event.EventReason.Builder builderForValue) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          reasonsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder addAllReasons(
+          java.lang.Iterable<? extends flyteidl.event.Event.EventReason> values) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, reasons_);
+          onChanged();
+        } else {
+          reasonsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder clearReasons() {
+        if (reasonsBuilder_ == null) {
+          reasons_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00008000);
+          onChanged();
+        } else {
+          reasonsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public Builder removeReasons(int index) {
+        if (reasonsBuilder_ == null) {
+          ensureReasonsIsMutable();
+          reasons_.remove(index);
+          onChanged();
+        } else {
+          reasonsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason.Builder getReasonsBuilder(
+          int index) {
+        return getReasonsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReasonOrBuilder getReasonsOrBuilder(
+          int index) {
+        if (reasonsBuilder_ == null) {
+          return reasons_.get(index);  } else {
+          return reasonsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public java.util.List<? extends flyteidl.event.Event.EventReasonOrBuilder> 
+           getReasonsOrBuilderList() {
+        if (reasonsBuilder_ != null) {
+          return reasonsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(reasons_);
+        }
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason.Builder addReasonsBuilder() {
+        return getReasonsFieldBuilder().addBuilder(
+            flyteidl.event.Event.EventReason.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public flyteidl.event.Event.EventReason.Builder addReasonsBuilder(
+          int index) {
+        return getReasonsFieldBuilder().addBuilder(
+            index, flyteidl.event.Event.EventReason.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * An optional list of explanations for the phase transition.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.event.EventReason reasons = 21;</code>
+       */
+      public java.util.List<flyteidl.event.Event.EventReason.Builder> 
+           getReasonsBuilderList() {
+        return getReasonsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder> 
+          getReasonsFieldBuilder() {
+        if (reasonsBuilder_ == null) {
+          reasonsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.event.Event.EventReason, flyteidl.event.Event.EventReason.Builder, flyteidl.event.Event.EventReasonOrBuilder>(
+                  reasons_,
+                  ((bitField0_ & 0x00008000) != 0),
+                  getParentForChildren(),
+                  isClean());
+          reasons_ = null;
+        }
+        return reasonsBuilder_;
       }
 
       private java.lang.Object taskType_ = "";
@@ -20244,6 +21654,11 @@ public final class Event {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_event_ParentNodeExecutionMetadata_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_event_EventReason_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_event_EventReason_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_event_TaskExecutionEvent_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -20287,7 +21702,7 @@ public final class Event {
       "\noutput_uri\030\005 \001(\tH\000\022.\n\005error\030\006 \001(\0132\035.fly" +
       "teidl.core.ExecutionErrorH\000\0220\n\013output_da" +
       "ta\030\007 \001(\0132\031.flyteidl.core.LiteralMapH\000B\017\n" +
-      "\routput_result\"\217\007\n\022NodeExecutionEvent\0222\n" +
+      "\routput_result\"\241\007\n\022NodeExecutionEvent\0222\n" +
       "\002id\030\001 \001(\0132&.flyteidl.core.NodeExecutionI" +
       "dentifier\022\023\n\013producer_id\030\002 \001(\t\0221\n\005phase\030" +
       "\003 \001(\0162\".flyteidl.core.NodeExecution.Phas" +
@@ -20308,63 +21723,66 @@ public final class Event {
       "_id\030\014 \001(\t\022\021\n\tnode_name\030\r \001(\t\022\025\n\revent_ve" +
       "rsion\030\020 \001(\005\022\021\n\tis_parent\030\021 \001(\010\022\022\n\nis_dyn" +
       "amic\030\022 \001(\010\022\020\n\010deck_uri\030\023 \001(\t\022/\n\013reported" +
-      "_at\030\025 \001(\0132\032.google.protobuf.TimestampB\r\n" +
-      "\013input_valueB\017\n\routput_resultB\021\n\017target_" +
-      "metadata\"X\n\024WorkflowNodeMetadata\022@\n\014exec" +
-      "ution_id\030\001 \001(\0132*.flyteidl.core.WorkflowE" +
-      "xecutionIdentifier\"\245\002\n\020TaskNodeMetadata\022" +
-      "7\n\014cache_status\030\001 \001(\0162!.flyteidl.core.Ca" +
-      "talogCacheStatus\0223\n\013catalog_key\030\002 \001(\0132\036." +
-      "flyteidl.core.CatalogMetadata\022D\n\022reserva" +
-      "tion_status\030\003 \001(\0162(.flyteidl.core.Catalo" +
-      "gReservation.Status\022\026\n\016checkpoint_uri\030\004 " +
-      "\001(\t\022E\n\020dynamic_workflow\030\020 \001(\0132+.flyteidl" +
-      ".event.DynamicWorkflowNodeMetadata\"\245\001\n\033D" +
-      "ynamicWorkflowNodeMetadata\022%\n\002id\030\001 \001(\0132\031" +
-      ".flyteidl.core.Identifier\022A\n\021compiled_wo" +
-      "rkflow\030\002 \001(\0132&.flyteidl.core.CompiledWor" +
-      "kflowClosure\022\034\n\024dynamic_job_spec_uri\030\003 \001" +
-      "(\t\"Q\n\033ParentTaskExecutionMetadata\0222\n\002id\030" +
-      "\001 \001(\0132&.flyteidl.core.TaskExecutionIdent" +
-      "ifier\".\n\033ParentNodeExecutionMetadata\022\017\n\007" +
-      "node_id\030\001 \001(\t\"\207\006\n\022TaskExecutionEvent\022*\n\007" +
-      "task_id\030\001 \001(\0132\031.flyteidl.core.Identifier" +
-      "\022H\n\030parent_node_execution_id\030\002 \001(\0132&.fly" +
-      "teidl.core.NodeExecutionIdentifier\022\025\n\rre" +
-      "try_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\".flyte" +
-      "idl.core.TaskExecution.Phase\022\023\n\013producer" +
-      "_id\030\005 \001(\t\022$\n\004logs\030\006 \003(\0132\026.flyteidl.core." +
-      "TaskLog\022/\n\013occurred_at\030\007 \001(\0132\032.google.pr" +
-      "otobuf.Timestamp\022\023\n\tinput_uri\030\010 \001(\tH\000\022/\n" +
-      "\ninput_data\030\023 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapH\000\022\024\n\noutput_uri\030\t \001(\tH\001\022.\n\005error\030\n " +
-      "\001(\0132\035.flyteidl.core.ExecutionErrorH\001\0220\n\013" +
-      "output_data\030\021 \001(\0132\031.flyteidl.core.Litera" +
-      "lMapH\001\022,\n\013custom_info\030\013 \001(\0132\027.google.pro" +
-      "tobuf.Struct\022\025\n\rphase_version\030\014 \001(\r\022\016\n\006r" +
-      "eason\030\r \001(\t\022\021\n\ttask_type\030\016 \001(\t\0227\n\010metada" +
-      "ta\030\020 \001(\0132%.flyteidl.event.TaskExecutionM" +
-      "etadata\022\025\n\revent_version\030\022 \001(\005\022/\n\013report" +
-      "ed_at\030\024 \001(\0132\032.google.protobuf.TimestampB" +
-      "\r\n\013input_valueB\017\n\routput_result\"\343\001\n\024Exte" +
-      "rnalResourceInfo\022\023\n\013external_id\030\001 \001(\t\022\r\n" +
-      "\005index\030\002 \001(\r\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005p" +
+      "_at\030\025 \001(\0132\032.google.protobuf.Timestamp\022\020\n" +
+      "\010is_array\030\026 \001(\010B\r\n\013input_valueB\017\n\routput" +
+      "_resultB\021\n\017target_metadata\"X\n\024WorkflowNo" +
+      "deMetadata\022@\n\014execution_id\030\001 \001(\0132*.flyte" +
+      "idl.core.WorkflowExecutionIdentifier\"\245\002\n" +
+      "\020TaskNodeMetadata\0227\n\014cache_status\030\001 \001(\0162" +
+      "!.flyteidl.core.CatalogCacheStatus\0223\n\013ca" +
+      "talog_key\030\002 \001(\0132\036.flyteidl.core.CatalogM" +
+      "etadata\022D\n\022reservation_status\030\003 \001(\0162(.fl" +
+      "yteidl.core.CatalogReservation.Status\022\026\n" +
+      "\016checkpoint_uri\030\004 \001(\t\022E\n\020dynamic_workflo" +
+      "w\030\020 \001(\0132+.flyteidl.event.DynamicWorkflow" +
+      "NodeMetadata\"\245\001\n\033DynamicWorkflowNodeMeta" +
+      "data\022%\n\002id\030\001 \001(\0132\031.flyteidl.core.Identif" +
+      "ier\022A\n\021compiled_workflow\030\002 \001(\0132&.flyteid" +
+      "l.core.CompiledWorkflowClosure\022\034\n\024dynami" +
+      "c_job_spec_uri\030\003 \001(\t\"Q\n\033ParentTaskExecut" +
+      "ionMetadata\0222\n\002id\030\001 \001(\0132&.flyteidl.core." +
+      "TaskExecutionIdentifier\".\n\033ParentNodeExe" +
+      "cutionMetadata\022\017\n\007node_id\030\001 \001(\t\"N\n\013Event" +
+      "Reason\022\016\n\006reason\030\001 \001(\t\022/\n\013occurred_at\030\002 " +
+      "\001(\0132\032.google.protobuf.Timestamp\"\271\006\n\022Task" +
+      "ExecutionEvent\022*\n\007task_id\030\001 \001(\0132\031.flytei" +
+      "dl.core.Identifier\022H\n\030parent_node_execut" +
+      "ion_id\030\002 \001(\0132&.flyteidl.core.NodeExecuti" +
+      "onIdentifier\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005p" +
       "hase\030\004 \001(\0162\".flyteidl.core.TaskExecution" +
-      ".Phase\0227\n\014cache_status\030\005 \001(\0162!.flyteidl." +
-      "core.CatalogCacheStatus\022$\n\004logs\030\006 \003(\0132\026." +
-      "flyteidl.core.TaskLog\"?\n\020ResourcePoolInf" +
-      "o\022\030\n\020allocation_token\030\001 \001(\t\022\021\n\tnamespace" +
-      "\030\002 \001(\t\"\310\002\n\025TaskExecutionMetadata\022\026\n\016gene" +
-      "rated_name\030\001 \001(\t\022@\n\022external_resources\030\002" +
-      " \003(\0132$.flyteidl.event.ExternalResourceIn" +
-      "fo\022<\n\022resource_pool_info\030\003 \003(\0132 .flyteid" +
-      "l.event.ResourcePoolInfo\022\031\n\021plugin_ident" +
-      "ifier\030\004 \001(\t\022K\n\016instance_class\030\020 \001(\01623.fl" +
-      "yteidl.event.TaskExecutionMetadata.Insta" +
-      "nceClass\"/\n\rInstanceClass\022\013\n\007DEFAULT\020\000\022\021" +
-      "\n\rINTERRUPTIBLE\020\001B7Z5github.com/flyteorg" +
-      "/flyteidl/gen/pb-go/flyteidl/eventb\006prot" +
-      "o3"
+      ".Phase\022\023\n\013producer_id\030\005 \001(\t\022$\n\004logs\030\006 \003(" +
+      "\0132\026.flyteidl.core.TaskLog\022/\n\013occurred_at" +
+      "\030\007 \001(\0132\032.google.protobuf.Timestamp\022\023\n\tin" +
+      "put_uri\030\010 \001(\tH\000\022/\n\ninput_data\030\023 \001(\0132\031.fl" +
+      "yteidl.core.LiteralMapH\000\022\024\n\noutput_uri\030\t" +
+      " \001(\tH\001\022.\n\005error\030\n \001(\0132\035.flyteidl.core.Ex" +
+      "ecutionErrorH\001\0220\n\013output_data\030\021 \001(\0132\031.fl" +
+      "yteidl.core.LiteralMapH\001\022,\n\013custom_info\030" +
+      "\013 \001(\0132\027.google.protobuf.Struct\022\025\n\rphase_" +
+      "version\030\014 \001(\r\022\022\n\006reason\030\r \001(\tB\002\030\001\022,\n\007rea" +
+      "sons\030\025 \003(\0132\033.flyteidl.event.EventReason\022" +
+      "\021\n\ttask_type\030\016 \001(\t\0227\n\010metadata\030\020 \001(\0132%.f" +
+      "lyteidl.event.TaskExecutionMetadata\022\025\n\re" +
+      "vent_version\030\022 \001(\005\022/\n\013reported_at\030\024 \001(\0132" +
+      "\032.google.protobuf.TimestampB\r\n\013input_val" +
+      "ueB\017\n\routput_result\"\343\001\n\024ExternalResource" +
+      "Info\022\023\n\013external_id\030\001 \001(\t\022\r\n\005index\030\002 \001(\r" +
+      "\022\025\n\rretry_attempt\030\003 \001(\r\0221\n\005phase\030\004 \001(\0162\"" +
+      ".flyteidl.core.TaskExecution.Phase\0227\n\014ca" +
+      "che_status\030\005 \001(\0162!.flyteidl.core.Catalog" +
+      "CacheStatus\022$\n\004logs\030\006 \003(\0132\026.flyteidl.cor" +
+      "e.TaskLog\"?\n\020ResourcePoolInfo\022\030\n\020allocat" +
+      "ion_token\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\"\310\002\n\025T" +
+      "askExecutionMetadata\022\026\n\016generated_name\030\001" +
+      " \001(\t\022@\n\022external_resources\030\002 \003(\0132$.flyte" +
+      "idl.event.ExternalResourceInfo\022<\n\022resour" +
+      "ce_pool_info\030\003 \003(\0132 .flyteidl.event.Reso" +
+      "urcePoolInfo\022\031\n\021plugin_identifier\030\004 \001(\t\022" +
+      "K\n\016instance_class\030\020 \001(\01623.flyteidl.event" +
+      ".TaskExecutionMetadata.InstanceClass\"/\n\r" +
+      "InstanceClass\022\013\n\007DEFAULT\020\000\022\021\n\rINTERRUPTI" +
+      "BLE\020\001B=Z;github.com/flyteorg/flyte/flyte" +
+      "idl/gen/pb-go/flyteidl/eventb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -20396,7 +21814,7 @@ public final class Event {
     internal_static_flyteidl_event_NodeExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_NodeExecutionEvent_descriptor,
-        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "InputValue", "OutputResult", "TargetMetadata", });
+        new java.lang.String[] { "Id", "ProducerId", "Phase", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "WorkflowNodeMetadata", "TaskNodeMetadata", "ParentTaskMetadata", "ParentNodeMetadata", "RetryGroup", "SpecNodeId", "NodeName", "EventVersion", "IsParent", "IsDynamic", "DeckUri", "ReportedAt", "IsArray", "InputValue", "OutputResult", "TargetMetadata", });
     internal_static_flyteidl_event_WorkflowNodeMetadata_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_event_WorkflowNodeMetadata_fieldAccessorTable = new
@@ -20427,26 +21845,32 @@ public final class Event {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ParentNodeExecutionMetadata_descriptor,
         new java.lang.String[] { "NodeId", });
-    internal_static_flyteidl_event_TaskExecutionEvent_descriptor =
+    internal_static_flyteidl_event_EventReason_descriptor =
       getDescriptor().getMessageTypes().get(7);
+    internal_static_flyteidl_event_EventReason_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_event_EventReason_descriptor,
+        new java.lang.String[] { "Reason", "OccurredAt", });
+    internal_static_flyteidl_event_TaskExecutionEvent_descriptor =
+      getDescriptor().getMessageTypes().get(8);
     internal_static_flyteidl_event_TaskExecutionEvent_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionEvent_descriptor,
-        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "TaskType", "Metadata", "EventVersion", "ReportedAt", "InputValue", "OutputResult", });
+        new java.lang.String[] { "TaskId", "ParentNodeExecutionId", "RetryAttempt", "Phase", "ProducerId", "Logs", "OccurredAt", "InputUri", "InputData", "OutputUri", "Error", "OutputData", "CustomInfo", "PhaseVersion", "Reason", "Reasons", "TaskType", "Metadata", "EventVersion", "ReportedAt", "InputValue", "OutputResult", });
     internal_static_flyteidl_event_ExternalResourceInfo_descriptor =
-      getDescriptor().getMessageTypes().get(8);
+      getDescriptor().getMessageTypes().get(9);
     internal_static_flyteidl_event_ExternalResourceInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ExternalResourceInfo_descriptor,
         new java.lang.String[] { "ExternalId", "Index", "RetryAttempt", "Phase", "CacheStatus", "Logs", });
     internal_static_flyteidl_event_ResourcePoolInfo_descriptor =
-      getDescriptor().getMessageTypes().get(9);
+      getDescriptor().getMessageTypes().get(10);
     internal_static_flyteidl_event_ResourcePoolInfo_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_ResourcePoolInfo_descriptor,
         new java.lang.String[] { "AllocationToken", "Namespace", });
     internal_static_flyteidl_event_TaskExecutionMetadata_descriptor =
-      getDescriptor().getMessageTypes().get(10);
+      getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_event_TaskExecutionMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_event_TaskExecutionMetadata_descriptor,

@@ -10,20 +10,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go/service/batch"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/sets"
-
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
-
 	"k8s.io/client-go/util/workqueue"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-
-	"k8s.io/apimachinery/pkg/types"
-
-	"github.com/aws/aws-sdk-go/service/batch"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/array/awsbatch/config"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
-
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -277,7 +272,7 @@ func syncBatches(_ context.Context, client Client, handler EventHandler, batchCh
 			for _, jobDetail := range response {
 				job, found := jobIDsMap[*jobDetail.JobId]
 				if !found {
-					logger.Warn(ctx, "Received an update for unrequested job id [%v]", jobDetail.JobId)
+					logger.Warnf(ctx, "Received an update for unrequested job id [%v]", jobDetail.JobId)
 					continue
 				}
 

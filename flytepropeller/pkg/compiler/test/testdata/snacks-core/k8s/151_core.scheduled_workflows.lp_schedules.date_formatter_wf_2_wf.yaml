@@ -74,8 +74,6 @@ spec:
       kind: task
       name: format_date
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.scheduled_workflows.lp_schedules.format_date" '
     start-node:
       id: start-node

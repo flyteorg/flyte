@@ -9,11 +9,12 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/gorilla/securecookie"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces/mocks"
 	stdConfig "github.com/flyteorg/flyte/flytestdlib/config"
-	"github.com/gorilla/securecookie"
-	"github.com/stretchr/testify/assert"
 )
 
 func mustParseURL(t testing.TB, u string) url.URL {

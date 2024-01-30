@@ -15,6 +15,7 @@ class CatalogCacheStatus(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     CACHE_LOOKUP_FAILURE: _ClassVar[CatalogCacheStatus]
     CACHE_PUT_FAILURE: _ClassVar[CatalogCacheStatus]
     CACHE_SKIPPED: _ClassVar[CatalogCacheStatus]
+    CACHE_EVICTED: _ClassVar[CatalogCacheStatus]
 CACHE_DISABLED: CatalogCacheStatus
 CACHE_MISS: CatalogCacheStatus
 CACHE_HIT: CatalogCacheStatus
@@ -22,6 +23,7 @@ CACHE_POPULATED: CatalogCacheStatus
 CACHE_LOOKUP_FAILURE: CatalogCacheStatus
 CACHE_PUT_FAILURE: CatalogCacheStatus
 CACHE_SKIPPED: CatalogCacheStatus
+CACHE_EVICTED: CatalogCacheStatus
 
 class CatalogArtifactTag(_message.Message):
     __slots__ = ["artifact_id", "name"]

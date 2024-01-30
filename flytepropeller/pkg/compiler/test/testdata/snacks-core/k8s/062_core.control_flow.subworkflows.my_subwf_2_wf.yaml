@@ -94,8 +94,6 @@ spec:
       kind: task
       name: t1
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.subworkflows.t1" '
     n1:
       id: n1
@@ -108,8 +106,6 @@ spec:
       kind: task
       name: t1
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.subworkflows.t1" '
     start-node:
       id: start-node

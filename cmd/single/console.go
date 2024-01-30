@@ -1,16 +1,16 @@
 package single
 
 import (
-	"path/filepath"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
 const (
-	consoleRoot = "/console"
+	consoleRoot   = "/console"
 	consoleStatic = consoleRoot + "/assets/"
-	packageDir = "dist"
-	indexHTML = "index.html"
+	packageDir    = "dist"
+	indexHTML     = "index.html"
 )
 
 // GetConsoleFile returns the console file that should be used for the given path.

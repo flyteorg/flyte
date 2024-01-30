@@ -86,8 +86,6 @@ spec:
       kind: task
       name: t1
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.decorating_tasks.t1" '
     n1:
       id: n1
@@ -100,8 +98,6 @@ spec:
       kind: task
       name: t2
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.flyte_basics.decorating_tasks.t2" '
     start-node:
       id: start-node

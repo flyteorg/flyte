@@ -162,14 +162,14 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fpytorch_2ep
   "icaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image\030\002 \001(\t"
   "\022+\n\tresources\030\003 \001(\0132\030.flyteidl.core.Reso"
   "urces\022@\n\016restart_policy\030\004 \001(\0162(.flyteidl"
-  ".plugins.kubeflow.RestartPolicyB9Z7githu"
-  "b.com/flyteorg/flyteidl/gen/pb-go/flytei"
-  "dl/pluginsb\006proto3"
+  ".plugins.kubeflow.RestartPolicyB\?Z=githu"
+  "b.com/flyteorg/flyte/flyteidl/gen/pb-go/"
+  "flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto,
-  "flyteidl/plugins/kubeflow/pytorch.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto, 858,
+  "flyteidl/plugins/kubeflow/pytorch.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto, 864,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto() {

@@ -86,8 +86,6 @@ spec:
       kind: task
       name: coin_toss
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.coin_toss" '
     n1:
       branch:
@@ -111,23 +109,17 @@ spec:
       kind: branch
       name: test
       resources: {}
-      retry:
-        minAttempts: 1
     n1-n0:
       id: n1-n0
       kind: task
       name: success
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.success" '
     n1-n1:
       id: n1-n1
       kind: task
       name: failed
       resources: {}
-      retry:
-        minAttempts: 1
       task: 'resource_type:TASK name:"core.control_flow.conditions.failed" '
     start-node:
       id: start-node

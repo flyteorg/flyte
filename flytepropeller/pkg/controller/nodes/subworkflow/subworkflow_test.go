@@ -5,14 +5,13 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
 	coreMocks "github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	execMocks "github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors/mocks"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces/mocks"
 )
 
@@ -31,6 +30,36 @@ func TestGetSubWorkflow(t *testing.T) {
 		ectx := &execMocks.ExecutionContext{}
 
 		swf := &coreMocks.ExecutableSubWorkflow{}
+		ectx.OnFindSubWorkflow("x").Return(swf)
+
+		nCtx := &mocks.NodeExecutionContext{}
+		nCtx.OnNode().Return(node)
+		nCtx.OnExecutionContext().Return(ectx)
+
+		w, err := GetSubWorkflow(ctx, nCtx)
+		assert.NoError(t, err)
+		assert.Equal(t, swf, w)
+	})
+
+	t.Run("subworkflow with failure node", func(t *testing.T) {
+
+		wfNode := &coreMocks.ExecutableWorkflowNode{}
+		x := "x"
+		wfNode.OnGetSubWorkflowRef().Return(&x)
+
+		node := &coreMocks.ExecutableNode{}
+		node.OnGetWorkflowNode().Return(wfNode)
+
+		ectx := &execMocks.ExecutionContext{}
+
+		wfFailureNode := &coreMocks.ExecutableWorkflowNode{}
+		y := "y"
+		wfFailureNode.OnGetSubWorkflowRef().Return(&y)
+		failureNode := &coreMocks.ExecutableNode{}
+		failureNode.OnGetWorkflowNode().Return(wfFailureNode)
+
+		swf := &coreMocks.ExecutableSubWorkflow{}
+		swf.OnGetOnFailureNode().Return(failureNode)
 		ectx.OnFindSubWorkflow("x").Return(swf)
 
 		nCtx := &mocks.NodeExecutionContext{}

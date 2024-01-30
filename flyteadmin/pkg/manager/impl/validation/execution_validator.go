@@ -5,15 +5,15 @@ import (
 	"regexp"
 	"strings"
 
-	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
+	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/core"
-	"google.golang.org/grpc/codes"
 )
 
 // Maximum value length of a Kubernetes label
@@ -67,11 +67,6 @@ func ValidateExecutionRequest(ctx context.Context, request admin.ExecutionCreate
 		if err := validateNotifications(request.Spec.GetNotifications().Notifications); err != nil {
 			return err
 		}
-	}
-	// TODO: Remove redundant validation with the rest of the method.
-	// This final call to validating the request ensures the notification types are expected.
-	if err := request.Validate(); err != nil {
-		return err
 	}
 	return nil
 }
@@ -131,7 +126,7 @@ func CheckValidExecutionID(executionID, fieldName string) error {
 	matched := executionIDRegex.MatchString(executionID)
 
 	if !matched {
-		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s format: %s", fieldName, executionID)
+		return errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid %s format: %s, does not match regex '%s'", fieldName, executionID, executionIDRegex.String())
 	}
 
 	return nil

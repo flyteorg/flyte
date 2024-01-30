@@ -6,18 +6,15 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/flyteorg/flyteidl/gen/pb-go/flyteidl/service"
-
-	"k8s.io/apimachinery/pkg/util/sets"
-
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/lestrrat-go/jwx/jwk"
-
 	"github.com/ory/fosite"
 	fositeOAuth2 "github.com/ory/fosite/handler/oauth2"
-
-	"github.com/coreos/go-oidc"
-	"github.com/flyteorg/flyte/flyteadmin/auth/config"
 	"golang.org/x/oauth2"
+	"k8s.io/apimachinery/pkg/util/sets"
+
+	"github.com/flyteorg/flyte/flyteadmin/auth/config"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 )
 
 //go:generate mockery -all -case=underscore

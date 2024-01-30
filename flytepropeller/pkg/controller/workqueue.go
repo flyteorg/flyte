@@ -3,14 +3,12 @@ package controller
 import (
 	"context"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
-
 	"golang.org/x/time/rate"
-
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	// Setup workqueue metrics
-	_ "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"k8s.io/client-go/util/workqueue"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	_ "github.com/flyteorg/flyte/flytestdlib/promutils" // Setup workqueue metrics
 )
 
 func NewWorkQueue(ctx context.Context, cfg config.WorkqueueConfig, name string) (workqueue.RateLimitingInterface, error) {

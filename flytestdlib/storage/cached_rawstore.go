@@ -7,13 +7,13 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/flyteorg/flyte/flytestdlib/errors"
-
 	"github.com/coocood/freecache"
 	"github.com/prometheus/client_golang/prometheus"
 
+	"github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -35,6 +35,9 @@ type cachedRawStore struct {
 
 // Head gets metadata about the reference. This should generally be a lightweight operation.
 func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/Head")
+	defer span.End()
+
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
 		s.metrics.CacheHit.Inc()
@@ -49,6 +52,9 @@ func (s *cachedRawStore) Head(ctx context.Context, reference DataReference) (Met
 
 // ReadRaw retrieves a byte array from the Blob store or an error
 func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (io.ReadCloser, error) {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/ReadRaw")
+	defer span.End()
+
 	key := []byte(reference)
 	if oRaw, err := s.cache.Get(key); err == nil {
 		// Found, Cache hit
@@ -84,6 +90,9 @@ func (s *cachedRawStore) ReadRaw(ctx context.Context, reference DataReference) (
 
 // WriteRaw stores a raw byte array.
 func (s *cachedRawStore) WriteRaw(ctx context.Context, reference DataReference, size int64, opts Options, raw io.Reader) error {
+	ctx, span := otelutils.NewSpan(ctx, otelutils.BlobstoreClientTracer, "flytestdlib.storage.cachedRawStore/WriteRaw")
+	defer span.End()
+
 	var buf bytes.Buffer
 	teeReader := io.TeeReader(raw, &buf)
 	err := s.RawStore.WriteRaw(ctx, reference, size, opts, teeReader)
