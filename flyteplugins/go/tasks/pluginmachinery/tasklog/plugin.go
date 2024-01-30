@@ -61,5 +61,5 @@ type TemplateLogPlugin struct {
 	DynamicTemplateURIs []TemplateURI              `json:"dynamicTemplateUris" pflag:",URI Templates for generating dynamic task log links."`
 	MessageFormat       core.TaskLog_MessageFormat `json:"messageFormat" pflag:"-,Log Message Format."`
 	// Deprecated: Please, do not use
-	Scheme TemplateScheme `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
+	DeprecatedScheme TemplateScheme `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 }
