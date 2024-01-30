@@ -3865,6 +3865,59 @@
         ]
       }
     },
+    "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.",
+        "operationId": "GetDynamicNodeWorkflow2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDynamicNodeWorkflowResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.",
@@ -3968,6 +4021,59 @@
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/flyteidladminNodeExecution"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.",
+        "operationId": "GetDynamicNodeWorkflow",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDynamicNodeWorkflowResponse"
             }
           }
         },
@@ -7563,6 +7669,14 @@
         }
       },
       "description": "Namespace within a project commonly used to differentiate between different service instances.\ne.g. \"production\", \"development\", etc."
+    },
+    "adminDynamicNodeWorkflowResponse": {
+      "type": "object",
+      "properties": {
+        "compiled_workflow": {
+          "$ref": "#/definitions/coreCompiledWorkflowClosure"
+        }
+      }
     },
     "adminEmailNotification": {
       "type": "object",
