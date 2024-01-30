@@ -3766,17 +3766,17 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_named_entity2(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def get_named_entity2(self, id_org, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_named_entity2(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.get_named_entity2(id_org, resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -3786,22 +3786,22 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.get_named_entity2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.get_named_entity2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_named_entity2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def get_named_entity2_with_http_info(self, id_org, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.get_named_entity2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -3810,7 +3810,7 @@ class AdminServiceApi(object):
                  returns the request thread.
         """
 
-        all_params = ['resource_type', 'id_org', 'id_project', 'id_domain', 'id_name']  # noqa: E501
+        all_params = ['id_org', 'resource_type', 'id_project', 'id_domain', 'id_name']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -3825,14 +3825,14 @@ class AdminServiceApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `get_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_org' is set
         if ('id_org' not in params or
                 params['id_org'] is None):
             raise ValueError("Missing the required parameter `id_org` when calling `get_named_entity2`")  # noqa: E501
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `get_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
         if ('id_project' not in params or
                 params['id_project'] is None):
@@ -3849,10 +3849,10 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
-        if 'resource_type' in params:
-            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_org' in params:
             path_params['id.org'] = params['id_org']  # noqa: E501
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_project' in params:
             path_params['id.project'] = params['id_project']  # noqa: E501
         if 'id_domain' in params:
@@ -3880,7 +3880,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -4388,7 +4388,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}', 'GET',
+            '/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -5794,7 +5794,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}', 'GET',
+            '/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -6805,17 +6805,17 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_description_entities2(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def list_description_entities2(self, id_org, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities2(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.list_description_entities2(id_org, resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -6830,22 +6830,22 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.list_description_entities2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.list_description_entities2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_description_entities2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def list_description_entities2_with_http_info(self, id_org, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.list_description_entities2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -6859,7 +6859,7 @@ class AdminServiceApi(object):
                  returns the request thread.
         """
 
-        all_params = ['resource_type', 'id_org', 'id_project', 'id_domain', 'id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['id_org', 'resource_type', 'id_project', 'id_domain', 'id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -6874,14 +6874,14 @@ class AdminServiceApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities2`")  # noqa: E501
         # verify the required parameter 'id_org' is set
         if ('id_org' not in params or
                 params['id_org'] is None):
             raise ValueError("Missing the required parameter `id_org` when calling `list_description_entities2`")  # noqa: E501
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
         if ('id_project' not in params or
                 params['id_project'] is None):
@@ -6898,10 +6898,10 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
-        if 'resource_type' in params:
-            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_org' in params:
             path_params['id.org'] = params['id_org']  # noqa: E501
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_project' in params:
             path_params['id.project'] = params['id_project']  # noqa: E501
         if 'id_domain' in params:
@@ -6939,7 +6939,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -7095,17 +7095,17 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_description_entities4(self, resource_type, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def list_description_entities4(self, id_org, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities4(resource_type, id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.list_description_entities4(id_org, resource_type, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
@@ -7120,22 +7120,22 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.list_description_entities4_with_http_info(id_org, resource_type, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.list_description_entities4_with_http_info(id_org, resource_type, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_description_entities4_with_http_info(self, resource_type, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def list_description_entities4_with_http_info(self, id_org, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.list_description_entities4_with_http_info(id_org, resource_type, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
@@ -7149,7 +7149,7 @@ class AdminServiceApi(object):
                  returns the request thread.
         """
 
-        all_params = ['resource_type', 'id_org', 'id_project', 'id_domain', 'id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
+        all_params = ['id_org', 'resource_type', 'id_project', 'id_domain', 'id_name', 'limit', 'token', 'filters', 'sort_by_key', 'sort_by_direction']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -7164,14 +7164,14 @@ class AdminServiceApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities4`")  # noqa: E501
         # verify the required parameter 'id_org' is set
         if ('id_org' not in params or
                 params['id_org'] is None):
             raise ValueError("Missing the required parameter `id_org` when calling `list_description_entities4`")  # noqa: E501
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities4`")  # noqa: E501
         # verify the required parameter 'id_project' is set
         if ('id_project' not in params or
                 params['id_project'] is None):
@@ -7184,10 +7184,10 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
-        if 'resource_type' in params:
-            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_org' in params:
             path_params['id.org'] = params['id_org']  # noqa: E501
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_project' in params:
             path_params['id.project'] = params['id_project']  # noqa: E501
         if 'id_domain' in params:
@@ -7225,7 +7225,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}', 'GET',
+            '/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -8655,17 +8655,17 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_named_entities2(self, resource_type, org, project, domain, **kwargs):  # noqa: E501
+    def list_named_entities2(self, org, resource_type, project, domain, **kwargs):  # noqa: E501
         """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_named_entities2(resource_type, org, project, domain, async_req=True)
+        >>> thread = api.list_named_entities2(org, resource_type, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required (required)
         :param str org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
@@ -8679,22 +8679,22 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_named_entities2_with_http_info(resource_type, org, project, domain, **kwargs)  # noqa: E501
+            return self.list_named_entities2_with_http_info(org, resource_type, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_named_entities2_with_http_info(resource_type, org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.list_named_entities2_with_http_info(org, resource_type, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_named_entities2_with_http_info(self, resource_type, org, project, domain, **kwargs):  # noqa: E501
+    def list_named_entities2_with_http_info(self, org, resource_type, project, domain, **kwargs):  # noqa: E501
         """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_named_entities2_with_http_info(resource_type, org, project, domain, async_req=True)
+        >>> thread = api.list_named_entities2_with_http_info(org, resource_type, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required (required)
         :param str org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
@@ -8707,7 +8707,7 @@ class AdminServiceApi(object):
                  returns the request thread.
         """
 
-        all_params = ['resource_type', 'org', 'project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction', 'filters']  # noqa: E501
+        all_params = ['org', 'resource_type', 'project', 'domain', 'limit', 'token', 'sort_by_key', 'sort_by_direction', 'filters']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -8722,14 +8722,14 @@ class AdminServiceApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_named_entities2`")  # noqa: E501
         # verify the required parameter 'org' is set
         if ('org' not in params or
                 params['org'] is None):
             raise ValueError("Missing the required parameter `org` when calling `list_named_entities2`")  # noqa: E501
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `list_named_entities2`")  # noqa: E501
         # verify the required parameter 'project' is set
         if ('project' not in params or
                 params['project'] is None):
@@ -8742,10 +8742,10 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
-        if 'resource_type' in params:
-            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'org' in params:
             path_params['org'] = params['org']  # noqa: E501
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'project' in params:
             path_params['project'] = params['project']  # noqa: E501
         if 'domain' in params:
@@ -8781,7 +8781,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}', 'GET',
+            '/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -9457,7 +9457,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}', 'GET',
+            '/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -13109,17 +13109,17 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_named_entity2(self, resource_type, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def update_named_entity2(self, id_org, resource_type, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_named_entity2(resource_type, id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.update_named_entity2(id_org, resource_type, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to update +required (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Resource type of the metadata to update +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -13130,22 +13130,22 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.update_named_entity2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.update_named_entity2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def update_named_entity2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def update_named_entity2_with_http_info(self, id_org, resource_type, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.update_named_entity2_with_http_info(id_org, resource_type, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: Resource type of the metadata to update +required (required)
         :param str id_org: Optional, org key applied to the resource. (required)
+        :param str resource_type: Resource type of the metadata to update +required (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
@@ -13155,7 +13155,7 @@ class AdminServiceApi(object):
                  returns the request thread.
         """
 
-        all_params = ['resource_type', 'id_org', 'id_project', 'id_domain', 'id_name', 'body']  # noqa: E501
+        all_params = ['id_org', 'resource_type', 'id_project', 'id_domain', 'id_name', 'body']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -13170,14 +13170,14 @@ class AdminServiceApi(object):
                 )
             params[key] = val
         del params['kwargs']
-        # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `update_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_org' is set
         if ('id_org' not in params or
                 params['id_org'] is None):
             raise ValueError("Missing the required parameter `id_org` when calling `update_named_entity2`")  # noqa: E501
+        # verify the required parameter 'resource_type' is set
+        if ('resource_type' not in params or
+                params['resource_type'] is None):
+            raise ValueError("Missing the required parameter `resource_type` when calling `update_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
         if ('id_project' not in params or
                 params['id_project'] is None):
@@ -13198,10 +13198,10 @@ class AdminServiceApi(object):
         collection_formats = {}
 
         path_params = {}
-        if 'resource_type' in params:
-            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_org' in params:
             path_params['id.org'] = params['id_org']  # noqa: E501
+        if 'resource_type' in params:
+            path_params['resource_type'] = params['resource_type']  # noqa: E501
         if 'id_project' in params:
             path_params['id.project'] = params['id_project']  # noqa: E501
         if 'id_domain' in params:
@@ -13231,7 +13231,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'PUT',
+            '/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'PUT',
             path_params,
             query_params,
             header_params,

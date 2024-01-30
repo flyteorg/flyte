@@ -257,7 +257,7 @@
         ]
       }
     },
-    "/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
+    "/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.",
         "operationId": "ListNodeExecutionsForTask2",
@@ -653,59 +653,6 @@
         ]
       }
     },
-    "/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
-      "get": {
-        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
-        "operationId": "GetNodeExecutionData2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminNodeExecutionGetDataResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.execution_id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.execution_id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.execution_id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.execution_id.name",
-            "description": "User or system provided value for the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.node_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
@@ -759,7 +706,60 @@
         ]
       }
     },
-    "/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
+    "/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
+      "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
+        "operationId": "GetNodeExecutionData2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionGetDataResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.",
         "operationId": "GetTaskExecutionData2",
@@ -1047,75 +1047,7 @@
         ]
       }
     },
-    "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
-      "get": {
-        "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
-        "operationId": "GetDescriptionEntity",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminDescriptionEntity"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.resource_type",
-            "description": "Identifies the specific type of resource that this identifier corresponds to.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "UNSPECIFIED",
-              "TASK",
-              "WORKFLOW",
-              "LAUNCH_PLAN",
-              "DATASET"
-            ]
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.version",
-            "description": "Specific version of the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}": {
+    "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
         "operationId": "ListDescriptionEntities4",
@@ -1129,6 +1061,13 @@
         },
         "parameters": [
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Identifies the specific type of resource that this identifier corresponds to.",
             "in": "path",
@@ -1141,13 +1080,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "id.project",
@@ -1217,7 +1149,7 @@
         ]
       }
     },
-    "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+    "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
         "operationId": "ListDescriptionEntities2",
@@ -1231,6 +1163,13 @@
         },
         "parameters": [
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Identifies the specific type of resource that this identifier corresponds to.",
             "in": "path",
@@ -1243,13 +1182,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "id.project",
@@ -1312,6 +1244,74 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
+      "get": {
+        "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
+        "operationId": "GetDescriptionEntity",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntity"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.version",
+            "description": "Specific version of the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -3373,7 +3373,7 @@
         ]
       }
     },
-    "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+    "/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
         "operationId": "GetNamedEntity2",
@@ -3387,6 +3387,13 @@
         },
         "parameters": [
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.\n+required",
             "in": "path",
@@ -3399,13 +3406,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "id.project",
@@ -3446,6 +3446,13 @@
         },
         "parameters": [
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Resource type of the metadata to update\n+required",
             "in": "path",
@@ -3458,13 +3465,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "id.project",
@@ -3501,7 +3501,7 @@
         ]
       }
     },
-    "/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}": {
+    "/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}": {
       "get": {
         "summary": "Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.",
         "operationId": "ListNamedEntities2",
@@ -3515,6 +3515,13 @@
         },
         "parameters": [
           {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.\n+required",
             "in": "path",
@@ -3527,13 +3534,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "project",
