@@ -576,6 +576,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 		var err error
 		pluginTrns, err = t.invokePlugin(ctx, p, tCtx, ts)
 		// @@@ bug comes from downstream
+		// 0130, here
 		if err != nil {
 			return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
 		}
@@ -598,7 +599,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	// STEP 4: Send buffered events!
-	logger.Debugf(ctx, "Sending buffered Task events.")
+	logger.Infof(ctx, "@@@ STEP 4: Sending buffered Task events.")
 	for _, ev := range tCtx.ber.GetAll(ctx) {
 		evInfo, err := ToTaskExecutionEvent(ToTaskExecutionEventInputs{
 			TaskExecContext:       tCtx,
@@ -615,6 +616,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 			ClusterID:             t.clusterID,
 			OccurredAt:            occurredAt,
 		})
+		// evInfo.Info = pluginTrns.pInfo
 		if err != nil {
 			return handler.UnknownTransition, err
 		}
@@ -627,13 +629,14 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	// STEP 5: Send Transition events
-	logger.Debugf(ctx, "Sending transition event for plugin phase [%s]", pluginTrns.pInfo.Phase().String())
+	logger.Infof(ctx, "@@@ STEP 5: Send Transition events: [%s]", pluginTrns.pInfo.Phase().String())
 	evInfo, err := pluginTrns.FinalTaskEvent(ToTaskExecutionEventInputs{
 		TaskExecContext:       tCtx,
 		InputReader:           nCtx.InputReader(),
 		Inputs:                inputs,
 		EventConfig:           t.eventConfig,
 		OutputWriter:          tCtx.ow,
+		Info:                  pluginTrns.pInfo,
 		NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
 		ExecContext:           nCtx.ExecutionContext(),
 		TaskType:              ttype,
@@ -658,6 +661,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	}
 
 	// STEP 6: Persist the plugin state
+	logger.Infof(ctx, "@@@ STEP 6: Persist the plugin state: [%s]", pluginTrns.pInfo.Phase().String())
 	err = nCtx.NodeStateWriter().PutTaskNodeState(handler.TaskNodeState{
 		PluginState:                        pluginTrns.pluginState,
 		PluginStateVersion:                 pluginTrns.pluginStateVersion,
@@ -676,6 +680,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 	if pluginTrns != nil && !pluginTrns.pInfo.Phase().IsTerminal() {
 		logger.Infof(ctx, "Parallelism now set to [%d].", nCtx.ExecutionContext().IncrementParallelism())
 	}
+	logger.Infof(ctx, "@@@ STEP FINAL: go to the end")
 	return pluginTrns.FinalTransition(ctx)
 }
 

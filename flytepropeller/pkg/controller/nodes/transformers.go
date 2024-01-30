@@ -230,9 +230,9 @@ func ToK8sTime(t time.Time) v1.Time {
 
 func UpdateNodeStatus(np v1alpha1.NodePhase, p handler.PhaseInfo, n interfaces.NodeStateReader, s v1alpha1.ExecutableNodeStatus, enableCRDebugMetadata bool) {
 	// We update the phase and / or reason only if they are not already updated
-	if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
-		s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), enableCRDebugMetadata, p.GetErr())
-	}
+	// if np != s.GetPhase() || p.GetReason() != s.GetMessage() {
+	s.UpdatePhase(np, ToK8sTime(p.GetOccurredAt()), p.GetReason(), enableCRDebugMetadata, p.GetErr())
+	// }
 	// Update TaskStatus
 	if n.HasTaskNodeState() {
 		nt := n.GetTaskNodeState()

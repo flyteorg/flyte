@@ -192,7 +192,20 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	resource := taskCtx.Resource().(ResourceWrapper)
-	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
+	// taskInfo := &core.TaskInfo{Logs: resource.LogLinks,
+	// 	ExternalResources: &core.ExternalResource{Logs: resource.LogLinks}}
+
+	taskInfo := &core.TaskInfo{
+		Logs: resource.LogLinks,
+		ExternalResources: []*core.ExternalResource{
+			{
+				Logs: resource.LogLinks,
+				// Initialize other fields of ExternalResource if needed
+			},
+		},
+	}
+
+	// taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
@@ -203,7 +216,9 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_RUNNING:
 		logger.Infof(ctx, "@@@ running")
-		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+		// pi := core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo)
+		// pi.reason = resource.Message
+		return core.PhaseInfoRunningWithReason(core.DefaultPhaseVersion, taskInfo, resource.Message), nil
 		// return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 
 		// return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
@@ -230,7 +245,10 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
-		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+		logger.Infof(ctx, "@@@ running")
+		// return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+		return core.PhaseInfoRunningWithReason(core.DefaultPhaseVersion, taskInfo, resource.Message), nil
+		// return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	case admin.State_RETRYABLE_FAILURE:

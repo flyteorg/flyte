@@ -258,7 +258,14 @@ func PhaseInfoFailed(p Phase, err *core.ExecutionError, info *TaskInfo) PhaseInf
 }
 
 func PhaseInfoRunning(version uint32, info *TaskInfo) PhaseInfo {
-	return phaseInfo(PhaseRunning, version, nil, info, false)
+	pi := phaseInfo(PhaseRunning, version, nil, info, false)
+	return pi
+}
+
+func PhaseInfoRunningWithReason(version uint32, info *TaskInfo, reason string) PhaseInfo {
+	pi := phaseInfo(PhaseRunning, version, nil, info, false)
+	pi.reason = reason
+	return pi
 }
 
 func PhaseInfoSuccess(info *TaskInfo) PhaseInfo {

@@ -820,10 +820,12 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 	if err != nil {
 		return handler.PhaseInfoUndefined, err
 	}
-	// @@@ the bug comes from here
+	// @@@ the bug comes before
 	phase := t.Info()
 
-	// logger.Info(ctx, "@@@ executor :[%v]", phase.pInfo)
+	logger.Info(ctx, "@@@ executor Transition:[%v]", t)
+	logger.Info(ctx, "@@@ executor phase.GetPhase():[%v]", phase.GetPhase())
+	logger.Info(ctx, "@@@ executor phase.GetInfo():[%v]", phase.GetInfo())
 
 	// check for timeout for non-terminal phases
 	if !phase.GetPhase().IsTerminal() {

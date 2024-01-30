@@ -10,6 +10,7 @@ import (
 	pluginCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type NextPhaseState struct {
@@ -36,6 +37,7 @@ func (n NextPhaseStatePlugin) GetProperties() pluginCore.PluginProperties {
 }
 
 func (n NextPhaseStatePlugin) Handle(ctx context.Context, tCtx pluginCore.TaskExecutionContext) (pluginCore.Transition, error) {
+	logger.Infof(ctx, "@@@ using nodes->Task->fakeplugins")
 	s := &NextPhaseState{}
 	if _, err := tCtx.PluginStateReader().Get(s); err != nil {
 		return pluginCore.UnknownTransition, err
