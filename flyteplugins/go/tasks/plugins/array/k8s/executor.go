@@ -103,15 +103,15 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	case arrayCore.PhasePreLaunch:
 		nextState = pluginState.SetPhase(arrayCore.PhaseLaunch, version+1).SetReason("Nothing to do in PreLaunch phase.")
 
-	case arrayCore.PhaseWaitingForResources:
-		fallthrough
-
 	case arrayCore.PhaseLaunch:
 		// In order to maintain backwards compatibility with the state transitions
 		// in the aws batch plugin. Forward to PhaseCheckingSubTasksExecutions where the launching
 		// is actually occurring.
 		nextState = pluginState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, version+1).SetReason("Nothing to do in Launch phase.")
 		err = nil
+
+	case arrayCore.PhaseWaitingForResources:
+		fallthrough
 
 	case arrayCore.PhaseCheckingSubTaskExecutions:
 		nextState, externalResources, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
