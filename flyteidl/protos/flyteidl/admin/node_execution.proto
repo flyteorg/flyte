@@ -235,3 +235,11 @@ message NodeExecutionGetDataResponse {
     FlyteURLs flyte_urls = 17;
 
 }
+
+message GetDynamicNodeWorkflowRequest {
+    core.NodeExecutionIdentifier id = 1;
+}
+
+message DynamicNodeWorkflowResponse {
+    core.CompiledWorkflowClosure compiled_workflow = 1;
+}

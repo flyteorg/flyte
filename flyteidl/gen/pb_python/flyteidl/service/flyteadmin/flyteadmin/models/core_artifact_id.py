@@ -18,6 +18,7 @@ import six
 
 from flyteadmin.models.core_artifact_key import CoreArtifactKey  # noqa: F401,E501
 from flyteadmin.models.core_partitions import CorePartitions  # noqa: F401,E501
+from flyteadmin.models.core_time_partition import CoreTimePartition  # noqa: F401,E501
 
 
 class CoreArtifactID(object):
@@ -36,21 +37,24 @@ class CoreArtifactID(object):
     swagger_types = {
         'artifact_key': 'CoreArtifactKey',
         'version': 'str',
-        'partitions': 'CorePartitions'
+        'partitions': 'CorePartitions',
+        'time_partition': 'CoreTimePartition'
     }
 
     attribute_map = {
         'artifact_key': 'artifact_key',
         'version': 'version',
-        'partitions': 'partitions'
+        'partitions': 'partitions',
+        'time_partition': 'time_partition'
     }
 
-    def __init__(self, artifact_key=None, version=None, partitions=None):  # noqa: E501
+    def __init__(self, artifact_key=None, version=None, partitions=None, time_partition=None):  # noqa: E501
         """CoreArtifactID - a model defined in Swagger"""  # noqa: E501
 
         self._artifact_key = None
         self._version = None
         self._partitions = None
+        self._time_partition = None
         self.discriminator = None
 
         if artifact_key is not None:
@@ -59,6 +63,8 @@ class CoreArtifactID(object):
             self.version = version
         if partitions is not None:
             self.partitions = partitions
+        if time_partition is not None:
+            self.time_partition = time_partition
 
     @property
     def artifact_key(self):
@@ -106,6 +112,7 @@ class CoreArtifactID(object):
     def partitions(self):
         """Gets the partitions of this CoreArtifactID.  # noqa: E501
 
+        Think of a partition as a tag on an Artifact, except it's a key-value pair. Different partitions naturally have different versions (execution ids).  # noqa: E501
 
         :return: The partitions of this CoreArtifactID.  # noqa: E501
         :rtype: CorePartitions
@@ -116,12 +123,36 @@ class CoreArtifactID(object):
     def partitions(self, partitions):
         """Sets the partitions of this CoreArtifactID.
 
+        Think of a partition as a tag on an Artifact, except it's a key-value pair. Different partitions naturally have different versions (execution ids).  # noqa: E501
 
         :param partitions: The partitions of this CoreArtifactID.  # noqa: E501
         :type: CorePartitions
         """
 
         self._partitions = partitions
+
+    @property
+    def time_partition(self):
+        """Gets the time_partition of this CoreArtifactID.  # noqa: E501
+
+        There is no such thing as an empty time partition - if it's not set, then there is no time partition.  # noqa: E501
+
+        :return: The time_partition of this CoreArtifactID.  # noqa: E501
+        :rtype: CoreTimePartition
+        """
+        return self._time_partition
+
+    @time_partition.setter
+    def time_partition(self, time_partition):
+        """Sets the time_partition of this CoreArtifactID.
+
+        There is no such thing as an empty time partition - if it's not set, then there is no time partition.  # noqa: E501
+
+        :param time_partition: The time_partition of this CoreArtifactID.  # noqa: E501
+        :type: CoreTimePartition
+        """
+
+        self._time_partition = time_partition
 
     def to_dict(self):
         """Returns the model properties as a dict"""

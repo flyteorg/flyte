@@ -324,10 +324,21 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
 		return nil, err
 	}
+
+	sCfg := storage.GetConfig()
+	if sCfg == nil {
+		logger.Errorf(ctx, "Storage configuration missing.")
+	}
+
+	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
+	}
+
 	var launchPlanActor launchplan.FlyteAdmin
 	if cfg.EnableAdminLauncher {
 		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
-			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"))
+			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"), store)
 		if err != nil {
 			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
 			return nil, err
@@ -400,16 +411,6 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	}
 
 	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(podNamespace)
-
-	sCfg := storage.GetConfig()
-	if sCfg == nil {
-		logger.Errorf(ctx, "Storage configuration missing.")
-	}
-
-	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
-	}
 
 	logger.Info(ctx, "Setting up Catalog client.")
 	catalogClient, err := catalog.NewCatalogClient(ctx, authOpts...)

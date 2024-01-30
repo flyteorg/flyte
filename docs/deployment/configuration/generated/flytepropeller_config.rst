@@ -12,6 +12,8 @@ Flyte Propeller Configuration
 
 - `logger <#section-logger>`_
 
+- `otel <#section-otel>`_
+
 - `plugins <#section-plugins>`_
 
 - `propeller <#section-propeller>`_
@@ -735,6 +737,75 @@ Sets logging format type.
   json
   
 
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemtry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
+  
+
 Section: plugins
 ========================================================================================================================
 
@@ -750,7 +821,7 @@ agent-service (`agent.Config`_)
   defaultAgent:
     defaultServiceConfig: ""
     defaultTimeout: 10s
-    endpoint: dns:///flyteagent.flyte.svc.cluster.local:80
+    endpoint: ""
     insecure: true
     timeouts: null
   resourceConstraints:
@@ -911,6 +982,16 @@ databricks (`databricks.Config`_)
       qps: 10
   
 
+echo (`testing.Config`_)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  sleep-duration: 0s
+  
+
 k8s (`config.K8sPluginConfig`_)
 ------------------------------------------------------------------------------------------------------------------------
 
@@ -929,6 +1010,7 @@ k8s (`config.K8sPluginConfig`_)
     output-vol-name: flyte-outputs
     start-timeout: 1m40s
     storage: ""
+  create-container-config-error-grace-period: 0s
   create-container-error-grace-period: 3m0s
   default-annotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
@@ -957,6 +1039,7 @@ k8s (`config.K8sPluginConfig`_)
   interruptible-node-selector-requirement: null
   interruptible-tolerations: null
   non-interruptible-node-selector-requirement: null
+  pod-pending-timeout: 0s
   resource-tolerations: null
   scheduler-name: ""
   send-object-events: false
@@ -983,6 +1066,8 @@ k8s-array (`k8s.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
+      flyin-enabled: false
+      flyin-template-uri: ""
       gcp-project: ""
       kubernetes-enabled: true
       kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -1032,6 +1117,8 @@ logs (`logs.LogConfig`_)
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: true
   kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -1075,6 +1162,7 @@ ray (`ray.Config`_)
 .. code-block:: yaml
 
   dashboardHost: 0.0.0.0
+  dashboardURLTemplate: null
   defaults:
     headNode:
       ipAddress: $MY_POD_IP
@@ -1091,6 +1179,8 @@ ray (`ray.Config`_)
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
+    flyin-enabled: false
+    flyin-template-uri: ""
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -1099,6 +1189,7 @@ ray (`ray.Config`_)
     stackdriver-logresourcename: ""
     stackdriver-template-uri: ""
     templates: null
+  logsSidecar: null
   remoteClusterConfig:
     auth:
       caCertPath: ""
@@ -1109,25 +1200,6 @@ ray (`ray.Config`_)
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
-  
-
-sagemaker (`config.Config (sagemaker)`_)
-------------------------------------------------------------------------------------------------------------------------
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  prebuiltAlgorithms:
-  - name: xgboost
-    regionalConfigs:
-    - region: us-east-1
-      versionConfigs:
-      - image: 683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3
-        version: "0.90"
-  region: us-east-1
-  roleAnnotationKey: ""
-  roleArn: default_role
   
 
 snowflake (`snowflake.Config`_)
@@ -1175,6 +1247,8 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
+      flyin-enabled: false
+      flyin-template-uri: ""
       gcp-project: ""
       kubernetes-enabled: false
       kubernetes-template-uri: ""
@@ -1188,6 +1262,8 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
+      flyin-enabled: false
+      flyin-template-uri: ""
       gcp-project: ""
       kubernetes-enabled: true
       kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -1202,6 +1278,8 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
+      flyin-enabled: false
+      flyin-template-uri: ""
       gcp-project: ""
       kubernetes-enabled: false
       kubernetes-template-uri: ""
@@ -1215,6 +1293,8 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
+      flyin-enabled: false
+      flyin-template-uri: ""
       gcp-project: ""
       kubernetes-enabled: false
       kubernetes-template-uri: ""
@@ -1279,7 +1359,7 @@ The default agent.
 
   defaultServiceConfig: ""
   defaultTimeout: 10s
-  endpoint: dns:///flyteagent.flyte.svc.cluster.local:80
+  endpoint: ""
   insecure: true
   timeouts: null
   
@@ -1327,7 +1407,7 @@ endpoint (string)
 
 .. code-block:: yaml
 
-  dns:///flyteagent.flyte.svc.cluster.local:80
+  ""
   
 
 insecure (bool)
@@ -2058,60 +2138,6 @@ destinationClusterConfigs ([]config.DestinationClusterConfig)
   []
   
 
-config.Config (sagemaker)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-roleArn (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The role the SageMaker plugin uses to communicate with the SageMaker service
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  default_role
-  
-
-region (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-The AWS region the SageMaker plugin communicates to
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  us-east-1
-  
-
-roleAnnotationKey (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Map key to use to lookup role from task annotations.
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
-  
-
-prebuiltAlgorithms ([]config.PrebuiltAlgorithmConfig)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  - name: xgboost
-    regionalConfigs:
-    - region: us-east-1
-      versionConfigs:
-      - image: 683313688378.dkr.ecr.us-east-1.amazonaws.com/sagemaker-xgboost:0.90-2-cpu-py3
-        version: "0.90"
-  
-
 config.K8sPluginConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -2326,6 +2352,16 @@ create-container-error-grace-period (`config.Duration`_)
   3m0s
   
 
+create-container-config-error-grace-period (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
+  
+
 image-pull-backoff-grace-period (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2334,6 +2370,16 @@ image-pull-backoff-grace-period (`config.Duration`_)
 .. code-block:: yaml
 
   3m0s
+  
+
+pod-pending-timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 gpu-device-node-label (string)
@@ -2895,6 +2941,8 @@ Config for log links for k8s array jobs.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
+    flyin-enabled: false
+    flyin-template-uri: ""
     gcp-project: ""
     kubernetes-enabled: true
     kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3012,6 +3060,8 @@ Defines the log config for k8s logs.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: true
   kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3159,7 +3209,31 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-templates ([]logs.TemplateLogPluginConfig)
+flyin-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Log-links to flyin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+flyin-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building flyin log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+templates ([]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3332,7 +3406,31 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-templates ([]logs.TemplateLogPluginConfig)
+flyin-enabled (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable Log-links to flyin logs
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+flyin-template-uri (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template Uri to use when building flyin log links
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
+  
+
+templates ([]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
@@ -3433,6 +3531,8 @@ logs (`logs.LogConfig`_)
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3441,6 +3541,28 @@ logs (`logs.LogConfig`_)
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
+  
+
+logsSidecar (v1.Container)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+dashboardURLTemplate (tasklog.TemplateLogPlugin)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Template for URL of Ray dashboard running on a head node.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 defaults (`ray.DefaultConfig`_)
@@ -3646,6 +3768,8 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
+    flyin-enabled: false
+    flyin-template-uri: ""
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -3659,6 +3783,8 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
+    flyin-enabled: false
+    flyin-template-uri: ""
     gcp-project: ""
     kubernetes-enabled: true
     kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3673,6 +3799,8 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
+    flyin-enabled: false
+    flyin-template-uri: ""
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -3686,6 +3814,8 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
+    flyin-enabled: false
+    flyin-template-uri: ""
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -3712,6 +3842,8 @@ Defines the log config that's not split into user/system.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: true
   kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3736,6 +3868,8 @@ Defines the log config for user logs.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3759,6 +3893,8 @@ Defines the log config for system logs.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3782,6 +3918,8 @@ All user logs across driver and executors.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
+  flyin-enabled: false
+  flyin-template-uri: ""
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3790,6 +3928,21 @@ All user logs across driver and executors.
   stackdriver-logresourcename: ""
   stackdriver-template-uri: ""
   templates: null
+  
+
+testing.Config
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+sleep-duration (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Indicates the amount of time before transitioning to success
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 Section: propeller
@@ -4084,6 +4237,7 @@ config for a workflow node
     node-execution-deadline: 0s
     workflow-active-deadline: 0s
   default-max-attempts: 1
+  enable-cr-debug-metadata: false
   ignore-retry-cause: false
   interruptible-failure-threshold: -1
   max-node-retries-system-failures: 3
@@ -4220,6 +4374,18 @@ ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => 
 .. code-block:: yaml
 
   "0"
+  
+
+node-execution-worker-count (int)
+------------------------------------------------------------------------------------------------------------------------
+
+Number of workers to evaluate node executions, currently only used for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "8"
   
 
 admin-launcher (`launchplan.AdminConfig`_)
@@ -4708,6 +4874,18 @@ ignore-retry-cause (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Ignore retry cause and count all attempts toward a node's max attempts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+enable-cr-debug-metadata (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd.
 
 **Default Value**: 
 
@@ -5464,6 +5642,16 @@ requests (v1.ResourceList)
 
   cpu: 200m
   memory: 500Mi
+  
+
+claims ([]v1.ResourceClaim)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
   
 
 config.GCPSecretManagerConfig

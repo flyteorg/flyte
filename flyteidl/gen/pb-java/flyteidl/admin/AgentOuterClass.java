@@ -6178,20 +6178,20 @@ public final class AgentOuterClass {
 
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    int getStateValue();
+    @java.lang.Deprecated int getStateValue();
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    flyteidl.admin.AgentOuterClass.State getState();
+    @java.lang.Deprecated flyteidl.admin.AgentOuterClass.State getState();
 
     /**
      * <pre>
@@ -6285,6 +6285,23 @@ public final class AgentOuterClass {
      */
     flyteidl.core.Execution.TaskLogOrBuilder getLogLinksOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    int getPhaseValue();
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    flyteidl.core.Execution.TaskExecution.Phase getPhase();
   }
   /**
    * Protobuf type {@code flyteidl.admin.Resource}
@@ -6302,6 +6319,7 @@ public final class AgentOuterClass {
       state_ = 0;
       message_ = "";
       logLinks_ = java.util.Collections.emptyList();
+      phase_ = 0;
     }
 
     @java.lang.Override
@@ -6362,6 +6380,12 @@ public final class AgentOuterClass {
                   input.readMessage(flyteidl.core.Execution.TaskLog.parser(), extensionRegistry));
               break;
             }
+            case 40: {
+              int rawValue = input.readEnum();
+
+              phase_ = rawValue;
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -6402,22 +6426,22 @@ public final class AgentOuterClass {
     private int state_;
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    public int getStateValue() {
+    @java.lang.Deprecated public int getStateValue() {
       return state_;
     }
     /**
      * <pre>
-     * The state of the execution is used to control its visibility in the UI/CLI.
+     * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
      * </pre>
      *
-     * <code>.flyteidl.admin.State state = 1;</code>
+     * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
      */
-    public flyteidl.admin.AgentOuterClass.State getState() {
+    @java.lang.Deprecated public flyteidl.admin.AgentOuterClass.State getState() {
       @SuppressWarnings("deprecation")
       flyteidl.admin.AgentOuterClass.State result = flyteidl.admin.AgentOuterClass.State.valueOf(state_);
       return result == null ? flyteidl.admin.AgentOuterClass.State.UNRECOGNIZED : result;
@@ -6559,6 +6583,31 @@ public final class AgentOuterClass {
       return logLinks_.get(index);
     }
 
+    public static final int PHASE_FIELD_NUMBER = 5;
+    private int phase_;
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    public int getPhaseValue() {
+      return phase_;
+    }
+    /**
+     * <pre>
+     * The phase of the execution is used to determine the phase of the plugin's execution.
+     * </pre>
+     *
+     * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+     */
+    public flyteidl.core.Execution.TaskExecution.Phase getPhase() {
+      @SuppressWarnings("deprecation")
+      flyteidl.core.Execution.TaskExecution.Phase result = flyteidl.core.Execution.TaskExecution.Phase.valueOf(phase_);
+      return result == null ? flyteidl.core.Execution.TaskExecution.Phase.UNRECOGNIZED : result;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -6585,6 +6634,9 @@ public final class AgentOuterClass {
       for (int i = 0; i < logLinks_.size(); i++) {
         output.writeMessage(4, logLinks_.get(i));
       }
+      if (phase_ != flyteidl.core.Execution.TaskExecution.Phase.UNDEFINED.getNumber()) {
+        output.writeEnum(5, phase_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -6608,6 +6660,10 @@ public final class AgentOuterClass {
       for (int i = 0; i < logLinks_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, logLinks_.get(i));
+      }
+      if (phase_ != flyteidl.core.Execution.TaskExecution.Phase.UNDEFINED.getNumber()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeEnumSize(5, phase_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -6634,6 +6690,7 @@ public final class AgentOuterClass {
           .equals(other.getMessage())) return false;
       if (!getLogLinksList()
           .equals(other.getLogLinksList())) return false;
+      if (phase_ != other.phase_) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -6657,6 +6714,8 @@ public final class AgentOuterClass {
         hash = (37 * hash) + LOG_LINKS_FIELD_NUMBER;
         hash = (53 * hash) + getLogLinksList().hashCode();
       }
+      hash = (37 * hash) + PHASE_FIELD_NUMBER;
+      hash = (53 * hash) + phase_;
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -6807,6 +6866,8 @@ public final class AgentOuterClass {
         } else {
           logLinksBuilder_.clear();
         }
+        phase_ = 0;
+
         return this;
       }
 
@@ -6851,6 +6912,7 @@ public final class AgentOuterClass {
         } else {
           result.logLinks_ = logLinksBuilder_.build();
         }
+        result.phase_ = phase_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -6936,6 +6998,9 @@ public final class AgentOuterClass {
             }
           }
         }
+        if (other.phase_ != 0) {
+          setPhaseValue(other.getPhaseValue());
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -6969,46 +7034,46 @@ public final class AgentOuterClass {
       private int state_ = 0;
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public int getStateValue() {
+      @java.lang.Deprecated public int getStateValue() {
         return state_;
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public Builder setStateValue(int value) {
+      @java.lang.Deprecated public Builder setStateValue(int value) {
         state_ = value;
         onChanged();
         return this;
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public flyteidl.admin.AgentOuterClass.State getState() {
+      @java.lang.Deprecated public flyteidl.admin.AgentOuterClass.State getState() {
         @SuppressWarnings("deprecation")
         flyteidl.admin.AgentOuterClass.State result = flyteidl.admin.AgentOuterClass.State.valueOf(state_);
         return result == null ? flyteidl.admin.AgentOuterClass.State.UNRECOGNIZED : result;
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public Builder setState(flyteidl.admin.AgentOuterClass.State value) {
+      @java.lang.Deprecated public Builder setState(flyteidl.admin.AgentOuterClass.State value) {
         if (value == null) {
           throw new NullPointerException();
         }
@@ -7019,12 +7084,12 @@ public final class AgentOuterClass {
       }
       /**
        * <pre>
-       * The state of the execution is used to control its visibility in the UI/CLI.
+       * DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
        * </pre>
        *
-       * <code>.flyteidl.admin.State state = 1;</code>
+       * <code>.flyteidl.admin.State state = 1 [deprecated = true];</code>
        */
-      public Builder clearState() {
+      @java.lang.Deprecated public Builder clearState() {
         
         state_ = 0;
         onChanged();
@@ -7601,6 +7666,71 @@ public final class AgentOuterClass {
           logLinks_ = null;
         }
         return logLinksBuilder_;
+      }
+
+      private int phase_ = 0;
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public int getPhaseValue() {
+        return phase_;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public Builder setPhaseValue(int value) {
+        phase_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public flyteidl.core.Execution.TaskExecution.Phase getPhase() {
+        @SuppressWarnings("deprecation")
+        flyteidl.core.Execution.TaskExecution.Phase result = flyteidl.core.Execution.TaskExecution.Phase.valueOf(phase_);
+        return result == null ? flyteidl.core.Execution.TaskExecution.Phase.UNRECOGNIZED : result;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public Builder setPhase(flyteidl.core.Execution.TaskExecution.Phase value) {
+        if (value == null) {
+          throw new NullPointerException();
+        }
+        
+        phase_ = value.getNumber();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The phase of the execution is used to determine the phase of the plugin's execution.
+       * </pre>
+       *
+       * <code>.flyteidl.core.TaskExecution.Phase phase = 5;</code>
+       */
+      public Builder clearPhase() {
+        
+        phase_ = 0;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -12023,6 +12153,4435 @@ public final class AgentOuterClass {
 
   }
 
+  public interface GetTaskMetricsRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.GetTaskMetricsRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    java.lang.String getTaskType();
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getTaskTypeBytes();
+
+    /**
+     * <pre>
+     * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+     * </pre>
+     *
+     * <code>bytes resource_meta = 2;</code>
+     */
+    com.google.protobuf.ByteString getResourceMeta();
+
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    java.util.List<java.lang.String>
+        getQueriesList();
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    int getQueriesCount();
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    java.lang.String getQueries(int index);
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getQueriesBytes(int index);
+
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    boolean hasStartTime();
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    com.google.protobuf.Timestamp getStartTime();
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getStartTimeOrBuilder();
+
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    boolean hasEndTime();
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    com.google.protobuf.Timestamp getEndTime();
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    com.google.protobuf.TimestampOrBuilder getEndTimeOrBuilder();
+
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    boolean hasStep();
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    com.google.protobuf.Duration getStep();
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    com.google.protobuf.DurationOrBuilder getStepOrBuilder();
+  }
+  /**
+   * <pre>
+   * A request to get the metrics from a task execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.GetTaskMetricsRequest}
+   */
+  public  static final class GetTaskMetricsRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.GetTaskMetricsRequest)
+      GetTaskMetricsRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GetTaskMetricsRequest.newBuilder() to construct.
+    private GetTaskMetricsRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GetTaskMetricsRequest() {
+      taskType_ = "";
+      resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+      queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GetTaskMetricsRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              taskType_ = s;
+              break;
+            }
+            case 18: {
+
+              resourceMeta_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000004) != 0)) {
+                queries_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000004;
+              }
+              queries_.add(s);
+              break;
+            }
+            case 34: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (startTime_ != null) {
+                subBuilder = startTime_.toBuilder();
+              }
+              startTime_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(startTime_);
+                startTime_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 42: {
+              com.google.protobuf.Timestamp.Builder subBuilder = null;
+              if (endTime_ != null) {
+                subBuilder = endTime_.toBuilder();
+              }
+              endTime_ = input.readMessage(com.google.protobuf.Timestamp.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(endTime_);
+                endTime_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 50: {
+              com.google.protobuf.Duration.Builder subBuilder = null;
+              if (step_ != null) {
+                subBuilder = step_.toBuilder();
+              }
+              step_ = input.readMessage(com.google.protobuf.Duration.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(step_);
+                step_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000004) != 0)) {
+          queries_ = queries_.getUnmodifiableView();
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.class, flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int TASK_TYPE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object taskType_;
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    public java.lang.String getTaskType() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        taskType_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTaskTypeBytes() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        taskType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int RESOURCE_META_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString resourceMeta_;
+    /**
+     * <pre>
+     * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+     * </pre>
+     *
+     * <code>bytes resource_meta = 2;</code>
+     */
+    public com.google.protobuf.ByteString getResourceMeta() {
+      return resourceMeta_;
+    }
+
+    public static final int QUERIES_FIELD_NUMBER = 3;
+    private com.google.protobuf.LazyStringList queries_;
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getQueriesList() {
+      return queries_;
+    }
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    public int getQueriesCount() {
+      return queries_.size();
+    }
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    public java.lang.String getQueries(int index) {
+      return queries_.get(index);
+    }
+    /**
+     * <pre>
+     * The metrics to query. If empty, will return a default set of metrics.
+     * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+     * </pre>
+     *
+     * <code>repeated string queries = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getQueriesBytes(int index) {
+      return queries_.getByteString(index);
+    }
+
+    public static final int START_TIME_FIELD_NUMBER = 4;
+    private com.google.protobuf.Timestamp startTime_;
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    public boolean hasStartTime() {
+      return startTime_ != null;
+    }
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    public com.google.protobuf.Timestamp getStartTime() {
+      return startTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : startTime_;
+    }
+    /**
+     * <pre>
+     * Start timestamp, inclusive.
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp start_time = 4;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getStartTimeOrBuilder() {
+      return getStartTime();
+    }
+
+    public static final int END_TIME_FIELD_NUMBER = 5;
+    private com.google.protobuf.Timestamp endTime_;
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    public boolean hasEndTime() {
+      return endTime_ != null;
+    }
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    public com.google.protobuf.Timestamp getEndTime() {
+      return endTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : endTime_;
+    }
+    /**
+     * <pre>
+     * End timestamp, inclusive..
+     * </pre>
+     *
+     * <code>.google.protobuf.Timestamp end_time = 5;</code>
+     */
+    public com.google.protobuf.TimestampOrBuilder getEndTimeOrBuilder() {
+      return getEndTime();
+    }
+
+    public static final int STEP_FIELD_NUMBER = 6;
+    private com.google.protobuf.Duration step_;
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    public boolean hasStep() {
+      return step_ != null;
+    }
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    public com.google.protobuf.Duration getStep() {
+      return step_ == null ? com.google.protobuf.Duration.getDefaultInstance() : step_;
+    }
+    /**
+     * <pre>
+     * Query resolution step width in duration format or float number of seconds.
+     * </pre>
+     *
+     * <code>.google.protobuf.Duration step = 6;</code>
+     */
+    public com.google.protobuf.DurationOrBuilder getStepOrBuilder() {
+      return getStep();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getTaskTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, taskType_);
+      }
+      if (!resourceMeta_.isEmpty()) {
+        output.writeBytes(2, resourceMeta_);
+      }
+      for (int i = 0; i < queries_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, queries_.getRaw(i));
+      }
+      if (startTime_ != null) {
+        output.writeMessage(4, getStartTime());
+      }
+      if (endTime_ != null) {
+        output.writeMessage(5, getEndTime());
+      }
+      if (step_ != null) {
+        output.writeMessage(6, getStep());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getTaskTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, taskType_);
+      }
+      if (!resourceMeta_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, resourceMeta_);
+      }
+      {
+        int dataSize = 0;
+        for (int i = 0; i < queries_.size(); i++) {
+          dataSize += computeStringSizeNoTag(queries_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getQueriesList().size();
+      }
+      if (startTime_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, getStartTime());
+      }
+      if (endTime_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, getEndTime());
+      }
+      if (step_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(6, getStep());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest other = (flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest) obj;
+
+      if (!getTaskType()
+          .equals(other.getTaskType())) return false;
+      if (!getResourceMeta()
+          .equals(other.getResourceMeta())) return false;
+      if (!getQueriesList()
+          .equals(other.getQueriesList())) return false;
+      if (hasStartTime() != other.hasStartTime()) return false;
+      if (hasStartTime()) {
+        if (!getStartTime()
+            .equals(other.getStartTime())) return false;
+      }
+      if (hasEndTime() != other.hasEndTime()) return false;
+      if (hasEndTime()) {
+        if (!getEndTime()
+            .equals(other.getEndTime())) return false;
+      }
+      if (hasStep() != other.hasStep()) return false;
+      if (hasStep()) {
+        if (!getStep()
+            .equals(other.getStep())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + TASK_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getTaskType().hashCode();
+      hash = (37 * hash) + RESOURCE_META_FIELD_NUMBER;
+      hash = (53 * hash) + getResourceMeta().hashCode();
+      if (getQueriesCount() > 0) {
+        hash = (37 * hash) + QUERIES_FIELD_NUMBER;
+        hash = (53 * hash) + getQueriesList().hashCode();
+      }
+      if (hasStartTime()) {
+        hash = (37 * hash) + START_TIME_FIELD_NUMBER;
+        hash = (53 * hash) + getStartTime().hashCode();
+      }
+      if (hasEndTime()) {
+        hash = (37 * hash) + END_TIME_FIELD_NUMBER;
+        hash = (53 * hash) + getEndTime().hashCode();
+      }
+      if (hasStep()) {
+        hash = (37 * hash) + STEP_FIELD_NUMBER;
+        hash = (53 * hash) + getStep().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * A request to get the metrics from a task execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.GetTaskMetricsRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.GetTaskMetricsRequest)
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.class, flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        taskType_ = "";
+
+        resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+
+        queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        if (startTimeBuilder_ == null) {
+          startTime_ = null;
+        } else {
+          startTime_ = null;
+          startTimeBuilder_ = null;
+        }
+        if (endTimeBuilder_ == null) {
+          endTime_ = null;
+        } else {
+          endTime_ = null;
+          endTimeBuilder_ = null;
+        }
+        if (stepBuilder_ == null) {
+          step_ = null;
+        } else {
+          step_ = null;
+          stepBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest getDefaultInstanceForType() {
+        return flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest build() {
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest buildPartial() {
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest result = new flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        result.taskType_ = taskType_;
+        result.resourceMeta_ = resourceMeta_;
+        if (((bitField0_ & 0x00000004) != 0)) {
+          queries_ = queries_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000004);
+        }
+        result.queries_ = queries_;
+        if (startTimeBuilder_ == null) {
+          result.startTime_ = startTime_;
+        } else {
+          result.startTime_ = startTimeBuilder_.build();
+        }
+        if (endTimeBuilder_ == null) {
+          result.endTime_ = endTime_;
+        } else {
+          result.endTime_ = endTimeBuilder_.build();
+        }
+        if (stepBuilder_ == null) {
+          result.step_ = step_;
+        } else {
+          result.step_ = stepBuilder_.build();
+        }
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest) {
+          return mergeFrom((flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest other) {
+        if (other == flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest.getDefaultInstance()) return this;
+        if (!other.getTaskType().isEmpty()) {
+          taskType_ = other.taskType_;
+          onChanged();
+        }
+        if (other.getResourceMeta() != com.google.protobuf.ByteString.EMPTY) {
+          setResourceMeta(other.getResourceMeta());
+        }
+        if (!other.queries_.isEmpty()) {
+          if (queries_.isEmpty()) {
+            queries_ = other.queries_;
+            bitField0_ = (bitField0_ & ~0x00000004);
+          } else {
+            ensureQueriesIsMutable();
+            queries_.addAll(other.queries_);
+          }
+          onChanged();
+        }
+        if (other.hasStartTime()) {
+          mergeStartTime(other.getStartTime());
+        }
+        if (other.hasEndTime()) {
+          mergeEndTime(other.getEndTime());
+        }
+        if (other.hasStep()) {
+          mergeStep(other.getStep());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.lang.Object taskType_ = "";
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public java.lang.String getTaskType() {
+        java.lang.Object ref = taskType_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          taskType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTaskTypeBytes() {
+        java.lang.Object ref = taskType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          taskType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder setTaskType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder clearTaskType() {
+        
+        taskType_ = getDefaultInstance().getTaskType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder setTaskTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <pre>
+       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+       * </pre>
+       *
+       * <code>bytes resource_meta = 2;</code>
+       */
+      public com.google.protobuf.ByteString getResourceMeta() {
+        return resourceMeta_;
+      }
+      /**
+       * <pre>
+       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+       * </pre>
+       *
+       * <code>bytes resource_meta = 2;</code>
+       */
+      public Builder setResourceMeta(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        resourceMeta_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+       * </pre>
+       *
+       * <code>bytes resource_meta = 2;</code>
+       */
+      public Builder clearResourceMeta() {
+        
+        resourceMeta_ = getDefaultInstance().getResourceMeta();
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.LazyStringList queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureQueriesIsMutable() {
+        if (!((bitField0_ & 0x00000004) != 0)) {
+          queries_ = new com.google.protobuf.LazyStringArrayList(queries_);
+          bitField0_ |= 0x00000004;
+         }
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getQueriesList() {
+        return queries_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public int getQueriesCount() {
+        return queries_.size();
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public java.lang.String getQueries(int index) {
+        return queries_.get(index);
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getQueriesBytes(int index) {
+        return queries_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public Builder setQueries(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureQueriesIsMutable();
+        queries_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public Builder addQueries(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureQueriesIsMutable();
+        queries_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public Builder addAllQueries(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureQueriesIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, queries_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public Builder clearQueries() {
+        queries_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The metrics to query. If empty, will return a default set of metrics.
+       * e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+       * </pre>
+       *
+       * <code>repeated string queries = 3;</code>
+       */
+      public Builder addQueriesBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureQueriesIsMutable();
+        queries_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.Timestamp startTime_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> startTimeBuilder_;
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public boolean hasStartTime() {
+        return startTimeBuilder_ != null || startTime_ != null;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public com.google.protobuf.Timestamp getStartTime() {
+        if (startTimeBuilder_ == null) {
+          return startTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : startTime_;
+        } else {
+          return startTimeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder setStartTime(com.google.protobuf.Timestamp value) {
+        if (startTimeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          startTime_ = value;
+          onChanged();
+        } else {
+          startTimeBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder setStartTime(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (startTimeBuilder_ == null) {
+          startTime_ = builderForValue.build();
+          onChanged();
+        } else {
+          startTimeBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder mergeStartTime(com.google.protobuf.Timestamp value) {
+        if (startTimeBuilder_ == null) {
+          if (startTime_ != null) {
+            startTime_ =
+              com.google.protobuf.Timestamp.newBuilder(startTime_).mergeFrom(value).buildPartial();
+          } else {
+            startTime_ = value;
+          }
+          onChanged();
+        } else {
+          startTimeBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public Builder clearStartTime() {
+        if (startTimeBuilder_ == null) {
+          startTime_ = null;
+          onChanged();
+        } else {
+          startTime_ = null;
+          startTimeBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getStartTimeBuilder() {
+        
+        onChanged();
+        return getStartTimeFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getStartTimeOrBuilder() {
+        if (startTimeBuilder_ != null) {
+          return startTimeBuilder_.getMessageOrBuilder();
+        } else {
+          return startTime_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : startTime_;
+        }
+      }
+      /**
+       * <pre>
+       * Start timestamp, inclusive.
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp start_time = 4;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getStartTimeFieldBuilder() {
+        if (startTimeBuilder_ == null) {
+          startTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getStartTime(),
+                  getParentForChildren(),
+                  isClean());
+          startTime_ = null;
+        }
+        return startTimeBuilder_;
+      }
+
+      private com.google.protobuf.Timestamp endTime_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> endTimeBuilder_;
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public boolean hasEndTime() {
+        return endTimeBuilder_ != null || endTime_ != null;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public com.google.protobuf.Timestamp getEndTime() {
+        if (endTimeBuilder_ == null) {
+          return endTime_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : endTime_;
+        } else {
+          return endTimeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder setEndTime(com.google.protobuf.Timestamp value) {
+        if (endTimeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          endTime_ = value;
+          onChanged();
+        } else {
+          endTimeBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder setEndTime(
+          com.google.protobuf.Timestamp.Builder builderForValue) {
+        if (endTimeBuilder_ == null) {
+          endTime_ = builderForValue.build();
+          onChanged();
+        } else {
+          endTimeBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder mergeEndTime(com.google.protobuf.Timestamp value) {
+        if (endTimeBuilder_ == null) {
+          if (endTime_ != null) {
+            endTime_ =
+              com.google.protobuf.Timestamp.newBuilder(endTime_).mergeFrom(value).buildPartial();
+          } else {
+            endTime_ = value;
+          }
+          onChanged();
+        } else {
+          endTimeBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public Builder clearEndTime() {
+        if (endTimeBuilder_ == null) {
+          endTime_ = null;
+          onChanged();
+        } else {
+          endTime_ = null;
+          endTimeBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public com.google.protobuf.Timestamp.Builder getEndTimeBuilder() {
+        
+        onChanged();
+        return getEndTimeFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      public com.google.protobuf.TimestampOrBuilder getEndTimeOrBuilder() {
+        if (endTimeBuilder_ != null) {
+          return endTimeBuilder_.getMessageOrBuilder();
+        } else {
+          return endTime_ == null ?
+              com.google.protobuf.Timestamp.getDefaultInstance() : endTime_;
+        }
+      }
+      /**
+       * <pre>
+       * End timestamp, inclusive..
+       * </pre>
+       *
+       * <code>.google.protobuf.Timestamp end_time = 5;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
+          getEndTimeFieldBuilder() {
+        if (endTimeBuilder_ == null) {
+          endTimeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder>(
+                  getEndTime(),
+                  getParentForChildren(),
+                  isClean());
+          endTime_ = null;
+        }
+        return endTimeBuilder_;
+      }
+
+      private com.google.protobuf.Duration step_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> stepBuilder_;
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public boolean hasStep() {
+        return stepBuilder_ != null || step_ != null;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public com.google.protobuf.Duration getStep() {
+        if (stepBuilder_ == null) {
+          return step_ == null ? com.google.protobuf.Duration.getDefaultInstance() : step_;
+        } else {
+          return stepBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder setStep(com.google.protobuf.Duration value) {
+        if (stepBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          step_ = value;
+          onChanged();
+        } else {
+          stepBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder setStep(
+          com.google.protobuf.Duration.Builder builderForValue) {
+        if (stepBuilder_ == null) {
+          step_ = builderForValue.build();
+          onChanged();
+        } else {
+          stepBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder mergeStep(com.google.protobuf.Duration value) {
+        if (stepBuilder_ == null) {
+          if (step_ != null) {
+            step_ =
+              com.google.protobuf.Duration.newBuilder(step_).mergeFrom(value).buildPartial();
+          } else {
+            step_ = value;
+          }
+          onChanged();
+        } else {
+          stepBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public Builder clearStep() {
+        if (stepBuilder_ == null) {
+          step_ = null;
+          onChanged();
+        } else {
+          step_ = null;
+          stepBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public com.google.protobuf.Duration.Builder getStepBuilder() {
+        
+        onChanged();
+        return getStepFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      public com.google.protobuf.DurationOrBuilder getStepOrBuilder() {
+        if (stepBuilder_ != null) {
+          return stepBuilder_.getMessageOrBuilder();
+        } else {
+          return step_ == null ?
+              com.google.protobuf.Duration.getDefaultInstance() : step_;
+        }
+      }
+      /**
+       * <pre>
+       * Query resolution step width in duration format or float number of seconds.
+       * </pre>
+       *
+       * <code>.google.protobuf.Duration step = 6;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder> 
+          getStepFieldBuilder() {
+        if (stepBuilder_ == null) {
+          stepBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.google.protobuf.Duration, com.google.protobuf.Duration.Builder, com.google.protobuf.DurationOrBuilder>(
+                  getStep(),
+                  getParentForChildren(),
+                  isClean());
+          step_ = null;
+        }
+        return stepBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.GetTaskMetricsRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.GetTaskMetricsRequest)
+    private static final flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest();
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GetTaskMetricsRequest>
+        PARSER = new com.google.protobuf.AbstractParser<GetTaskMetricsRequest>() {
+      @java.lang.Override
+      public GetTaskMetricsRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GetTaskMetricsRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GetTaskMetricsRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GetTaskMetricsRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.AgentOuterClass.GetTaskMetricsRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface GetTaskMetricsResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.GetTaskMetricsResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    java.util.List<flyteidl.core.Metrics.ExecutionMetricResult> 
+        getResultsList();
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    flyteidl.core.Metrics.ExecutionMetricResult getResults(int index);
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    int getResultsCount();
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    java.util.List<? extends flyteidl.core.Metrics.ExecutionMetricResultOrBuilder> 
+        getResultsOrBuilderList();
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    flyteidl.core.Metrics.ExecutionMetricResultOrBuilder getResultsOrBuilder(
+        int index);
+  }
+  /**
+   * <pre>
+   * A response containing a list of metrics for a task execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.GetTaskMetricsResponse}
+   */
+  public  static final class GetTaskMetricsResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.GetTaskMetricsResponse)
+      GetTaskMetricsResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GetTaskMetricsResponse.newBuilder() to construct.
+    private GetTaskMetricsResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GetTaskMetricsResponse() {
+      results_ = java.util.Collections.emptyList();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GetTaskMetricsResponse(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                results_ = new java.util.ArrayList<flyteidl.core.Metrics.ExecutionMetricResult>();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              results_.add(
+                  input.readMessage(flyteidl.core.Metrics.ExecutionMetricResult.parser(), extensionRegistry));
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          results_ = java.util.Collections.unmodifiableList(results_);
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.class, flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.Builder.class);
+    }
+
+    public static final int RESULTS_FIELD_NUMBER = 1;
+    private java.util.List<flyteidl.core.Metrics.ExecutionMetricResult> results_;
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    public java.util.List<flyteidl.core.Metrics.ExecutionMetricResult> getResultsList() {
+      return results_;
+    }
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Metrics.ExecutionMetricResultOrBuilder> 
+        getResultsOrBuilderList() {
+      return results_;
+    }
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    public int getResultsCount() {
+      return results_.size();
+    }
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    public flyteidl.core.Metrics.ExecutionMetricResult getResults(int index) {
+      return results_.get(index);
+    }
+    /**
+     * <pre>
+     * The execution metric results.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+     */
+    public flyteidl.core.Metrics.ExecutionMetricResultOrBuilder getResultsOrBuilder(
+        int index) {
+      return results_.get(index);
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < results_.size(); i++) {
+        output.writeMessage(1, results_.get(i));
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      for (int i = 0; i < results_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, results_.get(i));
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse other = (flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse) obj;
+
+      if (!getResultsList()
+          .equals(other.getResultsList())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getResultsCount() > 0) {
+        hash = (37 * hash) + RESULTS_FIELD_NUMBER;
+        hash = (53 * hash) + getResultsList().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * A response containing a list of metrics for a task execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.GetTaskMetricsResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.GetTaskMetricsResponse)
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.class, flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+          getResultsFieldBuilder();
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (resultsBuilder_ == null) {
+          results_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        } else {
+          resultsBuilder_.clear();
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse getDefaultInstanceForType() {
+        return flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse build() {
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse buildPartial() {
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse result = new flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse(this);
+        int from_bitField0_ = bitField0_;
+        if (resultsBuilder_ == null) {
+          if (((bitField0_ & 0x00000001) != 0)) {
+            results_ = java.util.Collections.unmodifiableList(results_);
+            bitField0_ = (bitField0_ & ~0x00000001);
+          }
+          result.results_ = results_;
+        } else {
+          result.results_ = resultsBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse) {
+          return mergeFrom((flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse other) {
+        if (other == flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse.getDefaultInstance()) return this;
+        if (resultsBuilder_ == null) {
+          if (!other.results_.isEmpty()) {
+            if (results_.isEmpty()) {
+              results_ = other.results_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+            } else {
+              ensureResultsIsMutable();
+              results_.addAll(other.results_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.results_.isEmpty()) {
+            if (resultsBuilder_.isEmpty()) {
+              resultsBuilder_.dispose();
+              resultsBuilder_ = null;
+              results_ = other.results_;
+              bitField0_ = (bitField0_ & ~0x00000001);
+              resultsBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getResultsFieldBuilder() : null;
+            } else {
+              resultsBuilder_.addAllMessages(other.results_);
+            }
+          }
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private java.util.List<flyteidl.core.Metrics.ExecutionMetricResult> results_ =
+        java.util.Collections.emptyList();
+      private void ensureResultsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          results_ = new java.util.ArrayList<flyteidl.core.Metrics.ExecutionMetricResult>(results_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Metrics.ExecutionMetricResult, flyteidl.core.Metrics.ExecutionMetricResult.Builder, flyteidl.core.Metrics.ExecutionMetricResultOrBuilder> resultsBuilder_;
+
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public java.util.List<flyteidl.core.Metrics.ExecutionMetricResult> getResultsList() {
+        if (resultsBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(results_);
+        } else {
+          return resultsBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public int getResultsCount() {
+        if (resultsBuilder_ == null) {
+          return results_.size();
+        } else {
+          return resultsBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public flyteidl.core.Metrics.ExecutionMetricResult getResults(int index) {
+        if (resultsBuilder_ == null) {
+          return results_.get(index);
+        } else {
+          return resultsBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder setResults(
+          int index, flyteidl.core.Metrics.ExecutionMetricResult value) {
+        if (resultsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureResultsIsMutable();
+          results_.set(index, value);
+          onChanged();
+        } else {
+          resultsBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder setResults(
+          int index, flyteidl.core.Metrics.ExecutionMetricResult.Builder builderForValue) {
+        if (resultsBuilder_ == null) {
+          ensureResultsIsMutable();
+          results_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          resultsBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder addResults(flyteidl.core.Metrics.ExecutionMetricResult value) {
+        if (resultsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureResultsIsMutable();
+          results_.add(value);
+          onChanged();
+        } else {
+          resultsBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder addResults(
+          int index, flyteidl.core.Metrics.ExecutionMetricResult value) {
+        if (resultsBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureResultsIsMutable();
+          results_.add(index, value);
+          onChanged();
+        } else {
+          resultsBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder addResults(
+          flyteidl.core.Metrics.ExecutionMetricResult.Builder builderForValue) {
+        if (resultsBuilder_ == null) {
+          ensureResultsIsMutable();
+          results_.add(builderForValue.build());
+          onChanged();
+        } else {
+          resultsBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder addResults(
+          int index, flyteidl.core.Metrics.ExecutionMetricResult.Builder builderForValue) {
+        if (resultsBuilder_ == null) {
+          ensureResultsIsMutable();
+          results_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          resultsBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder addAllResults(
+          java.lang.Iterable<? extends flyteidl.core.Metrics.ExecutionMetricResult> values) {
+        if (resultsBuilder_ == null) {
+          ensureResultsIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, results_);
+          onChanged();
+        } else {
+          resultsBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder clearResults() {
+        if (resultsBuilder_ == null) {
+          results_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000001);
+          onChanged();
+        } else {
+          resultsBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public Builder removeResults(int index) {
+        if (resultsBuilder_ == null) {
+          ensureResultsIsMutable();
+          results_.remove(index);
+          onChanged();
+        } else {
+          resultsBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public flyteidl.core.Metrics.ExecutionMetricResult.Builder getResultsBuilder(
+          int index) {
+        return getResultsFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public flyteidl.core.Metrics.ExecutionMetricResultOrBuilder getResultsOrBuilder(
+          int index) {
+        if (resultsBuilder_ == null) {
+          return results_.get(index);  } else {
+          return resultsBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Metrics.ExecutionMetricResultOrBuilder> 
+           getResultsOrBuilderList() {
+        if (resultsBuilder_ != null) {
+          return resultsBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(results_);
+        }
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public flyteidl.core.Metrics.ExecutionMetricResult.Builder addResultsBuilder() {
+        return getResultsFieldBuilder().addBuilder(
+            flyteidl.core.Metrics.ExecutionMetricResult.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public flyteidl.core.Metrics.ExecutionMetricResult.Builder addResultsBuilder(
+          int index) {
+        return getResultsFieldBuilder().addBuilder(
+            index, flyteidl.core.Metrics.ExecutionMetricResult.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * The execution metric results.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.ExecutionMetricResult results = 1;</code>
+       */
+      public java.util.List<flyteidl.core.Metrics.ExecutionMetricResult.Builder> 
+           getResultsBuilderList() {
+        return getResultsFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Metrics.ExecutionMetricResult, flyteidl.core.Metrics.ExecutionMetricResult.Builder, flyteidl.core.Metrics.ExecutionMetricResultOrBuilder> 
+          getResultsFieldBuilder() {
+        if (resultsBuilder_ == null) {
+          resultsBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Metrics.ExecutionMetricResult, flyteidl.core.Metrics.ExecutionMetricResult.Builder, flyteidl.core.Metrics.ExecutionMetricResultOrBuilder>(
+                  results_,
+                  ((bitField0_ & 0x00000001) != 0),
+                  getParentForChildren(),
+                  isClean());
+          results_ = null;
+        }
+        return resultsBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.GetTaskMetricsResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.GetTaskMetricsResponse)
+    private static final flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse();
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GetTaskMetricsResponse>
+        PARSER = new com.google.protobuf.AbstractParser<GetTaskMetricsResponse>() {
+      @java.lang.Override
+      public GetTaskMetricsResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GetTaskMetricsResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GetTaskMetricsResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GetTaskMetricsResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.AgentOuterClass.GetTaskMetricsResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface GetTaskLogsRequestOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.GetTaskLogsRequest)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    java.lang.String getTaskType();
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getTaskTypeBytes();
+
+    /**
+     * <pre>
+     * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+     * </pre>
+     *
+     * <code>bytes resource_meta = 2;</code>
+     */
+    com.google.protobuf.ByteString getResourceMeta();
+
+    /**
+     * <pre>
+     * Number of lines to return.
+     * </pre>
+     *
+     * <code>uint64 lines = 3;</code>
+     */
+    long getLines();
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
+  }
+  /**
+   * <pre>
+   * A request to get the log from a task execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.GetTaskLogsRequest}
+   */
+  public  static final class GetTaskLogsRequest extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.GetTaskLogsRequest)
+      GetTaskLogsRequestOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GetTaskLogsRequest.newBuilder() to construct.
+    private GetTaskLogsRequest(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GetTaskLogsRequest() {
+      taskType_ = "";
+      resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+      token_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GetTaskLogsRequest(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              taskType_ = s;
+              break;
+            }
+            case 18: {
+
+              resourceMeta_ = input.readBytes();
+              break;
+            }
+            case 24: {
+
+              lines_ = input.readUInt64();
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsRequest_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.class, flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.Builder.class);
+    }
+
+    public static final int TASK_TYPE_FIELD_NUMBER = 1;
+    private volatile java.lang.Object taskType_;
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    public java.lang.String getTaskType() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        taskType_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * A predefined yet extensible Task type identifier.
+     * </pre>
+     *
+     * <code>string task_type = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTaskTypeBytes() {
+      java.lang.Object ref = taskType_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        taskType_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int RESOURCE_META_FIELD_NUMBER = 2;
+    private com.google.protobuf.ByteString resourceMeta_;
+    /**
+     * <pre>
+     * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+     * </pre>
+     *
+     * <code>bytes resource_meta = 2;</code>
+     */
+    public com.google.protobuf.ByteString getResourceMeta() {
+      return resourceMeta_;
+    }
+
+    public static final int LINES_FIELD_NUMBER = 3;
+    private long lines_;
+    /**
+     * <pre>
+     * Number of lines to return.
+     * </pre>
+     *
+     * <code>uint64 lines = 3;</code>
+     */
+    public long getLines() {
+      return lines_;
+    }
+
+    public static final int TOKEN_FIELD_NUMBER = 4;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getTaskTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, taskType_);
+      }
+      if (!resourceMeta_.isEmpty()) {
+        output.writeBytes(2, resourceMeta_);
+      }
+      if (lines_ != 0L) {
+        output.writeUInt64(3, lines_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, token_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getTaskTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, taskType_);
+      }
+      if (!resourceMeta_.isEmpty()) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, resourceMeta_);
+      }
+      if (lines_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeUInt64Size(3, lines_);
+      }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, token_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.AgentOuterClass.GetTaskLogsRequest)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.AgentOuterClass.GetTaskLogsRequest other = (flyteidl.admin.AgentOuterClass.GetTaskLogsRequest) obj;
+
+      if (!getTaskType()
+          .equals(other.getTaskType())) return false;
+      if (!getResourceMeta()
+          .equals(other.getResourceMeta())) return false;
+      if (getLines()
+          != other.getLines()) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + TASK_TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getTaskType().hashCode();
+      hash = (37 * hash) + RESOURCE_META_FIELD_NUMBER;
+      hash = (53 * hash) + getResourceMeta().hashCode();
+      hash = (37 * hash) + LINES_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getLines());
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.AgentOuterClass.GetTaskLogsRequest prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * A request to get the log from a task execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.GetTaskLogsRequest}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.GetTaskLogsRequest)
+        flyteidl.admin.AgentOuterClass.GetTaskLogsRequestOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsRequest_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.class, flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        taskType_ = "";
+
+        resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+
+        lines_ = 0L;
+
+        token_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskLogsRequest getDefaultInstanceForType() {
+        return flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskLogsRequest build() {
+        flyteidl.admin.AgentOuterClass.GetTaskLogsRequest result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskLogsRequest buildPartial() {
+        flyteidl.admin.AgentOuterClass.GetTaskLogsRequest result = new flyteidl.admin.AgentOuterClass.GetTaskLogsRequest(this);
+        result.taskType_ = taskType_;
+        result.resourceMeta_ = resourceMeta_;
+        result.lines_ = lines_;
+        result.token_ = token_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.AgentOuterClass.GetTaskLogsRequest) {
+          return mergeFrom((flyteidl.admin.AgentOuterClass.GetTaskLogsRequest)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.AgentOuterClass.GetTaskLogsRequest other) {
+        if (other == flyteidl.admin.AgentOuterClass.GetTaskLogsRequest.getDefaultInstance()) return this;
+        if (!other.getTaskType().isEmpty()) {
+          taskType_ = other.taskType_;
+          onChanged();
+        }
+        if (other.getResourceMeta() != com.google.protobuf.ByteString.EMPTY) {
+          setResourceMeta(other.getResourceMeta());
+        }
+        if (other.getLines() != 0L) {
+          setLines(other.getLines());
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.AgentOuterClass.GetTaskLogsRequest parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.AgentOuterClass.GetTaskLogsRequest) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object taskType_ = "";
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public java.lang.String getTaskType() {
+        java.lang.Object ref = taskType_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          taskType_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTaskTypeBytes() {
+        java.lang.Object ref = taskType_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          taskType_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder setTaskType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder clearTaskType() {
+        
+        taskType_ = getDefaultInstance().getTaskType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * A predefined yet extensible Task type identifier.
+       * </pre>
+       *
+       * <code>string task_type = 1;</code>
+       */
+      public Builder setTaskTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        taskType_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.ByteString resourceMeta_ = com.google.protobuf.ByteString.EMPTY;
+      /**
+       * <pre>
+       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+       * </pre>
+       *
+       * <code>bytes resource_meta = 2;</code>
+       */
+      public com.google.protobuf.ByteString getResourceMeta() {
+        return resourceMeta_;
+      }
+      /**
+       * <pre>
+       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+       * </pre>
+       *
+       * <code>bytes resource_meta = 2;</code>
+       */
+      public Builder setResourceMeta(com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        resourceMeta_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+       * </pre>
+       *
+       * <code>bytes resource_meta = 2;</code>
+       */
+      public Builder clearResourceMeta() {
+        
+        resourceMeta_ = getDefaultInstance().getResourceMeta();
+        onChanged();
+        return this;
+      }
+
+      private long lines_ ;
+      /**
+       * <pre>
+       * Number of lines to return.
+       * </pre>
+       *
+       * <code>uint64 lines = 3;</code>
+       */
+      public long getLines() {
+        return lines_;
+      }
+      /**
+       * <pre>
+       * Number of lines to return.
+       * </pre>
+       *
+       * <code>uint64 lines = 3;</code>
+       */
+      public Builder setLines(long value) {
+        
+        lines_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Number of lines to return.
+       * </pre>
+       *
+       * <code>uint64 lines = 3;</code>
+       */
+      public Builder clearLines() {
+        
+        lines_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 4;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.GetTaskLogsRequest)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.GetTaskLogsRequest)
+    private static final flyteidl.admin.AgentOuterClass.GetTaskLogsRequest DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.AgentOuterClass.GetTaskLogsRequest();
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsRequest getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GetTaskLogsRequest>
+        PARSER = new com.google.protobuf.AbstractParser<GetTaskLogsRequest>() {
+      @java.lang.Override
+      public GetTaskLogsRequest parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GetTaskLogsRequest(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GetTaskLogsRequest> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GetTaskLogsRequest> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.AgentOuterClass.GetTaskLogsRequest getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
+  public interface GetTaskLogsResponseOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.admin.GetTaskLogsResponse)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    java.util.List<java.lang.String>
+        getResultsList();
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    int getResultsCount();
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    java.lang.String getResults(int index);
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    com.google.protobuf.ByteString
+        getResultsBytes(int index);
+
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    java.lang.String getToken();
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getTokenBytes();
+  }
+  /**
+   * <pre>
+   * A response containing the logs for a task execution.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.admin.GetTaskLogsResponse}
+   */
+  public  static final class GetTaskLogsResponse extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.admin.GetTaskLogsResponse)
+      GetTaskLogsResponseOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use GetTaskLogsResponse.newBuilder() to construct.
+    private GetTaskLogsResponse(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private GetTaskLogsResponse() {
+      results_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      token_ = "";
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private GetTaskLogsResponse(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+              if (!((mutable_bitField0_ & 0x00000001) != 0)) {
+                results_ = new com.google.protobuf.LazyStringArrayList();
+                mutable_bitField0_ |= 0x00000001;
+              }
+              results_.add(s);
+              break;
+            }
+            case 18: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              token_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        if (((mutable_bitField0_ & 0x00000001) != 0)) {
+          results_ = results_.getUnmodifiableView();
+        }
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsResponse_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.class, flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.Builder.class);
+    }
+
+    private int bitField0_;
+    public static final int RESULTS_FIELD_NUMBER = 1;
+    private com.google.protobuf.LazyStringList results_;
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    public com.google.protobuf.ProtocolStringList
+        getResultsList() {
+      return results_;
+    }
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    public int getResultsCount() {
+      return results_.size();
+    }
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    public java.lang.String getResults(int index) {
+      return results_.get(index);
+    }
+    /**
+     * <pre>
+     * The execution log results.
+     * </pre>
+     *
+     * <code>repeated string results = 1;</code>
+     */
+    public com.google.protobuf.ByteString
+        getResultsBytes(int index) {
+      return results_.getByteString(index);
+    }
+
+    public static final int TOKEN_FIELD_NUMBER = 2;
+    private volatile java.lang.Object token_;
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public java.lang.String getToken() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        token_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+     * in a query. If there are no more results, this value will be empty.
+     * </pre>
+     *
+     * <code>string token = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getTokenBytes() {
+      java.lang.Object ref = token_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        token_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      for (int i = 0; i < results_.size(); i++) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, results_.getRaw(i));
+      }
+      if (!getTokenBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, token_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      {
+        int dataSize = 0;
+        for (int i = 0; i < results_.size(); i++) {
+          dataSize += computeStringSizeNoTag(results_.getRaw(i));
+        }
+        size += dataSize;
+        size += 1 * getResultsList().size();
+      }
+      if (!getTokenBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, token_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.admin.AgentOuterClass.GetTaskLogsResponse)) {
+        return super.equals(obj);
+      }
+      flyteidl.admin.AgentOuterClass.GetTaskLogsResponse other = (flyteidl.admin.AgentOuterClass.GetTaskLogsResponse) obj;
+
+      if (!getResultsList()
+          .equals(other.getResultsList())) return false;
+      if (!getToken()
+          .equals(other.getToken())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (getResultsCount() > 0) {
+        hash = (37 * hash) + RESULTS_FIELD_NUMBER;
+        hash = (53 * hash) + getResultsList().hashCode();
+      }
+      hash = (37 * hash) + TOKEN_FIELD_NUMBER;
+      hash = (53 * hash) + getToken().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.admin.AgentOuterClass.GetTaskLogsResponse prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * A response containing the logs for a task execution.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.admin.GetTaskLogsResponse}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.admin.GetTaskLogsResponse)
+        flyteidl.admin.AgentOuterClass.GetTaskLogsResponseOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsResponse_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.class, flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.Builder.class);
+      }
+
+      // Construct using flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        results_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        token_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.admin.AgentOuterClass.internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskLogsResponse getDefaultInstanceForType() {
+        return flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskLogsResponse build() {
+        flyteidl.admin.AgentOuterClass.GetTaskLogsResponse result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.admin.AgentOuterClass.GetTaskLogsResponse buildPartial() {
+        flyteidl.admin.AgentOuterClass.GetTaskLogsResponse result = new flyteidl.admin.AgentOuterClass.GetTaskLogsResponse(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((bitField0_ & 0x00000001) != 0)) {
+          results_ = results_.getUnmodifiableView();
+          bitField0_ = (bitField0_ & ~0x00000001);
+        }
+        result.results_ = results_;
+        result.token_ = token_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.admin.AgentOuterClass.GetTaskLogsResponse) {
+          return mergeFrom((flyteidl.admin.AgentOuterClass.GetTaskLogsResponse)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.admin.AgentOuterClass.GetTaskLogsResponse other) {
+        if (other == flyteidl.admin.AgentOuterClass.GetTaskLogsResponse.getDefaultInstance()) return this;
+        if (!other.results_.isEmpty()) {
+          if (results_.isEmpty()) {
+            results_ = other.results_;
+            bitField0_ = (bitField0_ & ~0x00000001);
+          } else {
+            ensureResultsIsMutable();
+            results_.addAll(other.results_);
+          }
+          onChanged();
+        }
+        if (!other.getToken().isEmpty()) {
+          token_ = other.token_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.admin.AgentOuterClass.GetTaskLogsResponse parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.admin.AgentOuterClass.GetTaskLogsResponse) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      private com.google.protobuf.LazyStringList results_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      private void ensureResultsIsMutable() {
+        if (!((bitField0_ & 0x00000001) != 0)) {
+          results_ = new com.google.protobuf.LazyStringArrayList(results_);
+          bitField0_ |= 0x00000001;
+         }
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public com.google.protobuf.ProtocolStringList
+          getResultsList() {
+        return results_.getUnmodifiableView();
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public int getResultsCount() {
+        return results_.size();
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public java.lang.String getResults(int index) {
+        return results_.get(index);
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public com.google.protobuf.ByteString
+          getResultsBytes(int index) {
+        return results_.getByteString(index);
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public Builder setResults(
+          int index, java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureResultsIsMutable();
+        results_.set(index, value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public Builder addResults(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  ensureResultsIsMutable();
+        results_.add(value);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public Builder addAllResults(
+          java.lang.Iterable<java.lang.String> values) {
+        ensureResultsIsMutable();
+        com.google.protobuf.AbstractMessageLite.Builder.addAll(
+            values, results_);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public Builder clearResults() {
+        results_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * The execution log results.
+       * </pre>
+       *
+       * <code>repeated string results = 1;</code>
+       */
+      public Builder addResultsBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        ensureResultsIsMutable();
+        results_.add(value);
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object token_ = "";
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public java.lang.String getToken() {
+        java.lang.Object ref = token_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          token_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getTokenBytes() {
+        java.lang.Object ref = token_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          token_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setToken(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder clearToken() {
+        
+        token_ = getDefaultInstance().getToken();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+       * in a query. If there are no more results, this value will be empty.
+       * </pre>
+       *
+       * <code>string token = 2;</code>
+       */
+      public Builder setTokenBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        token_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.admin.GetTaskLogsResponse)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.admin.GetTaskLogsResponse)
+    private static final flyteidl.admin.AgentOuterClass.GetTaskLogsResponse DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.admin.AgentOuterClass.GetTaskLogsResponse();
+    }
+
+    public static flyteidl.admin.AgentOuterClass.GetTaskLogsResponse getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<GetTaskLogsResponse>
+        PARSER = new com.google.protobuf.AbstractParser<GetTaskLogsResponse>() {
+      @java.lang.Override
+      public GetTaskLogsResponse parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new GetTaskLogsResponse(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<GetTaskLogsResponse> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<GetTaskLogsResponse> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.admin.AgentOuterClass.GetTaskLogsResponse getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor;
   private static final 
@@ -12103,6 +16662,26 @@ public final class AgentOuterClass {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_admin_ListAgentsResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_GetTaskMetricsRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_GetTaskMetricsResponse_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_GetTaskLogsRequest_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_admin_GetTaskLogsResponse_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -12114,51 +16693,65 @@ public final class AgentOuterClass {
     java.lang.String[] descriptorData = {
       "\n\032flyteidl/admin/agent.proto\022\016flyteidl.a" +
       "dmin\032\034flyteidl/core/literals.proto\032\031flyt" +
-      "eidl/core/tasks.proto\032\035flyteidl/core/int" +
-      "erface.proto\032\036flyteidl/core/identifier.p" +
-      "roto\032\035flyteidl/core/execution.proto\"\232\004\n\025" +
-      "TaskExecutionMetadata\022A\n\021task_execution_" +
-      "id\030\001 \001(\0132&.flyteidl.core.TaskExecutionId" +
-      "entifier\022\021\n\tnamespace\030\002 \001(\t\022A\n\006labels\030\003 " +
-      "\003(\01321.flyteidl.admin.TaskExecutionMetada" +
-      "ta.LabelsEntry\022K\n\013annotations\030\004 \003(\01326.fl" +
-      "yteidl.admin.TaskExecutionMetadata.Annot" +
-      "ationsEntry\022\033\n\023k8s_service_account\030\005 \001(\t" +
-      "\022^\n\025environment_variables\030\006 \003(\0132?.flytei" +
-      "dl.admin.TaskExecutionMetadata.Environme" +
-      "ntVariablesEntry\032-\n\013LabelsEntry\022\013\n\003key\030\001" +
-      " \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\0322\n\020AnnotationsEn" +
-      "try\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031E" +
-      "nvironmentVariablesEntry\022\013\n\003key\030\001 \001(\t\022\r\n" +
-      "\005value\030\002 \001(\t:\0028\001\"\314\001\n\021CreateTaskRequest\022)" +
-      "\n\006inputs\030\001 \001(\0132\031.flyteidl.core.LiteralMa" +
-      "p\022-\n\010template\030\002 \001(\0132\033.flyteidl.core.Task" +
-      "Template\022\025\n\routput_prefix\030\003 \001(\t\022F\n\027task_" +
-      "execution_metadata\030\004 \001(\0132%.flyteidl.admi" +
-      "n.TaskExecutionMetadata\"b\n\022CreateTaskRes" +
-      "ponse\022\027\n\rresource_meta\030\001 \001(\014H\000\022,\n\010resour" +
-      "ce\030\002 \001(\0132\030.flyteidl.admin.ResourceH\000B\005\n\003" +
-      "res\":\n\016GetTaskRequest\022\021\n\ttask_type\030\001 \001(\t" +
-      "\022\025\n\rresource_meta\030\002 \001(\014\"h\n\017GetTaskRespon" +
-      "se\022*\n\010resource\030\001 \001(\0132\030.flyteidl.admin.Re" +
-      "source\022)\n\tlog_links\030\002 \003(\0132\026.flyteidl.cor" +
-      "e.TaskLog\"\230\001\n\010Resource\022$\n\005state\030\001 \001(\0162\025." +
-      "flyteidl.admin.State\022*\n\007outputs\030\002 \001(\0132\031." +
-      "flyteidl.core.LiteralMap\022\017\n\007message\030\003 \001(" +
-      "\t\022)\n\tlog_links\030\004 \003(\0132\026.flyteidl.core.Tas" +
-      "kLog\"=\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001" +
-      " \001(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTas" +
-      "kResponse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024supp" +
-      "orted_task_types\030\002 \003(\t\"\037\n\017GetAgentReques" +
-      "t\022\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005a" +
-      "gent\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021Lis" +
-      "tAgentsRequest\";\n\022ListAgentsResponse\022%\n\006" +
-      "agents\030\001 \003(\0132\025.flyteidl.admin.Agent*^\n\005S" +
-      "tate\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021PERMANENT" +
-      "_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNING\020\003\022\r\n\t" +
-      "SUCCEEDED\020\004B=Z;github.com/flyteorg/flyte" +
-      "/flyteidl/gen/pb-go/flyteidl/adminb\006prot" +
-      "o3"
+      "eidl/core/tasks.proto\032\036flyteidl/core/ide" +
+      "ntifier.proto\032\035flyteidl/core/execution.p" +
+      "roto\032\033flyteidl/core/metrics.proto\032\036googl" +
+      "e/protobuf/duration.proto\032\037google/protob" +
+      "uf/timestamp.proto\"\232\004\n\025TaskExecutionMeta" +
+      "data\022A\n\021task_execution_id\030\001 \001(\0132&.flytei" +
+      "dl.core.TaskExecutionIdentifier\022\021\n\tnames" +
+      "pace\030\002 \001(\t\022A\n\006labels\030\003 \003(\01321.flyteidl.ad" +
+      "min.TaskExecutionMetadata.LabelsEntry\022K\n" +
+      "\013annotations\030\004 \003(\01326.flyteidl.admin.Task" +
+      "ExecutionMetadata.AnnotationsEntry\022\033\n\023k8" +
+      "s_service_account\030\005 \001(\t\022^\n\025environment_v" +
+      "ariables\030\006 \003(\0132?.flyteidl.admin.TaskExec" +
+      "utionMetadata.EnvironmentVariablesEntry\032" +
+      "-\n\013LabelsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001" +
+      "(\t:\0028\001\0322\n\020AnnotationsEntry\022\013\n\003key\030\001 \001(\t\022" +
+      "\r\n\005value\030\002 \001(\t:\0028\001\032;\n\031EnvironmentVariabl" +
+      "esEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"" +
+      "\314\001\n\021CreateTaskRequest\022)\n\006inputs\030\001 \001(\0132\031." +
+      "flyteidl.core.LiteralMap\022-\n\010template\030\002 \001" +
+      "(\0132\033.flyteidl.core.TaskTemplate\022\025\n\routpu" +
+      "t_prefix\030\003 \001(\t\022F\n\027task_execution_metadat" +
+      "a\030\004 \001(\0132%.flyteidl.admin.TaskExecutionMe" +
+      "tadata\"b\n\022CreateTaskResponse\022\027\n\rresource" +
+      "_meta\030\001 \001(\014H\000\022,\n\010resource\030\002 \001(\0132\030.flytei" +
+      "dl.admin.ResourceH\000B\005\n\003res\":\n\016GetTaskReq" +
+      "uest\022\021\n\ttask_type\030\001 \001(\t\022\025\n\rresource_meta" +
+      "\030\002 \001(\014\"h\n\017GetTaskResponse\022*\n\010resource\030\001 " +
+      "\001(\0132\030.flyteidl.admin.Resource\022)\n\tlog_lin" +
+      "ks\030\002 \003(\0132\026.flyteidl.core.TaskLog\"\317\001\n\010Res" +
+      "ource\022(\n\005state\030\001 \001(\0162\025.flyteidl.admin.St" +
+      "ateB\002\030\001\022*\n\007outputs\030\002 \001(\0132\031.flyteidl.core" +
+      ".LiteralMap\022\017\n\007message\030\003 \001(\t\022)\n\tlog_link" +
+      "s\030\004 \003(\0132\026.flyteidl.core.TaskLog\0221\n\005phase" +
+      "\030\005 \001(\0162\".flyteidl.core.TaskExecution.Pha" +
+      "se\"=\n\021DeleteTaskRequest\022\021\n\ttask_type\030\001 \001" +
+      "(\t\022\025\n\rresource_meta\030\002 \001(\014\"\024\n\022DeleteTaskR" +
+      "esponse\"3\n\005Agent\022\014\n\004name\030\001 \001(\t\022\034\n\024suppor" +
+      "ted_task_types\030\002 \003(\t\"\037\n\017GetAgentRequest\022" +
+      "\014\n\004name\030\001 \001(\t\"8\n\020GetAgentResponse\022$\n\005age" +
+      "nt\030\001 \001(\0132\025.flyteidl.admin.Agent\"\023\n\021ListA" +
+      "gentsRequest\";\n\022ListAgentsResponse\022%\n\006ag" +
+      "ents\030\001 \003(\0132\025.flyteidl.admin.Agent\"\331\001\n\025Ge" +
+      "tTaskMetricsRequest\022\021\n\ttask_type\030\001 \001(\t\022\025" +
+      "\n\rresource_meta\030\002 \001(\014\022\017\n\007queries\030\003 \003(\t\022." +
+      "\n\nstart_time\030\004 \001(\0132\032.google.protobuf.Tim" +
+      "estamp\022,\n\010end_time\030\005 \001(\0132\032.google.protob" +
+      "uf.Timestamp\022\'\n\004step\030\006 \001(\0132\031.google.prot" +
+      "obuf.Duration\"O\n\026GetTaskMetricsResponse\022" +
+      "5\n\007results\030\001 \003(\0132$.flyteidl.core.Executi" +
+      "onMetricResult\"\\\n\022GetTaskLogsRequest\022\021\n\t" +
+      "task_type\030\001 \001(\t\022\025\n\rresource_meta\030\002 \001(\014\022\r" +
+      "\n\005lines\030\003 \001(\004\022\r\n\005token\030\004 \001(\t\"5\n\023GetTaskL" +
+      "ogsResponse\022\017\n\007results\030\001 \003(\t\022\r\n\005token\030\002 " +
+      "\001(\t*^\n\005State\022\025\n\021RETRYABLE_FAILURE\020\000\022\025\n\021P" +
+      "ERMANENT_FAILURE\020\001\022\013\n\007PENDING\020\002\022\013\n\007RUNNI" +
+      "NG\020\003\022\r\n\tSUCCEEDED\020\004B=Z;github.com/flyteo" +
+      "rg/flyte/flyteidl/gen/pb-go/flyteidl/adm" +
+      "inb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -12173,9 +16766,11 @@ public final class AgentOuterClass {
         new com.google.protobuf.Descriptors.FileDescriptor[] {
           flyteidl.core.Literals.getDescriptor(),
           flyteidl.core.Tasks.getDescriptor(),
-          flyteidl.core.Interface.getDescriptor(),
           flyteidl.core.IdentifierOuterClass.getDescriptor(),
           flyteidl.core.Execution.getDescriptor(),
+          flyteidl.core.Metrics.getDescriptor(),
+          com.google.protobuf.DurationProto.getDescriptor(),
+          com.google.protobuf.TimestampProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_admin_TaskExecutionMetadata_descriptor =
       getDescriptor().getMessageTypes().get(0);
@@ -12230,7 +16825,7 @@ public final class AgentOuterClass {
     internal_static_flyteidl_admin_Resource_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Resource_descriptor,
-        new java.lang.String[] { "State", "Outputs", "Message", "LogLinks", });
+        new java.lang.String[] { "State", "Outputs", "Message", "LogLinks", "Phase", });
     internal_static_flyteidl_admin_DeleteTaskRequest_descriptor =
       getDescriptor().getMessageTypes().get(6);
     internal_static_flyteidl_admin_DeleteTaskRequest_fieldAccessorTable = new
@@ -12273,11 +16868,37 @@ public final class AgentOuterClass {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ListAgentsResponse_descriptor,
         new java.lang.String[] { "Agents", });
+    internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(13);
+    internal_static_flyteidl_admin_GetTaskMetricsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_GetTaskMetricsRequest_descriptor,
+        new java.lang.String[] { "TaskType", "ResourceMeta", "Queries", "StartTime", "EndTime", "Step", });
+    internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor =
+      getDescriptor().getMessageTypes().get(14);
+    internal_static_flyteidl_admin_GetTaskMetricsResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_GetTaskMetricsResponse_descriptor,
+        new java.lang.String[] { "Results", });
+    internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor =
+      getDescriptor().getMessageTypes().get(15);
+    internal_static_flyteidl_admin_GetTaskLogsRequest_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_GetTaskLogsRequest_descriptor,
+        new java.lang.String[] { "TaskType", "ResourceMeta", "Lines", "Token", });
+    internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor =
+      getDescriptor().getMessageTypes().get(16);
+    internal_static_flyteidl_admin_GetTaskLogsResponse_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_admin_GetTaskLogsResponse_descriptor,
+        new java.lang.String[] { "Results", "Token", });
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.Tasks.getDescriptor();
-    flyteidl.core.Interface.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
+    flyteidl.core.Metrics.getDescriptor();
+    com.google.protobuf.DurationProto.getDescriptor();
+    com.google.protobuf.TimestampProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

@@ -594,7 +594,7 @@ func (in *NodeStatus) GetOrCreateArrayNodeStatus() MutableArrayNodeStatus {
 	return in.ArrayNodeStatus
 }
 
-func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, err *core.ExecutionError) {
+func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, enableCRDebugMetadata bool, err *core.ExecutionError) {
 	if in.Phase == p && in.Message == reason {
 		// We will not update the phase multiple times. This prevents the comparison from returning false positive
 		return
@@ -607,6 +607,7 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 	}
 
 	n := occurredAt
+	in.LastUpdatedAt = &n
 	if occurredAt.IsZero() {
 		n = metav1.Now()
 	}
@@ -625,34 +626,30 @@ func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason st
 			in.LastAttemptStartedAt = &n
 		}
 	} else if IsPhaseTerminal(p) {
-		// If we are in terminal phase then we will clear out all our fields as they are not required anymore
-		// Only thing required is stopped at and lastupdatedat time
 		if in.StoppedAt == nil {
 			in.StoppedAt = &n
 		}
-		if in.StartedAt == nil {
-			in.StartedAt = &n
+		if p == NodePhaseSucceeded || p == NodePhaseSkipped || !enableCRDebugMetadata {
+			// Clear most status related fields after reaching a terminal state. This keeps the CR state small to avoid
+			// etcd size limits. Importantly we keep Phase, StoppedAt and Error which will be needed further.
+			in.Message = ""
+			in.QueuedAt = nil
+			in.StartedAt = nil
+			in.LastUpdatedAt = nil
+			in.LastAttemptStartedAt = nil
+			in.DynamicNodeStatus = nil
+			in.BranchStatus = nil
+			in.SubNodeStatus = nil
+			in.TaskNodeStatus = nil
+			in.WorkflowNodeStatus = nil
+		} else {
+			if in.StartedAt == nil {
+				in.StartedAt = &n
+			}
+			if in.LastAttemptStartedAt == nil {
+				in.LastAttemptStartedAt = &n
+			}
 		}
-		if in.LastAttemptStartedAt == nil {
-			in.LastAttemptStartedAt = &n
-		}
-	}
-	in.LastUpdatedAt = &n
-
-	// For cases in which the node is either Succeeded or Skipped we clear most fields from the status
-	// except for StoppedAt and Phase. StoppedAt is used to calculate transition latency between this node and
-	// any downstream nodes and Phase is required for propeller to continue to downstream nodes.
-	if p == NodePhaseSucceeded || p == NodePhaseSkipped {
-		in.Message = ""
-		in.QueuedAt = nil
-		in.StartedAt = nil
-		in.LastAttemptStartedAt = nil
-		in.DynamicNodeStatus = nil
-		in.BranchStatus = nil
-		in.SubNodeStatus = nil
-		in.TaskNodeStatus = nil
-		in.WorkflowNodeStatus = nil
-		in.LastUpdatedAt = nil
 	}
 	in.SetDirty()
 }

@@ -42,7 +42,8 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	State    admin.State
+	Phase    flyteIdl.TaskExecution_Phase
+	State    admin.State // This is deprecated.
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
@@ -121,6 +122,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		logger.Infof(ctx, "Agent is executing a synchronous task.")
 		return nil,
 			ResourceWrapper{
+				Phase:    res.GetResource().Phase,
 				State:    res.GetResource().State,
 				Outputs:  res.GetResource().Outputs,
 				Message:  res.GetResource().Message,
@@ -159,6 +161,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	}
 
 	return ResourceWrapper{
+		Phase:    res.Resource.Phase,
 		State:    res.Resource.State,
 		Outputs:  res.Resource.Outputs,
 		Message:  res.Resource.Message,
@@ -190,6 +193,34 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	resource := taskCtx.Resource().(ResourceWrapper)
 	taskInfo := &core.TaskInfo{Logs: resource.LogLinks}
 
+	switch resource.Phase {
+	case flyteIdl.TaskExecution_QUEUED:
+		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+	case flyteIdl.TaskExecution_WAITING_FOR_RESOURCES:
+		return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+	case flyteIdl.TaskExecution_INITIALIZING:
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+	case flyteIdl.TaskExecution_RUNNING:
+		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+	case flyteIdl.TaskExecution_SUCCEEDED:
+		err = writeOutput(ctx, taskCtx, resource)
+		if err != nil {
+			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+			return core.PhaseInfoUndefined, err
+		}
+		return core.PhaseInfoSuccess(taskInfo), nil
+	case flyteIdl.TaskExecution_ABORTED:
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase", taskInfo), nil
+	case flyteIdl.TaskExecution_FAILED:
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+	}
+
+	// The default phase is undefined.
+	if resource.Phase != flyteIdl.TaskExecution_UNDEFINED {
+		return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.Phase)
+	}
+
+	// If the phase is undefined, we will use state to determine the phase.
 	switch resource.State {
 	case admin.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
@@ -207,7 +238,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}
-	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution phase [%v].", resource.State)
+	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
@@ -366,10 +397,10 @@ func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.Clien
 			}
 
 			if !ok {
-				return nil, fmt.Errorf("failed to list agent with a non-gRPC error : [%v]", err)
+				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment, err)
 			}
 
-			return nil, fmt.Errorf("failed to list agent with error: [%v]", err)
+			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployment, err)
 		}
 
 		agents := res.GetAgents()

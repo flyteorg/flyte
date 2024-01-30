@@ -30,6 +30,8 @@ Flyte Admin Configuration
 
 - `notifications <#section-notifications>`_
 
+- `otel <#section-otel>`_
+
 - `plugins <#section-plugins>`_
 
 - `propeller <#section-propeller>`_
@@ -1408,6 +1410,16 @@ reconnectDelaySeconds (int)
   "0"
   
 
+cloudEventVersion (uint8)
+------------------------------------------------------------------------------------------------------------------------
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  v1
+  
+
 interfaces.AWSConfig
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1721,11 +1733,11 @@ postgres (`database.PostgresConfig`_)
 
   dbname: postgres
   debug: false
-  host: postgres
+  host: localhost
   options: sslmode=disable
-  password: ""
+  password: postgres
   passwordPath: ""
-  port: 5432
+  port: 30001
   username: postgres
   
 
@@ -1751,7 +1763,7 @@ The host name of the database server
 
 .. code-block:: yaml
 
-  postgres
+  localhost
   
 
 port (int)
@@ -1763,7 +1775,7 @@ The port name of the database server
 
 .. code-block:: yaml
 
-  "5432"
+  "30001"
   
 
 dbname (string)
@@ -1799,7 +1811,7 @@ The database password.
 
 .. code-block:: yaml
 
-  ""
+  postgres
   
 
 passwordPath (string)
@@ -2132,6 +2144,33 @@ envs (map[string]string)
   null
   
 
+featureGates (`interfaces.FeatureGates`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Enable experimental features.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  enableArtifacts: false
+  
+
+interfaces.FeatureGates
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+enableArtifacts (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Enable artifacts feature.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
 Section: logger
 ========================================================================================================================
 
@@ -2445,6 +2484,75 @@ topicName (string)
   ""
   
 
+Section: otel
+========================================================================================================================
+
+type (string)
+------------------------------------------------------------------------------------------------------------------------
+
+Sets the type of exporter to configure [noop/file/jaeger].
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  noop
+  
+
+file (`otelutils.FileConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a file
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  filename: /tmp/trace.txt
+  
+
+jaeger (`otelutils.JaegerConfig`_)
+------------------------------------------------------------------------------------------------------------------------
+
+Configuration for exporting telemetry traces to a jaeger
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  endpoint: http://localhost:14268/api/traces
+  
+
+otelutils.FileConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+filename (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Filename to store exported telemetry traces
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  /tmp/trace.txt
+  
+
+otelutils.JaegerConfig
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+endpoint (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Endpoint for the jaeger telemtry trace ingestor
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  http://localhost:14268/api/traces
+  
+
 Section: plugins
 ========================================================================================================================
 
@@ -2483,6 +2591,7 @@ k8s (`config.K8sPluginConfig`_)
     output-vol-name: flyte-outputs
     start-timeout: 1m40s
     storage: ""
+  create-container-config-error-grace-period: 0s
   create-container-error-grace-period: 3m0s
   default-annotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
@@ -2511,6 +2620,7 @@ k8s (`config.K8sPluginConfig`_)
   interruptible-node-selector-requirement: null
   interruptible-tolerations: null
   non-interruptible-node-selector-requirement: null
+  pod-pending-timeout: 0s
   resource-tolerations: null
   scheduler-name: ""
   send-object-events: false
@@ -2800,6 +2910,16 @@ create-container-error-grace-period (`config.Duration`_)
   3m0s
   
 
+create-container-config-error-grace-period (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
+  
+
 image-pull-backoff-grace-period (`config.Duration`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -2808,6 +2928,16 @@ image-pull-backoff-grace-period (`config.Duration`_)
 .. code-block:: yaml
 
   3m0s
+  
+
+pod-pending-timeout (`config.Duration`_)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  0s
   
 
 gpu-device-node-label (string)
@@ -3428,6 +3558,7 @@ config for a workflow node
     node-execution-deadline: 0s
     workflow-active-deadline: 0s
   default-max-attempts: 1
+  enable-cr-debug-metadata: false
   ignore-retry-cause: false
   interruptible-failure-threshold: -1
   max-node-retries-system-failures: 3
@@ -3564,6 +3695,18 @@ ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => 
 .. code-block:: yaml
 
   "0"
+  
+
+node-execution-worker-count (int)
+------------------------------------------------------------------------------------------------------------------------
+
+Number of workers to evaluate node executions, currently only used for array nodes
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "8"
   
 
 config.CompositeQueueConfig
@@ -3906,6 +4049,18 @@ ignore-retry-cause (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 Ignore retry cause and count all attempts toward a node's max attempts
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  "false"
+  
+
+enable-cr-debug-metadata (bool)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Collapse node on any terminal state, not just successful terminations. This is useful to reduce the size of workflow state in etcd.
 
 **Default Value**: 
 
@@ -4522,7 +4677,7 @@ grpc (`config.GrpcConfig`_)
 
 .. code-block:: yaml
 
-  enableGrpcHistograms: false
+  enableGrpcLatencyMetrics: false
   maxMessageSizeBytes: 0
   port: 8089
   serverReflection: true
@@ -4723,10 +4878,10 @@ The max size in bytes for incoming gRPC messages
   "0"
   
 
-enableGrpcHistograms (bool)
+enableGrpcLatencyMetrics (bool)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-Enable grpc histograms
+Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.
 
 **Default Value**: 
 
