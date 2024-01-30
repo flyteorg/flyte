@@ -820,8 +820,11 @@ func (c *nodeExecutor) execute(ctx context.Context, h interfaces.NodeHandler, nC
 	if err != nil {
 		return handler.PhaseInfoUndefined, err
 	}
-
+	// @@@ the bug comes from here
 	phase := t.Info()
+
+	// logger.Info(ctx, "@@@ executor :[%v]", phase.pInfo)
+
 	// check for timeout for non-terminal phases
 	if !phase.GetPhase().IsTerminal() {
 		activeDeadline := c.defaultActiveDeadline

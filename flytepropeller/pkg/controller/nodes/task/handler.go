@@ -171,6 +171,7 @@ func (p *pluginRequestedTransition) FinalTransition(ctx context.Context) (handle
 	}
 
 	logger.Debugf(ctx, "Task still running")
+	// @@@ the bugs comes from here, we can print p and pInfo and pInfo Logs to find it
 	return handler.DoTransition(p.ttype, handler.PhaseInfoRunning(nil)), nil
 }
 
@@ -408,8 +409,10 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		v = ts.PluginPhaseVersion
 	}
 	pluginTrns.ObservedTransitionAndState(trns, v, b)
-
+	logger.Infof(ctx, "@@@ plugin [%s], ts.PluginPhase:[%v], pluginTrns.pInfo.Phase() [%v], Logs:[%v]",
+		p.GetID(), ts.PluginPhase, pluginTrns.pInfo.Phase().String(), pluginTrns.pInfo.Info().Logs)
 	// Emit the queue latency if the task has just transitioned from Queued to Running.
+	// @@@ GUESS NOT IMPORTANT
 	if ts.PluginPhase == pluginCore.PhaseQueued &&
 		(pluginTrns.pInfo.Phase() == pluginCore.PhaseInitializing || pluginTrns.pInfo.Phase() == pluginCore.PhaseRunning) {
 		if !ts.LastPhaseUpdatedAt.IsZero() {
@@ -572,6 +575,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 
 		var err error
 		pluginTrns, err = t.invokePlugin(ctx, p, tCtx, ts)
+		// @@@ bug comes from downstream
 		if err != nil {
 			return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
 		}
