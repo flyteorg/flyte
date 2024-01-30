@@ -316,7 +316,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			version++
 		}
 
-		newState = newState.SetPhase(phase, version).SetReason("Task is still running")
+		newState = newState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, version).SetReason("Task is still running")
 	} else {
 		newState = newState.SetPhase(phase, version+1)
 	}
