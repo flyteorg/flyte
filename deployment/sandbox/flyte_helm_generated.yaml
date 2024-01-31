@@ -7544,6 +7544,7 @@ metadata:
   annotations: 
     nginx.ingress.kubernetes.io/app-root: /console
 spec:
+  ingressClassName: 
   rules:
     - http:
         paths:

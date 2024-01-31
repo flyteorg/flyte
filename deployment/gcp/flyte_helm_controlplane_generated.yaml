@@ -1029,6 +1029,7 @@ metadata:
     nginx.ingress.kubernetes.io/app-root: /console
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
+  ingressClassName: 
   rules:
     - http:
         paths:
@@ -1189,6 +1190,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
+  ingressClassName: 
   rules:
     - host: '<HOSTNAME>'
       http:

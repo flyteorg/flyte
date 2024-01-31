@@ -1020,6 +1020,7 @@ metadata:
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
 spec:
+  ingressClassName: 
   rules:
     - http:
         paths:
@@ -1189,6 +1190,7 @@ metadata:
     alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
+  ingressClassName: 
   rules:
     - host: null
       http:

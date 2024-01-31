@@ -163,6 +163,7 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4}}
   {{- end }}
 spec:
+  ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
   rules:
     - http:
         paths:
@@ -485,6 +486,7 @@ metadata:
   {{- toYaml . | nindent 4}}
   {{- end }}
 spec:
+  ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
   rules:
     - host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
       http:
