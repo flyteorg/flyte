@@ -13,7 +13,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	golang.org/x/sync v0.3.0
 	gorm.io/driver/postgres v1.5.3
-	k8s.io/client-go v0.28.3
 	sigs.k8s.io/controller-runtime v0.16.3
 )
 
@@ -213,6 +212,7 @@ require (
 	k8s.io/api v0.28.3 // indirect
 	k8s.io/apiextensions-apiserver v0.28.0 // indirect
 	k8s.io/apimachinery v0.28.3 // indirect
+	k8s.io/client-go v0.28.3 // indirect
 	k8s.io/component-base v0.28.1 // indirect
 	k8s.io/klog/v2 v2.100.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f // indirect
