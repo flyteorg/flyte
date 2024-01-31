@@ -4,11 +4,8 @@ channels:
 dependencies:
   - python=3.9
   - pip
-  - pip:
-    - flyteidl --pre
   - codespell
   - furo
-  - flytekit>=1.10.2
   - gitpython
   - ipython!=8.7.0
   - graphviz
@@ -60,6 +57,8 @@ dependencies:
   - vaex-core                   # vaex
 
   - pip:
+    - flytekit>=1.10.3
+    - flyteidl==1.10.7b2
     - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
