@@ -84,3 +84,7 @@ func (m *MockNodeExecutionManager) GetNodeExecutionData(
 	}
 	return nil, nil
 }
+
+func (m *MockNodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	return nil, nil
+}

@@ -5,9 +5,12 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/tasks.proto";
-import "flyteidl/core/interface.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/metrics.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+
 
 // The state of the execution is used to control its visibility in the UI/CLI.
 enum State {
@@ -75,8 +78,8 @@ message GetTaskResponse {
 }
 
 message Resource {
-  // The state of the execution is used to control its visibility in the UI/CLI.
-  State state = 1;
+  // DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI.
+  State state = 1 [deprecated = true];
   // The outputs of the execution. It's typically used by sql task. Agent service will create a
   // Structured dataset pointing to the query result table.
   // +optional
@@ -85,6 +88,8 @@ message Resource {
   string message = 3;
   // log information for the task execution.
   repeated core.TaskLog log_links = 4;
+  // The phase of the execution is used to determine the phase of the plugin's execution.
+  core.TaskExecution.Phase phase = 5;
 }
 
 // A message used to delete a task.
@@ -124,4 +129,49 @@ message ListAgentsRequest {}
 // A response containing a list of agents.
 message ListAgentsResponse {
   repeated Agent agents = 1;
+}
+
+// A request to get the metrics from a task execution.
+message GetTaskMetricsRequest {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  bytes resource_meta = 2;
+  // The metrics to query. If empty, will return a default set of metrics.
+  // e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG
+  repeated string queries = 3;
+  // Start timestamp, inclusive.
+  google.protobuf.Timestamp start_time = 4;
+  // End timestamp, inclusive..
+  google.protobuf.Timestamp end_time = 5;
+  // Query resolution step width in duration format or float number of seconds.
+  google.protobuf.Duration step = 6;
+}
+
+// A response containing a list of metrics for a task execution.
+message GetTaskMetricsResponse {
+  // The execution metric results.
+  repeated core.ExecutionMetricResult results = 1;
+}
+
+// A request to get the log from a task execution.
+message GetTaskLogsRequest {
+  // A predefined yet extensible Task type identifier.
+  string task_type = 1;
+  // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+  bytes resource_meta = 2;
+  // Number of lines to return.
+  uint64 lines = 3;
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query. If there are no more results, this value will be empty.
+  string token = 4;
+}
+
+// A response containing the logs for a task execution.
+message GetTaskLogsResponse {
+  // The execution log results.
+  repeated string results = 1;
+  // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+  // in a query. If there are no more results, this value will be empty.
+  string token = 2;
 }

@@ -6,12 +6,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
@@ -38,12 +36,11 @@ type taskMetrics struct {
 }
 
 type TaskManager struct {
-	db               repoInterfaces.Repository
-	config           runtimeInterfaces.Configuration
-	compiler         workflowengine.Compiler
-	metrics          taskMetrics
-	resourceManager  interfaces.ResourceInterface
-	artifactRegistry *artifacts.ArtifactRegistry
+	db              repoInterfaces.Repository
+	config          runtimeInterfaces.Configuration
+	compiler        workflowengine.Compiler
+	metrics         taskMetrics
+	resourceManager interfaces.ResourceInterface
 }
 
 func getTaskContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -132,18 +129,6 @@ func (t *TaskManager) CreateTask(
 		contextWithRuntimeMeta = context.WithValue(
 			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.Spec.Template.Metadata.Runtime.Version)
 		t.metrics.Registered.Inc(contextWithRuntimeMeta)
-	}
-	// TODO: Artifact feature gate, remove when ready
-	if t.artifactRegistry.GetClient() != nil {
-		tIfaceCopy := proto.Clone(finalizedRequest.Spec.Template.Interface).(*core.TypedInterface)
-		go func() {
-			ceCtx := context.TODO()
-			if finalizedRequest.Spec.Template.Interface == nil {
-				logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
-				return
-			}
-			t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
-		}()
 	}
 
 	return &admin.TaskCreateResponse{}, nil
@@ -276,8 +261,7 @@ func (t *TaskManager) ListUniqueTaskIdentifiers(ctx context.Context, request adm
 func NewTaskManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
-	scope promutils.Scope,
-	artifactRegistry *artifacts.ArtifactRegistry) interfaces.TaskInterface {
+	scope promutils.Scope) interfaces.TaskInterface {
 
 	metrics := taskMetrics{
 		Scope:            scope,
@@ -286,11 +270,10 @@ func NewTaskManager(
 	}
 	resourceManager := resources.NewResourceManager(db, config.ApplicationConfiguration())
 	return &TaskManager{
-		db:               db,
-		config:           config,
-		compiler:         compiler,
-		metrics:          metrics,
-		resourceManager:  resourceManager,
-		artifactRegistry: artifactRegistry,
+		db:              db,
+		config:          config,
+		compiler:        compiler,
+		metrics:         metrics,
+		resourceManager: resourceManager,
 	}
 }

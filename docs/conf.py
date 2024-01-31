@@ -35,7 +35,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.8.0"
+release = "1.10.7-b2"
 
 # -- General configuration ---------------------------------------------------
 
@@ -186,7 +186,7 @@ html_theme_options = {
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ["_static"]
-html_css_files = ["custom.css", "flyte.css"]
+html_css_files = ["custom.css", "flyte.css", "algolia.css"]
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -311,7 +311,7 @@ PROTO_REF_REPLACE = r"\1/protos/docs"
 # from other repos.
 REPLACE_PATTERNS = {
     r"<flyte:deployment/index>": r"</deployment/index>",
-    r"<flytectl:index>": r"</flytectl_overview>",
+    r"<flytectl:index>": r"</flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
     r"<auto_examples": r"<flytesnacks/examples",
     r"<protos/docs/core/core:taskmetadata>": r"<ref_flyteidl.core.TaskMetadata>",
@@ -337,6 +337,7 @@ import_projects_config = {
         "flytesnacks/tutorials",
         "flytesnacks/integrations",
     ],
+    "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
 
 # Define these environment variables to use local copies of the projects. This
@@ -444,6 +445,7 @@ class CustomWarningSuppressor(logging.Filter):
             'Error with CSV data in "csv-table" directive',
             "Definition list ends without a blank line",
             "autodoc: failed to import module 'awssagemaker' from module 'flytekitplugins'",
+            "Enumerated list ends without a blank line",
         )
 
         if msg.strip().startswith(filter_out):

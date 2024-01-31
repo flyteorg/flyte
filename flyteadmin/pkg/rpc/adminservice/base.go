@@ -7,7 +7,6 @@ import (
 
 	"github.com/golang/protobuf/proto"
 
-	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
@@ -22,7 +21,6 @@ import (
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineImpl "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/impl"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -44,7 +42,6 @@ type AdminService struct {
 	DescriptionEntityManager interfaces.DescriptionEntityInterface
 	MetricsManager           interfaces.MetricsInterface
 	Metrics                  AdminMetrics
-	Artifacts                *artifacts.ArtifactRegistry
 }
 
 // Intercepts all admin requests to handle panics during execution.
@@ -114,14 +111,8 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	eventScheduler := workflowScheduler.GetEventScheduler()
 
-	var artifactRegistry *artifacts.ArtifactRegistry
-	if configuration.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
-		adminClientCfg := admin2.GetConfig(ctx)
-		artifactRegistry = artifacts.NewArtifactRegistry(ctx, adminClientCfg)
-	}
-
 	launchPlanManager := manager.NewLaunchPlanManager(
-		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"), artifactRegistry)
+		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
 
 	// Configure admin-specific remote data handler (separate from storage)
 	remoteDataConfig := configuration.ApplicationConfiguration().GetRemoteDataConfig()
@@ -138,7 +129,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	workflowManager := manager.NewWorkflowManager(
 		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
-		adminScope.NewSubScope("workflow_manager"), artifactRegistry)
+		adminScope.NewSubScope("workflow_manager"))
 	namedEntityManager := manager.NewNamedEntityManager(repo, configuration, adminScope.NewSubScope("named_entity_manager"))
 	descriptionEntityManager := manager.NewDescriptionEntityManager(repo, configuration, adminScope.NewSubScope("description_entity_manager"))
 
@@ -149,7 +140,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter, artifactRegistry)
+		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
@@ -172,7 +163,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{
 		TaskManager: manager.NewTaskManager(repo, configuration, workflowengineImpl.NewCompiler(),
-			adminScope.NewSubScope("task_manager"), artifactRegistry),
+			adminScope.NewSubScope("task_manager")),
 		WorkflowManager:          workflowManager,
 		LaunchPlanManager:        launchPlanManager,
 		ExecutionManager:         executionManager,
@@ -185,7 +176,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		ResourceManager:          resources.NewResourceManager(repo, configuration.ApplicationConfiguration()),
 		MetricsManager: manager.NewMetricsManager(workflowManager, executionManager, nodeExecutionManager,
 			taskExecutionManager, adminScope.NewSubScope("metrics_manager")),
-		Metrics:   InitMetrics(adminScope),
-		Artifacts: artifactRegistry,
+		Metrics: InitMetrics(adminScope),
 	}
 }

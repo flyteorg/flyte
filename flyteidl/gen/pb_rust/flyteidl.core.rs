@@ -621,6 +621,9 @@ pub struct Identifier {
     /// Specific version of the resource.
     #[prost(string, tag="5")]
     pub version: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that uniquely identifies a Flyte workflow execution
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -636,6 +639,9 @@ pub struct WorkflowExecutionIdentifier {
     /// User or system provided value for the resource.
     #[prost(string, tag="4")]
     pub name: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="5")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that identify a Flyte node execution entity.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -724,11 +730,24 @@ pub struct ArtifactKey {
 pub struct ArtifactBindingData {
     #[prost(uint32, tag="1")]
     pub index: u32,
-    /// These two fields are only relevant in the partition value case
-    #[prost(string, tag="2")]
-    pub partition_key: ::prost::alloc::string::String,
-    #[prost(string, tag="3")]
+    /// This is only relevant in the time partition case
+    #[prost(string, tag="4")]
     pub transform: ::prost::alloc::string::String,
+    /// These two fields are only relevant in the partition value case
+    #[prost(oneof="artifact_binding_data::PartitionData", tags="2, 3")]
+    pub partition_data: ::core::option::Option<artifact_binding_data::PartitionData>,
+}
+/// Nested message and enum types in `ArtifactBindingData`.
+pub mod artifact_binding_data {
+    /// These two fields are only relevant in the partition value case
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum PartitionData {
+        #[prost(string, tag="2")]
+        PartitionKey(::prost::alloc::string::String),
+        #[prost(bool, tag="3")]
+        BindToTimePartition(bool),
+    }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -739,7 +758,7 @@ pub struct InputBindingData {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LabelValue {
-    #[prost(oneof="label_value::Value", tags="1, 2, 3")]
+    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4")]
     pub value: ::core::option::Option<label_value::Value>,
 }
 /// Nested message and enum types in `LabelValue`.
@@ -747,11 +766,15 @@ pub mod label_value {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum Value {
+        /// The string static value is for use in the Partitions object
         #[prost(string, tag="1")]
         StaticValue(::prost::alloc::string::String),
+        /// The time value is for use in the TimePartition case
         #[prost(message, tag="2")]
-        TriggeredBinding(super::ArtifactBindingData),
+        TimeValue(::prost_types::Timestamp),
         #[prost(message, tag="3")]
+        TriggeredBinding(super::ArtifactBindingData),
+        #[prost(message, tag="4")]
         InputBinding(super::InputBindingData),
     }
 }
@@ -763,6 +786,12 @@ pub struct Partitions {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TimePartition {
+    #[prost(message, optional, tag="1")]
+    pub value: ::core::option::Option<LabelValue>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactId {
     #[prost(message, optional, tag="1")]
     pub artifact_key: ::core::option::Option<ArtifactKey>,
@@ -770,27 +799,11 @@ pub struct ArtifactId {
     pub version: ::prost::alloc::string::String,
     /// Think of a partition as a tag on an Artifact, except it's a key-value pair.
     /// Different partitions naturally have different versions (execution ids).
-    /// This is a oneof because of partition querying... we need a way to distinguish between
-    /// a user not-specifying partitions when searching, and specifically searching for an Artifact
-    /// that is not partitioned (this can happen if an Artifact goes from partitioned to non-
-    /// partitioned across executions).
-    #[prost(oneof="artifact_id::Dimensions", tags="3")]
-    pub dimensions: ::core::option::Option<artifact_id::Dimensions>,
-}
-/// Nested message and enum types in `ArtifactID`.
-pub mod artifact_id {
-    /// Think of a partition as a tag on an Artifact, except it's a key-value pair.
-    /// Different partitions naturally have different versions (execution ids).
-    /// This is a oneof because of partition querying... we need a way to distinguish between
-    /// a user not-specifying partitions when searching, and specifically searching for an Artifact
-    /// that is not partitioned (this can happen if an Artifact goes from partitioned to non-
-    /// partitioned across executions).
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Dimensions {
-        #[prost(message, tag="3")]
-        Partitions(super::Partitions),
-    }
+    #[prost(message, optional, tag="3")]
+    pub partitions: ::core::option::Option<Partitions>,
+    /// There is no such thing as an empty time partition - if it's not set, then there is no time partition.
+    #[prost(message, optional, tag="4")]
+    pub time_partition: ::core::option::Option<TimePartition>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -827,17 +840,6 @@ pub mod artifact_query {
         #[prost(message, tag="4")]
         Binding(super::ArtifactBindingData),
     }
-}
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Trigger {
-    /// This will be set to a launch plan type, but note that this is different than the actual launch plan type.
-    #[prost(message, optional, tag="1")]
-    pub trigger_id: ::core::option::Option<Identifier>,
-    /// These are partial artifact IDs that will be triggered on
-    /// Consider making these ArtifactQuery instead.
-    #[prost(message, repeated, tag="2")]
-    pub triggers: ::prost::alloc::vec::Vec<ArtifactId>,
 }
 /// Defines a strongly typed variable.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2028,6 +2030,58 @@ pub mod quality_of_service {
         Spec(super::QualityOfServiceSpec),
     }
 }
+/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
+/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
+/// precise definitions.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Span {
+    /// start_time defines the instance this span began.
+    #[prost(message, optional, tag="1")]
+    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// end_time defines the instance this span completed.
+    #[prost(message, optional, tag="2")]
+    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// spans defines a collection of Spans that breakdown this execution.
+    #[prost(message, repeated, tag="7")]
+    pub spans: ::prost::alloc::vec::Vec<Span>,
+    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
+    pub id: ::core::option::Option<span::Id>,
+}
+/// Nested message and enum types in `Span`.
+pub mod span {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Id {
+        /// workflow_id is the id of the workflow execution this Span represents.
+        #[prost(message, tag="3")]
+        WorkflowId(super::WorkflowExecutionIdentifier),
+        /// node_id is the id of the node execution this Span represents.
+        #[prost(message, tag="4")]
+        NodeId(super::NodeExecutionIdentifier),
+        /// task_id is the id of the task execution this Span represents.
+        #[prost(message, tag="5")]
+        TaskId(super::TaskExecutionIdentifier),
+        /// operation_id is the id of a unique operation that this Span represents.
+        #[prost(string, tag="6")]
+        OperationId(::prost::alloc::string::String),
+    }
+}
+/// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionMetricResult {
+    /// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+    #[prost(string, tag="1")]
+    pub metric: ::prost::alloc::string::String,
+    /// The result data in prometheus range query result format
+    /// <https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.>
+    /// This may include multiple time series, differentiated by their metric labels.
+    /// Start time is greater of (execution attempt start, 48h ago)
+    /// End time is lesser of (execution attempt end, now)
+    #[prost(message, optional, tag="2")]
+    pub data: ::core::option::Option<::prost_types::Struct>,
+}
 /// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
 /// Each expression results in a boolean result.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2711,6 +2765,8 @@ pub enum CatalogCacheStatus {
     CachePutFailure = 5,
     /// Used to indicate the cache lookup was skipped
     CacheSkipped = 6,
+    /// Used to indicate that the cache was evicted
+    CacheEvicted = 7,
 }
 impl CatalogCacheStatus {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -2726,6 +2782,7 @@ impl CatalogCacheStatus {
             CatalogCacheStatus::CacheLookupFailure => "CACHE_LOOKUP_FAILURE",
             CatalogCacheStatus::CachePutFailure => "CACHE_PUT_FAILURE",
             CatalogCacheStatus::CacheSkipped => "CACHE_SKIPPED",
+            CatalogCacheStatus::CacheEvicted => "CACHE_EVICTED",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
@@ -2738,45 +2795,9 @@ impl CatalogCacheStatus {
             "CACHE_LOOKUP_FAILURE" => Some(Self::CacheLookupFailure),
             "CACHE_PUT_FAILURE" => Some(Self::CachePutFailure),
             "CACHE_SKIPPED" => Some(Self::CacheSkipped),
+            "CACHE_EVICTED" => Some(Self::CacheEvicted),
             _ => None,
         }
-    }
-}
-/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
-/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
-/// precise definitions.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Span {
-    /// start_time defines the instance this span began.
-    #[prost(message, optional, tag="1")]
-    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// end_time defines the instance this span completed.
-    #[prost(message, optional, tag="2")]
-    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// spans defines a collection of Spans that breakdown this execution.
-    #[prost(message, repeated, tag="7")]
-    pub spans: ::prost::alloc::vec::Vec<Span>,
-    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
-    pub id: ::core::option::Option<span::Id>,
-}
-/// Nested message and enum types in `Span`.
-pub mod span {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Id {
-        /// workflow_id is the id of the workflow execution this Span represents.
-        #[prost(message, tag="3")]
-        WorkflowId(super::WorkflowExecutionIdentifier),
-        /// node_id is the id of the node execution this Span represents.
-        #[prost(message, tag="4")]
-        NodeId(super::NodeExecutionIdentifier),
-        /// task_id is the id of the task execution this Span represents.
-        #[prost(message, tag="5")]
-        TaskId(super::TaskExecutionIdentifier),
-        /// operation_id is the id of a unique operation that this Span represents.
-        #[prost(string, tag="6")]
-        OperationId(::prost::alloc::string::String),
     }
 }
 /// Describes a set of tasks to execute and how the final outputs are produced.

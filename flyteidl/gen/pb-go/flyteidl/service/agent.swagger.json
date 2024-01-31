@@ -259,6 +259,36 @@
       },
       "description": "A response containing an agent."
     },
+    "adminGetTaskLogsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The execution log results."
+        },
+        "token": {
+          "type": "string",
+          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
+        }
+      },
+      "description": "A response containing the logs for a task execution."
+    },
+    "adminGetTaskMetricsResponse": {
+      "type": "object",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/coreExecutionMetricResult"
+          },
+          "description": "The execution metric results."
+        }
+      },
+      "description": "A response containing a list of metrics for a task execution."
+    },
     "adminGetTaskResponse": {
       "type": "object",
       "properties": {
@@ -292,7 +322,7 @@
       "properties": {
         "state": {
           "$ref": "#/definitions/flyteidladminState",
-          "description": "The state of the execution is used to control its visibility in the UI/CLI."
+          "description": "DEPRECATED. The state of the execution is used to control its visibility in the UI/CLI."
         },
         "outputs": {
           "$ref": "#/definitions/coreLiteralMap",
@@ -308,6 +338,10 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "description": "log information for the task execution."
+        },
+        "phase": {
+          "$ref": "#/definitions/coreTaskExecutionPhase",
+          "description": "The phase of the execution is used to determine the phase of the plugin's execution."
         }
       }
     },
@@ -319,11 +353,15 @@
           "format": "int64"
         },
         "partition_key": {
-          "type": "string",
-          "title": "These two fields are only relevant in the partition value case"
+          "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "transform": {
-          "type": "string"
+          "type": "string",
+          "title": "This is only relevant in the time partition case"
         }
       },
       "title": "Only valid for triggers"
@@ -338,7 +376,12 @@
           "type": "string"
         },
         "partitions": {
-          "$ref": "#/definitions/corePartitions"
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
         }
       }
     },
@@ -533,6 +576,20 @@
       },
       "description": "Represents an error thrown from a node."
     },
+    "coreExecutionMetricResult": {
+      "type": "object",
+      "properties": {
+        "metric": {
+          "type": "string",
+          "description": "The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG."
+        },
+        "data": {
+          "$ref": "#/definitions/protobufStruct",
+          "title": "The result data in prometheus range query result format\nhttps://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.\nThis may include multiple time series, differentiated by their metric labels.\nStart time is greater of (execution attempt start, 48h ago)\nEnd time is lesser of (execution attempt end, now)"
+        }
+      },
+      "description": "ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task."
+    },
     "coreExtendedResources": {
       "type": "object",
       "properties": {
@@ -597,6 +654,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -687,7 +748,13 @@
       "type": "object",
       "properties": {
         "static_value": {
-          "type": "string"
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
         },
         "triggered_binding": {
           "$ref": "#/definitions/coreArtifactBindingData"
@@ -1155,6 +1222,21 @@
       },
       "description": "Encapsulation of fields that identify a Flyte task execution entity."
     },
+    "coreTaskExecutionPhase": {
+      "type": "string",
+      "enum": [
+        "UNDEFINED",
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "ABORTED",
+        "FAILED",
+        "INITIALIZING",
+        "WAITING_FOR_RESOURCES"
+      ],
+      "default": "UNDEFINED",
+      "title": "- INITIALIZING: To indicate cases where task is initializing, like: ErrImagePull, ContainerCreating, PodInitializing\n - WAITING_FOR_RESOURCES: To address cases, where underlying resource is not available: Backoff error, Resource quota exceeded"
+    },
     "coreTaskLog": {
       "type": "object",
       "properties": {
@@ -1291,6 +1373,14 @@
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
     },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
+    },
     "coreTypeAnnotation": {
       "type": "object",
       "properties": {
@@ -1407,6 +1497,10 @@
         "name": {
           "type": "string",
           "description": "User or system provided value for the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"

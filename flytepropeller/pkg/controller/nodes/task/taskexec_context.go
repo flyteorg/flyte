@@ -197,14 +197,12 @@ func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v
 			v1.ResourceCPU:              taskResources.Requests.CPU,
 			v1.ResourceMemory:           taskResources.Requests.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Requests.EphemeralStorage,
-			v1.ResourceStorage:          taskResources.Requests.Storage,
 			utils.ResourceNvidiaGPU:     taskResources.Requests.GPU,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceCPU:              taskResources.Limits.CPU,
 			v1.ResourceMemory:           taskResources.Limits.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Limits.EphemeralStorage,
-			v1.ResourceStorage:          taskResources.Limits.Storage,
 			utils.ResourceNvidiaGPU:     taskResources.Limits.GPU,
 		},
 	}

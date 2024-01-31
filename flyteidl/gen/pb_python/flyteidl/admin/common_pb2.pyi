@@ -20,14 +20,16 @@ NAMED_ENTITY_ARCHIVED: NamedEntityState
 SYSTEM_GENERATED: NamedEntityState
 
 class NamedEntityIdentifier(_message.Message):
-    __slots__ = ["project", "domain", "name"]
+    __slots__ = ["project", "domain", "name", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     name: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class NamedEntityMetadata(_message.Message):
     __slots__ = ["description", "state"]
@@ -62,23 +64,25 @@ class Sort(_message.Message):
     def __init__(self, key: _Optional[str] = ..., direction: _Optional[_Union[Sort.Direction, str]] = ...) -> None: ...
 
 class NamedEntityIdentifierListRequest(_message.Message):
-    __slots__ = ["project", "domain", "limit", "token", "sort_by", "filters"]
+    __slots__ = ["project", "domain", "limit", "token", "sort_by", "filters", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     SORT_BY_FIELD_NUMBER: _ClassVar[int]
     FILTERS_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     domain: str
     limit: int
     token: str
     sort_by: Sort
     filters: str
-    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., sort_by: _Optional[_Union[Sort, _Mapping]] = ..., filters: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., sort_by: _Optional[_Union[Sort, _Mapping]] = ..., filters: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class NamedEntityListRequest(_message.Message):
-    __slots__ = ["resource_type", "project", "domain", "limit", "token", "sort_by", "filters"]
+    __slots__ = ["resource_type", "project", "domain", "limit", "token", "sort_by", "filters", "org"]
     RESOURCE_TYPE_FIELD_NUMBER: _ClassVar[int]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
@@ -86,6 +90,7 @@ class NamedEntityListRequest(_message.Message):
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     SORT_BY_FIELD_NUMBER: _ClassVar[int]
     FILTERS_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     resource_type: _identifier_pb2.ResourceType
     project: str
     domain: str
@@ -93,7 +98,8 @@ class NamedEntityListRequest(_message.Message):
     token: str
     sort_by: Sort
     filters: str
-    def __init__(self, resource_type: _Optional[_Union[_identifier_pb2.ResourceType, str]] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., sort_by: _Optional[_Union[Sort, _Mapping]] = ..., filters: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, resource_type: _Optional[_Union[_identifier_pb2.ResourceType, str]] = ..., project: _Optional[str] = ..., domain: _Optional[str] = ..., limit: _Optional[int] = ..., token: _Optional[str] = ..., sort_by: _Optional[_Union[Sort, _Mapping]] = ..., filters: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class NamedEntityIdentifierList(_message.Message):
     __slots__ = ["entities", "token"]
