@@ -15,10 +15,6 @@ docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" --volume "$(pwd):/
 # suggestions is to manually create such files, which is what we do here:
 find gen/pb_python -type d -exec touch {}/__init__.py \;
 
-
-# Generate binary data from OpenAPI 2 file
-docker run --rm -u $(id -u):$(id -g) -v $DIR/gen/pb-go/flyteidl/service:/service --entrypoint go-bindata $LYFT_IMAGE -pkg service -o /service/openapi.go -prefix /service/ -modtime 1562572800 /service/admin.swagger.json
-
 # Generate JS code
 
 # This section is used by Travis CI to ensure that the generation step was run
