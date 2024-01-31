@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -17,6 +18,13 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 )
+
+func TestMain(m *testing.M) {
+	// All tests should run assuming UTC timezone.
+	time.Local = time.UTC
+	code := m.Run()
+	os.Exit(code)
+}
 
 func TestExtractCurrentCondition(t *testing.T) {
 	jobCreated := commonOp.JobCondition{
@@ -203,8 +211,9 @@ func TestGetLogsTemplateUri(t *testing.T) {
 
 	taskCtx := dummyTaskContext()
 	pytorchJobObjectMeta := meta_v1.ObjectMeta{
-		Name:      "test",
-		Namespace: "pytorch-namespace",
+		Name: "test",
+		Namespace: "pytorch-" +
+			"namespace",
 		CreationTimestamp: meta_v1.Time{
 			Time: time.Date(2022, time.January, 1, 12, 0, 0, 0, time.UTC),
 		},
@@ -309,6 +318,8 @@ func dummyTaskContext() pluginsCore.TaskExecutionContext {
 		},
 		RetryAttempt: 0,
 	})
+	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)

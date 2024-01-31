@@ -19,7 +19,7 @@ A Flyte :ref:`workflow <divedeep-workflows>` is represented as a Directed Acycli
 - ``DynamicNodes`` add nodes to the DAG.
 - ``WorkflowNodes`` allow embedding workflows within each other.
 
-FlytePropeller is responsible for scheduling and tracking execution of Flyte workflows. It is implemented using a K8s controller and adheres to the established K8s design principles. In this scheme, resources are periodically evaluated and the goal is to transition from the observed state to a requested state. 
+FlytePropeller is responsible for scheduling and tracking execution of Flyte workflows. It is implemented using a K8s controller and adheres to the established K8s design principles. In this scheme, resources are periodically evaluated and the goal is to transition from the observed state to a requested state.
 
 In our case, workflows are the resources and they are iteratively evaluated to transition from the current state to success. During each loop, the current workflow state is established as the phase of workflow nodes and subsequent tasks, and FlytePropeller performs operations to transition this state to success. The operations may include scheduling (or rescheduling) node executions, evaluating dynamic or branch nodes, etc. These design decisions ensure that FlytePropeller can scale to manage a large number of concurrent workflows without performance degradation.
 
@@ -33,7 +33,7 @@ Components
 FlyteWorkflow CRD / K8s Integration
 -----------------------------------
 
-Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CR (Custom Resource) which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status' (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
+Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CR (Custom Resource) which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
 
 K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the FlyteWorkflow CR is created/updated, the FlytePropeller instance is notified. FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions. However, it is conceivable to manually create FlyteWorkflow CRs, but this will have limited visibility and usability.
 
@@ -69,7 +69,15 @@ NodeHandlers
 
 FlytePropeller includes a robust collection of NodeHandlers to support diverse evaluation of the workflow DAG:
 
-* **TaskHandler (Plugins)**: These are responsible for executing plugin specific tasks. This may include contacting FlyteAdmin to schedule K8s pod to perform work, calling a web API to begin/track evaluation, and much more. The plugin paradigm exposes an extensible interface for adding functionality to Flyte workflows.
+* **TaskHandler (Plugins)**: These are responsible for executing tasks in the Flyte cluster. There are mainly 3 kinds of tasks for the task handler:
+
+  1. **Pod Task**: Create a pod in the Kubernetes cluster, execute the task, and then delete the pod.
+
+  2. **K8s Operator Backend Plugin**: Install a specific Kubernetes Operator (e.g., Spark, Ray, and Kubeflow) in the cluster, create pods by the Kubernetes Operator, execute the task, and then delete the pods.
+
+  3. **Web API Task**: Send REST/gRPC requests to a server and return the response.
+     Note: The Web API Task will not start a pod.
+
 * **DynamicHandler**: Flyte workflow CRs are initialized using a DAG compiled during the registration process. The numerous benefits of this approach are beyond the scope of this document. However, there are situations where the complete DAG is unknown at compile time. For example, when executing a task on each value of an input list. Using Dynamic nodes, a new DAG subgraph may be dynamically compiled during runtime and linked to the existing FlyteWorkflow CR.
 * **WorkflowHandler**: This handler allows embedding workflows within another workflow definition. The API exposes this functionality using either (1) an inline execution, where the workflow function is invoked directly resulting in a single FlyteWorkflow CR with an appended sub-workflow, or (2) a launch plan, which uses a TODO to create a separate sub-FlyteWorkflow CR whose execution state is linked to the parent FlyteWorkflow CR.
 * **BranchHandler**: The branch handler allows the DAG to follow a specific control path based on input (or computed) values.
@@ -79,3 +87,10 @@ FlyteAdmin Events
 -----------------
 
 It should be noted that the WorkflowExecutor, NodeExecutor, and TaskHandlers send events to FlyteAdmin, enabling it to track workflows in near real-time.
+
+FlytePlugins
+------------
+
+Here is an overview architecture of FlytePlugins:
+
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/flyte/concepts/architecture/flytepropeller_plugins_architecture.png

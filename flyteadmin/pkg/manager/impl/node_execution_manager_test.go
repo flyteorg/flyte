@@ -10,7 +10,9 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -1318,4 +1320,149 @@ func TestGetNodeExecutionData(t *testing.T) {
 			Deck:    "flyte://v1/project/domain/name/node id/d",
 		},
 	}, dataResponse))
+}
+
+func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: remoteClosureIdentifier}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	expectedClosure := testutils.GetWorkflowClosure().CompiledWorkflow
+	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		assert.Equal(t, remoteClosureIdentifier, reference.String())
+		bytes, err := proto.Marshal(expectedClosure)
+		require.NoError(t, err)
+		return proto.Unmarshal(bytes, msg)
+	}
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+	expected := &admin.DynamicNodeWorkflowResponse{
+		CompiledWorkflow: expectedClosure,
+	}
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+
+	assert.NoError(t, err)
+	assert.True(t, proto.Equal(expected, resp))
+}
+
+func Test_GetDynamicNodeWorkflow_DBError(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	expectedErr := errors.New("failure")
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{}, expectedErr
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+
+	assert.Equal(t, expectedErr, err)
+	assert.Empty(t, resp)
+}
+
+func Test_GetDynamicNodeWorkflow_NoRemoteReference(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: ""}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+
+	st, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.NotFound, st.Code())
+	assert.Equal(t, "node does not contain dynamic workflow", st.Message())
+	assert.Empty(t, resp)
+}
+
+func Test_GetDynamicNodeWorkflow_StorageError(t *testing.T) {
+	repo := repositoryMocks.NewMockRepository()
+	nodeExecID := core.NodeExecutionIdentifier{
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: project,
+			Domain:  domain,
+			Name:    name,
+		},
+	}
+	repo.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).
+		SetGetCallback(func(ctx context.Context, input interfaces.NodeExecutionResource) (models.NodeExecution, error) {
+			assert.Equal(t, nodeExecID, input.NodeExecutionIdentifier)
+			return models.NodeExecution{DynamicWorkflowRemoteClosureReference: remoteClosureIdentifier}, nil
+		})
+	mockStorageClient := commonMocks.GetMockStorageClient()
+	mockStorageClient.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		assert.Equal(t, remoteClosureIdentifier, reference.String())
+		return errors.New("failure")
+	}
+	ctx := context.TODO()
+	nodeExecManager := NewNodeExecutionManager(repo,
+		getMockExecutionsConfigProvider(),
+		storagePrefix,
+		mockStorageClient,
+		mockScope.NewTestScope(),
+		mockNodeExecutionRemoteURL,
+		nil, nil,
+		&eventWriterMocks.NodeExecutionEventWriter{})
+
+	resp, err := nodeExecManager.GetDynamicNodeWorkflow(ctx, admin.GetDynamicNodeWorkflowRequest{Id: &nodeExecID})
+
+	st, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.Internal, st.Code())
+	assert.Equal(t, "Unable to read WorkflowClosure from location s3://flyte/metadata/admin/remote closure id : failure", st.Message())
+	assert.Empty(t, resp)
 }
