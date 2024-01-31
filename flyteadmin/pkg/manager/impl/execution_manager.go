@@ -249,23 +249,6 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		})
 	}
 
-	// Only assign storage when it is either requested or limited in the task definition, or a platform
-	// default exists.
-	if !taskResourceRequirements.Defaults.Storage.IsZero() ||
-		!taskResourceRequirements.Limits.Storage.IsZero() ||
-		!platformTaskResources.Defaults.Storage.IsZero() {
-		storageResource := flytek8s.AdjustOrDefaultResource(taskResourceRequirements.Defaults.Storage, taskResourceRequirements.Limits.Storage,
-			platformTaskResources.Defaults.Storage, platformTaskResources.Limits.Storage)
-		finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Request.String(),
-		})
-		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Limit.String(),
-		})
-	}
-
 	// Only assign gpu when it is either requested or limited in the task definition, or a platform default exists.
 	if !taskResourceRequirements.Defaults.GPU.IsZero() ||
 		!taskResourceRequirements.Limits.GPU.IsZero() ||
