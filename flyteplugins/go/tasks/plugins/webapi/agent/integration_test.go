@@ -64,7 +64,7 @@ func TestEndToEnd(t *testing.T) {
 
 	inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 	template := flyteIdlCore.TaskTemplate{
-		Type:   "databricks",
+		Type:   "spark",
 		Custom: st,
 		Target: &flyteIdlCore.TaskTemplate_Container{
 			Container: &flyteIdlCore.Container{Args: []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}},
@@ -237,7 +237,10 @@ func newMockAgentPlugin() webapi.PluginEntry {
 			ResourceMeta: []byte{1, 2, 3, 4},
 		}}, nil)
 
-	agentClient.On("GetTask", mock.Anything, mock.Anything).Return(
+	mockGetRequestMatcher := mock.MatchedBy(func(request *admin.GetTaskRequest) bool {
+		return request.GetTaskType() == "spark"
+	})
+	agentClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
 		&admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil)
 
 	agentClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
