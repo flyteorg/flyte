@@ -73,4 +73,3 @@ exclude = [
     "gen/pb-js",
     "gen/pb-rust",
 ]
-namespaces = false
