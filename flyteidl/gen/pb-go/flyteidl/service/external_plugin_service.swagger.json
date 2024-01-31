@@ -171,11 +171,15 @@
           "format": "int64"
         },
         "partition_key": {
-          "type": "string",
-          "title": "These two fields are only relevant in the partition value case"
+          "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean",
+          "format": "boolean"
         },
         "transform": {
-          "type": "string"
+          "type": "string",
+          "title": "This is only relevant in the time partition case"
         }
       },
       "title": "Only valid for triggers"
@@ -190,7 +194,12 @@
           "type": "string"
         },
         "partitions": {
-          "$ref": "#/definitions/corePartitions"
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
         }
       }
     },
@@ -449,6 +458,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -539,7 +552,13 @@
       "type": "object",
       "properties": {
         "static_value": {
-          "type": "string"
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
         },
         "triggered_binding": {
           "$ref": "#/definitions/coreArtifactBindingData"
@@ -1096,6 +1115,14 @@
         }
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
+    },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        }
+      }
     },
     "coreTypeAnnotation": {
       "type": "object",

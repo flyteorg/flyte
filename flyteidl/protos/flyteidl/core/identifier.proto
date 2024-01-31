@@ -33,6 +33,9 @@ message Identifier {
 
     // Specific version of the resource.
     string version              = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 // Encapsulation of fields that uniquely identifies a Flyte workflow execution
@@ -46,6 +49,9 @@ message WorkflowExecutionIdentifier {
 
     // User or system provided value for the resource.
     string name                 = 4;
+
+    // Optional, org key applied to the resource.
+    string org = 5;
 }
 
 // Encapsulation of fields that identify a Flyte node execution entity.

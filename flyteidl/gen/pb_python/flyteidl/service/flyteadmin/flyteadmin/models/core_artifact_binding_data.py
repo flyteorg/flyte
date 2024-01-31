@@ -33,20 +33,23 @@ class CoreArtifactBindingData(object):
     swagger_types = {
         'index': 'int',
         'partition_key': 'str',
+        'bind_to_time_partition': 'bool',
         'transform': 'str'
     }
 
     attribute_map = {
         'index': 'index',
         'partition_key': 'partition_key',
+        'bind_to_time_partition': 'bind_to_time_partition',
         'transform': 'transform'
     }
 
-    def __init__(self, index=None, partition_key=None, transform=None):  # noqa: E501
+    def __init__(self, index=None, partition_key=None, bind_to_time_partition=None, transform=None):  # noqa: E501
         """CoreArtifactBindingData - a model defined in Swagger"""  # noqa: E501
 
         self._index = None
         self._partition_key = None
+        self._bind_to_time_partition = None
         self._transform = None
         self.discriminator = None
 
@@ -54,6 +57,8 @@ class CoreArtifactBindingData(object):
             self.index = index
         if partition_key is not None:
             self.partition_key = partition_key
+        if bind_to_time_partition is not None:
+            self.bind_to_time_partition = bind_to_time_partition
         if transform is not None:
             self.transform = transform
 
@@ -98,6 +103,27 @@ class CoreArtifactBindingData(object):
         """
 
         self._partition_key = partition_key
+
+    @property
+    def bind_to_time_partition(self):
+        """Gets the bind_to_time_partition of this CoreArtifactBindingData.  # noqa: E501
+
+
+        :return: The bind_to_time_partition of this CoreArtifactBindingData.  # noqa: E501
+        :rtype: bool
+        """
+        return self._bind_to_time_partition
+
+    @bind_to_time_partition.setter
+    def bind_to_time_partition(self, bind_to_time_partition):
+        """Sets the bind_to_time_partition of this CoreArtifactBindingData.
+
+
+        :param bind_to_time_partition: The bind_to_time_partition of this CoreArtifactBindingData.  # noqa: E501
+        :type: bool
+        """
+
+        self._bind_to_time_partition = bind_to_time_partition
 
     @property
     def transform(self):

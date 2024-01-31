@@ -13512,10 +13512,28 @@ public final class LaunchPlanOuterClass {
      * <code>.flyteidl.admin.Sort sort_by = 5;</code>
      */
     flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
-   * Represents a request structure to list active launch plans within a project/domain.
+   * Represents a request structure to list active launch plans within a project/domain and optional org.
    * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
    * </pre>
    *
@@ -13534,6 +13552,7 @@ public final class LaunchPlanOuterClass {
       project_ = "";
       domain_ = "";
       token_ = "";
+      org_ = "";
     }
 
     @java.lang.Override
@@ -13594,6 +13613,12 @@ public final class LaunchPlanOuterClass {
                 sortBy_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 50: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -13812,6 +13837,48 @@ public final class LaunchPlanOuterClass {
       return getSortBy();
     }
 
+    public static final int ORG_FIELD_NUMBER = 6;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 6;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -13841,6 +13908,9 @@ public final class LaunchPlanOuterClass {
       if (sortBy_ != null) {
         output.writeMessage(5, getSortBy());
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 6, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -13866,6 +13936,9 @@ public final class LaunchPlanOuterClass {
       if (sortBy_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(5, getSortBy());
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(6, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -13895,6 +13968,8 @@ public final class LaunchPlanOuterClass {
         if (!getSortBy()
             .equals(other.getSortBy())) return false;
       }
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -13918,6 +13993,8 @@ public final class LaunchPlanOuterClass {
         hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
         hash = (53 * hash) + getSortBy().hashCode();
       }
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -14015,7 +14092,7 @@ public final class LaunchPlanOuterClass {
     }
     /**
      * <pre>
-     * Represents a request structure to list active launch plans within a project/domain.
+     * Represents a request structure to list active launch plans within a project/domain and optional org.
      * See :ref:`ref_flyteidl.admin.LaunchPlan` for more details
      * </pre>
      *
@@ -14070,6 +14147,8 @@ public final class LaunchPlanOuterClass {
           sortBy_ = null;
           sortByBuilder_ = null;
         }
+        org_ = "";
+
         return this;
       }
 
@@ -14105,6 +14184,7 @@ public final class LaunchPlanOuterClass {
         } else {
           result.sortBy_ = sortByBuilder_.build();
         }
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -14170,6 +14250,10 @@ public final class LaunchPlanOuterClass {
         }
         if (other.hasSortBy()) {
           mergeSortBy(other.getSortBy());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -14689,6 +14773,95 @@ public final class LaunchPlanOuterClass {
         }
         return sortByBuilder_;
       }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 6;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
+        onChanged();
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -14866,13 +15039,14 @@ public final class LaunchPlanOuterClass {
       "\001(\0162\037.flyteidl.admin.LaunchPlanState\"\032\n\030" +
       "LaunchPlanUpdateResponse\"L\n\027ActiveLaunch" +
       "PlanRequest\0221\n\002id\030\001 \001(\0132%.flyteidl.admin" +
-      ".NamedEntityIdentifier\"\203\001\n\033ActiveLaunchP" +
+      ".NamedEntityIdentifier\"\220\001\n\033ActiveLaunchP" +
       "lanListRequest\022\017\n\007project\030\001 \001(\t\022\016\n\006domai" +
       "n\030\002 \001(\t\022\r\n\005limit\030\003 \001(\r\022\r\n\005token\030\004 \001(\t\022%\n" +
-      "\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort*+\n\017" +
-      "LaunchPlanState\022\014\n\010INACTIVE\020\000\022\n\n\006ACTIVE\020" +
-      "\001B=Z;github.com/flyteorg/flyte/flyteidl/" +
-      "gen/pb-go/flyteidl/adminb\006proto3"
+      "\007sort_by\030\005 \001(\0132\024.flyteidl.admin.Sort\022\013\n\003" +
+      "org\030\006 \001(\t*+\n\017LaunchPlanState\022\014\n\010INACTIVE" +
+      "\020\000\022\n\n\006ACTIVE\020\001B=Z;github.com/flyteorg/fl" +
+      "yte/flyteidl/gen/pb-go/flyteidl/adminb\006p" +
+      "roto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -14967,7 +15141,7 @@ public final class LaunchPlanOuterClass {
     internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ActiveLaunchPlanListRequest_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", });
+        new java.lang.String[] { "Project", "Domain", "Limit", "Token", "SortBy", "Org", });
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.Literals.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();

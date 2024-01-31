@@ -37,7 +37,8 @@ class AdminMatchableAttributesConfiguration(object):
         'domain': 'str',
         'project': 'str',
         'workflow': 'str',
-        'launch_plan': 'str'
+        'launch_plan': 'str',
+        'org': 'str'
     }
 
     attribute_map = {
@@ -45,10 +46,11 @@ class AdminMatchableAttributesConfiguration(object):
         'domain': 'domain',
         'project': 'project',
         'workflow': 'workflow',
-        'launch_plan': 'launch_plan'
+        'launch_plan': 'launch_plan',
+        'org': 'org'
     }
 
-    def __init__(self, attributes=None, domain=None, project=None, workflow=None, launch_plan=None):  # noqa: E501
+    def __init__(self, attributes=None, domain=None, project=None, workflow=None, launch_plan=None, org=None):  # noqa: E501
         """AdminMatchableAttributesConfiguration - a model defined in Swagger"""  # noqa: E501
 
         self._attributes = None
@@ -56,6 +58,7 @@ class AdminMatchableAttributesConfiguration(object):
         self._project = None
         self._workflow = None
         self._launch_plan = None
+        self._org = None
         self.discriminator = None
 
         if attributes is not None:
@@ -68,6 +71,8 @@ class AdminMatchableAttributesConfiguration(object):
             self.workflow = workflow
         if launch_plan is not None:
             self.launch_plan = launch_plan
+        if org is not None:
+            self.org = org
 
     @property
     def attributes(self):
@@ -173,6 +178,29 @@ class AdminMatchableAttributesConfiguration(object):
         """
 
         self._launch_plan = launch_plan
+
+    @property
+    def org(self):
+        """Gets the org of this AdminMatchableAttributesConfiguration.  # noqa: E501
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :return: The org of this AdminMatchableAttributesConfiguration.  # noqa: E501
+        :rtype: str
+        """
+        return self._org
+
+    @org.setter
+    def org(self, org):
+        """Sets the org of this AdminMatchableAttributesConfiguration.
+
+        Optional, org key applied to the resource.  # noqa: E501
+
+        :param org: The org of this AdminMatchableAttributesConfiguration.  # noqa: E501
+        :type: str
+        """
+
+        self._org = org
 
     def to_dict(self):
         """Returns the model properties as a dict"""

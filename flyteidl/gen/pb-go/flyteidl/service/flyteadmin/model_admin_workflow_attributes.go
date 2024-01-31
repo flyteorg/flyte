@@ -17,4 +17,6 @@ type AdminWorkflowAttributes struct {
 	// Workflow name for which this set of attributes will be applied.
 	Workflow string `json:"workflow,omitempty"`
 	MatchingAttributes *AdminMatchingAttributes `json:"matching_attributes,omitempty"`
+	// Optional, org key applied to the attributes.
+	Org string `json:"org,omitempty"`
 }

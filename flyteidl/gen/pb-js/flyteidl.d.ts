@@ -78,6 +78,9 @@ export namespace flyteidl {
             /** ArtifactBindingData partitionKey */
             partitionKey?: (string|null);
 
+            /** ArtifactBindingData bindToTimePartition */
+            bindToTimePartition?: (boolean|null);
+
             /** ArtifactBindingData transform */
             transform?: (string|null);
         }
@@ -97,8 +100,14 @@ export namespace flyteidl {
             /** ArtifactBindingData partitionKey. */
             public partitionKey: string;
 
+            /** ArtifactBindingData bindToTimePartition. */
+            public bindToTimePartition: boolean;
+
             /** ArtifactBindingData transform. */
             public transform: string;
+
+            /** ArtifactBindingData partitionData. */
+            public partitionData?: ("partitionKey"|"bindToTimePartition");
 
             /**
              * Creates a new ArtifactBindingData instance using the specified properties.
@@ -191,6 +200,9 @@ export namespace flyteidl {
             /** LabelValue staticValue */
             staticValue?: (string|null);
 
+            /** LabelValue timeValue */
+            timeValue?: (google.protobuf.ITimestamp|null);
+
             /** LabelValue triggeredBinding */
             triggeredBinding?: (flyteidl.core.IArtifactBindingData|null);
 
@@ -210,6 +222,9 @@ export namespace flyteidl {
             /** LabelValue staticValue. */
             public staticValue: string;
 
+            /** LabelValue timeValue. */
+            public timeValue?: (google.protobuf.ITimestamp|null);
+
             /** LabelValue triggeredBinding. */
             public triggeredBinding?: (flyteidl.core.IArtifactBindingData|null);
 
@@ -217,7 +232,7 @@ export namespace flyteidl {
             public inputBinding?: (flyteidl.core.IInputBindingData|null);
 
             /** LabelValue value. */
-            public value?: ("staticValue"|"triggeredBinding"|"inputBinding");
+            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding");
 
             /**
              * Creates a new LabelValue instance using the specified properties.
@@ -304,6 +319,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TimePartition. */
+        interface ITimePartition {
+
+            /** TimePartition value */
+            value?: (flyteidl.core.ILabelValue|null);
+        }
+
+        /** Represents a TimePartition. */
+        class TimePartition implements ITimePartition {
+
+            /**
+             * Constructs a new TimePartition.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITimePartition);
+
+            /** TimePartition value. */
+            public value?: (flyteidl.core.ILabelValue|null);
+
+            /**
+             * Creates a new TimePartition instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TimePartition instance
+             */
+            public static create(properties?: flyteidl.core.ITimePartition): flyteidl.core.TimePartition;
+
+            /**
+             * Encodes the specified TimePartition message. Does not implicitly {@link flyteidl.core.TimePartition.verify|verify} messages.
+             * @param message TimePartition message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITimePartition, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TimePartition message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TimePartition
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TimePartition;
+
+            /**
+             * Verifies a TimePartition message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an ArtifactID. */
         interface IArtifactID {
 
@@ -315,6 +382,9 @@ export namespace flyteidl {
 
             /** ArtifactID partitions */
             partitions?: (flyteidl.core.IPartitions|null);
+
+            /** ArtifactID timePartition */
+            timePartition?: (flyteidl.core.ITimePartition|null);
         }
 
         /** Represents an ArtifactID. */
@@ -335,8 +405,8 @@ export namespace flyteidl {
             /** ArtifactID partitions. */
             public partitions?: (flyteidl.core.IPartitions|null);
 
-            /** ArtifactID dimensions. */
-            public dimensions?: "partitions";
+            /** ArtifactID timePartition. */
+            public timePartition?: (flyteidl.core.ITimePartition|null);
 
             /**
              * Creates a new ArtifactID instance using the specified properties.
@@ -502,64 +572,6 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
-        /** Properties of a Trigger. */
-        interface ITrigger {
-
-            /** Trigger triggerId */
-            triggerId?: (flyteidl.core.IIdentifier|null);
-
-            /** Trigger triggers */
-            triggers?: (flyteidl.core.IArtifactID[]|null);
-        }
-
-        /** Represents a Trigger. */
-        class Trigger implements ITrigger {
-
-            /**
-             * Constructs a new Trigger.
-             * @param [properties] Properties to set
-             */
-            constructor(properties?: flyteidl.core.ITrigger);
-
-            /** Trigger triggerId. */
-            public triggerId?: (flyteidl.core.IIdentifier|null);
-
-            /** Trigger triggers. */
-            public triggers: flyteidl.core.IArtifactID[];
-
-            /**
-             * Creates a new Trigger instance using the specified properties.
-             * @param [properties] Properties to set
-             * @returns Trigger instance
-             */
-            public static create(properties?: flyteidl.core.ITrigger): flyteidl.core.Trigger;
-
-            /**
-             * Encodes the specified Trigger message. Does not implicitly {@link flyteidl.core.Trigger.verify|verify} messages.
-             * @param message Trigger message or plain object to encode
-             * @param [writer] Writer to encode to
-             * @returns Writer
-             */
-            public static encode(message: flyteidl.core.ITrigger, writer?: $protobuf.Writer): $protobuf.Writer;
-
-            /**
-             * Decodes a Trigger message from the specified reader or buffer.
-             * @param reader Reader or buffer to decode from
-             * @param [length] Message length if known beforehand
-             * @returns Trigger
-             * @throws {Error} If the payload is not a reader or valid buffer
-             * @throws {$protobuf.util.ProtocolError} If required fields are missing
-             */
-            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Trigger;
-
-            /**
-             * Verifies a Trigger message.
-             * @param message Plain object to verify
-             * @returns `null` if valid, otherwise the reason why it is not
-             */
-            public static verify(message: { [k: string]: any }): (string|null);
-        }
-
         /** ResourceType enum. */
         enum ResourceType {
             UNSPECIFIED = 0,
@@ -586,6 +598,9 @@ export namespace flyteidl {
 
             /** Identifier version */
             version?: (string|null);
+
+            /** Identifier org */
+            org?: (string|null);
         }
 
         /** Represents an Identifier. */
@@ -611,6 +626,9 @@ export namespace flyteidl {
 
             /** Identifier version. */
             public version: string;
+
+            /** Identifier org. */
+            public org: string;
 
             /**
              * Creates a new Identifier instance using the specified properties.
@@ -656,6 +674,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionIdentifier name */
             name?: (string|null);
+
+            /** WorkflowExecutionIdentifier org */
+            org?: (string|null);
         }
 
         /** Represents a WorkflowExecutionIdentifier. */
@@ -675,6 +696,9 @@ export namespace flyteidl {
 
             /** WorkflowExecutionIdentifier name. */
             public name: string;
+
+            /** WorkflowExecutionIdentifier org. */
+            public org: string;
 
             /**
              * Creates a new WorkflowExecutionIdentifier instance using the specified properties.
@@ -9156,6 +9180,9 @@ export namespace flyteidl {
 
             /** Resource logLinks */
             logLinks?: (flyteidl.core.ITaskLog[]|null);
+
+            /** Resource phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
         }
 
         /** Represents a Resource. */
@@ -9178,6 +9205,9 @@ export namespace flyteidl {
 
             /** Resource logLinks. */
             public logLinks: flyteidl.core.ITaskLog[];
+
+            /** Resource phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
 
             /**
              * Creates a new Resource instance using the specified properties.
@@ -9901,6 +9931,9 @@ export namespace flyteidl {
 
             /** NamedEntityIdentifier name */
             name?: (string|null);
+
+            /** NamedEntityIdentifier org */
+            org?: (string|null);
         }
 
         /** Represents a NamedEntityIdentifier. */
@@ -9920,6 +9953,9 @@ export namespace flyteidl {
 
             /** NamedEntityIdentifier name. */
             public name: string;
+
+            /** NamedEntityIdentifier org. */
+            public org: string;
 
             /**
              * Creates a new NamedEntityIdentifier instance using the specified properties.
@@ -10170,6 +10206,9 @@ export namespace flyteidl {
 
             /** NamedEntityIdentifierListRequest filters */
             filters?: (string|null);
+
+            /** NamedEntityIdentifierListRequest org */
+            org?: (string|null);
         }
 
         /** Represents a NamedEntityIdentifierListRequest. */
@@ -10198,6 +10237,9 @@ export namespace flyteidl {
 
             /** NamedEntityIdentifierListRequest filters. */
             public filters: string;
+
+            /** NamedEntityIdentifierListRequest org. */
+            public org: string;
 
             /**
              * Creates a new NamedEntityIdentifierListRequest instance using the specified properties.
@@ -10255,6 +10297,9 @@ export namespace flyteidl {
 
             /** NamedEntityListRequest filters */
             filters?: (string|null);
+
+            /** NamedEntityListRequest org */
+            org?: (string|null);
         }
 
         /** Represents a NamedEntityListRequest. */
@@ -10286,6 +10331,9 @@ export namespace flyteidl {
 
             /** NamedEntityListRequest filters. */
             public filters: string;
+
+            /** NamedEntityListRequest org. */
+            public org: string;
 
             /**
              * Creates a new NamedEntityListRequest instance using the specified properties.
@@ -12192,6 +12240,9 @@ export namespace flyteidl {
 
             /** ExecutionCreateRequest inputs */
             inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** ExecutionCreateRequest org */
+            org?: (string|null);
         }
 
         /** Represents an ExecutionCreateRequest. */
@@ -12217,6 +12268,9 @@ export namespace flyteidl {
 
             /** ExecutionCreateRequest inputs. */
             public inputs?: (flyteidl.core.ILiteralMap|null);
+
+            /** ExecutionCreateRequest org. */
+            public org: string;
 
             /**
              * Creates a new ExecutionCreateRequest instance using the specified properties.
@@ -14480,6 +14534,9 @@ export namespace flyteidl {
 
             /** ActiveLaunchPlanListRequest sortBy */
             sortBy?: (flyteidl.admin.ISort|null);
+
+            /** ActiveLaunchPlanListRequest org */
+            org?: (string|null);
         }
 
         /** Represents an ActiveLaunchPlanListRequest. */
@@ -14505,6 +14562,9 @@ export namespace flyteidl {
 
             /** ActiveLaunchPlanListRequest sortBy. */
             public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** ActiveLaunchPlanListRequest org. */
+            public org: string;
 
             /**
              * Creates a new ActiveLaunchPlanListRequest instance using the specified properties.
@@ -15370,6 +15430,9 @@ export namespace flyteidl {
 
             /** MatchableAttributesConfiguration launchPlan */
             launchPlan?: (string|null);
+
+            /** MatchableAttributesConfiguration org */
+            org?: (string|null);
         }
 
         /** Represents a MatchableAttributesConfiguration. */
@@ -15395,6 +15458,9 @@ export namespace flyteidl {
 
             /** MatchableAttributesConfiguration launchPlan. */
             public launchPlan: string;
+
+            /** MatchableAttributesConfiguration org. */
+            public org: string;
 
             /**
              * Creates a new MatchableAttributesConfiguration instance using the specified properties.
@@ -15434,6 +15500,9 @@ export namespace flyteidl {
 
             /** ListMatchableAttributesRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** ListMatchableAttributesRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ListMatchableAttributesRequest. */
@@ -15447,6 +15516,9 @@ export namespace flyteidl {
 
             /** ListMatchableAttributesRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** ListMatchableAttributesRequest org. */
+            public org: string;
 
             /**
              * Creates a new ListMatchableAttributesRequest instance using the specified properties.
@@ -16385,6 +16457,110 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a GetDynamicNodeWorkflowRequest. */
+        interface IGetDynamicNodeWorkflowRequest {
+
+            /** GetDynamicNodeWorkflowRequest id */
+            id?: (flyteidl.core.INodeExecutionIdentifier|null);
+        }
+
+        /** Represents a GetDynamicNodeWorkflowRequest. */
+        class GetDynamicNodeWorkflowRequest implements IGetDynamicNodeWorkflowRequest {
+
+            /**
+             * Constructs a new GetDynamicNodeWorkflowRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IGetDynamicNodeWorkflowRequest);
+
+            /** GetDynamicNodeWorkflowRequest id. */
+            public id?: (flyteidl.core.INodeExecutionIdentifier|null);
+
+            /**
+             * Creates a new GetDynamicNodeWorkflowRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns GetDynamicNodeWorkflowRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IGetDynamicNodeWorkflowRequest): flyteidl.admin.GetDynamicNodeWorkflowRequest;
+
+            /**
+             * Encodes the specified GetDynamicNodeWorkflowRequest message. Does not implicitly {@link flyteidl.admin.GetDynamicNodeWorkflowRequest.verify|verify} messages.
+             * @param message GetDynamicNodeWorkflowRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IGetDynamicNodeWorkflowRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a GetDynamicNodeWorkflowRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns GetDynamicNodeWorkflowRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.GetDynamicNodeWorkflowRequest;
+
+            /**
+             * Verifies a GetDynamicNodeWorkflowRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a DynamicNodeWorkflowResponse. */
+        interface IDynamicNodeWorkflowResponse {
+
+            /** DynamicNodeWorkflowResponse compiledWorkflow */
+            compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+        }
+
+        /** Represents a DynamicNodeWorkflowResponse. */
+        class DynamicNodeWorkflowResponse implements IDynamicNodeWorkflowResponse {
+
+            /**
+             * Constructs a new DynamicNodeWorkflowResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IDynamicNodeWorkflowResponse);
+
+            /** DynamicNodeWorkflowResponse compiledWorkflow. */
+            public compiledWorkflow?: (flyteidl.core.ICompiledWorkflowClosure|null);
+
+            /**
+             * Creates a new DynamicNodeWorkflowResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns DynamicNodeWorkflowResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IDynamicNodeWorkflowResponse): flyteidl.admin.DynamicNodeWorkflowResponse;
+
+            /**
+             * Encodes the specified DynamicNodeWorkflowResponse message. Does not implicitly {@link flyteidl.admin.DynamicNodeWorkflowResponse.verify|verify} messages.
+             * @param message DynamicNodeWorkflowResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IDynamicNodeWorkflowResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a DynamicNodeWorkflowResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns DynamicNodeWorkflowResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.DynamicNodeWorkflowResponse;
+
+            /**
+             * Verifies a DynamicNodeWorkflowResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of an EmailMessage. */
         interface IEmailMessage {
 
@@ -16533,6 +16709,9 @@ export namespace flyteidl {
 
             /** Project state */
             state?: (flyteidl.admin.Project.ProjectState|null);
+
+            /** Project org */
+            org?: (string|null);
         }
 
         /** Represents a Project. */
@@ -16561,6 +16740,9 @@ export namespace flyteidl {
 
             /** Project state. */
             public state: flyteidl.admin.Project.ProjectState;
+
+            /** Project org. */
+            public org: string;
 
             /**
              * Creates a new Project instance using the specified properties.
@@ -16677,6 +16859,9 @@ export namespace flyteidl {
 
             /** ProjectListRequest sortBy */
             sortBy?: (flyteidl.admin.ISort|null);
+
+            /** ProjectListRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectListRequest. */
@@ -16699,6 +16884,9 @@ export namespace flyteidl {
 
             /** ProjectListRequest sortBy. */
             public sortBy?: (flyteidl.admin.ISort|null);
+
+            /** ProjectListRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectListRequest instance using the specified properties.
@@ -16885,6 +17073,9 @@ export namespace flyteidl {
 
             /** ProjectAttributes matchingAttributes */
             matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** ProjectAttributes org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectAttributes. */
@@ -16901,6 +17092,9 @@ export namespace flyteidl {
 
             /** ProjectAttributes matchingAttributes. */
             public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** ProjectAttributes org. */
+            public org: string;
 
             /**
              * Creates a new ProjectAttributes instance using the specified properties.
@@ -17041,6 +17235,9 @@ export namespace flyteidl {
 
             /** ProjectAttributesGetRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** ProjectAttributesGetRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectAttributesGetRequest. */
@@ -17057,6 +17254,9 @@ export namespace flyteidl {
 
             /** ProjectAttributesGetRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** ProjectAttributesGetRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectAttributesGetRequest instance using the specified properties.
@@ -17151,6 +17351,9 @@ export namespace flyteidl {
 
             /** ProjectAttributesDeleteRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** ProjectAttributesDeleteRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectAttributesDeleteRequest. */
@@ -17167,6 +17370,9 @@ export namespace flyteidl {
 
             /** ProjectAttributesDeleteRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** ProjectAttributesDeleteRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectAttributesDeleteRequest instance using the specified properties.
@@ -17258,6 +17464,9 @@ export namespace flyteidl {
 
             /** ProjectDomainAttributes matchingAttributes */
             matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** ProjectDomainAttributes org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectDomainAttributes. */
@@ -17277,6 +17486,9 @@ export namespace flyteidl {
 
             /** ProjectDomainAttributes matchingAttributes. */
             public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** ProjectDomainAttributes org. */
+            public org: string;
 
             /**
              * Creates a new ProjectDomainAttributes instance using the specified properties.
@@ -17420,6 +17632,9 @@ export namespace flyteidl {
 
             /** ProjectDomainAttributesGetRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** ProjectDomainAttributesGetRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectDomainAttributesGetRequest. */
@@ -17439,6 +17654,9 @@ export namespace flyteidl {
 
             /** ProjectDomainAttributesGetRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** ProjectDomainAttributesGetRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectDomainAttributesGetRequest instance using the specified properties.
@@ -17536,6 +17754,9 @@ export namespace flyteidl {
 
             /** ProjectDomainAttributesDeleteRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** ProjectDomainAttributesDeleteRequest org */
+            org?: (string|null);
         }
 
         /** Represents a ProjectDomainAttributesDeleteRequest. */
@@ -17555,6 +17776,9 @@ export namespace flyteidl {
 
             /** ProjectDomainAttributesDeleteRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** ProjectDomainAttributesDeleteRequest org. */
+            public org: string;
 
             /**
              * Creates a new ProjectDomainAttributesDeleteRequest instance using the specified properties.
@@ -19607,6 +19831,9 @@ export namespace flyteidl {
 
             /** WorkflowAttributes matchingAttributes */
             matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** WorkflowAttributes org */
+            org?: (string|null);
         }
 
         /** Represents a WorkflowAttributes. */
@@ -19629,6 +19856,9 @@ export namespace flyteidl {
 
             /** WorkflowAttributes matchingAttributes. */
             public matchingAttributes?: (flyteidl.admin.IMatchingAttributes|null);
+
+            /** WorkflowAttributes org. */
+            public org: string;
 
             /**
              * Creates a new WorkflowAttributes instance using the specified properties.
@@ -19775,6 +20005,9 @@ export namespace flyteidl {
 
             /** WorkflowAttributesGetRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** WorkflowAttributesGetRequest org */
+            org?: (string|null);
         }
 
         /** Represents a WorkflowAttributesGetRequest. */
@@ -19797,6 +20030,9 @@ export namespace flyteidl {
 
             /** WorkflowAttributesGetRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** WorkflowAttributesGetRequest org. */
+            public org: string;
 
             /**
              * Creates a new WorkflowAttributesGetRequest instance using the specified properties.
@@ -19897,6 +20133,9 @@ export namespace flyteidl {
 
             /** WorkflowAttributesDeleteRequest resourceType */
             resourceType?: (flyteidl.admin.MatchableResource|null);
+
+            /** WorkflowAttributesDeleteRequest org */
+            org?: (string|null);
         }
 
         /** Represents a WorkflowAttributesDeleteRequest. */
@@ -19919,6 +20158,9 @@ export namespace flyteidl {
 
             /** WorkflowAttributesDeleteRequest resourceType. */
             public resourceType: flyteidl.admin.MatchableResource;
+
+            /** WorkflowAttributesDeleteRequest org. */
+            public org: string;
 
             /**
              * Creates a new WorkflowAttributesDeleteRequest instance using the specified properties.
@@ -20358,6 +20600,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public getNodeExecution(request: flyteidl.admin.INodeExecutionGetRequest): Promise<flyteidl.admin.NodeExecution>;
+
+            /**
+             * Calls GetDynamicNodeWorkflow.
+             * @param request GetDynamicNodeWorkflowRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and DynamicNodeWorkflowResponse
+             */
+            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest, callback: flyteidl.service.AdminService.GetDynamicNodeWorkflowCallback): void;
+
+            /**
+             * Calls GetDynamicNodeWorkflow.
+             * @param request GetDynamicNodeWorkflowRequest message or plain object
+             * @returns Promise
+             */
+            public getDynamicNodeWorkflow(request: flyteidl.admin.IGetDynamicNodeWorkflowRequest): Promise<flyteidl.admin.DynamicNodeWorkflowResponse>;
 
             /**
              * Calls ListNodeExecutions.
@@ -20935,6 +21191,13 @@ export namespace flyteidl {
              * @param [response] NodeExecution
              */
             type GetNodeExecutionCallback = (error: (Error|null), response?: flyteidl.admin.NodeExecution) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getDynamicNodeWorkflow}.
+             * @param error Error, if any
+             * @param [response] DynamicNodeWorkflowResponse
+             */
+            type GetDynamicNodeWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.DynamicNodeWorkflowResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listNodeExecutions}.

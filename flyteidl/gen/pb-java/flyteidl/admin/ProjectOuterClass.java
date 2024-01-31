@@ -892,6 +892,24 @@ public final class ProjectOuterClass {
      * <code>.flyteidl.admin.Project.ProjectState state = 6;</code>
      */
     flyteidl.admin.ProjectOuterClass.Project.ProjectState getState();
+
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -915,6 +933,7 @@ public final class ProjectOuterClass {
       domains_ = java.util.Collections.emptyList();
       description_ = "";
       state_ = 0;
+      org_ = "";
     }
 
     @java.lang.Override
@@ -985,6 +1004,12 @@ public final class ProjectOuterClass {
               int rawValue = input.readEnum();
 
               state_ = rawValue;
+              break;
+            }
+            case 58: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -1364,6 +1389,48 @@ public final class ProjectOuterClass {
       return result == null ? flyteidl.admin.ProjectOuterClass.Project.ProjectState.UNRECOGNIZED : result;
     }
 
+    public static final int ORG_FIELD_NUMBER = 7;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org key applied to the resource.
+     * </pre>
+     *
+     * <code>string org = 7;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1396,6 +1463,9 @@ public final class ProjectOuterClass {
       if (state_ != flyteidl.admin.ProjectOuterClass.Project.ProjectState.ACTIVE.getNumber()) {
         output.writeEnum(6, state_);
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -1426,6 +1496,9 @@ public final class ProjectOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(6, state_);
       }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, org_);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1455,6 +1528,8 @@ public final class ProjectOuterClass {
             .equals(other.getLabels())) return false;
       }
       if (state_ != other.state_) return false;
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1482,6 +1557,8 @@ public final class ProjectOuterClass {
       }
       hash = (37 * hash) + STATE_FIELD_NUMBER;
       hash = (53 * hash) + state_;
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -1640,6 +1717,8 @@ public final class ProjectOuterClass {
         }
         state_ = 0;
 
+        org_ = "";
+
         return this;
       }
 
@@ -1686,6 +1765,7 @@ public final class ProjectOuterClass {
           result.labels_ = labelsBuilder_.build();
         }
         result.state_ = state_;
+        result.org_ = org_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1778,6 +1858,10 @@ public final class ProjectOuterClass {
         }
         if (other.state_ != 0) {
           setStateValue(other.getStateValue());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -2499,6 +2583,95 @@ public final class ProjectOuterClass {
       public Builder clearState() {
         
         state_ = 0;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org key applied to the resource.
+       * </pre>
+       *
+       * <code>string org = 7;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
         onChanged();
         return this;
       }
@@ -3616,6 +3789,24 @@ public final class ProjectOuterClass {
      * <code>.flyteidl.admin.Sort sort_by = 4;</code>
      */
     flyteidl.admin.Common.SortOrBuilder getSortByOrBuilder();
+
+    /**
+     * <pre>
+     * Optional, org filter applied to list project requests.
+     * </pre>
+     *
+     * <code>string org = 5;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <pre>
+     * Optional, org filter applied to list project requests.
+     * </pre>
+     *
+     * <code>string org = 5;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * <pre>
@@ -3637,6 +3828,7 @@ public final class ProjectOuterClass {
     private ProjectListRequest() {
       token_ = "";
       filters_ = "";
+      org_ = "";
     }
 
     @java.lang.Override
@@ -3691,6 +3883,12 @@ public final class ProjectOuterClass {
                 sortBy_ = subBuilder.buildPartial();
               }
 
+              break;
+            }
+            case 42: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -3867,6 +4065,48 @@ public final class ProjectOuterClass {
       return getSortBy();
     }
 
+    public static final int ORG_FIELD_NUMBER = 5;
+    private volatile java.lang.Object org_;
+    /**
+     * <pre>
+     * Optional, org filter applied to list project requests.
+     * </pre>
+     *
+     * <code>string org = 5;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <pre>
+     * Optional, org filter applied to list project requests.
+     * </pre>
+     *
+     * <code>string org = 5;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3893,6 +4133,9 @@ public final class ProjectOuterClass {
       if (sortBy_ != null) {
         output.writeMessage(4, getSortBy());
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 5, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3915,6 +4158,9 @@ public final class ProjectOuterClass {
       if (sortBy_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(4, getSortBy());
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(5, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3942,6 +4188,8 @@ public final class ProjectOuterClass {
         if (!getSortBy()
             .equals(other.getSortBy())) return false;
       }
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3963,6 +4211,8 @@ public final class ProjectOuterClass {
         hash = (37 * hash) + SORT_BY_FIELD_NUMBER;
         hash = (53 * hash) + getSortBy().hashCode();
       }
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -4113,6 +4363,8 @@ public final class ProjectOuterClass {
           sortBy_ = null;
           sortByBuilder_ = null;
         }
+        org_ = "";
+
         return this;
       }
 
@@ -4147,6 +4399,7 @@ public final class ProjectOuterClass {
         } else {
           result.sortBy_ = sortByBuilder_.build();
         }
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -4208,6 +4461,10 @@ public final class ProjectOuterClass {
         }
         if (other.hasSortBy()) {
           mergeSortBy(other.getSortBy());
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
+          onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
@@ -4637,6 +4894,95 @@ public final class ProjectOuterClass {
           sortBy_ = null;
         }
         return sortByBuilder_;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <pre>
+       * Optional, org filter applied to list project requests.
+       * </pre>
+       *
+       * <code>string org = 5;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org filter applied to list project requests.
+       * </pre>
+       *
+       * <code>string org = 5;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <pre>
+       * Optional, org filter applied to list project requests.
+       * </pre>
+       *
+       * <code>string org = 5;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org filter applied to list project requests.
+       * </pre>
+       *
+       * <code>string org = 5;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <pre>
+       * Optional, org filter applied to list project requests.
+       * </pre>
+       *
+       * <code>string org = 5;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
+        onChanged();
+        return this;
       }
       @java.lang.Override
       public final Builder setUnknownFields(
@@ -6251,23 +6597,24 @@ public final class ProjectOuterClass {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/admin/project.proto\022\016flyteidl" +
       ".admin\032\033flyteidl/admin/common.proto\"\"\n\006D" +
-      "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\376\001\n\007Proj" +
+      "omain\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\"\213\002\n\007Proj" +
       "ect\022\n\n\002id\030\001 \001(\t\022\014\n\004name\030\002 \001(\t\022\'\n\007domains" +
       "\030\003 \003(\0132\026.flyteidl.admin.Domain\022\023\n\013descri" +
       "ption\030\004 \001(\t\022&\n\006labels\030\005 \001(\0132\026.flyteidl.a" +
       "dmin.Labels\0223\n\005state\030\006 \001(\0162$.flyteidl.ad" +
-      "min.Project.ProjectState\">\n\014ProjectState" +
-      "\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022\024\n\020SYSTEM_GEN" +
-      "ERATED\020\002\"D\n\010Projects\022)\n\010projects\030\001 \003(\0132\027" +
-      ".flyteidl.admin.Project\022\r\n\005token\030\002 \001(\t\"j" +
-      "\n\022ProjectListRequest\022\r\n\005limit\030\001 \001(\r\022\r\n\005t" +
-      "oken\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t\022%\n\007sort_by\030\004" +
-      " \001(\0132\024.flyteidl.admin.Sort\"B\n\026ProjectReg" +
-      "isterRequest\022(\n\007project\030\001 \001(\0132\027.flyteidl" +
-      ".admin.Project\"\031\n\027ProjectRegisterRespons" +
-      "e\"\027\n\025ProjectUpdateResponseB=Z;github.com" +
-      "/flyteorg/flyte/flyteidl/gen/pb-go/flyte" +
-      "idl/adminb\006proto3"
+      "min.Project.ProjectState\022\013\n\003org\030\007 \001(\t\">\n" +
+      "\014ProjectState\022\n\n\006ACTIVE\020\000\022\014\n\010ARCHIVED\020\001\022" +
+      "\024\n\020SYSTEM_GENERATED\020\002\"D\n\010Projects\022)\n\010pro" +
+      "jects\030\001 \003(\0132\027.flyteidl.admin.Project\022\r\n\005" +
+      "token\030\002 \001(\t\"w\n\022ProjectListRequest\022\r\n\005lim" +
+      "it\030\001 \001(\r\022\r\n\005token\030\002 \001(\t\022\017\n\007filters\030\003 \001(\t" +
+      "\022%\n\007sort_by\030\004 \001(\0132\024.flyteidl.admin.Sort\022" +
+      "\013\n\003org\030\005 \001(\t\"B\n\026ProjectRegisterRequest\022(" +
+      "\n\007project\030\001 \001(\0132\027.flyteidl.admin.Project" +
+      "\"\031\n\027ProjectRegisterResponse\"\027\n\025ProjectUp" +
+      "dateResponseB=Z;github.com/flyteorg/flyt" +
+      "e/flyteidl/gen/pb-go/flyteidl/adminb\006pro" +
+      "to3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -6293,7 +6640,7 @@ public final class ProjectOuterClass {
     internal_static_flyteidl_admin_Project_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_Project_descriptor,
-        new java.lang.String[] { "Id", "Name", "Domains", "Description", "Labels", "State", });
+        new java.lang.String[] { "Id", "Name", "Domains", "Description", "Labels", "State", "Org", });
     internal_static_flyteidl_admin_Projects_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_flyteidl_admin_Projects_fieldAccessorTable = new
@@ -6305,7 +6652,7 @@ public final class ProjectOuterClass {
     internal_static_flyteidl_admin_ProjectListRequest_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_admin_ProjectListRequest_descriptor,
-        new java.lang.String[] { "Limit", "Token", "Filters", "SortBy", });
+        new java.lang.String[] { "Limit", "Token", "Filters", "SortBy", "Org", });
     internal_static_flyteidl_admin_ProjectRegisterRequest_descriptor =
       getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_admin_ProjectRegisterRequest_fieldAccessorTable = new

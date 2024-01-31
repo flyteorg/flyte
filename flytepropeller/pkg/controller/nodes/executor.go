@@ -583,7 +583,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 			state.PreviousNodeExecutionCheckpointURI = storage.DataReference(metadata.TaskNodeMetadata.CheckpointUri)
 			err = nCtx.NodeStateWriter().PutTaskNodeState(state)
 			if err != nil {
-				logger.Warn(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
+				logger.Warnf(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
 					nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
 			}
 		}
