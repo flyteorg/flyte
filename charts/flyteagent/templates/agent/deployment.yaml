@@ -23,6 +23,7 @@ spec:
       - command:
         - pyflyte
         - serve
+        - agent
         {{- if .Values.podEnv }}
         env:
         {{- with .Values.podEnv }}
