@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -165,17 +166,8 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 func GetHandleOpenapiSpec(ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		swaggerBytes, err := grpcService.Asset("admin.swagger.json")
-		if err != nil {
-			logger.Warningf(ctx, "Err %v", err)
-			w.WriteHeader(http.StatusFailedDependency)
-		} else {
-			w.WriteHeader(http.StatusOK)
-			_, err := w.Write(swaggerBytes)
-			if err != nil {
-				logger.Errorf(ctx, "failed to write openAPI information, error: %s", err.Error())
-			}
-		}
+		// TODO: find a better way to point to admin.swagger.json
+		w.WriteHeader(http.StatusOK)
 	}
 }
 
