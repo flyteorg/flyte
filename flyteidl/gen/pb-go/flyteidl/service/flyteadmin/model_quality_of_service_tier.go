@@ -13,8 +13,8 @@ type QualityOfServiceTier string
 
 // List of QualityOfServiceTier
 const (
-	QualityOfServiceTierUNDEFINED QualityOfServiceTier = "UNDEFINED"
-	QualityOfServiceTierHIGH QualityOfServiceTier = "HIGH"
-	QualityOfServiceTierMEDIUM QualityOfServiceTier = "MEDIUM"
-	QualityOfServiceTierLOW QualityOfServiceTier = "LOW"
+	UNDEFINED_QualityOfServiceTier QualityOfServiceTier = "UNDEFINED"
+	HIGH_QualityOfServiceTier QualityOfServiceTier = "HIGH"
+	MEDIUM_QualityOfServiceTier QualityOfServiceTier = "MEDIUM"
+	LOW_QualityOfServiceTier QualityOfServiceTier = "LOW"
 )

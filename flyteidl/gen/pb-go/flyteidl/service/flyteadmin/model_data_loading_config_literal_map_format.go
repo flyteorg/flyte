@@ -13,7 +13,7 @@ type DataLoadingConfigLiteralMapFormat string
 
 // List of DataLoadingConfigLiteralMapFormat
 const (
-	DataLoadingConfigLiteralMapFormatJSON DataLoadingConfigLiteralMapFormat = "JSON"
-	DataLoadingConfigLiteralMapFormatYAML DataLoadingConfigLiteralMapFormat = "YAML"
-	DataLoadingConfigLiteralMapFormatPROTO DataLoadingConfigLiteralMapFormat = "PROTO"
+	JSON_DataLoadingConfigLiteralMapFormat DataLoadingConfigLiteralMapFormat = "JSON"
+	YAML_DataLoadingConfigLiteralMapFormat DataLoadingConfigLiteralMapFormat = "YAML"
+	PROTO_DataLoadingConfigLiteralMapFormat DataLoadingConfigLiteralMapFormat = "PROTO"
 )

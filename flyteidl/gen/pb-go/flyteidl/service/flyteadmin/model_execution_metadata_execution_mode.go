@@ -13,10 +13,10 @@ type ExecutionMetadataExecutionMode string
 
 // List of ExecutionMetadataExecutionMode
 const (
-	ExecutionMetadataExecutionModeMANUAL ExecutionMetadataExecutionMode = "MANUAL"
-	ExecutionMetadataExecutionModeSCHEDULED ExecutionMetadataExecutionMode = "SCHEDULED"
-	ExecutionMetadataExecutionModeSYSTEM ExecutionMetadataExecutionMode = "SYSTEM"
-	ExecutionMetadataExecutionModeRELAUNCH ExecutionMetadataExecutionMode = "RELAUNCH"
-	ExecutionMetadataExecutionModeCHILD_WORKFLOW ExecutionMetadataExecutionMode = "CHILD_WORKFLOW"
-	ExecutionMetadataExecutionModeRECOVERED ExecutionMetadataExecutionMode = "RECOVERED"
+	MANUAL_ExecutionMetadataExecutionMode ExecutionMetadataExecutionMode = "MANUAL"
+	SCHEDULED_ExecutionMetadataExecutionMode ExecutionMetadataExecutionMode = "SCHEDULED"
+	SYSTEM_ExecutionMetadataExecutionMode ExecutionMetadataExecutionMode = "SYSTEM"
+	RELAUNCH_ExecutionMetadataExecutionMode ExecutionMetadataExecutionMode = "RELAUNCH"
+	CHILD_WORKFLOW_ExecutionMetadataExecutionMode ExecutionMetadataExecutionMode = "CHILD_WORKFLOW"
+	RECOVERED_ExecutionMetadataExecutionMode ExecutionMetadataExecutionMode = "RECOVERED"
 )

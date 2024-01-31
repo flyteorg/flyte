@@ -13,6 +13,6 @@ type PluginOverrideMissingPluginBehavior string
 
 // List of PluginOverrideMissingPluginBehavior
 const (
-	PluginOverrideMissingPluginBehaviorFAIL PluginOverrideMissingPluginBehavior = "FAIL"
-	PluginOverrideMissingPluginBehaviorUSE_DEFAULT PluginOverrideMissingPluginBehavior = "USE_DEFAULT"
+	FAIL_PluginOverrideMissingPluginBehavior PluginOverrideMissingPluginBehavior = "FAIL"
+	USE_DEFAULT_PluginOverrideMissingPluginBehavior PluginOverrideMissingPluginBehavior = "USE_DEFAULT"
 )

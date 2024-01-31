@@ -13,6 +13,6 @@ type RuntimeMetadataRuntimeType string
 
 // List of RuntimeMetadataRuntimeType
 const (
-	RuntimeMetadataRuntimeTypeOTHER RuntimeMetadataRuntimeType = "OTHER"
-	RuntimeMetadataRuntimeTypeFLYTE_SDK RuntimeMetadataRuntimeType = "FLYTE_SDK"
+	OTHER_RuntimeMetadataRuntimeType RuntimeMetadataRuntimeType = "OTHER"
+	FLYTE_SDK_RuntimeMetadataRuntimeType RuntimeMetadataRuntimeType = "FLYTE_SDK"
 )

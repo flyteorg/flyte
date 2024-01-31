@@ -13,12 +13,12 @@ type CoreCatalogCacheStatus string
 
 // List of coreCatalogCacheStatus
 const (
-	CoreCatalogCacheStatusDISABLED CoreCatalogCacheStatus = "CACHE_DISABLED"
-	CoreCatalogCacheStatusMISS CoreCatalogCacheStatus = "CACHE_MISS"
-	CoreCatalogCacheStatusHIT CoreCatalogCacheStatus = "CACHE_HIT"
-	CoreCatalogCacheStatusPOPULATED CoreCatalogCacheStatus = "CACHE_POPULATED"
-	CoreCatalogCacheStatusLOOKUP_FAILURE CoreCatalogCacheStatus = "CACHE_LOOKUP_FAILURE"
-	CoreCatalogCacheStatusPUT_FAILURE CoreCatalogCacheStatus = "CACHE_PUT_FAILURE"
-	CoreCatalogCacheStatusSKIPPED CoreCatalogCacheStatus = "CACHE_SKIPPED"
-	CoreCatalogCacheStatusEVICTED CoreCatalogCacheStatus = "CACHE_EVICTED"
+	DISABLED_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_DISABLED"
+	MISS_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_MISS"
+	HIT_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_HIT"
+	POPULATED_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_POPULATED"
+	LOOKUP_FAILURE_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_LOOKUP_FAILURE"
+	PUT_FAILURE_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_PUT_FAILURE"
+	SKIPPED_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_SKIPPED"
+	EVICTED_CoreCatalogCacheStatus CoreCatalogCacheStatus = "CACHE_EVICTED"
 )

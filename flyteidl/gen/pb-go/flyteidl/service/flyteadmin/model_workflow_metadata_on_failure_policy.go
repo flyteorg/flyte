@@ -13,6 +13,6 @@ type WorkflowMetadataOnFailurePolicy string
 
 // List of WorkflowMetadataOnFailurePolicy
 const (
-	WorkflowMetadataOnFailurePolicyIMMEDIATELY WorkflowMetadataOnFailurePolicy = "FAIL_IMMEDIATELY"
-	WorkflowMetadataOnFailurePolicyAFTER_EXECUTABLE_NODES_COMPLETE WorkflowMetadataOnFailurePolicy = "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"
+	IMMEDIATELY_WorkflowMetadataOnFailurePolicy WorkflowMetadataOnFailurePolicy = "FAIL_IMMEDIATELY"
+	AFTER_EXECUTABLE_NODES_COMPLETE_WorkflowMetadataOnFailurePolicy WorkflowMetadataOnFailurePolicy = "FAIL_AFTER_EXECUTABLE_NODES_COMPLETE"
 )

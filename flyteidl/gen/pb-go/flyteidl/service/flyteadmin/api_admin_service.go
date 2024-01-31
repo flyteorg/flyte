@@ -1,3 +1,4 @@
+
 /*
  * flyteidl/service/admin.proto
  *
@@ -26,14 +27,15 @@ var (
 
 type AdminServiceApiService service
 
-/* 
+/*
 AdminServiceApiService Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+Create a workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to launch an execution with the given project, domain and optionally-assigned name.
 
 @return AdminExecutionCreateResponse
 */
-func (a *AdminServiceApiService) CreateExecution(ctx context.Context, body AdminExecutionCreateRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateExecution(ctx context.Context, body AdminExecutionCreateRequest) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -87,9 +89,7 @@ func (a *AdminServiceApiService) CreateExecution(ctx context.Context, body Admin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -109,21 +109,33 @@ func (a *AdminServiceApiService) CreateExecution(ctx context.Context, body Admin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+Create a workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
  * @param body
 
 @return AdminExecutionCreateResponse
 */
-func (a *AdminServiceApiService) CreateExecution2(ctx context.Context, org string, body AdminExecutionCreateRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateExecution2(ctx context.Context, org string, body AdminServiceCreateExecutionBody) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -178,9 +190,7 @@ func (a *AdminServiceApiService) CreateExecution2(ctx context.Context, org strin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -200,20 +210,32 @@ func (a *AdminServiceApiService) CreateExecution2(ctx context.Context, org strin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
+Create and register a launch plan definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan.
 
 @return AdminLaunchPlanCreateResponse
 */
-func (a *AdminServiceApiService) CreateLaunchPlan(ctx context.Context, body AdminLaunchPlanCreateRequest) (AdminLaunchPlanCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateLaunchPlan(ctx context.Context, body AdminLaunchPlanCreateRequest) (AdminLaunchPlanCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -267,9 +289,7 @@ func (a *AdminServiceApiService) CreateLaunchPlan(ctx context.Context, body Admi
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -289,21 +309,55 @@ func (a *AdminServiceApiService) CreateLaunchPlan(ctx context.Context, body Admi
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 400 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 409 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
+Create and register a launch plan definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminLaunchPlanCreateResponse
 */
-func (a *AdminServiceApiService) CreateLaunchPlan2(ctx context.Context, idOrg string, body AdminLaunchPlanCreateRequest) (AdminLaunchPlanCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateLaunchPlan2(ctx context.Context, idOrg string, body AdminServiceCreateLaunchPlanBody) (AdminLaunchPlanCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -358,9 +412,7 @@ func (a *AdminServiceApiService) CreateLaunchPlan2(ctx context.Context, idOrg st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -380,20 +432,54 @@ func (a *AdminServiceApiService) CreateLaunchPlan2(ctx context.Context, idOrg st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 400 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 409 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
+Create a node execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to send a notification that a node execution event has occurred.
 
 @return AdminNodeExecutionEventResponse
 */
-func (a *AdminServiceApiService) CreateNodeEvent(ctx context.Context, body AdminNodeExecutionEventRequest) (AdminNodeExecutionEventResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateNodeEvent(ctx context.Context, body AdminNodeExecutionEventRequest) (AdminNodeExecutionEventResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -447,9 +533,7 @@ func (a *AdminServiceApiService) CreateNodeEvent(ctx context.Context, body Admin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -469,21 +553,33 @@ func (a *AdminServiceApiService) CreateNodeEvent(ctx context.Context, body Admin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
+Create a node execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param eventIdExecutionIdOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminNodeExecutionEventResponse
 */
-func (a *AdminServiceApiService) CreateNodeEvent2(ctx context.Context, eventIdExecutionIdOrg string, body AdminNodeExecutionEventRequest) (AdminNodeExecutionEventResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateNodeEvent2(ctx context.Context, eventIdExecutionIdOrg string, body AdminServiceCreateNodeEventBody) (AdminNodeExecutionEventResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -538,9 +634,7 @@ func (a *AdminServiceApiService) CreateNodeEvent2(ctx context.Context, eventIdEx
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -560,20 +654,32 @@ func (a *AdminServiceApiService) CreateNodeEvent2(ctx context.Context, eventIdEx
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
+Create and register a task definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
 @return FlyteidladminTaskCreateResponse
 */
-func (a *AdminServiceApiService) CreateTask(ctx context.Context, body FlyteidladminTaskCreateRequest) (FlyteidladminTaskCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateTask(ctx context.Context, body FlyteidladminTaskCreateRequest) (FlyteidladminTaskCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -627,9 +733,7 @@ func (a *AdminServiceApiService) CreateTask(ctx context.Context, body Flyteidlad
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -649,21 +753,55 @@ func (a *AdminServiceApiService) CreateTask(ctx context.Context, body Flyteidlad
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 400 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 409 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
+Create and register a task definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param body
 
 @return FlyteidladminTaskCreateResponse
 */
-func (a *AdminServiceApiService) CreateTask2(ctx context.Context, idOrg string, body FlyteidladminTaskCreateRequest) (FlyteidladminTaskCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateTask2(ctx context.Context, idOrg string, body ServiceAdminServiceCreateTaskBody) (FlyteidladminTaskCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -718,9 +856,7 @@ func (a *AdminServiceApiService) CreateTask2(ctx context.Context, idOrg string, 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -740,20 +876,54 @@ func (a *AdminServiceApiService) CreateTask2(ctx context.Context, idOrg string, 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 400 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 409 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
+Create a task execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to send a notification that a task execution event has occurred.
 
 @return AdminTaskExecutionEventResponse
 */
-func (a *AdminServiceApiService) CreateTaskEvent(ctx context.Context, body AdminTaskExecutionEventRequest) (AdminTaskExecutionEventResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateTaskEvent(ctx context.Context, body AdminTaskExecutionEventRequest) (AdminTaskExecutionEventResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -807,9 +977,7 @@ func (a *AdminServiceApiService) CreateTaskEvent(ctx context.Context, body Admin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -829,21 +997,33 @@ func (a *AdminServiceApiService) CreateTaskEvent(ctx context.Context, body Admin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
+Create a task execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param eventParentNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminTaskExecutionEventResponse
 */
-func (a *AdminServiceApiService) CreateTaskEvent2(ctx context.Context, eventParentNodeExecutionIdExecutionIdOrg string, body AdminTaskExecutionEventRequest) (AdminTaskExecutionEventResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateTaskEvent2(ctx context.Context, eventParentNodeExecutionIdExecutionIdOrg string, body AdminServiceCreateTaskEventBody) (AdminTaskExecutionEventResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -898,9 +1078,7 @@ func (a *AdminServiceApiService) CreateTaskEvent2(ctx context.Context, eventPare
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -920,20 +1098,32 @@ func (a *AdminServiceApiService) CreateTaskEvent2(ctx context.Context, eventPare
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
+Create and register a workflow definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
 @return AdminWorkflowCreateResponse
 */
-func (a *AdminServiceApiService) CreateWorkflow(ctx context.Context, body AdminWorkflowCreateRequest) (AdminWorkflowCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateWorkflow(ctx context.Context, body AdminWorkflowCreateRequest) (AdminWorkflowCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -987,9 +1177,7 @@ func (a *AdminServiceApiService) CreateWorkflow(ctx context.Context, body AdminW
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1009,21 +1197,55 @@ func (a *AdminServiceApiService) CreateWorkflow(ctx context.Context, body AdminW
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 400 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 409 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
+Create and register a workflow definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminWorkflowCreateResponse
 */
-func (a *AdminServiceApiService) CreateWorkflow2(ctx context.Context, idOrg string, body AdminWorkflowCreateRequest) (AdminWorkflowCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateWorkflow2(ctx context.Context, idOrg string, body AdminServiceCreateWorkflowBody) (AdminWorkflowCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -1078,9 +1300,7 @@ func (a *AdminServiceApiService) CreateWorkflow2(ctx context.Context, idOrg stri
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1100,20 +1320,54 @@ func (a *AdminServiceApiService) CreateWorkflow2(ctx context.Context, idOrg stri
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 400 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 409 {
+			var v interface{}
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
+Create a workflow execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to send a notification that a workflow execution event has occurred.
 
 @return AdminWorkflowExecutionEventResponse
 */
-func (a *AdminServiceApiService) CreateWorkflowEvent(ctx context.Context, body AdminWorkflowExecutionEventRequest) (AdminWorkflowExecutionEventResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateWorkflowEvent(ctx context.Context, body AdminWorkflowExecutionEventRequest) (AdminWorkflowExecutionEventResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -1167,9 +1421,7 @@ func (a *AdminServiceApiService) CreateWorkflowEvent(ctx context.Context, body A
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1189,21 +1441,33 @@ func (a *AdminServiceApiService) CreateWorkflowEvent(ctx context.Context, body A
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
+Create a workflow execution event recording a phase transition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param eventExecutionIdOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminWorkflowExecutionEventResponse
 */
-func (a *AdminServiceApiService) CreateWorkflowEvent2(ctx context.Context, eventExecutionIdOrg string, body AdminWorkflowExecutionEventRequest) (AdminWorkflowExecutionEventResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceCreateWorkflowEvent2(ctx context.Context, eventExecutionIdOrg string, body AdminServiceCreateWorkflowEventBody) (AdminWorkflowExecutionEventResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -1258,9 +1522,7 @@ func (a *AdminServiceApiService) CreateWorkflowEvent2(ctx context.Context, event
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1280,21 +1542,33 @@ func (a *AdminServiceApiService) CreateWorkflowEvent2(ctx context.Context, event
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Delete the customized resource attributes associated with a project
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
  * @param body
 
 @return AdminProjectAttributesDeleteResponse
 */
-func (a *AdminServiceApiService) DeleteProjectAttributes(ctx context.Context, project string, body AdminProjectAttributesDeleteRequest) (AdminProjectAttributesDeleteResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceDeleteProjectAttributes(ctx context.Context, project string, body AdminServiceDeleteProjectAttributesBody) (AdminProjectAttributesDeleteResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -1349,9 +1623,7 @@ func (a *AdminServiceApiService) DeleteProjectAttributes(ctx context.Context, pr
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1371,14 +1643,26 @@ func (a *AdminServiceApiService) DeleteProjectAttributes(ctx context.Context, pr
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Delete the customized resource attributes associated with a project
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the project.
  * @param project Unique project id which this set of attributes references. +required
@@ -1386,7 +1670,7 @@ AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
 
 @return AdminProjectAttributesDeleteResponse
 */
-func (a *AdminServiceApiService) DeleteProjectAttributes2(ctx context.Context, org string, project string, body AdminProjectAttributesDeleteRequest) (AdminProjectAttributesDeleteResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceDeleteProjectAttributes2(ctx context.Context, org string, project string, body AdminServiceDeleteProjectAttributesBody) (AdminProjectAttributesDeleteResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -1442,9 +1726,7 @@ func (a *AdminServiceApiService) DeleteProjectAttributes2(ctx context.Context, o
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1464,14 +1746,26 @@ func (a *AdminServiceApiService) DeleteProjectAttributes2(ctx context.Context, o
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Delete the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
@@ -1479,7 +1773,7 @@ AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
 
 @return AdminProjectDomainAttributesDeleteResponse
 */
-func (a *AdminServiceApiService) DeleteProjectDomainAttributes(ctx context.Context, project string, domain string, body AdminProjectDomainAttributesDeleteRequest) (AdminProjectDomainAttributesDeleteResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceDeleteProjectDomainAttributes(ctx context.Context, project string, domain string, body AdminServiceDeleteProjectDomainAttributesBody) (AdminProjectDomainAttributesDeleteResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -1535,9 +1829,7 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes(ctx context.Conte
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1557,14 +1849,26 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes(ctx context.Conte
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Delete the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the attributes.
  * @param project Unique project id which this set of attributes references. +required
@@ -1573,7 +1877,7 @@ AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
 
 @return AdminProjectDomainAttributesDeleteResponse
 */
-func (a *AdminServiceApiService) DeleteProjectDomainAttributes2(ctx context.Context, org string, project string, domain string, body AdminProjectDomainAttributesDeleteRequest) (AdminProjectDomainAttributesDeleteResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceDeleteProjectDomainAttributes2(ctx context.Context, org string, project string, domain string, body AdminServiceDeleteProjectDomainAttributesBody) (AdminProjectDomainAttributesDeleteResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -1630,9 +1934,7 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes2(ctx context.Cont
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1652,14 +1954,26 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes2(ctx context.Cont
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+Delete the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
@@ -1668,7 +1982,7 @@ AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
 
 @return AdminWorkflowAttributesDeleteResponse
 */
-func (a *AdminServiceApiService) DeleteWorkflowAttributes(ctx context.Context, project string, domain string, workflow string, body AdminWorkflowAttributesDeleteRequest) (AdminWorkflowAttributesDeleteResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceDeleteWorkflowAttributes(ctx context.Context, project string, domain string, workflow string, body AdminServiceDeleteWorkflowAttributesBody) (AdminWorkflowAttributesDeleteResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -1725,9 +2039,7 @@ func (a *AdminServiceApiService) DeleteWorkflowAttributes(ctx context.Context, p
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1747,14 +2059,26 @@ func (a *AdminServiceApiService) DeleteWorkflowAttributes(ctx context.Context, p
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+Delete the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the attributes.
  * @param project Unique project id which this set of attributes references. +required
@@ -1764,7 +2088,7 @@ AdminServiceApiService Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAtt
 
 @return AdminWorkflowAttributesDeleteResponse
 */
-func (a *AdminServiceApiService) DeleteWorkflowAttributes2(ctx context.Context, org string, project string, domain string, workflow string, body AdminWorkflowAttributesDeleteRequest) (AdminWorkflowAttributesDeleteResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceDeleteWorkflowAttributes2(ctx context.Context, org string, project string, domain string, workflow string, body AdminServiceDeleteWorkflowAttributesBody) (AdminWorkflowAttributesDeleteResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -1822,9 +2146,7 @@ func (a *AdminServiceApiService) DeleteWorkflowAttributes2(ctx context.Context, 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1844,29 +2166,41 @@ func (a *AdminServiceApiService) DeleteWorkflowAttributes2(ctx context.Context, 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+Retrieve the active launch plan version specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *GetActiveLaunchPlanOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetActiveLaunchPlanOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminLaunchPlan
 */
 
-type GetActiveLaunchPlanOpts struct { 
+type AdminServiceApiAdminServiceGetActiveLaunchPlanOpts struct { 
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetActiveLaunchPlanOpts) (AdminLaunchPlan, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetActiveLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceGetActiveLaunchPlanOpts) (AdminLaunchPlan, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -1924,9 +2258,7 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProj
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -1946,14 +2278,26 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan(ctx context.Context, idProj
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+Retrieve the active launch plan version specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
@@ -1962,7 +2306,7 @@ AdminServiceApiService Fetch the active version of a :ref:&#x60;ref_flyteidl.adm
 
 @return AdminLaunchPlan
 */
-func (a *AdminServiceApiService) GetActiveLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminLaunchPlan, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetActiveLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminLaunchPlan, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2018,9 +2362,7 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan2(ctx context.Context, idOrg
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2040,31 +2382,43 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan2(ctx context.Context, idOrg
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+Retrieve an existing description entity description.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idResourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetDescriptionEntityOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetDescriptionEntityOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminDescriptionEntity
 */
 
-type GetDescriptionEntityOpts struct { 
+type AdminServiceApiAdminServiceGetDescriptionEntityOpts struct { 
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idResourceType string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetDescriptionEntityOpts) (AdminDescriptionEntity, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetDescriptionEntity(ctx context.Context, idResourceType string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetDescriptionEntityOpts) (AdminDescriptionEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2124,9 +2478,7 @@ func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idRes
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2146,14 +2498,26 @@ func (a *AdminServiceApiService) GetDescriptionEntity(ctx context.Context, idRes
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+Retrieve an existing description entity description.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idResourceType Identifies the specific type of resource that this identifier corresponds to.
@@ -2164,7 +2528,7 @@ AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#
 
 @return AdminDescriptionEntity
 */
-func (a *AdminServiceApiService) GetDescriptionEntity2(ctx context.Context, idOrg string, idResourceType string, idProject string, idDomain string, idName string, idVersion string) (AdminDescriptionEntity, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetDescriptionEntity2(ctx context.Context, idOrg string, idResourceType string, idProject string, idDomain string, idName string, idVersion string) (AdminDescriptionEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2222,9 +2586,7 @@ func (a *AdminServiceApiService) GetDescriptionEntity2(ctx context.Context, idOr
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2244,30 +2606,41 @@ func (a *AdminServiceApiService) GetDescriptionEntity2(ctx context.Context, idOr
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdProject Name of the project the resource belongs to.
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
- * @param optional nil or *GetDynamicNodeWorkflowOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetDynamicNodeWorkflowOpts - Optional Parameters:
      * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminDynamicNodeWorkflowResponse
 */
 
-type GetDynamicNodeWorkflowOpts struct { 
+type AdminServiceApiAdminServiceGetDynamicNodeWorkflowOpts struct { 
 	IdExecutionIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetDynamicNodeWorkflow(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetDynamicNodeWorkflowOpts) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetDynamicNodeWorkflow(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *AdminServiceApiAdminServiceGetDynamicNodeWorkflowOpts) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2326,9 +2699,7 @@ func (a *AdminServiceApiService) GetDynamicNodeWorkflow(ctx context.Context, idE
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2348,13 +2719,24 @@ func (a *AdminServiceApiService) GetDynamicNodeWorkflow(ctx context.Context, idE
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdOrg Optional, org key applied to the resource.
@@ -2365,7 +2747,7 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkfl
 
 @return AdminDynamicNodeWorkflowResponse
 */
-func (a *AdminServiceApiService) GetDynamicNodeWorkflow2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetDynamicNodeWorkflow2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminDynamicNodeWorkflowResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2422,9 +2804,7 @@ func (a *AdminServiceApiService) GetDynamicNodeWorkflow2(ctx context.Context, id
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2444,29 +2824,41 @@ func (a *AdminServiceApiService) GetDynamicNodeWorkflow2(ctx context.Context, id
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+Retrieve an existing workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
- * @param optional nil or *GetExecutionOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetExecutionOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminExecution
 */
 
-type GetExecutionOpts struct { 
+type AdminServiceApiAdminServiceGetExecutionOpts struct { 
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionOpts) (AdminExecution, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetExecution(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceGetExecutionOpts) (AdminExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2524,9 +2916,7 @@ func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject str
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2546,14 +2936,26 @@ func (a *AdminServiceApiService) GetExecution(ctx context.Context, idProject str
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+Retrieve an existing workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
@@ -2562,7 +2964,7 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
 
 @return AdminExecution
 */
-func (a *AdminServiceApiService) GetExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminExecution, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2618,9 +3020,7 @@ func (a *AdminServiceApiService) GetExecution2(ctx context.Context, idOrg string
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2640,29 +3040,40 @@ func (a *AdminServiceApiService) GetExecution2(ctx context.Context, idOrg string
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
- * @param optional nil or *GetExecutionDataOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetExecutionDataOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminWorkflowExecutionGetDataResponse
 */
 
-type GetExecutionDataOpts struct { 
+type AdminServiceApiAdminServiceGetExecutionDataOpts struct { 
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionDataOpts) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetExecutionData(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceGetExecutionDataOpts) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2720,9 +3131,7 @@ func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2742,13 +3151,24 @@ func (a *AdminServiceApiService) GetExecutionData(ctx context.Context, idProject
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
@@ -2758,7 +3178,7 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
 
 @return AdminWorkflowExecutionGetDataResponse
 */
-func (a *AdminServiceApiService) GetExecutionData2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetExecutionData2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string) (AdminWorkflowExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2814,9 +3234,7 @@ func (a *AdminServiceApiService) GetExecutionData2(ctx context.Context, idOrg st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2836,31 +3254,43 @@ func (a *AdminServiceApiService) GetExecutionData2(ctx context.Context, idOrg st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+Retrieve metrics from an existing workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
- * @param optional nil or *GetExecutionMetricsOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetExecutionMetricsOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "Depth" (optional.Int32) -  depth defines the number of Flyte entity levels to traverse when breaking down execution details.
 
 @return AdminWorkflowExecutionGetMetricsResponse
 */
 
-type GetExecutionMetricsOpts struct { 
+type AdminServiceApiAdminServiceGetExecutionMetricsOpts struct { 
 	IdOrg optional.String
 	Depth optional.Int32
 }
 
-func (a *AdminServiceApiService) GetExecutionMetrics(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionMetricsOpts) (AdminWorkflowExecutionGetMetricsResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetExecutionMetrics(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceGetExecutionMetricsOpts) (AdminWorkflowExecutionGetMetricsResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -2921,9 +3351,7 @@ func (a *AdminServiceApiService) GetExecutionMetrics(ctx context.Context, idProj
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -2943,30 +3371,42 @@ func (a *AdminServiceApiService) GetExecutionMetrics(ctx context.Context, idProj
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+Retrieve metrics from an existing workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User or system provided value for the resource.
- * @param optional nil or *GetExecutionMetrics2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetExecutionMetrics2Opts - Optional Parameters:
      * @param "Depth" (optional.Int32) -  depth defines the number of Flyte entity levels to traverse when breaking down execution details.
 
 @return AdminWorkflowExecutionGetMetricsResponse
 */
 
-type GetExecutionMetrics2Opts struct { 
+type AdminServiceApiAdminServiceGetExecutionMetrics2Opts struct { 
 	Depth optional.Int32
 }
 
-func (a *AdminServiceApiService) GetExecutionMetrics2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *GetExecutionMetrics2Opts) (AdminWorkflowExecutionGetMetricsResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetExecutionMetrics2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceGetExecutionMetrics2Opts) (AdminWorkflowExecutionGetMetricsResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3025,9 +3465,7 @@ func (a *AdminServiceApiService) GetExecutionMetrics2(ctx context.Context, idOrg
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3047,32 +3485,44 @@ func (a *AdminServiceApiService) GetExecutionMetrics2(ctx context.Context, idOrg
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
+Retrieve an existing launch plan definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetLaunchPlanOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetLaunchPlanOpts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminLaunchPlan
 */
 
-type GetLaunchPlanOpts struct { 
+type AdminServiceApiAdminServiceGetLaunchPlanOpts struct { 
 	IdResourceType optional.String
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetLaunchPlanOpts) (AdminLaunchPlan, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetLaunchPlanOpts) (AdminLaunchPlan, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3134,9 +3584,7 @@ func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3156,31 +3604,43 @@ func (a *AdminServiceApiService) GetLaunchPlan(ctx context.Context, idProject st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
+Retrieve an existing launch plan definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetLaunchPlan2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetLaunchPlan2Opts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
 
 @return AdminLaunchPlan
 */
 
-type GetLaunchPlan2Opts struct { 
+type AdminServiceApiAdminServiceGetLaunchPlan2Opts struct { 
 	IdResourceType optional.String
 }
 
-func (a *AdminServiceApiService) GetLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetLaunchPlan2Opts) (AdminLaunchPlan, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetLaunchPlan2Opts) (AdminLaunchPlan, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3240,9 +3700,7 @@ func (a *AdminServiceApiService) GetLaunchPlan2(ctx context.Context, idOrg strin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3262,30 +3720,42 @@ func (a *AdminServiceApiService) GetLaunchPlan2(ctx context.Context, idOrg strin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+Retrieve a NamedEntity object.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *GetNamedEntityOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetNamedEntityOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntity
 */
 
-type GetNamedEntityOpts struct { 
+type AdminServiceApiAdminServiceGetNamedEntityOpts struct { 
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, localVarOptionals *GetNamedEntityOpts) (AdminNamedEntity, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetNamedEntity(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceGetNamedEntityOpts) (AdminNamedEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3344,9 +3814,7 @@ func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceTyp
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3366,14 +3834,26 @@ func (a *AdminServiceApiService) GetNamedEntity(ctx context.Context, resourceTyp
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+Retrieve a NamedEntity object.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to get. One of Task, Workflow or LaunchPlan. +required
  * @param idOrg Optional, org key applied to the resource.
@@ -3383,7 +3863,7 @@ AdminServiceApiService Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60;
 
 @return AdminNamedEntity
 */
-func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string) (AdminNamedEntity, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string) (AdminNamedEntity, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3440,9 +3920,7 @@ func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, resourceTy
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3462,30 +3940,41 @@ func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, resourceTy
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdProject Name of the project the resource belongs to.
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
- * @param optional nil or *GetNodeExecutionOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetNodeExecutionOpts - Optional Parameters:
      * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return FlyteidladminNodeExecution
 */
 
-type GetNodeExecutionOpts struct { 
+type AdminServiceApiAdminServiceGetNodeExecutionOpts struct { 
 	IdExecutionIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetNodeExecutionOpts) (FlyteidladminNodeExecution, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetNodeExecution(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *AdminServiceApiAdminServiceGetNodeExecutionOpts) (FlyteidladminNodeExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3544,9 +4033,7 @@ func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecuti
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3566,13 +4053,24 @@ func (a *AdminServiceApiService) GetNodeExecution(ctx context.Context, idExecuti
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdOrg Optional, org key applied to the resource.
@@ -3583,7 +4081,7 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x6
 
 @return FlyteidladminNodeExecution
 */
-func (a *AdminServiceApiService) GetNodeExecution2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (FlyteidladminNodeExecution, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetNodeExecution2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (FlyteidladminNodeExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3640,9 +4138,7 @@ func (a *AdminServiceApiService) GetNodeExecution2(ctx context.Context, idExecut
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3662,30 +4158,41 @@ func (a *AdminServiceApiService) GetNodeExecution2(ctx context.Context, idExecut
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdProject Name of the project the resource belongs to.
  * @param idExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idExecutionIdName User or system provided value for the resource.
  * @param idNodeId
- * @param optional nil or *GetNodeExecutionDataOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetNodeExecutionDataOpts - Optional Parameters:
      * @param "IdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNodeExecutionGetDataResponse
 */
 
-type GetNodeExecutionDataOpts struct { 
+type AdminServiceApiAdminServiceGetNodeExecutionDataOpts struct { 
 	IdExecutionIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *GetNodeExecutionDataOpts) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetNodeExecutionData(ctx context.Context, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string, localVarOptionals *AdminServiceApiAdminServiceGetNodeExecutionDataOpts) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3744,9 +4251,7 @@ func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExe
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3766,13 +4271,24 @@ func (a *AdminServiceApiService) GetNodeExecutionData(ctx context.Context, idExe
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idExecutionIdOrg Optional, org key applied to the resource.
@@ -3783,7 +4299,7 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
 
 @return AdminNodeExecutionGetDataResponse
 */
-func (a *AdminServiceApiService) GetNodeExecutionData2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetNodeExecutionData2(ctx context.Context, idExecutionIdOrg string, idExecutionIdProject string, idExecutionIdDomain string, idExecutionIdName string, idNodeId string) (AdminNodeExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3840,9 +4356,7 @@ func (a *AdminServiceApiService) GetNodeExecutionData2(ctx context.Context, idEx
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3862,29 +4376,41 @@ func (a *AdminServiceApiService) GetNodeExecutionData2(ctx context.Context, idEx
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Retrieve the customized resource attributes associated with a project
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
- * @param optional nil or *GetProjectAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceGetProjectAttributesOpts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
      * @param "Org" (optional.String) -  Optional, org key applied to the project.
 
 @return AdminProjectAttributesGetResponse
 */
 
-type GetProjectAttributesOpts struct { 
+type AdminServiceApiAdminServiceGetProjectAttributesOpts struct { 
 	ResourceType optional.String
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) GetProjectAttributes(ctx context.Context, project string, localVarOptionals *GetProjectAttributesOpts) (AdminProjectAttributesGetResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetProjectAttributes(ctx context.Context, project string, localVarOptionals *AdminServiceApiAdminServiceGetProjectAttributesOpts) (AdminProjectAttributesGetResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -3943,9 +4469,7 @@ func (a *AdminServiceApiService) GetProjectAttributes(ctx context.Context, proje
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -3965,28 +4489,40 @@ func (a *AdminServiceApiService) GetProjectAttributes(ctx context.Context, proje
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Retrieve the customized resource attributes associated with a project
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the project.
  * @param project Unique project id which this set of attributes references. +required
- * @param optional nil or *GetProjectAttributes2Opts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceGetProjectAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
 
 @return AdminProjectAttributesGetResponse
 */
 
-type GetProjectAttributes2Opts struct { 
+type AdminServiceApiAdminServiceGetProjectAttributes2Opts struct { 
 	ResourceType optional.String
 }
 
-func (a *AdminServiceApiService) GetProjectAttributes2(ctx context.Context, org string, project string, localVarOptionals *GetProjectAttributes2Opts) (AdminProjectAttributesGetResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetProjectAttributes2(ctx context.Context, org string, project string, localVarOptionals *AdminServiceApiAdminServiceGetProjectAttributes2Opts) (AdminProjectAttributesGetResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4043,9 +4579,7 @@ func (a *AdminServiceApiService) GetProjectAttributes2(ctx context.Context, org 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4065,30 +4599,42 @@ func (a *AdminServiceApiService) GetProjectAttributes2(ctx context.Context, org 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Retrieve the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
- * @param optional nil or *GetProjectDomainAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceGetProjectDomainAttributesOpts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
      * @param "Org" (optional.String) -  Optional, org key applied to the attributes.
 
 @return AdminProjectDomainAttributesGetResponse
 */
 
-type GetProjectDomainAttributesOpts struct { 
+type AdminServiceApiAdminServiceGetProjectDomainAttributesOpts struct { 
 	ResourceType optional.String
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) GetProjectDomainAttributes(ctx context.Context, project string, domain string, localVarOptionals *GetProjectDomainAttributesOpts) (AdminProjectDomainAttributesGetResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetProjectDomainAttributes(ctx context.Context, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceGetProjectDomainAttributesOpts) (AdminProjectDomainAttributesGetResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4148,9 +4694,7 @@ func (a *AdminServiceApiService) GetProjectDomainAttributes(ctx context.Context,
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4170,29 +4714,41 @@ func (a *AdminServiceApiService) GetProjectDomainAttributes(ctx context.Context,
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Retrieve the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the attributes.
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
- * @param optional nil or *GetProjectDomainAttributes2Opts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceGetProjectDomainAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
 
 @return AdminProjectDomainAttributesGetResponse
 */
 
-type GetProjectDomainAttributes2Opts struct { 
+type AdminServiceApiAdminServiceGetProjectDomainAttributes2Opts struct { 
 	ResourceType optional.String
 }
 
-func (a *AdminServiceApiService) GetProjectDomainAttributes2(ctx context.Context, org string, project string, domain string, localVarOptionals *GetProjectDomainAttributes2Opts) (AdminProjectDomainAttributesGetResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetProjectDomainAttributes2(ctx context.Context, org string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceGetProjectDomainAttributes2Opts) (AdminProjectDomainAttributesGetResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4250,9 +4806,7 @@ func (a *AdminServiceApiService) GetProjectDomainAttributes2(ctx context.Context
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4272,32 +4826,44 @@ func (a *AdminServiceApiService) GetProjectDomainAttributes2(ctx context.Context
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
+Retrieve an existing task definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetTaskOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetTaskOpts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminTask
 */
 
-type GetTaskOpts struct { 
+type AdminServiceApiAdminServiceGetTaskOpts struct { 
 	IdResourceType optional.String
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetTask(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetTaskOpts) (AdminTask, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetTask(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetTaskOpts) (AdminTask, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4359,9 +4925,7 @@ func (a *AdminServiceApiService) GetTask(ctx context.Context, idProject string, 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4381,31 +4945,43 @@ func (a *AdminServiceApiService) GetTask(ctx context.Context, idProject string, 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
+Retrieve an existing task definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetTask2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetTask2Opts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
 
 @return AdminTask
 */
 
-type GetTask2Opts struct { 
+type AdminServiceApiAdminServiceGetTask2Opts struct { 
 	IdResourceType optional.String
 }
 
-func (a *AdminServiceApiService) GetTask2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetTask2Opts) (AdminTask, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetTask2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetTask2Opts) (AdminTask, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4465,9 +5041,7 @@ func (a *AdminServiceApiService) GetTask2(ctx context.Context, idOrg string, idP
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4487,14 +5061,26 @@ func (a *AdminServiceApiService) GetTask2(ctx context.Context, idOrg string, idP
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+Retrieve an existing task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param idNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -4505,7 +5091,7 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x6
  * @param idTaskIdName User provided value for the resource.
  * @param idTaskIdVersion Specific version of the resource.
  * @param idRetryAttempt
- * @param optional nil or *GetTaskExecutionOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetTaskExecutionOpts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "IdNodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
@@ -4513,13 +5099,13 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x6
 @return FlyteidladminTaskExecution
 */
 
-type GetTaskExecutionOpts struct { 
+type AdminServiceApiAdminServiceGetTaskExecutionOpts struct { 
 	IdTaskIdResourceType optional.String
 	IdTaskIdOrg optional.String
 	IdNodeExecutionIdExecutionIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionOpts) (FlyteidladminTaskExecution, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetTaskExecution(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *AdminServiceApiAdminServiceGetTaskExecutionOpts) (FlyteidladminTaskExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4589,9 +5175,7 @@ func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExe
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4611,14 +5195,26 @@ func (a *AdminServiceApiService) GetTaskExecution(ctx context.Context, idNodeExe
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+Retrieve an existing task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
  * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
@@ -4630,19 +5226,19 @@ AdminServiceApiService Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x6
  * @param idTaskIdName User provided value for the resource.
  * @param idTaskIdVersion Specific version of the resource.
  * @param idRetryAttempt
- * @param optional nil or *GetTaskExecution2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetTaskExecution2Opts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return FlyteidladminTaskExecution
 */
 
-type GetTaskExecution2Opts struct { 
+type AdminServiceApiAdminServiceGetTaskExecution2Opts struct { 
 	IdTaskIdResourceType optional.String
 	IdTaskIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetTaskExecution2(ctx context.Context, idNodeExecutionIdExecutionIdOrg string, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecution2Opts) (FlyteidladminTaskExecution, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetTaskExecution2(ctx context.Context, idNodeExecutionIdExecutionIdOrg string, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *AdminServiceApiAdminServiceGetTaskExecution2Opts) (FlyteidladminTaskExecution, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4710,9 +5306,7 @@ func (a *AdminServiceApiService) GetTaskExecution2(ctx context.Context, idNodeEx
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4732,14 +5326,26 @@ func (a *AdminServiceApiService) GetTaskExecution2(ctx context.Context, idNodeEx
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+Retrieve input and output data from an existing task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param idNodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -4750,7 +5356,7 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idTaskIdName User provided value for the resource.
  * @param idTaskIdVersion Specific version of the resource.
  * @param idRetryAttempt
- * @param optional nil or *GetTaskExecutionDataOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetTaskExecutionDataOpts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "IdNodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
@@ -4758,13 +5364,13 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
 @return AdminTaskExecutionGetDataResponse
 */
 
-type GetTaskExecutionDataOpts struct { 
+type AdminServiceApiAdminServiceGetTaskExecutionDataOpts struct { 
 	IdTaskIdResourceType optional.String
 	IdTaskIdOrg optional.String
 	IdNodeExecutionIdExecutionIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionDataOpts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetTaskExecutionData(ctx context.Context, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *AdminServiceApiAdminServiceGetTaskExecutionDataOpts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4834,9 +5440,7 @@ func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNod
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4856,14 +5460,26 @@ func (a *AdminServiceApiService) GetTaskExecutionData(ctx context.Context, idNod
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+Retrieve input and output data from an existing task execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
  * @param idNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
@@ -4875,19 +5491,19 @@ AdminServiceApiService Fetches input and output data for a :ref:&#x60;ref_flytei
  * @param idTaskIdName User provided value for the resource.
  * @param idTaskIdVersion Specific version of the resource.
  * @param idRetryAttempt
- * @param optional nil or *GetTaskExecutionData2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetTaskExecutionData2Opts - Optional Parameters:
      * @param "IdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminTaskExecutionGetDataResponse
 */
 
-type GetTaskExecutionData2Opts struct { 
+type AdminServiceApiAdminServiceGetTaskExecutionData2Opts struct { 
 	IdTaskIdResourceType optional.String
 	IdTaskIdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetTaskExecutionData2(ctx context.Context, idNodeExecutionIdExecutionIdOrg string, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *GetTaskExecutionData2Opts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetTaskExecutionData2(ctx context.Context, idNodeExecutionIdExecutionIdOrg string, idNodeExecutionIdExecutionIdProject string, idNodeExecutionIdExecutionIdDomain string, idNodeExecutionIdExecutionIdName string, idNodeExecutionIdNodeId string, idTaskIdProject string, idTaskIdDomain string, idTaskIdName string, idTaskIdVersion string, idRetryAttempt int64, localVarOptionals *AdminServiceApiAdminServiceGetTaskExecutionData2Opts) (AdminTaskExecutionGetDataResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -4955,9 +5571,7 @@ func (a *AdminServiceApiService) GetTaskExecutionData2(ctx context.Context, idNo
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -4977,19 +5591,31 @@ func (a *AdminServiceApiService) GetTaskExecutionData2(ctx context.Context, idNo
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService
+Retrieve the Version (including the Build  information) for FlyteAdmin service
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
 
 @return AdminGetVersionResponse
 */
-func (a *AdminServiceApiService) GetVersion(ctx context.Context) (AdminGetVersionResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetVersion(ctx context.Context) (AdminGetVersionResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5041,9 +5667,7 @@ func (a *AdminServiceApiService) GetVersion(ctx context.Context) (AdminGetVersio
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5063,32 +5687,44 @@ func (a *AdminServiceApiService) GetVersion(ctx context.Context) (AdminGetVersio
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
+Retrieve an existing workflow definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetWorkflowOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetWorkflowOpts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminWorkflow
 */
 
-type GetWorkflowOpts struct { 
+type AdminServiceApiAdminServiceGetWorkflowOpts struct { 
 	IdResourceType optional.String
 	IdOrg optional.String
 }
 
-func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetWorkflowOpts) (AdminWorkflow, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetWorkflow(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetWorkflowOpts) (AdminWorkflow, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5150,9 +5786,7 @@ func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject stri
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5172,31 +5806,43 @@ func (a *AdminServiceApiService) GetWorkflow(ctx context.Context, idProject stri
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
+Retrieve an existing workflow definition.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
- * @param optional nil or *GetWorkflow2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceGetWorkflow2Opts - Optional Parameters:
      * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
 
 @return AdminWorkflow
 */
 
-type GetWorkflow2Opts struct { 
+type AdminServiceApiAdminServiceGetWorkflow2Opts struct { 
 	IdResourceType optional.String
 }
 
-func (a *AdminServiceApiService) GetWorkflow2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *GetWorkflow2Opts) (AdminWorkflow, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetWorkflow2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceGetWorkflow2Opts) (AdminWorkflow, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5256,9 +5902,7 @@ func (a *AdminServiceApiService) GetWorkflow2(ctx context.Context, idOrg string,
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5278,31 +5922,43 @@ func (a *AdminServiceApiService) GetWorkflow2(ctx context.Context, idOrg string,
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+Retrieve the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
  * @param workflow Workflow name which this set of attributes references. +required
- * @param optional nil or *GetWorkflowAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceGetWorkflowAttributesOpts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
      * @param "Org" (optional.String) -  Optional, org key applied to the attributes.
 
 @return AdminWorkflowAttributesGetResponse
 */
 
-type GetWorkflowAttributesOpts struct { 
+type AdminServiceApiAdminServiceGetWorkflowAttributesOpts struct { 
 	ResourceType optional.String
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) GetWorkflowAttributes(ctx context.Context, project string, domain string, workflow string, localVarOptionals *GetWorkflowAttributesOpts) (AdminWorkflowAttributesGetResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetWorkflowAttributes(ctx context.Context, project string, domain string, workflow string, localVarOptionals *AdminServiceApiAdminServiceGetWorkflowAttributesOpts) (AdminWorkflowAttributesGetResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5363,9 +6019,7 @@ func (a *AdminServiceApiService) GetWorkflowAttributes(ctx context.Context, proj
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5385,30 +6039,42 @@ func (a *AdminServiceApiService) GetWorkflowAttributes(ctx context.Context, proj
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+Retrieve the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the attributes.
  * @param project Unique project id which this set of attributes references. +required
  * @param domain Unique domain id which this set of attributes references. +required
  * @param workflow Workflow name which this set of attributes references. +required
- * @param optional nil or *GetWorkflowAttributes2Opts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceGetWorkflowAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
 
 @return AdminWorkflowAttributesGetResponse
 */
 
-type GetWorkflowAttributes2Opts struct { 
+type AdminServiceApiAdminServiceGetWorkflowAttributes2Opts struct { 
 	ResourceType optional.String
 }
 
-func (a *AdminServiceApiService) GetWorkflowAttributes2(ctx context.Context, org string, project string, domain string, workflow string, localVarOptionals *GetWorkflowAttributes2Opts) (AdminWorkflowAttributesGetResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceGetWorkflowAttributes2(ctx context.Context, org string, project string, domain string, workflow string, localVarOptionals *AdminServiceApiAdminServiceGetWorkflowAttributes2Opts) (AdminWorkflowAttributesGetResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5467,9 +6133,7 @@ func (a *AdminServiceApiService) GetWorkflowAttributes2(ctx context.Context, org
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5489,28 +6153,40 @@ func (a *AdminServiceApiService) GetWorkflowAttributes2(ctx context.Context, org
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+Fetch the active launch plan versions specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers. +required.
  * @param domain Name of the domain the identifiers belongs to within the project. +required.
- * @param optional nil or *ListActiveLaunchPlansOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListActiveLaunchPlansOpts - Optional Parameters:
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminLaunchPlanList
 */
 
-type ListActiveLaunchPlansOpts struct { 
+type AdminServiceApiAdminServiceListActiveLaunchPlansOpts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -5518,7 +6194,7 @@ type ListActiveLaunchPlansOpts struct {
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListActiveLaunchPlans(ctx context.Context, project string, domain string, localVarOptionals *ListActiveLaunchPlansOpts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListActiveLaunchPlans(ctx context.Context, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListActiveLaunchPlansOpts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5587,9 +6263,7 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans(ctx context.Context, proj
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5609,35 +6283,47 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans(ctx context.Context, proj
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+Fetch the active launch plan versions specified by input request filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
  * @param project Name of the project that contains the identifiers. +required.
  * @param domain Name of the domain the identifiers belongs to within the project. +required.
- * @param optional nil or *ListActiveLaunchPlans2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListActiveLaunchPlans2Opts - Optional Parameters:
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
 
-type ListActiveLaunchPlans2Opts struct { 
+type AdminServiceApiAdminServiceListActiveLaunchPlans2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListActiveLaunchPlans2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListActiveLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListActiveLaunchPlans2(ctx context.Context, org string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListActiveLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5704,9 +6390,7 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans2(ctx context.Context, org
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5726,31 +6410,43 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans2(ctx context.Context, org
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+Fetch existing description entity definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListDescriptionEntitiesOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListDescriptionEntitiesOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminDescriptionEntityList
 */
 
-type ListDescriptionEntitiesOpts struct { 
+type AdminServiceApiAdminServiceListDescriptionEntitiesOpts struct { 
 	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -5759,7 +6455,7 @@ type ListDescriptionEntitiesOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, localVarOptionals *ListDescriptionEntitiesOpts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListDescriptionEntities(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListDescriptionEntitiesOpts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5833,9 +6529,7 @@ func (a *AdminServiceApiService) ListDescriptionEntities(ctx context.Context, re
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5855,31 +6549,43 @@ func (a *AdminServiceApiService) ListDescriptionEntities(ctx context.Context, re
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+Fetch existing description entity definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListDescriptionEntities2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListDescriptionEntities2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminDescriptionEntityList
 */
 
-type ListDescriptionEntities2Opts struct { 
+type AdminServiceApiAdminServiceListDescriptionEntities2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -5887,7 +6593,7 @@ type ListDescriptionEntities2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListDescriptionEntities2Opts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListDescriptionEntities2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListDescriptionEntities2Opts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -5959,9 +6665,7 @@ func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, r
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -5981,31 +6685,43 @@ func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, r
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+Fetch existing description entity definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListDescriptionEntities3Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+ * @param optional nil or *AdminServiceApiAdminServiceListDescriptionEntities3Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminDescriptionEntityList
 */
 
-type ListDescriptionEntities3Opts struct { 
+type AdminServiceApiAdminServiceListDescriptionEntities3Opts struct { 
 	IdName optional.String
 	IdOrg optional.String
 	Limit optional.Int64
@@ -6015,7 +6731,7 @@ type ListDescriptionEntities3Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities3(ctx context.Context, resourceType string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities3Opts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListDescriptionEntities3(ctx context.Context, resourceType string, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListDescriptionEntities3Opts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6091,9 +6807,7 @@ func (a *AdminServiceApiService) ListDescriptionEntities3(ctx context.Context, r
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6113,31 +6827,43 @@ func (a *AdminServiceApiService) ListDescriptionEntities3(ctx context.Context, r
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+Fetch existing description entity definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Identifies the specific type of resource that this identifier corresponds to.
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListDescriptionEntities4Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListDescriptionEntities4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminDescriptionEntityList
 */
 
-type ListDescriptionEntities4Opts struct { 
+type AdminServiceApiAdminServiceListDescriptionEntities4Opts struct { 
 	IdName optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -6146,7 +6872,7 @@ type ListDescriptionEntities4Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, localVarOptionals *ListDescriptionEntities4Opts) (AdminDescriptionEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListDescriptionEntities4(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListDescriptionEntities4Opts) (AdminDescriptionEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6220,9 +6946,7 @@ func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, r
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6242,30 +6966,41 @@ func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, r
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListExecutionsOpts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+ * @param optional nil or *AdminServiceApiAdminServiceListExecutionsOpts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminExecutionList
 */
 
-type ListExecutionsOpts struct { 
+type AdminServiceApiAdminServiceListExecutionsOpts struct { 
 	IdName optional.String
 	IdOrg optional.String
 	Limit optional.Int64
@@ -6275,7 +7010,7 @@ type ListExecutionsOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListExecutions(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListExecutionsOpts) (AdminExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListExecutions(ctx context.Context, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListExecutionsOpts) (AdminExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6350,9 +7085,7 @@ func (a *AdminServiceApiService) ListExecutions(ctx context.Context, idProject s
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6372,30 +7105,41 @@ func (a *AdminServiceApiService) ListExecutions(ctx context.Context, idProject s
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListExecutions2Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListExecutions2Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminExecutionList
 */
 
-type ListExecutions2Opts struct { 
+type AdminServiceApiAdminServiceListExecutions2Opts struct { 
 	IdName optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -6404,7 +7148,7 @@ type ListExecutions2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListExecutions2(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListExecutions2Opts) (AdminExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListExecutions2(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListExecutions2Opts) (AdminExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6477,9 +7221,7 @@ func (a *AdminServiceApiService) ListExecutions2(ctx context.Context, idOrg stri
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6499,29 +7241,41 @@ func (a *AdminServiceApiService) ListExecutions2(ctx context.Context, idOrg stri
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
+Fetch existing launch plan definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project. +required
- * @param optional nil or *ListLaunchPlanIdsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+ * @param optional nil or *AdminServiceApiAdminServiceListLaunchPlanIdsOpts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
      * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityIdentifierList
 */
 
-type ListLaunchPlanIdsOpts struct { 
+type AdminServiceApiAdminServiceListLaunchPlanIdsOpts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -6530,7 +7284,7 @@ type ListLaunchPlanIdsOpts struct {
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project string, domain string, localVarOptionals *ListLaunchPlanIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListLaunchPlanIds(ctx context.Context, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListLaunchPlanIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6602,9 +7356,7 @@ func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6624,29 +7376,41 @@ func (a *AdminServiceApiService) ListLaunchPlanIds(ctx context.Context, project 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
+Fetch existing launch plan definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project. +required
- * @param optional nil or *ListLaunchPlanIds2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+ * @param optional nil or *AdminServiceApiAdminServiceListLaunchPlanIds2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
 
 @return AdminNamedEntityIdentifierList
 */
 
-type ListLaunchPlanIds2Opts struct { 
+type AdminServiceApiAdminServiceListLaunchPlanIds2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -6654,7 +7418,7 @@ type ListLaunchPlanIds2Opts struct {
 	Filters optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlanIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListLaunchPlanIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListLaunchPlanIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListLaunchPlanIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6724,9 +7488,7 @@ func (a *AdminServiceApiService) ListLaunchPlanIds2(ctx context.Context, org str
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6746,30 +7508,42 @@ func (a *AdminServiceApiService) ListLaunchPlanIds2(ctx context.Context, org str
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+Fetch existing launch plan definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListLaunchPlansOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListLaunchPlansOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
 
-type ListLaunchPlansOpts struct { 
+type AdminServiceApiAdminServiceListLaunchPlansOpts struct { 
 	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -6778,7 +7552,7 @@ type ListLaunchPlansOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlans(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *ListLaunchPlansOpts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListLaunchPlans(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListLaunchPlansOpts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6851,9 +7625,7 @@ func (a *AdminServiceApiService) ListLaunchPlans(ctx context.Context, idProject 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6873,30 +7645,42 @@ func (a *AdminServiceApiService) ListLaunchPlans(ctx context.Context, idProject 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+Fetch existing launch plan definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListLaunchPlans2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListLaunchPlans2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
 
-type ListLaunchPlans2Opts struct { 
+type AdminServiceApiAdminServiceListLaunchPlans2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -6904,7 +7688,7 @@ type ListLaunchPlans2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListLaunchPlans2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListLaunchPlans2Opts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -6975,9 +7759,7 @@ func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idOrg str
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -6997,30 +7779,42 @@ func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idOrg str
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+Fetch existing launch plan definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListLaunchPlans3Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+ * @param optional nil or *AdminServiceApiAdminServiceListLaunchPlans3Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
 
-type ListLaunchPlans3Opts struct { 
+type AdminServiceApiAdminServiceListLaunchPlans3Opts struct { 
 	IdName optional.String
 	IdOrg optional.String
 	Limit optional.Int64
@@ -7030,7 +7824,7 @@ type ListLaunchPlans3Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlans3(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListLaunchPlans3Opts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListLaunchPlans3(ctx context.Context, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListLaunchPlans3Opts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7105,9 +7899,7 @@ func (a *AdminServiceApiService) ListLaunchPlans3(ctx context.Context, idProject
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7127,30 +7919,42 @@ func (a *AdminServiceApiService) ListLaunchPlans3(ctx context.Context, idProject
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+Fetch existing launch plan definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListLaunchPlans4Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListLaunchPlans4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminLaunchPlanList
 */
 
-type ListLaunchPlans4Opts struct { 
+type AdminServiceApiAdminServiceListLaunchPlans4Opts struct { 
 	IdName optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -7159,7 +7963,7 @@ type ListLaunchPlans4Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListLaunchPlans4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListLaunchPlans4Opts) (AdminLaunchPlanList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListLaunchPlans4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListLaunchPlans4Opts) (AdminLaunchPlanList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7232,9 +8036,7 @@ func (a *AdminServiceApiService) ListLaunchPlans4(ctx context.Context, idOrg str
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7254,28 +8056,40 @@ func (a *AdminServiceApiService) ListLaunchPlans4(ctx context.Context, idOrg str
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
+Retrieve a list of MatchableAttributesConfiguration objects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param optional nil or *ListMatchableAttributesOpts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceListMatchableAttributesOpts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
      * @param "Org" (optional.String) -  Optional, org filter applied to list project requests.
 
 @return AdminListMatchableAttributesResponse
 */
 
-type ListMatchableAttributesOpts struct { 
+type AdminServiceApiAdminServiceListMatchableAttributesOpts struct { 
 	ResourceType optional.String
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListMatchableAttributes(ctx context.Context, localVarOptionals *ListMatchableAttributesOpts) (AdminListMatchableAttributesResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListMatchableAttributes(ctx context.Context, localVarOptionals *AdminServiceApiAdminServiceListMatchableAttributesOpts) (AdminListMatchableAttributesResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7333,9 +8147,7 @@ func (a *AdminServiceApiService) ListMatchableAttributes(ctx context.Context, lo
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7355,27 +8167,39 @@ func (a *AdminServiceApiService) ListMatchableAttributes(ctx context.Context, lo
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
+Retrieve a list of MatchableAttributesConfiguration objects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org filter applied to list project requests.
- * @param optional nil or *ListMatchableAttributes2Opts - Optional Parameters:
-     * @param "ResourceType" (optional.String) -  +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+ * @param optional nil or *AdminServiceApiAdminServiceListMatchableAttributes2Opts - Optional Parameters:
+     * @param "ResourceType" (optional.String) -  +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
 
 @return AdminListMatchableAttributesResponse
 */
 
-type ListMatchableAttributes2Opts struct { 
+type AdminServiceApiAdminServiceListMatchableAttributes2Opts struct { 
 	ResourceType optional.String
 }
 
-func (a *AdminServiceApiService) ListMatchableAttributes2(ctx context.Context, org string, localVarOptionals *ListMatchableAttributes2Opts) (AdminListMatchableAttributesResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListMatchableAttributes2(ctx context.Context, org string, localVarOptionals *AdminServiceApiAdminServiceListMatchableAttributes2Opts) (AdminListMatchableAttributesResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7431,9 +8255,7 @@ func (a *AdminServiceApiService) ListMatchableAttributes2(ctx context.Context, o
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7453,30 +8275,42 @@ func (a *AdminServiceApiService) ListMatchableAttributes2(ctx context.Context, o
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
+Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project.
- * @param optional nil or *ListNamedEntitiesOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListNamedEntitiesOpts - Optional Parameters:
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
      * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityList
 */
 
-type ListNamedEntitiesOpts struct { 
+type AdminServiceApiAdminServiceListNamedEntitiesOpts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -7485,7 +8319,7 @@ type ListNamedEntitiesOpts struct {
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resourceType string, project string, domain string, localVarOptionals *ListNamedEntitiesOpts) (AdminNamedEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListNamedEntities(ctx context.Context, resourceType string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListNamedEntitiesOpts) (AdminNamedEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7558,9 +8392,7 @@ func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resource
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7580,30 +8412,42 @@ func (a *AdminServiceApiService) ListNamedEntities(ctx context.Context, resource
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
+Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to query. One of Task, Workflow or LaunchPlan. +required
  * @param org Optional, org key applied to the resource.
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project.
- * @param optional nil or *ListNamedEntities2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListNamedEntities2Opts - Optional Parameters:
      * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
 
 @return AdminNamedEntityList
 */
 
-type ListNamedEntities2Opts struct { 
+type AdminServiceApiAdminServiceListNamedEntities2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -7611,7 +8455,7 @@ type ListNamedEntities2Opts struct {
 	Filters optional.String
 }
 
-func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, resourceType string, org string, project string, domain string, localVarOptionals *ListNamedEntities2Opts) (AdminNamedEntityList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListNamedEntities2(ctx context.Context, resourceType string, org string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListNamedEntities2Opts) (AdminNamedEntityList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7682,9 +8526,7 @@ func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, resourc
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7704,31 +8546,42 @@ func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, resourc
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param workflowExecutionIdProject Name of the project the resource belongs to.
  * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param workflowExecutionIdName User or system provided value for the resource.
- * @param optional nil or *ListNodeExecutionsOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListNodeExecutionsOpts - Optional Parameters:
      * @param "WorkflowExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
      * @param "Token" (optional.String) - 
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "UniqueParentId" (optional.String) -  Unique identifier of the parent node in the execution +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "UniqueParentId" (optional.String) -  Unique identifier of the parent node in the execution +optional
 
 @return AdminNodeExecutionList
 */
 
-type ListNodeExecutionsOpts struct { 
+type AdminServiceApiAdminServiceListNodeExecutionsOpts struct { 
 	WorkflowExecutionIdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -7738,7 +8591,7 @@ type ListNodeExecutionsOpts struct {
 	UniqueParentId optional.String
 }
 
-func (a *AdminServiceApiService) ListNodeExecutions(ctx context.Context, workflowExecutionIdProject string, workflowExecutionIdDomain string, workflowExecutionIdName string, localVarOptionals *ListNodeExecutionsOpts) (AdminNodeExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListNodeExecutions(ctx context.Context, workflowExecutionIdProject string, workflowExecutionIdDomain string, workflowExecutionIdName string, localVarOptionals *AdminServiceApiAdminServiceListNodeExecutionsOpts) (AdminNodeExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7814,9 +8667,7 @@ func (a *AdminServiceApiService) ListNodeExecutions(ctx context.Context, workflo
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7836,31 +8687,42 @@ func (a *AdminServiceApiService) ListNodeExecutions(ctx context.Context, workflo
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param workflowExecutionIdOrg Optional, org key applied to the resource.
  * @param workflowExecutionIdProject Name of the project the resource belongs to.
  * @param workflowExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param workflowExecutionIdName User or system provided value for the resource.
- * @param optional nil or *ListNodeExecutions2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
+ * @param optional nil or *AdminServiceApiAdminServiceListNodeExecutions2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
      * @param "Token" (optional.String) - 
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "UniqueParentId" (optional.String) -  Unique identifier of the parent node in the execution +optional.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "UniqueParentId" (optional.String) -  Unique identifier of the parent node in the execution +optional
 
 @return AdminNodeExecutionList
 */
 
-type ListNodeExecutions2Opts struct { 
+type AdminServiceApiAdminServiceListNodeExecutions2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -7869,7 +8731,7 @@ type ListNodeExecutions2Opts struct {
 	UniqueParentId optional.String
 }
 
-func (a *AdminServiceApiService) ListNodeExecutions2(ctx context.Context, workflowExecutionIdOrg string, workflowExecutionIdProject string, workflowExecutionIdDomain string, workflowExecutionIdName string, localVarOptionals *ListNodeExecutions2Opts) (AdminNodeExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListNodeExecutions2(ctx context.Context, workflowExecutionIdOrg string, workflowExecutionIdProject string, workflowExecutionIdDomain string, workflowExecutionIdName string, localVarOptionals *AdminServiceApiAdminServiceListNodeExecutions2Opts) (AdminNodeExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -7943,9 +8805,7 @@ func (a *AdminServiceApiService) ListNodeExecutions2(ctx context.Context, workfl
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -7965,13 +8825,24 @@ func (a *AdminServiceApiService) ListNodeExecutions2(ctx context.Context, workfl
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param taskExecutionIdNodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
@@ -7983,20 +8854,20 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
  * @param taskExecutionIdTaskIdName User provided value for the resource.
  * @param taskExecutionIdTaskIdVersion Specific version of the resource.
  * @param taskExecutionIdRetryAttempt
- * @param optional nil or *ListNodeExecutionsForTaskOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListNodeExecutionsForTaskOpts - Optional Parameters:
      * @param "TaskExecutionIdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "TaskExecutionIdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
      * @param "TaskExecutionIdNodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminNodeExecutionList
 */
 
-type ListNodeExecutionsForTaskOpts struct { 
+type AdminServiceApiAdminServiceListNodeExecutionsForTaskOpts struct { 
 	TaskExecutionIdTaskIdResourceType optional.String
 	TaskExecutionIdTaskIdOrg optional.String
 	TaskExecutionIdNodeExecutionIdExecutionIdOrg optional.String
@@ -8007,7 +8878,7 @@ type ListNodeExecutionsForTaskOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, taskExecutionIdNodeExecutionIdExecutionIdProject string, taskExecutionIdNodeExecutionIdExecutionIdDomain string, taskExecutionIdNodeExecutionIdExecutionIdName string, taskExecutionIdNodeExecutionIdNodeId string, taskExecutionIdTaskIdProject string, taskExecutionIdTaskIdDomain string, taskExecutionIdTaskIdName string, taskExecutionIdTaskIdVersion string, taskExecutionIdRetryAttempt int64, localVarOptionals *ListNodeExecutionsForTaskOpts) (AdminNodeExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListNodeExecutionsForTask(ctx context.Context, taskExecutionIdNodeExecutionIdExecutionIdProject string, taskExecutionIdNodeExecutionIdExecutionIdDomain string, taskExecutionIdNodeExecutionIdExecutionIdName string, taskExecutionIdNodeExecutionIdNodeId string, taskExecutionIdTaskIdProject string, taskExecutionIdTaskIdDomain string, taskExecutionIdTaskIdName string, taskExecutionIdTaskIdVersion string, taskExecutionIdRetryAttempt int64, localVarOptionals *AdminServiceApiAdminServiceListNodeExecutionsForTaskOpts) (AdminNodeExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8092,9 +8963,7 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8114,13 +8983,24 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask(ctx context.Context, 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param taskExecutionIdNodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
@@ -8133,19 +9013,19 @@ AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecuti
  * @param taskExecutionIdTaskIdName User provided value for the resource.
  * @param taskExecutionIdTaskIdVersion Specific version of the resource.
  * @param taskExecutionIdRetryAttempt
- * @param optional nil or *ListNodeExecutionsForTask2Opts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListNodeExecutionsForTask2Opts - Optional Parameters:
      * @param "TaskExecutionIdTaskIdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
      * @param "TaskExecutionIdTaskIdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminNodeExecutionList
 */
 
-type ListNodeExecutionsForTask2Opts struct { 
+type AdminServiceApiAdminServiceListNodeExecutionsForTask2Opts struct { 
 	TaskExecutionIdTaskIdResourceType optional.String
 	TaskExecutionIdTaskIdOrg optional.String
 	Limit optional.Int64
@@ -8155,7 +9035,7 @@ type ListNodeExecutionsForTask2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListNodeExecutionsForTask2(ctx context.Context, taskExecutionIdNodeExecutionIdExecutionIdOrg string, taskExecutionIdNodeExecutionIdExecutionIdProject string, taskExecutionIdNodeExecutionIdExecutionIdDomain string, taskExecutionIdNodeExecutionIdExecutionIdName string, taskExecutionIdNodeExecutionIdNodeId string, taskExecutionIdTaskIdProject string, taskExecutionIdTaskIdDomain string, taskExecutionIdTaskIdName string, taskExecutionIdTaskIdVersion string, taskExecutionIdRetryAttempt int64, localVarOptionals *ListNodeExecutionsForTask2Opts) (AdminNodeExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListNodeExecutionsForTask2(ctx context.Context, taskExecutionIdNodeExecutionIdExecutionIdOrg string, taskExecutionIdNodeExecutionIdExecutionIdProject string, taskExecutionIdNodeExecutionIdExecutionIdDomain string, taskExecutionIdNodeExecutionIdExecutionIdName string, taskExecutionIdNodeExecutionIdNodeId string, taskExecutionIdTaskIdProject string, taskExecutionIdTaskIdDomain string, taskExecutionIdTaskIdName string, taskExecutionIdTaskIdVersion string, taskExecutionIdRetryAttempt int64, localVarOptionals *AdminServiceApiAdminServiceListNodeExecutionsForTask2Opts) (AdminNodeExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8238,9 +9118,7 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask2(ctx context.Context,
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8260,27 +9138,39 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask2(ctx context.Context,
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
+Fetch registered projects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param optional nil or *ListProjectsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListProjectsOpts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
      * @param "Org" (optional.String) -  Optional, org filter applied to list project requests.
 
 @return AdminProjects
 */
 
-type ListProjectsOpts struct { 
+type AdminServiceApiAdminServiceListProjectsOpts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -8289,7 +9179,7 @@ type ListProjectsOpts struct {
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListProjects(ctx context.Context, localVarOptionals *ListProjectsOpts) (AdminProjects, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListProjects(ctx context.Context, localVarOptionals *AdminServiceApiAdminServiceListProjectsOpts) (AdminProjects, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8359,9 +9249,7 @@ func (a *AdminServiceApiService) ListProjects(ctx context.Context, localVarOptio
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8381,27 +9269,39 @@ func (a *AdminServiceApiService) ListProjects(ctx context.Context, localVarOptio
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
+Fetch registered projects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org filter applied to list project requests.
- * @param optional nil or *ListProjects2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListProjects2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of projects to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminProjects
 */
 
-type ListProjects2Opts struct { 
+type AdminServiceApiAdminServiceListProjects2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -8409,7 +9309,7 @@ type ListProjects2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListProjects2(ctx context.Context, org string, localVarOptionals *ListProjects2Opts) (AdminProjects, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListProjects2(ctx context.Context, org string, localVarOptionals *AdminServiceApiAdminServiceListProjects2Opts) (AdminProjects, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8477,9 +9377,7 @@ func (a *AdminServiceApiService) ListProjects2(ctx context.Context, org string, 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8499,31 +9397,43 @@ func (a *AdminServiceApiService) ListProjects2(ctx context.Context, org string, 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+Fetch existing task executions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param nodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param nodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param nodeExecutionIdExecutionIdName User or system provided value for the resource.
  * @param nodeExecutionIdNodeId
- * @param optional nil or *ListTaskExecutionsOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListTaskExecutionsOpts - Optional Parameters:
      * @param "NodeExecutionIdExecutionIdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskExecutionList
 */
 
-type ListTaskExecutionsOpts struct { 
+type AdminServiceApiAdminServiceListTaskExecutionsOpts struct { 
 	NodeExecutionIdExecutionIdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -8532,7 +9442,7 @@ type ListTaskExecutionsOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExecutionIdExecutionIdProject string, nodeExecutionIdExecutionIdDomain string, nodeExecutionIdExecutionIdName string, nodeExecutionIdNodeId string, localVarOptionals *ListTaskExecutionsOpts) (AdminTaskExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTaskExecutions(ctx context.Context, nodeExecutionIdExecutionIdProject string, nodeExecutionIdExecutionIdDomain string, nodeExecutionIdExecutionIdName string, nodeExecutionIdNodeId string, localVarOptionals *AdminServiceApiAdminServiceListTaskExecutionsOpts) (AdminTaskExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8606,9 +9516,7 @@ func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExe
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8628,31 +9536,43 @@ func (a *AdminServiceApiService) ListTaskExecutions(ctx context.Context, nodeExe
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+Fetch existing task executions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param nodeExecutionIdExecutionIdOrg Optional, org key applied to the resource.
  * @param nodeExecutionIdExecutionIdProject Name of the project the resource belongs to.
  * @param nodeExecutionIdExecutionIdDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param nodeExecutionIdExecutionIdName User or system provided value for the resource.
  * @param nodeExecutionIdNodeId
- * @param optional nil or *ListTaskExecutions2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListTaskExecutions2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskExecutionList
 */
 
-type ListTaskExecutions2Opts struct { 
+type AdminServiceApiAdminServiceListTaskExecutions2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -8660,7 +9580,7 @@ type ListTaskExecutions2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTaskExecutions2(ctx context.Context, nodeExecutionIdExecutionIdOrg string, nodeExecutionIdExecutionIdProject string, nodeExecutionIdExecutionIdDomain string, nodeExecutionIdExecutionIdName string, nodeExecutionIdNodeId string, localVarOptionals *ListTaskExecutions2Opts) (AdminTaskExecutionList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTaskExecutions2(ctx context.Context, nodeExecutionIdExecutionIdOrg string, nodeExecutionIdExecutionIdProject string, nodeExecutionIdExecutionIdDomain string, nodeExecutionIdExecutionIdName string, nodeExecutionIdNodeId string, localVarOptionals *AdminServiceApiAdminServiceListTaskExecutions2Opts) (AdminTaskExecutionList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8732,9 +9652,7 @@ func (a *AdminServiceApiService) ListTaskExecutions2(ctx context.Context, nodeEx
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8754,29 +9672,41 @@ func (a *AdminServiceApiService) ListTaskExecutions2(ctx context.Context, nodeEx
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
+Fetch existing task definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project. +required
- * @param optional nil or *ListTaskIdsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+ * @param optional nil or *AdminServiceApiAdminServiceListTaskIdsOpts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
      * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityIdentifierList
 */
 
-type ListTaskIdsOpts struct { 
+type AdminServiceApiAdminServiceListTaskIdsOpts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -8785,7 +9715,7 @@ type ListTaskIdsOpts struct {
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string, domain string, localVarOptionals *ListTaskIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTaskIds(ctx context.Context, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListTaskIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8857,9 +9787,7 @@ func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -8879,29 +9807,41 @@ func (a *AdminServiceApiService) ListTaskIds(ctx context.Context, project string
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
+Fetch existing task definition identifiers matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project. +required
- * @param optional nil or *ListTaskIds2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+ * @param optional nil or *AdminServiceApiAdminServiceListTaskIds2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
 
 @return AdminNamedEntityIdentifierList
 */
 
-type ListTaskIds2Opts struct { 
+type AdminServiceApiAdminServiceListTaskIds2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -8909,7 +9849,7 @@ type ListTaskIds2Opts struct {
 	Filters optional.String
 }
 
-func (a *AdminServiceApiService) ListTaskIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListTaskIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTaskIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListTaskIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -8979,9 +9919,7 @@ func (a *AdminServiceApiService) ListTaskIds2(ctx context.Context, org string, p
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9001,30 +9939,42 @@ func (a *AdminServiceApiService) ListTaskIds2(ctx context.Context, org string, p
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+Fetch existing task definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListTasksOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListTasksOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskList
 */
 
-type ListTasksOpts struct { 
+type AdminServiceApiAdminServiceListTasksOpts struct { 
 	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -9033,7 +9983,7 @@ type ListTasksOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTasks(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *ListTasksOpts) (AdminTaskList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTasks(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListTasksOpts) (AdminTaskList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9106,9 +10056,7 @@ func (a *AdminServiceApiService) ListTasks(ctx context.Context, idProject string
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9128,30 +10076,42 @@ func (a *AdminServiceApiService) ListTasks(ctx context.Context, idProject string
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+Fetch existing task definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListTasks2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListTasks2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskList
 */
 
-type ListTasks2Opts struct { 
+type AdminServiceApiAdminServiceListTasks2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -9159,7 +10119,7 @@ type ListTasks2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListTasks2Opts) (AdminTaskList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTasks2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListTasks2Opts) (AdminTaskList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9230,9 +10190,7 @@ func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idOrg string, i
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9252,30 +10210,42 @@ func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idOrg string, i
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+Fetch existing task definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListTasks3Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+ * @param optional nil or *AdminServiceApiAdminServiceListTasks3Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskList
 */
 
-type ListTasks3Opts struct { 
+type AdminServiceApiAdminServiceListTasks3Opts struct { 
 	IdName optional.String
 	IdOrg optional.String
 	Limit optional.Int64
@@ -9285,7 +10255,7 @@ type ListTasks3Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTasks3(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListTasks3Opts) (AdminTaskList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTasks3(ctx context.Context, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListTasks3Opts) (AdminTaskList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9360,9 +10330,7 @@ func (a *AdminServiceApiService) ListTasks3(ctx context.Context, idProject strin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9382,30 +10350,42 @@ func (a *AdminServiceApiService) ListTasks3(ctx context.Context, idProject strin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+Fetch existing task definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListTasks4Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListTasks4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminTaskList
 */
 
-type ListTasks4Opts struct { 
+type AdminServiceApiAdminServiceListTasks4Opts struct { 
 	IdName optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -9414,7 +10394,7 @@ type ListTasks4Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListTasks4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListTasks4Opts) (AdminTaskList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListTasks4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListTasks4Opts) (AdminTaskList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9487,9 +10467,7 @@ func (a *AdminServiceApiService) ListTasks4(ctx context.Context, idOrg string, i
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9509,29 +10487,40 @@ func (a *AdminServiceApiService) ListTasks4(ctx context.Context, idOrg string, i
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project. +required
- * @param optional nil or *ListWorkflowIdsOpts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+ * @param optional nil or *AdminServiceApiAdminServiceListWorkflowIdsOpts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
      * @param "Org" (optional.String) -  Optional, org key applied to the resource.
 
 @return AdminNamedEntityIdentifierList
 */
 
-type ListWorkflowIdsOpts struct { 
+type AdminServiceApiAdminServiceListWorkflowIdsOpts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -9540,7 +10529,7 @@ type ListWorkflowIdsOpts struct {
 	Org optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project string, domain string, localVarOptionals *ListWorkflowIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListWorkflowIds(ctx context.Context, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListWorkflowIdsOpts) (AdminNamedEntityIdentifierList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9612,9 +10601,7 @@ func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9634,29 +10621,40 @@ func (a *AdminServiceApiService) ListWorkflowIds(ctx context.Context, project st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
  * @param project Name of the project that contains the identifiers. +required
  * @param domain Name of the domain the identifiers belongs to within the project. +required
- * @param optional nil or *ListWorkflowIds2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional.
+ * @param optional nil or *AdminServiceApiAdminServiceListWorkflowIds2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. +optional
 
 @return AdminNamedEntityIdentifierList
 */
 
-type ListWorkflowIds2Opts struct { 
+type AdminServiceApiAdminServiceListWorkflowIds2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	SortByKey optional.String
@@ -9664,7 +10662,7 @@ type ListWorkflowIds2Opts struct {
 	Filters optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflowIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *ListWorkflowIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListWorkflowIds2(ctx context.Context, org string, project string, domain string, localVarOptionals *AdminServiceApiAdminServiceListWorkflowIds2Opts) (AdminNamedEntityIdentifierList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9734,9 +10732,7 @@ func (a *AdminServiceApiService) ListWorkflowIds2(ctx context.Context, org strin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9756,30 +10752,42 @@ func (a *AdminServiceApiService) ListWorkflowIds2(ctx context.Context, org strin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+Fetch existing workflow definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListWorkflowsOpts - Optional Parameters:
+ * @param optional nil or *AdminServiceApiAdminServiceListWorkflowsOpts - Optional Parameters:
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminWorkflowList
 */
 
-type ListWorkflowsOpts struct { 
+type AdminServiceApiAdminServiceListWorkflowsOpts struct { 
 	IdOrg optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -9788,7 +10796,7 @@ type ListWorkflowsOpts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflows(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *ListWorkflowsOpts) (AdminWorkflowList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListWorkflows(ctx context.Context, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListWorkflowsOpts) (AdminWorkflowList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9861,9 +10869,7 @@ func (a *AdminServiceApiService) ListWorkflows(ctx context.Context, idProject st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -9883,30 +10889,42 @@ func (a *AdminServiceApiService) ListWorkflows(ctx context.Context, idProject st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+Fetch existing workflow definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
- * @param optional nil or *ListWorkflows2Opts - Optional Parameters:
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListWorkflows2Opts - Optional Parameters:
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminWorkflowList
 */
 
-type ListWorkflows2Opts struct { 
+type AdminServiceApiAdminServiceListWorkflows2Opts struct { 
 	Limit optional.Int64
 	Token optional.String
 	Filters optional.String
@@ -9914,7 +10932,7 @@ type ListWorkflows2Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *ListWorkflows2Opts) (AdminWorkflowList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListWorkflows2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, localVarOptionals *AdminServiceApiAdminServiceListWorkflows2Opts) (AdminWorkflowList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -9985,9 +11003,7 @@ func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idOrg strin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10007,30 +11023,42 @@ func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idOrg strin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+Fetch existing workflow definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListWorkflows3Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
+ * @param optional nil or *AdminServiceApiAdminServiceListWorkflows3Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
      * @param "IdOrg" (optional.String) -  Optional, org key applied to the resource.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminWorkflowList
 */
 
-type ListWorkflows3Opts struct { 
+type AdminServiceApiAdminServiceListWorkflows3Opts struct { 
 	IdName optional.String
 	IdOrg optional.String
 	Limit optional.Int64
@@ -10040,7 +11068,7 @@ type ListWorkflows3Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflows3(ctx context.Context, idProject string, idDomain string, localVarOptionals *ListWorkflows3Opts) (AdminWorkflowList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListWorkflows3(ctx context.Context, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListWorkflows3Opts) (AdminWorkflowList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -10115,9 +11143,7 @@ func (a *AdminServiceApiService) ListWorkflows3(ctx context.Context, idProject s
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10137,30 +11163,42 @@ func (a *AdminServiceApiService) ListWorkflows3(ctx context.Context, idProject s
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+Fetch existing workflow definitions matching input filters.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
- * @param optional nil or *ListWorkflows4Opts - Optional Parameters:
-     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;.
-     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required.
-     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional.
-     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required.
-     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+ * @param optional nil or *AdminServiceApiAdminServiceListWorkflows4Opts - Optional Parameters:
+     * @param "IdName" (optional.String) -  User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like &#39;List API&#39;, &#39;Launch plans&#39;
+     * @param "Limit" (optional.Int64) -  Indicates the number of resources to be returned. +required
+     * @param "Token" (optional.String) -  In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+     * @param "Filters" (optional.String) -  Indicates a list of filters passed as string. More info on constructing filters : &lt;Link&gt; +optional
+     * @param "SortByKey" (optional.String) -  Indicates an attribute to sort the response values. +required
+     * @param "SortByDirection" (optional.String) -  Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
 
 @return AdminWorkflowList
 */
 
-type ListWorkflows4Opts struct { 
+type AdminServiceApiAdminServiceListWorkflows4Opts struct { 
 	IdName optional.String
 	Limit optional.Int64
 	Token optional.String
@@ -10169,7 +11207,7 @@ type ListWorkflows4Opts struct {
 	SortByDirection optional.String
 }
 
-func (a *AdminServiceApiService) ListWorkflows4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *ListWorkflows4Opts) (AdminWorkflowList, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceListWorkflows4(ctx context.Context, idOrg string, idProject string, idDomain string, localVarOptionals *AdminServiceApiAdminServiceListWorkflows4Opts) (AdminWorkflowList, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Get")
 		localVarPostBody   interface{}
@@ -10242,9 +11280,7 @@ func (a *AdminServiceApiService) ListWorkflows4(ctx context.Context, idOrg strin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10264,20 +11300,32 @@ func (a *AdminServiceApiService) ListWorkflows4(ctx context.Context, idOrg strin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
+Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to recover the referenced execution.
 
 @return AdminExecutionCreateResponse
 */
-func (a *AdminServiceApiService) RecoverExecution(ctx context.Context, body AdminExecutionRecoverRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceRecoverExecution(ctx context.Context, body AdminExecutionRecoverRequest) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -10331,9 +11379,7 @@ func (a *AdminServiceApiService) RecoverExecution(ctx context.Context, body Admi
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10353,21 +11399,33 @@ func (a *AdminServiceApiService) RecoverExecution(ctx context.Context, body Admi
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
+Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminExecutionCreateResponse
 */
-func (a *AdminServiceApiService) RecoverExecution2(ctx context.Context, idOrg string, body AdminExecutionRecoverRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceRecoverExecution2(ctx context.Context, idOrg string, body AdminServiceRecoverExecutionBody) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -10422,9 +11480,7 @@ func (a *AdminServiceApiService) RecoverExecution2(ctx context.Context, idOrg st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10444,20 +11500,31 @@ func (a *AdminServiceApiService) RecoverExecution2(ctx context.Context, idOrg st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param body
 
 @return AdminProjectRegisterResponse
 */
-func (a *AdminServiceApiService) RegisterProject(ctx context.Context, body AdminProjectRegisterRequest) (AdminProjectRegisterResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceRegisterProject(ctx context.Context, body AdminProjectRegisterRequest) (AdminProjectRegisterResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -10511,9 +11578,7 @@ func (a *AdminServiceApiService) RegisterProject(ctx context.Context, body Admin
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10533,13 +11598,24 @@ func (a *AdminServiceApiService) RegisterProject(ctx context.Context, body Admin
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param projectOrg Optional, org key applied to the resource.
@@ -10547,7 +11623,7 @@ AdminServiceApiService Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; w
 
 @return AdminProjectRegisterResponse
 */
-func (a *AdminServiceApiService) RegisterProject2(ctx context.Context, projectOrg string, body AdminProjectRegisterRequest) (AdminProjectRegisterResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceRegisterProject2(ctx context.Context, projectOrg string, body AdminServiceRegisterProjectBody) (AdminProjectRegisterResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -10602,9 +11678,7 @@ func (a *AdminServiceApiService) RegisterProject2(ctx context.Context, projectOr
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10624,20 +11698,32 @@ func (a *AdminServiceApiService) RegisterProject2(ctx context.Context, projectOr
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+Relaunch a workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
- * @param body
+ * @param body Request to relaunch the referenced execution.
 
 @return AdminExecutionCreateResponse
 */
-func (a *AdminServiceApiService) RelaunchExecution(ctx context.Context, body AdminExecutionRelaunchRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceRelaunchExecution(ctx context.Context, body AdminExecutionRelaunchRequest) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -10691,9 +11777,7 @@ func (a *AdminServiceApiService) RelaunchExecution(ctx context.Context, body Adm
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10713,21 +11797,33 @@ func (a *AdminServiceApiService) RelaunchExecution(ctx context.Context, body Adm
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+Relaunch a workflow execution.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param body
 
 @return AdminExecutionCreateResponse
 */
-func (a *AdminServiceApiService) RelaunchExecution2(ctx context.Context, idOrg string, body AdminExecutionRelaunchRequest) (AdminExecutionCreateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceRelaunchExecution2(ctx context.Context, idOrg string, body AdminServiceRelaunchExecutionBody) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
@@ -10782,9 +11878,7 @@ func (a *AdminServiceApiService) RelaunchExecution2(ctx context.Context, idOrg s
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10804,13 +11898,24 @@ func (a *AdminServiceApiService) RelaunchExecution2(ctx context.Context, idOrg s
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
@@ -10820,7 +11925,7 @@ AdminServiceApiService Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.E
 
 @return AdminExecutionTerminateResponse
 */
-func (a *AdminServiceApiService) TerminateExecution(ctx context.Context, idProject string, idDomain string, idName string, body AdminExecutionTerminateRequest) (AdminExecutionTerminateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceTerminateExecution(ctx context.Context, idProject string, idDomain string, idName string, body AdminServiceTerminateExecutionBody) (AdminExecutionTerminateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -10877,9 +11982,7 @@ func (a *AdminServiceApiService) TerminateExecution(ctx context.Context, idProje
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10899,13 +12002,24 @@ func (a *AdminServiceApiService) TerminateExecution(ctx context.Context, idProje
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
@@ -10916,7 +12030,7 @@ AdminServiceApiService Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.E
 
 @return AdminExecutionTerminateResponse
 */
-func (a *AdminServiceApiService) TerminateExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, body AdminExecutionTerminateRequest) (AdminExecutionTerminateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceTerminateExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, body AdminServiceTerminateExecutionBody) (AdminExecutionTerminateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Delete")
 		localVarPostBody   interface{}
@@ -10974,9 +12088,7 @@ func (a *AdminServiceApiService) TerminateExecution2(ctx context.Context, idOrg 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -10996,13 +12108,24 @@ func (a *AdminServiceApiService) TerminateExecution2(ctx context.Context, idOrg 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
@@ -11012,7 +12135,7 @@ AdminServiceApiService Update execution belonging to project domain :ref:&#x60;r
 
 @return AdminExecutionUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateExecution(ctx context.Context, idProject string, idDomain string, idName string, body AdminExecutionUpdateRequest) (AdminExecutionUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateExecution(ctx context.Context, idProject string, idDomain string, idName string, body AdminServiceUpdateExecutionBody) (AdminExecutionUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11069,9 +12192,7 @@ func (a *AdminServiceApiService) UpdateExecution(ctx context.Context, idProject 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11091,13 +12212,24 @@ func (a *AdminServiceApiService) UpdateExecution(ctx context.Context, idProject 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
@@ -11108,7 +12240,7 @@ AdminServiceApiService Update execution belonging to project domain :ref:&#x60;r
 
 @return AdminExecutionUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, body AdminExecutionUpdateRequest) (AdminExecutionUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateExecution2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, body AdminServiceUpdateExecutionBody) (AdminExecutionUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11166,9 +12298,7 @@ func (a *AdminServiceApiService) UpdateExecution2(ctx context.Context, idOrg str
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11188,14 +12318,26 @@ func (a *AdminServiceApiService) UpdateExecution2(ctx context.Context, idOrg str
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
@@ -11205,7 +12347,7 @@ AdminServiceApiService Updates the status of a registered :ref:&#x60;ref_flyteid
 
 @return AdminLaunchPlanUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, body AdminLaunchPlanUpdateRequest) (AdminLaunchPlanUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateLaunchPlan(ctx context.Context, idProject string, idDomain string, idName string, idVersion string, body AdminServiceUpdateLaunchPlanBody) (AdminLaunchPlanUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11263,9 +12405,7 @@ func (a *AdminServiceApiService) UpdateLaunchPlan(ctx context.Context, idProject
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11285,24 +12425,45 @@ func (a *AdminServiceApiService) UpdateLaunchPlan(ctx context.Context, idProject
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param idOrg Optional, org key applied to the resource.
  * @param idProject Name of the project the resource belongs to.
  * @param idDomain Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project.
  * @param idName User provided value for the resource.
  * @param idVersion Specific version of the resource.
+ * @param optional nil or *AdminServiceApiAdminServiceUpdateLaunchPlan2Opts - Optional Parameters:
+     * @param "IdResourceType" (optional.String) -  Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+     * @param "State" (optional.String) -  Desired state to apply to the launch plan. +required.
 
 @return AdminLaunchPlanUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string) (AdminLaunchPlanUpdateResponse, *http.Response, error) {
+
+type AdminServiceApiAdminServiceUpdateLaunchPlan2Opts struct { 
+	IdResourceType optional.String
+	State optional.String
+}
+
+func (a *AdminServiceApiService) AdminServiceUpdateLaunchPlan2(ctx context.Context, idOrg string, idProject string, idDomain string, idName string, idVersion string, localVarOptionals *AdminServiceApiAdminServiceUpdateLaunchPlan2Opts) (AdminLaunchPlanUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11323,6 +12484,12 @@ func (a *AdminServiceApiService) UpdateLaunchPlan2(ctx context.Context, idOrg st
 	localVarQueryParams := url.Values{}
 	localVarFormParams := url.Values{}
 
+	if localVarOptionals != nil && localVarOptionals.IdResourceType.IsSet() {
+		localVarQueryParams.Add("id.resource_type", parameterToString(localVarOptionals.IdResourceType.Value(), ""))
+	}
+	if localVarOptionals != nil && localVarOptionals.State.IsSet() {
+		localVarQueryParams.Add("state", parameterToString(localVarOptionals.State.Value(), ""))
+	}
 	// to determine the Content-Type header
 	localVarHttpContentTypes := []string{"application/json"}
 
@@ -11359,9 +12526,7 @@ func (a *AdminServiceApiService) UpdateLaunchPlan2(ctx context.Context, idOrg st
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11381,14 +12546,26 @@ func (a *AdminServiceApiService) UpdateLaunchPlan2(ctx context.Context, idOrg st
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+Update the fields associated with a NamedEntity
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to update +required
  * @param idProject Name of the project the resource belongs to.
@@ -11398,7 +12575,7 @@ AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60;
 
 @return AdminNamedEntityUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateNamedEntity(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, body AdminNamedEntityUpdateRequest) (AdminNamedEntityUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateNamedEntity(ctx context.Context, resourceType string, idProject string, idDomain string, idName string, body AdminServiceUpdateNamedEntityBody) (AdminNamedEntityUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11456,9 +12633,7 @@ func (a *AdminServiceApiService) UpdateNamedEntity(ctx context.Context, resource
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11478,14 +12653,26 @@ func (a *AdminServiceApiService) UpdateNamedEntity(ctx context.Context, resource
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+Update the fields associated with a NamedEntity
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param resourceType Resource type of the metadata to update +required
  * @param idOrg Optional, org key applied to the resource.
@@ -11496,7 +12683,7 @@ AdminServiceApiService Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60;
 
 @return AdminNamedEntityUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, body AdminNamedEntityUpdateRequest) (AdminNamedEntityUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateNamedEntity2(ctx context.Context, resourceType string, idOrg string, idProject string, idDomain string, idName string, body AdminServiceUpdateNamedEntityBody) (AdminNamedEntityUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11555,9 +12742,7 @@ func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourc
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11577,21 +12762,33 @@ func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, resourc
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
+Update a project.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param id Globally unique project name.
  * @param body
 
 @return AdminProjectUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateProject(ctx context.Context, id string, body AdminServiceUpdateProjectBody) (AdminProjectUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11646,9 +12843,7 @@ func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, b
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11668,14 +12863,26 @@ func (a *AdminServiceApiService) UpdateProject(ctx context.Context, id string, b
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
+Update a project.
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param org Optional, org key applied to the resource.
  * @param id Globally unique project name.
@@ -11683,7 +12890,7 @@ AdminServiceApiService Updates an existing :ref:&#x60;ref_flyteidl.admin.Project
 
 @return AdminProjectUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, org string, id string, body AdminProject) (AdminProjectUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateProject2(ctx context.Context, org string, id string, body AdminServiceUpdateProjectBody) (AdminProjectUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11739,9 +12946,7 @@ func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, org string,
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11761,21 +12966,33 @@ func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, org string,
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
+Update the customized resource attributes associated with a project
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesProject Unique project id for which this set of attributes will be applied.
  * @param body
 
 @return AdminProjectAttributesUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProjectAttributes(ctx context.Context, attributesProject string, body AdminProjectAttributesUpdateRequest) (AdminProjectAttributesUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateProjectAttributes(ctx context.Context, attributesProject string, body AdminServiceUpdateProjectAttributesBody) (AdminProjectAttributesUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11830,9 +13047,7 @@ func (a *AdminServiceApiService) UpdateProjectAttributes(ctx context.Context, at
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11852,14 +13067,26 @@ func (a *AdminServiceApiService) UpdateProjectAttributes(ctx context.Context, at
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
+Update the customized resource attributes associated with a project
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesOrg Optional, org key applied to the project.
  * @param attributesProject Unique project id for which this set of attributes will be applied.
@@ -11867,7 +13094,7 @@ AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.M
 
 @return AdminProjectAttributesUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProjectAttributes2(ctx context.Context, attributesOrg string, attributesProject string, body AdminProjectAttributesUpdateRequest) (AdminProjectAttributesUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateProjectAttributes2(ctx context.Context, attributesOrg string, attributesProject string, body AdminServiceUpdateProjectAttributesBody) (AdminProjectAttributesUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -11923,9 +13150,7 @@ func (a *AdminServiceApiService) UpdateProjectAttributes2(ctx context.Context, a
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -11945,14 +13170,26 @@ func (a *AdminServiceApiService) UpdateProjectAttributes2(ctx context.Context, a
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Update the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesProject Unique project id for which this set of attributes will be applied.
  * @param attributesDomain Unique domain id for which this set of attributes will be applied.
@@ -11960,7 +13197,7 @@ AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.M
 
 @return AdminProjectDomainAttributesUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProjectDomainAttributes(ctx context.Context, attributesProject string, attributesDomain string, body AdminProjectDomainAttributesUpdateRequest) (AdminProjectDomainAttributesUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateProjectDomainAttributes(ctx context.Context, attributesProject string, attributesDomain string, body AdminServiceUpdateProjectDomainAttributesBody) (AdminProjectDomainAttributesUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -12016,9 +13253,7 @@ func (a *AdminServiceApiService) UpdateProjectDomainAttributes(ctx context.Conte
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -12038,14 +13273,26 @@ func (a *AdminServiceApiService) UpdateProjectDomainAttributes(ctx context.Conte
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+Update the customized resource attributes associated with a project-domain combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesOrg Optional, org key applied to the attributes.
  * @param attributesProject Unique project id for which this set of attributes will be applied.
@@ -12054,7 +13301,7 @@ AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.M
 
 @return AdminProjectDomainAttributesUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateProjectDomainAttributes2(ctx context.Context, attributesOrg string, attributesProject string, attributesDomain string, body AdminProjectDomainAttributesUpdateRequest) (AdminProjectDomainAttributesUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateProjectDomainAttributes2(ctx context.Context, attributesOrg string, attributesProject string, attributesDomain string, body AdminServiceUpdateProjectDomainAttributesBody) (AdminProjectDomainAttributesUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -12111,9 +13358,7 @@ func (a *AdminServiceApiService) UpdateProjectDomainAttributes2(ctx context.Cont
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -12133,14 +13378,26 @@ func (a *AdminServiceApiService) UpdateProjectDomainAttributes2(ctx context.Cont
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+Update the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesProject Unique project id for which this set of attributes will be applied.
  * @param attributesDomain Unique domain id for which this set of attributes will be applied.
@@ -12149,7 +13406,7 @@ AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.M
 
 @return AdminWorkflowAttributesUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateWorkflowAttributes(ctx context.Context, attributesProject string, attributesDomain string, attributesWorkflow string, body AdminWorkflowAttributesUpdateRequest) (AdminWorkflowAttributesUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateWorkflowAttributes(ctx context.Context, attributesProject string, attributesDomain string, attributesWorkflow string, body AdminServiceUpdateWorkflowAttributesBody) (AdminWorkflowAttributesUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -12206,9 +13463,7 @@ func (a *AdminServiceApiService) UpdateWorkflowAttributes(ctx context.Context, a
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -12228,14 +13483,26 @@ func (a *AdminServiceApiService) UpdateWorkflowAttributes(ctx context.Context, a
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
 
-/* 
+/*
 AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+Update the customized resource attributes associated with a project, domain and workflow combination
  * @param ctx context.Context - for authentication, logging, cancellation, deadlines, tracing, etc. Passed from http.Request or context.Background().
  * @param attributesOrg Optional, org key applied to the attributes.
  * @param attributesProject Unique project id for which this set of attributes will be applied.
@@ -12245,7 +13512,7 @@ AdminServiceApiService Creates or updates custom :ref:&#x60;ref_flyteidl.admin.M
 
 @return AdminWorkflowAttributesUpdateResponse
 */
-func (a *AdminServiceApiService) UpdateWorkflowAttributes2(ctx context.Context, attributesOrg string, attributesProject string, attributesDomain string, attributesWorkflow string, body AdminWorkflowAttributesUpdateRequest) (AdminWorkflowAttributesUpdateResponse, *http.Response, error) {
+func (a *AdminServiceApiService) AdminServiceUpdateWorkflowAttributes2(ctx context.Context, attributesOrg string, attributesProject string, attributesDomain string, attributesWorkflow string, body AdminServiceUpdateWorkflowAttributesBody) (AdminWorkflowAttributesUpdateResponse, *http.Response, error) {
 	var (
 		localVarHttpMethod = strings.ToUpper("Put")
 		localVarPostBody   interface{}
@@ -12303,9 +13570,7 @@ func (a *AdminServiceApiService) UpdateWorkflowAttributes2(ctx context.Context, 
 	if localVarHttpResponse.StatusCode < 300 {
 		// If we succeed, return the data, otherwise pass on to decode error.
 		err = a.client.decode(&localVarReturnValue, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
-		if err == nil { 
-			return localVarReturnValue, localVarHttpResponse, err
-		}
+		return localVarReturnValue, localVarHttpResponse, err
 	}
 
 	if localVarHttpResponse.StatusCode >= 300 {
@@ -12325,8 +13590,20 @@ func (a *AdminServiceApiService) UpdateWorkflowAttributes2(ctx context.Context, 
 				return localVarReturnValue, localVarHttpResponse, newErr
 		}
 		
+		if localVarHttpResponse.StatusCode == 0 {
+			var v GooglerpcStatus
+			err = a.client.decode(&v, localVarBody, localVarHttpResponse.Header.Get("Content-Type"));
+				if err != nil {
+					newErr.error = err.Error()
+					return localVarReturnValue, localVarHttpResponse, newErr
+				}
+				newErr.model = v
+				return localVarReturnValue, localVarHttpResponse, newErr
+		}
+		
 		return localVarReturnValue, localVarHttpResponse, newErr
 	}
 
 	return localVarReturnValue, localVarHttpResponse, nil
 }
+

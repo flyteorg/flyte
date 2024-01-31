@@ -13,7 +13,7 @@ type ProjectProjectState string
 
 // List of ProjectProjectState
 const (
-	ProjectProjectStateACTIVE ProjectProjectState = "ACTIVE"
-	ProjectProjectStateARCHIVED ProjectProjectState = "ARCHIVED"
-	ProjectProjectStateSYSTEM_GENERATED ProjectProjectState = "SYSTEM_GENERATED"
+	ACTIVE_ProjectProjectState ProjectProjectState = "ACTIVE"
+	ARCHIVED_ProjectProjectState ProjectProjectState = "ARCHIVED"
+	SYSTEM_GENERATED_ProjectProjectState ProjectProjectState = "SYSTEM_GENERATED"
 )

@@ -13,9 +13,9 @@ type CoreResourceType string
 
 // List of coreResourceType
 const (
-	CoreResourceTypeUNSPECIFIED CoreResourceType = "UNSPECIFIED"
-	CoreResourceTypeTASK CoreResourceType = "TASK"
-	CoreResourceTypeWORKFLOW CoreResourceType = "WORKFLOW"
-	CoreResourceTypeLAUNCH_PLAN CoreResourceType = "LAUNCH_PLAN"
-	CoreResourceTypeDATASET CoreResourceType = "DATASET"
+	UNSPECIFIED_CoreResourceType CoreResourceType = "UNSPECIFIED"
+	TASK_CoreResourceType CoreResourceType = "TASK"
+	WORKFLOW_CoreResourceType CoreResourceType = "WORKFLOW"
+	LAUNCH_PLAN_CoreResourceType CoreResourceType = "LAUNCH_PLAN"
+	DATASET_CoreResourceType CoreResourceType = "DATASET"
 )

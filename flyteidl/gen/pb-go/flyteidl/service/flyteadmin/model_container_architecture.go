@@ -13,9 +13,9 @@ type ContainerArchitecture string
 
 // List of ContainerArchitecture
 const (
-	ContainerArchitectureUNKNOWN ContainerArchitecture = "UNKNOWN"
-	ContainerArchitectureAMD64 ContainerArchitecture = "AMD64"
-	ContainerArchitectureARM64 ContainerArchitecture = "ARM64"
-	ContainerArchitectureARM_V6 ContainerArchitecture = "ARM_V6"
-	ContainerArchitectureARM_V7 ContainerArchitecture = "ARM_V7"
+	UNKNOWN_ContainerArchitecture ContainerArchitecture = "UNKNOWN"
+	AMD64_ContainerArchitecture ContainerArchitecture = "AMD64"
+	ARM64_ContainerArchitecture ContainerArchitecture = "ARM64"
+	ARM_V6_ContainerArchitecture ContainerArchitecture = "ARM_V6"
+	ARM_V7_ContainerArchitecture ContainerArchitecture = "ARM_V7"
 )

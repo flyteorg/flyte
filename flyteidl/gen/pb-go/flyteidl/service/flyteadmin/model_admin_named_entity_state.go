@@ -13,7 +13,7 @@ type AdminNamedEntityState string
 
 // List of adminNamedEntityState
 const (
-	AdminNamedEntityStateNAMED_ENTITY_ACTIVE AdminNamedEntityState = "NAMED_ENTITY_ACTIVE"
-	AdminNamedEntityStateNAMED_ENTITY_ARCHIVED AdminNamedEntityState = "NAMED_ENTITY_ARCHIVED"
-	AdminNamedEntityStateSYSTEM_GENERATED AdminNamedEntityState = "SYSTEM_GENERATED"
+	NAMED_ENTITY_ACTIVE_AdminNamedEntityState AdminNamedEntityState = "NAMED_ENTITY_ACTIVE"
+	NAMED_ENTITY_ARCHIVED_AdminNamedEntityState AdminNamedEntityState = "NAMED_ENTITY_ARCHIVED"
+	SYSTEM_GENERATED_AdminNamedEntityState AdminNamedEntityState = "SYSTEM_GENERATED"
 )

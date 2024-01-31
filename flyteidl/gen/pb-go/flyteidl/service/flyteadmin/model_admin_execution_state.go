@@ -13,6 +13,6 @@ type AdminExecutionState string
 
 // List of adminExecutionState
 const (
-	AdminExecutionStateACTIVE AdminExecutionState = "EXECUTION_ACTIVE"
-	AdminExecutionStateARCHIVED AdminExecutionState = "EXECUTION_ARCHIVED"
+	ACTIVE_AdminExecutionState AdminExecutionState = "EXECUTION_ACTIVE"
+	ARCHIVED_AdminExecutionState AdminExecutionState = "EXECUTION_ARCHIVED"
 )

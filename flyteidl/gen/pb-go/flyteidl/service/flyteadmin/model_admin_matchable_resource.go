@@ -13,12 +13,12 @@ type AdminMatchableResource string
 
 // List of adminMatchableResource
 const (
-	AdminMatchableResourceTASK_RESOURCE AdminMatchableResource = "TASK_RESOURCE"
-	AdminMatchableResourceCLUSTER_RESOURCE AdminMatchableResource = "CLUSTER_RESOURCE"
-	AdminMatchableResourceEXECUTION_QUEUE AdminMatchableResource = "EXECUTION_QUEUE"
-	AdminMatchableResourceEXECUTION_CLUSTER_LABEL AdminMatchableResource = "EXECUTION_CLUSTER_LABEL"
-	AdminMatchableResourceQUALITY_OF_SERVICE_SPECIFICATION AdminMatchableResource = "QUALITY_OF_SERVICE_SPECIFICATION"
-	AdminMatchableResourcePLUGIN_OVERRIDE AdminMatchableResource = "PLUGIN_OVERRIDE"
-	AdminMatchableResourceWORKFLOW_EXECUTION_CONFIG AdminMatchableResource = "WORKFLOW_EXECUTION_CONFIG"
-	AdminMatchableResourceCLUSTER_ASSIGNMENT AdminMatchableResource = "CLUSTER_ASSIGNMENT"
+	TASK_RESOURCE_AdminMatchableResource AdminMatchableResource = "TASK_RESOURCE"
+	CLUSTER_RESOURCE_AdminMatchableResource AdminMatchableResource = "CLUSTER_RESOURCE"
+	EXECUTION_QUEUE_AdminMatchableResource AdminMatchableResource = "EXECUTION_QUEUE"
+	EXECUTION_CLUSTER_LABEL_AdminMatchableResource AdminMatchableResource = "EXECUTION_CLUSTER_LABEL"
+	QUALITY_OF_SERVICE_SPECIFICATION_AdminMatchableResource AdminMatchableResource = "QUALITY_OF_SERVICE_SPECIFICATION"
+	PLUGIN_OVERRIDE_AdminMatchableResource AdminMatchableResource = "PLUGIN_OVERRIDE"
+	WORKFLOW_EXECUTION_CONFIG_AdminMatchableResource AdminMatchableResource = "WORKFLOW_EXECUTION_CONFIG"
+	CLUSTER_ASSIGNMENT_AdminMatchableResource AdminMatchableResource = "CLUSTER_ASSIGNMENT"
 )

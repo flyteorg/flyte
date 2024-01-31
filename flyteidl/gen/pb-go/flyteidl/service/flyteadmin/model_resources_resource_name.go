@@ -13,10 +13,10 @@ type ResourcesResourceName string
 
 // List of ResourcesResourceName
 const (
-	ResourcesResourceNameUNKNOWN ResourcesResourceName = "UNKNOWN"
-	ResourcesResourceNameCPU ResourcesResourceName = "CPU"
-	ResourcesResourceNameGPU ResourcesResourceName = "GPU"
-	ResourcesResourceNameMEMORY ResourcesResourceName = "MEMORY"
-	ResourcesResourceNameSTORAGE ResourcesResourceName = "STORAGE"
-	ResourcesResourceNameEPHEMERAL_STORAGE ResourcesResourceName = "EPHEMERAL_STORAGE"
+	UNKNOWN_ResourcesResourceName ResourcesResourceName = "UNKNOWN"
+	CPU_ResourcesResourceName ResourcesResourceName = "CPU"
+	GPU_ResourcesResourceName ResourcesResourceName = "GPU"
+	MEMORY_ResourcesResourceName ResourcesResourceName = "MEMORY"
+	STORAGE_ResourcesResourceName ResourcesResourceName = "STORAGE"
+	EPHEMERAL_STORAGE_ResourcesResourceName ResourcesResourceName = "EPHEMERAL_STORAGE"
 )

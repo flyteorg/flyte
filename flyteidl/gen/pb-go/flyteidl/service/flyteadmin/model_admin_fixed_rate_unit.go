@@ -13,7 +13,7 @@ type AdminFixedRateUnit string
 
 // List of adminFixedRateUnit
 const (
-	AdminFixedRateUnitMINUTE AdminFixedRateUnit = "MINUTE"
-	AdminFixedRateUnitHOUR AdminFixedRateUnit = "HOUR"
-	AdminFixedRateUnitDAY AdminFixedRateUnit = "DAY"
+	MINUTE_AdminFixedRateUnit AdminFixedRateUnit = "MINUTE"
+	HOUR_AdminFixedRateUnit AdminFixedRateUnit = "HOUR"
+	DAY_AdminFixedRateUnit AdminFixedRateUnit = "DAY"
 )

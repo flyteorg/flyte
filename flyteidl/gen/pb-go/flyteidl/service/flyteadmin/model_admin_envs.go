@@ -12,5 +12,5 @@ package flyteadmin
 // Environment variable values to be applied to an execution resource. In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined to specify how to merge environment variables defined at registration and execution time.
 type AdminEnvs struct {
 	// Map of custom environment variables to be applied to the execution resource.
-	Values []CoreKeyValuePair `json:"values,omitempty"`
+	Values []FlyteidlcoreKeyValuePair `json:"values,omitempty"`
 }

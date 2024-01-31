@@ -13,6 +13,6 @@ type ConjunctionExpressionLogicalOperator string
 
 // List of ConjunctionExpressionLogicalOperator
 const (
-	ConjunctionExpressionLogicalOperatorAND ConjunctionExpressionLogicalOperator = "AND"
-	ConjunctionExpressionLogicalOperatorOR ConjunctionExpressionLogicalOperator = "OR"
+	AND_ConjunctionExpressionLogicalOperator ConjunctionExpressionLogicalOperator = "AND"
+	OR_ConjunctionExpressionLogicalOperator ConjunctionExpressionLogicalOperator = "OR"
 )

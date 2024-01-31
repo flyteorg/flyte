@@ -13,12 +13,12 @@ type CoreTaskExecutionPhase string
 
 // List of coreTaskExecutionPhase
 const (
-	CoreTaskExecutionPhaseUNDEFINED CoreTaskExecutionPhase = "UNDEFINED"
-	CoreTaskExecutionPhaseQUEUED CoreTaskExecutionPhase = "QUEUED"
-	CoreTaskExecutionPhaseRUNNING CoreTaskExecutionPhase = "RUNNING"
-	CoreTaskExecutionPhaseSUCCEEDED CoreTaskExecutionPhase = "SUCCEEDED"
-	CoreTaskExecutionPhaseABORTED CoreTaskExecutionPhase = "ABORTED"
-	CoreTaskExecutionPhaseFAILED CoreTaskExecutionPhase = "FAILED"
-	CoreTaskExecutionPhaseINITIALIZING CoreTaskExecutionPhase = "INITIALIZING"
-	CoreTaskExecutionPhaseWAITING_FOR_RESOURCES CoreTaskExecutionPhase = "WAITING_FOR_RESOURCES"
+	UNDEFINED_CoreTaskExecutionPhase CoreTaskExecutionPhase = "UNDEFINED"
+	QUEUED_CoreTaskExecutionPhase CoreTaskExecutionPhase = "QUEUED"
+	RUNNING_CoreTaskExecutionPhase CoreTaskExecutionPhase = "RUNNING"
+	SUCCEEDED_CoreTaskExecutionPhase CoreTaskExecutionPhase = "SUCCEEDED"
+	ABORTED_CoreTaskExecutionPhase CoreTaskExecutionPhase = "ABORTED"
+	FAILED_CoreTaskExecutionPhase CoreTaskExecutionPhase = "FAILED"
+	INITIALIZING_CoreTaskExecutionPhase CoreTaskExecutionPhase = "INITIALIZING"
+	WAITING_FOR_RESOURCES_CoreTaskExecutionPhase CoreTaskExecutionPhase = "WAITING_FOR_RESOURCES"
 )

@@ -13,7 +13,7 @@ type IoStrategyDownloadMode string
 
 // List of IOStrategyDownloadMode
 const (
-	IoStrategyDownloadModeDOWNLOAD_EAGER IoStrategyDownloadMode = "DOWNLOAD_EAGER"
-	IoStrategyDownloadModeDOWNLOAD_STREAM IoStrategyDownloadMode = "DOWNLOAD_STREAM"
-	IoStrategyDownloadModeDO_NOT_DOWNLOAD IoStrategyDownloadMode = "DO_NOT_DOWNLOAD"
+	DOWNLOAD_EAGER_IoStrategyDownloadMode IoStrategyDownloadMode = "DOWNLOAD_EAGER"
+	DOWNLOAD_STREAM_IoStrategyDownloadMode IoStrategyDownloadMode = "DOWNLOAD_STREAM"
+	DO_NOT_DOWNLOAD_IoStrategyDownloadMode IoStrategyDownloadMode = "DO_NOT_DOWNLOAD"
 )

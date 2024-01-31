@@ -13,7 +13,7 @@ type IoStrategyUploadMode string
 
 // List of IOStrategyUploadMode
 const (
-	IoStrategyUploadModeUPLOAD_ON_EXIT IoStrategyUploadMode = "UPLOAD_ON_EXIT"
-	IoStrategyUploadModeUPLOAD_EAGER IoStrategyUploadMode = "UPLOAD_EAGER"
-	IoStrategyUploadModeDO_NOT_UPLOAD IoStrategyUploadMode = "DO_NOT_UPLOAD"
+	UPLOAD_ON_EXIT_IoStrategyUploadMode IoStrategyUploadMode = "UPLOAD_ON_EXIT"
+	UPLOAD_EAGER_IoStrategyUploadMode IoStrategyUploadMode = "UPLOAD_EAGER"
+	DO_NOT_UPLOAD_IoStrategyUploadMode IoStrategyUploadMode = "DO_NOT_UPLOAD"
 )

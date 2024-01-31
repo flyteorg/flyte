@@ -13,15 +13,15 @@ type CoreNodeExecutionPhase string
 
 // List of coreNodeExecutionPhase
 const (
-	CoreNodeExecutionPhaseUNDEFINED CoreNodeExecutionPhase = "UNDEFINED"
-	CoreNodeExecutionPhaseQUEUED CoreNodeExecutionPhase = "QUEUED"
-	CoreNodeExecutionPhaseRUNNING CoreNodeExecutionPhase = "RUNNING"
-	CoreNodeExecutionPhaseSUCCEEDED CoreNodeExecutionPhase = "SUCCEEDED"
-	CoreNodeExecutionPhaseFAILING CoreNodeExecutionPhase = "FAILING"
-	CoreNodeExecutionPhaseFAILED CoreNodeExecutionPhase = "FAILED"
-	CoreNodeExecutionPhaseABORTED CoreNodeExecutionPhase = "ABORTED"
-	CoreNodeExecutionPhaseSKIPPED CoreNodeExecutionPhase = "SKIPPED"
-	CoreNodeExecutionPhaseTIMED_OUT CoreNodeExecutionPhase = "TIMED_OUT"
-	CoreNodeExecutionPhaseDYNAMIC_RUNNING CoreNodeExecutionPhase = "DYNAMIC_RUNNING"
-	CoreNodeExecutionPhaseRECOVERED CoreNodeExecutionPhase = "RECOVERED"
+	UNDEFINED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "UNDEFINED"
+	QUEUED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "QUEUED"
+	RUNNING_CoreNodeExecutionPhase CoreNodeExecutionPhase = "RUNNING"
+	SUCCEEDED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "SUCCEEDED"
+	FAILING_CoreNodeExecutionPhase CoreNodeExecutionPhase = "FAILING"
+	FAILED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "FAILED"
+	ABORTED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "ABORTED"
+	SKIPPED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "SKIPPED"
+	TIMED_OUT_CoreNodeExecutionPhase CoreNodeExecutionPhase = "TIMED_OUT"
+	DYNAMIC_RUNNING_CoreNodeExecutionPhase CoreNodeExecutionPhase = "DYNAMIC_RUNNING"
+	RECOVERED_CoreNodeExecutionPhase CoreNodeExecutionPhase = "RECOVERED"
 )

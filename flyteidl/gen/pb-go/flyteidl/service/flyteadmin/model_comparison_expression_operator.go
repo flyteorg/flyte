@@ -13,10 +13,10 @@ type ComparisonExpressionOperator string
 
 // List of ComparisonExpressionOperator
 const (
-	ComparisonExpressionOperatorEQ ComparisonExpressionOperator = "EQ"
-	ComparisonExpressionOperatorNEQ ComparisonExpressionOperator = "NEQ"
-	ComparisonExpressionOperatorGT ComparisonExpressionOperator = "GT"
-	ComparisonExpressionOperatorGTE ComparisonExpressionOperator = "GTE"
-	ComparisonExpressionOperatorLT ComparisonExpressionOperator = "LT"
-	ComparisonExpressionOperatorLTE ComparisonExpressionOperator = "LTE"
+	EQ_ComparisonExpressionOperator ComparisonExpressionOperator = "EQ"
+	NEQ_ComparisonExpressionOperator ComparisonExpressionOperator = "NEQ"
+	GT_ComparisonExpressionOperator ComparisonExpressionOperator = "GT"
+	GTE_ComparisonExpressionOperator ComparisonExpressionOperator = "GTE"
+	LT_ComparisonExpressionOperator ComparisonExpressionOperator = "LT"
+	LTE_ComparisonExpressionOperator ComparisonExpressionOperator = "LTE"
 )

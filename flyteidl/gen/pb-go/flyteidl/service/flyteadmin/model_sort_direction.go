@@ -13,6 +13,6 @@ type SortDirection string
 
 // List of SortDirection
 const (
-	SortDirectionDESCENDING SortDirection = "DESCENDING"
-	SortDirectionASCENDING SortDirection = "ASCENDING"
+	DESCENDING_SortDirection SortDirection = "DESCENDING"
+	ASCENDING_SortDirection SortDirection = "ASCENDING"
 )

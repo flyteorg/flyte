@@ -13,10 +13,10 @@ type SchemaColumnSchemaColumnType string
 
 // List of SchemaColumnSchemaColumnType
 const (
-	SchemaColumnSchemaColumnTypeINTEGER SchemaColumnSchemaColumnType = "INTEGER"
-	SchemaColumnSchemaColumnTypeFLOAT SchemaColumnSchemaColumnType = "FLOAT"
-	SchemaColumnSchemaColumnTypeSTRING_ SchemaColumnSchemaColumnType = "STRING"
-	SchemaColumnSchemaColumnTypeBOOLEAN SchemaColumnSchemaColumnType = "BOOLEAN"
-	SchemaColumnSchemaColumnTypeDATETIME SchemaColumnSchemaColumnType = "DATETIME"
-	SchemaColumnSchemaColumnTypeDURATION SchemaColumnSchemaColumnType = "DURATION"
+	INTEGER_SchemaColumnSchemaColumnType SchemaColumnSchemaColumnType = "INTEGER"
+	FLOAT_SchemaColumnSchemaColumnType SchemaColumnSchemaColumnType = "FLOAT"
+	STRING__SchemaColumnSchemaColumnType SchemaColumnSchemaColumnType = "STRING"
+	BOOLEAN_SchemaColumnSchemaColumnType SchemaColumnSchemaColumnType = "BOOLEAN"
+	DATETIME_SchemaColumnSchemaColumnType SchemaColumnSchemaColumnType = "DATETIME"
+	DURATION_SchemaColumnSchemaColumnType SchemaColumnSchemaColumnType = "DURATION"
 )

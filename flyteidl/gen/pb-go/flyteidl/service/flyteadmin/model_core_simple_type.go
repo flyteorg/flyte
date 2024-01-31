@@ -13,14 +13,14 @@ type CoreSimpleType string
 
 // List of coreSimpleType
 const (
-	CoreSimpleTypeNONE CoreSimpleType = "NONE"
-	CoreSimpleTypeINTEGER CoreSimpleType = "INTEGER"
-	CoreSimpleTypeFLOAT CoreSimpleType = "FLOAT"
-	CoreSimpleTypeSTRING_ CoreSimpleType = "STRING"
-	CoreSimpleTypeBOOLEAN CoreSimpleType = "BOOLEAN"
-	CoreSimpleTypeDATETIME CoreSimpleType = "DATETIME"
-	CoreSimpleTypeDURATION CoreSimpleType = "DURATION"
-	CoreSimpleTypeBINARY CoreSimpleType = "BINARY"
-	CoreSimpleTypeERROR_ CoreSimpleType = "ERROR"
-	CoreSimpleTypeSTRUCT_ CoreSimpleType = "STRUCT"
+	NONE_CoreSimpleType CoreSimpleType = "NONE"
+	INTEGER_CoreSimpleType CoreSimpleType = "INTEGER"
+	FLOAT_CoreSimpleType CoreSimpleType = "FLOAT"
+	STRING__CoreSimpleType CoreSimpleType = "STRING"
+	BOOLEAN_CoreSimpleType CoreSimpleType = "BOOLEAN"
+	DATETIME_CoreSimpleType CoreSimpleType = "DATETIME"
+	DURATION_CoreSimpleType CoreSimpleType = "DURATION"
+	BINARY_CoreSimpleType CoreSimpleType = "BINARY"
+	ERROR__CoreSimpleType CoreSimpleType = "ERROR"
+	STRUCT__CoreSimpleType CoreSimpleType = "STRUCT"
 )

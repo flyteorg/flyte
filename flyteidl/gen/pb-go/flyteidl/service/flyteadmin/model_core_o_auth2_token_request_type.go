@@ -13,5 +13,5 @@ type CoreOAuth2TokenRequestType string
 
 // List of coreOAuth2TokenRequestType
 const (
-	CoreOAuth2TokenRequestTypeCLIENT_CREDENTIALS CoreOAuth2TokenRequestType = "CLIENT_CREDENTIALS"
+	CLIENT_CREDENTIALS_CoreOAuth2TokenRequestType CoreOAuth2TokenRequestType = "CLIENT_CREDENTIALS"
 )

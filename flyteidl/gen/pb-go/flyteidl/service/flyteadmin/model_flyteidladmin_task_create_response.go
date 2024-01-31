@@ -9,6 +9,6 @@
 
 package flyteadmin
 
-// Represents a response structure if task creation succeeds.
+// Represents a response structure if task creation succeeds.  Purposefully empty, may be populated in the future.
 type FlyteidladminTaskCreateResponse struct {
 }

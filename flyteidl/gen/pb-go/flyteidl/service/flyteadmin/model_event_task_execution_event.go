@@ -34,7 +34,7 @@ type EventTaskExecutionEvent struct {
 	// Raw output data produced by this task execution.
 	OutputData *CoreLiteralMap `json:"output_data,omitempty"`
 	// Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.
-	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`
+	CustomInfo interface{} `json:"custom_info,omitempty"`
 	// Some phases, like RUNNING, can send multiple events with changed metadata (new logs, additional custom_info, etc) that should be recorded regardless of the lack of phase change. The version field should be incremented when metadata changes across the duration of an individual phase.
 	PhaseVersion int64 `json:"phase_version,omitempty"`
 	// An optional explanation for the phase transition. Deprecated: Use reasons instead.

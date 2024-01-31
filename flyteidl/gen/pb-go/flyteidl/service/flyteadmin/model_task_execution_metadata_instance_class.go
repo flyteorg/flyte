@@ -13,6 +13,6 @@ type TaskExecutionMetadataInstanceClass string
 
 // List of TaskExecutionMetadataInstanceClass
 const (
-	TaskExecutionMetadataInstanceClassDEFAULT_ TaskExecutionMetadataInstanceClass = "DEFAULT"
-	TaskExecutionMetadataInstanceClassINTERRUPTIBLE TaskExecutionMetadataInstanceClass = "INTERRUPTIBLE"
+	DEFAULT__TaskExecutionMetadataInstanceClass TaskExecutionMetadataInstanceClass = "DEFAULT"
+	INTERRUPTIBLE_TaskExecutionMetadataInstanceClass TaskExecutionMetadataInstanceClass = "INTERRUPTIBLE"
 )

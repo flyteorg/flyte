@@ -13,6 +13,6 @@ type AdminLaunchPlanState string
 
 // List of adminLaunchPlanState
 const (
-	AdminLaunchPlanStateINACTIVE AdminLaunchPlanState = "INACTIVE"
-	AdminLaunchPlanStateACTIVE AdminLaunchPlanState = "ACTIVE"
+	INACTIVE_AdminLaunchPlanState AdminLaunchPlanState = "INACTIVE"
+	ACTIVE_AdminLaunchPlanState AdminLaunchPlanState = "ACTIVE"
 )

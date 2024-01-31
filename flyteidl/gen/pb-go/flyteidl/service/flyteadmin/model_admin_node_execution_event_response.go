@@ -9,5 +9,6 @@
 
 package flyteadmin
 
+// Purposefully empty, may be populated in the future.
 type AdminNodeExecutionEventResponse struct {
 }

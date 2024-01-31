@@ -13,8 +13,8 @@ type SqlDialect string
 
 // List of SqlDialect
 const (
-	SqlDialectUNDEFINED SqlDialect = "UNDEFINED"
-	SqlDialectANSI SqlDialect = "ANSI"
-	SqlDialectHIVE SqlDialect = "HIVE"
-	SqlDialectOTHER SqlDialect = "OTHER"
+	UNDEFINED_SqlDialect SqlDialect = "UNDEFINED"
+	ANSI_SqlDialect SqlDialect = "ANSI"
+	HIVE_SqlDialect SqlDialect = "HIVE"
+	OTHER_SqlDialect SqlDialect = "OTHER"
 )

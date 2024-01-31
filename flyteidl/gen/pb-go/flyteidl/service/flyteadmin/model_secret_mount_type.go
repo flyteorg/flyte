@@ -13,7 +13,7 @@ type SecretMountType string
 
 // List of SecretMountType
 const (
-	SecretMountTypeANY SecretMountType = "ANY"
-	SecretMountTypeENV_VAR SecretMountType = "ENV_VAR"
-	SecretMountTypeFILE SecretMountType = "FILE"
+	ANY_SecretMountType SecretMountType = "ANY"
+	ENV_VAR_SecretMountType SecretMountType = "ENV_VAR"
+	FILE_SecretMountType SecretMountType = "FILE"
 )

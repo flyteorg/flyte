@@ -13,8 +13,8 @@ type AdminDescriptionFormat string
 
 // List of adminDescriptionFormat
 const (
-	AdminDescriptionFormatUNKNOWN AdminDescriptionFormat = "DESCRIPTION_FORMAT_UNKNOWN"
-	AdminDescriptionFormatMARKDOWN AdminDescriptionFormat = "DESCRIPTION_FORMAT_MARKDOWN"
-	AdminDescriptionFormatHTML AdminDescriptionFormat = "DESCRIPTION_FORMAT_HTML"
-	AdminDescriptionFormatRST AdminDescriptionFormat = "DESCRIPTION_FORMAT_RST"
+	UNKNOWN_AdminDescriptionFormat AdminDescriptionFormat = "DESCRIPTION_FORMAT_UNKNOWN"
+	MARKDOWN_AdminDescriptionFormat AdminDescriptionFormat = "DESCRIPTION_FORMAT_MARKDOWN"
+	HTML_AdminDescriptionFormat AdminDescriptionFormat = "DESCRIPTION_FORMAT_HTML"
+	RST_AdminDescriptionFormat AdminDescriptionFormat = "DESCRIPTION_FORMAT_RST"
 )

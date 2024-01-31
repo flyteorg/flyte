@@ -34,7 +34,7 @@ type AdminTaskExecutionClosure struct {
 	// Time at which the task execution was last updated.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Custom data specific to the task plugin.
-	CustomInfo *ProtobufStruct `json:"custom_info,omitempty"`
+	CustomInfo interface{} `json:"custom_info,omitempty"`
 	// If there is an explanation for the most recent phase transition, the reason will capture it.
 	Reason string `json:"reason,omitempty"`
 	// A predefined yet extensible Task type identifier.

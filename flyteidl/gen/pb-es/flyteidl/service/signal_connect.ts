@@ -17,14 +17,6 @@ export const SignalService = {
     /**
      * Fetches or creates a :ref:`ref_flyteidl.admin.Signal`.
      *
-     * Purposefully left out an HTTP API for this RPC call. This is meant to idempotently retrieve
-     * a signal, meaning the first call will create the signal and all subsequent calls will
-     * fetch the existing signal. This is only useful during Flyte Workflow execution and therefore
-     * is not exposed to mitigate unintended behavior.
-     * option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-     *   description: "Retrieve a signal, creating it if it does not exist."
-     * };
-     *
      * @generated from rpc flyteidl.service.SignalService.GetOrCreateSignal
      */
     getOrCreateSignal: {

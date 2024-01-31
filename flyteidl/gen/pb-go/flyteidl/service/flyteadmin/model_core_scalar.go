@@ -13,10 +13,10 @@ type CoreScalar struct {
 	Primitive *CorePrimitive `json:"primitive,omitempty"`
 	Blob *CoreBlob `json:"blob,omitempty"`
 	Binary *CoreBinary `json:"binary,omitempty"`
-	Schema *CoreSchema `json:"schema,omitempty"`
+	Schema *FlyteidlcoreSchema `json:"schema,omitempty"`
 	NoneType *CoreVoid `json:"none_type,omitempty"`
 	Error_ *CoreError `json:"error,omitempty"`
-	Generic *ProtobufStruct `json:"generic,omitempty"`
+	Generic interface{} `json:"generic,omitempty"`
 	StructuredDataset *CoreStructuredDataset `json:"structured_dataset,omitempty"`
 	Union *CoreUnion `json:"union,omitempty"`
 }
