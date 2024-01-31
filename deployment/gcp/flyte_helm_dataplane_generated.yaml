@@ -748,12 +748,12 @@ kind: Ingress
 metadata:
   name: flyte-core-grpc
   namespace: flyte
-  annotations:
+  annotations: 
     cert-manager.io/issuer: letsencrypt-production
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/app-root: /console
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: 
   rules:

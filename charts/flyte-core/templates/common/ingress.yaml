@@ -478,12 +478,10 @@ kind: Ingress
 metadata:
   name: {{ template "flyte.name" . }}-grpc
   namespace: {{ template "flyte.namespace" . }}
-  annotations:
-  {{- with .Values.common.ingress.annotations }}
-  {{- tpl (toYaml .) $ | nindent 4}}
-  {{- end }}
-  {{- with .Values.common.ingress.separateGrpcIngressAnnotations }}
-  {{- toYaml . | nindent 4}}
+  {{- $annotations := .Values.common.ingress.annotations | deepCopy -}}
+  {{- $_ := merge $annotations .Values.common.ingress.separateGrpcIngressAnnotations -}}
+  {{- with $annotations }}
+  annotations: {{ tpl (toYaml .) $ | nindent 4}}
   {{- end }}
 spec:
   ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
