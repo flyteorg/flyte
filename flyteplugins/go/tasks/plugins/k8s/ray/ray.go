@@ -113,15 +113,19 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
 	}
 
-	enableIngress := true
 	headPodSpec := podSpec.DeepCopy()
 
 	if cfg.KubeRayCrdVersion == "v1" {
-		return constructV1Job(taskCtx, rayJob, objectMeta, podSpec, headPodSpec, headReplicas, primaryContainerIdx), nil
-	} else {
-
+		return constructV1Job(taskCtx, rayJob, objectMeta, podSpec, headPodSpec, headReplicas, headNodeRayStartParams, primaryContainerIdx, primaryContainer), nil
 	}
 
+	return constructV1Alpha1Job(taskCtx, rayJob, objectMeta, podSpec, headPodSpec, headReplicas, headNodeRayStartParams, primaryContainerIdx, primaryContainer), nil
+
+}
+
+func constructV1Alpha1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headReplicas int32, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) rayv1.RayJob {
+	enableIngress := true
+	cfg := GetConfig()
 	rayClusterSpec := rayv1alpha1.RayClusterSpec{
 		HeadGroupSpec: rayv1alpha1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(
@@ -206,7 +210,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		RuntimeEnv:               rayJob.RuntimeEnv,
 	}
 
-	rayJobObject := rayv1alpha1.RayJob{
+	return rayv1alpha1.RayJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindRayJob,
 			APIVersion: rayv1alpha1.SchemeGroupVersion.String(),
@@ -214,8 +218,6 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		Spec:       jobSpec,
 		ObjectMeta: *objectMeta,
 	}
-
-	return &rayJobObject, nil
 }
 
 func constructV1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headReplicas int32, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) rayv1.RayJob {
