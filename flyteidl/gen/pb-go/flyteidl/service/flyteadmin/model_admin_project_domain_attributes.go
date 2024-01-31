@@ -15,4 +15,6 @@ type AdminProjectDomainAttributes struct {
 	// Unique domain id for which this set of attributes will be applied.
 	Domain string `json:"domain,omitempty"`
 	MatchingAttributes *AdminMatchingAttributes `json:"matching_attributes,omitempty"`
+	// Optional, org key applied to the attributes.
+	Org string `json:"org,omitempty"`
 }

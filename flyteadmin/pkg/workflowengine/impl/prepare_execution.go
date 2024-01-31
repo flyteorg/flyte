@@ -85,9 +85,6 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		if !taskResources.Defaults.EphemeralStorage.IsZero() {
 			requests.EphemeralStorage = taskResources.Defaults.EphemeralStorage
 		}
-		if !taskResources.Defaults.Storage.IsZero() {
-			requests.Storage = taskResources.Defaults.Storage
-		}
 		if !taskResources.Defaults.GPU.IsZero() {
 			requests.GPU = taskResources.Defaults.GPU
 		}
@@ -101,9 +98,6 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		}
 		if !taskResources.Limits.EphemeralStorage.IsZero() {
 			limits.EphemeralStorage = taskResources.Limits.EphemeralStorage
-		}
-		if !taskResources.Limits.Storage.IsZero() {
-			limits.Storage = taskResources.Limits.Storage
 		}
 		if !taskResources.Limits.GPU.IsZero() {
 			limits.GPU = taskResources.Limits.GPU

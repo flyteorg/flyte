@@ -475,6 +475,7 @@ func (c *recursiveNodeExecutor) WithNodeExecutionContextBuilder(nCtxBuilder inte
 type nodeExecutor struct {
 	catalog                         catalog.Client
 	clusterID                       string
+	enableCRDebugMetadata           bool
 	defaultActiveDeadline           time.Duration
 	defaultDataSandbox              storage.DataReference
 	defaultExecutionDeadline        time.Duration
@@ -582,7 +583,7 @@ func (c *nodeExecutor) attemptRecovery(ctx context.Context, nCtx interfaces.Node
 			state.PreviousNodeExecutionCheckpointURI = storage.DataReference(metadata.TaskNodeMetadata.CheckpointUri)
 			err = nCtx.NodeStateWriter().PutTaskNodeState(state)
 			if err != nil {
-				logger.Warn(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
+				logger.Warnf(ctx, "failed to save recovered checkpoint uri for [%+v]: [%+v]",
 					nCtx.NodeExecutionMetadata().GetNodeExecutionID(), err)
 			}
 		}
@@ -1005,7 +1006,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 			logger.Warningf(ctx, "Failed to record nodeEvent, error [%s]", err.Error())
 			return interfaces.NodeStatusUndefined, errors.Wrapf(errors.EventRecordingFailed, nCtx.NodeID(), err, "failed to record node event")
 		}
-		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+		UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.enableCRDebugMetadata)
 		c.RecordTransitionLatency(ctx, dag, nCtx.ContextualNodeLookup(), nCtx.Node(), nodeStatus)
 	}
 
@@ -1271,7 +1272,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 		}
 	}
 
-	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus)
+	UpdateNodeStatus(np, p, nCtx.NodeStateReader(), nodeStatus, c.enableCRDebugMetadata)
 	return finalStatus, nil
 }
 
@@ -1285,7 +1286,7 @@ func (c *nodeExecutor) handleRetryableFailure(ctx context.Context, nCtx interfac
 	// NOTE: It is important to increment attempts only after abort has been called. Increment attempt mutates the state
 	// Attempt is used throughout the system to determine the idempotent resource version.
 	nodeStatus.IncrementAttempts()
-	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", nil)
+	nodeStatus.UpdatePhase(v1alpha1.NodePhaseRunning, metav1.Now(), "retrying", c.enableCRDebugMetadata, nil)
 	// We are going to retry in the next round, so we should clear all current state
 	nodeStatus.ClearSubNodeStatus()
 	nodeStatus.ClearTaskStatus()
@@ -1324,8 +1325,14 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 		if err := c.Abort(ctx, h, nCtx, "node failing", false); err != nil {
 			return interfaces.NodeStatusUndefined, err
 		}
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
-		c.metrics.FailureDuration.Observe(ctx, nodeStatus.GetStartedAt().Time, nodeStatus.GetStoppedAt().Time)
+		t := metav1.Now()
+
+		startedAt := nodeStatus.GetStartedAt()
+		if startedAt == nil {
+			startedAt = &t
+		}
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseFailed, t, nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
+		c.metrics.FailureDuration.Observe(ctx, startedAt.Time, nodeStatus.GetStoppedAt().Time)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
@@ -1338,8 +1345,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 			return interfaces.NodeStatusUndefined, err
 		}
 
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), nodeStatus.GetExecutionError())
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseTimedOut, metav1.Now(), nodeStatus.GetMessage(), c.enableCRDebugMetadata, nodeStatus.GetExecutionError())
 		c.metrics.TimedOutFailure.Inc(ctx)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
@@ -1363,8 +1369,7 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 			stopped = &t
 		}
 		c.metrics.SuccessDuration.Observe(ctx, started.Time, stopped.Time)
-		nodeStatus.ClearSubNodeStatus()
-		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", nil)
+		nodeStatus.UpdatePhase(v1alpha1.NodePhaseSucceeded, t, "completed successfully", c.enableCRDebugMetadata, nil)
 		if nCtx.NodeExecutionMetadata().IsInterruptible() {
 			c.metrics.InterruptibleNodesTerminated.Inc(ctx)
 		}
@@ -1431,6 +1436,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	nodeExecutor := &nodeExecutor{
 		catalog:                         catalogClient,
 		clusterID:                       clusterID,
+		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,
 		defaultDataSandbox:              defaultRawOutputPrefix,
 		defaultExecutionDeadline:        nodeConfig.DefaultDeadlines.DefaultNodeExecutionDeadline.Duration,

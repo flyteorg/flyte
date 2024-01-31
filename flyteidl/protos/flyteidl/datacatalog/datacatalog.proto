@@ -289,6 +289,9 @@ message DatasetID {
     string domain = 3;   // The domain (eg. environment)
     string version = 4;  // Version of the data schema
     string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 /*
@@ -386,6 +389,8 @@ message DatasetPropertyFilter {
         string name = 2;
         string domain = 3;
         string version = 4;
+        // Optional, org key applied to the dataset.
+        string org = 5;
     }
 }
 

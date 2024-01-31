@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.10.7-b0 # FLYTEADMIN_TAG
+    tag: v1.10.7-b2 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -89,9 +89,11 @@ flyteadmin:
         - limitranges
       # -- Specifies the verbs (actions) that this ClusterRole can perform on the specified resources
       verbs:
-        - '*'
+        - "*"
   # -- Annotations for Flyteadmin pods
   podAnnotations: {}
+  # -- Labels for Flyteadmin pods
+  podLabels: {}
   # -- nodeSelector for Flyteadmin deployment
   nodeSelector: {}
   # -- tolerations for Flyteadmin deployment
@@ -132,7 +134,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.10.7-b0 # FLYTESCHEDULER_TAG
+    tag: v1.10.7-b2 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -158,6 +160,10 @@ flytescheduler:
     imagePullSecrets: []
   # -- Annotations for Flytescheduler pods
   podAnnotations: {}
+  # -- Additional Flytescheduler container environment variables
+  podEnv: {}
+  # -- Labels for Flytescheduler pods
+  podLabels: {}
   # -- nodeSelector for Flytescheduler deployment
   nodeSelector: {}
   # -- tolerations for Flytescheduler deployment
@@ -186,7 +192,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.10.7-b0 # DATACATALOG_TAG
+    tag: v1.10.7-b2 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -216,6 +222,10 @@ datacatalog:
     imagePullSecrets: []
   # -- Annotations for Datacatalog pods
   podAnnotations: {}
+  # -- Additional Datacatalog container environment variables
+  podEnv: {}
+  # -- Labels for Datacatalog pods
+  podLabels: {}
   # -- nodeSelector for Datacatalog deployment
   nodeSelector: {}
   # -- tolerations for Datacatalog deployment
@@ -254,7 +264,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.10.7-b0 # FLYTEPROPELLER_TAG
+    tag: v1.10.7-b2 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -282,6 +292,10 @@ flytepropeller:
     imagePullSecrets: []
   # -- Annotations for Flytepropeller pods
   podAnnotations: {}
+  # -- Additional Flytepropeller container environment variables
+  podEnv: {}
+  # -- Labels for Flytepropeller pods
+  podLabels: {}
   # -- nodeSelector for Flytepropeller deployment
   nodeSelector: {}
   # -- tolerations for Flytepropeller deployment
@@ -344,6 +358,10 @@ flyteconsole:
     type: ClusterIP
   # -- Annotations for Flyteconsole pods
   podAnnotations: {}
+  # -- Additional Flyteconsole container environment variables
+  podEnv: {}
+  # -- Labels for Flyteconsole pods
+  podLabels: {}
   # -- nodeSelector for Flyteconsole deployment
   nodeSelector: {}
   # -- tolerations for Flyteconsole deployment
@@ -356,7 +374,6 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
-
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -489,37 +506,37 @@ db:
 configmap:
   clusters:
     labelClusterMap: {}
-#  labelClusterMap:
-#    team1:
-#      - id: testcluster
-#        weight: 1
-#    team2:
-#      - id: testcluster2
-#        weight: 0.5
-#      - id: testcluster3
-#        weight: 0.5
+    #  labelClusterMap:
+    #    team1:
+    #      - id: testcluster
+    #        weight: 1
+    #    team2:
+    #      - id: testcluster2
+    #        weight: 0.5
+    #      - id: testcluster3
+    #        weight: 0.5
     clusterConfigs: []
-#  clusterConfigs:
-#    - name: "testcluster"
-#      endpoint: "testcluster_endpoint"
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster/token"
-#        certPath: "/path/to/testcluster/cert"
-#    - name: "testcluster2"
-#      endpoint: "testcluster2_endpoint"
-#      enabled: true
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster2/token"
-#        certPath: "/path/to/testcluster2/cert"
-#    - name: "testcluster3"
-#      endpoint: "testcluster3_endpoint"
-#      enabled: true
-#      auth:
-#        type: "file_path"
-#        tokenPath: "/path/to/testcluster3/token"
-#        certPath: "/path/to/testcluster3/cert"
+  #  clusterConfigs:
+  #    - name: "testcluster"
+  #      endpoint: "testcluster_endpoint"
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster/token"
+  #        certPath: "/path/to/testcluster/cert"
+  #    - name: "testcluster2"
+  #      endpoint: "testcluster2_endpoint"
+  #      enabled: true
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster2/token"
+  #        certPath: "/path/to/testcluster2/cert"
+  #    - name: "testcluster3"
+  #      endpoint: "testcluster3_endpoint"
+  #      enabled: true
+  #      auth:
+  #        type: "file_path"
+  #        tokenPath: "/path/to/testcluster3/token"
+  #        certPath: "/path/to/testcluster3/cert"
 
   # -- Configuration for Flyte console UI
   console:
@@ -571,7 +588,7 @@ configmap:
       eventVersion: 2
       testing:
         host: http://flyteadmin
-      
+
     # -- Authentication configuration
     auth:
       authorizedUris:
@@ -621,11 +638,11 @@ configmap:
       defaults:
         cpu: 100m
         memory: 500Mi
-        storage: 500Mi
+        ephemeralStorage: 500Mi
       limits:
         cpu: 2
         memory: 1Gi
-        storage: 20Mi
+        ephemeralStorage: 20Mi
         gpu: 1
 
   # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
@@ -654,7 +671,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b0 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b2 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -824,6 +841,10 @@ cluster_resource_manager:
   service_account_name: flyteadmin
   # -- Annotations for ClusterResource pods
   podAnnotations: {}
+  # -- Additional ClusterResource container environment variables
+  podEnv: {}
+  # -- Labels for ClusterResource pods
+  podLabels: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters

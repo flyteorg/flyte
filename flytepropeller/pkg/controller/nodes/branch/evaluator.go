@@ -129,7 +129,9 @@ func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.
 		}
 		nStatus := nl.GetNodeExecutionStatus(ctx, n.GetID())
 		logger.Infof(ctx, "Branch Setting Node[%v] status to Skipped!", skippedNodeID)
-		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false", nil)
+		// We hard code enableCRDebugMetadata=true because it has no effect when setting phase to
+		// NodePhaseSkipped. This saves us passing the config all the way down from the nodeExecutor.
+		nStatus.UpdatePhase(v1alpha1.NodePhaseSkipped, v1.Now(), "Branch evaluated to false", true, nil)
 	}
 
 	if selectedNodeID == nil {
