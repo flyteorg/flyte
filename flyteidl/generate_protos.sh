@@ -17,16 +17,16 @@ docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d pr
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/plugins -l go --go_source_relative
 docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/datacatalog -l go --go_source_relative
 
-languages=("cpp" "java")
-idlfolders=("service" "admin" "core" "event" "plugins" "datacatalog")
+# languages=("cpp" "java")
+# idlfolders=("service" "admin" "core" "event" "plugins" "datacatalog")
 
-for lang in "${languages[@]}"
-do
-    for folder in "${idlfolders[@]}"
-    do
-        docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/$folder -l $lang
-    done
-done
+# for lang in "${languages[@]}"
+# do
+#     for folder in "${idlfolders[@]}"
+#     do
+#         docker run --rm -u $(id -u):$(id -g) -v $DIR:/defs $LYFT_IMAGE -i ./protos -d protos/flyteidl/$folder -l $lang
+#     done
+# done
 
 # Buf migration
 docker run -u $(id -u):$(id -g) -e "BUF_CACHE_DIR=/tmp/cache" --volume "$(pwd):/workspace" --workdir /workspace bufbuild/buf generate
