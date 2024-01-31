@@ -187,22 +187,20 @@ var logTemplateRegexes = struct {
 	tasklog.MustCreateRegex("subtaskParentRetryAttempt"),
 }
 
-func (s SubTaskExecutionID) TemplateVarsByScheme() *tasklog.TemplateVarsByScheme {
-	return &tasklog.TemplateVarsByScheme{
-		TaskExecution: tasklog.TemplateVars{
-			{Regex: logTemplateRegexes.ParentName, Value: s.parentName},
-			{
-				Regex: logTemplateRegexes.ExecutionIndex,
-				Value: strconv.FormatUint(uint64(s.executionIndex), 10),
-			},
-			{
-				Regex: logTemplateRegexes.RetryAttempt,
-				Value: strconv.FormatUint(s.subtaskRetryAttempt, 10),
-			},
-			{
-				Regex: logTemplateRegexes.ParentRetryAttempt,
-				Value: strconv.FormatUint(uint64(s.taskRetryAttempt), 10),
-			},
+func (s SubTaskExecutionID) TemplateVarsByScheme() []tasklog.TemplateVar {
+	return []tasklog.TemplateVar{
+		{Regex: logTemplateRegexes.ParentName, Value: s.parentName},
+		{
+			Regex: logTemplateRegexes.ExecutionIndex,
+			Value: strconv.FormatUint(uint64(s.executionIndex), 10),
+		},
+		{
+			Regex: logTemplateRegexes.RetryAttempt,
+			Value: strconv.FormatUint(s.subtaskRetryAttempt, 10),
+		},
+		{
+			Regex: logTemplateRegexes.ParentRetryAttempt,
+			Value: strconv.FormatUint(uint64(s.taskRetryAttempt), 10),
 		},
 	}
 }

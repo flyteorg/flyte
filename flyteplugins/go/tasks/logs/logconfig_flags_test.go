@@ -253,32 +253,4 @@ func TestLogConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
-	t.Run("Test_flyin-enabled", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("flyin-enabled", testValue)
-			if vBool, err := cmdFlags.GetBool("flyin-enabled"); err == nil {
-				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vBool), &actual.IsFlyinEnabled)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
-	t.Run("Test_flyin-template-uri", func(t *testing.T) {
-
-		t.Run("Override", func(t *testing.T) {
-			testValue := "1"
-
-			cmdFlags.Set("flyin-template-uri", testValue)
-			if vString, err := cmdFlags.GetString("flyin-template-uri"); err == nil {
-				testDecodeJson_LogConfig(t, fmt.Sprintf("%v", vString), &actual.FlyinTemplateURI)
-
-			} else {
-				assert.FailNow(t, err.Error())
-			}
-		})
-	})
 }

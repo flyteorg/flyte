@@ -43,19 +43,23 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 	return tID
 }
 
-func Test_Input_templateVarsForScheme(t *testing.T) {
+func Test_Input_templateVars(t *testing.T) {
 	testRegexes := struct {
-		Foo  *regexp.Regexp
-		Bar  *regexp.Regexp
-		Baz  *regexp.Regexp
-		Ham  *regexp.Regexp
-		Spam *regexp.Regexp
+		Foo      *regexp.Regexp
+		Bar      *regexp.Regexp
+		Baz      *regexp.Regexp
+		Ham      *regexp.Regexp
+		Spam     *regexp.Regexp
+		LinkType *regexp.Regexp
+		Port     *regexp.Regexp
 	}{
 		MustCreateRegex("foo"),
 		MustCreateRegex("bar"),
 		MustCreateRegex("baz"),
 		MustCreateRegex("ham"),
 		MustCreateRegex("spam"),
+		MustCreateDynamicLogRegex("link_type"),
+		MustCreateDynamicLogRegex("port"),
 	}
 	podBase := Input{
 		HostName:             "my-host",
@@ -78,40 +82,20 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		PodUnixStartTime:     123,
 		PodUnixFinishTime:    12345,
 	}
-	flyinBase := Input{
-		HostName:             "my-host",
-		PodName:              "my-pod",
-		PodUID:               "my-pod-uid",
-		Namespace:            "my-namespace",
-		ContainerName:        "my-container",
-		ContainerID:          "docker://containerID",
-		LogName:              "main_logs",
-		PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
-		PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
-		PodUnixStartTime:     123,
-		PodUnixFinishTime:    12345,
-		TaskTemplate: &core.TaskTemplate{
-			Config: map[string]string{
-				"port": "1234",
-			},
-		},
-	}
 
 	tests := []struct {
 		name        string
-		scheme      TemplateScheme
 		baseVars    Input
-		extraVars   *TemplateVarsByScheme
-		exact       TemplateVars
-		contains    TemplateVars
-		notContains TemplateVars
+		extraVars   []TemplateVar
+		exact       []TemplateVar
+		contains    []TemplateVar
+		notContains []TemplateVar
 	}{
 		{
 			"pod happy path",
-			TemplateSchemePod,
 			podBase,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.LogName, "main_logs"},
 				{defaultRegexes.PodName, "my-pod"},
 				{defaultRegexes.PodUID, "my-pod-uid"},
@@ -129,19 +113,14 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		},
 		{
 			"pod with extra vars",
-			TemplateSchemePod,
 			podBase,
-			&TemplateVarsByScheme{
-				Common: TemplateVars{
-					{testRegexes.Foo, "foo"},
-				},
-				Pod: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
+			[]TemplateVar{
+				{testRegexes.Foo, "foo"},
+				{testRegexes.Bar, "bar"},
+				{testRegexes.Baz, "baz"},
 			},
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{testRegexes.Foo, "foo"},
 				{testRegexes.Bar, "bar"},
 				{testRegexes.Baz, "baz"},
@@ -149,29 +128,17 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			nil,
 		},
 		{
-			"pod with unused extra vars",
-			TemplateSchemePod,
-			podBase,
-			&TemplateVarsByScheme{
-				TaskExecution: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
-			},
-			nil,
-			nil,
-			TemplateVars{
-				{testRegexes.Bar, "bar"},
-				{testRegexes.Baz, "baz"},
-			},
-		},
-		{
 			"task execution happy path",
-			TemplateSchemeTaskExecution,
 			taskExecutionBase,
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{defaultRegexes.LogName, "main_logs"},
+				{defaultRegexes.PodName, ""},
+				{defaultRegexes.PodUID, ""},
+				{defaultRegexes.Namespace, ""},
+				{defaultRegexes.ContainerName, ""},
+				{defaultRegexes.ContainerID, ""},
+				{defaultRegexes.Hostname, ""},
 				{defaultRegexes.NodeID, "n0-0-n0"},
 				{defaultRegexes.GeneratedName, "generated-name"},
 				{defaultRegexes.TaskRetryAttempt, "1"},
@@ -192,19 +159,14 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 		},
 		{
 			"task execution with extra vars",
-			TemplateSchemeTaskExecution,
 			taskExecutionBase,
-			&TemplateVarsByScheme{
-				Common: TemplateVars{
-					{testRegexes.Foo, "foo"},
-				},
-				TaskExecution: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
+			[]TemplateVar{
+				{testRegexes.Foo, "foo"},
+				{testRegexes.Bar, "bar"},
+				{testRegexes.Baz, "baz"},
 			},
 			nil,
-			TemplateVars{
+			[]TemplateVar{
 				{testRegexes.Foo, "foo"},
 				{testRegexes.Bar, "bar"},
 				{testRegexes.Baz, "baz"},
@@ -212,72 +174,21 @@ func Test_Input_templateVarsForScheme(t *testing.T) {
 			nil,
 		},
 		{
-			"task execution with unused extra vars",
-			TemplateSchemeTaskExecution,
-			taskExecutionBase,
-			&TemplateVarsByScheme{
-				Pod: TemplateVars{
-					{testRegexes.Bar, "bar"},
-					{testRegexes.Baz, "baz"},
-				},
-			},
-			nil,
-			nil,
-			TemplateVars{
-				{testRegexes.Bar, "bar"},
-				{testRegexes.Baz, "baz"},
-			},
-		},
-		{
-			"flyin happy path",
-			TemplateSchemeFlyin,
-			flyinBase,
-			nil,
-			nil,
-			TemplateVars{
-				{defaultRegexes.Port, "1234"},
-			},
-			nil,
-		},
-		{
-			"flyin and pod happy path",
-			TemplateSchemeFlyin,
-			flyinBase,
-			nil,
-			TemplateVars{
-				{defaultRegexes.LogName, "main_logs"},
-				{defaultRegexes.Port, "1234"},
-				{defaultRegexes.PodName, "my-pod"},
-				{defaultRegexes.PodUID, "my-pod-uid"},
-				{defaultRegexes.Namespace, "my-namespace"},
-				{defaultRegexes.ContainerName, "my-container"},
-				{defaultRegexes.ContainerID, "containerID"},
-				{defaultRegexes.Hostname, "my-host"},
-				{defaultRegexes.PodRFC3339StartTime, "1970-01-01T01:02:03+01:00"},
-				{defaultRegexes.PodRFC3339FinishTime, "1970-01-01T04:25:45+01:00"},
-				{defaultRegexes.PodUnixStartTime, "123"},
-				{defaultRegexes.PodUnixFinishTime, "12345"},
-			},
-			nil,
-			nil,
-		},
-		{
 			"pod with port not affected",
-			TemplateSchemePod,
 			podBase,
 			nil,
 			nil,
 			nil,
-			TemplateVars{
-				{defaultRegexes.Port, "1234"},
+			[]TemplateVar{
+				{testRegexes.Port, "1234"},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			base := tt.baseVars
-			base.ExtraTemplateVarsByScheme = tt.extraVars
-			got := base.templateVarsForScheme(tt.scheme)
+			base.ExtraTemplateVars = tt.extraVars
+			got := base.templateVars()
 			if tt.exact != nil {
 				assert.Equal(t, got, tt.exact)
 			}
@@ -476,7 +387,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"task-with-task-execution-identifier",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeTaskExecution,
 				TemplateURIs:  []TemplateURI{"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs"},
 				MessageFormat: core.TaskLog_JSON,
 			},
@@ -508,7 +418,6 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"mapped-task-with-task-execution-identifier",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeTaskExecution,
 				TemplateURIs:  []TemplateURI{"https://flyte.corp.net/console/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .subtaskParentRetryAttempt }}/mappedIndex/{{ .subtaskExecutionIndex }}/mappedAttempt/{{ .subtaskRetryAttempt }}/view/logs"},
 				MessageFormat: core.TaskLog_JSON,
 			},
@@ -525,12 +434,10 @@ func TestTemplateLogPlugin(t *testing.T) {
 					PodUnixStartTime:     123,
 					PodUnixFinishTime:    12345,
 					TaskExecutionID:      dummyTaskExecID(),
-					ExtraTemplateVarsByScheme: &TemplateVarsByScheme{
-						TaskExecution: TemplateVars{
-							{MustCreateRegex("subtaskExecutionIndex"), "1"},
-							{MustCreateRegex("subtaskRetryAttempt"), "1"},
-							{MustCreateRegex("subtaskParentRetryAttempt"), "0"},
-						},
+					ExtraTemplateVars: []TemplateVar{
+						{MustCreateRegex("subtaskExecutionIndex"), "1"},
+						{MustCreateRegex("subtaskRetryAttempt"), "1"},
+						{MustCreateRegex("subtaskParentRetryAttempt"), "0"},
 					},
 				},
 			},
@@ -545,11 +452,11 @@ func TestTemplateLogPlugin(t *testing.T) {
 			},
 		},
 		{
-			"flyin",
+			"flyteinteractive",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeFlyin,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
+				Name:                "vscode",
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat:       core.TaskLog_JSON,
 			},
 			args{
 				input: Input{
@@ -565,45 +472,19 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "vscode://flyin:1234/my-pod-name",
+						Uri:           "vscode://flyteinteractive:1234/my-pod-name",
 						MessageFormat: core.TaskLog_JSON,
 					},
 				},
 			},
 		},
 		{
-			"flyin - default port",
+			"flyteinteractive - no link_type in task template",
 			TemplateLogPlugin{
-				Scheme:        TemplateSchemeFlyin,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
-			},
-			args{
-				input: Input{
-					PodName: "my-pod-name",
-					TaskTemplate: &core.TaskTemplate{
-						Config: map[string]string{
-							"link_type": "vscode",
-						},
-					},
-				},
-			},
-			Output{
-				TaskLogs: []*core.TaskLog{
-					{
-						Uri:           "vscode://flyin:8080/my-pod-name",
-						MessageFormat: core.TaskLog_JSON,
-					},
-				},
-			},
-		},
-		{
-			"flyin - no link_type in task template",
-			TemplateLogPlugin{
-				Scheme:        TemplateSchemeFlyin,
-				TemplateURIs:  []TemplateURI{"vscode://flyin:{{ .port }}/{{ .podName }}"},
-				MessageFormat: core.TaskLog_JSON,
-				DisplayName:   "Flyin Logs",
+				Name:                "vscode",
+				DynamicTemplateURIs: []TemplateURI{"vscode://flyteinteractive:{{ .taskConfig.port }}/{{ .podName }}"},
+				MessageFormat:       core.TaskLog_JSON,
+				DisplayName:         "Flyteinteractive Logs",
 			},
 			args{
 				input: Input{
@@ -613,6 +494,32 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{},
 			},
+		},
+		{
+			"kubernetes",
+			TemplateLogPlugin{
+				TemplateURIs:  []TemplateURI{"https://dashboard.k8s.net/#!/log/{{.namespace}}/{{.podName}}/pod?namespace={{.namespace}}"},
+				MessageFormat: core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					PodName:              "flyteexamples-development-task-name",
+					PodUID:               "pod-uid",
+					Namespace:            "flyteexamples-development",
+					ContainerName:        "ignore",
+					ContainerID:          "ignore",
+					LogName:              "main_logs",
+					PodRFC3339StartTime:  "1970-01-01T01:02:03+01:00",
+					PodRFC3339FinishTime: "1970-01-01T04:25:45+01:00",
+					PodUnixStartTime:     123,
+					PodUnixFinishTime:    12345,
+				},
+			},
+			Output{TaskLogs: []*core.TaskLog{{
+				Uri:           "https://dashboard.k8s.net/#!/log/flyteexamples-development/flyteexamples-development-task-name/pod?namespace=flyteexamples-development",
+				MessageFormat: core.TaskLog_JSON,
+				Name:          "main_logs",
+			}}},
 		},
 	}
 	for _, tt := range tests {
