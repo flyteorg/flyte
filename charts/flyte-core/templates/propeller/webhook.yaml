@@ -37,8 +37,11 @@ spec:
     spec:
       securityContext:
         fsGroup: 65534
+        runAsNonRoot: true
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
 {{- if .Values.webhook.enabled }}
       initContainers:
@@ -66,6 +69,10 @@ spec:
         {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -96,6 +103,10 @@ spec:
         {{- end }}
           ports:
           - containerPort: 9443
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
