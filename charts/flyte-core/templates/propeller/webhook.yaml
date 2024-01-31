@@ -103,6 +103,9 @@ spec:
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
+      {{- with .Values.flytepropeller.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
 ---
 # Service
 apiVersion: v1

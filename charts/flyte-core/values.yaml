@@ -845,6 +845,8 @@ cluster_resource_manager:
   podEnv: {}
   # -- Labels for ClusterResource pods
   podLabels: {}
+  # -- nodeSelector for ClusterResource deployment
+  nodeSelector: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
