@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_cron_schedule import AdminCronSchedule  # noqa: F401,E501
-from flyteadmin.models.admin_fixed_rate import AdminFixedRate  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminSchedule(object):
@@ -47,8 +46,11 @@ class AdminSchedule(object):
         'kickoff_time_input_arg': 'kickoff_time_input_arg'
     }
 
-    def __init__(self, cron_expression=None, rate=None, cron_schedule=None, kickoff_time_input_arg=None):  # noqa: E501
+    def __init__(self, cron_expression=None, rate=None, cron_schedule=None, kickoff_time_input_arg=None, _configuration=None):  # noqa: E501
         """AdminSchedule - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._cron_expression = None
         self._rate = None
@@ -191,8 +193,11 @@ class AdminSchedule(object):
         if not isinstance(other, AdminSchedule):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminSchedule):
+            return True
+
+        return self.to_dict() != other.to_dict()

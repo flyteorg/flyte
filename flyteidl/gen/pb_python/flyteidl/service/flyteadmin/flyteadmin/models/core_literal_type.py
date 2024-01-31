@@ -16,16 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_blob_type import CoreBlobType  # noqa: F401,E501
-from flyteadmin.models.core_enum_type import CoreEnumType  # noqa: F401,E501
-from flyteadmin.models.core_literal_type import CoreLiteralType  # noqa: F401,E501
-from flyteadmin.models.core_schema_type import CoreSchemaType  # noqa: F401,E501
-from flyteadmin.models.core_simple_type import CoreSimpleType  # noqa: F401,E501
-from flyteadmin.models.core_structured_dataset_type import CoreStructuredDatasetType  # noqa: F401,E501
-from flyteadmin.models.core_type_annotation import CoreTypeAnnotation  # noqa: F401,E501
-from flyteadmin.models.core_type_structure import CoreTypeStructure  # noqa: F401,E501
-from flyteadmin.models.core_union_type import CoreUnionType  # noqa: F401,E501
-from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreLiteralType(object):
@@ -47,10 +38,10 @@ class CoreLiteralType(object):
         'collection_type': 'CoreLiteralType',
         'map_value_type': 'CoreLiteralType',
         'blob': 'CoreBlobType',
-        'enum_type': 'CoreEnumType',
+        'enum_type': 'FlyteidlcoreEnumType',
         'structured_dataset_type': 'CoreStructuredDatasetType',
         'union_type': 'CoreUnionType',
-        'metadata': 'ProtobufStruct',
+        'metadata': 'object',
         'annotation': 'CoreTypeAnnotation',
         'structure': 'CoreTypeStructure'
     }
@@ -69,8 +60,11 @@ class CoreLiteralType(object):
         'structure': 'structure'
     }
 
-    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, union_type=None, metadata=None, annotation=None, structure=None):  # noqa: E501
+    def __init__(self, simple=None, schema=None, collection_type=None, map_value_type=None, blob=None, enum_type=None, structured_dataset_type=None, union_type=None, metadata=None, annotation=None, structure=None, _configuration=None):  # noqa: E501
         """CoreLiteralType - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._simple = None
         self._schema = None
@@ -230,7 +224,7 @@ class CoreLiteralType(object):
         Defines an enum with pre-defined string values.  # noqa: E501
 
         :return: The enum_type of this CoreLiteralType.  # noqa: E501
-        :rtype: CoreEnumType
+        :rtype: FlyteidlcoreEnumType
         """
         return self._enum_type
 
@@ -241,7 +235,7 @@ class CoreLiteralType(object):
         Defines an enum with pre-defined string values.  # noqa: E501
 
         :param enum_type: The enum_type of this CoreLiteralType.  # noqa: E501
-        :type: CoreEnumType
+        :type: FlyteidlcoreEnumType
         """
 
         self._enum_type = enum_type
@@ -297,7 +291,7 @@ class CoreLiteralType(object):
         This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by consumers to identify special behavior or display extended information for the type.  # noqa: E501
 
         :return: The metadata of this CoreLiteralType.  # noqa: E501
-        :rtype: ProtobufStruct
+        :rtype: object
         """
         return self._metadata
 
@@ -308,7 +302,7 @@ class CoreLiteralType(object):
         This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by consumers to identify special behavior or display extended information for the type.  # noqa: E501
 
         :param metadata: The metadata of this CoreLiteralType.  # noqa: E501
-        :type: ProtobufStruct
+        :type: object
         """
 
         self._metadata = metadata
@@ -399,8 +393,11 @@ class CoreLiteralType(object):
         if not isinstance(other, CoreLiteralType):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreLiteralType):
+            return True
+
+        return self.to_dict() != other.to_dict()

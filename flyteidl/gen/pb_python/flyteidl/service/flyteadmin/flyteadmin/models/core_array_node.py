@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_node import CoreNode  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreArrayNode(object):
@@ -46,8 +46,11 @@ class CoreArrayNode(object):
         'min_success_ratio': 'min_success_ratio'
     }
 
-    def __init__(self, node=None, parallelism=None, min_successes=None, min_success_ratio=None):  # noqa: E501
+    def __init__(self, node=None, parallelism=None, min_successes=None, min_success_ratio=None, _configuration=None):  # noqa: E501
         """CoreArrayNode - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._node = None
         self._parallelism = None
@@ -196,8 +199,11 @@ class CoreArrayNode(object):
         if not isinstance(other, CoreArrayNode):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreArrayNode):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,14 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_cluster_assignment import AdminClusterAssignment  # noqa: F401,E501
-from flyteadmin.models.admin_cluster_resource_attributes import AdminClusterResourceAttributes  # noqa: F401,E501
-from flyteadmin.models.admin_execution_cluster_label import AdminExecutionClusterLabel  # noqa: F401,E501
-from flyteadmin.models.admin_execution_queue_attributes import AdminExecutionQueueAttributes  # noqa: F401,E501
-from flyteadmin.models.admin_plugin_overrides import AdminPluginOverrides  # noqa: F401,E501
-from flyteadmin.models.admin_task_resource_attributes import AdminTaskResourceAttributes  # noqa: F401,E501
-from flyteadmin.models.admin_workflow_execution_config import AdminWorkflowExecutionConfig  # noqa: F401,E501
-from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminMatchingAttributes(object):
@@ -61,8 +54,11 @@ class AdminMatchingAttributes(object):
         'cluster_assignment': 'cluster_assignment'
     }
 
-    def __init__(self, task_resource_attributes=None, cluster_resource_attributes=None, execution_queue_attributes=None, execution_cluster_label=None, quality_of_service=None, plugin_overrides=None, workflow_execution_config=None, cluster_assignment=None):  # noqa: E501
+    def __init__(self, task_resource_attributes=None, cluster_resource_attributes=None, execution_queue_attributes=None, execution_cluster_label=None, quality_of_service=None, plugin_overrides=None, workflow_execution_config=None, cluster_assignment=None, _configuration=None):  # noqa: E501
         """AdminMatchingAttributes - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._task_resource_attributes = None
         self._cluster_resource_attributes = None
@@ -299,8 +295,11 @@ class AdminMatchingAttributes(object):
         if not isinstance(other, AdminMatchingAttributes):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminMatchingAttributes):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_extended_resources import CoreExtendedResources  # noqa: F401,E501
-from flyteadmin.models.core_resources import CoreResources  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreTaskNodeOverrides(object):
@@ -43,8 +42,11 @@ class CoreTaskNodeOverrides(object):
         'extended_resources': 'extended_resources'
     }
 
-    def __init__(self, resources=None, extended_resources=None):  # noqa: E501
+    def __init__(self, resources=None, extended_resources=None, _configuration=None):  # noqa: E501
         """CoreTaskNodeOverrides - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._resources = None
         self._extended_resources = None
@@ -141,8 +143,11 @@ class CoreTaskNodeOverrides(object):
         if not isinstance(other, CoreTaskNodeOverrides):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreTaskNodeOverrides):
+            return True
+
+        return self.to_dict() != other.to_dict()

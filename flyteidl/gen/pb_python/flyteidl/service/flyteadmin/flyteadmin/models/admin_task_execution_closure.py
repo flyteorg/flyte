@@ -16,13 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_reason import AdminReason  # noqa: F401,E501
-from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
-from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
-from flyteadmin.models.flyteidlevent_task_execution_metadata import FlyteidleventTaskExecutionMetadata  # noqa: F401,E501
-from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminTaskExecutionClosure(object):
@@ -48,7 +42,7 @@ class AdminTaskExecutionClosure(object):
         'duration': 'str',
         'created_at': 'datetime',
         'updated_at': 'datetime',
-        'custom_info': 'ProtobufStruct',
+        'custom_info': 'object',
         'reason': 'str',
         'task_type': 'str',
         'metadata': 'FlyteidleventTaskExecutionMetadata',
@@ -74,8 +68,11 @@ class AdminTaskExecutionClosure(object):
         'reasons': 'reasons'
     }
 
-    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None, event_version=None, reasons=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, logs=None, started_at=None, duration=None, created_at=None, updated_at=None, custom_info=None, reason=None, task_type=None, metadata=None, event_version=None, reasons=None, _configuration=None):  # noqa: E501
         """AdminTaskExecutionClosure - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._output_uri = None
         self._error = None
@@ -339,7 +336,7 @@ class AdminTaskExecutionClosure(object):
         Custom data specific to the task plugin.  # noqa: E501
 
         :return: The custom_info of this AdminTaskExecutionClosure.  # noqa: E501
-        :rtype: ProtobufStruct
+        :rtype: object
         """
         return self._custom_info
 
@@ -350,7 +347,7 @@ class AdminTaskExecutionClosure(object):
         Custom data specific to the task plugin.  # noqa: E501
 
         :param custom_info: The custom_info of this AdminTaskExecutionClosure.  # noqa: E501
-        :type: ProtobufStruct
+        :type: object
         """
 
         self._custom_info = custom_info
@@ -510,8 +507,11 @@ class AdminTaskExecutionClosure(object):
         if not isinstance(other, AdminTaskExecutionClosure):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminTaskExecutionClosure):
+            return True
+
+        return self.to_dict() != other.to_dict()

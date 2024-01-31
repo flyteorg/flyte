@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_io_strategy import CoreIOStrategy  # noqa: F401,E501
-from flyteadmin.models.data_loading_config_literal_map_format import DataLoadingConfigLiteralMapFormat  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreDataLoadingConfig(object):
@@ -49,8 +48,11 @@ class CoreDataLoadingConfig(object):
         'io_strategy': 'io_strategy'
     }
 
-    def __init__(self, enabled=None, input_path=None, output_path=None, format=None, io_strategy=None):  # noqa: E501
+    def __init__(self, enabled=None, input_path=None, output_path=None, format=None, io_strategy=None, _configuration=None):  # noqa: E501
         """CoreDataLoadingConfig - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._enabled = None
         self._input_path = None
@@ -215,8 +217,11 @@ class CoreDataLoadingConfig(object):
         if not isinstance(other, CoreDataLoadingConfig):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreDataLoadingConfig):
+            return True
+
+        return self.to_dict() != other.to_dict()

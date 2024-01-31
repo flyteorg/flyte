@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_quality_of_service_spec import CoreQualityOfServiceSpec  # noqa: F401,E501
-from flyteadmin.models.quality_of_service_tier import QualityOfServiceTier  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreQualityOfService(object):
@@ -43,8 +42,11 @@ class CoreQualityOfService(object):
         'spec': 'spec'
     }
 
-    def __init__(self, tier=None, spec=None):  # noqa: E501
+    def __init__(self, tier=None, spec=None, _configuration=None):  # noqa: E501
         """CoreQualityOfService - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._tier = None
         self._spec = None
@@ -137,8 +139,11 @@ class CoreQualityOfService(object):
         if not isinstance(other, CoreQualityOfService):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreQualityOfService):
+            return True
+
+        return self.to_dict() != other.to_dict()

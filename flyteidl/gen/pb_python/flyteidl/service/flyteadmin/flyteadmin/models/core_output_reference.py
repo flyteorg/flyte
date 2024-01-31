@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_promise_attribute import CorePromiseAttribute  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreOutputReference(object):
@@ -44,8 +44,11 @@ class CoreOutputReference(object):
         'attr_path': 'attr_path'
     }
 
-    def __init__(self, node_id=None, var=None, attr_path=None):  # noqa: E501
+    def __init__(self, node_id=None, var=None, attr_path=None, _configuration=None):  # noqa: E501
         """CoreOutputReference - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._node_id = None
         self._var = None
@@ -166,8 +169,11 @@ class CoreOutputReference(object):
         if not isinstance(other, CoreOutputReference):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreOutputReference):
+            return True
+
+        return self.to_dict() != other.to_dict()

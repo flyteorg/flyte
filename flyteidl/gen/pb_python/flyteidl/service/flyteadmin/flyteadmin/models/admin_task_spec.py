@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_description_entity import AdminDescriptionEntity  # noqa: F401,E501
-from flyteadmin.models.core_task_template import CoreTaskTemplate  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminTaskSpec(object):
@@ -43,8 +42,11 @@ class AdminTaskSpec(object):
         'description': 'description'
     }
 
-    def __init__(self, template=None, description=None):  # noqa: E501
+    def __init__(self, template=None, description=None, _configuration=None):  # noqa: E501
         """AdminTaskSpec - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._template = None
         self._description = None
@@ -141,8 +143,11 @@ class AdminTaskSpec(object):
         if not isinstance(other, AdminTaskSpec):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminTaskSpec):
+            return True
+
+        return self.to_dict() != other.to_dict()

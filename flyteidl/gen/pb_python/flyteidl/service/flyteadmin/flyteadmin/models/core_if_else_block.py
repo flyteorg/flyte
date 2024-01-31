@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_error import CoreError  # noqa: F401,E501
-from flyteadmin.models.core_if_block import CoreIfBlock  # noqa: F401,E501
-from flyteadmin.models.core_node import CoreNode  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreIfElseBlock(object):
@@ -48,8 +46,11 @@ class CoreIfElseBlock(object):
         'error': 'error'
     }
 
-    def __init__(self, case=None, other=None, else_node=None, error=None):  # noqa: E501
+    def __init__(self, case=None, other=None, else_node=None, error=None, _configuration=None):  # noqa: E501
         """CoreIfElseBlock - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._case = None
         self._other = None
@@ -198,8 +199,11 @@ class CoreIfElseBlock(object):
         if not isinstance(other, CoreIfElseBlock):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreIfElseBlock):
+            return True
+
+        return self.to_dict() != other.to_dict()

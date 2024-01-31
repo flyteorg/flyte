@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_flyte_ur_ls import AdminFlyteURLs  # noqa: F401,E501
-from flyteadmin.models.admin_url_blob import AdminUrlBlob  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminTaskExecutionGetDataResponse(object):
@@ -50,8 +48,11 @@ class AdminTaskExecutionGetDataResponse(object):
         'flyte_urls': 'flyte_urls'
     }
 
-    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None, flyte_urls=None):  # noqa: E501
+    def __init__(self, inputs=None, outputs=None, full_inputs=None, full_outputs=None, flyte_urls=None, _configuration=None):  # noqa: E501
         """AdminTaskExecutionGetDataResponse - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._inputs = None
         self._outputs = None
@@ -224,8 +225,11 @@ class AdminTaskExecutionGetDataResponse(object):
         if not isinstance(other, AdminTaskExecutionGetDataResponse):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminTaskExecutionGetDataResponse):
+            return True
+
+        return self.to_dict() != other.to_dict()

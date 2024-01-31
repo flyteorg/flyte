@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_description_format import AdminDescriptionFormat  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminDescription(object):
@@ -46,8 +46,11 @@ class AdminDescription(object):
         'icon_link': 'icon_link'
     }
 
-    def __init__(self, value=None, uri=None, format=None, icon_link=None):  # noqa: E501
+    def __init__(self, value=None, uri=None, format=None, icon_link=None, _configuration=None):  # noqa: E501
         """AdminDescription - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._value = None
         self._uri = None
@@ -188,8 +191,11 @@ class AdminDescription(object):
         if not isinstance(other, AdminDescription):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminDescription):
+            return True
+
+        return self.to_dict() != other.to_dict()

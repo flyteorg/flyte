@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.structured_dataset_type_dataset_column import StructuredDatasetTypeDatasetColumn  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreStructuredDatasetType(object):
@@ -46,8 +46,11 @@ class CoreStructuredDatasetType(object):
         'external_schema_bytes': 'external_schema_bytes'
     }
 
-    def __init__(self, columns=None, format=None, external_schema_type=None, external_schema_bytes=None):  # noqa: E501
+    def __init__(self, columns=None, format=None, external_schema_type=None, external_schema_bytes=None, _configuration=None):  # noqa: E501
         """CoreStructuredDatasetType - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._columns = None
         self._format = None
@@ -153,7 +156,8 @@ class CoreStructuredDatasetType(object):
         :param external_schema_bytes: The external_schema_bytes of this CoreStructuredDatasetType.  # noqa: E501
         :type: str
         """
-        if external_schema_bytes is not None and not re.search(r'^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$', external_schema_bytes):  # noqa: E501
+        if (self._configuration.client_side_validation and
+                external_schema_bytes is not None and not re.search(r'^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$', external_schema_bytes)):  # noqa: E501
             raise ValueError(r"Invalid value for `external_schema_bytes`, must be a follow pattern or equal to `/^(?:[A-Za-z0-9+\/]{4})*(?:[A-Za-z0-9+\/]{2}==|[A-Za-z0-9+\/]{3}=)?$/`")  # noqa: E501
 
         self._external_schema_bytes = external_schema_bytes
@@ -198,8 +202,11 @@ class CoreStructuredDatasetType(object):
         if not isinstance(other, CoreStructuredDatasetType):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreStructuredDatasetType):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
-from flyteadmin.models.workflow_metadata_on_failure_policy import WorkflowMetadataOnFailurePolicy  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreWorkflowMetadata(object):
@@ -45,8 +44,11 @@ class CoreWorkflowMetadata(object):
         'tags': 'tags'
     }
 
-    def __init__(self, quality_of_service=None, on_failure=None, tags=None):  # noqa: E501
+    def __init__(self, quality_of_service=None, on_failure=None, tags=None, _configuration=None):  # noqa: E501
         """CoreWorkflowMetadata - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._quality_of_service = None
         self._on_failure = None
@@ -167,8 +169,11 @@ class CoreWorkflowMetadata(object):
         if not isinstance(other, CoreWorkflowMetadata):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreWorkflowMetadata):
+            return True
+
+        return self.to_dict() != other.to_dict()

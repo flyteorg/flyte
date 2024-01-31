@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminLiteralMapBlob(object):
@@ -42,8 +42,11 @@ class AdminLiteralMapBlob(object):
         'uri': 'uri'
     }
 
-    def __init__(self, values=None, uri=None):  # noqa: E501
+    def __init__(self, values=None, uri=None, _configuration=None):  # noqa: E501
         """AdminLiteralMapBlob - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._values = None
         self._uri = None
@@ -136,8 +139,11 @@ class AdminLiteralMapBlob(object):
         if not isinstance(other, AdminLiteralMapBlob):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminLiteralMapBlob):
+            return True
+
+        return self.to_dict() != other.to_dict()

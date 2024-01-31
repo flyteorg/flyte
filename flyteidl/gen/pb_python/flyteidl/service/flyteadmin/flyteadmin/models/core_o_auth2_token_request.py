@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_o_auth2_client import CoreOAuth2Client  # noqa: F401,E501
-from flyteadmin.models.core_o_auth2_token_request_type import CoreOAuth2TokenRequestType  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreOAuth2TokenRequest(object):
@@ -49,8 +48,11 @@ class CoreOAuth2TokenRequest(object):
         'token_endpoint': 'token_endpoint'
     }
 
-    def __init__(self, name=None, type=None, client=None, idp_discovery_endpoint=None, token_endpoint=None):  # noqa: E501
+    def __init__(self, name=None, type=None, client=None, idp_discovery_endpoint=None, token_endpoint=None, _configuration=None):  # noqa: E501
         """CoreOAuth2TokenRequest - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._name = None
         self._type = None
@@ -215,8 +217,11 @@ class CoreOAuth2TokenRequest(object):
         if not isinstance(other, CoreOAuth2TokenRequest):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreOAuth2TokenRequest):
+            return True
+
+        return self.to_dict() != other.to_dict()

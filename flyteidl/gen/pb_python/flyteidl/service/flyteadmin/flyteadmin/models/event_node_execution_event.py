@@ -16,14 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
-from flyteadmin.models.event_parent_node_execution_metadata import EventParentNodeExecutionMetadata  # noqa: F401,E501
-from flyteadmin.models.event_parent_task_execution_metadata import EventParentTaskExecutionMetadata  # noqa: F401,E501
-from flyteadmin.models.flyteidlevent_task_node_metadata import FlyteidleventTaskNodeMetadata  # noqa: F401,E501
-from flyteadmin.models.flyteidlevent_workflow_node_metadata import FlyteidleventWorkflowNodeMetadata  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class EventNodeExecutionEvent(object):
@@ -89,8 +82,11 @@ class EventNodeExecutionEvent(object):
         'is_array': 'is_array'
     }
 
-    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None, reported_at=None, is_array=None):  # noqa: E501
+    def __init__(self, id=None, producer_id=None, phase=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, workflow_node_metadata=None, task_node_metadata=None, parent_task_metadata=None, parent_node_metadata=None, retry_group=None, spec_node_id=None, node_name=None, event_version=None, is_parent=None, is_dynamic=None, deck_uri=None, reported_at=None, is_array=None, _configuration=None):  # noqa: E501
         """EventNodeExecutionEvent - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._producer_id = None
@@ -683,8 +679,11 @@ class EventNodeExecutionEvent(object):
         if not isinstance(other, EventNodeExecutionEvent):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, EventNodeExecutionEvent):
+            return True
+
+        return self.to_dict() != other.to_dict()

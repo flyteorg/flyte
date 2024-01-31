@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.blob_type_blob_dimensionality import BlobTypeBlobDimensionality  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreBlobType(object):
@@ -42,8 +42,11 @@ class CoreBlobType(object):
         'dimensionality': 'dimensionality'
     }
 
-    def __init__(self, format=None, dimensionality=None):  # noqa: E501
+    def __init__(self, format=None, dimensionality=None, _configuration=None):  # noqa: E501
         """CoreBlobType - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._format = None
         self._dimensionality = None
@@ -136,8 +139,11 @@ class CoreBlobType(object):
         if not isinstance(other, CoreBlobType):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreBlobType):
+            return True
+
+        return self.to_dict() != other.to_dict()

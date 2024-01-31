@@ -16,14 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_abort_metadata import AdminAbortMetadata  # noqa: F401,E501
-from flyteadmin.models.admin_execution_state_change_details import AdminExecutionStateChangeDetails  # noqa: F401,E501
-from flyteadmin.models.admin_literal_map_blob import AdminLiteralMapBlob  # noqa: F401,E501
-from flyteadmin.models.admin_notification import AdminNotification  # noqa: F401,E501
-from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminExecutionClosure(object):
@@ -73,8 +66,11 @@ class AdminExecutionClosure(object):
         'state_change_details': 'state_change_details'
     }
 
-    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, output_data=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None, state_change_details=None):  # noqa: E501
+    def __init__(self, outputs=None, error=None, abort_cause=None, abort_metadata=None, output_data=None, computed_inputs=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, notifications=None, workflow_id=None, state_change_details=None, _configuration=None):  # noqa: E501
         """AdminExecutionClosure - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._outputs = None
         self._error = None
@@ -479,8 +475,11 @@ class AdminExecutionClosure(object):
         if not isinstance(other, AdminExecutionClosure):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminExecutionClosure):
+            return True
+
+        return self.to_dict() != other.to_dict()

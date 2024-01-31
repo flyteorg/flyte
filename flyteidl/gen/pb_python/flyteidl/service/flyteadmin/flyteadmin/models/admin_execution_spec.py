@@ -16,18 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_annotations import AdminAnnotations  # noqa: F401,E501
-from flyteadmin.models.admin_auth_role import AdminAuthRole  # noqa: F401,E501
-from flyteadmin.models.admin_cluster_assignment import AdminClusterAssignment  # noqa: F401,E501
-from flyteadmin.models.admin_envs import AdminEnvs  # noqa: F401,E501
-from flyteadmin.models.admin_execution_metadata import AdminExecutionMetadata  # noqa: F401,E501
-from flyteadmin.models.admin_labels import AdminLabels  # noqa: F401,E501
-from flyteadmin.models.admin_notification_list import AdminNotificationList  # noqa: F401,E501
-from flyteadmin.models.admin_raw_output_data_config import AdminRawOutputDataConfig  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_quality_of_service import CoreQualityOfService  # noqa: F401,E501
-from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminExecutionSpec(object):
@@ -83,8 +72,11 @@ class AdminExecutionSpec(object):
         'tags': 'tags'
     }
 
-    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None, overwrite_cache=None, envs=None, tags=None):  # noqa: E501
+    def __init__(self, launch_plan=None, inputs=None, metadata=None, notifications=None, disable_all=None, labels=None, annotations=None, security_context=None, auth_role=None, quality_of_service=None, max_parallelism=None, raw_output_data_config=None, cluster_assignment=None, interruptible=None, overwrite_cache=None, envs=None, tags=None, _configuration=None):  # noqa: E501
         """AdminExecutionSpec - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._launch_plan = None
         self._inputs = None
@@ -563,8 +555,11 @@ class AdminExecutionSpec(object):
         if not isinstance(other, AdminExecutionSpec):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminExecutionSpec):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_compiled_workflow_closure import CoreCompiledWorkflowClosure  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminDynamicNodeWorkflowResponse(object):
@@ -40,8 +40,11 @@ class AdminDynamicNodeWorkflowResponse(object):
         'compiled_workflow': 'compiled_workflow'
     }
 
-    def __init__(self, compiled_workflow=None):  # noqa: E501
+    def __init__(self, compiled_workflow=None, _configuration=None):  # noqa: E501
         """AdminDynamicNodeWorkflowResponse - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._compiled_workflow = None
         self.discriminator = None
@@ -110,8 +113,11 @@ class AdminDynamicNodeWorkflowResponse(object):
         if not isinstance(other, AdminDynamicNodeWorkflowResponse):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminDynamicNodeWorkflowResponse):
+            return True
+
+        return self.to_dict() != other.to_dict()

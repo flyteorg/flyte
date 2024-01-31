@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class FlyteidleventWorkflowNodeMetadata(object):
@@ -40,8 +40,11 @@ class FlyteidleventWorkflowNodeMetadata(object):
         'execution_id': 'execution_id'
     }
 
-    def __init__(self, execution_id=None):  # noqa: E501
+    def __init__(self, execution_id=None, _configuration=None):  # noqa: E501
         """FlyteidleventWorkflowNodeMetadata - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._execution_id = None
         self.discriminator = None
@@ -110,8 +113,11 @@ class FlyteidleventWorkflowNodeMetadata(object):
         if not isinstance(other, FlyteidleventWorkflowNodeMetadata):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, FlyteidleventWorkflowNodeMetadata):
+            return True
+
+        return self.to_dict() != other.to_dict()

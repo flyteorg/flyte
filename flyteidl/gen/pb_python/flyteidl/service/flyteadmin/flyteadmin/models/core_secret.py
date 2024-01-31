@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.secret_mount_type import SecretMountType  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreSecret(object):
@@ -46,8 +46,11 @@ class CoreSecret(object):
         'mount_requirement': 'mount_requirement'
     }
 
-    def __init__(self, group=None, group_version=None, key=None, mount_requirement=None):  # noqa: E501
+    def __init__(self, group=None, group_version=None, key=None, mount_requirement=None, _configuration=None):  # noqa: E501
         """CoreSecret - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._group = None
         self._group_version = None
@@ -188,8 +191,11 @@ class CoreSecret(object):
         if not isinstance(other, CoreSecret):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreSecret):
+            return True
+
+        return self.to_dict() != other.to_dict()

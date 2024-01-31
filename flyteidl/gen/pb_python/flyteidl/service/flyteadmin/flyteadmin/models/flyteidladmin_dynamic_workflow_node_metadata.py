@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_compiled_workflow_closure import CoreCompiledWorkflowClosure  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class FlyteidladminDynamicWorkflowNodeMetadata(object):
@@ -45,8 +44,11 @@ class FlyteidladminDynamicWorkflowNodeMetadata(object):
         'dynamic_job_spec_uri': 'dynamic_job_spec_uri'
     }
 
-    def __init__(self, id=None, compiled_workflow=None, dynamic_job_spec_uri=None):  # noqa: E501
+    def __init__(self, id=None, compiled_workflow=None, dynamic_job_spec_uri=None, _configuration=None):  # noqa: E501
         """FlyteidladminDynamicWorkflowNodeMetadata - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._compiled_workflow = None
@@ -169,8 +171,11 @@ class FlyteidladminDynamicWorkflowNodeMetadata(object):
         if not isinstance(other, FlyteidladminDynamicWorkflowNodeMetadata):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, FlyteidladminDynamicWorkflowNodeMetadata):
+            return True
+
+        return self.to_dict() != other.to_dict()

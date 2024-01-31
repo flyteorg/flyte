@@ -16,12 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_binding import CoreBinding  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_node import CoreNode  # noqa: F401,E501
-from flyteadmin.models.core_typed_interface import CoreTypedInterface  # noqa: F401,E501
-from flyteadmin.models.core_workflow_metadata import CoreWorkflowMetadata  # noqa: F401,E501
-from flyteadmin.models.core_workflow_metadata_defaults import CoreWorkflowMetadataDefaults  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreWorkflowTemplate(object):
@@ -57,8 +52,11 @@ class CoreWorkflowTemplate(object):
         'metadata_defaults': 'metadata_defaults'
     }
 
-    def __init__(self, id=None, metadata=None, interface=None, nodes=None, outputs=None, failure_node=None, metadata_defaults=None):  # noqa: E501
+    def __init__(self, id=None, metadata=None, interface=None, nodes=None, outputs=None, failure_node=None, metadata_defaults=None, _configuration=None):  # noqa: E501
         """CoreWorkflowTemplate - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._metadata = None
@@ -283,8 +281,11 @@ class CoreWorkflowTemplate(object):
         if not isinstance(other, CoreWorkflowTemplate):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreWorkflowTemplate):
+            return True
+
+        return self.to_dict() != other.to_dict()

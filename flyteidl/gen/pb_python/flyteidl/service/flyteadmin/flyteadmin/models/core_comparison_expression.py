@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.comparison_expression_operator import ComparisonExpressionOperator  # noqa: F401,E501
-from flyteadmin.models.core_operand import CoreOperand  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreComparisonExpression(object):
@@ -45,8 +44,11 @@ class CoreComparisonExpression(object):
         'right_value': 'right_value'
     }
 
-    def __init__(self, operator=None, left_value=None, right_value=None):  # noqa: E501
+    def __init__(self, operator=None, left_value=None, right_value=None, _configuration=None):  # noqa: E501
         """CoreComparisonExpression - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._operator = None
         self._left_value = None
@@ -163,8 +165,11 @@ class CoreComparisonExpression(object):
         if not isinstance(other, CoreComparisonExpression):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreComparisonExpression):
+            return True
+
+        return self.to_dict() != other.to_dict()

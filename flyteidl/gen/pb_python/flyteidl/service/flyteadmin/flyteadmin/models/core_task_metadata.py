@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_retry_strategy import CoreRetryStrategy  # noqa: F401,E501
-from flyteadmin.models.core_runtime_metadata import CoreRuntimeMetadata  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreTaskMetadata(object):
@@ -63,8 +62,11 @@ class CoreTaskMetadata(object):
         'cache_ignore_input_vars': 'cache_ignore_input_vars'
     }
 
-    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None, cache_ignore_input_vars=None):  # noqa: E501
+    def __init__(self, discoverable=None, runtime=None, timeout=None, retries=None, discovery_version=None, deprecated_error_message=None, interruptible=None, cache_serializable=None, generates_deck=None, tags=None, pod_template_name=None, cache_ignore_input_vars=None, _configuration=None):  # noqa: E501
         """CoreTaskMetadata - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._discoverable = None
         self._runtime = None
@@ -415,8 +417,11 @@ class CoreTaskMetadata(object):
         if not isinstance(other, CoreTaskMetadata):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreTaskMetadata):
+            return True
+
+        return self.to_dict() != other.to_dict()

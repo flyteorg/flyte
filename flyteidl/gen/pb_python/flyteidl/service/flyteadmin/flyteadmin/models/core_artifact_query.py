@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_artifact_binding_data import CoreArtifactBindingData  # noqa: F401,E501
-from flyteadmin.models.core_artifact_id import CoreArtifactID  # noqa: F401,E501
-from flyteadmin.models.core_artifact_tag import CoreArtifactTag  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreArtifactQuery(object):
@@ -48,8 +46,11 @@ class CoreArtifactQuery(object):
         'binding': 'binding'
     }
 
-    def __init__(self, artifact_id=None, artifact_tag=None, uri=None, binding=None):  # noqa: E501
+    def __init__(self, artifact_id=None, artifact_tag=None, uri=None, binding=None, _configuration=None):  # noqa: E501
         """CoreArtifactQuery - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._artifact_id = None
         self._artifact_tag = None
@@ -192,8 +193,11 @@ class CoreArtifactQuery(object):
         if not isinstance(other, CoreArtifactQuery):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreArtifactQuery):
+            return True
+
+        return self.to_dict() != other.to_dict()

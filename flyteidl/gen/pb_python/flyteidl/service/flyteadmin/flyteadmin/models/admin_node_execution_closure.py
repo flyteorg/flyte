@@ -16,11 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_node_execution_phase import CoreNodeExecutionPhase  # noqa: F401,E501
-from flyteadmin.models.flyteidladmin_task_node_metadata import FlyteidladminTaskNodeMetadata  # noqa: F401,E501
-from flyteadmin.models.flyteidladmin_workflow_node_metadata import FlyteidladminWorkflowNodeMetadata  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminNodeExecutionClosure(object):
@@ -66,8 +62,11 @@ class AdminNodeExecutionClosure(object):
         'dynamic_job_spec_uri': 'dynamic_job_spec_uri'
     }
 
-    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None, deck_uri=None, dynamic_job_spec_uri=None):  # noqa: E501
+    def __init__(self, output_uri=None, error=None, output_data=None, phase=None, started_at=None, duration=None, created_at=None, updated_at=None, workflow_node_metadata=None, task_node_metadata=None, deck_uri=None, dynamic_job_spec_uri=None, _configuration=None):  # noqa: E501
         """AdminNodeExecutionClosure - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._output_uri = None
         self._error = None
@@ -416,8 +415,11 @@ class AdminNodeExecutionClosure(object):
         if not isinstance(other, AdminNodeExecutionClosure):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminNodeExecutionClosure):
+            return True
+
+        return self.to_dict() != other.to_dict()

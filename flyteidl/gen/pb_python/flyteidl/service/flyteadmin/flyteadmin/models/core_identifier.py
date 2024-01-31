@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_resource_type import CoreResourceType  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreIdentifier(object):
@@ -50,8 +50,11 @@ class CoreIdentifier(object):
         'org': 'org'
     }
 
-    def __init__(self, resource_type=None, project=None, domain=None, name=None, version=None, org=None):  # noqa: E501
+    def __init__(self, resource_type=None, project=None, domain=None, name=None, version=None, org=None, _configuration=None):  # noqa: E501
         """CoreIdentifier - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._resource_type = None
         self._project = None
@@ -252,8 +255,11 @@ class CoreIdentifier(object):
         if not isinstance(other, CoreIdentifier):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreIdentifier):
+            return True
+
+        return self.to_dict() != other.to_dict()

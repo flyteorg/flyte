@@ -16,10 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_artifact_id import CoreArtifactID  # noqa: F401,E501
-from flyteadmin.models.core_artifact_query import CoreArtifactQuery  # noqa: F401,E501
-from flyteadmin.models.core_literal import CoreLiteral  # noqa: F401,E501
-from flyteadmin.models.core_variable import CoreVariable  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreParameter(object):
@@ -51,8 +48,11 @@ class CoreParameter(object):
         'artifact_id': 'artifact_id'
     }
 
-    def __init__(self, var=None, default=None, required=None, artifact_query=None, artifact_id=None):  # noqa: E501
+    def __init__(self, var=None, default=None, required=None, artifact_query=None, artifact_id=None, _configuration=None):  # noqa: E501
         """CoreParameter - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._var = None
         self._default = None
@@ -225,8 +225,11 @@ class CoreParameter(object):
         if not isinstance(other, CoreParameter):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreParameter):
+            return True
+
+        return self.to_dict() != other.to_dict()

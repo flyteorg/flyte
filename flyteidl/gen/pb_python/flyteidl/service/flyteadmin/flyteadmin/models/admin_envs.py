@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_key_value_pair import CoreKeyValuePair  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminEnvs(object):
@@ -33,15 +33,18 @@ class AdminEnvs(object):
                             and the value is json key in definition.
     """
     swagger_types = {
-        'values': 'list[CoreKeyValuePair]'
+        'values': 'list[FlyteidlcoreKeyValuePair]'
     }
 
     attribute_map = {
         'values': 'values'
     }
 
-    def __init__(self, values=None):  # noqa: E501
+    def __init__(self, values=None, _configuration=None):  # noqa: E501
         """AdminEnvs - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._values = None
         self.discriminator = None
@@ -56,7 +59,7 @@ class AdminEnvs(object):
         Map of custom environment variables to be applied to the execution resource.  # noqa: E501
 
         :return: The values of this AdminEnvs.  # noqa: E501
-        :rtype: list[CoreKeyValuePair]
+        :rtype: list[FlyteidlcoreKeyValuePair]
         """
         return self._values
 
@@ -67,7 +70,7 @@ class AdminEnvs(object):
         Map of custom environment variables to be applied to the execution resource.  # noqa: E501
 
         :param values: The values of this AdminEnvs.  # noqa: E501
-        :type: list[CoreKeyValuePair]
+        :type: list[FlyteidlcoreKeyValuePair]
         """
 
         self._values = values
@@ -112,8 +115,11 @@ class AdminEnvs(object):
         if not isinstance(other, AdminEnvs):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminEnvs):
+            return True
+
+        return self.to_dict() != other.to_dict()

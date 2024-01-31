@@ -16,11 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_system_metadata import AdminSystemMetadata  # noqa: F401,E501
-from flyteadmin.models.core_artifact_id import CoreArtifactID  # noqa: F401,E501
-from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier  # noqa: F401,E501
-from flyteadmin.models.execution_metadata_execution_mode import ExecutionMetadataExecutionMode  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminExecutionMetadata(object):
@@ -58,8 +54,11 @@ class AdminExecutionMetadata(object):
         'artifact_ids': 'artifact_ids'
     }
 
-    def __init__(self, mode=None, principal=None, nesting=None, scheduled_at=None, parent_node_execution=None, reference_execution=None, system_metadata=None, artifact_ids=None):  # noqa: E501
+    def __init__(self, mode=None, principal=None, nesting=None, scheduled_at=None, parent_node_execution=None, reference_execution=None, system_metadata=None, artifact_ids=None, _configuration=None):  # noqa: E501
         """AdminExecutionMetadata - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._mode = None
         self._principal = None
@@ -308,8 +307,11 @@ class AdminExecutionMetadata(object):
         if not isinstance(other, AdminExecutionMetadata):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminExecutionMetadata):
+            return True
+
+        return self.to_dict() != other.to_dict()

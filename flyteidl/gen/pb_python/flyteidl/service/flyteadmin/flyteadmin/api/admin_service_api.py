@@ -33,37 +33,39 @@ class AdminServiceApi(object):
             api_client = ApiClient()
         self.api_client = api_client
 
-    def create_execution(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_execution(self, body, **kwargs):  # noqa: E501
         """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Create a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_execution(body, async_req=True)
+        >>> thread = api.admin_service_create_execution(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminExecutionCreateRequest body: (required)
+        :param AdminExecutionCreateRequest body: Request to launch an execution with the given project, domain and optionally-assigned name. (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_execution_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_execution_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_execution_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_execution_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_execution_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_execution_with_http_info(self, body, **kwargs):  # noqa: E501
         """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Create a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_execution_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_execution_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminExecutionCreateRequest body: (required)
+        :param AdminExecutionCreateRequest body: Request to launch an execution with the given project, domain and optionally-assigned name. (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -80,14 +82,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_execution" % key
+                    " to method admin_service_create_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -130,39 +132,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_execution2(self, org, body, **kwargs):  # noqa: E501
+    def admin_service_create_execution2(self, org, body, **kwargs):  # noqa: E501
         """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Create a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_execution2(org, body, async_req=True)
+        >>> thread = api.admin_service_create_execution2(org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
-        :param AdminExecutionCreateRequest body: (required)
+        :param AdminServiceCreateExecutionBody body: (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_execution2_with_http_info(org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_execution2_with_http_info(org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_execution2_with_http_info(org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_execution2_with_http_info(org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_execution2_with_http_info(self, org, body, **kwargs):  # noqa: E501
+    def admin_service_create_execution2_with_http_info(self, org, body, **kwargs):  # noqa: E501
         """Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Create a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_execution2_with_http_info(org, body, async_req=True)
+        >>> thread = api.admin_service_create_execution2_with_http_info(org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
-        :param AdminExecutionCreateRequest body: (required)
+        :param AdminServiceCreateExecutionBody body: (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -179,18 +183,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_execution2" % key
+                    " to method admin_service_create_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `create_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_create_execution2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -235,37 +239,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_launch_plan(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_launch_plan(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
 
+        Create and register a launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_launch_plan(body, async_req=True)
+        >>> thread = api.admin_service_create_launch_plan(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminLaunchPlanCreateRequest body: (required)
+        :param AdminLaunchPlanCreateRequest body: Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan. (required)
         :return: AdminLaunchPlanCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_launch_plan_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_launch_plan_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_launch_plan_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_launch_plan_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_launch_plan_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_launch_plan_with_http_info(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
 
+        Create and register a launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_launch_plan_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_launch_plan_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminLaunchPlanCreateRequest body: (required)
+        :param AdminLaunchPlanCreateRequest body: Request to register a launch plan. The included LaunchPlanSpec may have a complete or incomplete set of inputs required to launch a workflow execution. By default all launch plans are registered in state INACTIVE. If you wish to set the state to ACTIVE, you must submit a LaunchPlanUpdateRequest, after you have successfully created a launch plan. (required)
         :return: AdminLaunchPlanCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -282,14 +288,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_launch_plan" % key
+                    " to method admin_service_create_launch_plan" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_launch_plan`")  # noqa: E501
 
         collection_formats = {}
 
@@ -332,39 +338,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_launch_plan2(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_launch_plan2(self, id_org, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
 
+        Create and register a launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_launch_plan2(id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_launch_plan2(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminLaunchPlanCreateRequest body: (required)
+        :param AdminServiceCreateLaunchPlanBody body: (required)
         :return: AdminLaunchPlanCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_launch_plan2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_launch_plan2_with_http_info(id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_launch_plan2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_launch_plan2_with_http_info(id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_launch_plan2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_launch_plan2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition  # noqa: E501
 
+        Create and register a launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_launch_plan2_with_http_info(id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_launch_plan2_with_http_info(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminLaunchPlanCreateRequest body: (required)
+        :param AdminServiceCreateLaunchPlanBody body: (required)
         :return: AdminLaunchPlanCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -381,18 +389,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_launch_plan2" % key
+                    " to method admin_service_create_launch_plan2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `create_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_create_launch_plan2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_launch_plan2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -437,37 +445,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_node_event(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_node_event(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
 
+        Create a node execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_node_event(body, async_req=True)
+        >>> thread = api.admin_service_create_node_event(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminNodeExecutionEventRequest body: (required)
+        :param AdminNodeExecutionEventRequest body: Request to send a notification that a node execution event has occurred. (required)
         :return: AdminNodeExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_node_event_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_node_event_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_node_event_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_node_event_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_node_event_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_node_event_with_http_info(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
 
+        Create a node execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_node_event_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_node_event_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminNodeExecutionEventRequest body: (required)
+        :param AdminNodeExecutionEventRequest body: Request to send a notification that a node execution event has occurred. (required)
         :return: AdminNodeExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -484,14 +494,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_node_event" % key
+                    " to method admin_service_create_node_event" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_node_event`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_node_event`")  # noqa: E501
 
         collection_formats = {}
 
@@ -534,39 +544,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_node_event2(self, event_id_execution_id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_node_event2(self, event_id_execution_id_org, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
 
+        Create a node execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_node_event2(event_id_execution_id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_node_event2(event_id_execution_id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str event_id_execution_id_org: Optional, org key applied to the resource. (required)
-        :param AdminNodeExecutionEventRequest body: (required)
+        :param AdminServiceCreateNodeEventBody body: (required)
         :return: AdminNodeExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_node_event2_with_http_info(event_id_execution_id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_node_event2_with_http_info(event_id_execution_id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_node_event2_with_http_info(event_id_execution_id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_node_event2_with_http_info(event_id_execution_id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_node_event2_with_http_info(self, event_id_execution_id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_node_event2_with_http_info(self, event_id_execution_id_org, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.  # noqa: E501
 
+        Create a node execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_node_event2_with_http_info(event_id_execution_id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_node_event2_with_http_info(event_id_execution_id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str event_id_execution_id_org: Optional, org key applied to the resource. (required)
-        :param AdminNodeExecutionEventRequest body: (required)
+        :param AdminServiceCreateNodeEventBody body: (required)
         :return: AdminNodeExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -583,18 +595,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_node_event2" % key
+                    " to method admin_service_create_node_event2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'event_id_execution_id_org' is set
-        if ('event_id_execution_id_org' not in params or
-                params['event_id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `event_id_execution_id_org` when calling `create_node_event2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('event_id_execution_id_org' not in params or
+                                                       params['event_id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `event_id_execution_id_org` when calling `admin_service_create_node_event2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_node_event2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_node_event2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -639,12 +651,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_task(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_task(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
 
+        Create and register a task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task(body, async_req=True)
+        >>> thread = api.admin_service_create_task(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -655,17 +668,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_task_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_task_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_task_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_task_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_task_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_task_with_http_info(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
 
+        Create and register a task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_task_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -686,14 +700,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_task" % key
+                    " to method admin_service_create_task" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_task`")  # noqa: E501
 
         collection_formats = {}
 
@@ -736,39 +750,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_task2(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_task2(self, id_org, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
 
+        Create and register a task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task2(id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_task2(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param FlyteidladminTaskCreateRequest body: (required)
+        :param ServiceAdminServiceCreateTaskBody body: (required)
         :return: FlyteidladminTaskCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_task2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_task2_with_http_info(id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_task2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_task2_with_http_info(id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_task2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_task2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Task` definition  # noqa: E501
 
+        Create and register a task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task2_with_http_info(id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_task2_with_http_info(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param FlyteidladminTaskCreateRequest body: (required)
+        :param ServiceAdminServiceCreateTaskBody body: (required)
         :return: FlyteidladminTaskCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -785,18 +801,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_task2" % key
+                    " to method admin_service_create_task2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `create_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_create_task2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_task2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -841,37 +857,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_task_event(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_task_event(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
 
+        Create a task execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task_event(body, async_req=True)
+        >>> thread = api.admin_service_create_task_event(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminTaskExecutionEventRequest body: (required)
+        :param AdminTaskExecutionEventRequest body: Request to send a notification that a task execution event has occurred. (required)
         :return: AdminTaskExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_task_event_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_task_event_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_task_event_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_task_event_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_task_event_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_task_event_with_http_info(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
 
+        Create a task execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task_event_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_task_event_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminTaskExecutionEventRequest body: (required)
+        :param AdminTaskExecutionEventRequest body: Request to send a notification that a task execution event has occurred. (required)
         :return: AdminTaskExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -888,14 +906,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_task_event" % key
+                    " to method admin_service_create_task_event" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_task_event`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_task_event`")  # noqa: E501
 
         collection_formats = {}
 
@@ -938,39 +956,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_task_event2(self, event_parent_node_execution_id_execution_id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_task_event2(self, event_parent_node_execution_id_execution_id_org, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
 
+        Create a task execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task_event2(event_parent_node_execution_id_execution_id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_task_event2(event_parent_node_execution_id_execution_id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str event_parent_node_execution_id_execution_id_org: Optional, org key applied to the resource. (required)
-        :param AdminTaskExecutionEventRequest body: (required)
+        :param AdminServiceCreateTaskEventBody body: (required)
         :return: AdminTaskExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_task_event2_with_http_info(self, event_parent_node_execution_id_execution_id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_task_event2_with_http_info(self, event_parent_node_execution_id_execution_id_org, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.  # noqa: E501
 
+        Create a task execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_task_event2_with_http_info(event_parent_node_execution_id_execution_id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str event_parent_node_execution_id_execution_id_org: Optional, org key applied to the resource. (required)
-        :param AdminTaskExecutionEventRequest body: (required)
+        :param AdminServiceCreateTaskEventBody body: (required)
         :return: AdminTaskExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -987,18 +1007,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_task_event2" % key
+                    " to method admin_service_create_task_event2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'event_parent_node_execution_id_execution_id_org' is set
-        if ('event_parent_node_execution_id_execution_id_org' not in params or
-                params['event_parent_node_execution_id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `event_parent_node_execution_id_execution_id_org` when calling `create_task_event2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('event_parent_node_execution_id_execution_id_org' not in params or
+                                                       params['event_parent_node_execution_id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `event_parent_node_execution_id_execution_id_org` when calling `admin_service_create_task_event2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_task_event2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_task_event2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1043,12 +1063,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_workflow(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
 
+        Create and register a workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow(body, async_req=True)
+        >>> thread = api.admin_service_create_workflow(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -1059,17 +1080,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_workflow_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_workflow_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_workflow_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_workflow_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_workflow_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow_with_http_info(self, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
 
+        Create and register a workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_workflow_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -1090,14 +1112,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_workflow" % key
+                    " to method admin_service_create_workflow" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_workflow`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1140,39 +1162,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_workflow2(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow2(self, id_org, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
 
+        Create and register a workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow2(id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_workflow2(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminWorkflowCreateRequest body: (required)
+        :param AdminServiceCreateWorkflowBody body: (required)
         :return: AdminWorkflowCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_workflow2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_workflow2_with_http_info(id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_workflow2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_workflow2_with_http_info(id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_workflow2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
         """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition  # noqa: E501
 
+        Create and register a workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow2_with_http_info(id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_workflow2_with_http_info(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminWorkflowCreateRequest body: (required)
+        :param AdminServiceCreateWorkflowBody body: (required)
         :return: AdminWorkflowCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1189,18 +1213,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_workflow2" % key
+                    " to method admin_service_create_workflow2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `create_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_create_workflow2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_workflow2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1245,37 +1269,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_workflow_event(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow_event(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
 
+        Create a workflow execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow_event(body, async_req=True)
+        >>> thread = api.admin_service_create_workflow_event(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminWorkflowExecutionEventRequest body: (required)
+        :param AdminWorkflowExecutionEventRequest body: Request to send a notification that a workflow execution event has occurred. (required)
         :return: AdminWorkflowExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_workflow_event_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_create_workflow_event_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_workflow_event_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_workflow_event_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def create_workflow_event_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow_event_with_http_info(self, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
 
+        Create a workflow execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow_event_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_create_workflow_event_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminWorkflowExecutionEventRequest body: (required)
+        :param AdminWorkflowExecutionEventRequest body: Request to send a notification that a workflow execution event has occurred. (required)
         :return: AdminWorkflowExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1292,14 +1318,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_workflow_event" % key
+                    " to method admin_service_create_workflow_event" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_workflow_event`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_workflow_event`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1342,39 +1368,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def create_workflow_event2(self, event_execution_id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow_event2(self, event_execution_id_org, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
 
+        Create a workflow execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow_event2(event_execution_id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_workflow_event2(event_execution_id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str event_execution_id_org: Optional, org key applied to the resource. (required)
-        :param AdminWorkflowExecutionEventRequest body: (required)
+        :param AdminServiceCreateWorkflowEventBody body: (required)
         :return: AdminWorkflowExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.create_workflow_event2_with_http_info(event_execution_id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_create_workflow_event2_with_http_info(event_execution_id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.create_workflow_event2_with_http_info(event_execution_id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_create_workflow_event2_with_http_info(event_execution_id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def create_workflow_event2_with_http_info(self, event_execution_id_org, body, **kwargs):  # noqa: E501
+    def admin_service_create_workflow_event2_with_http_info(self, event_execution_id_org, body, **kwargs):  # noqa: E501
         """Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.  # noqa: E501
 
+        Create a workflow execution event recording a phase transition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.create_workflow_event2_with_http_info(event_execution_id_org, body, async_req=True)
+        >>> thread = api.admin_service_create_workflow_event2_with_http_info(event_execution_id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str event_execution_id_org: Optional, org key applied to the resource. (required)
-        :param AdminWorkflowExecutionEventRequest body: (required)
+        :param AdminServiceCreateWorkflowEventBody body: (required)
         :return: AdminWorkflowExecutionEventResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1391,18 +1419,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method create_workflow_event2" % key
+                    " to method admin_service_create_workflow_event2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'event_execution_id_org' is set
-        if ('event_execution_id_org' not in params or
-                params['event_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `event_execution_id_org` when calling `create_workflow_event2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('event_execution_id_org' not in params or
+                                                       params['event_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `event_execution_id_org` when calling `admin_service_create_workflow_event2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `create_workflow_event2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_create_workflow_event2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1447,39 +1475,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def delete_project_attributes(self, project, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_attributes(self, project, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_attributes(project, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_attributes(project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param AdminProjectAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectAttributesBody body: (required)
         :return: AdminProjectAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.delete_project_attributes_with_http_info(project, body, **kwargs)  # noqa: E501
+            return self.admin_service_delete_project_attributes_with_http_info(project, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.delete_project_attributes_with_http_info(project, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_delete_project_attributes_with_http_info(project, body, **kwargs)  # noqa: E501
             return data
 
-    def delete_project_attributes_with_http_info(self, project, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_attributes_with_http_info(self, project, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_attributes_with_http_info(project, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_attributes_with_http_info(project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param AdminProjectAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectAttributesBody body: (required)
         :return: AdminProjectAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1496,18 +1526,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method delete_project_attributes" % key
+                    " to method admin_service_delete_project_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `delete_project_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_delete_project_attributes`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `delete_project_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_delete_project_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1552,41 +1582,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def delete_project_attributes2(self, org, project, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_attributes2(self, org, project, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_attributes2(org, project, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_attributes2(org, project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the project. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param AdminProjectAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectAttributesBody body: (required)
         :return: AdminProjectAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.delete_project_attributes2_with_http_info(org, project, body, **kwargs)  # noqa: E501
+            return self.admin_service_delete_project_attributes2_with_http_info(org, project, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.delete_project_attributes2_with_http_info(org, project, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_delete_project_attributes2_with_http_info(org, project, body, **kwargs)  # noqa: E501
             return data
 
-    def delete_project_attributes2_with_http_info(self, org, project, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_attributes2_with_http_info(self, org, project, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_attributes2_with_http_info(org, project, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_attributes2_with_http_info(org, project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the project. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param AdminProjectAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectAttributesBody body: (required)
         :return: AdminProjectAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1603,22 +1635,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method delete_project_attributes2" % key
+                    " to method admin_service_delete_project_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `delete_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_delete_project_attributes2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `delete_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_delete_project_attributes2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `delete_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_delete_project_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1665,41 +1697,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def delete_project_domain_attributes(self, project, domain, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_domain_attributes(self, project, domain, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_domain_attributes(project, domain, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_domain_attributes(project, domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param AdminProjectDomainAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.delete_project_domain_attributes_with_http_info(project, domain, body, **kwargs)  # noqa: E501
+            return self.admin_service_delete_project_domain_attributes_with_http_info(project, domain, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.delete_project_domain_attributes_with_http_info(project, domain, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_delete_project_domain_attributes_with_http_info(project, domain, body, **kwargs)  # noqa: E501
             return data
 
-    def delete_project_domain_attributes_with_http_info(self, project, domain, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_domain_attributes_with_http_info(self, project, domain, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_domain_attributes_with_http_info(project, domain, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_domain_attributes_with_http_info(project, domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param AdminProjectDomainAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1716,22 +1750,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method delete_project_domain_attributes" % key
+                    " to method admin_service_delete_project_domain_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `delete_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_delete_project_domain_attributes`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `delete_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_delete_project_domain_attributes`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `delete_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_delete_project_domain_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1778,43 +1812,45 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def delete_project_domain_attributes2(self, org, project, domain, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_domain_attributes2(self, org, project, domain, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_domain_attributes2(org, project, domain, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_domain_attributes2(org, project, domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the attributes. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param AdminProjectDomainAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.delete_project_domain_attributes2_with_http_info(org, project, domain, body, **kwargs)  # noqa: E501
+            return self.admin_service_delete_project_domain_attributes2_with_http_info(org, project, domain, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.delete_project_domain_attributes2_with_http_info(org, project, domain, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_delete_project_domain_attributes2_with_http_info(org, project, domain, body, **kwargs)  # noqa: E501
             return data
 
-    def delete_project_domain_attributes2_with_http_info(self, org, project, domain, body, **kwargs):  # noqa: E501
+    def admin_service_delete_project_domain_attributes2_with_http_info(self, org, project, domain, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_project_domain_attributes2_with_http_info(org, project, domain, body, async_req=True)
+        >>> thread = api.admin_service_delete_project_domain_attributes2_with_http_info(org, project, domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the attributes. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param AdminProjectDomainAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1831,26 +1867,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method delete_project_domain_attributes2" % key
+                    " to method admin_service_delete_project_domain_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `delete_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_delete_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `delete_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_delete_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `delete_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_delete_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `delete_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_delete_project_domain_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -1899,43 +1935,45 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def delete_workflow_attributes(self, project, domain, workflow, body, **kwargs):  # noqa: E501
+    def admin_service_delete_workflow_attributes(self, project, domain, workflow, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_workflow_attributes(project, domain, workflow, body, async_req=True)
+        >>> thread = api.admin_service_delete_workflow_attributes(project, domain, workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param AdminWorkflowAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.delete_workflow_attributes_with_http_info(project, domain, workflow, body, **kwargs)  # noqa: E501
+            return self.admin_service_delete_workflow_attributes_with_http_info(project, domain, workflow, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.delete_workflow_attributes_with_http_info(project, domain, workflow, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_delete_workflow_attributes_with_http_info(project, domain, workflow, body, **kwargs)  # noqa: E501
             return data
 
-    def delete_workflow_attributes_with_http_info(self, project, domain, workflow, body, **kwargs):  # noqa: E501
+    def admin_service_delete_workflow_attributes_with_http_info(self, project, domain, workflow, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_workflow_attributes_with_http_info(project, domain, workflow, body, async_req=True)
+        >>> thread = api.admin_service_delete_workflow_attributes_with_http_info(project, domain, workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param AdminWorkflowAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -1952,26 +1990,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method delete_workflow_attributes" % key
+                    " to method admin_service_delete_workflow_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `delete_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_delete_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `delete_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_delete_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'workflow' is set
-        if ('workflow' not in params or
-                params['workflow'] is None):
-            raise ValueError("Missing the required parameter `workflow` when calling `delete_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow' not in params or
+                                                       params['workflow'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow` when calling `admin_service_delete_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `delete_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_delete_workflow_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2020,12 +2058,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def delete_workflow_attributes2(self, org, project, domain, workflow, body, **kwargs):  # noqa: E501
+    def admin_service_delete_workflow_attributes2(self, org, project, domain, workflow, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_workflow_attributes2(org, project, domain, workflow, body, async_req=True)
+        >>> thread = api.admin_service_delete_workflow_attributes2(org, project, domain, workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2033,24 +2072,25 @@ class AdminServiceApi(object):
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param AdminWorkflowAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.delete_workflow_attributes2_with_http_info(org, project, domain, workflow, body, **kwargs)  # noqa: E501
+            return self.admin_service_delete_workflow_attributes2_with_http_info(org, project, domain, workflow, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.delete_workflow_attributes2_with_http_info(org, project, domain, workflow, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_delete_workflow_attributes2_with_http_info(org, project, domain, workflow, body, **kwargs)  # noqa: E501
             return data
 
-    def delete_workflow_attributes2_with_http_info(self, org, project, domain, workflow, body, **kwargs):  # noqa: E501
+    def admin_service_delete_workflow_attributes2_with_http_info(self, org, project, domain, workflow, body, **kwargs):  # noqa: E501
         """Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Delete the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.delete_workflow_attributes2_with_http_info(org, project, domain, workflow, body, async_req=True)
+        >>> thread = api.admin_service_delete_workflow_attributes2_with_http_info(org, project, domain, workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2058,7 +2098,7 @@ class AdminServiceApi(object):
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param AdminWorkflowAttributesDeleteRequest body: (required)
+        :param AdminServiceDeleteWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesDeleteResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -2075,30 +2115,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method delete_workflow_attributes2" % key
+                    " to method admin_service_delete_workflow_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `delete_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_delete_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `delete_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_delete_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `delete_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_delete_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'workflow' is set
-        if ('workflow' not in params or
-                params['workflow'] is None):
-            raise ValueError("Missing the required parameter `workflow` when calling `delete_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow' not in params or
+                                                       params['workflow'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow` when calling `admin_service_delete_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `delete_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_delete_workflow_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2149,12 +2189,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_active_launch_plan(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_active_launch_plan(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Retrieve the active launch plan version specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_active_launch_plan(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_active_launch_plan(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2168,17 +2209,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_active_launch_plan_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_active_launch_plan_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_active_launch_plan_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_active_launch_plan_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_active_launch_plan_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_active_launch_plan_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Retrieve the active launch plan version specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_active_launch_plan_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_active_launch_plan_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2202,22 +2244,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_active_launch_plan" % key
+                    " to method admin_service_get_active_launch_plan" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_active_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_active_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_active_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_active_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_active_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_active_launch_plan`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2266,12 +2308,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_active_launch_plan2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_active_launch_plan2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Retrieve the active launch plan version specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_active_launch_plan2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_active_launch_plan2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2285,17 +2328,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_active_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_active_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_active_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_active_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_active_launch_plan2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_active_launch_plan2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Retrieve the active launch plan version specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_active_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_active_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2319,26 +2363,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_active_launch_plan2" % key
+                    " to method admin_service_get_active_launch_plan2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_active_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_active_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_active_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_active_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_active_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_active_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_active_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_active_launch_plan2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2387,12 +2431,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_description_entity(self, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_description_entity(self, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
 
+        Retrieve an existing description entity description.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_description_entity(id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_description_entity(id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2408,17 +2453,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_description_entity_with_http_info(self, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_description_entity_with_http_info(self, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
 
+        Retrieve an existing description entity description.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_description_entity_with_http_info(id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2444,30 +2490,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_description_entity" % key
+                    " to method admin_service_get_description_entity" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_resource_type' is set
-        if ('id_resource_type' not in params or
-                params['id_resource_type'] is None):
-            raise ValueError("Missing the required parameter `id_resource_type` when calling `get_description_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_resource_type' not in params or
+                                                       params['id_resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_resource_type` when calling `admin_service_get_description_entity`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_description_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_description_entity`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_description_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_description_entity`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_description_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_description_entity`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_description_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_description_entity`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2520,12 +2566,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_description_entity2(self, id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_description_entity2(self, id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
 
+        Retrieve an existing description entity description.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_description_entity2(id_org, id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_description_entity2(id_org, id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2541,17 +2588,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_description_entity2_with_http_info(id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_description_entity2_with_http_info(id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_description_entity2_with_http_info(id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_description_entity2_with_http_info(id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_description_entity2_with_http_info(self, id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_description_entity2_with_http_info(self, id_org, id_resource_type, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.  # noqa: E501
 
+        Retrieve an existing description entity description.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_description_entity2_with_http_info(id_org, id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_description_entity2_with_http_info(id_org, id_resource_type, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2577,34 +2625,34 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_description_entity2" % key
+                    " to method admin_service_get_description_entity2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_description_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_description_entity2`")  # noqa: E501
         # verify the required parameter 'id_resource_type' is set
-        if ('id_resource_type' not in params or
-                params['id_resource_type'] is None):
-            raise ValueError("Missing the required parameter `id_resource_type` when calling `get_description_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_resource_type' not in params or
+                                                       params['id_resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_resource_type` when calling `admin_service_get_description_entity2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_description_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_description_entity2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_description_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_description_entity2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_description_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_description_entity2`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_description_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_description_entity2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2657,12 +2705,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_dynamic_node_workflow(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_dynamic_node_workflow(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_dynamic_node_workflow(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_dynamic_node_workflow(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2677,17 +2725,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def get_dynamic_node_workflow_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_dynamic_node_workflow_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_dynamic_node_workflow_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2712,26 +2760,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_dynamic_node_workflow" % key
+                    " to method admin_service_get_dynamic_node_workflow" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_execution_id_project' is set
-        if ('id_execution_id_project' not in params or
-                params['id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_project' not in params or
+                                                       params['id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `admin_service_get_dynamic_node_workflow`")  # noqa: E501
         # verify the required parameter 'id_execution_id_domain' is set
-        if ('id_execution_id_domain' not in params or
-                params['id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_domain' not in params or
+                                                       params['id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `admin_service_get_dynamic_node_workflow`")  # noqa: E501
         # verify the required parameter 'id_execution_id_name' is set
-        if ('id_execution_id_name' not in params or
-                params['id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_name' not in params or
+                                                       params['id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `admin_service_get_dynamic_node_workflow`")  # noqa: E501
         # verify the required parameter 'id_node_id' is set
-        if ('id_node_id' not in params or
-                params['id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_id` when calling `get_dynamic_node_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_id' not in params or
+                                                       params['id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_id` when calling `admin_service_get_dynamic_node_workflow`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2782,12 +2830,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_dynamic_node_workflow2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_dynamic_node_workflow2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_dynamic_node_workflow2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_dynamic_node_workflow2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2802,17 +2850,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def get_dynamic_node_workflow2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_dynamic_node_workflow2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.DynamicNodeWorkflowResponse`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_dynamic_node_workflow2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2837,30 +2885,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_dynamic_node_workflow2" % key
+                    " to method admin_service_get_dynamic_node_workflow2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_execution_id_org' is set
-        if ('id_execution_id_org' not in params or
-                params['id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_org' not in params or
+                                                       params['id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `admin_service_get_dynamic_node_workflow2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_project' is set
-        if ('id_execution_id_project' not in params or
-                params['id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_project' not in params or
+                                                       params['id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `admin_service_get_dynamic_node_workflow2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_domain' is set
-        if ('id_execution_id_domain' not in params or
-                params['id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_domain' not in params or
+                                                       params['id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `admin_service_get_dynamic_node_workflow2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_name' is set
-        if ('id_execution_id_name' not in params or
-                params['id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_name' not in params or
+                                                       params['id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `admin_service_get_dynamic_node_workflow2`")  # noqa: E501
         # verify the required parameter 'id_node_id' is set
-        if ('id_node_id' not in params or
-                params['id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_id` when calling `get_dynamic_node_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_id' not in params or
+                                                       params['id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_id` when calling `admin_service_get_dynamic_node_workflow2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -2911,12 +2959,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_execution(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2930,17 +2979,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_execution_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_execution_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_execution_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_execution_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_execution_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -2964,22 +3014,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_execution" % key
+                    " to method admin_service_get_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_execution`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_execution`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3028,12 +3078,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_execution2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3047,17 +3098,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_execution2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_execution2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_execution2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_execution2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_execution2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3081,26 +3133,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_execution2" % key
+                    " to method admin_service_get_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_execution2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_execution2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_execution2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3149,12 +3201,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_execution_data(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_data(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_data(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_data(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3168,17 +3220,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_execution_data_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_execution_data_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_execution_data_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_execution_data_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_execution_data_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_data_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_data_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_data_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3202,22 +3254,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_execution_data" % key
+                    " to method admin_service_get_execution_data" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_execution_data`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_execution_data`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_execution_data`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3266,12 +3318,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_execution_data2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_data2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_data2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_data2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3285,17 +3337,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_execution_data2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_execution_data2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_execution_data2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_execution_data2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_execution_data2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_data2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_data2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_data2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3319,26 +3371,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_execution_data2" % key
+                    " to method admin_service_get_execution_data2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_execution_data2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3387,12 +3439,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_execution_metrics(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_metrics(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve metrics from an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_metrics(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_metrics(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3407,17 +3460,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_execution_metrics_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_execution_metrics_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_execution_metrics_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_execution_metrics_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_execution_metrics_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_metrics_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve metrics from an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_metrics_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_metrics_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3442,22 +3496,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_execution_metrics" % key
+                    " to method admin_service_get_execution_metrics" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_execution_metrics`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_execution_metrics`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution_metrics`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_execution_metrics`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_execution_metrics`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_execution_metrics`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3508,12 +3562,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_execution_metrics2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_metrics2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve metrics from an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_metrics2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_metrics2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3528,17 +3583,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_execution_metrics2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_execution_metrics2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_execution_metrics2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_execution_metrics2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_execution_metrics2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_execution_metrics2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
+        Retrieve metrics from an existing workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_execution_metrics2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_execution_metrics2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3563,26 +3619,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_execution_metrics2" % key
+                    " to method admin_service_get_execution_metrics2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_execution_metrics2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_execution_metrics2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_execution_metrics2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_execution_metrics2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_execution_metrics2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_execution_metrics2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_execution_metrics2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_execution_metrics2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3633,12 +3689,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_launch_plan(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_launch_plan(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.  # noqa: E501
 
+        Retrieve an existing launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_launch_plan(id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_launch_plan(id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3654,17 +3711,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_launch_plan_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_launch_plan_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.  # noqa: E501
 
+        Retrieve an existing launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3690,26 +3748,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_launch_plan" % key
+                    " to method admin_service_get_launch_plan" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_launch_plan`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3762,12 +3820,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_launch_plan2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_launch_plan2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.  # noqa: E501
 
+        Retrieve an existing launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_launch_plan2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_launch_plan2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3783,17 +3842,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_launch_plan2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_launch_plan2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.  # noqa: E501
 
+        Retrieve an existing launch plan definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3819,30 +3879,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_launch_plan2" % key
+                    " to method admin_service_get_launch_plan2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_launch_plan2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -3895,12 +3955,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_named_entity(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_named_entity(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Retrieve a NamedEntity object.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_named_entity(resource_type, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_named_entity(resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3915,17 +3976,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_named_entity_with_http_info(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_named_entity_with_http_info(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Retrieve a NamedEntity object.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -3950,26 +4012,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_named_entity" % key
+                    " to method admin_service_get_named_entity" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `get_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_get_named_entity`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_named_entity`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_named_entity`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_named_entity`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4020,12 +4082,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_named_entity2(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_named_entity2(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Retrieve a NamedEntity object.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_named_entity2(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_named_entity2(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4040,17 +4103,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def get_named_entity2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_get_named_entity2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Retrieve a NamedEntity object.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_get_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4075,30 +4139,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_named_entity2" % key
+                    " to method admin_service_get_named_entity2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `get_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_get_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_named_entity2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4149,12 +4213,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_node_execution(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4169,17 +4233,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def get_node_execution_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4204,26 +4268,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_node_execution" % key
+                    " to method admin_service_get_node_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_execution_id_project' is set
-        if ('id_execution_id_project' not in params or
-                params['id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_node_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_project' not in params or
+                                                       params['id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `admin_service_get_node_execution`")  # noqa: E501
         # verify the required parameter 'id_execution_id_domain' is set
-        if ('id_execution_id_domain' not in params or
-                params['id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_node_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_domain' not in params or
+                                                       params['id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `admin_service_get_node_execution`")  # noqa: E501
         # verify the required parameter 'id_execution_id_name' is set
-        if ('id_execution_id_name' not in params or
-                params['id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_node_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_name' not in params or
+                                                       params['id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `admin_service_get_node_execution`")  # noqa: E501
         # verify the required parameter 'id_node_id' is set
-        if ('id_node_id' not in params or
-                params['id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_id` when calling `get_node_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_id' not in params or
+                                                       params['id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_id` when calling `admin_service_get_node_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4274,12 +4338,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_node_execution2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4294,17 +4358,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_node_execution2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_get_node_execution2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_node_execution2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_node_execution2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def get_node_execution2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4329,30 +4393,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_node_execution2" % key
+                    " to method admin_service_get_node_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_execution_id_org' is set
-        if ('id_execution_id_org' not in params or
-                params['id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `get_node_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_org' not in params or
+                                                       params['id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `admin_service_get_node_execution2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_project' is set
-        if ('id_execution_id_project' not in params or
-                params['id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_node_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_project' not in params or
+                                                       params['id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `admin_service_get_node_execution2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_domain' is set
-        if ('id_execution_id_domain' not in params or
-                params['id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_node_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_domain' not in params or
+                                                       params['id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `admin_service_get_node_execution2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_name' is set
-        if ('id_execution_id_name' not in params or
-                params['id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_node_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_name' not in params or
+                                                       params['id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `admin_service_get_node_execution2`")  # noqa: E501
         # verify the required parameter 'id_node_id' is set
-        if ('id_node_id' not in params or
-                params['id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_id` when calling `get_node_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_id' not in params or
+                                                       params['id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_id` when calling `admin_service_get_node_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4403,12 +4467,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_node_execution_data(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution_data(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution_data(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution_data(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4423,17 +4487,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def get_node_execution_data_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution_data_with_http_info(self, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution_data_with_http_info(id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4458,26 +4522,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_node_execution_data" % key
+                    " to method admin_service_get_node_execution_data" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_execution_id_project' is set
-        if ('id_execution_id_project' not in params or
-                params['id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_node_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_project' not in params or
+                                                       params['id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `admin_service_get_node_execution_data`")  # noqa: E501
         # verify the required parameter 'id_execution_id_domain' is set
-        if ('id_execution_id_domain' not in params or
-                params['id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_node_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_domain' not in params or
+                                                       params['id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `admin_service_get_node_execution_data`")  # noqa: E501
         # verify the required parameter 'id_execution_id_name' is set
-        if ('id_execution_id_name' not in params or
-                params['id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_node_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_name' not in params or
+                                                       params['id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `admin_service_get_node_execution_data`")  # noqa: E501
         # verify the required parameter 'id_node_id' is set
-        if ('id_node_id' not in params or
-                params['id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_id` when calling `get_node_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_id' not in params or
+                                                       params['id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_id` when calling `admin_service_get_node_execution_data`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4528,12 +4592,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_node_execution_data2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution_data2(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution_data2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution_data2(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4548,17 +4612,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_node_execution_data2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_get_node_execution_data2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_node_execution_data2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_node_execution_data2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def get_node_execution_data2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
+    def admin_service_get_node_execution_data2_with_http_info(self, id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_node_execution_data2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
+        >>> thread = api.admin_service_get_node_execution_data2_with_http_info(id_execution_id_org, id_execution_id_project, id_execution_id_domain, id_execution_id_name, id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -4583,30 +4647,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_node_execution_data2" % key
+                    " to method admin_service_get_node_execution_data2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_execution_id_org' is set
-        if ('id_execution_id_org' not in params or
-                params['id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `get_node_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_org' not in params or
+                                                       params['id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_org` when calling `admin_service_get_node_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_project' is set
-        if ('id_execution_id_project' not in params or
-                params['id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `get_node_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_project' not in params or
+                                                       params['id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_project` when calling `admin_service_get_node_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_domain' is set
-        if ('id_execution_id_domain' not in params or
-                params['id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `get_node_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_domain' not in params or
+                                                       params['id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_domain` when calling `admin_service_get_node_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_execution_id_name' is set
-        if ('id_execution_id_name' not in params or
-                params['id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `get_node_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_execution_id_name' not in params or
+                                                       params['id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_execution_id_name` when calling `admin_service_get_node_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_node_id' is set
-        if ('id_node_id' not in params or
-                params['id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_id` when calling `get_node_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_id' not in params or
+                                                       params['id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_id` when calling `admin_service_get_node_execution_data2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4657,17 +4721,18 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_project_attributes(self, project, **kwargs):  # noqa: E501
+    def admin_service_get_project_attributes(self, project, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_attributes(project, async_req=True)
+        >>> thread = api.admin_service_get_project_attributes(project, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org key applied to the project.
         :return: AdminProjectAttributesGetResponse
                  If the method is called asynchronously,
@@ -4675,22 +4740,23 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_project_attributes_with_http_info(project, **kwargs)  # noqa: E501
+            return self.admin_service_get_project_attributes_with_http_info(project, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_project_attributes_with_http_info(project, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_project_attributes_with_http_info(project, **kwargs)  # noqa: E501
             return data
 
-    def get_project_attributes_with_http_info(self, project, **kwargs):  # noqa: E501
+    def admin_service_get_project_attributes_with_http_info(self, project, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_attributes_with_http_info(project, async_req=True)
+        >>> thread = api.admin_service_get_project_attributes_with_http_info(project, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org key applied to the project.
         :return: AdminProjectAttributesGetResponse
                  If the method is called asynchronously,
@@ -4708,14 +4774,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_project_attributes" % key
+                    " to method admin_service_get_project_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `get_project_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_get_project_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4762,41 +4828,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_project_attributes2(self, org, project, **kwargs):  # noqa: E501
+    def admin_service_get_project_attributes2(self, org, project, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_attributes2(org, project, async_req=True)
+        >>> thread = api.admin_service_get_project_attributes2(org, project, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the project. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminProjectAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_project_attributes2_with_http_info(org, project, **kwargs)  # noqa: E501
+            return self.admin_service_get_project_attributes2_with_http_info(org, project, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_project_attributes2_with_http_info(org, project, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_project_attributes2_with_http_info(org, project, **kwargs)  # noqa: E501
             return data
 
-    def get_project_attributes2_with_http_info(self, org, project, **kwargs):  # noqa: E501
+    def admin_service_get_project_attributes2_with_http_info(self, org, project, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_attributes2_with_http_info(org, project, async_req=True)
+        >>> thread = api.admin_service_get_project_attributes2_with_http_info(org, project, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the project. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminProjectAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -4813,18 +4881,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_project_attributes2" % key
+                    " to method admin_service_get_project_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `get_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_get_project_attributes2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `get_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_get_project_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4871,18 +4939,19 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_project_domain_attributes(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_get_project_domain_attributes(self, project, domain, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_domain_attributes(project, domain, async_req=True)
+        >>> thread = api.admin_service_get_project_domain_attributes(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org key applied to the attributes.
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
@@ -4890,23 +4959,24 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_project_domain_attributes_with_http_info(project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_get_project_domain_attributes_with_http_info(project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_project_domain_attributes_with_http_info(project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_project_domain_attributes_with_http_info(project, domain, **kwargs)  # noqa: E501
             return data
 
-    def get_project_domain_attributes_with_http_info(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_get_project_domain_attributes_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_domain_attributes_with_http_info(project, domain, async_req=True)
+        >>> thread = api.admin_service_get_project_domain_attributes_with_http_info(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org key applied to the attributes.
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
@@ -4924,18 +4994,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_project_domain_attributes" % key
+                    " to method admin_service_get_project_domain_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `get_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_get_project_domain_attributes`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `get_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_get_project_domain_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -4984,43 +5054,45 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_project_domain_attributes2(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_get_project_domain_attributes2(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_domain_attributes2(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_get_project_domain_attributes2(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the attributes. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_project_domain_attributes2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_get_project_domain_attributes2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_project_domain_attributes2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_project_domain_attributes2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def get_project_domain_attributes2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_get_project_domain_attributes2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_project_domain_attributes2_with_http_info(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_get_project_domain_attributes2_with_http_info(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the attributes. (required)
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminProjectDomainAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -5037,22 +5109,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_project_domain_attributes2" % key
+                    " to method admin_service_get_project_domain_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `get_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_get_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `get_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_get_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `get_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_get_project_domain_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -5101,12 +5173,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_task(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_task(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Task` definition.  # noqa: E501
 
+        Retrieve an existing task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task(id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_task(id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5122,17 +5195,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_task_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_task_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_task_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_task_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_task_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_task_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Task` definition.  # noqa: E501
 
+        Retrieve an existing task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_task_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5158,26 +5232,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_task" % key
+                    " to method admin_service_get_task" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_task`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_task`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_task`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_task`")  # noqa: E501
 
         collection_formats = {}
 
@@ -5230,12 +5304,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_task2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_task2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Task` definition.  # noqa: E501
 
+        Retrieve an existing task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_task2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5251,17 +5326,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_task2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_task2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_task2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_task2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_task2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_task2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Task` definition.  # noqa: E501
 
+        Retrieve an existing task definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_task2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5287,30 +5363,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_task2" % key
+                    " to method admin_service_get_task2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_task2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_task2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_task2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_task2`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_task2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -5363,12 +5439,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_task_execution(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5390,17 +5467,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            return self.admin_service_get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
             return data
 
-    def get_task_execution_with_http_info(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution_with_http_info(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5432,46 +5510,46 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_task_execution" % key
+                    " to method admin_service_get_task_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_node_execution_id_execution_id_project' is set
-        if ('id_node_execution_id_execution_id_project' not in params or
-                params['id_node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_project' not in params or
+                                                       params['id_node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_domain' is set
-        if ('id_node_execution_id_execution_id_domain' not in params or
-                params['id_node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_domain' not in params or
+                                                       params['id_node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_name' is set
-        if ('id_node_execution_id_execution_id_name' not in params or
-                params['id_node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_name' not in params or
+                                                       params['id_node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_node_id' is set
-        if ('id_node_execution_id_node_id' not in params or
-                params['id_node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_node_id' not in params or
+                                                       params['id_node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_task_id_project' is set
-        if ('id_task_id_project' not in params or
-                params['id_task_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_project` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_project' not in params or
+                                                       params['id_task_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_project` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_task_id_domain' is set
-        if ('id_task_id_domain' not in params or
-                params['id_task_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_domain' not in params or
+                                                       params['id_task_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_task_id_name' is set
-        if ('id_task_id_name' not in params or
-                params['id_task_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_name` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_name' not in params or
+                                                       params['id_task_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_name` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_task_id_version' is set
-        if ('id_task_id_version' not in params or
-                params['id_task_id_version'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_version` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_version' not in params or
+                                                       params['id_task_id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_version` when calling `admin_service_get_task_execution`")  # noqa: E501
         # verify the required parameter 'id_retry_attempt' is set
-        if ('id_retry_attempt' not in params or
-                params['id_retry_attempt'] is None):
-            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `get_task_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_retry_attempt' not in params or
+                                                       params['id_retry_attempt'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `admin_service_get_task_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -5536,12 +5614,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_task_execution2(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution2(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution2(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution2(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5563,17 +5642,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_task_execution2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            return self.admin_service_get_task_execution2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_task_execution2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_task_execution2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
             return data
 
-    def get_task_execution2_with_http_info(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution2_with_http_info(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5605,50 +5685,50 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_task_execution2" % key
+                    " to method admin_service_get_task_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_node_execution_id_execution_id_org' is set
-        if ('id_node_execution_id_execution_id_org' not in params or
-                params['id_node_execution_id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_org` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_org' not in params or
+                                                       params['id_node_execution_id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_org` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_project' is set
-        if ('id_node_execution_id_execution_id_project' not in params or
-                params['id_node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_project' not in params or
+                                                       params['id_node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_domain' is set
-        if ('id_node_execution_id_execution_id_domain' not in params or
-                params['id_node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_domain' not in params or
+                                                       params['id_node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_name' is set
-        if ('id_node_execution_id_execution_id_name' not in params or
-                params['id_node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_name' not in params or
+                                                       params['id_node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_node_id' is set
-        if ('id_node_execution_id_node_id' not in params or
-                params['id_node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_node_id' not in params or
+                                                       params['id_node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_task_id_project' is set
-        if ('id_task_id_project' not in params or
-                params['id_task_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_project` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_project' not in params or
+                                                       params['id_task_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_project` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_task_id_domain' is set
-        if ('id_task_id_domain' not in params or
-                params['id_task_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_domain' not in params or
+                                                       params['id_task_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_task_id_name' is set
-        if ('id_task_id_name' not in params or
-                params['id_task_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_name` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_name' not in params or
+                                                       params['id_task_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_name` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_task_id_version' is set
-        if ('id_task_id_version' not in params or
-                params['id_task_id_version'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_version` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_version' not in params or
+                                                       params['id_task_id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_version` when calling `admin_service_get_task_execution2`")  # noqa: E501
         # verify the required parameter 'id_retry_attempt' is set
-        if ('id_retry_attempt' not in params or
-                params['id_retry_attempt'] is None):
-            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `get_task_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_retry_attempt' not in params or
+                                                       params['id_retry_attempt'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `admin_service_get_task_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -5713,12 +5793,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_task_execution_data(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution_data(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve input and output data from an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution_data(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution_data(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5740,17 +5821,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            return self.admin_service_get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
             return data
 
-    def get_task_execution_data_with_http_info(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution_data_with_http_info(self, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve input and output data from an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution_data_with_http_info(id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5782,46 +5864,46 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_task_execution_data" % key
+                    " to method admin_service_get_task_execution_data" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_node_execution_id_execution_id_project' is set
-        if ('id_node_execution_id_execution_id_project' not in params or
-                params['id_node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_project' not in params or
+                                                       params['id_node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_domain' is set
-        if ('id_node_execution_id_execution_id_domain' not in params or
-                params['id_node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_domain' not in params or
+                                                       params['id_node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_name' is set
-        if ('id_node_execution_id_execution_id_name' not in params or
-                params['id_node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_name' not in params or
+                                                       params['id_node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_node_id' is set
-        if ('id_node_execution_id_node_id' not in params or
-                params['id_node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_node_id' not in params or
+                                                       params['id_node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_task_id_project' is set
-        if ('id_task_id_project' not in params or
-                params['id_task_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_project` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_project' not in params or
+                                                       params['id_task_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_project` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_task_id_domain' is set
-        if ('id_task_id_domain' not in params or
-                params['id_task_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_domain' not in params or
+                                                       params['id_task_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_task_id_name' is set
-        if ('id_task_id_name' not in params or
-                params['id_task_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_name` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_name' not in params or
+                                                       params['id_task_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_name` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_task_id_version' is set
-        if ('id_task_id_version' not in params or
-                params['id_task_id_version'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_version` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_version' not in params or
+                                                       params['id_task_id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_version` when calling `admin_service_get_task_execution_data`")  # noqa: E501
         # verify the required parameter 'id_retry_attempt' is set
-        if ('id_retry_attempt' not in params or
-                params['id_retry_attempt'] is None):
-            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `get_task_execution_data`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_retry_attempt' not in params or
+                                                       params['id_retry_attempt'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `admin_service_get_task_execution_data`")  # noqa: E501
 
         collection_formats = {}
 
@@ -5886,12 +5968,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_task_execution_data2(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution_data2(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve input and output data from an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution_data2(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution_data2(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5913,17 +5996,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_task_execution_data2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            return self.admin_service_get_task_execution_data2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_task_execution_data2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_task_execution_data2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs)  # noqa: E501
             return data
 
-    def get_task_execution_data2_with_http_info(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_get_task_execution_data2_with_http_info(self, id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, **kwargs):  # noqa: E501
         """Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Retrieve input and output data from an existing task execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_task_execution_data2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_get_task_execution_data2_with_http_info(id_node_execution_id_execution_id_org, id_node_execution_id_execution_id_project, id_node_execution_id_execution_id_domain, id_node_execution_id_execution_id_name, id_node_execution_id_node_id, id_task_id_project, id_task_id_domain, id_task_id_name, id_task_id_version, id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -5955,50 +6039,50 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_task_execution_data2" % key
+                    " to method admin_service_get_task_execution_data2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_node_execution_id_execution_id_org' is set
-        if ('id_node_execution_id_execution_id_org' not in params or
-                params['id_node_execution_id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_org` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_org' not in params or
+                                                       params['id_node_execution_id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_org` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_project' is set
-        if ('id_node_execution_id_execution_id_project' not in params or
-                params['id_node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_project' not in params or
+                                                       params['id_node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_project` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_domain' is set
-        if ('id_node_execution_id_execution_id_domain' not in params or
-                params['id_node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_domain' not in params or
+                                                       params['id_node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_domain` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_execution_id_name' is set
-        if ('id_node_execution_id_execution_id_name' not in params or
-                params['id_node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_execution_id_name' not in params or
+                                                       params['id_node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_execution_id_name` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_node_execution_id_node_id' is set
-        if ('id_node_execution_id_node_id' not in params or
-                params['id_node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_node_execution_id_node_id' not in params or
+                                                       params['id_node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_node_execution_id_node_id` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_task_id_project' is set
-        if ('id_task_id_project' not in params or
-                params['id_task_id_project'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_project` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_project' not in params or
+                                                       params['id_task_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_project` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_task_id_domain' is set
-        if ('id_task_id_domain' not in params or
-                params['id_task_id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_domain' not in params or
+                                                       params['id_task_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_domain` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_task_id_name' is set
-        if ('id_task_id_name' not in params or
-                params['id_task_id_name'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_name` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_name' not in params or
+                                                       params['id_task_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_name` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_task_id_version' is set
-        if ('id_task_id_version' not in params or
-                params['id_task_id_version'] is None):
-            raise ValueError("Missing the required parameter `id_task_id_version` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_task_id_version' not in params or
+                                                       params['id_task_id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_task_id_version` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
         # verify the required parameter 'id_retry_attempt' is set
-        if ('id_retry_attempt' not in params or
-                params['id_retry_attempt'] is None):
-            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `get_task_execution_data2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_retry_attempt' not in params or
+                                                       params['id_retry_attempt'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_retry_attempt` when calling `admin_service_get_task_execution_data2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6063,12 +6147,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_version(self, **kwargs):  # noqa: E501
-        """get_version  # noqa: E501
+    def admin_service_get_version(self, **kwargs):  # noqa: E501
+        """admin_service_get_version  # noqa: E501
 
+        Retrieve the Version (including the Build  information) for FlyteAdmin service  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_version(async_req=True)
+        >>> thread = api.admin_service_get_version(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6078,17 +6163,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_version_with_http_info(**kwargs)  # noqa: E501
+            return self.admin_service_get_version_with_http_info(**kwargs)  # noqa: E501
         else:
-            (data) = self.get_version_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.admin_service_get_version_with_http_info(**kwargs)  # noqa: E501
             return data
 
-    def get_version_with_http_info(self, **kwargs):  # noqa: E501
-        """get_version  # noqa: E501
+    def admin_service_get_version_with_http_info(self, **kwargs):  # noqa: E501
+        """admin_service_get_version  # noqa: E501
 
+        Retrieve the Version (including the Build  information) for FlyteAdmin service  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_version_with_http_info(async_req=True)
+        >>> thread = api.admin_service_get_version_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6108,7 +6194,7 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_version" % key
+                    " to method admin_service_get_version" % key
                 )
             params[key] = val
         del params['kwargs']
@@ -6152,12 +6238,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_workflow(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_workflow(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.  # noqa: E501
 
+        Retrieve an existing workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow(id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_workflow(id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6173,17 +6260,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_workflow_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_workflow_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_workflow_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_workflow_with_http_info(id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_workflow_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_workflow_with_http_info(self, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.  # noqa: E501
 
+        Retrieve an existing workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_workflow_with_http_info(id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6209,26 +6297,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_workflow" % key
+                    " to method admin_service_get_workflow" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_workflow`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_workflow`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_workflow`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_workflow`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_workflow`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6281,12 +6369,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_workflow2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_workflow2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.  # noqa: E501
 
+        Retrieve an existing workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_workflow2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6302,17 +6391,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_workflow2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_get_workflow2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_workflow2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_workflow2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def get_workflow2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_get_workflow2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.  # noqa: E501
 
+        Retrieve an existing workflow definition.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_get_workflow2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6338,30 +6428,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_workflow2" % key
+                    " to method admin_service_get_workflow2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `get_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_get_workflow2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `get_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_get_workflow2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `get_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_get_workflow2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `get_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_get_workflow2`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `get_workflow2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_get_workflow2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6414,19 +6504,20 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_workflow_attributes(self, project, domain, workflow, **kwargs):  # noqa: E501
+    def admin_service_get_workflow_attributes(self, project, domain, workflow, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow_attributes(project, domain, workflow, async_req=True)
+        >>> thread = api.admin_service_get_workflow_attributes(project, domain, workflow, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org key applied to the attributes.
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
@@ -6434,24 +6525,25 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_workflow_attributes_with_http_info(project, domain, workflow, **kwargs)  # noqa: E501
+            return self.admin_service_get_workflow_attributes_with_http_info(project, domain, workflow, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_workflow_attributes_with_http_info(project, domain, workflow, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_workflow_attributes_with_http_info(project, domain, workflow, **kwargs)  # noqa: E501
             return data
 
-    def get_workflow_attributes_with_http_info(self, project, domain, workflow, **kwargs):  # noqa: E501
+    def admin_service_get_workflow_attributes_with_http_info(self, project, domain, workflow, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow_attributes_with_http_info(project, domain, workflow, async_req=True)
+        >>> thread = api.admin_service_get_workflow_attributes_with_http_info(project, domain, workflow, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org key applied to the attributes.
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
@@ -6469,22 +6561,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_workflow_attributes" % key
+                    " to method admin_service_get_workflow_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `get_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_get_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `get_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_get_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'workflow' is set
-        if ('workflow' not in params or
-                params['workflow'] is None):
-            raise ValueError("Missing the required parameter `workflow` when calling `get_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow' not in params or
+                                                       params['workflow'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow` when calling `admin_service_get_workflow_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6535,12 +6627,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def get_workflow_attributes2(self, org, project, domain, workflow, **kwargs):  # noqa: E501
+    def admin_service_get_workflow_attributes2(self, org, project, domain, workflow, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow_attributes2(org, project, domain, workflow, async_req=True)
+        >>> thread = api.admin_service_get_workflow_attributes2(org, project, domain, workflow, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6548,24 +6641,25 @@ class AdminServiceApi(object):
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.get_workflow_attributes2_with_http_info(org, project, domain, workflow, **kwargs)  # noqa: E501
+            return self.admin_service_get_workflow_attributes2_with_http_info(org, project, domain, workflow, **kwargs)  # noqa: E501
         else:
-            (data) = self.get_workflow_attributes2_with_http_info(org, project, domain, workflow, **kwargs)  # noqa: E501
+            (data) = self.admin_service_get_workflow_attributes2_with_http_info(org, project, domain, workflow, **kwargs)  # noqa: E501
             return data
 
-    def get_workflow_attributes2_with_http_info(self, org, project, domain, workflow, **kwargs):  # noqa: E501
+    def admin_service_get_workflow_attributes2_with_http_info(self, org, project, domain, workflow, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Retrieve the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.get_workflow_attributes2_with_http_info(org, project, domain, workflow, async_req=True)
+        >>> thread = api.admin_service_get_workflow_attributes2_with_http_info(org, project, domain, workflow, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6573,7 +6667,7 @@ class AdminServiceApi(object):
         :param str project: Unique project id which this set of attributes references. +required (required)
         :param str domain: Unique domain id which this set of attributes references. +required (required)
         :param str workflow: Workflow name which this set of attributes references. +required (required)
-        :param str resource_type: Which type of matchable attributes to return. +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: Which type of matchable attributes to return. +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminWorkflowAttributesGetResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -6590,26 +6684,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method get_workflow_attributes2" % key
+                    " to method admin_service_get_workflow_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `get_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_get_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `get_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_get_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `get_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_get_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'workflow' is set
-        if ('workflow' not in params or
-                params['workflow'] is None):
-            raise ValueError("Missing the required parameter `workflow` when calling `get_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow' not in params or
+                                                       params['workflow'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow` when calling `admin_service_get_workflow_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6660,21 +6754,22 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_active_launch_plans(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_active_launch_plans(self, project, domain, **kwargs):  # noqa: E501
         """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Fetch the active launch plan versions specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_active_launch_plans(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_active_launch_plans(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required. (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
         :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :param str org: Optional, org key applied to the resource.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
@@ -6682,26 +6777,27 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_active_launch_plans_with_http_info(project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_active_launch_plans_with_http_info(project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_active_launch_plans_with_http_info(project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_active_launch_plans_with_http_info(project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_active_launch_plans_with_http_info(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_active_launch_plans_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Fetch the active launch plan versions specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_active_launch_plans_with_http_info(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_active_launch_plans_with_http_info(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required. (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
         :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :param str org: Optional, org key applied to the resource.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
@@ -6719,18 +6815,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_active_launch_plans" % key
+                    " to method admin_service_list_active_launch_plans" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_active_launch_plans`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_active_launch_plans`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_active_launch_plans`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_active_launch_plans`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6785,12 +6881,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_active_launch_plans2(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_active_launch_plans2(self, org, project, domain, **kwargs):  # noqa: E501
         """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Fetch the active launch plan versions specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_active_launch_plans2(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_active_launch_plans2(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6798,26 +6895,27 @@ class AdminServiceApi(object):
         :param str project: Name of the project that contains the identifiers. +required. (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
         :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_active_launch_plans2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_active_launch_plans2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_active_launch_plans2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_active_launch_plans2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_active_launch_plans2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_active_launch_plans2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
         """List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Fetch the active launch plan versions specified by input request filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_active_launch_plans2_with_http_info(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_active_launch_plans2_with_http_info(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6825,9 +6923,9 @@ class AdminServiceApi(object):
         :param str project: Name of the project that contains the identifiers. +required. (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required. (required)
         :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -6844,22 +6942,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_active_launch_plans2" % key
+                    " to method admin_service_list_active_launch_plans2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_active_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_active_launch_plans2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_active_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_active_launch_plans2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_active_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_active_launch_plans2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -6914,12 +7012,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_description_entities(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities(resource_type, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_description_entities(resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6928,28 +7027,29 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_description_entities_with_http_info(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities_with_http_info(self, resource_type, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_description_entities_with_http_info(resource_type, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -6958,11 +7058,11 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -6979,26 +7079,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_description_entities" % key
+                    " to method admin_service_list_description_entities" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_list_description_entities`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_description_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_description_entities`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_description_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_description_entities`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_description_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_description_entities`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7059,12 +7159,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_description_entities2(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities2(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities2(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_description_entities2(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -7073,28 +7174,29 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_description_entities2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_description_entities2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -7103,11 +7205,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7124,30 +7226,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_description_entities2" % key
+                    " to method admin_service_list_description_entities2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_list_description_entities2`")  # noqa: E501
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_description_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_description_entities2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_description_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_description_entities2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_description_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_description_entities2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_description_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_description_entities2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7208,55 +7310,57 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_description_entities3(self, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities3(self, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities3(resource_type, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_description_entities3(resource_type, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_description_entities3_with_http_info(resource_type, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_description_entities3_with_http_info(resource_type, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_description_entities3_with_http_info(resource_type, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_description_entities3_with_http_info(resource_type, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_description_entities3_with_http_info(self, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities3_with_http_info(self, resource_type, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities3_with_http_info(resource_type, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_description_entities3_with_http_info(resource_type, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str resource_type: Identifies the specific type of resource that this identifier corresponds to. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7273,22 +7377,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_description_entities3" % key
+                    " to method admin_service_list_description_entities3" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_list_description_entities3`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_description_entities3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_description_entities3`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_description_entities3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_description_entities3`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7349,12 +7453,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_description_entities4(self, resource_type, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities4(self, resource_type, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities4(resource_type, id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_description_entities4(resource_type, id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -7362,29 +7467,30 @@ class AdminServiceApi(object):
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_description_entities4_with_http_info(self, resource_type, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_description_entities4_with_http_info(self, resource_type, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.  # noqa: E501
 
+        Fetch existing description entity definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_description_entities4_with_http_info(resource_type, id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -7392,12 +7498,12 @@ class AdminServiceApi(object):
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminDescriptionEntityList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7414,26 +7520,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_description_entities4" % key
+                    " to method admin_service_list_description_entities4" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_description_entities4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_list_description_entities4`")  # noqa: E501
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_description_entities4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_description_entities4`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_description_entities4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_description_entities4`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_description_entities4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_description_entities4`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7494,53 +7600,53 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_executions(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_executions(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_executions(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_executions(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_executions_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_executions_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_executions_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_executions_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_executions_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_executions_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_executions_with_http_info(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_executions_with_http_info(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7557,18 +7663,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_executions" % key
+                    " to method admin_service_list_executions" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_executions`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_executions`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7627,53 +7733,53 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_executions2(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_executions2(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_executions2(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_executions2(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_executions2_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_executions2_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_executions2_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_executions2_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_executions2_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_executions2_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_executions2_with_http_info(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_executions2_with_http_info(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7690,22 +7796,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_executions2" % key
+                    " to method admin_service_list_executions2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_executions2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_executions2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_executions2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7764,22 +7870,23 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_launch_plan_ids(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plan_ids(self, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.  # noqa: E501
 
+        Fetch existing launch plan definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plan_ids(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plan_ids(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -7787,27 +7894,28 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_launch_plan_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_launch_plan_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_launch_plan_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_launch_plan_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_launch_plan_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plan_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.  # noqa: E501
 
+        Fetch existing launch plan definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plan_ids_with_http_info(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plan_ids_with_http_info(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -7825,18 +7933,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_launch_plan_ids" % key
+                    " to method admin_service_list_launch_plan_ids" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_launch_plan_ids`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_launch_plan_ids`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_launch_plan_ids`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_launch_plan_ids`")  # noqa: E501
 
         collection_formats = {}
 
@@ -7893,51 +8001,53 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_launch_plan_ids2(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plan_ids2(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.  # noqa: E501
 
+        Fetch existing launch plan definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plan_ids2(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plan_ids2(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_launch_plan_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_launch_plan_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_launch_plan_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_launch_plan_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_launch_plan_ids2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plan_ids2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.  # noqa: E501
 
+        Fetch existing launch plan definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plan_ids2_with_http_info(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plan_ids2_with_http_info(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -7954,22 +8064,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_launch_plan_ids2" % key
+                    " to method admin_service_list_launch_plan_ids2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_launch_plan_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_launch_plan_ids2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_launch_plan_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_launch_plan_ids2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_launch_plan_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_launch_plan_ids2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8026,12 +8136,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_launch_plans(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8039,28 +8150,29 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_launch_plans_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_launch_plans_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_launch_plans_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_launch_plans_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_launch_plans_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8068,11 +8180,11 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8089,22 +8201,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_launch_plans" % key
+                    " to method admin_service_list_launch_plans" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_launch_plans`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_launch_plans`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_launch_plans`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_launch_plans`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_launch_plans`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_launch_plans`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8163,12 +8275,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_launch_plans2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8176,28 +8289,29 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_launch_plans2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_launch_plans2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_launch_plans2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_launch_plans2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_launch_plans2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8205,11 +8319,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8226,26 +8340,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_launch_plans2" % key
+                    " to method admin_service_list_launch_plans2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_launch_plans2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_launch_plans2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_launch_plans2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_launch_plans2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_launch_plans2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8304,53 +8418,55 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_launch_plans3(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans3(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans3(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans3(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_launch_plans3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_launch_plans3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_launch_plans3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_launch_plans3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_launch_plans3_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans3_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans3_with_http_info(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans3_with_http_info(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8367,18 +8483,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_launch_plans3" % key
+                    " to method admin_service_list_launch_plans3" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_launch_plans3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_launch_plans3`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_launch_plans3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_launch_plans3`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8437,53 +8553,55 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_launch_plans4(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans4(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans4(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans4(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_launch_plans4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_launch_plans4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_launch_plans4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_launch_plans4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_launch_plans4_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_launch_plans4_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.  # noqa: E501
 
+        Fetch existing launch plan definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_launch_plans4_with_http_info(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_launch_plans4_with_http_info(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminLaunchPlanList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8500,22 +8618,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_launch_plans4" % key
+                    " to method admin_service_list_launch_plans4" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_launch_plans4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_launch_plans4`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_launch_plans4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_launch_plans4`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_launch_plans4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_launch_plans4`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8574,16 +8692,17 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_matchable_attributes(self, **kwargs):  # noqa: E501
+    def admin_service_list_matchable_attributes(self, **kwargs):  # noqa: E501
         """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
 
+        Retrieve a list of MatchableAttributesConfiguration objects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_matchable_attributes(async_req=True)
+        >>> thread = api.admin_service_list_matchable_attributes(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org filter applied to list project requests.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
@@ -8591,21 +8710,22 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_matchable_attributes_with_http_info(**kwargs)  # noqa: E501
+            return self.admin_service_list_matchable_attributes_with_http_info(**kwargs)  # noqa: E501
         else:
-            (data) = self.list_matchable_attributes_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.admin_service_list_matchable_attributes_with_http_info(**kwargs)  # noqa: E501
             return data
 
-    def list_matchable_attributes_with_http_info(self, **kwargs):  # noqa: E501
+    def admin_service_list_matchable_attributes_with_http_info(self, **kwargs):  # noqa: E501
         """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
 
+        Retrieve a list of MatchableAttributesConfiguration objects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_matchable_attributes_with_http_info(async_req=True)
+        >>> thread = api.admin_service_list_matchable_attributes_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :param str org: Optional, org filter applied to list project requests.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
@@ -8623,7 +8743,7 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_matchable_attributes" % key
+                    " to method admin_service_list_matchable_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
@@ -8671,39 +8791,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_matchable_attributes2(self, org, **kwargs):  # noqa: E501
+    def admin_service_list_matchable_attributes2(self, org, **kwargs):  # noqa: E501
         """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
 
+        Retrieve a list of MatchableAttributesConfiguration objects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_matchable_attributes2(org, async_req=True)
+        >>> thread = api.admin_service_list_matchable_attributes2(org, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org filter applied to list project requests. (required)
-        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_matchable_attributes2_with_http_info(org, **kwargs)  # noqa: E501
+            return self.admin_service_list_matchable_attributes2_with_http_info(org, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_matchable_attributes2_with_http_info(org, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_matchable_attributes2_with_http_info(org, **kwargs)  # noqa: E501
             return data
 
-    def list_matchable_attributes2_with_http_info(self, org, **kwargs):  # noqa: E501
+    def admin_service_list_matchable_attributes2_with_http_info(self, org, **kwargs):  # noqa: E501
         """Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.  # noqa: E501
 
+        Retrieve a list of MatchableAttributesConfiguration objects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_matchable_attributes2_with_http_info(org, async_req=True)
+        >>> thread = api.admin_service_list_matchable_attributes2_with_http_info(org, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org filter applied to list project requests. (required)
-        :param str resource_type: +required.   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
+        :param str resource_type: +required   - TASK_RESOURCE: Applies to customizable task resource requests and limits.  - CLUSTER_RESOURCE: Applies to configuring templated kubernetes cluster resources.  - EXECUTION_QUEUE: Configures task and dynamic task execution queue assignment.  - EXECUTION_CLUSTER_LABEL: Configures the K8s cluster label to be used for execution to be run  - QUALITY_OF_SERVICE_SPECIFICATION: Configures default quality of service when undefined in an execution spec.  - PLUGIN_OVERRIDE: Selects configurable plugin implementation behavior for a given task type.  - WORKFLOW_EXECUTION_CONFIG: Adds defaults for customizable workflow-execution specifications and overrides.  - CLUSTER_ASSIGNMENT: Controls how to select an available cluster on which this execution should run.
         :return: AdminListMatchableAttributesResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8720,14 +8842,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_matchable_attributes2" % key
+                    " to method admin_service_list_matchable_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_matchable_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_matchable_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8772,12 +8894,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_named_entities(self, resource_type, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_named_entities(self, resource_type, project, domain, **kwargs):  # noqa: E501
         """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
 
+        Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_named_entities(resource_type, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_named_entities(resource_type, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8785,10 +8908,10 @@ class AdminServiceApi(object):
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
@@ -8796,17 +8919,18 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_named_entities_with_http_info(resource_type, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_named_entities_with_http_info(resource_type, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_named_entities_with_http_info(resource_type, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_named_entities_with_http_info(resource_type, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_named_entities_with_http_info(self, resource_type, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_named_entities_with_http_info(self, resource_type, project, domain, **kwargs):  # noqa: E501
         """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
 
+        Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_named_entities_with_http_info(resource_type, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_named_entities_with_http_info(resource_type, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8814,10 +8938,10 @@ class AdminServiceApi(object):
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
@@ -8835,22 +8959,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_named_entities" % key
+                    " to method admin_service_list_named_entities" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_named_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_list_named_entities`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_named_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_named_entities`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_named_entities`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_named_entities`")  # noqa: E501
 
         collection_formats = {}
 
@@ -8909,12 +9033,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_named_entities2(self, resource_type, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_named_entities2(self, resource_type, org, project, domain, **kwargs):  # noqa: E501
         """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
 
+        Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_named_entities2(resource_type, org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_named_entities2(resource_type, org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8923,27 +9048,28 @@ class AdminServiceApi(object):
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_named_entities2_with_http_info(resource_type, org, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_named_entities2_with_http_info(resource_type, org, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_named_entities2_with_http_info(resource_type, org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_named_entities2_with_http_info(resource_type, org, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_named_entities2_with_http_info(self, resource_type, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_named_entities2_with_http_info(self, resource_type, org, project, domain, **kwargs):  # noqa: E501
         """Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.  # noqa: E501
 
+        Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_named_entities2_with_http_info(resource_type, org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_named_entities2_with_http_info(resource_type, org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -8952,10 +9078,10 @@ class AdminServiceApi(object):
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. (required)
         :param int limit: Indicates the number of resources to be returned.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -8972,26 +9098,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_named_entities2" % key
+                    " to method admin_service_list_named_entities2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `list_named_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_list_named_entities2`")  # noqa: E501
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_named_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_named_entities2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_named_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_named_entities2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_named_entities2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_named_entities2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -9050,12 +9176,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_node_executions(self, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions(self, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
+        >>> thread = api.admin_service_list_node_executions(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9063,29 +9189,29 @@ class AdminServiceApi(object):
         :param str workflow_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str workflow_execution_id_name: User or system provided value for the resource. (required)
         :param str workflow_execution_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
+        :param int limit: Indicates the number of resources to be returned. +required
         :param str token:
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_node_executions_with_http_info(self, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions_with_http_info(self, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
+        >>> thread = api.admin_service_list_node_executions_with_http_info(workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9093,12 +9219,12 @@ class AdminServiceApi(object):
         :param str workflow_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str workflow_execution_id_name: User or system provided value for the resource. (required)
         :param str workflow_execution_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
+        :param int limit: Indicates the number of resources to be returned. +required
         :param str token:
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -9115,22 +9241,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_node_executions" % key
+                    " to method admin_service_list_node_executions" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'workflow_execution_id_project' is set
-        if ('workflow_execution_id_project' not in params or
-                params['workflow_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_project` when calling `list_node_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_project' not in params or
+                                                       params['workflow_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_project` when calling `admin_service_list_node_executions`")  # noqa: E501
         # verify the required parameter 'workflow_execution_id_domain' is set
-        if ('workflow_execution_id_domain' not in params or
-                params['workflow_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_domain` when calling `list_node_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_domain' not in params or
+                                                       params['workflow_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_domain` when calling `admin_service_list_node_executions`")  # noqa: E501
         # verify the required parameter 'workflow_execution_id_name' is set
-        if ('workflow_execution_id_name' not in params or
-                params['workflow_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_name` when calling `list_node_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_name' not in params or
+                                                       params['workflow_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_name` when calling `admin_service_list_node_executions`")  # noqa: E501
 
         collection_formats = {}
 
@@ -9191,12 +9317,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_node_executions2(self, workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions2(self, workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions2(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
+        >>> thread = api.admin_service_list_node_executions2(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9204,29 +9330,29 @@ class AdminServiceApi(object):
         :param str workflow_execution_id_project: Name of the project the resource belongs to. (required)
         :param str workflow_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str workflow_execution_id_name: User or system provided value for the resource. (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
+        :param int limit: Indicates the number of resources to be returned. +required
         :param str token:
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_node_executions2_with_http_info(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_node_executions2_with_http_info(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_node_executions2_with_http_info(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_node_executions2_with_http_info(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_node_executions2_with_http_info(self, workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions2_with_http_info(self, workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions2_with_http_info(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
+        >>> thread = api.admin_service_list_node_executions2_with_http_info(workflow_execution_id_org, workflow_execution_id_project, workflow_execution_id_domain, workflow_execution_id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9234,12 +9360,12 @@ class AdminServiceApi(object):
         :param str workflow_execution_id_project: Name of the project the resource belongs to. (required)
         :param str workflow_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str workflow_execution_id_name: User or system provided value for the resource. (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
+        :param int limit: Indicates the number of resources to be returned. +required
         :param str token:
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional.
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str unique_parent_id: Unique identifier of the parent node in the execution +optional
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -9256,26 +9382,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_node_executions2" % key
+                    " to method admin_service_list_node_executions2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'workflow_execution_id_org' is set
-        if ('workflow_execution_id_org' not in params or
-                params['workflow_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_org` when calling `list_node_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_org' not in params or
+                                                       params['workflow_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_org` when calling `admin_service_list_node_executions2`")  # noqa: E501
         # verify the required parameter 'workflow_execution_id_project' is set
-        if ('workflow_execution_id_project' not in params or
-                params['workflow_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_project` when calling `list_node_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_project' not in params or
+                                                       params['workflow_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_project` when calling `admin_service_list_node_executions2`")  # noqa: E501
         # verify the required parameter 'workflow_execution_id_domain' is set
-        if ('workflow_execution_id_domain' not in params or
-                params['workflow_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_domain` when calling `list_node_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_domain' not in params or
+                                                       params['workflow_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_domain` when calling `admin_service_list_node_executions2`")  # noqa: E501
         # verify the required parameter 'workflow_execution_id_name' is set
-        if ('workflow_execution_id_name' not in params or
-                params['workflow_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `workflow_execution_id_name` when calling `list_node_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('workflow_execution_id_name' not in params or
+                                                       params['workflow_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `workflow_execution_id_name` when calling `admin_service_list_node_executions2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -9336,12 +9462,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_node_executions_for_task(self, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions_for_task(self, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions_for_task(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_list_node_executions_for_task(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9357,28 +9483,28 @@ class AdminServiceApi(object):
         :param str task_execution_id_task_id_resource_type: Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
         :param str task_execution_id_task_id_org: Optional, org key applied to the resource.
         :param str task_execution_id_node_execution_id_execution_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
+            return self.admin_service_list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
             return data
 
-    def list_node_executions_for_task_with_http_info(self, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions_for_task_with_http_info(self, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_list_node_executions_for_task_with_http_info(task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9394,11 +9520,11 @@ class AdminServiceApi(object):
         :param str task_execution_id_task_id_resource_type: Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
         :param str task_execution_id_task_id_org: Optional, org key applied to the resource.
         :param str task_execution_id_node_execution_id_execution_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -9415,46 +9541,46 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_node_executions_for_task" % key
+                    " to method admin_service_list_node_executions_for_task" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_project' is set
-        if ('task_execution_id_node_execution_id_execution_id_project' not in params or
-                params['task_execution_id_node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_project` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_project' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_project` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_domain' is set
-        if ('task_execution_id_node_execution_id_execution_id_domain' not in params or
-                params['task_execution_id_node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_domain` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_domain' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_domain` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_name' is set
-        if ('task_execution_id_node_execution_id_execution_id_name' not in params or
-                params['task_execution_id_node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_name` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_name' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_name` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_node_id' is set
-        if ('task_execution_id_node_execution_id_node_id' not in params or
-                params['task_execution_id_node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_node_id` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_node_id' not in params or
+                                                       params['task_execution_id_node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_node_id` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_project' is set
-        if ('task_execution_id_task_id_project' not in params or
-                params['task_execution_id_task_id_project'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_project` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_project' not in params or
+                                                       params['task_execution_id_task_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_project` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_domain' is set
-        if ('task_execution_id_task_id_domain' not in params or
-                params['task_execution_id_task_id_domain'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_domain` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_domain' not in params or
+                                                       params['task_execution_id_task_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_domain` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_name' is set
-        if ('task_execution_id_task_id_name' not in params or
-                params['task_execution_id_task_id_name'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_name` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_name' not in params or
+                                                       params['task_execution_id_task_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_name` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_version' is set
-        if ('task_execution_id_task_id_version' not in params or
-                params['task_execution_id_task_id_version'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_version` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_version' not in params or
+                                                       params['task_execution_id_task_id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_version` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
         # verify the required parameter 'task_execution_id_retry_attempt' is set
-        if ('task_execution_id_retry_attempt' not in params or
-                params['task_execution_id_retry_attempt'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_retry_attempt` when calling `list_node_executions_for_task`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_retry_attempt' not in params or
+                                                       params['task_execution_id_retry_attempt'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_retry_attempt` when calling `admin_service_list_node_executions_for_task`")  # noqa: E501
 
         collection_formats = {}
 
@@ -9529,12 +9655,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_node_executions_for_task2(self, task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions_for_task2(self, task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions_for_task2(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_list_node_executions_for_task2(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9550,28 +9676,28 @@ class AdminServiceApi(object):
         :param int task_execution_id_retry_attempt: (required)
         :param str task_execution_id_task_id_resource_type: Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
         :param str task_execution_id_task_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_node_executions_for_task2_with_http_info(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
+            return self.admin_service_list_node_executions_for_task2_with_http_info(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_node_executions_for_task2_with_http_info(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_node_executions_for_task2_with_http_info(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs)  # noqa: E501
             return data
 
-    def list_node_executions_for_task2_with_http_info(self, task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
+    def admin_service_list_node_executions_for_task2_with_http_info(self, task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_node_executions_for_task2_with_http_info(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
+        >>> thread = api.admin_service_list_node_executions_for_task2_with_http_info(task_execution_id_node_execution_id_execution_id_org, task_execution_id_node_execution_id_execution_id_project, task_execution_id_node_execution_id_execution_id_domain, task_execution_id_node_execution_id_execution_id_name, task_execution_id_node_execution_id_node_id, task_execution_id_task_id_project, task_execution_id_task_id_domain, task_execution_id_task_id_name, task_execution_id_task_id_version, task_execution_id_retry_attempt, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9587,11 +9713,11 @@ class AdminServiceApi(object):
         :param int task_execution_id_retry_attempt: (required)
         :param str task_execution_id_task_id_resource_type: Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
         :param str task_execution_id_task_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the, server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminNodeExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -9608,50 +9734,50 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_node_executions_for_task2" % key
+                    " to method admin_service_list_node_executions_for_task2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_org' is set
-        if ('task_execution_id_node_execution_id_execution_id_org' not in params or
-                params['task_execution_id_node_execution_id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_org` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_org' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_org` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_project' is set
-        if ('task_execution_id_node_execution_id_execution_id_project' not in params or
-                params['task_execution_id_node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_project` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_project' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_project` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_domain' is set
-        if ('task_execution_id_node_execution_id_execution_id_domain' not in params or
-                params['task_execution_id_node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_domain` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_domain' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_domain` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_execution_id_name' is set
-        if ('task_execution_id_node_execution_id_execution_id_name' not in params or
-                params['task_execution_id_node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_name` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_execution_id_name' not in params or
+                                                       params['task_execution_id_node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_execution_id_name` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_node_execution_id_node_id' is set
-        if ('task_execution_id_node_execution_id_node_id' not in params or
-                params['task_execution_id_node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_node_id` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_node_execution_id_node_id' not in params or
+                                                       params['task_execution_id_node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_node_execution_id_node_id` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_project' is set
-        if ('task_execution_id_task_id_project' not in params or
-                params['task_execution_id_task_id_project'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_project` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_project' not in params or
+                                                       params['task_execution_id_task_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_project` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_domain' is set
-        if ('task_execution_id_task_id_domain' not in params or
-                params['task_execution_id_task_id_domain'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_domain` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_domain' not in params or
+                                                       params['task_execution_id_task_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_domain` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_name' is set
-        if ('task_execution_id_task_id_name' not in params or
-                params['task_execution_id_task_id_name'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_name` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_name' not in params or
+                                                       params['task_execution_id_task_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_name` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_task_id_version' is set
-        if ('task_execution_id_task_id_version' not in params or
-                params['task_execution_id_task_id_version'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_task_id_version` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_task_id_version' not in params or
+                                                       params['task_execution_id_task_id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_task_id_version` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
         # verify the required parameter 'task_execution_id_retry_attempt' is set
-        if ('task_execution_id_retry_attempt' not in params or
-                params['task_execution_id_retry_attempt'] is None):
-            raise ValueError("Missing the required parameter `task_execution_id_retry_attempt` when calling `list_node_executions_for_task2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('task_execution_id_retry_attempt' not in params or
+                                                       params['task_execution_id_retry_attempt'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `task_execution_id_retry_attempt` when calling `admin_service_list_node_executions_for_task2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -9726,20 +9852,21 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_projects(self, **kwargs):  # noqa: E501
+    def admin_service_list_projects(self, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
 
+        Fetch registered projects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_projects(async_req=True)
+        >>> thread = api.admin_service_list_projects(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param int limit: Indicates the number of projects to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of projects to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :param str org: Optional, org filter applied to list project requests.
         :return: AdminProjects
                  If the method is called asynchronously,
@@ -9747,25 +9874,26 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_projects_with_http_info(**kwargs)  # noqa: E501
+            return self.admin_service_list_projects_with_http_info(**kwargs)  # noqa: E501
         else:
-            (data) = self.list_projects_with_http_info(**kwargs)  # noqa: E501
+            (data) = self.admin_service_list_projects_with_http_info(**kwargs)  # noqa: E501
             return data
 
-    def list_projects_with_http_info(self, **kwargs):  # noqa: E501
+    def admin_service_list_projects_with_http_info(self, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
 
+        Fetch registered projects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_projects_with_http_info(async_req=True)
+        >>> thread = api.admin_service_list_projects_with_http_info(async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param int limit: Indicates the number of projects to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of projects to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :param str org: Optional, org filter applied to list project requests.
         :return: AdminProjects
                  If the method is called asynchronously,
@@ -9783,7 +9911,7 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_projects" % key
+                    " to method admin_service_list_projects" % key
                 )
             params[key] = val
         del params['kwargs']
@@ -9839,47 +9967,49 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_projects2(self, org, **kwargs):  # noqa: E501
+    def admin_service_list_projects2(self, org, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
 
+        Fetch registered projects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_projects2(org, async_req=True)
+        >>> thread = api.admin_service_list_projects2(org, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org filter applied to list project requests. (required)
-        :param int limit: Indicates the number of projects to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of projects to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminProjects
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_projects2_with_http_info(org, **kwargs)  # noqa: E501
+            return self.admin_service_list_projects2_with_http_info(org, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_projects2_with_http_info(org, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_projects2_with_http_info(org, **kwargs)  # noqa: E501
             return data
 
-    def list_projects2_with_http_info(self, org, **kwargs):  # noqa: E501
+    def admin_service_list_projects2_with_http_info(self, org, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.Project`  # noqa: E501
 
+        Fetch registered projects.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_projects2_with_http_info(org, async_req=True)
+        >>> thread = api.admin_service_list_projects2_with_http_info(org, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org filter applied to list project requests. (required)
-        :param int limit: Indicates the number of projects to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of projects to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminProjects
                  If the method is called asynchronously,
                  returns the request thread.
@@ -9896,14 +10026,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_projects2" % key
+                    " to method admin_service_list_projects2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_projects2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_projects2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -9956,12 +10086,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_task_executions(self, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
+    def admin_service_list_task_executions(self, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Fetch existing task executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_executions(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
+        >>> thread = api.admin_service_list_task_executions(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -9970,28 +10101,29 @@ class AdminServiceApi(object):
         :param str node_execution_id_execution_id_name: User or system provided value for the resource. (required)
         :param str node_execution_id_node_id: (required)
         :param str node_execution_id_execution_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def list_task_executions_with_http_info(self, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
+    def admin_service_list_task_executions_with_http_info(self, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Fetch existing task executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
+        >>> thread = api.admin_service_list_task_executions_with_http_info(node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10000,11 +10132,11 @@ class AdminServiceApi(object):
         :param str node_execution_id_execution_id_name: User or system provided value for the resource. (required)
         :param str node_execution_id_node_id: (required)
         :param str node_execution_id_execution_id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10021,26 +10153,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_task_executions" % key
+                    " to method admin_service_list_task_executions" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'node_execution_id_execution_id_project' is set
-        if ('node_execution_id_execution_id_project' not in params or
-                params['node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_project` when calling `list_task_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_project' not in params or
+                                                       params['node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_project` when calling `admin_service_list_task_executions`")  # noqa: E501
         # verify the required parameter 'node_execution_id_execution_id_domain' is set
-        if ('node_execution_id_execution_id_domain' not in params or
-                params['node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_domain` when calling `list_task_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_domain' not in params or
+                                                       params['node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_domain` when calling `admin_service_list_task_executions`")  # noqa: E501
         # verify the required parameter 'node_execution_id_execution_id_name' is set
-        if ('node_execution_id_execution_id_name' not in params or
-                params['node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_name` when calling `list_task_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_name' not in params or
+                                                       params['node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_name` when calling `admin_service_list_task_executions`")  # noqa: E501
         # verify the required parameter 'node_execution_id_node_id' is set
-        if ('node_execution_id_node_id' not in params or
-                params['node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_node_id` when calling `list_task_executions`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_node_id' not in params or
+                                                       params['node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_node_id` when calling `admin_service_list_task_executions`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10101,12 +10233,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_task_executions2(self, node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
+    def admin_service_list_task_executions2(self, node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Fetch existing task executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_executions2(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
+        >>> thread = api.admin_service_list_task_executions2(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10115,28 +10248,29 @@ class AdminServiceApi(object):
         :param str node_execution_id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str node_execution_id_execution_id_name: User or system provided value for the resource. (required)
         :param str node_execution_id_node_id: (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_task_executions2_with_http_info(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
+            return self.admin_service_list_task_executions2_with_http_info(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_task_executions2_with_http_info(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_task_executions2_with_http_info(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs)  # noqa: E501
             return data
 
-    def list_task_executions2_with_http_info(self, node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
+    def admin_service_list_task_executions2_with_http_info(self, node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, **kwargs):  # noqa: E501
         """Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.  # noqa: E501
 
+        Fetch existing task executions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_executions2_with_http_info(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
+        >>> thread = api.admin_service_list_task_executions2_with_http_info(node_execution_id_execution_id_org, node_execution_id_execution_id_project, node_execution_id_execution_id_domain, node_execution_id_execution_id_name, node_execution_id_node_id, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10145,11 +10279,11 @@ class AdminServiceApi(object):
         :param str node_execution_id_execution_id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str node_execution_id_execution_id_name: User or system provided value for the resource. (required)
         :param str node_execution_id_node_id: (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskExecutionList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10166,30 +10300,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_task_executions2" % key
+                    " to method admin_service_list_task_executions2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'node_execution_id_execution_id_org' is set
-        if ('node_execution_id_execution_id_org' not in params or
-                params['node_execution_id_execution_id_org'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_org` when calling `list_task_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_org' not in params or
+                                                       params['node_execution_id_execution_id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_org` when calling `admin_service_list_task_executions2`")  # noqa: E501
         # verify the required parameter 'node_execution_id_execution_id_project' is set
-        if ('node_execution_id_execution_id_project' not in params or
-                params['node_execution_id_execution_id_project'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_project` when calling `list_task_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_project' not in params or
+                                                       params['node_execution_id_execution_id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_project` when calling `admin_service_list_task_executions2`")  # noqa: E501
         # verify the required parameter 'node_execution_id_execution_id_domain' is set
-        if ('node_execution_id_execution_id_domain' not in params or
-                params['node_execution_id_execution_id_domain'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_domain` when calling `list_task_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_domain' not in params or
+                                                       params['node_execution_id_execution_id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_domain` when calling `admin_service_list_task_executions2`")  # noqa: E501
         # verify the required parameter 'node_execution_id_execution_id_name' is set
-        if ('node_execution_id_execution_id_name' not in params or
-                params['node_execution_id_execution_id_name'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_execution_id_name` when calling `list_task_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_execution_id_name' not in params or
+                                                       params['node_execution_id_execution_id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_execution_id_name` when calling `admin_service_list_task_executions2`")  # noqa: E501
         # verify the required parameter 'node_execution_id_node_id' is set
-        if ('node_execution_id_node_id' not in params or
-                params['node_execution_id_node_id'] is None):
-            raise ValueError("Missing the required parameter `node_execution_id_node_id` when calling `list_task_executions2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('node_execution_id_node_id' not in params or
+                                                       params['node_execution_id_node_id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `node_execution_id_node_id` when calling `admin_service_list_task_executions2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10250,22 +10384,23 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_task_ids(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_task_ids(self, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.  # noqa: E501
 
+        Fetch existing task definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_ids(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_task_ids(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -10273,27 +10408,28 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_task_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_task_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_task_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_task_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_task_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_task_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.  # noqa: E501
 
+        Fetch existing task definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_ids_with_http_info(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_task_ids_with_http_info(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -10311,18 +10447,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_task_ids" % key
+                    " to method admin_service_list_task_ids" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_task_ids`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_task_ids`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_task_ids`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_task_ids`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10379,51 +10515,53 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_task_ids2(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_task_ids2(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.  # noqa: E501
 
+        Fetch existing task definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_ids2(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_task_ids2(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_task_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_task_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_task_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_task_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_task_ids2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_task_ids2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.  # noqa: E501
 
+        Fetch existing task definition identifiers matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_task_ids2_with_http_info(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_task_ids2_with_http_info(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10440,22 +10578,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_task_ids2" % key
+                    " to method admin_service_list_task_ids2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_task_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_task_ids2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_task_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_task_ids2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_task_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_task_ids2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10512,12 +10650,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_tasks(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_tasks(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_tasks(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10525,28 +10664,29 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_tasks_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_tasks_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_tasks_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_tasks_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_tasks_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_tasks_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_tasks_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10554,11 +10694,11 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10575,22 +10715,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_tasks" % key
+                    " to method admin_service_list_tasks" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_tasks`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_tasks`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_tasks`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_tasks`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_tasks`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_tasks`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10649,12 +10789,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_tasks2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_tasks2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_tasks2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10662,28 +10803,29 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_tasks2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_tasks2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_tasks2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_tasks2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_tasks2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_tasks2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_tasks2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -10691,11 +10833,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10712,26 +10854,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_tasks2" % key
+                    " to method admin_service_list_tasks2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_tasks2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_tasks2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_tasks2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_tasks2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_tasks2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_tasks2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_tasks2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_tasks2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10790,53 +10932,55 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_tasks3(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_tasks3(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks3(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_tasks3(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_tasks3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_tasks3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_tasks3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_tasks3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_tasks3_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_tasks3_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks3_with_http_info(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_tasks3_with_http_info(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10853,18 +10997,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_tasks3" % key
+                    " to method admin_service_list_tasks3" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_tasks3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_tasks3`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_tasks3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_tasks3`")  # noqa: E501
 
         collection_formats = {}
 
@@ -10923,53 +11067,55 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_tasks4(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_tasks4(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks4(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_tasks4(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_tasks4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_tasks4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_tasks4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_tasks4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_tasks4_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_tasks4_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.  # noqa: E501
 
+        Fetch existing task definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_tasks4_with_http_info(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_tasks4_with_http_info(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminTaskList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -10986,22 +11132,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_tasks4" % key
+                    " to method admin_service_list_tasks4" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_tasks4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_tasks4`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_tasks4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_tasks4`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_tasks4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_tasks4`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11060,22 +11206,22 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_workflow_ids(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflow_ids(self, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflow_ids(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_workflow_ids(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -11083,27 +11229,27 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_workflow_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_workflow_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_workflow_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_workflow_ids_with_http_info(project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_workflow_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflow_ids_with_http_info(self, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflow_ids_with_http_info(project, domain, async_req=True)
+        >>> thread = api.admin_service_list_workflow_ids_with_http_info(project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :param str org: Optional, org key applied to the resource.
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
@@ -11121,18 +11267,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_workflow_ids" % key
+                    " to method admin_service_list_workflow_ids" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_workflow_ids`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_workflow_ids`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_workflow_ids`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_workflow_ids`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11189,51 +11335,51 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_workflow_ids2(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflow_ids2(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflow_ids2(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_workflow_ids2(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_workflow_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_workflow_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_workflow_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_workflow_ids2_with_http_info(org, project, domain, **kwargs)  # noqa: E501
             return data
 
-    def list_workflow_ids2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflow_ids2_with_http_info(self, org, project, domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflow_ids2_with_http_info(org, project, domain, async_req=True)
+        >>> thread = api.admin_service_list_workflow_ids2_with_http_info(org, project, domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str project: Name of the project that contains the identifiers. +required (required)
         :param str domain: Name of the domain the identifiers belongs to within the project. +required (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
-        :param str filters: Indicates a list of filters passed as string. +optional.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, the server-provided token can be used to fetch the next page in a query. +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
+        :param str filters: Indicates a list of filters passed as string. +optional
         :return: AdminNamedEntityIdentifierList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -11250,22 +11396,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_workflow_ids2" % key
+                    " to method admin_service_list_workflow_ids2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `list_workflow_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_list_workflow_ids2`")  # noqa: E501
         # verify the required parameter 'project' is set
-        if ('project' not in params or
-                params['project'] is None):
-            raise ValueError("Missing the required parameter `project` when calling `list_workflow_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project' not in params or
+                                                       params['project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project` when calling `admin_service_list_workflow_ids2`")  # noqa: E501
         # verify the required parameter 'domain' is set
-        if ('domain' not in params or
-                params['domain'] is None):
-            raise ValueError("Missing the required parameter `domain` when calling `list_workflow_ids2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('domain' not in params or
+                                                       params['domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `domain` when calling `admin_service_list_workflow_ids2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11322,12 +11468,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_workflows(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_workflows(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_workflows(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11335,28 +11482,29 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_workflows_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_workflows_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_workflows_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_workflows_with_http_info(id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_workflows_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_workflows_with_http_info(self, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows_with_http_info(id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_workflows_with_http_info(id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11364,11 +11512,11 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -11385,22 +11533,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_workflows" % key
+                    " to method admin_service_list_workflows" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_workflows`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_workflows`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_workflows`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_workflows`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_workflows`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_workflows`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11459,12 +11607,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_workflows2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_workflows2(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows2(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_workflows2(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11472,28 +11621,29 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_workflows2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            return self.admin_service_list_workflows2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_workflows2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_workflows2_with_http_info(id_org, id_project, id_domain, id_name, **kwargs)  # noqa: E501
             return data
 
-    def list_workflows2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
+    def admin_service_list_workflows2_with_http_info(self, id_org, id_project, id_domain, id_name, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
+        >>> thread = api.admin_service_list_workflows2_with_http_info(id_org, id_project, id_domain, id_name, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -11501,11 +11651,11 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -11522,26 +11672,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_workflows2" % key
+                    " to method admin_service_list_workflows2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_workflows2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_workflows2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_workflows2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_workflows2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_workflows2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_workflows2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `list_workflows2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_list_workflows2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11600,53 +11750,55 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_workflows3(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflows3(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows3(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_workflows3(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_workflows3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_workflows3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_workflows3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_workflows3_with_http_info(id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_workflows3_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflows3_with_http_info(self, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows3_with_http_info(id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_workflows3_with_http_info(id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
         :param str id_org: Optional, org key applied to the resource.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -11663,18 +11815,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_workflows3" % key
+                    " to method admin_service_list_workflows3" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_workflows3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_workflows3`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_workflows3`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_workflows3`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11733,53 +11885,55 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def list_workflows4(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflows4(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows4(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_workflows4(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.list_workflows4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            return self.admin_service_list_workflows4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
         else:
-            (data) = self.list_workflows4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
+            (data) = self.admin_service_list_workflows4_with_http_info(id_org, id_project, id_domain, **kwargs)  # noqa: E501
             return data
 
-    def list_workflows4_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
+    def admin_service_list_workflows4_with_http_info(self, id_org, id_project, id_domain, **kwargs):  # noqa: E501
         """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.  # noqa: E501
 
+        Fetch existing workflow definitions matching input filters.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.list_workflows4_with_http_info(id_org, id_project, id_domain, async_req=True)
+        >>> thread = api.admin_service_list_workflows4_with_http_info(id_org, id_project, id_domain, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
-        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'.
-        :param int limit: Indicates the number of resources to be returned. +required.
-        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional.
-        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional.
-        :param str sort_by_key: Indicates an attribute to sort the response values. +required.
-        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional.   - DESCENDING: By default, fields are sorted in descending order.
+        :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans'
+        :param int limit: Indicates the number of resources to be returned. +required
+        :param str token: In the case of multiple pages of results, this server-provided token can be used to fetch the next page in a query. +optional
+        :param str filters: Indicates a list of filters passed as string. More info on constructing filters : <Link> +optional
+        :param str sort_by_key: Indicates an attribute to sort the response values. +required
+        :param str sort_by_direction: Indicates the direction to apply sort key for response values. +optional   - DESCENDING: By default, fields are sorted in descending order.
         :return: AdminWorkflowList
                  If the method is called asynchronously,
                  returns the request thread.
@@ -11796,22 +11950,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method list_workflows4" % key
+                    " to method admin_service_list_workflows4" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `list_workflows4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_list_workflows4`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `list_workflows4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_list_workflows4`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `list_workflows4`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_list_workflows4`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11870,37 +12024,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def recover_execution(self, body, **kwargs):  # noqa: E501
+    def admin_service_recover_execution(self, body, **kwargs):  # noqa: E501
         """Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
 
+        Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.recover_execution(body, async_req=True)
+        >>> thread = api.admin_service_recover_execution(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminExecutionRecoverRequest body: (required)
+        :param AdminExecutionRecoverRequest body: Request to recover the referenced execution. (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.recover_execution_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_recover_execution_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.recover_execution_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_recover_execution_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def recover_execution_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_recover_execution_with_http_info(self, body, **kwargs):  # noqa: E501
         """Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
 
+        Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.recover_execution_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_recover_execution_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminExecutionRecoverRequest body: (required)
+        :param AdminExecutionRecoverRequest body: Request to recover the referenced execution. (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -11917,14 +12073,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method recover_execution" % key
+                    " to method admin_service_recover_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `recover_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_recover_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -11967,39 +12123,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def recover_execution2(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_recover_execution2(self, id_org, body, **kwargs):  # noqa: E501
         """Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
 
+        Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.recover_execution2(id_org, body, async_req=True)
+        >>> thread = api.admin_service_recover_execution2(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminExecutionRecoverRequest body: (required)
+        :param AdminServiceRecoverExecutionBody body: (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.recover_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_recover_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.recover_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_recover_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def recover_execution2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_recover_execution2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
         """Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.  # noqa: E501
 
+        Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.recover_execution2_with_http_info(id_org, body, async_req=True)
+        >>> thread = api.admin_service_recover_execution2_with_http_info(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminExecutionRecoverRequest body: (required)
+        :param AdminServiceRecoverExecutionBody body: (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12016,18 +12174,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method recover_execution2" % key
+                    " to method admin_service_recover_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `recover_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_recover_execution2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `recover_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_recover_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12072,12 +12230,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def register_project(self, body, **kwargs):  # noqa: E501
+    def admin_service_register_project(self, body, **kwargs):  # noqa: E501
         """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.register_project(body, async_req=True)
+        >>> thread = api.admin_service_register_project(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12088,17 +12246,17 @@ class AdminServiceApi(object):
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.register_project_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_register_project_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.register_project_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_register_project_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def register_project_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_register_project_with_http_info(self, body, **kwargs):  # noqa: E501
         """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.register_project_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_register_project_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12119,14 +12277,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method register_project" % key
+                    " to method admin_service_register_project" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `register_project`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_register_project`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12169,39 +12327,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def register_project2(self, project_org, body, **kwargs):  # noqa: E501
+    def admin_service_register_project2(self, project_org, body, **kwargs):  # noqa: E501
         """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.register_project2(project_org, body, async_req=True)
+        >>> thread = api.admin_service_register_project2(project_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project_org: Optional, org key applied to the resource. (required)
-        :param AdminProjectRegisterRequest body: (required)
+        :param AdminServiceRegisterProjectBody body: (required)
         :return: AdminProjectRegisterResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.register_project2_with_http_info(project_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_register_project2_with_http_info(project_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.register_project2_with_http_info(project_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_register_project2_with_http_info(project_org, body, **kwargs)  # noqa: E501
             return data
 
-    def register_project2_with_http_info(self, project_org, body, **kwargs):  # noqa: E501
+    def admin_service_register_project2_with_http_info(self, project_org, body, **kwargs):  # noqa: E501
         """Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.register_project2_with_http_info(project_org, body, async_req=True)
+        >>> thread = api.admin_service_register_project2_with_http_info(project_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str project_org: Optional, org key applied to the resource. (required)
-        :param AdminProjectRegisterRequest body: (required)
+        :param AdminServiceRegisterProjectBody body: (required)
         :return: AdminProjectRegisterResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12218,18 +12376,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method register_project2" % key
+                    " to method admin_service_register_project2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'project_org' is set
-        if ('project_org' not in params or
-                params['project_org'] is None):
-            raise ValueError("Missing the required parameter `project_org` when calling `register_project2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('project_org' not in params or
+                                                       params['project_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `project_org` when calling `admin_service_register_project2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `register_project2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_register_project2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12274,37 +12432,39 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def relaunch_execution(self, body, **kwargs):  # noqa: E501
+    def admin_service_relaunch_execution(self, body, **kwargs):  # noqa: E501
         """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Relaunch a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.relaunch_execution(body, async_req=True)
+        >>> thread = api.admin_service_relaunch_execution(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminExecutionRelaunchRequest body: (required)
+        :param AdminExecutionRelaunchRequest body: Request to relaunch the referenced execution. (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.relaunch_execution_with_http_info(body, **kwargs)  # noqa: E501
+            return self.admin_service_relaunch_execution_with_http_info(body, **kwargs)  # noqa: E501
         else:
-            (data) = self.relaunch_execution_with_http_info(body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_relaunch_execution_with_http_info(body, **kwargs)  # noqa: E501
             return data
 
-    def relaunch_execution_with_http_info(self, body, **kwargs):  # noqa: E501
+    def admin_service_relaunch_execution_with_http_info(self, body, **kwargs):  # noqa: E501
         """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Relaunch a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.relaunch_execution_with_http_info(body, async_req=True)
+        >>> thread = api.admin_service_relaunch_execution_with_http_info(body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
-        :param AdminExecutionRelaunchRequest body: (required)
+        :param AdminExecutionRelaunchRequest body: Request to relaunch the referenced execution. (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12321,14 +12481,14 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method relaunch_execution" % key
+                    " to method admin_service_relaunch_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `relaunch_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_relaunch_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12371,39 +12531,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def relaunch_execution2(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_relaunch_execution2(self, id_org, body, **kwargs):  # noqa: E501
         """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Relaunch a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.relaunch_execution2(id_org, body, async_req=True)
+        >>> thread = api.admin_service_relaunch_execution2(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminExecutionRelaunchRequest body: (required)
+        :param AdminServiceRelaunchExecutionBody body: (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.relaunch_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            return self.admin_service_relaunch_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.relaunch_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_relaunch_execution2_with_http_info(id_org, body, **kwargs)  # noqa: E501
             return data
 
-    def relaunch_execution2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
+    def admin_service_relaunch_execution2_with_http_info(self, id_org, body, **kwargs):  # noqa: E501
         """Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`  # noqa: E501
 
+        Relaunch a workflow execution.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.relaunch_execution2_with_http_info(id_org, body, async_req=True)
+        >>> thread = api.admin_service_relaunch_execution2_with_http_info(id_org, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_org: Optional, org key applied to the resource. (required)
-        :param AdminExecutionRelaunchRequest body: (required)
+        :param AdminServiceRelaunchExecutionBody body: (required)
         :return: AdminExecutionCreateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12420,18 +12582,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method relaunch_execution2" % key
+                    " to method admin_service_relaunch_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `relaunch_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_relaunch_execution2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `relaunch_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_relaunch_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12476,43 +12638,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def terminate_execution(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_terminate_execution(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.terminate_execution(id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_terminate_execution(id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionTerminateRequest body: (required)
+        :param AdminServiceTerminateExecutionBody body: (required)
         :return: AdminExecutionTerminateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.terminate_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.admin_service_terminate_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.terminate_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_terminate_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def terminate_execution_with_http_info(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_terminate_execution_with_http_info(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.terminate_execution_with_http_info(id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_terminate_execution_with_http_info(id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionTerminateRequest body: (required)
+        :param AdminServiceTerminateExecutionBody body: (required)
         :return: AdminExecutionTerminateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12529,26 +12691,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method terminate_execution" % key
+                    " to method admin_service_terminate_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `terminate_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_terminate_execution`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `terminate_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_terminate_execution`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `terminate_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_terminate_execution`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `terminate_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_terminate_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12597,12 +12759,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def terminate_execution2(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_terminate_execution2(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.terminate_execution2(id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_terminate_execution2(id_org, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12610,24 +12772,24 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionTerminateRequest body: (required)
+        :param AdminServiceTerminateExecutionBody body: (required)
         :return: AdminExecutionTerminateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.terminate_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.admin_service_terminate_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.terminate_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_terminate_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def terminate_execution2_with_http_info(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_terminate_execution2_with_http_info(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Terminates an in-progress :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.terminate_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_terminate_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12635,7 +12797,7 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionTerminateRequest body: (required)
+        :param AdminServiceTerminateExecutionBody body: (required)
         :return: AdminExecutionTerminateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12652,30 +12814,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method terminate_execution2" % key
+                    " to method admin_service_terminate_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `terminate_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_terminate_execution2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `terminate_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_terminate_execution2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `terminate_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_terminate_execution2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `terminate_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_terminate_execution2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `terminate_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_terminate_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12726,43 +12888,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_execution(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_execution(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_execution(id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_execution(id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionUpdateRequest body: (required)
+        :param AdminServiceUpdateExecutionBody body: (required)
         :return: AdminExecutionUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_execution_with_http_info(id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def update_execution_with_http_info(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_execution_with_http_info(self, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_execution_with_http_info(id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_execution_with_http_info(id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionUpdateRequest body: (required)
+        :param AdminServiceUpdateExecutionBody body: (required)
         :return: AdminExecutionUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12779,26 +12941,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_execution" % key
+                    " to method admin_service_update_execution" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `update_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_update_execution`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `update_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_update_execution`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `update_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_update_execution`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_execution`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_execution`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12847,12 +13009,12 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_execution2(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_execution2(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_execution2(id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_execution2(id_org, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12860,24 +13022,24 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionUpdateRequest body: (required)
+        :param AdminServiceUpdateExecutionBody body: (required)
         :return: AdminExecutionUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def update_execution2_with_http_info(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_execution2_with_http_info(self, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Update execution belonging to project domain :ref:`ref_flyteidl.admin.Execution`.  # noqa: E501
 
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_execution2_with_http_info(id_org, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12885,7 +13047,7 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User or system provided value for the resource. (required)
-        :param AdminExecutionUpdateRequest body: (required)
+        :param AdminServiceUpdateExecutionBody body: (required)
         :return: AdminExecutionUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -12902,30 +13064,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_execution2" % key
+                    " to method admin_service_update_execution2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `update_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_update_execution2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `update_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_update_execution2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `update_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_update_execution2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `update_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_update_execution2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_execution2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_execution2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -12976,12 +13138,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_launch_plan(self, id_project, id_domain, id_name, id_version, body, **kwargs):  # noqa: E501
+    def admin_service_update_launch_plan(self, id_project, id_domain, id_name, id_version, body, **kwargs):  # noqa: E501
         """Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_launch_plan(id_project, id_domain, id_name, id_version, body, async_req=True)
+        >>> thread = api.admin_service_update_launch_plan(id_project, id_domain, id_name, id_version, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -12989,24 +13152,25 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. (required)
         :param str id_version: Specific version of the resource. (required)
-        :param AdminLaunchPlanUpdateRequest body: (required)
+        :param AdminServiceUpdateLaunchPlanBody body: (required)
         :return: AdminLaunchPlanUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, **kwargs)  # noqa: E501
             return data
 
-    def update_launch_plan_with_http_info(self, id_project, id_domain, id_name, id_version, body, **kwargs):  # noqa: E501
+    def admin_service_update_launch_plan_with_http_info(self, id_project, id_domain, id_name, id_version, body, **kwargs):  # noqa: E501
         """Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, async_req=True)
+        >>> thread = api.admin_service_update_launch_plan_with_http_info(id_project, id_domain, id_name, id_version, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13014,7 +13178,7 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. (required)
         :param str id_version: Specific version of the resource. (required)
-        :param AdminLaunchPlanUpdateRequest body: (required)
+        :param AdminServiceUpdateLaunchPlanBody body: (required)
         :return: AdminLaunchPlanUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13031,30 +13195,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_launch_plan" % key
+                    " to method admin_service_update_launch_plan" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `update_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_update_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `update_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_update_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `update_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_update_launch_plan`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `update_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_update_launch_plan`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_launch_plan`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_launch_plan`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13105,12 +13269,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_launch_plan2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_update_launch_plan2(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_launch_plan2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_update_launch_plan2(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13119,23 +13284,26 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. (required)
         :param str id_version: Specific version of the resource. (required)
+        :param str id_resource_type: Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+        :param str state: Desired state to apply to the launch plan. +required.
         :return: AdminLaunchPlanUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            return self.admin_service_update_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, **kwargs)  # noqa: E501
             return data
 
-    def update_launch_plan2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
+    def admin_service_update_launch_plan2_with_http_info(self, id_org, id_project, id_domain, id_name, id_version, **kwargs):  # noqa: E501
         """Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.  # noqa: E501
 
+        Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
+        >>> thread = api.admin_service_update_launch_plan2_with_http_info(id_org, id_project, id_domain, id_name, id_version, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13144,12 +13312,14 @@ class AdminServiceApi(object):
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. (required)
         :param str id_version: Specific version of the resource. (required)
+        :param str id_resource_type: Identifies the specific type of resource that this identifier corresponds to.   - DATASET: A dataset represents an entity modeled in Flyte DataCatalog. A Dataset is also a versioned entity and can be a compilation of multiple individual objects. Eventually all Catalog objects should be modeled similar to Flyte Objects. The Dataset entities makes it possible for the UI  and CLI to act on the objects  in a similar manner to other Flyte objects
+        :param str state: Desired state to apply to the launch plan. +required.
         :return: AdminLaunchPlanUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
 
-        all_params = ['id_org', 'id_project', 'id_domain', 'id_name', 'id_version']  # noqa: E501
+        all_params = ['id_org', 'id_project', 'id_domain', 'id_name', 'id_version', 'id_resource_type', 'state']  # noqa: E501
         all_params.append('async_req')
         all_params.append('_return_http_data_only')
         all_params.append('_preload_content')
@@ -13160,30 +13330,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_launch_plan2" % key
+                    " to method admin_service_update_launch_plan2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `update_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_update_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `update_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_update_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `update_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_update_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `update_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_update_launch_plan2`")  # noqa: E501
         # verify the required parameter 'id_version' is set
-        if ('id_version' not in params or
-                params['id_version'] is None):
-            raise ValueError("Missing the required parameter `id_version` when calling `update_launch_plan2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_version' not in params or
+                                                       params['id_version'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_version` when calling `admin_service_update_launch_plan2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13200,6 +13370,10 @@ class AdminServiceApi(object):
             path_params['id.version'] = params['id_version']  # noqa: E501
 
         query_params = []
+        if 'id_resource_type' in params:
+            query_params.append(('id.resource_type', params['id_resource_type']))  # noqa: E501
+        if 'state' in params:
+            query_params.append(('state', params['state']))  # noqa: E501
 
         header_params = {}
 
@@ -13234,12 +13408,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_named_entity(self, resource_type, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_named_entity(self, resource_type, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Update the fields associated with a NamedEntity  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_named_entity(resource_type, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_named_entity(resource_type, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13247,24 +13422,25 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param AdminNamedEntityUpdateRequest body: (required)
+        :param AdminServiceUpdateNamedEntityBody body: (required)
         :return: AdminNamedEntityUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def update_named_entity_with_http_info(self, resource_type, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_named_entity_with_http_info(self, resource_type, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Update the fields associated with a NamedEntity  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_named_entity_with_http_info(resource_type, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13272,7 +13448,7 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param AdminNamedEntityUpdateRequest body: (required)
+        :param AdminServiceUpdateNamedEntityBody body: (required)
         :return: AdminNamedEntityUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13289,30 +13465,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_named_entity" % key
+                    " to method admin_service_update_named_entity" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `update_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_update_named_entity`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `update_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_update_named_entity`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `update_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_update_named_entity`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `update_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_update_named_entity`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_named_entity`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_named_entity`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13363,12 +13539,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_named_entity2(self, resource_type, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_named_entity2(self, resource_type, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Update the fields associated with a NamedEntity  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_named_entity2(resource_type, id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_named_entity2(resource_type, id_org, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13377,24 +13554,25 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param AdminNamedEntityUpdateRequest body: (required)
+        :param AdminServiceUpdateNamedEntityBody body: (required)
         :return: AdminNamedEntityUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, **kwargs)  # noqa: E501
             return data
 
-    def update_named_entity2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
+    def admin_service_update_named_entity2_with_http_info(self, resource_type, id_org, id_project, id_domain, id_name, body, **kwargs):  # noqa: E501
         """Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.  # noqa: E501
 
+        Update the fields associated with a NamedEntity  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, async_req=True)
+        >>> thread = api.admin_service_update_named_entity2_with_http_info(resource_type, id_org, id_project, id_domain, id_name, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -13403,7 +13581,7 @@ class AdminServiceApi(object):
         :param str id_project: Name of the project the resource belongs to. (required)
         :param str id_domain: Name of the domain the resource belongs to. A domain can be considered as a subset within a specific project. (required)
         :param str id_name: User provided value for the resource. The combination of project + domain + name uniquely identifies the resource. +optional - in certain contexts - like 'List API', 'Launch plans' (required)
-        :param AdminNamedEntityUpdateRequest body: (required)
+        :param AdminServiceUpdateNamedEntityBody body: (required)
         :return: AdminNamedEntityUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13420,34 +13598,34 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_named_entity2" % key
+                    " to method admin_service_update_named_entity2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'resource_type' is set
-        if ('resource_type' not in params or
-                params['resource_type'] is None):
-            raise ValueError("Missing the required parameter `resource_type` when calling `update_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('resource_type' not in params or
+                                                       params['resource_type'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `resource_type` when calling `admin_service_update_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_org' is set
-        if ('id_org' not in params or
-                params['id_org'] is None):
-            raise ValueError("Missing the required parameter `id_org` when calling `update_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_org' not in params or
+                                                       params['id_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_org` when calling `admin_service_update_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_project' is set
-        if ('id_project' not in params or
-                params['id_project'] is None):
-            raise ValueError("Missing the required parameter `id_project` when calling `update_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_project' not in params or
+                                                       params['id_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_project` when calling `admin_service_update_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_domain' is set
-        if ('id_domain' not in params or
-                params['id_domain'] is None):
-            raise ValueError("Missing the required parameter `id_domain` when calling `update_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_domain' not in params or
+                                                       params['id_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_domain` when calling `admin_service_update_named_entity2`")  # noqa: E501
         # verify the required parameter 'id_name' is set
-        if ('id_name' not in params or
-                params['id_name'] is None):
-            raise ValueError("Missing the required parameter `id_name` when calling `update_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id_name' not in params or
+                                                       params['id_name'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id_name` when calling `admin_service_update_named_entity2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_named_entity2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_named_entity2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13500,39 +13678,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project(self, id, body, **kwargs):  # noqa: E501
+    def admin_service_update_project(self, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
+        Update a project.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project(id, body, async_req=True)
+        >>> thread = api.admin_service_update_project(id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id: Globally unique project name. (required)
-        :param AdminProject body: (required)
+        :param AdminServiceUpdateProjectBody body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project_with_http_info(id, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_project_with_http_info(id, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project_with_http_info(id, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_project_with_http_info(id, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project_with_http_info(self, id, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_with_http_info(self, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
+        Update a project.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_with_http_info(id, body, async_req=True)
+        >>> thread = api.admin_service_update_project_with_http_info(id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str id: Globally unique project name. (required)
-        :param AdminProject body: (required)
+        :param AdminServiceUpdateProjectBody body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13549,18 +13729,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project" % key
+                    " to method admin_service_update_project" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'id' is set
-        if ('id' not in params or
-                params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `update_project`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id' not in params or
+                                                       params['id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `admin_service_update_project`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_project`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13605,41 +13785,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project2(self, org, id, body, **kwargs):  # noqa: E501
+    def admin_service_update_project2(self, org, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
+        Update a project.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project2(org, id, body, async_req=True)
+        >>> thread = api.admin_service_update_project2(org, id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str id: Globally unique project name. (required)
-        :param AdminProject body: (required)
+        :param AdminServiceUpdateProjectBody body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project2_with_http_info(org, id, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_project2_with_http_info(org, id, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project2_with_http_info(org, id, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_project2_with_http_info(org, id, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project2_with_http_info(self, org, id, body, **kwargs):  # noqa: E501
+    def admin_service_update_project2_with_http_info(self, org, id, body, **kwargs):  # noqa: E501
         """Updates an existing :ref:`ref_flyteidl.admin.Project` flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.  # noqa: E501
 
+        Update a project.  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project2_with_http_info(org, id, body, async_req=True)
+        >>> thread = api.admin_service_update_project2_with_http_info(org, id, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str org: Optional, org key applied to the resource. (required)
         :param str id: Globally unique project name. (required)
-        :param AdminProject body: (required)
+        :param AdminServiceUpdateProjectBody body: (required)
         :return: AdminProjectUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13656,22 +13838,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project2" % key
+                    " to method admin_service_update_project2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'org' is set
-        if ('org' not in params or
-                params['org'] is None):
-            raise ValueError("Missing the required parameter `org` when calling `update_project2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('org' not in params or
+                                                       params['org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `org` when calling `admin_service_update_project2`")  # noqa: E501
         # verify the required parameter 'id' is set
-        if ('id' not in params or
-                params['id'] is None):
-            raise ValueError("Missing the required parameter `id` when calling `update_project2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('id' not in params or
+                                                       params['id'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `id` when calling `admin_service_update_project2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_project2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13718,39 +13900,41 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project_attributes(self, attributes_project, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_attributes(self, attributes_project, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
 
+        Update the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_attributes(attributes_project, body, async_req=True)
+        >>> thread = api.admin_service_update_project_attributes(attributes_project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
-        :param AdminProjectAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectAttributesBody body: (required)
         :return: AdminProjectAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project_attributes_with_http_info(attributes_project, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_project_attributes_with_http_info(attributes_project, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project_attributes_with_http_info(attributes_project, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_project_attributes_with_http_info(attributes_project, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project_attributes_with_http_info(self, attributes_project, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_attributes_with_http_info(self, attributes_project, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
 
+        Update the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_attributes_with_http_info(attributes_project, body, async_req=True)
+        >>> thread = api.admin_service_update_project_attributes_with_http_info(attributes_project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
-        :param AdminProjectAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectAttributesBody body: (required)
         :return: AdminProjectAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13767,18 +13951,18 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project_attributes" % key
+                    " to method admin_service_update_project_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'attributes_project' is set
-        if ('attributes_project' not in params or
-                params['attributes_project'] is None):
-            raise ValueError("Missing the required parameter `attributes_project` when calling `update_project_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_project' not in params or
+                                                       params['attributes_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_project` when calling `admin_service_update_project_attributes`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_project_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13823,41 +14007,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project_attributes2(self, attributes_org, attributes_project, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_attributes2(self, attributes_org, attributes_project, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
 
+        Update the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_attributes2(attributes_org, attributes_project, body, async_req=True)
+        >>> thread = api.admin_service_update_project_attributes2(attributes_org, attributes_project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_org: Optional, org key applied to the project. (required)
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
-        :param AdminProjectAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectAttributesBody body: (required)
         :return: AdminProjectAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project_attributes2_with_http_info(attributes_org, attributes_project, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_project_attributes2_with_http_info(attributes_org, attributes_project, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project_attributes2_with_http_info(attributes_org, attributes_project, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_project_attributes2_with_http_info(attributes_org, attributes_project, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project_attributes2_with_http_info(self, attributes_org, attributes_project, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_attributes2_with_http_info(self, attributes_org, attributes_project, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level  # noqa: E501
 
+        Update the customized resource attributes associated with a project  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_attributes2_with_http_info(attributes_org, attributes_project, body, async_req=True)
+        >>> thread = api.admin_service_update_project_attributes2_with_http_info(attributes_org, attributes_project, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_org: Optional, org key applied to the project. (required)
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
-        :param AdminProjectAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectAttributesBody body: (required)
         :return: AdminProjectAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13874,22 +14060,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project_attributes2" % key
+                    " to method admin_service_update_project_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'attributes_org' is set
-        if ('attributes_org' not in params or
-                params['attributes_org'] is None):
-            raise ValueError("Missing the required parameter `attributes_org` when calling `update_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_org' not in params or
+                                                       params['attributes_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_org` when calling `admin_service_update_project_attributes2`")  # noqa: E501
         # verify the required parameter 'attributes_project' is set
-        if ('attributes_project' not in params or
-                params['attributes_project'] is None):
-            raise ValueError("Missing the required parameter `attributes_project` when calling `update_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_project' not in params or
+                                                       params['attributes_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_project` when calling `admin_service_update_project_attributes2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_project_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -13936,41 +14122,43 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project_domain_attributes(self, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_domain_attributes(self, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Update the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_domain_attributes(attributes_project, attributes_domain, body, async_req=True)
+        >>> thread = api.admin_service_update_project_domain_attributes(attributes_project, attributes_domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
-        :param AdminProjectDomainAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project_domain_attributes_with_http_info(attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_project_domain_attributes_with_http_info(attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project_domain_attributes_with_http_info(attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_project_domain_attributes_with_http_info(attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project_domain_attributes_with_http_info(self, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_domain_attributes_with_http_info(self, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Update the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_domain_attributes_with_http_info(attributes_project, attributes_domain, body, async_req=True)
+        >>> thread = api.admin_service_update_project_domain_attributes_with_http_info(attributes_project, attributes_domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
-        :param AdminProjectDomainAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -13987,22 +14175,22 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project_domain_attributes" % key
+                    " to method admin_service_update_project_domain_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'attributes_project' is set
-        if ('attributes_project' not in params or
-                params['attributes_project'] is None):
-            raise ValueError("Missing the required parameter `attributes_project` when calling `update_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_project' not in params or
+                                                       params['attributes_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_project` when calling `admin_service_update_project_domain_attributes`")  # noqa: E501
         # verify the required parameter 'attributes_domain' is set
-        if ('attributes_domain' not in params or
-                params['attributes_domain'] is None):
-            raise ValueError("Missing the required parameter `attributes_domain` when calling `update_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_domain' not in params or
+                                                       params['attributes_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_domain` when calling `admin_service_update_project_domain_attributes`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project_domain_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_project_domain_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -14049,43 +14237,45 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_project_domain_attributes2(self, attributes_org, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_domain_attributes2(self, attributes_org, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Update the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_domain_attributes2(attributes_org, attributes_project, attributes_domain, body, async_req=True)
+        >>> thread = api.admin_service_update_project_domain_attributes2(attributes_org, attributes_project, attributes_domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_org: Optional, org key applied to the attributes. (required)
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
-        :param AdminProjectDomainAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_project_domain_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_project_domain_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_project_domain_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_project_domain_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, body, **kwargs)  # noqa: E501
             return data
 
-    def update_project_domain_attributes2_with_http_info(self, attributes_org, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
+    def admin_service_update_project_domain_attributes2_with_http_info(self, attributes_org, attributes_project, attributes_domain, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 
+        Update the customized resource attributes associated with a project-domain combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_project_domain_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, body, async_req=True)
+        >>> thread = api.admin_service_update_project_domain_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_org: Optional, org key applied to the attributes. (required)
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
-        :param AdminProjectDomainAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateProjectDomainAttributesBody body: (required)
         :return: AdminProjectDomainAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -14102,26 +14292,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_project_domain_attributes2" % key
+                    " to method admin_service_update_project_domain_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'attributes_org' is set
-        if ('attributes_org' not in params or
-                params['attributes_org'] is None):
-            raise ValueError("Missing the required parameter `attributes_org` when calling `update_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_org' not in params or
+                                                       params['attributes_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_org` when calling `admin_service_update_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'attributes_project' is set
-        if ('attributes_project' not in params or
-                params['attributes_project'] is None):
-            raise ValueError("Missing the required parameter `attributes_project` when calling `update_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_project' not in params or
+                                                       params['attributes_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_project` when calling `admin_service_update_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'attributes_domain' is set
-        if ('attributes_domain' not in params or
-                params['attributes_domain'] is None):
-            raise ValueError("Missing the required parameter `attributes_domain` when calling `update_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_domain' not in params or
+                                                       params['attributes_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_domain` when calling `admin_service_update_project_domain_attributes2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_project_domain_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_project_domain_attributes2`")  # noqa: E501
 
         collection_formats = {}
 
@@ -14170,43 +14360,45 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_workflow_attributes(self, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
+    def admin_service_update_workflow_attributes(self, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Update the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_workflow_attributes(attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
+        >>> thread = api.admin_service_update_workflow_attributes(attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
         :param str attributes_workflow: Workflow name for which this set of attributes will be applied. (required)
-        :param AdminWorkflowAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_workflow_attributes_with_http_info(attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_workflow_attributes_with_http_info(attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_workflow_attributes_with_http_info(attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_workflow_attributes_with_http_info(attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
             return data
 
-    def update_workflow_attributes_with_http_info(self, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
+    def admin_service_update_workflow_attributes_with_http_info(self, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Update the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_workflow_attributes_with_http_info(attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
+        >>> thread = api.admin_service_update_workflow_attributes_with_http_info(attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
         :param str attributes_workflow: Workflow name for which this set of attributes will be applied. (required)
-        :param AdminWorkflowAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -14223,26 +14415,26 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_workflow_attributes" % key
+                    " to method admin_service_update_workflow_attributes" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'attributes_project' is set
-        if ('attributes_project' not in params or
-                params['attributes_project'] is None):
-            raise ValueError("Missing the required parameter `attributes_project` when calling `update_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_project' not in params or
+                                                       params['attributes_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_project` when calling `admin_service_update_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'attributes_domain' is set
-        if ('attributes_domain' not in params or
-                params['attributes_domain'] is None):
-            raise ValueError("Missing the required parameter `attributes_domain` when calling `update_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_domain' not in params or
+                                                       params['attributes_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_domain` when calling `admin_service_update_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'attributes_workflow' is set
-        if ('attributes_workflow' not in params or
-                params['attributes_workflow'] is None):
-            raise ValueError("Missing the required parameter `attributes_workflow` when calling `update_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_workflow' not in params or
+                                                       params['attributes_workflow'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_workflow` when calling `admin_service_update_workflow_attributes`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_workflow_attributes`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_workflow_attributes`")  # noqa: E501
 
         collection_formats = {}
 
@@ -14291,12 +14483,13 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
-    def update_workflow_attributes2(self, attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
+    def admin_service_update_workflow_attributes2(self, attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Update the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_workflow_attributes2(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
+        >>> thread = api.admin_service_update_workflow_attributes2(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -14304,24 +14497,25 @@ class AdminServiceApi(object):
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
         :param str attributes_workflow: Workflow name for which this set of attributes will be applied. (required)
-        :param AdminWorkflowAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
         """
         kwargs['_return_http_data_only'] = True
         if kwargs.get('async_req'):
-            return self.update_workflow_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
+            return self.admin_service_update_workflow_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
         else:
-            (data) = self.update_workflow_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
+            (data) = self.admin_service_update_workflow_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs)  # noqa: E501
             return data
 
-    def update_workflow_attributes2_with_http_info(self, attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
+    def admin_service_update_workflow_attributes2_with_http_info(self, attributes_org, attributes_project, attributes_domain, attributes_workflow, body, **kwargs):  # noqa: E501
         """Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.  # noqa: E501
 
+        Update the customized resource attributes associated with a project, domain and workflow combination  # noqa: E501
         This method makes a synchronous HTTP request by default. To make an
         asynchronous HTTP request, please pass async_req=True
-        >>> thread = api.update_workflow_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
+        >>> thread = api.admin_service_update_workflow_attributes2_with_http_info(attributes_org, attributes_project, attributes_domain, attributes_workflow, body, async_req=True)
         >>> result = thread.get()
 
         :param async_req bool
@@ -14329,7 +14523,7 @@ class AdminServiceApi(object):
         :param str attributes_project: Unique project id for which this set of attributes will be applied. (required)
         :param str attributes_domain: Unique domain id for which this set of attributes will be applied. (required)
         :param str attributes_workflow: Workflow name for which this set of attributes will be applied. (required)
-        :param AdminWorkflowAttributesUpdateRequest body: (required)
+        :param AdminServiceUpdateWorkflowAttributesBody body: (required)
         :return: AdminWorkflowAttributesUpdateResponse
                  If the method is called asynchronously,
                  returns the request thread.
@@ -14346,30 +14540,30 @@ class AdminServiceApi(object):
             if key not in all_params:
                 raise TypeError(
                     "Got an unexpected keyword argument '%s'"
-                    " to method update_workflow_attributes2" % key
+                    " to method admin_service_update_workflow_attributes2" % key
                 )
             params[key] = val
         del params['kwargs']
         # verify the required parameter 'attributes_org' is set
-        if ('attributes_org' not in params or
-                params['attributes_org'] is None):
-            raise ValueError("Missing the required parameter `attributes_org` when calling `update_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_org' not in params or
+                                                       params['attributes_org'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_org` when calling `admin_service_update_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'attributes_project' is set
-        if ('attributes_project' not in params or
-                params['attributes_project'] is None):
-            raise ValueError("Missing the required parameter `attributes_project` when calling `update_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_project' not in params or
+                                                       params['attributes_project'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_project` when calling `admin_service_update_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'attributes_domain' is set
-        if ('attributes_domain' not in params or
-                params['attributes_domain'] is None):
-            raise ValueError("Missing the required parameter `attributes_domain` when calling `update_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_domain' not in params or
+                                                       params['attributes_domain'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_domain` when calling `admin_service_update_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'attributes_workflow' is set
-        if ('attributes_workflow' not in params or
-                params['attributes_workflow'] is None):
-            raise ValueError("Missing the required parameter `attributes_workflow` when calling `update_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('attributes_workflow' not in params or
+                                                       params['attributes_workflow'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `attributes_workflow` when calling `admin_service_update_workflow_attributes2`")  # noqa: E501
         # verify the required parameter 'body' is set
-        if ('body' not in params or
-                params['body'] is None):
-            raise ValueError("Missing the required parameter `body` when calling `update_workflow_attributes2`")  # noqa: E501
+        if self.api_client.client_side_validation and ('body' not in params or
+                                                       params['body'] is None):  # noqa: E501
+            raise ValueError("Missing the required parameter `body` when calling `admin_service_update_workflow_attributes2`")  # noqa: E501
 
         collection_formats = {}
 

@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_o_auth2_client import CoreOAuth2Client  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreIdentity(object):
@@ -46,8 +46,11 @@ class CoreIdentity(object):
         'execution_identity': 'execution_identity'
     }
 
-    def __init__(self, iam_role=None, k8s_service_account=None, oauth2_client=None, execution_identity=None):  # noqa: E501
+    def __init__(self, iam_role=None, k8s_service_account=None, oauth2_client=None, execution_identity=None, _configuration=None):  # noqa: E501
         """CoreIdentity - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._iam_role = None
         self._k8s_service_account = None
@@ -194,8 +197,11 @@ class CoreIdentity(object):
         if not isinstance(other, CoreIdentity):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreIdentity):
+            return True
+
+        return self.to_dict() != other.to_dict()

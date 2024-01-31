@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_launch_plan_state import AdminLaunchPlanState  # noqa: F401,E501
-from flyteadmin.models.core_parameter_map import CoreParameterMap  # noqa: F401,E501
-from flyteadmin.models.core_variable_map import CoreVariableMap  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminLaunchPlanClosure(object):
@@ -50,8 +48,11 @@ class AdminLaunchPlanClosure(object):
         'updated_at': 'updated_at'
     }
 
-    def __init__(self, state=None, expected_inputs=None, expected_outputs=None, created_at=None, updated_at=None):  # noqa: E501
+    def __init__(self, state=None, expected_inputs=None, expected_outputs=None, created_at=None, updated_at=None, _configuration=None):  # noqa: E501
         """AdminLaunchPlanClosure - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._state = None
         self._expected_inputs = None
@@ -222,8 +223,11 @@ class AdminLaunchPlanClosure(object):
         if not isinstance(other, AdminLaunchPlanClosure):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminLaunchPlanClosure):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_artifact_key import CoreArtifactKey  # noqa: F401,E501
-from flyteadmin.models.core_label_value import CoreLabelValue  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreArtifactTag(object):
@@ -43,8 +42,11 @@ class CoreArtifactTag(object):
         'value': 'value'
     }
 
-    def __init__(self, artifact_key=None, value=None):  # noqa: E501
+    def __init__(self, artifact_key=None, value=None, _configuration=None):  # noqa: E501
         """CoreArtifactTag - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._artifact_key = None
         self._value = None
@@ -137,8 +139,11 @@ class CoreArtifactTag(object):
         if not isinstance(other, CoreArtifactTag):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreArtifactTag):
+            return True
+
+        return self.to_dict() != other.to_dict()

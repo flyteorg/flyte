@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_artifact_binding_data import CoreArtifactBindingData  # noqa: F401,E501
-from flyteadmin.models.core_input_binding_data import CoreInputBindingData  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreLabelValue(object):
@@ -47,8 +46,11 @@ class CoreLabelValue(object):
         'input_binding': 'input_binding'
     }
 
-    def __init__(self, static_value=None, time_value=None, triggered_binding=None, input_binding=None):  # noqa: E501
+    def __init__(self, static_value=None, time_value=None, triggered_binding=None, input_binding=None, _configuration=None):  # noqa: E501
         """CoreLabelValue - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._static_value = None
         self._time_value = None
@@ -189,8 +191,11 @@ class CoreLabelValue(object):
         if not isinstance(other, CoreLabelValue):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreLabelValue):
+            return True
+
+        return self.to_dict() != other.to_dict()

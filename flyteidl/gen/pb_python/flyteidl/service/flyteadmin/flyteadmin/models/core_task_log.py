@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.task_log_message_format import TaskLogMessageFormat  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreTaskLog(object):
@@ -46,8 +46,11 @@ class CoreTaskLog(object):
         'ttl': 'ttl'
     }
 
-    def __init__(self, uri=None, name=None, message_format=None, ttl=None):  # noqa: E501
+    def __init__(self, uri=None, name=None, message_format=None, ttl=None, _configuration=None):  # noqa: E501
         """CoreTaskLog - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._uri = None
         self._name = None
@@ -188,8 +191,11 @@ class CoreTaskLog(object):
         if not isinstance(other, CoreTaskLog):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreTaskLog):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_node_execution_closure import AdminNodeExecutionClosure  # noqa: F401,E501
-from flyteadmin.models.admin_node_execution_meta_data import AdminNodeExecutionMetaData  # noqa: F401,E501
-from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class FlyteidladminNodeExecution(object):
@@ -48,8 +46,11 @@ class FlyteidladminNodeExecution(object):
         'metadata': 'metadata'
     }
 
-    def __init__(self, id=None, input_uri=None, closure=None, metadata=None):  # noqa: E501
+    def __init__(self, id=None, input_uri=None, closure=None, metadata=None, _configuration=None):  # noqa: E501
         """FlyteidladminNodeExecution - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._input_uri = None
@@ -196,8 +197,11 @@ class FlyteidladminNodeExecution(object):
         if not isinstance(other, FlyteidladminNodeExecution):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, FlyteidladminNodeExecution):
+            return True
+
+        return self.to_dict() != other.to_dict()

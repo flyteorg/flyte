@@ -16,14 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_alias import CoreAlias  # noqa: F401,E501
-from flyteadmin.models.core_array_node import CoreArrayNode  # noqa: F401,E501
-from flyteadmin.models.core_binding import CoreBinding  # noqa: F401,E501
-from flyteadmin.models.core_branch_node import CoreBranchNode  # noqa: F401,E501
-from flyteadmin.models.core_gate_node import CoreGateNode  # noqa: F401,E501
-from flyteadmin.models.core_node_metadata import CoreNodeMetadata  # noqa: F401,E501
-from flyteadmin.models.core_task_node import CoreTaskNode  # noqa: F401,E501
-from flyteadmin.models.core_workflow_node import CoreWorkflowNode  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreNode(object):
@@ -65,8 +58,11 @@ class CoreNode(object):
         'array_node': 'array_node'
     }
 
-    def __init__(self, id=None, metadata=None, inputs=None, upstream_node_ids=None, output_aliases=None, task_node=None, workflow_node=None, branch_node=None, gate_node=None, array_node=None):  # noqa: E501
+    def __init__(self, id=None, metadata=None, inputs=None, upstream_node_ids=None, output_aliases=None, task_node=None, workflow_node=None, branch_node=None, gate_node=None, array_node=None, _configuration=None):  # noqa: E501
         """CoreNode - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._metadata = None
@@ -371,8 +367,11 @@ class CoreNode(object):
         if not isinstance(other, CoreNode):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreNode):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,15 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_node_execution_identifier import CoreNodeExecutionIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
-from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
-from flyteadmin.models.event_event_reason import EventEventReason  # noqa: F401,E501
-from flyteadmin.models.flyteidlevent_task_execution_metadata import FlyteidleventTaskExecutionMetadata  # noqa: F401,E501
-from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class EventTaskExecutionEvent(object):
@@ -53,7 +45,7 @@ class EventTaskExecutionEvent(object):
         'output_uri': 'str',
         'error': 'CoreExecutionError',
         'output_data': 'CoreLiteralMap',
-        'custom_info': 'ProtobufStruct',
+        'custom_info': 'object',
         'phase_version': 'int',
         'reason': 'str',
         'reasons': 'list[EventEventReason]',
@@ -86,8 +78,11 @@ class EventTaskExecutionEvent(object):
         'reported_at': 'reported_at'
     }
 
-    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, reasons=None, task_type=None, metadata=None, event_version=None, reported_at=None):  # noqa: E501
+    def __init__(self, task_id=None, parent_node_execution_id=None, retry_attempt=None, phase=None, producer_id=None, logs=None, occurred_at=None, input_uri=None, input_data=None, output_uri=None, error=None, output_data=None, custom_info=None, phase_version=None, reason=None, reasons=None, task_type=None, metadata=None, event_version=None, reported_at=None, _configuration=None):  # noqa: E501
         """EventTaskExecutionEvent - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._task_id = None
         self._parent_node_execution_id = None
@@ -423,7 +418,7 @@ class EventTaskExecutionEvent(object):
         Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.  # noqa: E501
 
         :return: The custom_info of this EventTaskExecutionEvent.  # noqa: E501
-        :rtype: ProtobufStruct
+        :rtype: object
         """
         return self._custom_info
 
@@ -434,7 +429,7 @@ class EventTaskExecutionEvent(object):
         Custom data that the task plugin sends back. This is extensible to allow various plugins in the system.  # noqa: E501
 
         :param custom_info: The custom_info of this EventTaskExecutionEvent.  # noqa: E501
-        :type: ProtobufStruct
+        :type: object
         """
 
         self._custom_info = custom_info
@@ -640,8 +635,11 @@ class EventTaskExecutionEvent(object):
         if not isinstance(other, EventTaskExecutionEvent):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, EventTaskExecutionEvent):
+            return True
+
+        return self.to_dict() != other.to_dict()

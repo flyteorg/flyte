@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_catalog_cache_status import CoreCatalogCacheStatus  # noqa: F401,E501
-from flyteadmin.models.core_task_execution_phase import CoreTaskExecutionPhase  # noqa: F401,E501
-from flyteadmin.models.core_task_log import CoreTaskLog  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class EventExternalResourceInfo(object):
@@ -52,8 +50,11 @@ class EventExternalResourceInfo(object):
         'logs': 'logs'
     }
 
-    def __init__(self, external_id=None, index=None, retry_attempt=None, phase=None, cache_status=None, logs=None):  # noqa: E501
+    def __init__(self, external_id=None, index=None, retry_attempt=None, phase=None, cache_status=None, logs=None, _configuration=None):  # noqa: E501
         """EventExternalResourceInfo - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._external_id = None
         self._index = None
@@ -248,8 +249,11 @@ class EventExternalResourceInfo(object):
         if not isinstance(other, EventExternalResourceInfo):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, EventExternalResourceInfo):
+            return True
+
+        return self.to_dict() != other.to_dict()

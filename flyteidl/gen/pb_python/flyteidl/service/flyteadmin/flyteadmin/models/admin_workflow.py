@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_workflow_closure import AdminWorkflowClosure  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminWorkflow(object):
@@ -35,7 +34,7 @@ class AdminWorkflow(object):
     """
     swagger_types = {
         'id': 'CoreIdentifier',
-        'closure': 'AdminWorkflowClosure',
+        'closure': 'FlyteidladminWorkflowClosure',
         'short_description': 'str'
     }
 
@@ -45,8 +44,11 @@ class AdminWorkflow(object):
         'short_description': 'short_description'
     }
 
-    def __init__(self, id=None, closure=None, short_description=None):  # noqa: E501
+    def __init__(self, id=None, closure=None, short_description=None, _configuration=None):  # noqa: E501
         """AdminWorkflow - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._closure = None
@@ -90,7 +92,7 @@ class AdminWorkflow(object):
         closure encapsulates all the fields that maps to a compiled version of the workflow.  # noqa: E501
 
         :return: The closure of this AdminWorkflow.  # noqa: E501
-        :rtype: AdminWorkflowClosure
+        :rtype: FlyteidladminWorkflowClosure
         """
         return self._closure
 
@@ -101,7 +103,7 @@ class AdminWorkflow(object):
         closure encapsulates all the fields that maps to a compiled version of the workflow.  # noqa: E501
 
         :param closure: The closure of this AdminWorkflow.  # noqa: E501
-        :type: AdminWorkflowClosure
+        :type: FlyteidladminWorkflowClosure
         """
 
         self._closure = closure
@@ -169,8 +171,11 @@ class AdminWorkflow(object):
         if not isinstance(other, AdminWorkflow):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminWorkflow):
+            return True
+
+        return self.to_dict() != other.to_dict()

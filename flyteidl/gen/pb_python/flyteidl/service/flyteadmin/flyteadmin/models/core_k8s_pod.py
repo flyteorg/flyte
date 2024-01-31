@@ -16,9 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_data_loading_config import CoreDataLoadingConfig  # noqa: F401,E501
-from flyteadmin.models.core_k8s_object_metadata import CoreK8sObjectMetadata  # noqa: F401,E501
-from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreK8sPod(object):
@@ -36,7 +34,7 @@ class CoreK8sPod(object):
     """
     swagger_types = {
         'metadata': 'CoreK8sObjectMetadata',
-        'pod_spec': 'ProtobufStruct',
+        'pod_spec': 'object',
         'data_config': 'CoreDataLoadingConfig'
     }
 
@@ -46,8 +44,11 @@ class CoreK8sPod(object):
         'data_config': 'data_config'
     }
 
-    def __init__(self, metadata=None, pod_spec=None, data_config=None):  # noqa: E501
+    def __init__(self, metadata=None, pod_spec=None, data_config=None, _configuration=None):  # noqa: E501
         """CoreK8sPod - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._metadata = None
         self._pod_spec = None
@@ -90,7 +91,7 @@ class CoreK8sPod(object):
 
 
         :return: The pod_spec of this CoreK8sPod.  # noqa: E501
-        :rtype: ProtobufStruct
+        :rtype: object
         """
         return self._pod_spec
 
@@ -100,7 +101,7 @@ class CoreK8sPod(object):
 
 
         :param pod_spec: The pod_spec of this CoreK8sPod.  # noqa: E501
-        :type: ProtobufStruct
+        :type: object
         """
 
         self._pod_spec = pod_spec
@@ -166,8 +167,11 @@ class CoreK8sPod(object):
         if not isinstance(other, CoreK8sPod):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreK8sPod):
+            return True
+
+        return self.to_dict() != other.to_dict()

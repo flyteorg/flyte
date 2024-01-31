@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_project import AdminProject  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminProjectRegisterRequest(object):
@@ -40,8 +40,11 @@ class AdminProjectRegisterRequest(object):
         'project': 'project'
     }
 
-    def __init__(self, project=None):  # noqa: E501
+    def __init__(self, project=None, _configuration=None):  # noqa: E501
         """AdminProjectRegisterRequest - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._project = None
         self.discriminator = None
@@ -110,8 +113,11 @@ class AdminProjectRegisterRequest(object):
         if not isinstance(other, AdminProjectRegisterRequest):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminProjectRegisterRequest):
+            return True
+
+        return self.to_dict() != other.to_dict()

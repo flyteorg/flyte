@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.connection_set_id_list import ConnectionSetIdList  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreConnectionSet(object):
@@ -42,8 +42,11 @@ class CoreConnectionSet(object):
         'upstream': 'upstream'
     }
 
-    def __init__(self, downstream=None, upstream=None):  # noqa: E501
+    def __init__(self, downstream=None, upstream=None, _configuration=None):  # noqa: E501
         """CoreConnectionSet - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._downstream = None
         self._upstream = None
@@ -136,8 +139,11 @@ class CoreConnectionSet(object):
         if not isinstance(other, CoreConnectionSet):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreConnectionSet):
+            return True
+
+        return self.to_dict() != other.to_dict()

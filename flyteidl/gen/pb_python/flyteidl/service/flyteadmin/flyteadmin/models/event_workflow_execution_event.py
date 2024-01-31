@@ -16,10 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_execution_error import CoreExecutionError  # noqa: F401,E501
-from flyteadmin.models.core_literal_map import CoreLiteralMap  # noqa: F401,E501
-from flyteadmin.models.core_workflow_execution_identifier import CoreWorkflowExecutionIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_workflow_execution_phase import CoreWorkflowExecutionPhase  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class EventWorkflowExecutionEvent(object):
@@ -55,8 +52,11 @@ class EventWorkflowExecutionEvent(object):
         'output_data': 'output_data'
     }
 
-    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, output_data=None):  # noqa: E501
+    def __init__(self, execution_id=None, producer_id=None, phase=None, occurred_at=None, output_uri=None, error=None, output_data=None, _configuration=None):  # noqa: E501
         """EventWorkflowExecutionEvent - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._execution_id = None
         self._producer_id = None
@@ -275,8 +275,11 @@ class EventWorkflowExecutionEvent(object):
         if not isinstance(other, EventWorkflowExecutionEvent):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, EventWorkflowExecutionEvent):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_retry_strategy import CoreRetryStrategy  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreNodeMetadata(object):
@@ -46,8 +46,11 @@ class CoreNodeMetadata(object):
         'interruptible': 'interruptible'
     }
 
-    def __init__(self, name=None, timeout=None, retries=None, interruptible=None):  # noqa: E501
+    def __init__(self, name=None, timeout=None, retries=None, interruptible=None, _configuration=None):  # noqa: E501
         """CoreNodeMetadata - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._name = None
         self._timeout = None
@@ -192,8 +195,11 @@ class CoreNodeMetadata(object):
         if not isinstance(other, CoreNodeMetadata):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreNodeMetadata):
+            return True
+
+        return self.to_dict() != other.to_dict()

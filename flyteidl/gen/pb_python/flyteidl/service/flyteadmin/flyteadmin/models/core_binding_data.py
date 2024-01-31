@@ -16,11 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_binding_data_collection import CoreBindingDataCollection  # noqa: F401,E501
-from flyteadmin.models.core_binding_data_map import CoreBindingDataMap  # noqa: F401,E501
-from flyteadmin.models.core_output_reference import CoreOutputReference  # noqa: F401,E501
-from flyteadmin.models.core_scalar import CoreScalar  # noqa: F401,E501
-from flyteadmin.models.core_union_info import CoreUnionInfo  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreBindingData(object):
@@ -52,8 +48,11 @@ class CoreBindingData(object):
         'union': 'union'
     }
 
-    def __init__(self, scalar=None, collection=None, promise=None, map=None, union=None):  # noqa: E501
+    def __init__(self, scalar=None, collection=None, promise=None, map=None, union=None, _configuration=None):  # noqa: E501
         """CoreBindingData - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._scalar = None
         self._collection = None
@@ -226,8 +225,11 @@ class CoreBindingData(object):
         if not isinstance(other, CoreBindingData):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreBindingData):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.execution_error_error_kind import ExecutionErrorErrorKind  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreExecutionError(object):
@@ -46,8 +46,11 @@ class CoreExecutionError(object):
         'kind': 'kind'
     }
 
-    def __init__(self, code=None, message=None, error_uri=None, kind=None):  # noqa: E501
+    def __init__(self, code=None, message=None, error_uri=None, kind=None, _configuration=None):  # noqa: E501
         """CoreExecutionError - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._code = None
         self._message = None
@@ -190,8 +193,11 @@ class CoreExecutionError(object):
         if not isinstance(other, CoreExecutionError):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreExecutionError):
+            return True
+
+        return self.to_dict() != other.to_dict()

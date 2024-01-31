@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.io_strategy_download_mode import IOStrategyDownloadMode  # noqa: F401,E501
-from flyteadmin.models.io_strategy_upload_mode import IOStrategyUploadMode  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreIOStrategy(object):
@@ -43,8 +42,11 @@ class CoreIOStrategy(object):
         'upload_mode': 'upload_mode'
     }
 
-    def __init__(self, download_mode=None, upload_mode=None):  # noqa: E501
+    def __init__(self, download_mode=None, upload_mode=None, _configuration=None):  # noqa: E501
         """CoreIOStrategy - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._download_mode = None
         self._upload_mode = None
@@ -137,8 +139,11 @@ class CoreIOStrategy(object):
         if not isinstance(other, CoreIOStrategy):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreIOStrategy):
+            return True
+
+        return self.to_dict() != other.to_dict()

@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_matching_attributes import AdminMatchingAttributes  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminWorkflowAttributes(object):
@@ -48,8 +48,11 @@ class AdminWorkflowAttributes(object):
         'org': 'org'
     }
 
-    def __init__(self, project=None, domain=None, workflow=None, matching_attributes=None, org=None):  # noqa: E501
+    def __init__(self, project=None, domain=None, workflow=None, matching_attributes=None, org=None, _configuration=None):  # noqa: E501
         """AdminWorkflowAttributes - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._project = None
         self._domain = None
@@ -222,8 +225,11 @@ class AdminWorkflowAttributes(object):
         if not isinstance(other, AdminWorkflowAttributes):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminWorkflowAttributes):
+            return True
+
+        return self.to_dict() != other.to_dict()

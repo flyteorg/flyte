@@ -53,138 +53,138 @@ from pprint import pprint
 
 # create an instance of the API class
 api_instance = flyteadmin.AdminServiceApi(flyteadmin.ApiClient(configuration))
-body = flyteadmin.AdminExecutionCreateRequest() # AdminExecutionCreateRequest | 
+body = flyteadmin.AdminExecutionCreateRequest() # AdminExecutionCreateRequest | Request to launch an execution with the given project, domain and optionally-assigned name.
 
 try:
     # Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
-    api_response = api_instance.create_execution(body)
+    api_response = api_instance.admin_service_create_execution(body)
     pprint(api_response)
 except ApiException as e:
-    print("Exception when calling AdminServiceApi->create_execution: %s\n" % e)
+    print("Exception when calling AdminServiceApi->admin_service_create_execution: %s\n" % e)
 
 ```
 
 ## Documentation for API Endpoints
 
-All URIs are relative to *http://localhost*
+All URIs are relative to *https://localhost*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*AdminServiceApi* | [**create_execution**](docs/AdminServiceApi.md#create_execution) | **POST** /api/v1/executions | Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
-*AdminServiceApi* | [**create_execution2**](docs/AdminServiceApi.md#create_execution2) | **PUT** /api/v1/executions/org/{org} | Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
-*AdminServiceApi* | [**create_launch_plan**](docs/AdminServiceApi.md#create_launch_plan) | **POST** /api/v1/launch_plans | Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
-*AdminServiceApi* | [**create_launch_plan2**](docs/AdminServiceApi.md#create_launch_plan2) | **POST** /api/v1/launch_plans/org/{id.org} | Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
-*AdminServiceApi* | [**create_node_event**](docs/AdminServiceApi.md#create_node_event) | **POST** /api/v1/events/nodes | Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
-*AdminServiceApi* | [**create_node_event2**](docs/AdminServiceApi.md#create_node_event2) | **POST** /api/v1/events/org/{event.id.execution_id.org}/nodes | Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
-*AdminServiceApi* | [**create_task**](docs/AdminServiceApi.md#create_task) | **POST** /api/v1/tasks | Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
-*AdminServiceApi* | [**create_task2**](docs/AdminServiceApi.md#create_task2) | **POST** /api/v1/tasks/org/{id.org} | Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
-*AdminServiceApi* | [**create_task_event**](docs/AdminServiceApi.md#create_task_event) | **POST** /api/v1/events/tasks | Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
-*AdminServiceApi* | [**create_task_event2**](docs/AdminServiceApi.md#create_task_event2) | **POST** /api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks | Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
-*AdminServiceApi* | [**create_workflow**](docs/AdminServiceApi.md#create_workflow) | **POST** /api/v1/workflows | Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
-*AdminServiceApi* | [**create_workflow2**](docs/AdminServiceApi.md#create_workflow2) | **POST** /api/v1/workflows/org/{id.org} | Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
-*AdminServiceApi* | [**create_workflow_event**](docs/AdminServiceApi.md#create_workflow_event) | **POST** /api/v1/events/workflows | Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
-*AdminServiceApi* | [**create_workflow_event2**](docs/AdminServiceApi.md#create_workflow_event2) | **POST** /api/v1/events/org/{event.execution_id.org}/workflows | Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
-*AdminServiceApi* | [**delete_project_attributes**](docs/AdminServiceApi.md#delete_project_attributes) | **DELETE** /api/v1/project_attributes/{project} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**delete_project_attributes2**](docs/AdminServiceApi.md#delete_project_attributes2) | **DELETE** /api/v1/project_domain_attributes/org/{org}/{project} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**delete_project_domain_attributes**](docs/AdminServiceApi.md#delete_project_domain_attributes) | **DELETE** /api/v1/project_domain_attributes/{project}/{domain} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**delete_project_domain_attributes2**](docs/AdminServiceApi.md#delete_project_domain_attributes2) | **DELETE** /api/v1/project_domain_attributes/org/{org}/{project}/{domain} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**delete_workflow_attributes**](docs/AdminServiceApi.md#delete_workflow_attributes) | **DELETE** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
-*AdminServiceApi* | [**delete_workflow_attributes2**](docs/AdminServiceApi.md#delete_workflow_attributes2) | **DELETE** /api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
-*AdminServiceApi* | [**get_active_launch_plan**](docs/AdminServiceApi.md#get_active_launch_plan) | **GET** /api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
-*AdminServiceApi* | [**get_active_launch_plan2**](docs/AdminServiceApi.md#get_active_launch_plan2) | **GET** /api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
-*AdminServiceApi* | [**get_description_entity**](docs/AdminServiceApi.md#get_description_entity) | **GET** /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
-*AdminServiceApi* | [**get_description_entity2**](docs/AdminServiceApi.md#get_description_entity2) | **GET** /api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
-*AdminServiceApi* | [**get_dynamic_node_workflow**](docs/AdminServiceApi.md#get_dynamic_node_workflow) | **GET** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
-*AdminServiceApi* | [**get_dynamic_node_workflow2**](docs/AdminServiceApi.md#get_dynamic_node_workflow2) | **GET** /api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
-*AdminServiceApi* | [**get_execution**](docs/AdminServiceApi.md#get_execution) | **GET** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**get_execution2**](docs/AdminServiceApi.md#get_execution2) | **GET** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**get_execution_data**](docs/AdminServiceApi.md#get_execution_data) | **GET** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**get_execution_data2**](docs/AdminServiceApi.md#get_execution_data2) | **GET** /api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**get_execution_metrics**](docs/AdminServiceApi.md#get_execution_metrics) | **GET** /api/v1/metrics/executions/{id.project}/{id.domain}/{id.name} | Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**get_execution_metrics2**](docs/AdminServiceApi.md#get_execution_metrics2) | **GET** /api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**get_launch_plan**](docs/AdminServiceApi.md#get_launch_plan) | **GET** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
-*AdminServiceApi* | [**get_launch_plan2**](docs/AdminServiceApi.md#get_launch_plan2) | **GET** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
-*AdminServiceApi* | [**get_named_entity**](docs/AdminServiceApi.md#get_named_entity) | **GET** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
-*AdminServiceApi* | [**get_named_entity2**](docs/AdminServiceApi.md#get_named_entity2) | **GET** /api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name} | Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
-*AdminServiceApi* | [**get_node_execution**](docs/AdminServiceApi.md#get_node_execution) | **GET** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
-*AdminServiceApi* | [**get_node_execution2**](docs/AdminServiceApi.md#get_node_execution2) | **GET** /api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
-*AdminServiceApi* | [**get_node_execution_data**](docs/AdminServiceApi.md#get_node_execution_data) | **GET** /api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
-*AdminServiceApi* | [**get_node_execution_data2**](docs/AdminServiceApi.md#get_node_execution_data2) | **GET** /api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
-*AdminServiceApi* | [**get_project_attributes**](docs/AdminServiceApi.md#get_project_attributes) | **GET** /api/v1/project_attributes/{project} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**get_project_attributes2**](docs/AdminServiceApi.md#get_project_attributes2) | **GET** /api/v1/project_domain_attributes/org/{org}/{project} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**get_project_domain_attributes**](docs/AdminServiceApi.md#get_project_domain_attributes) | **GET** /api/v1/project_domain_attributes/{project}/{domain} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**get_project_domain_attributes2**](docs/AdminServiceApi.md#get_project_domain_attributes2) | **GET** /api/v1/project_domain_attributes/org/{org}/{project}/{domain} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**get_task**](docs/AdminServiceApi.md#get_task) | **GET** /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
-*AdminServiceApi* | [**get_task2**](docs/AdminServiceApi.md#get_task2) | **GET** /api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
-*AdminServiceApi* | [**get_task_execution**](docs/AdminServiceApi.md#get_task_execution) | **GET** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**get_task_execution2**](docs/AdminServiceApi.md#get_task_execution2) | **GET** /api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**get_task_execution_data**](docs/AdminServiceApi.md#get_task_execution_data) | **GET** /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**get_task_execution_data2**](docs/AdminServiceApi.md#get_task_execution_data2) | **GET** /api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**get_version**](docs/AdminServiceApi.md#get_version) | **GET** /api/v1/version | 
-*AdminServiceApi* | [**get_workflow**](docs/AdminServiceApi.md#get_workflow) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
-*AdminServiceApi* | [**get_workflow2**](docs/AdminServiceApi.md#get_workflow2) | **GET** /api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
-*AdminServiceApi* | [**get_workflow_attributes**](docs/AdminServiceApi.md#get_workflow_attributes) | **GET** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
-*AdminServiceApi* | [**get_workflow_attributes2**](docs/AdminServiceApi.md#get_workflow_attributes2) | **GET** /api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
-*AdminServiceApi* | [**list_active_launch_plans**](docs/AdminServiceApi.md#list_active_launch_plans) | **GET** /api/v1/active_launch_plans/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
-*AdminServiceApi* | [**list_active_launch_plans2**](docs/AdminServiceApi.md#list_active_launch_plans2) | **GET** /api/v1/active_launch_plans/org/{org}/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
-*AdminServiceApi* | [**list_description_entities**](docs/AdminServiceApi.md#list_description_entities) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
-*AdminServiceApi* | [**list_description_entities2**](docs/AdminServiceApi.md#list_description_entities2) | **GET** /api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
-*AdminServiceApi* | [**list_description_entities3**](docs/AdminServiceApi.md#list_description_entities3) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
-*AdminServiceApi* | [**list_description_entities4**](docs/AdminServiceApi.md#list_description_entities4) | **GET** /api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
-*AdminServiceApi* | [**list_executions**](docs/AdminServiceApi.md#list_executions) | **GET** /api/v1/executions/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**list_executions2**](docs/AdminServiceApi.md#list_executions2) | **GET** /api/v1/executions/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**list_launch_plan_ids**](docs/AdminServiceApi.md#list_launch_plan_ids) | **GET** /api/v1/launch_plan_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
-*AdminServiceApi* | [**list_launch_plan_ids2**](docs/AdminServiceApi.md#list_launch_plan_ids2) | **GET** /api/v1/launch_plan_ids/org/{org}/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
-*AdminServiceApi* | [**list_launch_plans**](docs/AdminServiceApi.md#list_launch_plans) | **GET** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
-*AdminServiceApi* | [**list_launch_plans2**](docs/AdminServiceApi.md#list_launch_plans2) | **GET** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
-*AdminServiceApi* | [**list_launch_plans3**](docs/AdminServiceApi.md#list_launch_plans3) | **GET** /api/v1/launch_plans/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
-*AdminServiceApi* | [**list_launch_plans4**](docs/AdminServiceApi.md#list_launch_plans4) | **GET** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
-*AdminServiceApi* | [**list_matchable_attributes**](docs/AdminServiceApi.md#list_matchable_attributes) | **GET** /api/v1/matchable_attributes | Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
-*AdminServiceApi* | [**list_matchable_attributes2**](docs/AdminServiceApi.md#list_matchable_attributes2) | **GET** /api/v1/matchable_attributes/org/{org} | Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
-*AdminServiceApi* | [**list_named_entities**](docs/AdminServiceApi.md#list_named_entities) | **GET** /api/v1/named_entities/{resource_type}/{project}/{domain} | Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
-*AdminServiceApi* | [**list_named_entities2**](docs/AdminServiceApi.md#list_named_entities2) | **GET** /api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain} | Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
-*AdminServiceApi* | [**list_node_executions**](docs/AdminServiceApi.md#list_node_executions) | **GET** /api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
-*AdminServiceApi* | [**list_node_executions2**](docs/AdminServiceApi.md#list_node_executions2) | **GET** /api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
-*AdminServiceApi* | [**list_node_executions_for_task**](docs/AdminServiceApi.md#list_node_executions_for_task) | **GET** /api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**list_node_executions_for_task2**](docs/AdminServiceApi.md#list_node_executions_for_task2) | **GET** /api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**list_projects**](docs/AdminServiceApi.md#list_projects) | **GET** /api/v1/projects | Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
-*AdminServiceApi* | [**list_projects2**](docs/AdminServiceApi.md#list_projects2) | **GET** /api/v1/projects/org/{org} | Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
-*AdminServiceApi* | [**list_task_executions**](docs/AdminServiceApi.md#list_task_executions) | **GET** /api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id} | Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**list_task_executions2**](docs/AdminServiceApi.md#list_task_executions2) | **GET** /api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id} | Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
-*AdminServiceApi* | [**list_task_ids**](docs/AdminServiceApi.md#list_task_ids) | **GET** /api/v1/task_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
-*AdminServiceApi* | [**list_task_ids2**](docs/AdminServiceApi.md#list_task_ids2) | **GET** /api/v1/tasks/org/{org}/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
-*AdminServiceApi* | [**list_tasks**](docs/AdminServiceApi.md#list_tasks) | **GET** /api/v1/tasks/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
-*AdminServiceApi* | [**list_tasks2**](docs/AdminServiceApi.md#list_tasks2) | **GET** /api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
-*AdminServiceApi* | [**list_tasks3**](docs/AdminServiceApi.md#list_tasks3) | **GET** /api/v1/tasks/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
-*AdminServiceApi* | [**list_tasks4**](docs/AdminServiceApi.md#list_tasks4) | **GET** /api/v1/tasks/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
-*AdminServiceApi* | [**list_workflow_ids**](docs/AdminServiceApi.md#list_workflow_ids) | **GET** /api/v1/workflow_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
-*AdminServiceApi* | [**list_workflow_ids2**](docs/AdminServiceApi.md#list_workflow_ids2) | **GET** /api/v1/workflows/org/{org}/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
-*AdminServiceApi* | [**list_workflows**](docs/AdminServiceApi.md#list_workflows) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
-*AdminServiceApi* | [**list_workflows2**](docs/AdminServiceApi.md#list_workflows2) | **GET** /api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
-*AdminServiceApi* | [**list_workflows3**](docs/AdminServiceApi.md#list_workflows3) | **GET** /api/v1/workflows/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
-*AdminServiceApi* | [**list_workflows4**](docs/AdminServiceApi.md#list_workflows4) | **GET** /api/v1/workflows/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
-*AdminServiceApi* | [**recover_execution**](docs/AdminServiceApi.md#recover_execution) | **POST** /api/v1/executions/recover | Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
-*AdminServiceApi* | [**recover_execution2**](docs/AdminServiceApi.md#recover_execution2) | **POST** /api/v1/executions/org/{id.org}/recover | Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
-*AdminServiceApi* | [**register_project**](docs/AdminServiceApi.md#register_project) | **POST** /api/v1/projects | Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
-*AdminServiceApi* | [**register_project2**](docs/AdminServiceApi.md#register_project2) | **POST** /api/v1/projects/org/{project.org} | Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
-*AdminServiceApi* | [**relaunch_execution**](docs/AdminServiceApi.md#relaunch_execution) | **POST** /api/v1/executions/relaunch | Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
-*AdminServiceApi* | [**relaunch_execution2**](docs/AdminServiceApi.md#relaunch_execution2) | **POST** /api/v1/executions/org/{id.org}/relaunch | Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
-*AdminServiceApi* | [**terminate_execution**](docs/AdminServiceApi.md#terminate_execution) | **DELETE** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**terminate_execution2**](docs/AdminServiceApi.md#terminate_execution2) | **DELETE** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**update_execution**](docs/AdminServiceApi.md#update_execution) | **PUT** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**update_execution2**](docs/AdminServiceApi.md#update_execution2) | **PUT** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
-*AdminServiceApi* | [**update_launch_plan**](docs/AdminServiceApi.md#update_launch_plan) | **PUT** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
-*AdminServiceApi* | [**update_launch_plan2**](docs/AdminServiceApi.md#update_launch_plan2) | **PUT** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
-*AdminServiceApi* | [**update_named_entity**](docs/AdminServiceApi.md#update_named_entity) | **PUT** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
-*AdminServiceApi* | [**update_named_entity2**](docs/AdminServiceApi.md#update_named_entity2) | **PUT** /api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name} | Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
-*AdminServiceApi* | [**update_project**](docs/AdminServiceApi.md#update_project) | **PUT** /api/v1/projects/{id} | Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
-*AdminServiceApi* | [**update_project2**](docs/AdminServiceApi.md#update_project2) | **PUT** /api/v1/projects/org/{org}/{id} | Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
-*AdminServiceApi* | [**update_project_attributes**](docs/AdminServiceApi.md#update_project_attributes) | **PUT** /api/v1/project_attributes/{attributes.project} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
-*AdminServiceApi* | [**update_project_attributes2**](docs/AdminServiceApi.md#update_project_attributes2) | **PUT** /api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
-*AdminServiceApi* | [**update_project_domain_attributes**](docs/AdminServiceApi.md#update_project_domain_attributes) | **PUT** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**update_project_domain_attributes2**](docs/AdminServiceApi.md#update_project_domain_attributes2) | **PUT** /api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
-*AdminServiceApi* | [**update_workflow_attributes**](docs/AdminServiceApi.md#update_workflow_attributes) | **PUT** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
-*AdminServiceApi* | [**update_workflow_attributes2**](docs/AdminServiceApi.md#update_workflow_attributes2) | **PUT** /api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**admin_service_create_execution**](docs/AdminServiceApi.md#admin_service_create_execution) | **POST** /api/v1/executions | Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+*AdminServiceApi* | [**admin_service_create_execution2**](docs/AdminServiceApi.md#admin_service_create_execution2) | **PUT** /api/v1/executions/org/{org} | Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+*AdminServiceApi* | [**admin_service_create_launch_plan**](docs/AdminServiceApi.md#admin_service_create_launch_plan) | **POST** /api/v1/launch_plans | Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
+*AdminServiceApi* | [**admin_service_create_launch_plan2**](docs/AdminServiceApi.md#admin_service_create_launch_plan2) | **POST** /api/v1/launch_plans/org/{id.org} | Create and upload a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition
+*AdminServiceApi* | [**admin_service_create_node_event**](docs/AdminServiceApi.md#admin_service_create_node_event) | **POST** /api/v1/events/nodes | Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
+*AdminServiceApi* | [**admin_service_create_node_event2**](docs/AdminServiceApi.md#admin_service_create_node_event2) | **POST** /api/v1/events/org/{event.id.execution_id.org}/nodes | Indicates a :ref:&#x60;ref_flyteidl.event.NodeExecutionEvent&#x60; has occurred.
+*AdminServiceApi* | [**admin_service_create_task**](docs/AdminServiceApi.md#admin_service_create_task) | **POST** /api/v1/tasks | Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
+*AdminServiceApi* | [**admin_service_create_task2**](docs/AdminServiceApi.md#admin_service_create_task2) | **POST** /api/v1/tasks/org/{id.org} | Create and upload a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition
+*AdminServiceApi* | [**admin_service_create_task_event**](docs/AdminServiceApi.md#admin_service_create_task_event) | **POST** /api/v1/events/tasks | Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
+*AdminServiceApi* | [**admin_service_create_task_event2**](docs/AdminServiceApi.md#admin_service_create_task_event2) | **POST** /api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks | Indicates a :ref:&#x60;ref_flyteidl.event.TaskExecutionEvent&#x60; has occurred.
+*AdminServiceApi* | [**admin_service_create_workflow**](docs/AdminServiceApi.md#admin_service_create_workflow) | **POST** /api/v1/workflows | Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
+*AdminServiceApi* | [**admin_service_create_workflow2**](docs/AdminServiceApi.md#admin_service_create_workflow2) | **POST** /api/v1/workflows/org/{id.org} | Create and upload a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition
+*AdminServiceApi* | [**admin_service_create_workflow_event**](docs/AdminServiceApi.md#admin_service_create_workflow_event) | **POST** /api/v1/events/workflows | Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
+*AdminServiceApi* | [**admin_service_create_workflow_event2**](docs/AdminServiceApi.md#admin_service_create_workflow_event2) | **POST** /api/v1/events/org/{event.execution_id.org}/workflows | Indicates a :ref:&#x60;ref_flyteidl.event.WorkflowExecutionEvent&#x60; has occurred.
+*AdminServiceApi* | [**admin_service_delete_project_attributes**](docs/AdminServiceApi.md#admin_service_delete_project_attributes) | **DELETE** /api/v1/project_attributes/{project} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_delete_project_attributes2**](docs/AdminServiceApi.md#admin_service_delete_project_attributes2) | **DELETE** /api/v1/project_domain_attributes/org/{org}/{project} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_delete_project_domain_attributes**](docs/AdminServiceApi.md#admin_service_delete_project_domain_attributes) | **DELETE** /api/v1/project_domain_attributes/{project}/{domain} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_delete_project_domain_attributes2**](docs/AdminServiceApi.md#admin_service_delete_project_domain_attributes2) | **DELETE** /api/v1/project_domain_attributes/org/{org}/{project}/{domain} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_delete_workflow_attributes**](docs/AdminServiceApi.md#admin_service_delete_workflow_attributes) | **DELETE** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**admin_service_delete_workflow_attributes2**](docs/AdminServiceApi.md#admin_service_delete_workflow_attributes2) | **DELETE** /api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow} | Deletes custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**admin_service_get_active_launch_plan**](docs/AdminServiceApi.md#admin_service_get_active_launch_plan) | **GET** /api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**admin_service_get_active_launch_plan2**](docs/AdminServiceApi.md#admin_service_get_active_launch_plan2) | **GET** /api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch the active version of a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**admin_service_get_description_entity**](docs/AdminServiceApi.md#admin_service_get_description_entity) | **GET** /api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+*AdminServiceApi* | [**admin_service_get_description_entity2**](docs/AdminServiceApi.md#admin_service_get_description_entity2) | **GET** /api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; object.
+*AdminServiceApi* | [**admin_service_get_dynamic_node_workflow**](docs/AdminServiceApi.md#admin_service_get_dynamic_node_workflow) | **GET** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
+*AdminServiceApi* | [**admin_service_get_dynamic_node_workflow2**](docs/AdminServiceApi.md#admin_service_get_dynamic_node_workflow2) | **GET** /api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow | Fetches a :ref:&#x60;ref_flyteidl.admin.DynamicNodeWorkflowResponse&#x60;.
+*AdminServiceApi* | [**admin_service_get_execution**](docs/AdminServiceApi.md#admin_service_get_execution) | **GET** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_get_execution2**](docs/AdminServiceApi.md#admin_service_get_execution2) | **GET** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_get_execution_data**](docs/AdminServiceApi.md#admin_service_get_execution_data) | **GET** /api/v1/data/executions/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_get_execution_data2**](docs/AdminServiceApi.md#admin_service_get_execution_data2) | **GET** /api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_get_execution_metrics**](docs/AdminServiceApi.md#admin_service_get_execution_metrics) | **GET** /api/v1/metrics/executions/{id.project}/{id.domain}/{id.name} | Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_get_execution_metrics2**](docs/AdminServiceApi.md#admin_service_get_execution_metrics2) | **GET** /api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetches runtime metrics for a :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_get_launch_plan**](docs/AdminServiceApi.md#admin_service_get_launch_plan) | **GET** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
+*AdminServiceApi* | [**admin_service_get_launch_plan2**](docs/AdminServiceApi.md#admin_service_get_launch_plan2) | **GET** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definition.
+*AdminServiceApi* | [**admin_service_get_named_entity**](docs/AdminServiceApi.md#admin_service_get_named_entity) | **GET** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+*AdminServiceApi* | [**admin_service_get_named_entity2**](docs/AdminServiceApi.md#admin_service_get_named_entity2) | **GET** /api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name} | Returns a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+*AdminServiceApi* | [**admin_service_get_node_execution**](docs/AdminServiceApi.md#admin_service_get_node_execution) | **GET** /api/v1/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_node_execution2**](docs/AdminServiceApi.md#admin_service_get_node_execution2) | **GET** /api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_node_execution_data**](docs/AdminServiceApi.md#admin_service_get_node_execution_data) | **GET** /api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_node_execution_data2**](docs/AdminServiceApi.md#admin_service_get_node_execution_data2) | **GET** /api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_project_attributes**](docs/AdminServiceApi.md#admin_service_get_project_attributes) | **GET** /api/v1/project_attributes/{project} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_get_project_attributes2**](docs/AdminServiceApi.md#admin_service_get_project_attributes2) | **GET** /api/v1/project_domain_attributes/org/{org}/{project} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_get_project_domain_attributes**](docs/AdminServiceApi.md#admin_service_get_project_domain_attributes) | **GET** /api/v1/project_domain_attributes/{project}/{domain} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_get_project_domain_attributes2**](docs/AdminServiceApi.md#admin_service_get_project_domain_attributes2) | **GET** /api/v1/project_domain_attributes/org/{org}/{project}/{domain} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_get_task**](docs/AdminServiceApi.md#admin_service_get_task) | **GET** /api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
+*AdminServiceApi* | [**admin_service_get_task2**](docs/AdminServiceApi.md#admin_service_get_task2) | **GET** /api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Task&#x60; definition.
+*AdminServiceApi* | [**admin_service_get_task_execution**](docs/AdminServiceApi.md#admin_service_get_task_execution) | **GET** /api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_task_execution2**](docs/AdminServiceApi.md#admin_service_get_task_execution2) | **GET** /api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_task_execution_data**](docs/AdminServiceApi.md#admin_service_get_task_execution_data) | **GET** /api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_task_execution_data2**](docs/AdminServiceApi.md#admin_service_get_task_execution_data2) | **GET** /api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt} | Fetches input and output data for a :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_get_version**](docs/AdminServiceApi.md#admin_service_get_version) | **GET** /api/v1/version | 
+*AdminServiceApi* | [**admin_service_get_workflow**](docs/AdminServiceApi.md#admin_service_get_workflow) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
+*AdminServiceApi* | [**admin_service_get_workflow2**](docs/AdminServiceApi.md#admin_service_get_workflow2) | **GET** /api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Fetch a :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definition.
+*AdminServiceApi* | [**admin_service_get_workflow_attributes**](docs/AdminServiceApi.md#admin_service_get_workflow_attributes) | **GET** /api/v1/workflow_attributes/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**admin_service_get_workflow_attributes2**](docs/AdminServiceApi.md#admin_service_get_workflow_attributes2) | **GET** /api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow} | Fetches custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**admin_service_list_active_launch_plans**](docs/AdminServiceApi.md#admin_service_list_active_launch_plans) | **GET** /api/v1/active_launch_plans/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**admin_service_list_active_launch_plans2**](docs/AdminServiceApi.md#admin_service_list_active_launch_plans2) | **GET** /api/v1/active_launch_plans/org/{org}/{project}/{domain} | List active versions of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**admin_service_list_description_entities**](docs/AdminServiceApi.md#admin_service_list_description_entities) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_description_entities2**](docs/AdminServiceApi.md#admin_service_list_description_entities2) | **GET** /api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_description_entities3**](docs/AdminServiceApi.md#admin_service_list_description_entities3) | **GET** /api/v1/description_entities/{resource_type}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_description_entities4**](docs/AdminServiceApi.md#admin_service_list_description_entities4) | **GET** /api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.DescriptionEntity&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_executions**](docs/AdminServiceApi.md#admin_service_list_executions) | **GET** /api/v1/executions/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_list_executions2**](docs/AdminServiceApi.md#admin_service_list_executions2) | **GET** /api/v1/executions/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_list_launch_plan_ids**](docs/AdminServiceApi.md#admin_service_list_launch_plan_ids) | **GET** /api/v1/launch_plan_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
+*AdminServiceApi* | [**admin_service_list_launch_plan_ids2**](docs/AdminServiceApi.md#admin_service_list_launch_plan_ids2) | **GET** /api/v1/launch_plan_ids/org/{org}/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of launch plan objects.
+*AdminServiceApi* | [**admin_service_list_launch_plans**](docs/AdminServiceApi.md#admin_service_list_launch_plans) | **GET** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_launch_plans2**](docs/AdminServiceApi.md#admin_service_list_launch_plans2) | **GET** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_launch_plans3**](docs/AdminServiceApi.md#admin_service_list_launch_plans3) | **GET** /api/v1/launch_plans/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_launch_plans4**](docs/AdminServiceApi.md#admin_service_list_launch_plans4) | **GET** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_matchable_attributes**](docs/AdminServiceApi.md#admin_service_list_matchable_attributes) | **GET** /api/v1/matchable_attributes | Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
+*AdminServiceApi* | [**admin_service_list_matchable_attributes2**](docs/AdminServiceApi.md#admin_service_list_matchable_attributes2) | **GET** /api/v1/matchable_attributes/org/{org} | Lists custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a specific resource type.
+*AdminServiceApi* | [**admin_service_list_named_entities**](docs/AdminServiceApi.md#admin_service_list_named_entities) | **GET** /api/v1/named_entities/{resource_type}/{project}/{domain} | Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
+*AdminServiceApi* | [**admin_service_list_named_entities2**](docs/AdminServiceApi.md#admin_service_list_named_entities2) | **GET** /api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain} | Returns a list of :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; objects.
+*AdminServiceApi* | [**admin_service_list_node_executions**](docs/AdminServiceApi.md#admin_service_list_node_executions) | **GET** /api/v1/node_executions/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+*AdminServiceApi* | [**admin_service_list_node_executions2**](docs/AdminServiceApi.md#admin_service_list_node_executions2) | **GET** /api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60;.
+*AdminServiceApi* | [**admin_service_list_node_executions_for_task**](docs/AdminServiceApi.md#admin_service_list_node_executions_for_task) | **GET** /api/v1/children/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_list_node_executions_for_task2**](docs/AdminServiceApi.md#admin_service_list_node_executions_for_task2) | **GET** /api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NodeExecution&#x60; launched by the reference :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_list_projects**](docs/AdminServiceApi.md#admin_service_list_projects) | **GET** /api/v1/projects | Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
+*AdminServiceApi* | [**admin_service_list_projects2**](docs/AdminServiceApi.md#admin_service_list_projects2) | **GET** /api/v1/projects/org/{org} | Fetches a list of :ref:&#x60;ref_flyteidl.admin.Project&#x60;
+*AdminServiceApi* | [**admin_service_list_task_executions**](docs/AdminServiceApi.md#admin_service_list_task_executions) | **GET** /api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id} | Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_list_task_executions2**](docs/AdminServiceApi.md#admin_service_list_task_executions2) | **GET** /api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id} | Fetches a list of :ref:&#x60;ref_flyteidl.admin.TaskExecution&#x60;.
+*AdminServiceApi* | [**admin_service_list_task_ids**](docs/AdminServiceApi.md#admin_service_list_task_ids) | **GET** /api/v1/task_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
+*AdminServiceApi* | [**admin_service_list_task_ids2**](docs/AdminServiceApi.md#admin_service_list_task_ids2) | **GET** /api/v1/tasks/org/{org}/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of task objects.
+*AdminServiceApi* | [**admin_service_list_tasks**](docs/AdminServiceApi.md#admin_service_list_tasks) | **GET** /api/v1/tasks/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_tasks2**](docs/AdminServiceApi.md#admin_service_list_tasks2) | **GET** /api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_tasks3**](docs/AdminServiceApi.md#admin_service_list_tasks3) | **GET** /api/v1/tasks/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_tasks4**](docs/AdminServiceApi.md#admin_service_list_tasks4) | **GET** /api/v1/tasks/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Task&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_workflow_ids**](docs/AdminServiceApi.md#admin_service_list_workflow_ids) | **GET** /api/v1/workflow_ids/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
+*AdminServiceApi* | [**admin_service_list_workflow_ids2**](docs/AdminServiceApi.md#admin_service_list_workflow_ids2) | **GET** /api/v1/workflows/org/{org}/{project}/{domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.NamedEntityIdentifier&#x60; of workflow objects.
+*AdminServiceApi* | [**admin_service_list_workflows**](docs/AdminServiceApi.md#admin_service_list_workflows) | **GET** /api/v1/workflows/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_workflows2**](docs/AdminServiceApi.md#admin_service_list_workflows2) | **GET** /api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_workflows3**](docs/AdminServiceApi.md#admin_service_list_workflows3) | **GET** /api/v1/workflows/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+*AdminServiceApi* | [**admin_service_list_workflows4**](docs/AdminServiceApi.md#admin_service_list_workflows4) | **GET** /api/v1/workflows/org/{id.org}/{id.project}/{id.domain} | Fetch a list of :ref:&#x60;ref_flyteidl.admin.Workflow&#x60; definitions.
+*AdminServiceApi* | [**admin_service_recover_execution**](docs/AdminServiceApi.md#admin_service_recover_execution) | **POST** /api/v1/executions/recover | Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
+*AdminServiceApi* | [**admin_service_recover_execution2**](docs/AdminServiceApi.md#admin_service_recover_execution2) | **POST** /api/v1/executions/org/{id.org}/recover | Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again. See :ref:&#x60;ref_flyteidl.admin.ExecutionRecoverRequest&#x60; for more details.
+*AdminServiceApi* | [**admin_service_register_project**](docs/AdminServiceApi.md#admin_service_register_project) | **POST** /api/v1/projects | Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
+*AdminServiceApi* | [**admin_service_register_project2**](docs/AdminServiceApi.md#admin_service_register_project2) | **POST** /api/v1/projects/org/{project.org} | Registers a :ref:&#x60;ref_flyteidl.admin.Project&#x60; with the Flyte deployment.
+*AdminServiceApi* | [**admin_service_relaunch_execution**](docs/AdminServiceApi.md#admin_service_relaunch_execution) | **POST** /api/v1/executions/relaunch | Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+*AdminServiceApi* | [**admin_service_relaunch_execution2**](docs/AdminServiceApi.md#admin_service_relaunch_execution2) | **POST** /api/v1/executions/org/{id.org}/relaunch | Triggers the creation of an identical :ref:&#x60;ref_flyteidl.admin.Execution&#x60;
+*AdminServiceApi* | [**admin_service_terminate_execution**](docs/AdminServiceApi.md#admin_service_terminate_execution) | **DELETE** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_terminate_execution2**](docs/AdminServiceApi.md#admin_service_terminate_execution2) | **DELETE** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Terminates an in-progress :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_update_execution**](docs/AdminServiceApi.md#admin_service_update_execution) | **PUT** /api/v1/executions/{id.project}/{id.domain}/{id.name} | Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_update_execution2**](docs/AdminServiceApi.md#admin_service_update_execution2) | **PUT** /api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name} | Update execution belonging to project domain :ref:&#x60;ref_flyteidl.admin.Execution&#x60;.
+*AdminServiceApi* | [**admin_service_update_launch_plan**](docs/AdminServiceApi.md#admin_service_update_launch_plan) | **PUT** /api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version} | Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**admin_service_update_launch_plan2**](docs/AdminServiceApi.md#admin_service_update_launch_plan2) | **PUT** /api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version} | Updates the status of a registered :ref:&#x60;ref_flyteidl.admin.LaunchPlan&#x60;.
+*AdminServiceApi* | [**admin_service_update_named_entity**](docs/AdminServiceApi.md#admin_service_update_named_entity) | **PUT** /api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name} | Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+*AdminServiceApi* | [**admin_service_update_named_entity2**](docs/AdminServiceApi.md#admin_service_update_named_entity2) | **PUT** /api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name} | Updates a :ref:&#x60;ref_flyteidl.admin.NamedEntity&#x60; object.
+*AdminServiceApi* | [**admin_service_update_project**](docs/AdminServiceApi.md#admin_service_update_project) | **PUT** /api/v1/projects/{id} | Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
+*AdminServiceApi* | [**admin_service_update_project2**](docs/AdminServiceApi.md#admin_service_update_project2) | **PUT** /api/v1/projects/org/{org}/{id} | Updates an existing :ref:&#x60;ref_flyteidl.admin.Project&#x60; flyteidl.admin.Project should be passed but the domains property should be empty; it will be ignored in the handler as domains cannot be updated via this API.
+*AdminServiceApi* | [**admin_service_update_project_attributes**](docs/AdminServiceApi.md#admin_service_update_project_attributes) | **PUT** /api/v1/project_attributes/{attributes.project} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
+*AdminServiceApi* | [**admin_service_update_project_attributes2**](docs/AdminServiceApi.md#admin_service_update_project_attributes2) | **PUT** /api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; at the project level
+*AdminServiceApi* | [**admin_service_update_project_domain_attributes**](docs/AdminServiceApi.md#admin_service_update_project_domain_attributes) | **PUT** /api/v1/project_domain_attributes/{attributes.project}/{attributes.domain} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_update_project_domain_attributes2**](docs/AdminServiceApi.md#admin_service_update_project_domain_attributes2) | **PUT** /api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project and domain.
+*AdminServiceApi* | [**admin_service_update_workflow_attributes**](docs/AdminServiceApi.md#admin_service_update_workflow_attributes) | **PUT** /api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
+*AdminServiceApi* | [**admin_service_update_workflow_attributes2**](docs/AdminServiceApi.md#admin_service_update_workflow_attributes2) | **PUT** /api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow} | Creates or updates custom :ref:&#x60;ref_flyteidl.admin.MatchableAttributesConfiguration&#x60; for a project, domain and workflow.
 
 
 ## Documentation For Models
@@ -217,9 +217,7 @@ Class | Method | HTTP request | Description
  - [AdminExecutionSpec](docs/AdminExecutionSpec.md)
  - [AdminExecutionState](docs/AdminExecutionState.md)
  - [AdminExecutionStateChangeDetails](docs/AdminExecutionStateChangeDetails.md)
- - [AdminExecutionTerminateRequest](docs/AdminExecutionTerminateRequest.md)
  - [AdminExecutionTerminateResponse](docs/AdminExecutionTerminateResponse.md)
- - [AdminExecutionUpdateRequest](docs/AdminExecutionUpdateRequest.md)
  - [AdminExecutionUpdateResponse](docs/AdminExecutionUpdateResponse.md)
  - [AdminFixedRate](docs/AdminFixedRate.md)
  - [AdminFixedRateUnit](docs/AdminFixedRateUnit.md)
@@ -234,7 +232,6 @@ Class | Method | HTTP request | Description
  - [AdminLaunchPlanMetadata](docs/AdminLaunchPlanMetadata.md)
  - [AdminLaunchPlanSpec](docs/AdminLaunchPlanSpec.md)
  - [AdminLaunchPlanState](docs/AdminLaunchPlanState.md)
- - [AdminLaunchPlanUpdateRequest](docs/AdminLaunchPlanUpdateRequest.md)
  - [AdminLaunchPlanUpdateResponse](docs/AdminLaunchPlanUpdateResponse.md)
  - [AdminListMatchableAttributesResponse](docs/AdminListMatchableAttributesResponse.md)
  - [AdminLiteralMapBlob](docs/AdminLiteralMapBlob.md)
@@ -247,7 +244,6 @@ Class | Method | HTTP request | Description
  - [AdminNamedEntityList](docs/AdminNamedEntityList.md)
  - [AdminNamedEntityMetadata](docs/AdminNamedEntityMetadata.md)
  - [AdminNamedEntityState](docs/AdminNamedEntityState.md)
- - [AdminNamedEntityUpdateRequest](docs/AdminNamedEntityUpdateRequest.md)
  - [AdminNamedEntityUpdateResponse](docs/AdminNamedEntityUpdateResponse.md)
  - [AdminNodeExecutionClosure](docs/AdminNodeExecutionClosure.md)
  - [AdminNodeExecutionEventRequest](docs/AdminNodeExecutionEventRequest.md)
@@ -262,16 +258,12 @@ Class | Method | HTTP request | Description
  - [AdminPluginOverrides](docs/AdminPluginOverrides.md)
  - [AdminProject](docs/AdminProject.md)
  - [AdminProjectAttributes](docs/AdminProjectAttributes.md)
- - [AdminProjectAttributesDeleteRequest](docs/AdminProjectAttributesDeleteRequest.md)
  - [AdminProjectAttributesDeleteResponse](docs/AdminProjectAttributesDeleteResponse.md)
  - [AdminProjectAttributesGetResponse](docs/AdminProjectAttributesGetResponse.md)
- - [AdminProjectAttributesUpdateRequest](docs/AdminProjectAttributesUpdateRequest.md)
  - [AdminProjectAttributesUpdateResponse](docs/AdminProjectAttributesUpdateResponse.md)
  - [AdminProjectDomainAttributes](docs/AdminProjectDomainAttributes.md)
- - [AdminProjectDomainAttributesDeleteRequest](docs/AdminProjectDomainAttributesDeleteRequest.md)
  - [AdminProjectDomainAttributesDeleteResponse](docs/AdminProjectDomainAttributesDeleteResponse.md)
  - [AdminProjectDomainAttributesGetResponse](docs/AdminProjectDomainAttributesGetResponse.md)
- - [AdminProjectDomainAttributesUpdateRequest](docs/AdminProjectDomainAttributesUpdateRequest.md)
  - [AdminProjectDomainAttributesUpdateResponse](docs/AdminProjectDomainAttributesUpdateResponse.md)
  - [AdminProjectRegisterRequest](docs/AdminProjectRegisterRequest.md)
  - [AdminProjectRegisterResponse](docs/AdminProjectRegisterResponse.md)
@@ -280,6 +272,26 @@ Class | Method | HTTP request | Description
  - [AdminRawOutputDataConfig](docs/AdminRawOutputDataConfig.md)
  - [AdminReason](docs/AdminReason.md)
  - [AdminSchedule](docs/AdminSchedule.md)
+ - [AdminServiceCreateExecutionBody](docs/AdminServiceCreateExecutionBody.md)
+ - [AdminServiceCreateLaunchPlanBody](docs/AdminServiceCreateLaunchPlanBody.md)
+ - [AdminServiceCreateNodeEventBody](docs/AdminServiceCreateNodeEventBody.md)
+ - [AdminServiceCreateTaskEventBody](docs/AdminServiceCreateTaskEventBody.md)
+ - [AdminServiceCreateWorkflowBody](docs/AdminServiceCreateWorkflowBody.md)
+ - [AdminServiceCreateWorkflowEventBody](docs/AdminServiceCreateWorkflowEventBody.md)
+ - [AdminServiceDeleteProjectAttributesBody](docs/AdminServiceDeleteProjectAttributesBody.md)
+ - [AdminServiceDeleteProjectDomainAttributesBody](docs/AdminServiceDeleteProjectDomainAttributesBody.md)
+ - [AdminServiceDeleteWorkflowAttributesBody](docs/AdminServiceDeleteWorkflowAttributesBody.md)
+ - [AdminServiceRecoverExecutionBody](docs/AdminServiceRecoverExecutionBody.md)
+ - [AdminServiceRegisterProjectBody](docs/AdminServiceRegisterProjectBody.md)
+ - [AdminServiceRelaunchExecutionBody](docs/AdminServiceRelaunchExecutionBody.md)
+ - [AdminServiceTerminateExecutionBody](docs/AdminServiceTerminateExecutionBody.md)
+ - [AdminServiceUpdateExecutionBody](docs/AdminServiceUpdateExecutionBody.md)
+ - [AdminServiceUpdateLaunchPlanBody](docs/AdminServiceUpdateLaunchPlanBody.md)
+ - [AdminServiceUpdateNamedEntityBody](docs/AdminServiceUpdateNamedEntityBody.md)
+ - [AdminServiceUpdateProjectAttributesBody](docs/AdminServiceUpdateProjectAttributesBody.md)
+ - [AdminServiceUpdateProjectBody](docs/AdminServiceUpdateProjectBody.md)
+ - [AdminServiceUpdateProjectDomainAttributesBody](docs/AdminServiceUpdateProjectDomainAttributesBody.md)
+ - [AdminServiceUpdateWorkflowAttributesBody](docs/AdminServiceUpdateWorkflowAttributesBody.md)
  - [AdminSlackNotification](docs/AdminSlackNotification.md)
  - [AdminSort](docs/AdminSort.md)
  - [AdminSourceCode](docs/AdminSourceCode.md)
@@ -299,12 +311,9 @@ Class | Method | HTTP request | Description
  - [AdminVersion](docs/AdminVersion.md)
  - [AdminWorkflow](docs/AdminWorkflow.md)
  - [AdminWorkflowAttributes](docs/AdminWorkflowAttributes.md)
- - [AdminWorkflowAttributesDeleteRequest](docs/AdminWorkflowAttributesDeleteRequest.md)
  - [AdminWorkflowAttributesDeleteResponse](docs/AdminWorkflowAttributesDeleteResponse.md)
  - [AdminWorkflowAttributesGetResponse](docs/AdminWorkflowAttributesGetResponse.md)
- - [AdminWorkflowAttributesUpdateRequest](docs/AdminWorkflowAttributesUpdateRequest.md)
  - [AdminWorkflowAttributesUpdateResponse](docs/AdminWorkflowAttributesUpdateResponse.md)
- - [AdminWorkflowClosure](docs/AdminWorkflowClosure.md)
  - [AdminWorkflowCreateRequest](docs/AdminWorkflowCreateRequest.md)
  - [AdminWorkflowCreateResponse](docs/AdminWorkflowCreateResponse.md)
  - [AdminWorkflowExecutionConfig](docs/AdminWorkflowExecutionConfig.md)
@@ -315,7 +324,6 @@ Class | Method | HTTP request | Description
  - [AdminWorkflowList](docs/AdminWorkflowList.md)
  - [AdminWorkflowSpec](docs/AdminWorkflowSpec.md)
  - [BlobTypeBlobDimensionality](docs/BlobTypeBlobDimensionality.md)
- - [CatalogReservationStatus](docs/CatalogReservationStatus.md)
  - [ComparisonExpressionOperator](docs/ComparisonExpressionOperator.md)
  - [ConjunctionExpressionLogicalOperator](docs/ConjunctionExpressionLogicalOperator.md)
  - [ConnectionSetIdList](docs/ConnectionSetIdList.md)
@@ -341,6 +349,7 @@ Class | Method | HTTP request | Description
  - [CoreCatalogArtifactTag](docs/CoreCatalogArtifactTag.md)
  - [CoreCatalogCacheStatus](docs/CoreCatalogCacheStatus.md)
  - [CoreCatalogMetadata](docs/CoreCatalogMetadata.md)
+ - [CoreCatalogReservationStatus](docs/CoreCatalogReservationStatus.md)
  - [CoreComparisonExpression](docs/CoreComparisonExpression.md)
  - [CoreCompiledTask](docs/CoreCompiledTask.md)
  - [CoreCompiledWorkflow](docs/CoreCompiledWorkflow.md)
@@ -350,7 +359,6 @@ Class | Method | HTTP request | Description
  - [CoreContainer](docs/CoreContainer.md)
  - [CoreContainerPort](docs/CoreContainerPort.md)
  - [CoreDataLoadingConfig](docs/CoreDataLoadingConfig.md)
- - [CoreEnumType](docs/CoreEnumType.md)
  - [CoreError](docs/CoreError.md)
  - [CoreExecutionError](docs/CoreExecutionError.md)
  - [CoreExtendedResources](docs/CoreExtendedResources.md)
@@ -364,7 +372,6 @@ Class | Method | HTTP request | Description
  - [CoreInputBindingData](docs/CoreInputBindingData.md)
  - [CoreK8sObjectMetadata](docs/CoreK8sObjectMetadata.md)
  - [CoreK8sPod](docs/CoreK8sPod.md)
- - [CoreKeyValuePair](docs/CoreKeyValuePair.md)
  - [CoreLabelValue](docs/CoreLabelValue.md)
  - [CoreLiteral](docs/CoreLiteral.md)
  - [CoreLiteralCollection](docs/CoreLiteralCollection.md)
@@ -391,7 +398,6 @@ Class | Method | HTTP request | Description
  - [CoreRetryStrategy](docs/CoreRetryStrategy.md)
  - [CoreRuntimeMetadata](docs/CoreRuntimeMetadata.md)
  - [CoreScalar](docs/CoreScalar.md)
- - [CoreSchema](docs/CoreSchema.md)
  - [CoreSchemaType](docs/CoreSchemaType.md)
  - [CoreSecret](docs/CoreSecret.md)
  - [CoreSecurityContext](docs/CoreSecurityContext.md)
@@ -427,6 +433,10 @@ Class | Method | HTTP request | Description
  - [CoreWorkflowNode](docs/CoreWorkflowNode.md)
  - [CoreWorkflowTemplate](docs/CoreWorkflowTemplate.md)
  - [DataLoadingConfigLiteralMapFormat](docs/DataLoadingConfigLiteralMapFormat.md)
+ - [DetailsAboutTheEventThatOccurred1](docs/DetailsAboutTheEventThatOccurred1.md)
+ - [DetailsAboutTheEventThatOccurred2](docs/DetailsAboutTheEventThatOccurred2.md)
+ - [DetailsAboutTheEventThatOccurred_](docs/DetailsAboutTheEventThatOccurred_.md)
+ - [EncapsulationOfFieldsThatUniquelyIdentifiesAFlyteWorkflowExecution](docs/EncapsulationOfFieldsThatUniquelyIdentifiesAFlyteWorkflowExecution.md)
  - [EventEventReason](docs/EventEventReason.md)
  - [EventExternalResourceInfo](docs/EventExternalResourceInfo.md)
  - [EventNodeExecutionEvent](docs/EventNodeExecutionEvent.md)
@@ -443,32 +453,42 @@ Class | Method | HTTP request | Description
  - [FlyteidladminTaskCreateResponse](docs/FlyteidladminTaskCreateResponse.md)
  - [FlyteidladminTaskExecution](docs/FlyteidladminTaskExecution.md)
  - [FlyteidladminTaskNodeMetadata](docs/FlyteidladminTaskNodeMetadata.md)
+ - [FlyteidladminWorkflowClosure](docs/FlyteidladminWorkflowClosure.md)
  - [FlyteidladminWorkflowNodeMetadata](docs/FlyteidladminWorkflowNodeMetadata.md)
+ - [FlyteidlcoreEnumType](docs/FlyteidlcoreEnumType.md)
+ - [FlyteidlcoreKeyValuePair](docs/FlyteidlcoreKeyValuePair.md)
+ - [FlyteidlcoreSchema](docs/FlyteidlcoreSchema.md)
  - [FlyteidleventDynamicWorkflowNodeMetadata](docs/FlyteidleventDynamicWorkflowNodeMetadata.md)
  - [FlyteidleventTaskExecutionMetadata](docs/FlyteidleventTaskExecutionMetadata.md)
  - [FlyteidleventTaskNodeMetadata](docs/FlyteidleventTaskNodeMetadata.md)
  - [FlyteidleventWorkflowNodeMetadata](docs/FlyteidleventWorkflowNodeMetadata.md)
+ - [GooglerpcStatus](docs/GooglerpcStatus.md)
  - [IOStrategyDownloadMode](docs/IOStrategyDownloadMode.md)
  - [IOStrategyUploadMode](docs/IOStrategyUploadMode.md)
+ - [IdRepresentsTheUniqueIdentifierOfTheWorkflowRequired](docs/IdRepresentsTheUniqueIdentifierOfTheWorkflowRequired.md)
+ - [IdentifierOfLaunchPlanForWhichToChangeStateRequired_](docs/IdentifierOfLaunchPlanForWhichToChangeStateRequired_.md)
+ - [IdentifierOfTheWorkflowExecutionToRecover_](docs/IdentifierOfTheWorkflowExecutionToRecover_.md)
  - [PluginOverrideMissingPluginBehavior](docs/PluginOverrideMissingPluginBehavior.md)
  - [ProjectProjectState](docs/ProjectProjectState.md)
  - [ProtobufAny](docs/ProtobufAny.md)
- - [ProtobufListValue](docs/ProtobufListValue.md)
  - [ProtobufNullValue](docs/ProtobufNullValue.md)
- - [ProtobufStruct](docs/ProtobufStruct.md)
- - [ProtobufValue](docs/ProtobufValue.md)
  - [QualityOfServiceTier](docs/QualityOfServiceTier.md)
+ - [Required](docs/Required.md)
+ - [Required1](docs/Required1.md)
  - [ResourcesResourceEntry](docs/ResourcesResourceEntry.md)
  - [ResourcesResourceName](docs/ResourcesResourceName.md)
  - [RuntimeMetadataRuntimeType](docs/RuntimeMetadataRuntimeType.md)
  - [SchemaColumnSchemaColumnType](docs/SchemaColumnSchemaColumnType.md)
  - [SchemaTypeSchemaColumn](docs/SchemaTypeSchemaColumn.md)
  - [SecretMountType](docs/SecretMountType.md)
+ - [ServiceAdminServiceCreateTaskBody](docs/ServiceAdminServiceCreateTaskBody.md)
  - [SortDirection](docs/SortDirection.md)
  - [SqlDialect](docs/SqlDialect.md)
  - [StructuredDatasetTypeDatasetColumn](docs/StructuredDatasetTypeDatasetColumn.md)
  - [TaskExecutionMetadataInstanceClass](docs/TaskExecutionMetadataInstanceClass.md)
  - [TaskLogMessageFormat](docs/TaskLogMessageFormat.md)
+ - [UniqueIdentifierForThisNodeExecution](docs/UniqueIdentifierForThisNodeExecution.md)
+ - [UniquelyIdentifiesALaunchPlanEntity_](docs/UniquelyIdentifiesALaunchPlanEntity_.md)
  - [WorkflowMetadataOnFailurePolicy](docs/WorkflowMetadataOnFailurePolicy.md)
 
 

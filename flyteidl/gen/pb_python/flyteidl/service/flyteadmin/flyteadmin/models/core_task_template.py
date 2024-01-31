@@ -16,15 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_container import CoreContainer  # noqa: F401,E501
-from flyteadmin.models.core_extended_resources import CoreExtendedResources  # noqa: F401,E501
-from flyteadmin.models.core_identifier import CoreIdentifier  # noqa: F401,E501
-from flyteadmin.models.core_k8s_pod import CoreK8sPod  # noqa: F401,E501
-from flyteadmin.models.core_security_context import CoreSecurityContext  # noqa: F401,E501
-from flyteadmin.models.core_sql import CoreSql  # noqa: F401,E501
-from flyteadmin.models.core_task_metadata import CoreTaskMetadata  # noqa: F401,E501
-from flyteadmin.models.core_typed_interface import CoreTypedInterface  # noqa: F401,E501
-from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreTaskTemplate(object):
@@ -45,7 +37,7 @@ class CoreTaskTemplate(object):
         'type': 'str',
         'metadata': 'CoreTaskMetadata',
         'interface': 'CoreTypedInterface',
-        'custom': 'ProtobufStruct',
+        'custom': 'object',
         'container': 'CoreContainer',
         'k8s_pod': 'CoreK8sPod',
         'sql': 'CoreSql',
@@ -70,8 +62,11 @@ class CoreTaskTemplate(object):
         'config': 'config'
     }
 
-    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, k8s_pod=None, sql=None, task_type_version=None, security_context=None, extended_resources=None, config=None):  # noqa: E501
+    def __init__(self, id=None, type=None, metadata=None, interface=None, custom=None, container=None, k8s_pod=None, sql=None, task_type_version=None, security_context=None, extended_resources=None, config=None, _configuration=None):  # noqa: E501
         """CoreTaskTemplate - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._id = None
         self._type = None
@@ -211,7 +206,7 @@ class CoreTaskTemplate(object):
         Custom data about the task. This is extensible to allow various plugins in the system.  # noqa: E501
 
         :return: The custom of this CoreTaskTemplate.  # noqa: E501
-        :rtype: ProtobufStruct
+        :rtype: object
         """
         return self._custom
 
@@ -222,7 +217,7 @@ class CoreTaskTemplate(object):
         Custom data about the task. This is extensible to allow various plugins in the system.  # noqa: E501
 
         :param custom: The custom of this CoreTaskTemplate.  # noqa: E501
-        :type: ProtobufStruct
+        :type: object
         """
 
         self._custom = custom
@@ -420,8 +415,11 @@ class CoreTaskTemplate(object):
         if not isinstance(other, CoreTaskTemplate):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreTaskTemplate):
+            return True
+
+        return self.to_dict() != other.to_dict()

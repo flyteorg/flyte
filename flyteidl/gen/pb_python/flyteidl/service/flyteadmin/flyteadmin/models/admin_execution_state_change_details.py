@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.admin_execution_state import AdminExecutionState  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminExecutionStateChangeDetails(object):
@@ -44,8 +44,11 @@ class AdminExecutionStateChangeDetails(object):
         'principal': 'principal'
     }
 
-    def __init__(self, state=None, occurred_at=None, principal=None):  # noqa: E501
+    def __init__(self, state=None, occurred_at=None, principal=None, _configuration=None):  # noqa: E501
         """AdminExecutionStateChangeDetails - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._state = None
         self._occurred_at = None
@@ -166,8 +169,11 @@ class AdminExecutionStateChangeDetails(object):
         if not isinstance(other, AdminExecutionStateChangeDetails):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminExecutionStateChangeDetails):
+            return True
+
+        return self.to_dict() != other.to_dict()

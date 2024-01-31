@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.plugin_override_missing_plugin_behavior import PluginOverrideMissingPluginBehavior  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class AdminPluginOverride(object):
@@ -44,8 +44,11 @@ class AdminPluginOverride(object):
         'missing_plugin_behavior': 'missing_plugin_behavior'
     }
 
-    def __init__(self, task_type=None, plugin_id=None, missing_plugin_behavior=None):  # noqa: E501
+    def __init__(self, task_type=None, plugin_id=None, missing_plugin_behavior=None, _configuration=None):  # noqa: E501
         """AdminPluginOverride - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._task_type = None
         self._plugin_id = None
@@ -168,8 +171,11 @@ class AdminPluginOverride(object):
         if not isinstance(other, AdminPluginOverride):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, AdminPluginOverride):
+            return True
+
+        return self.to_dict() != other.to_dict()

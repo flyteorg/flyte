@@ -16,15 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_binary import CoreBinary  # noqa: F401,E501
-from flyteadmin.models.core_blob import CoreBlob  # noqa: F401,E501
-from flyteadmin.models.core_error import CoreError  # noqa: F401,E501
-from flyteadmin.models.core_primitive import CorePrimitive  # noqa: F401,E501
-from flyteadmin.models.core_schema import CoreSchema  # noqa: F401,E501
-from flyteadmin.models.core_structured_dataset import CoreStructuredDataset  # noqa: F401,E501
-from flyteadmin.models.core_union import CoreUnion  # noqa: F401,E501
-from flyteadmin.models.core_void import CoreVoid  # noqa: F401,E501
-from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreScalar(object):
@@ -44,10 +36,10 @@ class CoreScalar(object):
         'primitive': 'CorePrimitive',
         'blob': 'CoreBlob',
         'binary': 'CoreBinary',
-        'schema': 'CoreSchema',
+        'schema': 'FlyteidlcoreSchema',
         'none_type': 'CoreVoid',
         'error': 'CoreError',
-        'generic': 'ProtobufStruct',
+        'generic': 'object',
         'structured_dataset': 'CoreStructuredDataset',
         'union': 'CoreUnion'
     }
@@ -64,8 +56,11 @@ class CoreScalar(object):
         'union': 'union'
     }
 
-    def __init__(self, primitive=None, blob=None, binary=None, schema=None, none_type=None, error=None, generic=None, structured_dataset=None, union=None):  # noqa: E501
+    def __init__(self, primitive=None, blob=None, binary=None, schema=None, none_type=None, error=None, generic=None, structured_dataset=None, union=None, _configuration=None):  # noqa: E501
         """CoreScalar - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._primitive = None
         self._blob = None
@@ -166,7 +161,7 @@ class CoreScalar(object):
 
 
         :return: The schema of this CoreScalar.  # noqa: E501
-        :rtype: CoreSchema
+        :rtype: FlyteidlcoreSchema
         """
         return self._schema
 
@@ -176,7 +171,7 @@ class CoreScalar(object):
 
 
         :param schema: The schema of this CoreScalar.  # noqa: E501
-        :type: CoreSchema
+        :type: FlyteidlcoreSchema
         """
 
         self._schema = schema
@@ -229,7 +224,7 @@ class CoreScalar(object):
 
 
         :return: The generic of this CoreScalar.  # noqa: E501
-        :rtype: ProtobufStruct
+        :rtype: object
         """
         return self._generic
 
@@ -239,7 +234,7 @@ class CoreScalar(object):
 
 
         :param generic: The generic of this CoreScalar.  # noqa: E501
-        :type: ProtobufStruct
+        :type: object
         """
 
         self._generic = generic
@@ -326,8 +321,11 @@ class CoreScalar(object):
         if not isinstance(other, CoreScalar):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreScalar):
+            return True
+
+        return self.to_dict() != other.to_dict()

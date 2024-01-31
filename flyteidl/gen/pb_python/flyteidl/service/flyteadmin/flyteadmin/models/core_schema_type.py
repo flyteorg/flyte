@@ -16,7 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.schema_type_schema_column import SchemaTypeSchemaColumn  # noqa: F401,E501
+from flyteadmin.configuration import Configuration
 
 
 class CoreSchemaType(object):
@@ -40,8 +40,11 @@ class CoreSchemaType(object):
         'columns': 'columns'
     }
 
-    def __init__(self, columns=None):  # noqa: E501
+    def __init__(self, columns=None, _configuration=None):  # noqa: E501
         """CoreSchemaType - a model defined in Swagger"""  # noqa: E501
+        if _configuration is None:
+            _configuration = Configuration()
+        self._configuration = _configuration
 
         self._columns = None
         self.discriminator = None
@@ -112,8 +115,11 @@ class CoreSchemaType(object):
         if not isinstance(other, CoreSchemaType):
             return False
 
-        return self.__dict__ == other.__dict__
+        return self.to_dict() == other.to_dict()
 
     def __ne__(self, other):
         """Returns true if both objects are not equal"""
-        return not self == other
+        if not isinstance(other, CoreSchemaType):
+            return True
+
+        return self.to_dict() != other.to_dict()
