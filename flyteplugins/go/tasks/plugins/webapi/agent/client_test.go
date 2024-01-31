@@ -5,15 +5,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 )
 
-func mockGetBadAsyncClientFunc() *agentMocks.AsyncAgentServiceClient {
-	return nil
-}
-
-func TestInitializeClientFunc(t *testing.T) {
+func TestInitializeClients(t *testing.T) {
 	cfg := defaultConfig
 	ctx := context.Background()
 	err := SetConfig(&cfg)
