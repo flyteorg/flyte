@@ -135,6 +135,7 @@ Have questions or need support? The best way to reach us is through Slack:
 :hidden:
 
 Introduction <introduction>
+Quickstart guide <flytesnacks/getting_started/quickstart_guide>
 Getting started with workflow development <flytesnacks/getting_started/getting_started_with_workflow_development>
 Flyte Fundamentals <flytesnacks/getting_started/flyte_fundamentals>
 Core Use Cases <flytesnacks/getting_started/core_use_cases>

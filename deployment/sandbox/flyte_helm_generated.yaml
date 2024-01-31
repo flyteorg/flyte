@@ -334,10 +334,12 @@ data:
     task_resources:
       defaults:
         cpu: 100m
+        ephemeralStorage: 500Mi
         memory: 200Mi
         storage: 5Mi
       limits:
         cpu: 2
+        ephemeralStorage: 20Mi
         gpu: 1
         memory: 1Gi
         storage: 20Mi
@@ -6690,7 +6692,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "45f0232531c0d1494809cf83387a95b2fc802019ea095de7a24ccd4f8de86ec"
+        configChecksum: "82d6ffa2a2dd83eb11c491a95af43fdede659d6b5b400b6edcd88291a28c4f4"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -7040,7 +7042,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "45f0232531c0d1494809cf83387a95b2fc802019ea095de7a24ccd4f8de86ec"
+        configChecksum: "82d6ffa2a2dd83eb11c491a95af43fdede659d6b5b400b6edcd88291a28c4f4"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

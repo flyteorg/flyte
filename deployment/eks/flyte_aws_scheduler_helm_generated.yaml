@@ -192,10 +192,12 @@ data:
     task_resources:
       defaults:
         cpu: 1000m
+        ephemeralStorage: 500Mi
         memory: 1000Mi
         storage: 1000Mi
       limits:
         cpu: 2
+        ephemeralStorage: 20Mi
         gpu: 1
         memory: 1Gi
         storage: 2000Mi
@@ -847,7 +849,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2b5c85969f2bd85bb51a084f9fd72c20c3aca94be99e53cb4c4e9f78e77ebc5"
+        configChecksum: "85f2694a4138443026b87878dbbc5f1e9f52aa54eb87ef4c64117d1d91e1a7f"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1094,6 +1096,7 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        env:
         resources: 
           limits:
             cpu: 250m
