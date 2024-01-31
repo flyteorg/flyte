@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -112,8 +113,19 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
 	}
 
-	enableIngress := true
 	headPodSpec := podSpec.DeepCopy()
+
+	if cfg.KubeRayCrdVersion == "v1" {
+		return constructV1Job(taskCtx, rayJob, objectMeta, podSpec, headPodSpec, headReplicas, headNodeRayStartParams, primaryContainerIdx, primaryContainer), nil
+	}
+
+	return constructV1Alpha1Job(taskCtx, rayJob, objectMeta, podSpec, headPodSpec, headReplicas, headNodeRayStartParams, primaryContainerIdx, primaryContainer), nil
+
+}
+
+func constructV1Alpha1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headReplicas int32, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) rayv1.RayJob {
+	enableIngress := true
+	cfg := GetConfig()
 	rayClusterSpec := rayv1alpha1.RayClusterSpec{
 		HeadGroupSpec: rayv1alpha1.HeadGroupSpec{
 			Template: buildHeadPodTemplate(
@@ -191,14 +203,14 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	jobSpec := rayv1alpha1.RayJobSpec{
-		RayClusterSpec:           &rayClusterSpec,
+		RayClusterSpec:           rayClusterSpec,
 		Entrypoint:               strings.Join(primaryContainer.Args, " "),
 		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
 		TTLSecondsAfterFinished:  ttlSecondsAfterFinished,
 		RuntimeEnv:               rayJob.RuntimeEnv,
 	}
 
-	rayJobObject := rayv1alpha1.RayJob{
+	return rayv1alpha1.RayJob{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       KindRayJob,
 			APIVersion: rayv1alpha1.SchemeGroupVersion.String(),
@@ -206,8 +218,103 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		Spec:       jobSpec,
 		ObjectMeta: *objectMeta,
 	}
+}
 
-	return &rayJobObject, nil
+func constructV1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.RayJob, objectMeta *metav1.ObjectMeta, podSpec v1.PodSpec, headPodSpec *v1.PodSpec, headReplicas int32, headNodeRayStartParams map[string]string, primaryContainerIdx int, primaryContainer v1.Container) rayv1.RayJob {
+	enableIngress := true
+	cfg := GetConfig()
+	rayClusterSpec := rayv1.RayClusterSpec{
+		HeadGroupSpec: rayv1.HeadGroupSpec{
+			Template: buildHeadPodTemplate(
+				&headPodSpec.Containers[primaryContainerIdx],
+				headPodSpec,
+				objectMeta,
+				taskCtx,
+			),
+			ServiceType:    v1.ServiceType(cfg.ServiceType),
+			Replicas:       &headReplicas,
+			EnableIngress:  &enableIngress,
+			RayStartParams: headNodeRayStartParams,
+		},
+		WorkerGroupSpecs:        []rayv1alpha1.WorkerGroupSpec{},
+		EnableInTreeAutoscaling: &rayJob.RayCluster.EnableAutoscaling,
+	}
+
+	for _, spec := range rayJob.RayCluster.WorkerGroupSpec {
+		workerPodSpec := podSpec.DeepCopy()
+		workerPodTemplate := buildWorkerPodTemplate(
+			&workerPodSpec.Containers[primaryContainerIdx],
+			workerPodSpec,
+			objectMeta,
+			taskCtx,
+		)
+
+		workerNodeRayStartParams := make(map[string]string)
+		if spec.RayStartParams != nil {
+			workerNodeRayStartParams = spec.RayStartParams
+		} else if workerNode := cfg.Defaults.WorkerNode; len(workerNode.StartParameters) > 0 {
+			workerNodeRayStartParams = workerNode.StartParameters
+		}
+
+		if _, exist := workerNodeRayStartParams[NodeIPAddress]; !exist {
+			workerNodeRayStartParams[NodeIPAddress] = cfg.Defaults.WorkerNode.IPAddress
+		}
+
+		if _, exists := workerNodeRayStartParams[DisableUsageStatsStartParameter]; !exists && !cfg.EnableUsageStats {
+			workerNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
+		}
+
+		minReplicas := spec.MinReplicas
+		if minReplicas > spec.Replicas {
+			minReplicas = spec.Replicas
+		}
+		maxReplicas := spec.MaxReplicas
+		if maxReplicas < spec.Replicas {
+			maxReplicas = spec.Replicas
+		}
+
+		workerNodeSpec := rayv1alpha1.WorkerGroupSpec{
+			GroupName:      spec.GroupName,
+			MinReplicas:    &minReplicas,
+			MaxReplicas:    &maxReplicas,
+			Replicas:       &spec.Replicas,
+			RayStartParams: workerNodeRayStartParams,
+			Template:       workerPodTemplate,
+		}
+
+		rayClusterSpec.WorkerGroupSpecs = append(rayClusterSpec.WorkerGroupSpecs, workerNodeSpec)
+	}
+
+	serviceAccountName := flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+
+	rayClusterSpec.HeadGroupSpec.Template.Spec.ServiceAccountName = serviceAccountName
+	for index := range rayClusterSpec.WorkerGroupSpecs {
+		rayClusterSpec.WorkerGroupSpecs[index].Template.Spec.ServiceAccountName = serviceAccountName
+	}
+
+	shutdownAfterJobFinishes := cfg.ShutdownAfterJobFinishes
+	ttlSecondsAfterFinished := &cfg.TTLSecondsAfterFinished
+	if rayJob.ShutdownAfterJobFinishes {
+		shutdownAfterJobFinishes = true
+		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
+	}
+
+	jobSpec := rayv1alpha1.RayJobSpec{
+		RayClusterSpec:           rayClusterSpec,
+		Entrypoint:               strings.Join(primaryContainer.Args, " "),
+		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
+		TTLSecondsAfterFinished:  ttlSecondsAfterFinished,
+		RuntimeEnv:               rayJob.RuntimeEnv,
+	}
+
+	return rayv1.RayJob{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       KindRayJob,
+			APIVersion: rayv1alpha1.SchemeGroupVersion.String(),
+		},
+		Spec:       jobSpec,
+		ObjectMeta: *objectMeta,
+	}
 }
 
 func injectLogsSidecar(primaryContainer *v1.Container, podSpec *v1.PodSpec) {
@@ -457,13 +564,13 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	input := tasklog.Input{
-		Namespace:         rayJob.Namespace,
-		TaskExecutionID:   taskExecID,
-		ExtraTemplateVars: []tasklog.TemplateVar{},
+		Namespace:                 rayJob.Namespace,
+		TaskExecutionID:           taskExecID,
+		ExtraTemplateVarsByScheme: &tasklog.TemplateVarsByScheme{},
 	}
 	if rayJob.Status.JobId != "" {
-		input.ExtraTemplateVars = append(
-			input.ExtraTemplateVars,
+		input.ExtraTemplateVarsByScheme.Common = append(
+			input.ExtraTemplateVarsByScheme.Common,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayJobID,
 				Value: rayJob.Status.JobId,
@@ -471,8 +578,8 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		)
 	}
 	if rayJob.Status.RayClusterName != "" {
-		input.ExtraTemplateVars = append(
-			input.ExtraTemplateVars,
+		input.ExtraTemplateVarsByScheme.Common = append(
+			input.ExtraTemplateVarsByScheme.Common,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayClusterName,
 				Value: rayJob.Status.RayClusterName,
@@ -524,9 +631,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	case rayv1alpha1.JobDeploymentStatusFailedJobDeploy:
 		reason := fmt.Sprintf("Failed to submit Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
 		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
-	// JobDeploymentStatusSuspended is used when the suspend flag is set in rayJob. The suspend flag allows the temporary suspension of a Job's execution, which can be resumed later.
-	// Certain versions of KubeRay use a K8s job to submit a Ray job to the Ray cluster. JobDeploymentStatusWaitForK8sJob indicates that the K8s job is under creation.
-	case rayv1alpha1.JobDeploymentStatusWaitForDashboard, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, rayv1alpha1.JobDeploymentStatusWaitForDashboardReady, rayv1alpha1.JobDeploymentStatusWaitForK8sJob, rayv1alpha1.JobDeploymentStatusSuspended:
+	case rayv1alpha1.JobDeploymentStatusWaitForDashboard, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	case rayv1alpha1.JobDeploymentStatusRunning, rayv1alpha1.JobDeploymentStatusComplete:
 		switch rayJob.Status.JobStatus {
@@ -535,8 +640,7 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
 		case rayv1alpha1.JobStatusSucceeded:
 			return pluginsCore.PhaseInfoSuccess(info), nil
-		// JobStatusStopped can occur when the suspend flag is set in rayJob.
-		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusStopped:
+		case rayv1alpha1.JobStatusPending:
 			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 		case rayv1alpha1.JobStatusRunning:
 			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
@@ -544,6 +648,9 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 			return phaseInfo, nil
+		case rayv1alpha1.JobStatusStopped:
+			// There is no current usage of this job status in KubeRay. It's unclear what it represents
+			fallthrough
 		default:
 			// We already handle all known job status, so this should never happen unless a future version of ray
 			// introduced a new job status.
