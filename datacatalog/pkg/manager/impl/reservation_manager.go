@@ -199,33 +199,22 @@ func (r *reservationManager) ReleaseReservation(ctx context.Context, request *da
 		return nil, err
 	}
 
-	if err := r.releaseReservation(ctx, request.ReservationId, request.OwnerId); err != nil {
+	repo := r.repo.ReservationRepo()
+	reservationKey := transformers.FromReservationID(request.ReservationId)
+
+	err := repo.Delete(ctx, reservationKey, request.OwnerId)
+	if err != nil {
+		if errors.IsDoesNotExistError(err) {
+			logger.Warnf(ctx, "Reservation does not exist id: %+v, err %v", request.ReservationId, err)
+			r.systemMetrics.reservationDoesNotExist.Inc(ctx)
+			return &datacatalog.ReleaseReservationResponse{}, nil
+		}
+
+		logger.Errorf(ctx, "Failed to release reservation: %+v, err: %v", reservationKey, err)
 		r.systemMetrics.releaseReservationFailure.Inc(ctx)
 		return nil, err
 	}
 
-	return &datacatalog.ReleaseReservationResponse{}, nil
-}
-
-// releaseReservation performs the actual reservation release operation, deleting the respective object from
-// datacatalog's database, thus freeing the associated artifact for other entities. If the specified reservation was not
-// found, no error will be returned.
-func (r *reservationManager) releaseReservation(ctx context.Context, reservationID *datacatalog.ReservationID, ownerID string) error {
-	repo := r.repo.ReservationRepo()
-	reservationKey := transformers.FromReservationID(reservationID)
-
-	err := repo.Delete(ctx, reservationKey, ownerID)
-	if err != nil {
-		if errors.IsDoesNotExistError(err) {
-			logger.Warnf(ctx, "Reservation does not exist id: %+v, err %v", reservationID, err)
-			r.systemMetrics.reservationDoesNotExist.Inc(ctx)
-			return nil
-		}
-
-		logger.Errorf(ctx, "Failed to release reservation: %+v, err: %v", reservationKey, err)
-		return err
-	}
-
 	r.systemMetrics.reservationReleased.Inc(ctx)
-	return nil
+	return &datacatalog.ReleaseReservationResponse{}, nil
 }
