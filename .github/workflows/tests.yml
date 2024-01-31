@@ -40,6 +40,7 @@ jobs:
       - shell: bash -el {0}
         run: |
           conda activate monodocs-env
+          pip install -e ./flyteidl
           conda info
           conda list
           conda config --show-sources
