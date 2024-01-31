@@ -104,7 +104,7 @@ SEE ALSO
 * :doc:`flytectl_update_launchplan` 	 - Updates launch plan status
 * :doc:`flytectl_update_launchplan-meta` 	 - Updates the launch plan metadata
 * :doc:`flytectl_update_plugin-override` 	 - Update matchable resources of plugin overrides
-* :doc:`flytectl_update_project` 	 - Update project resources
+* :doc:`flytectl_update_project` 	 - Update the characteristics of a project
 * :doc:`flytectl_update_task-meta` 	 - Update task metadata
 * :doc:`flytectl_update_task-resource-attribute` 	 - Update matchable resources of task attributes
 * :doc:`flytectl_update_workflow-execution-config` 	 - Updates matchable resources of workflow execution config

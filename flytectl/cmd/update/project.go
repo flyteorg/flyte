@@ -15,71 +15,82 @@ import (
 )
 
 const (
-	projectShort = "Update project resources"
+	projectShort = "Update the characteristics of a project"
 	projectLong  = `
-Update the project according to the flags passed. Allows you to archive or activate a project.
-Activate project flytesnacks:
-::
+Allows you to update the characteristics of a project, including its name, labels and description.
+Also allows you to archive or activate (unarchive) a project.
 
- flytectl update project -p flytesnacks --activate
-
-Archive project flytesnacks:
+To archive a project, specify its ID with the *p* flag and add the *archive* flag:
 
 ::
 
- flytectl update project -p flytesnacks --archive
+    flytectl update project -p my-project-id --archive
 
-Incorrect usage when passing both archive and activate:
-
-::
-
- flytectl update project -p flytesnacks --archive --activate
-
-Incorrect usage when passing unknown-project:
+To activate (unarchive) an archived project, specify its ID with the *p* flag and add the *activate* flag:
 
 ::
 
- flytectl update project unknown-project --archive
+	flytectl update project -p my-project-id --activate
 
-project ID is required flag
-
-::
-
- flytectl update project unknown-project --archive
-
-Update projects.(project/projects can be used interchangeably in these commands)
+To update the characteristics of a project using flags, specify the project ID with the *p* flag and the flags corresponding to the characteristics you want to update:
 
 ::
 
- flytectl update project -p flytesnacks --description "flytesnacks description"  --labels app=flyte
+    flytectl update project -p my-project-id --description "A wonderful project"  --labels app=my-app
 
-Update a project by definition file. Note: The name shouldn't contain any whitespace characters.
-::
-
- flytectl update project --file project.yaml
+To update the characteristics of a project using a *yaml* file, define the file with the project ID desired updates:
 
 .. code-block:: yaml
 
-    id: "project-unique-id"
-    name: "Name"
+    id: "my-project-id"
+    name: "my-project-name"
     labels:
        values:
-         app: flyte
-    description: "Some description for the project"
+         app: my-app
+    description: "A wonderful project"
 
-Update a project state by definition file. Note: The name shouldn't contain any whitespace characters.
+
+(Note: The name parameter must not contain whitespace)
+
+Then, pass it in using the *file* flag:
+
 ::
 
- flytectl update project --file project.yaml  --archive
+    flytectl update project --file project.yaml
+
+To archive or activate (unarchive) a project using a *yaml* file:
+
+* Add a state field, with a value of *0* for activated (unarchived) or *1* for archived, at the top level of the the *yaml* file.
+
+* Add the *archive* flag to the command.
+
+For example, to archive a project:
 
 .. code-block:: yaml
 
-    id: "project-unique-id"
-    name: "Name"
-    labels:
-       values:
-         app: flyte
-    description: "Some description for the project"
+    # update.yaml
+    id: "my-project-id"
+    state: 1
+
+::
+
+    $ uctl update project --file update.yaml --archive
+
+And to activate (unarchive) the same project:
+
+.. code-block:: yaml
+
+    # update.yaml
+    id: "my-project-id"
+    state: 0
+
+::
+
+    $ uctl update project --file update.yaml --archive
+
+Note that when using a *yaml* file, the *activate* flag is not used.
+Instead, the *archive* flag is used for *both* archiving and activating (unarchiving) with the difference being in the *state* field of the *yaml* file.
+Furthermore, the *state* field only takes effect if the *archive* flag is present in the command.
 
 Usage
 `
