@@ -14,4 +14,6 @@ type CoreCompiledWorkflowClosure struct {
 	Primary *CoreCompiledWorkflow `json:"primary,omitempty"`
 	SubWorkflows []CoreCompiledWorkflow `json:"sub_workflows,omitempty"`
 	Tasks []CoreCompiledTask `json:"tasks,omitempty"`
+	// A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan with a given id, i.e., every launch plan has a unique id.
+	LaunchPlans []CoreCompiledLaunchPlan `json:"launch_plans,omitempty"`
 }

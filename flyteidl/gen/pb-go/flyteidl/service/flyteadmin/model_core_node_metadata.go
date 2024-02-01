@@ -17,4 +17,7 @@ type CoreNodeMetadata struct {
 	// Number of retries per task.
 	Retries *CoreRetryStrategy `json:"retries,omitempty"`
 	Interruptible bool `json:"interruptible,omitempty"`
+	Cacheable bool `json:"cacheable,omitempty"`
+	CacheVersion string `json:"cache_version,omitempty"`
+	CacheSerializable bool `json:"cache_serializable,omitempty"`
 }

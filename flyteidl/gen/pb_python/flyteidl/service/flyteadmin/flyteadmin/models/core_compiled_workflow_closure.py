@@ -16,6 +16,7 @@ import re  # noqa: F401
 
 import six
 
+from flyteadmin.models.core_compiled_launch_plan import CoreCompiledLaunchPlan  # noqa: F401,E501
 from flyteadmin.models.core_compiled_task import CoreCompiledTask  # noqa: F401,E501
 from flyteadmin.models.core_compiled_workflow import CoreCompiledWorkflow  # noqa: F401,E501
 
@@ -36,21 +37,24 @@ class CoreCompiledWorkflowClosure(object):
     swagger_types = {
         'primary': 'CoreCompiledWorkflow',
         'sub_workflows': 'list[CoreCompiledWorkflow]',
-        'tasks': 'list[CoreCompiledTask]'
+        'tasks': 'list[CoreCompiledTask]',
+        'launch_plans': 'list[CoreCompiledLaunchPlan]'
     }
 
     attribute_map = {
         'primary': 'primary',
         'sub_workflows': 'sub_workflows',
-        'tasks': 'tasks'
+        'tasks': 'tasks',
+        'launch_plans': 'launch_plans'
     }
 
-    def __init__(self, primary=None, sub_workflows=None, tasks=None):  # noqa: E501
+    def __init__(self, primary=None, sub_workflows=None, tasks=None, launch_plans=None):  # noqa: E501
         """CoreCompiledWorkflowClosure - a model defined in Swagger"""  # noqa: E501
 
         self._primary = None
         self._sub_workflows = None
         self._tasks = None
+        self._launch_plans = None
         self.discriminator = None
 
         if primary is not None:
@@ -59,6 +63,8 @@ class CoreCompiledWorkflowClosure(object):
             self.sub_workflows = sub_workflows
         if tasks is not None:
             self.tasks = tasks
+        if launch_plans is not None:
+            self.launch_plans = launch_plans
 
     @property
     def primary(self):
@@ -122,6 +128,29 @@ class CoreCompiledWorkflowClosure(object):
         """
 
         self._tasks = tasks
+
+    @property
+    def launch_plans(self):
+        """Gets the launch_plans of this CoreCompiledWorkflowClosure.  # noqa: E501
+
+        A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan with a given id, i.e., every launch plan has a unique id.  # noqa: E501
+
+        :return: The launch_plans of this CoreCompiledWorkflowClosure.  # noqa: E501
+        :rtype: list[CoreCompiledLaunchPlan]
+        """
+        return self._launch_plans
+
+    @launch_plans.setter
+    def launch_plans(self, launch_plans):
+        """Sets the launch_plans of this CoreCompiledWorkflowClosure.
+
+        A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan with a given id, i.e., every launch plan has a unique id.  # noqa: E501
+
+        :param launch_plans: The launch_plans of this CoreCompiledWorkflowClosure.  # noqa: E501
+        :type: list[CoreCompiledLaunchPlan]
+        """
+
+        self._launch_plans = launch_plans
 
     def to_dict(self):
         """Returns the model properties as a dict"""

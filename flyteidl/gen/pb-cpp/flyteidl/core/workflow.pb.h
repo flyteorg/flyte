@@ -54,7 +54,7 @@ struct TableStruct_flyteidl_2fcore_2fworkflow_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[18]
+  static const ::google::protobuf::internal::ParseTable schema[19]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -84,6 +84,9 @@ extern IfBlockDefaultTypeInternal _IfBlock_default_instance_;
 class IfElseBlock;
 class IfElseBlockDefaultTypeInternal;
 extern IfElseBlockDefaultTypeInternal _IfElseBlock_default_instance_;
+class LaunchPlanTemplate;
+class LaunchPlanTemplateDefaultTypeInternal;
+extern LaunchPlanTemplateDefaultTypeInternal _LaunchPlanTemplate_default_instance_;
 class Node;
 class NodeDefaultTypeInternal;
 extern NodeDefaultTypeInternal _Node_default_instance_;
@@ -128,6 +131,7 @@ template<> ::flyteidl::core::BranchNode* Arena::CreateMaybeMessage<::flyteidl::c
 template<> ::flyteidl::core::GateNode* Arena::CreateMaybeMessage<::flyteidl::core::GateNode>(Arena*);
 template<> ::flyteidl::core::IfBlock* Arena::CreateMaybeMessage<::flyteidl::core::IfBlock>(Arena*);
 template<> ::flyteidl::core::IfElseBlock* Arena::CreateMaybeMessage<::flyteidl::core::IfElseBlock>(Arena*);
+template<> ::flyteidl::core::LaunchPlanTemplate* Arena::CreateMaybeMessage<::flyteidl::core::LaunchPlanTemplate>(Arena*);
 template<> ::flyteidl::core::Node* Arena::CreateMaybeMessage<::flyteidl::core::Node>(Arena*);
 template<> ::flyteidl::core::NodeMetadata* Arena::CreateMaybeMessage<::flyteidl::core::NodeMetadata>(Arena*);
 template<> ::flyteidl::core::SignalCondition* Arena::CreateMaybeMessage<::flyteidl::core::SignalCondition>(Arena*);
@@ -1589,6 +1593,21 @@ class NodeMetadata final :
     INTERRUPTIBLE_VALUE_NOT_SET = 0,
   };
 
+  enum CacheableValueCase {
+    kCacheable = 7,
+    CACHEABLE_VALUE_NOT_SET = 0,
+  };
+
+  enum CacheVersionValueCase {
+    kCacheVersion = 8,
+    CACHE_VERSION_VALUE_NOT_SET = 0,
+  };
+
+  enum CacheSerializableValueCase {
+    kCacheSerializable = 9,
+    CACHE_SERIALIZABLE_VALUE_NOT_SET = 0,
+  };
+
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
   static inline const NodeMetadata* internal_default_instance() {
     return reinterpret_cast<const NodeMetadata*>(
@@ -1693,15 +1712,68 @@ class NodeMetadata final :
   bool interruptible() const;
   void set_interruptible(bool value);
 
+  // bool cacheable = 7;
+  private:
+  bool has_cacheable() const;
+  public:
+  void clear_cacheable();
+  static const int kCacheableFieldNumber = 7;
+  bool cacheable() const;
+  void set_cacheable(bool value);
+
+  // string cache_version = 8;
+  private:
+  bool has_cache_version() const;
+  public:
+  void clear_cache_version();
+  static const int kCacheVersionFieldNumber = 8;
+  const ::std::string& cache_version() const;
+  void set_cache_version(const ::std::string& value);
+  #if LANG_CXX11
+  void set_cache_version(::std::string&& value);
+  #endif
+  void set_cache_version(const char* value);
+  void set_cache_version(const char* value, size_t size);
+  ::std::string* mutable_cache_version();
+  ::std::string* release_cache_version();
+  void set_allocated_cache_version(::std::string* cache_version);
+
+  // bool cache_serializable = 9;
+  private:
+  bool has_cache_serializable() const;
+  public:
+  void clear_cache_serializable();
+  static const int kCacheSerializableFieldNumber = 9;
+  bool cache_serializable() const;
+  void set_cache_serializable(bool value);
+
   void clear_interruptible_value();
   InterruptibleValueCase interruptible_value_case() const;
+  void clear_cacheable_value();
+  CacheableValueCase cacheable_value_case() const;
+  void clear_cache_version_value();
+  CacheVersionValueCase cache_version_value_case() const;
+  void clear_cache_serializable_value();
+  CacheSerializableValueCase cache_serializable_value_case() const;
   // @@protoc_insertion_point(class_scope:flyteidl.core.NodeMetadata)
  private:
   class HasBitSetters;
   void set_has_interruptible();
+  void set_has_cacheable();
+  void set_has_cache_version();
+  void set_has_cache_serializable();
 
   inline bool has_interruptible_value() const;
   inline void clear_has_interruptible_value();
+
+  inline bool has_cacheable_value() const;
+  inline void clear_has_cacheable_value();
+
+  inline bool has_cache_version_value() const;
+  inline void clear_has_cache_version_value();
+
+  inline bool has_cache_serializable_value() const;
+  inline void clear_has_cache_serializable_value();
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr name_;
@@ -1711,8 +1783,20 @@ class NodeMetadata final :
     InterruptibleValueUnion() {}
     bool interruptible_;
   } interruptible_value_;
+  union CacheableValueUnion {
+    CacheableValueUnion() {}
+    bool cacheable_;
+  } cacheable_value_;
+  union CacheVersionValueUnion {
+    CacheVersionValueUnion() {}
+    ::google::protobuf::internal::ArenaStringPtr cache_version_;
+  } cache_version_value_;
+  union CacheSerializableValueUnion {
+    CacheSerializableValueUnion() {}
+    bool cache_serializable_;
+  } cache_serializable_value_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
-  ::google::protobuf::uint32 _oneof_case_[1];
+  ::google::protobuf::uint32 _oneof_case_[4];
 
   friend struct ::TableStruct_flyteidl_2fcore_2fworkflow_2eproto;
 };
@@ -2707,6 +2791,131 @@ class TaskNodeOverrides final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::flyteidl::core::Resources* resources_;
   ::flyteidl::core::ExtendedResources* extended_resources_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fworkflow_2eproto;
+};
+// -------------------------------------------------------------------
+
+class LaunchPlanTemplate final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.LaunchPlanTemplate) */ {
+ public:
+  LaunchPlanTemplate();
+  virtual ~LaunchPlanTemplate();
+
+  LaunchPlanTemplate(const LaunchPlanTemplate& from);
+
+  inline LaunchPlanTemplate& operator=(const LaunchPlanTemplate& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  LaunchPlanTemplate(LaunchPlanTemplate&& from) noexcept
+    : LaunchPlanTemplate() {
+    *this = ::std::move(from);
+  }
+
+  inline LaunchPlanTemplate& operator=(LaunchPlanTemplate&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const LaunchPlanTemplate& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const LaunchPlanTemplate* internal_default_instance() {
+    return reinterpret_cast<const LaunchPlanTemplate*>(
+               &_LaunchPlanTemplate_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    18;
+
+  void Swap(LaunchPlanTemplate* other);
+  friend void swap(LaunchPlanTemplate& a, LaunchPlanTemplate& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline LaunchPlanTemplate* New() const final {
+    return CreateMaybeMessage<LaunchPlanTemplate>(nullptr);
+  }
+
+  LaunchPlanTemplate* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<LaunchPlanTemplate>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const LaunchPlanTemplate& from);
+  void MergeFrom(const LaunchPlanTemplate& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(LaunchPlanTemplate* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.Identifier id = 1;
+  bool has_id() const;
+  void clear_id();
+  static const int kIdFieldNumber = 1;
+  const ::flyteidl::core::Identifier& id() const;
+  ::flyteidl::core::Identifier* release_id();
+  ::flyteidl::core::Identifier* mutable_id();
+  void set_allocated_id(::flyteidl::core::Identifier* id);
+
+  // .flyteidl.core.TypedInterface interface = 2;
+  bool has_interface() const;
+  void clear_interface();
+  static const int kInterfaceFieldNumber = 2;
+  const ::flyteidl::core::TypedInterface& interface() const;
+  ::flyteidl::core::TypedInterface* release_interface();
+  ::flyteidl::core::TypedInterface* mutable_interface();
+  void set_allocated_interface(::flyteidl::core::TypedInterface* interface);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.LaunchPlanTemplate)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::Identifier* id_;
+  ::flyteidl::core::TypedInterface* interface_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fworkflow_2eproto;
 };
@@ -3935,14 +4144,191 @@ inline void NodeMetadata::set_interruptible(bool value) {
   // @@protoc_insertion_point(field_set:flyteidl.core.NodeMetadata.interruptible)
 }
 
+// bool cacheable = 7;
+inline bool NodeMetadata::has_cacheable() const {
+  return cacheable_value_case() == kCacheable;
+}
+inline void NodeMetadata::set_has_cacheable() {
+  _oneof_case_[1] = kCacheable;
+}
+inline void NodeMetadata::clear_cacheable() {
+  if (has_cacheable()) {
+    cacheable_value_.cacheable_ = false;
+    clear_has_cacheable_value();
+  }
+}
+inline bool NodeMetadata::cacheable() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.NodeMetadata.cacheable)
+  if (has_cacheable()) {
+    return cacheable_value_.cacheable_;
+  }
+  return false;
+}
+inline void NodeMetadata::set_cacheable(bool value) {
+  if (!has_cacheable()) {
+    clear_cacheable_value();
+    set_has_cacheable();
+  }
+  cacheable_value_.cacheable_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.NodeMetadata.cacheable)
+}
+
+// string cache_version = 8;
+inline bool NodeMetadata::has_cache_version() const {
+  return cache_version_value_case() == kCacheVersion;
+}
+inline void NodeMetadata::set_has_cache_version() {
+  _oneof_case_[2] = kCacheVersion;
+}
+inline void NodeMetadata::clear_cache_version() {
+  if (has_cache_version()) {
+    cache_version_value_.cache_version_.DestroyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    clear_has_cache_version_value();
+  }
+}
+inline const ::std::string& NodeMetadata::cache_version() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.NodeMetadata.cache_version)
+  if (has_cache_version()) {
+    return cache_version_value_.cache_version_.GetNoArena();
+  }
+  return *&::google::protobuf::internal::GetEmptyStringAlreadyInited();
+}
+inline void NodeMetadata::set_cache_version(const ::std::string& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.core.NodeMetadata.cache_version)
+  if (!has_cache_version()) {
+    clear_cache_version_value();
+    set_has_cache_version();
+    cache_version_value_.cache_version_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  cache_version_value_.cache_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.core.NodeMetadata.cache_version)
+}
+#if LANG_CXX11
+inline void NodeMetadata::set_cache_version(::std::string&& value) {
+  // @@protoc_insertion_point(field_set:flyteidl.core.NodeMetadata.cache_version)
+  if (!has_cache_version()) {
+    clear_cache_version_value();
+    set_has_cache_version();
+    cache_version_value_.cache_version_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  cache_version_value_.cache_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.core.NodeMetadata.cache_version)
+}
+#endif
+inline void NodeMetadata::set_cache_version(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  if (!has_cache_version()) {
+    clear_cache_version_value();
+    set_has_cache_version();
+    cache_version_value_.cache_version_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  cache_version_value_.cache_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.core.NodeMetadata.cache_version)
+}
+inline void NodeMetadata::set_cache_version(const char* value, size_t size) {
+  if (!has_cache_version()) {
+    clear_cache_version_value();
+    set_has_cache_version();
+    cache_version_value_.cache_version_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  cache_version_value_.cache_version_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.core.NodeMetadata.cache_version)
+}
+inline ::std::string* NodeMetadata::mutable_cache_version() {
+  if (!has_cache_version()) {
+    clear_cache_version_value();
+    set_has_cache_version();
+    cache_version_value_.cache_version_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.NodeMetadata.cache_version)
+  return cache_version_value_.cache_version_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* NodeMetadata::release_cache_version() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.NodeMetadata.cache_version)
+  if (has_cache_version()) {
+    clear_has_cache_version_value();
+    return cache_version_value_.cache_version_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  } else {
+    return nullptr;
+  }
+}
+inline void NodeMetadata::set_allocated_cache_version(::std::string* cache_version) {
+  if (has_cache_version_value()) {
+    clear_cache_version_value();
+  }
+  if (cache_version != nullptr) {
+    set_has_cache_version();
+    cache_version_value_.cache_version_.UnsafeSetDefault(cache_version);
+  }
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.NodeMetadata.cache_version)
+}
+
+// bool cache_serializable = 9;
+inline bool NodeMetadata::has_cache_serializable() const {
+  return cache_serializable_value_case() == kCacheSerializable;
+}
+inline void NodeMetadata::set_has_cache_serializable() {
+  _oneof_case_[3] = kCacheSerializable;
+}
+inline void NodeMetadata::clear_cache_serializable() {
+  if (has_cache_serializable()) {
+    cache_serializable_value_.cache_serializable_ = false;
+    clear_has_cache_serializable_value();
+  }
+}
+inline bool NodeMetadata::cache_serializable() const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.NodeMetadata.cache_serializable)
+  if (has_cache_serializable()) {
+    return cache_serializable_value_.cache_serializable_;
+  }
+  return false;
+}
+inline void NodeMetadata::set_cache_serializable(bool value) {
+  if (!has_cache_serializable()) {
+    clear_cache_serializable_value();
+    set_has_cache_serializable();
+  }
+  cache_serializable_value_.cache_serializable_ = value;
+  // @@protoc_insertion_point(field_set:flyteidl.core.NodeMetadata.cache_serializable)
+}
+
 inline bool NodeMetadata::has_interruptible_value() const {
   return interruptible_value_case() != INTERRUPTIBLE_VALUE_NOT_SET;
 }
 inline void NodeMetadata::clear_has_interruptible_value() {
   _oneof_case_[0] = INTERRUPTIBLE_VALUE_NOT_SET;
 }
+inline bool NodeMetadata::has_cacheable_value() const {
+  return cacheable_value_case() != CACHEABLE_VALUE_NOT_SET;
+}
+inline void NodeMetadata::clear_has_cacheable_value() {
+  _oneof_case_[1] = CACHEABLE_VALUE_NOT_SET;
+}
+inline bool NodeMetadata::has_cache_version_value() const {
+  return cache_version_value_case() != CACHE_VERSION_VALUE_NOT_SET;
+}
+inline void NodeMetadata::clear_has_cache_version_value() {
+  _oneof_case_[2] = CACHE_VERSION_VALUE_NOT_SET;
+}
+inline bool NodeMetadata::has_cache_serializable_value() const {
+  return cache_serializable_value_case() != CACHE_SERIALIZABLE_VALUE_NOT_SET;
+}
+inline void NodeMetadata::clear_has_cache_serializable_value() {
+  _oneof_case_[3] = CACHE_SERIALIZABLE_VALUE_NOT_SET;
+}
 inline NodeMetadata::InterruptibleValueCase NodeMetadata::interruptible_value_case() const {
   return NodeMetadata::InterruptibleValueCase(_oneof_case_[0]);
+}
+inline NodeMetadata::CacheableValueCase NodeMetadata::cacheable_value_case() const {
+  return NodeMetadata::CacheableValueCase(_oneof_case_[1]);
+}
+inline NodeMetadata::CacheVersionValueCase NodeMetadata::cache_version_value_case() const {
+  return NodeMetadata::CacheVersionValueCase(_oneof_case_[2]);
+}
+inline NodeMetadata::CacheSerializableValueCase NodeMetadata::cache_serializable_value_case() const {
+  return NodeMetadata::CacheSerializableValueCase(_oneof_case_[3]);
 }
 // -------------------------------------------------------------------
 
@@ -5001,9 +5387,105 @@ inline void TaskNodeOverrides::set_allocated_extended_resources(::flyteidl::core
   // @@protoc_insertion_point(field_set_allocated:flyteidl.core.TaskNodeOverrides.extended_resources)
 }
 
+// -------------------------------------------------------------------
+
+// LaunchPlanTemplate
+
+// .flyteidl.core.Identifier id = 1;
+inline bool LaunchPlanTemplate::has_id() const {
+  return this != internal_default_instance() && id_ != nullptr;
+}
+inline const ::flyteidl::core::Identifier& LaunchPlanTemplate::id() const {
+  const ::flyteidl::core::Identifier* p = id_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.LaunchPlanTemplate.id)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::Identifier*>(
+      &::flyteidl::core::_Identifier_default_instance_);
+}
+inline ::flyteidl::core::Identifier* LaunchPlanTemplate::release_id() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.LaunchPlanTemplate.id)
+  
+  ::flyteidl::core::Identifier* temp = id_;
+  id_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::Identifier* LaunchPlanTemplate::mutable_id() {
+  
+  if (id_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::Identifier>(GetArenaNoVirtual());
+    id_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.LaunchPlanTemplate.id)
+  return id_;
+}
+inline void LaunchPlanTemplate::set_allocated_id(::flyteidl::core::Identifier* id) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(id_);
+  }
+  if (id) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      id = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, id, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  id_ = id;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.LaunchPlanTemplate.id)
+}
+
+// .flyteidl.core.TypedInterface interface = 2;
+inline bool LaunchPlanTemplate::has_interface() const {
+  return this != internal_default_instance() && interface_ != nullptr;
+}
+inline const ::flyteidl::core::TypedInterface& LaunchPlanTemplate::interface() const {
+  const ::flyteidl::core::TypedInterface* p = interface_;
+  // @@protoc_insertion_point(field_get:flyteidl.core.LaunchPlanTemplate.interface)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::TypedInterface*>(
+      &::flyteidl::core::_TypedInterface_default_instance_);
+}
+inline ::flyteidl::core::TypedInterface* LaunchPlanTemplate::release_interface() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.LaunchPlanTemplate.interface)
+  
+  ::flyteidl::core::TypedInterface* temp = interface_;
+  interface_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::TypedInterface* LaunchPlanTemplate::mutable_interface() {
+  
+  if (interface_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::TypedInterface>(GetArenaNoVirtual());
+    interface_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.LaunchPlanTemplate.interface)
+  return interface_;
+}
+inline void LaunchPlanTemplate::set_allocated_interface(::flyteidl::core::TypedInterface* interface) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(interface_);
+  }
+  if (interface) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      interface = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, interface, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  interface_ = interface;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.LaunchPlanTemplate.interface)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

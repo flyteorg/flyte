@@ -168,6 +168,7 @@ from flyteadmin.models.core_catalog_artifact_tag import CoreCatalogArtifactTag
 from flyteadmin.models.core_catalog_cache_status import CoreCatalogCacheStatus
 from flyteadmin.models.core_catalog_metadata import CoreCatalogMetadata
 from flyteadmin.models.core_comparison_expression import CoreComparisonExpression
+from flyteadmin.models.core_compiled_launch_plan import CoreCompiledLaunchPlan
 from flyteadmin.models.core_compiled_task import CoreCompiledTask
 from flyteadmin.models.core_compiled_workflow import CoreCompiledWorkflow
 from flyteadmin.models.core_compiled_workflow_closure import CoreCompiledWorkflowClosure
@@ -192,6 +193,7 @@ from flyteadmin.models.core_k8s_object_metadata import CoreK8sObjectMetadata
 from flyteadmin.models.core_k8s_pod import CoreK8sPod
 from flyteadmin.models.core_key_value_pair import CoreKeyValuePair
 from flyteadmin.models.core_label_value import CoreLabelValue
+from flyteadmin.models.core_launch_plan_template import CoreLaunchPlanTemplate
 from flyteadmin.models.core_literal import CoreLiteral
 from flyteadmin.models.core_literal_collection import CoreLiteralCollection
 from flyteadmin.models.core_literal_map import CoreLiteralMap

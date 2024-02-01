@@ -10085,7 +10085,33 @@ public final class Workflow {
      */
     boolean getInterruptible();
 
+    /**
+     * <code>bool cacheable = 7;</code>
+     */
+    boolean getCacheable();
+
+    /**
+     * <code>string cache_version = 8;</code>
+     */
+    java.lang.String getCacheVersion();
+    /**
+     * <code>string cache_version = 8;</code>
+     */
+    com.google.protobuf.ByteString
+        getCacheVersionBytes();
+
+    /**
+     * <code>bool cache_serializable = 9;</code>
+     */
+    boolean getCacheSerializable();
+
     public flyteidl.core.Workflow.NodeMetadata.InterruptibleValueCase getInterruptibleValueCase();
+
+    public flyteidl.core.Workflow.NodeMetadata.CacheableValueCase getCacheableValueCase();
+
+    public flyteidl.core.Workflow.NodeMetadata.CacheVersionValueCase getCacheVersionValueCase();
+
+    public flyteidl.core.Workflow.NodeMetadata.CacheSerializableValueCase getCacheSerializableValueCase();
   }
   /**
    * <pre>
@@ -10168,6 +10194,22 @@ public final class Workflow {
               interruptibleValue_ = input.readBool();
               break;
             }
+            case 56: {
+              cacheableValueCase_ = 7;
+              cacheableValue_ = input.readBool();
+              break;
+            }
+            case 66: {
+              java.lang.String s = input.readStringRequireUtf8();
+              cacheVersionValueCase_ = 8;
+              cacheVersionValue_ = s;
+              break;
+            }
+            case 72: {
+              cacheSerializableValueCase_ = 9;
+              cacheSerializableValue_ = input.readBool();
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -10234,6 +10276,114 @@ public final class Workflow {
     getInterruptibleValueCase() {
       return InterruptibleValueCase.forNumber(
           interruptibleValueCase_);
+    }
+
+    private int cacheableValueCase_ = 0;
+    private java.lang.Object cacheableValue_;
+    public enum CacheableValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      CACHEABLE(7),
+      CACHEABLEVALUE_NOT_SET(0);
+      private final int value;
+      private CacheableValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static CacheableValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static CacheableValueCase forNumber(int value) {
+        switch (value) {
+          case 7: return CACHEABLE;
+          case 0: return CACHEABLEVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public CacheableValueCase
+    getCacheableValueCase() {
+      return CacheableValueCase.forNumber(
+          cacheableValueCase_);
+    }
+
+    private int cacheVersionValueCase_ = 0;
+    private java.lang.Object cacheVersionValue_;
+    public enum CacheVersionValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      CACHE_VERSION(8),
+      CACHEVERSIONVALUE_NOT_SET(0);
+      private final int value;
+      private CacheVersionValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static CacheVersionValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static CacheVersionValueCase forNumber(int value) {
+        switch (value) {
+          case 8: return CACHE_VERSION;
+          case 0: return CACHEVERSIONVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public CacheVersionValueCase
+    getCacheVersionValueCase() {
+      return CacheVersionValueCase.forNumber(
+          cacheVersionValueCase_);
+    }
+
+    private int cacheSerializableValueCase_ = 0;
+    private java.lang.Object cacheSerializableValue_;
+    public enum CacheSerializableValueCase
+        implements com.google.protobuf.Internal.EnumLite {
+      CACHE_SERIALIZABLE(9),
+      CACHESERIALIZABLEVALUE_NOT_SET(0);
+      private final int value;
+      private CacheSerializableValueCase(int value) {
+        this.value = value;
+      }
+      /**
+       * @deprecated Use {@link #forNumber(int)} instead.
+       */
+      @java.lang.Deprecated
+      public static CacheSerializableValueCase valueOf(int value) {
+        return forNumber(value);
+      }
+
+      public static CacheSerializableValueCase forNumber(int value) {
+        switch (value) {
+          case 9: return CACHE_SERIALIZABLE;
+          case 0: return CACHESERIALIZABLEVALUE_NOT_SET;
+          default: return null;
+        }
+      }
+      public int getNumber() {
+        return this.value;
+      }
+    };
+
+    public CacheSerializableValueCase
+    getCacheSerializableValueCase() {
+      return CacheSerializableValueCase.forNumber(
+          cacheSerializableValueCase_);
     }
 
     public static final int NAME_FIELD_NUMBER = 1;
@@ -10355,6 +10505,71 @@ public final class Workflow {
       return false;
     }
 
+    public static final int CACHEABLE_FIELD_NUMBER = 7;
+    /**
+     * <code>bool cacheable = 7;</code>
+     */
+    public boolean getCacheable() {
+      if (cacheableValueCase_ == 7) {
+        return (java.lang.Boolean) cacheableValue_;
+      }
+      return false;
+    }
+
+    public static final int CACHE_VERSION_FIELD_NUMBER = 8;
+    /**
+     * <code>string cache_version = 8;</code>
+     */
+    public java.lang.String getCacheVersion() {
+      java.lang.Object ref = "";
+      if (cacheVersionValueCase_ == 8) {
+        ref = cacheVersionValue_;
+      }
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (cacheVersionValueCase_ == 8) {
+          cacheVersionValue_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>string cache_version = 8;</code>
+     */
+    public com.google.protobuf.ByteString
+        getCacheVersionBytes() {
+      java.lang.Object ref = "";
+      if (cacheVersionValueCase_ == 8) {
+        ref = cacheVersionValue_;
+      }
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        if (cacheVersionValueCase_ == 8) {
+          cacheVersionValue_ = b;
+        }
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int CACHE_SERIALIZABLE_FIELD_NUMBER = 9;
+    /**
+     * <code>bool cache_serializable = 9;</code>
+     */
+    public boolean getCacheSerializable() {
+      if (cacheSerializableValueCase_ == 9) {
+        return (java.lang.Boolean) cacheSerializableValue_;
+      }
+      return false;
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -10382,6 +10597,17 @@ public final class Workflow {
         output.writeBool(
             6, (boolean)((java.lang.Boolean) interruptibleValue_));
       }
+      if (cacheableValueCase_ == 7) {
+        output.writeBool(
+            7, (boolean)((java.lang.Boolean) cacheableValue_));
+      }
+      if (cacheVersionValueCase_ == 8) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 8, cacheVersionValue_);
+      }
+      if (cacheSerializableValueCase_ == 9) {
+        output.writeBool(
+            9, (boolean)((java.lang.Boolean) cacheSerializableValue_));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -10406,6 +10632,19 @@ public final class Workflow {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(
               6, (boolean)((java.lang.Boolean) interruptibleValue_));
+      }
+      if (cacheableValueCase_ == 7) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              7, (boolean)((java.lang.Boolean) cacheableValue_));
+      }
+      if (cacheVersionValueCase_ == 8) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(8, cacheVersionValue_);
+      }
+      if (cacheSerializableValueCase_ == 9) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(
+              9, (boolean)((java.lang.Boolean) cacheSerializableValue_));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -10443,6 +10682,33 @@ public final class Workflow {
         case 0:
         default:
       }
+      if (!getCacheableValueCase().equals(other.getCacheableValueCase())) return false;
+      switch (cacheableValueCase_) {
+        case 7:
+          if (getCacheable()
+              != other.getCacheable()) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!getCacheVersionValueCase().equals(other.getCacheVersionValueCase())) return false;
+      switch (cacheVersionValueCase_) {
+        case 8:
+          if (!getCacheVersion()
+              .equals(other.getCacheVersion())) return false;
+          break;
+        case 0:
+        default:
+      }
+      if (!getCacheSerializableValueCase().equals(other.getCacheSerializableValueCase())) return false;
+      switch (cacheSerializableValueCase_) {
+        case 9:
+          if (getCacheSerializable()
+              != other.getCacheSerializable()) return false;
+          break;
+        case 0:
+        default:
+      }
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -10469,6 +10735,32 @@ public final class Workflow {
           hash = (37 * hash) + INTERRUPTIBLE_FIELD_NUMBER;
           hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
               getInterruptible());
+          break;
+        case 0:
+        default:
+      }
+      switch (cacheableValueCase_) {
+        case 7:
+          hash = (37 * hash) + CACHEABLE_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getCacheable());
+          break;
+        case 0:
+        default:
+      }
+      switch (cacheVersionValueCase_) {
+        case 8:
+          hash = (37 * hash) + CACHE_VERSION_FIELD_NUMBER;
+          hash = (53 * hash) + getCacheVersion().hashCode();
+          break;
+        case 0:
+        default:
+      }
+      switch (cacheSerializableValueCase_) {
+        case 9:
+          hash = (37 * hash) + CACHE_SERIALIZABLE_FIELD_NUMBER;
+          hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+              getCacheSerializable());
           break;
         case 0:
         default:
@@ -10626,6 +10918,12 @@ public final class Workflow {
         }
         interruptibleValueCase_ = 0;
         interruptibleValue_ = null;
+        cacheableValueCase_ = 0;
+        cacheableValue_ = null;
+        cacheVersionValueCase_ = 0;
+        cacheVersionValue_ = null;
+        cacheSerializableValueCase_ = 0;
+        cacheSerializableValue_ = null;
         return this;
       }
 
@@ -10666,7 +10964,19 @@ public final class Workflow {
         if (interruptibleValueCase_ == 6) {
           result.interruptibleValue_ = interruptibleValue_;
         }
+        if (cacheableValueCase_ == 7) {
+          result.cacheableValue_ = cacheableValue_;
+        }
+        if (cacheVersionValueCase_ == 8) {
+          result.cacheVersionValue_ = cacheVersionValue_;
+        }
+        if (cacheSerializableValueCase_ == 9) {
+          result.cacheSerializableValue_ = cacheSerializableValue_;
+        }
         result.interruptibleValueCase_ = interruptibleValueCase_;
+        result.cacheableValueCase_ = cacheableValueCase_;
+        result.cacheVersionValueCase_ = cacheVersionValueCase_;
+        result.cacheSerializableValueCase_ = cacheSerializableValueCase_;
         onBuilt();
         return result;
       }
@@ -10734,6 +11044,35 @@ public final class Workflow {
             break;
           }
         }
+        switch (other.getCacheableValueCase()) {
+          case CACHEABLE: {
+            setCacheable(other.getCacheable());
+            break;
+          }
+          case CACHEABLEVALUE_NOT_SET: {
+            break;
+          }
+        }
+        switch (other.getCacheVersionValueCase()) {
+          case CACHE_VERSION: {
+            cacheVersionValueCase_ = 8;
+            cacheVersionValue_ = other.cacheVersionValue_;
+            onChanged();
+            break;
+          }
+          case CACHEVERSIONVALUE_NOT_SET: {
+            break;
+          }
+        }
+        switch (other.getCacheSerializableValueCase()) {
+          case CACHE_SERIALIZABLE: {
+            setCacheSerializable(other.getCacheSerializable());
+            break;
+          }
+          case CACHESERIALIZABLEVALUE_NOT_SET: {
+            break;
+          }
+        }
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -10773,6 +11112,51 @@ public final class Workflow {
       public Builder clearInterruptibleValue() {
         interruptibleValueCase_ = 0;
         interruptibleValue_ = null;
+        onChanged();
+        return this;
+      }
+
+      private int cacheableValueCase_ = 0;
+      private java.lang.Object cacheableValue_;
+      public CacheableValueCase
+          getCacheableValueCase() {
+        return CacheableValueCase.forNumber(
+            cacheableValueCase_);
+      }
+
+      public Builder clearCacheableValue() {
+        cacheableValueCase_ = 0;
+        cacheableValue_ = null;
+        onChanged();
+        return this;
+      }
+
+      private int cacheVersionValueCase_ = 0;
+      private java.lang.Object cacheVersionValue_;
+      public CacheVersionValueCase
+          getCacheVersionValueCase() {
+        return CacheVersionValueCase.forNumber(
+            cacheVersionValueCase_);
+      }
+
+      public Builder clearCacheVersionValue() {
+        cacheVersionValueCase_ = 0;
+        cacheVersionValue_ = null;
+        onChanged();
+        return this;
+      }
+
+      private int cacheSerializableValueCase_ = 0;
+      private java.lang.Object cacheSerializableValue_;
+      public CacheSerializableValueCase
+          getCacheSerializableValueCase() {
+        return CacheSerializableValueCase.forNumber(
+            cacheSerializableValueCase_);
+      }
+
+      public Builder clearCacheSerializableValue() {
+        cacheSerializableValueCase_ = 0;
+        cacheSerializableValue_ = null;
         onChanged();
         return this;
       }
@@ -11198,6 +11582,146 @@ public final class Workflow {
         if (interruptibleValueCase_ == 6) {
           interruptibleValueCase_ = 0;
           interruptibleValue_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <code>bool cacheable = 7;</code>
+       */
+      public boolean getCacheable() {
+        if (cacheableValueCase_ == 7) {
+          return (java.lang.Boolean) cacheableValue_;
+        }
+        return false;
+      }
+      /**
+       * <code>bool cacheable = 7;</code>
+       */
+      public Builder setCacheable(boolean value) {
+        cacheableValueCase_ = 7;
+        cacheableValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool cacheable = 7;</code>
+       */
+      public Builder clearCacheable() {
+        if (cacheableValueCase_ == 7) {
+          cacheableValueCase_ = 0;
+          cacheableValue_ = null;
+          onChanged();
+        }
+        return this;
+      }
+
+      /**
+       * <code>string cache_version = 8;</code>
+       */
+      public java.lang.String getCacheVersion() {
+        java.lang.Object ref = "";
+        if (cacheVersionValueCase_ == 8) {
+          ref = cacheVersionValue_;
+        }
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (cacheVersionValueCase_ == 8) {
+            cacheVersionValue_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string cache_version = 8;</code>
+       */
+      public com.google.protobuf.ByteString
+          getCacheVersionBytes() {
+        java.lang.Object ref = "";
+        if (cacheVersionValueCase_ == 8) {
+          ref = cacheVersionValue_;
+        }
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          if (cacheVersionValueCase_ == 8) {
+            cacheVersionValue_ = b;
+          }
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string cache_version = 8;</code>
+       */
+      public Builder setCacheVersion(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  cacheVersionValueCase_ = 8;
+        cacheVersionValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string cache_version = 8;</code>
+       */
+      public Builder clearCacheVersion() {
+        if (cacheVersionValueCase_ == 8) {
+          cacheVersionValueCase_ = 0;
+          cacheVersionValue_ = null;
+          onChanged();
+        }
+        return this;
+      }
+      /**
+       * <code>string cache_version = 8;</code>
+       */
+      public Builder setCacheVersionBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        cacheVersionValueCase_ = 8;
+        cacheVersionValue_ = value;
+        onChanged();
+        return this;
+      }
+
+      /**
+       * <code>bool cache_serializable = 9;</code>
+       */
+      public boolean getCacheSerializable() {
+        if (cacheSerializableValueCase_ == 9) {
+          return (java.lang.Boolean) cacheSerializableValue_;
+        }
+        return false;
+      }
+      /**
+       * <code>bool cache_serializable = 9;</code>
+       */
+      public Builder setCacheSerializable(boolean value) {
+        cacheSerializableValueCase_ = 9;
+        cacheSerializableValue_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool cache_serializable = 9;</code>
+       */
+      public Builder clearCacheSerializable() {
+        if (cacheSerializableValueCase_ == 9) {
+          cacheSerializableValueCase_ = 0;
+          cacheSerializableValue_ = null;
           onChanged();
         }
         return this;
@@ -21304,6 +21828,934 @@ public final class Workflow {
 
   }
 
+  public interface LaunchPlanTemplateOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.LaunchPlanTemplate)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * A globally unique identifier for the launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    boolean hasId();
+    /**
+     * <pre>
+     * A globally unique identifier for the launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.Identifier getId();
+    /**
+     * <pre>
+     * A globally unique identifier for the launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder();
+
+    /**
+     * <pre>
+     * The input and output interface for the launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+     */
+    boolean hasInterface();
+    /**
+     * <pre>
+     * The input and output interface for the launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+     */
+    flyteidl.core.Interface.TypedInterface getInterface();
+    /**
+     * <pre>
+     * The input and output interface for the launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+     */
+    flyteidl.core.Interface.TypedInterfaceOrBuilder getInterfaceOrBuilder();
+  }
+  /**
+   * <pre>
+   * A structure that uniquely identifies a launch plan in the system.
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.LaunchPlanTemplate}
+   */
+  public  static final class LaunchPlanTemplate extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.LaunchPlanTemplate)
+      LaunchPlanTemplateOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use LaunchPlanTemplate.newBuilder() to construct.
+    private LaunchPlanTemplate(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private LaunchPlanTemplate() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private LaunchPlanTemplate(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.IdentifierOuterClass.Identifier.Builder subBuilder = null;
+              if (id_ != null) {
+                subBuilder = id_.toBuilder();
+              }
+              id_ = input.readMessage(flyteidl.core.IdentifierOuterClass.Identifier.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(id_);
+                id_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            case 18: {
+              flyteidl.core.Interface.TypedInterface.Builder subBuilder = null;
+              if (interface_ != null) {
+                subBuilder = interface_.toBuilder();
+              }
+              interface_ = input.readMessage(flyteidl.core.Interface.TypedInterface.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(interface_);
+                interface_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_LaunchPlanTemplate_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Workflow.internal_static_flyteidl_core_LaunchPlanTemplate_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Workflow.LaunchPlanTemplate.class, flyteidl.core.Workflow.LaunchPlanTemplate.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private flyteidl.core.IdentifierOuterClass.Identifier id_;
+    /**
+     * <pre>
+     * A globally unique identifier for the launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public boolean hasId() {
+      return id_ != null;
+    }
+    /**
+     * <pre>
+     * A globally unique identifier for the launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.Identifier getId() {
+      return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+    }
+    /**
+     * <pre>
+     * A globally unique identifier for the launch plan.
+     * </pre>
+     *
+     * <code>.flyteidl.core.Identifier id = 1;</code>
+     */
+    public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
+      return getId();
+    }
+
+    public static final int INTERFACE_FIELD_NUMBER = 2;
+    private flyteidl.core.Interface.TypedInterface interface_;
+    /**
+     * <pre>
+     * The input and output interface for the launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+     */
+    public boolean hasInterface() {
+      return interface_ != null;
+    }
+    /**
+     * <pre>
+     * The input and output interface for the launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+     */
+    public flyteidl.core.Interface.TypedInterface getInterface() {
+      return interface_ == null ? flyteidl.core.Interface.TypedInterface.getDefaultInstance() : interface_;
+    }
+    /**
+     * <pre>
+     * The input and output interface for the launch plan
+     * </pre>
+     *
+     * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+     */
+    public flyteidl.core.Interface.TypedInterfaceOrBuilder getInterfaceOrBuilder() {
+      return getInterface();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (id_ != null) {
+        output.writeMessage(1, getId());
+      }
+      if (interface_ != null) {
+        output.writeMessage(2, getInterface());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (id_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getId());
+      }
+      if (interface_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getInterface());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Workflow.LaunchPlanTemplate)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Workflow.LaunchPlanTemplate other = (flyteidl.core.Workflow.LaunchPlanTemplate) obj;
+
+      if (hasId() != other.hasId()) return false;
+      if (hasId()) {
+        if (!getId()
+            .equals(other.getId())) return false;
+      }
+      if (hasInterface() != other.hasInterface()) return false;
+      if (hasInterface()) {
+        if (!getInterface()
+            .equals(other.getInterface())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasId()) {
+        hash = (37 * hash) + ID_FIELD_NUMBER;
+        hash = (53 * hash) + getId().hashCode();
+      }
+      if (hasInterface()) {
+        hash = (37 * hash) + INTERFACE_FIELD_NUMBER;
+        hash = (53 * hash) + getInterface().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Workflow.LaunchPlanTemplate parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Workflow.LaunchPlanTemplate prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * A structure that uniquely identifies a launch plan in the system.
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.LaunchPlanTemplate}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.LaunchPlanTemplate)
+        flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_LaunchPlanTemplate_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_LaunchPlanTemplate_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Workflow.LaunchPlanTemplate.class, flyteidl.core.Workflow.LaunchPlanTemplate.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Workflow.LaunchPlanTemplate.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (idBuilder_ == null) {
+          id_ = null;
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+        if (interfaceBuilder_ == null) {
+          interface_ = null;
+        } else {
+          interface_ = null;
+          interfaceBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Workflow.internal_static_flyteidl_core_LaunchPlanTemplate_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.LaunchPlanTemplate getDefaultInstanceForType() {
+        return flyteidl.core.Workflow.LaunchPlanTemplate.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.LaunchPlanTemplate build() {
+        flyteidl.core.Workflow.LaunchPlanTemplate result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Workflow.LaunchPlanTemplate buildPartial() {
+        flyteidl.core.Workflow.LaunchPlanTemplate result = new flyteidl.core.Workflow.LaunchPlanTemplate(this);
+        if (idBuilder_ == null) {
+          result.id_ = id_;
+        } else {
+          result.id_ = idBuilder_.build();
+        }
+        if (interfaceBuilder_ == null) {
+          result.interface_ = interface_;
+        } else {
+          result.interface_ = interfaceBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Workflow.LaunchPlanTemplate) {
+          return mergeFrom((flyteidl.core.Workflow.LaunchPlanTemplate)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Workflow.LaunchPlanTemplate other) {
+        if (other == flyteidl.core.Workflow.LaunchPlanTemplate.getDefaultInstance()) return this;
+        if (other.hasId()) {
+          mergeId(other.getId());
+        }
+        if (other.hasInterface()) {
+          mergeInterface(other.getInterface());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Workflow.LaunchPlanTemplate parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Workflow.LaunchPlanTemplate) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.IdentifierOuterClass.Identifier id_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> idBuilder_;
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public boolean hasId() {
+        return idBuilder_ != null || id_ != null;
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier getId() {
+        if (idBuilder_ == null) {
+          return id_ == null ? flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+        } else {
+          return idBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder setId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (idBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          id_ = value;
+          onChanged();
+        } else {
+          idBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder setId(
+          flyteidl.core.IdentifierOuterClass.Identifier.Builder builderForValue) {
+        if (idBuilder_ == null) {
+          id_ = builderForValue.build();
+          onChanged();
+        } else {
+          idBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder mergeId(flyteidl.core.IdentifierOuterClass.Identifier value) {
+        if (idBuilder_ == null) {
+          if (id_ != null) {
+            id_ =
+              flyteidl.core.IdentifierOuterClass.Identifier.newBuilder(id_).mergeFrom(value).buildPartial();
+          } else {
+            id_ = value;
+          }
+          onChanged();
+        } else {
+          idBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public Builder clearId() {
+        if (idBuilder_ == null) {
+          id_ = null;
+          onChanged();
+        } else {
+          id_ = null;
+          idBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.Identifier.Builder getIdBuilder() {
+        
+        onChanged();
+        return getIdFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      public flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder getIdOrBuilder() {
+        if (idBuilder_ != null) {
+          return idBuilder_.getMessageOrBuilder();
+        } else {
+          return id_ == null ?
+              flyteidl.core.IdentifierOuterClass.Identifier.getDefaultInstance() : id_;
+        }
+      }
+      /**
+       * <pre>
+       * A globally unique identifier for the launch plan.
+       * </pre>
+       *
+       * <code>.flyteidl.core.Identifier id = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder> 
+          getIdFieldBuilder() {
+        if (idBuilder_ == null) {
+          idBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.IdentifierOuterClass.Identifier, flyteidl.core.IdentifierOuterClass.Identifier.Builder, flyteidl.core.IdentifierOuterClass.IdentifierOrBuilder>(
+                  getId(),
+                  getParentForChildren(),
+                  isClean());
+          id_ = null;
+        }
+        return idBuilder_;
+      }
+
+      private flyteidl.core.Interface.TypedInterface interface_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> interfaceBuilder_;
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public boolean hasInterface() {
+        return interfaceBuilder_ != null || interface_ != null;
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public flyteidl.core.Interface.TypedInterface getInterface() {
+        if (interfaceBuilder_ == null) {
+          return interface_ == null ? flyteidl.core.Interface.TypedInterface.getDefaultInstance() : interface_;
+        } else {
+          return interfaceBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public Builder setInterface(flyteidl.core.Interface.TypedInterface value) {
+        if (interfaceBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          interface_ = value;
+          onChanged();
+        } else {
+          interfaceBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public Builder setInterface(
+          flyteidl.core.Interface.TypedInterface.Builder builderForValue) {
+        if (interfaceBuilder_ == null) {
+          interface_ = builderForValue.build();
+          onChanged();
+        } else {
+          interfaceBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public Builder mergeInterface(flyteidl.core.Interface.TypedInterface value) {
+        if (interfaceBuilder_ == null) {
+          if (interface_ != null) {
+            interface_ =
+              flyteidl.core.Interface.TypedInterface.newBuilder(interface_).mergeFrom(value).buildPartial();
+          } else {
+            interface_ = value;
+          }
+          onChanged();
+        } else {
+          interfaceBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public Builder clearInterface() {
+        if (interfaceBuilder_ == null) {
+          interface_ = null;
+          onChanged();
+        } else {
+          interface_ = null;
+          interfaceBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public flyteidl.core.Interface.TypedInterface.Builder getInterfaceBuilder() {
+        
+        onChanged();
+        return getInterfaceFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      public flyteidl.core.Interface.TypedInterfaceOrBuilder getInterfaceOrBuilder() {
+        if (interfaceBuilder_ != null) {
+          return interfaceBuilder_.getMessageOrBuilder();
+        } else {
+          return interface_ == null ?
+              flyteidl.core.Interface.TypedInterface.getDefaultInstance() : interface_;
+        }
+      }
+      /**
+       * <pre>
+       * The input and output interface for the launch plan
+       * </pre>
+       *
+       * <code>.flyteidl.core.TypedInterface interface = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder> 
+          getInterfaceFieldBuilder() {
+        if (interfaceBuilder_ == null) {
+          interfaceBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Interface.TypedInterface, flyteidl.core.Interface.TypedInterface.Builder, flyteidl.core.Interface.TypedInterfaceOrBuilder>(
+                  getInterface(),
+                  getParentForChildren(),
+                  isClean());
+          interface_ = null;
+        }
+        return interfaceBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.LaunchPlanTemplate)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.LaunchPlanTemplate)
+    private static final flyteidl.core.Workflow.LaunchPlanTemplate DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Workflow.LaunchPlanTemplate();
+    }
+
+    public static flyteidl.core.Workflow.LaunchPlanTemplate getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<LaunchPlanTemplate>
+        PARSER = new com.google.protobuf.AbstractParser<LaunchPlanTemplate>() {
+      @java.lang.Override
+      public LaunchPlanTemplate parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new LaunchPlanTemplate(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<LaunchPlanTemplate> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<LaunchPlanTemplate> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Workflow.LaunchPlanTemplate getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_IfBlock_descriptor;
   private static final 
@@ -21394,6 +22846,11 @@ public final class Workflow {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_TaskNodeOverrides_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_LaunchPlanTemplate_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_LaunchPlanTemplate_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -21439,46 +22896,53 @@ public final class Workflow {
       "\215\001\n\tArrayNode\022!\n\004node\030\001 \001(\0132\023.flyteidl.c" +
       "ore.Node\022\023\n\013parallelism\030\002 \001(\r\022\027\n\rmin_suc" +
       "cesses\030\003 \001(\rH\000\022\033\n\021min_success_ratio\030\004 \001(" +
-      "\002H\000B\022\n\020success_criteria\"\247\001\n\014NodeMetadata" +
+      "\002H\000B\022\n\020success_criteria\"\271\002\n\014NodeMetadata" +
       "\022\014\n\004name\030\001 \001(\t\022*\n\007timeout\030\004 \001(\0132\031.google" +
       ".protobuf.Duration\022-\n\007retries\030\005 \001(\0132\034.fl" +
       "yteidl.core.RetryStrategy\022\027\n\rinterruptib" +
-      "le\030\006 \001(\010H\000B\025\n\023interruptible_value\"#\n\005Ali" +
-      "as\022\013\n\003var\030\001 \001(\t\022\r\n\005alias\030\002 \001(\t\"\260\003\n\004Node\022" +
-      "\n\n\002id\030\001 \001(\t\022-\n\010metadata\030\002 \001(\0132\033.flyteidl" +
-      ".core.NodeMetadata\022&\n\006inputs\030\003 \003(\0132\026.fly" +
-      "teidl.core.Binding\022\031\n\021upstream_node_ids\030" +
-      "\004 \003(\t\022,\n\016output_aliases\030\005 \003(\0132\024.flyteidl" +
-      ".core.Alias\022,\n\ttask_node\030\006 \001(\0132\027.flyteid" +
-      "l.core.TaskNodeH\000\0224\n\rworkflow_node\030\007 \001(\013" +
-      "2\033.flyteidl.core.WorkflowNodeH\000\0220\n\013branc" +
-      "h_node\030\010 \001(\0132\031.flyteidl.core.BranchNodeH" +
-      "\000\022,\n\tgate_node\030\t \001(\0132\027.flyteidl.core.Gat" +
-      "eNodeH\000\022.\n\narray_node\030\n \001(\0132\030.flyteidl.c" +
-      "ore.ArrayNodeH\000B\010\n\006target\"\315\002\n\020WorkflowMe" +
-      "tadata\022;\n\022quality_of_service\030\001 \001(\0132\037.fly" +
-      "teidl.core.QualityOfService\022C\n\non_failur" +
-      "e\030\002 \001(\0162/.flyteidl.core.WorkflowMetadata" +
-      ".OnFailurePolicy\0227\n\004tags\030\003 \003(\0132).flyteid" +
-      "l.core.WorkflowMetadata.TagsEntry\032+\n\tTag" +
-      "sEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"Q" +
-      "\n\017OnFailurePolicy\022\024\n\020FAIL_IMMEDIATELY\020\000\022" +
-      "(\n$FAIL_AFTER_EXECUTABLE_NODES_COMPLETE\020" +
-      "\001\"1\n\030WorkflowMetadataDefaults\022\025\n\rinterru" +
-      "ptible\030\001 \001(\010\"\332\002\n\020WorkflowTemplate\022%\n\002id\030" +
-      "\001 \001(\0132\031.flyteidl.core.Identifier\0221\n\010meta" +
-      "data\030\002 \001(\0132\037.flyteidl.core.WorkflowMetad" +
-      "ata\0220\n\tinterface\030\003 \001(\0132\035.flyteidl.core.T" +
-      "ypedInterface\022\"\n\005nodes\030\004 \003(\0132\023.flyteidl." +
-      "core.Node\022\'\n\007outputs\030\005 \003(\0132\026.flyteidl.co" +
-      "re.Binding\022)\n\014failure_node\030\006 \001(\0132\023.flyte" +
-      "idl.core.Node\022B\n\021metadata_defaults\030\007 \001(\013" +
-      "2\'.flyteidl.core.WorkflowMetadataDefault" +
-      "s\"~\n\021TaskNodeOverrides\022+\n\tresources\030\001 \001(" +
-      "\0132\030.flyteidl.core.Resources\022<\n\022extended_" +
-      "resources\030\002 \001(\0132 .flyteidl.core.Extended" +
-      "ResourcesB<Z:github.com/flyteorg/flyte/f" +
-      "lyteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "le\030\006 \001(\010H\000\022\023\n\tcacheable\030\007 \001(\010H\001\022\027\n\rcache" +
+      "_version\030\010 \001(\tH\002\022\034\n\022cache_serializable\030\t" +
+      " \001(\010H\003B\025\n\023interruptible_valueB\021\n\017cacheab" +
+      "le_valueB\025\n\023cache_version_valueB\032\n\030cache" +
+      "_serializable_value\"#\n\005Alias\022\013\n\003var\030\001 \001(" +
+      "\t\022\r\n\005alias\030\002 \001(\t\"\260\003\n\004Node\022\n\n\002id\030\001 \001(\t\022-\n" +
+      "\010metadata\030\002 \001(\0132\033.flyteidl.core.NodeMeta" +
+      "data\022&\n\006inputs\030\003 \003(\0132\026.flyteidl.core.Bin" +
+      "ding\022\031\n\021upstream_node_ids\030\004 \003(\t\022,\n\016outpu" +
+      "t_aliases\030\005 \003(\0132\024.flyteidl.core.Alias\022,\n" +
+      "\ttask_node\030\006 \001(\0132\027.flyteidl.core.TaskNod" +
+      "eH\000\0224\n\rworkflow_node\030\007 \001(\0132\033.flyteidl.co" +
+      "re.WorkflowNodeH\000\0220\n\013branch_node\030\010 \001(\0132\031" +
+      ".flyteidl.core.BranchNodeH\000\022,\n\tgate_node" +
+      "\030\t \001(\0132\027.flyteidl.core.GateNodeH\000\022.\n\narr" +
+      "ay_node\030\n \001(\0132\030.flyteidl.core.ArrayNodeH" +
+      "\000B\010\n\006target\"\315\002\n\020WorkflowMetadata\022;\n\022qual" +
+      "ity_of_service\030\001 \001(\0132\037.flyteidl.core.Qua" +
+      "lityOfService\022C\n\non_failure\030\002 \001(\0162/.flyt" +
+      "eidl.core.WorkflowMetadata.OnFailurePoli" +
+      "cy\0227\n\004tags\030\003 \003(\0132).flyteidl.core.Workflo" +
+      "wMetadata.TagsEntry\032+\n\tTagsEntry\022\013\n\003key\030" +
+      "\001 \001(\t\022\r\n\005value\030\002 \001(\t:\0028\001\"Q\n\017OnFailurePol" +
+      "icy\022\024\n\020FAIL_IMMEDIATELY\020\000\022(\n$FAIL_AFTER_" +
+      "EXECUTABLE_NODES_COMPLETE\020\001\"1\n\030WorkflowM" +
+      "etadataDefaults\022\025\n\rinterruptible\030\001 \001(\010\"\332" +
+      "\002\n\020WorkflowTemplate\022%\n\002id\030\001 \001(\0132\031.flytei" +
+      "dl.core.Identifier\0221\n\010metadata\030\002 \001(\0132\037.f" +
+      "lyteidl.core.WorkflowMetadata\0220\n\tinterfa" +
+      "ce\030\003 \001(\0132\035.flyteidl.core.TypedInterface\022" +
+      "\"\n\005nodes\030\004 \003(\0132\023.flyteidl.core.Node\022\'\n\007o" +
+      "utputs\030\005 \003(\0132\026.flyteidl.core.Binding\022)\n\014" +
+      "failure_node\030\006 \001(\0132\023.flyteidl.core.Node\022" +
+      "B\n\021metadata_defaults\030\007 \001(\0132\'.flyteidl.co" +
+      "re.WorkflowMetadataDefaults\"~\n\021TaskNodeO" +
+      "verrides\022+\n\tresources\030\001 \001(\0132\030.flyteidl.c" +
+      "ore.Resources\022<\n\022extended_resources\030\002 \001(" +
+      "\0132 .flyteidl.core.ExtendedResources\"m\n\022L" +
+      "aunchPlanTemplate\022%\n\002id\030\001 \001(\0132\031.flyteidl" +
+      ".core.Identifier\0220\n\tinterface\030\002 \001(\0132\035.fl" +
+      "yteidl.core.TypedInterfaceB<Z:github.com" +
+      "/flyteorg/flyte/flyteidl/gen/pb-go/flyte" +
+      "idl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -21566,7 +23030,7 @@ public final class Workflow {
     internal_static_flyteidl_core_NodeMetadata_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_NodeMetadata_descriptor,
-        new java.lang.String[] { "Name", "Timeout", "Retries", "Interruptible", "InterruptibleValue", });
+        new java.lang.String[] { "Name", "Timeout", "Retries", "Interruptible", "Cacheable", "CacheVersion", "CacheSerializable", "InterruptibleValue", "CacheableValue", "CacheVersionValue", "CacheSerializableValue", });
     internal_static_flyteidl_core_Alias_descriptor =
       getDescriptor().getMessageTypes().get(11);
     internal_static_flyteidl_core_Alias_fieldAccessorTable = new
@@ -21609,6 +23073,12 @@ public final class Workflow {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_TaskNodeOverrides_descriptor,
         new java.lang.String[] { "Resources", "ExtendedResources", });
+    internal_static_flyteidl_core_LaunchPlanTemplate_descriptor =
+      getDescriptor().getMessageTypes().get(17);
+    internal_static_flyteidl_core_LaunchPlanTemplate_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_LaunchPlanTemplate_descriptor,
+        new java.lang.String[] { "Id", "Interface", });
     flyteidl.core.Condition.getDescriptor();
     flyteidl.core.Execution.getDescriptor();
     flyteidl.core.IdentifierOuterClass.getDescriptor();

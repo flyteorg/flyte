@@ -2683,6 +2683,680 @@ public final class Compiler {
 
   }
 
+  public interface CompiledLaunchPlanOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:flyteidl.core.CompiledLaunchPlan)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <pre>
+     * Completely contained LaunchPlan Template
+     * </pre>
+     *
+     * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+     */
+    boolean hasTemplate();
+    /**
+     * <pre>
+     * Completely contained LaunchPlan Template
+     * </pre>
+     *
+     * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+     */
+    flyteidl.core.Workflow.LaunchPlanTemplate getTemplate();
+    /**
+     * <pre>
+     * Completely contained LaunchPlan Template
+     * </pre>
+     *
+     * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+     */
+    flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder getTemplateOrBuilder();
+  }
+  /**
+   * <pre>
+   * Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer
+   * </pre>
+   *
+   * Protobuf type {@code flyteidl.core.CompiledLaunchPlan}
+   */
+  public  static final class CompiledLaunchPlan extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:flyteidl.core.CompiledLaunchPlan)
+      CompiledLaunchPlanOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use CompiledLaunchPlan.newBuilder() to construct.
+    private CompiledLaunchPlan(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private CompiledLaunchPlan() {
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private CompiledLaunchPlan(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              flyteidl.core.Workflow.LaunchPlanTemplate.Builder subBuilder = null;
+              if (template_ != null) {
+                subBuilder = template_.toBuilder();
+              }
+              template_ = input.readMessage(flyteidl.core.Workflow.LaunchPlanTemplate.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(template_);
+                template_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledLaunchPlan_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledLaunchPlan_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              flyteidl.core.Compiler.CompiledLaunchPlan.class, flyteidl.core.Compiler.CompiledLaunchPlan.Builder.class);
+    }
+
+    public static final int TEMPLATE_FIELD_NUMBER = 1;
+    private flyteidl.core.Workflow.LaunchPlanTemplate template_;
+    /**
+     * <pre>
+     * Completely contained LaunchPlan Template
+     * </pre>
+     *
+     * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+     */
+    public boolean hasTemplate() {
+      return template_ != null;
+    }
+    /**
+     * <pre>
+     * Completely contained LaunchPlan Template
+     * </pre>
+     *
+     * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+     */
+    public flyteidl.core.Workflow.LaunchPlanTemplate getTemplate() {
+      return template_ == null ? flyteidl.core.Workflow.LaunchPlanTemplate.getDefaultInstance() : template_;
+    }
+    /**
+     * <pre>
+     * Completely contained LaunchPlan Template
+     * </pre>
+     *
+     * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+     */
+    public flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder getTemplateOrBuilder() {
+      return getTemplate();
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (template_ != null) {
+        output.writeMessage(1, getTemplate());
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (template_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getTemplate());
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof flyteidl.core.Compiler.CompiledLaunchPlan)) {
+        return super.equals(obj);
+      }
+      flyteidl.core.Compiler.CompiledLaunchPlan other = (flyteidl.core.Compiler.CompiledLaunchPlan) obj;
+
+      if (hasTemplate() != other.hasTemplate()) return false;
+      if (hasTemplate()) {
+        if (!getTemplate()
+            .equals(other.getTemplate())) return false;
+      }
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasTemplate()) {
+        hash = (37 * hash) + TEMPLATE_FIELD_NUMBER;
+        hash = (53 * hash) + getTemplate().hashCode();
+      }
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static flyteidl.core.Compiler.CompiledLaunchPlan parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(flyteidl.core.Compiler.CompiledLaunchPlan prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * <pre>
+     * Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer
+     * </pre>
+     *
+     * Protobuf type {@code flyteidl.core.CompiledLaunchPlan}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:flyteidl.core.CompiledLaunchPlan)
+        flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledLaunchPlan_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledLaunchPlan_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                flyteidl.core.Compiler.CompiledLaunchPlan.class, flyteidl.core.Compiler.CompiledLaunchPlan.Builder.class);
+      }
+
+      // Construct using flyteidl.core.Compiler.CompiledLaunchPlan.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        if (templateBuilder_ == null) {
+          template_ = null;
+        } else {
+          template_ = null;
+          templateBuilder_ = null;
+        }
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return flyteidl.core.Compiler.internal_static_flyteidl_core_CompiledLaunchPlan_descriptor;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Compiler.CompiledLaunchPlan getDefaultInstanceForType() {
+        return flyteidl.core.Compiler.CompiledLaunchPlan.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Compiler.CompiledLaunchPlan build() {
+        flyteidl.core.Compiler.CompiledLaunchPlan result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public flyteidl.core.Compiler.CompiledLaunchPlan buildPartial() {
+        flyteidl.core.Compiler.CompiledLaunchPlan result = new flyteidl.core.Compiler.CompiledLaunchPlan(this);
+        if (templateBuilder_ == null) {
+          result.template_ = template_;
+        } else {
+          result.template_ = templateBuilder_.build();
+        }
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof flyteidl.core.Compiler.CompiledLaunchPlan) {
+          return mergeFrom((flyteidl.core.Compiler.CompiledLaunchPlan)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(flyteidl.core.Compiler.CompiledLaunchPlan other) {
+        if (other == flyteidl.core.Compiler.CompiledLaunchPlan.getDefaultInstance()) return this;
+        if (other.hasTemplate()) {
+          mergeTemplate(other.getTemplate());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        flyteidl.core.Compiler.CompiledLaunchPlan parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (flyteidl.core.Compiler.CompiledLaunchPlan) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private flyteidl.core.Workflow.LaunchPlanTemplate template_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.LaunchPlanTemplate, flyteidl.core.Workflow.LaunchPlanTemplate.Builder, flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder> templateBuilder_;
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public boolean hasTemplate() {
+        return templateBuilder_ != null || template_ != null;
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public flyteidl.core.Workflow.LaunchPlanTemplate getTemplate() {
+        if (templateBuilder_ == null) {
+          return template_ == null ? flyteidl.core.Workflow.LaunchPlanTemplate.getDefaultInstance() : template_;
+        } else {
+          return templateBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public Builder setTemplate(flyteidl.core.Workflow.LaunchPlanTemplate value) {
+        if (templateBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          template_ = value;
+          onChanged();
+        } else {
+          templateBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public Builder setTemplate(
+          flyteidl.core.Workflow.LaunchPlanTemplate.Builder builderForValue) {
+        if (templateBuilder_ == null) {
+          template_ = builderForValue.build();
+          onChanged();
+        } else {
+          templateBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public Builder mergeTemplate(flyteidl.core.Workflow.LaunchPlanTemplate value) {
+        if (templateBuilder_ == null) {
+          if (template_ != null) {
+            template_ =
+              flyteidl.core.Workflow.LaunchPlanTemplate.newBuilder(template_).mergeFrom(value).buildPartial();
+          } else {
+            template_ = value;
+          }
+          onChanged();
+        } else {
+          templateBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public Builder clearTemplate() {
+        if (templateBuilder_ == null) {
+          template_ = null;
+          onChanged();
+        } else {
+          template_ = null;
+          templateBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public flyteidl.core.Workflow.LaunchPlanTemplate.Builder getTemplateBuilder() {
+        
+        onChanged();
+        return getTemplateFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      public flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder getTemplateOrBuilder() {
+        if (templateBuilder_ != null) {
+          return templateBuilder_.getMessageOrBuilder();
+        } else {
+          return template_ == null ?
+              flyteidl.core.Workflow.LaunchPlanTemplate.getDefaultInstance() : template_;
+        }
+      }
+      /**
+       * <pre>
+       * Completely contained LaunchPlan Template
+       * </pre>
+       *
+       * <code>.flyteidl.core.LaunchPlanTemplate template = 1;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          flyteidl.core.Workflow.LaunchPlanTemplate, flyteidl.core.Workflow.LaunchPlanTemplate.Builder, flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder> 
+          getTemplateFieldBuilder() {
+        if (templateBuilder_ == null) {
+          templateBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              flyteidl.core.Workflow.LaunchPlanTemplate, flyteidl.core.Workflow.LaunchPlanTemplate.Builder, flyteidl.core.Workflow.LaunchPlanTemplateOrBuilder>(
+                  getTemplate(),
+                  getParentForChildren(),
+                  isClean());
+          template_ = null;
+        }
+        return templateBuilder_;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:flyteidl.core.CompiledLaunchPlan)
+    }
+
+    // @@protoc_insertion_point(class_scope:flyteidl.core.CompiledLaunchPlan)
+    private static final flyteidl.core.Compiler.CompiledLaunchPlan DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new flyteidl.core.Compiler.CompiledLaunchPlan();
+    }
+
+    public static flyteidl.core.Compiler.CompiledLaunchPlan getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<CompiledLaunchPlan>
+        PARSER = new com.google.protobuf.AbstractParser<CompiledLaunchPlan>() {
+      @java.lang.Override
+      public CompiledLaunchPlan parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new CompiledLaunchPlan(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<CompiledLaunchPlan> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<CompiledLaunchPlan> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public flyteidl.core.Compiler.CompiledLaunchPlan getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface CompiledTaskOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.CompiledTask)
       com.google.protobuf.MessageOrBuilder {
@@ -3493,6 +4167,55 @@ public final class Compiler {
      */
     flyteidl.core.Compiler.CompiledTaskOrBuilder getTasksOrBuilder(
         int index);
+
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    java.util.List<flyteidl.core.Compiler.CompiledLaunchPlan> 
+        getLaunchPlansList();
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    flyteidl.core.Compiler.CompiledLaunchPlan getLaunchPlans(int index);
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    int getLaunchPlansCount();
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    java.util.List<? extends flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder> 
+        getLaunchPlansOrBuilderList();
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder getLaunchPlansOrBuilder(
+        int index);
   }
   /**
    * <pre>
@@ -3516,6 +4239,7 @@ public final class Compiler {
     private CompiledWorkflowClosure() {
       subWorkflows_ = java.util.Collections.emptyList();
       tasks_ = java.util.Collections.emptyList();
+      launchPlans_ = java.util.Collections.emptyList();
     }
 
     @java.lang.Override
@@ -3573,6 +4297,15 @@ public final class Compiler {
                   input.readMessage(flyteidl.core.Compiler.CompiledTask.parser(), extensionRegistry));
               break;
             }
+            case 34: {
+              if (!((mutable_bitField0_ & 0x00000008) != 0)) {
+                launchPlans_ = new java.util.ArrayList<flyteidl.core.Compiler.CompiledLaunchPlan>();
+                mutable_bitField0_ |= 0x00000008;
+              }
+              launchPlans_.add(
+                  input.readMessage(flyteidl.core.Compiler.CompiledLaunchPlan.parser(), extensionRegistry));
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -3593,6 +4326,9 @@ public final class Compiler {
         }
         if (((mutable_bitField0_ & 0x00000004) != 0)) {
           tasks_ = java.util.Collections.unmodifiableList(tasks_);
+        }
+        if (((mutable_bitField0_ & 0x00000008) != 0)) {
+          launchPlans_ = java.util.Collections.unmodifiableList(launchPlans_);
         }
         this.unknownFields = unknownFields.build();
         makeExtensionsImmutable();
@@ -3775,6 +4511,66 @@ public final class Compiler {
       return tasks_.get(index);
     }
 
+    public static final int LAUNCH_PLANS_FIELD_NUMBER = 4;
+    private java.util.List<flyteidl.core.Compiler.CompiledLaunchPlan> launchPlans_;
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    public java.util.List<flyteidl.core.Compiler.CompiledLaunchPlan> getLaunchPlansList() {
+      return launchPlans_;
+    }
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    public java.util.List<? extends flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder> 
+        getLaunchPlansOrBuilderList() {
+      return launchPlans_;
+    }
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    public int getLaunchPlansCount() {
+      return launchPlans_.size();
+    }
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    public flyteidl.core.Compiler.CompiledLaunchPlan getLaunchPlans(int index) {
+      return launchPlans_.get(index);
+    }
+    /**
+     * <pre>
+     * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+     * with a given id, i.e., every launch plan has a unique id.
+     * </pre>
+     *
+     * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+     */
+    public flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder getLaunchPlansOrBuilder(
+        int index) {
+      return launchPlans_.get(index);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -3798,6 +4594,9 @@ public final class Compiler {
       for (int i = 0; i < tasks_.size(); i++) {
         output.writeMessage(3, tasks_.get(i));
       }
+      for (int i = 0; i < launchPlans_.size(); i++) {
+        output.writeMessage(4, launchPlans_.get(i));
+      }
       unknownFields.writeTo(output);
     }
 
@@ -3818,6 +4617,10 @@ public final class Compiler {
       for (int i = 0; i < tasks_.size(); i++) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, tasks_.get(i));
+      }
+      for (int i = 0; i < launchPlans_.size(); i++) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(4, launchPlans_.get(i));
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3843,6 +4646,8 @@ public final class Compiler {
           .equals(other.getSubWorkflowsList())) return false;
       if (!getTasksList()
           .equals(other.getTasksList())) return false;
+      if (!getLaunchPlansList()
+          .equals(other.getLaunchPlansList())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -3865,6 +4670,10 @@ public final class Compiler {
       if (getTasksCount() > 0) {
         hash = (37 * hash) + TASKS_FIELD_NUMBER;
         hash = (53 * hash) + getTasksList().hashCode();
+      }
+      if (getLaunchPlansCount() > 0) {
+        hash = (37 * hash) + LAUNCH_PLANS_FIELD_NUMBER;
+        hash = (53 * hash) + getLaunchPlansList().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -4003,6 +4812,7 @@ public final class Compiler {
                 .alwaysUseFieldBuilders) {
           getSubWorkflowsFieldBuilder();
           getTasksFieldBuilder();
+          getLaunchPlansFieldBuilder();
         }
       }
       @java.lang.Override
@@ -4025,6 +4835,12 @@ public final class Compiler {
           bitField0_ = (bitField0_ & ~0x00000004);
         } else {
           tasksBuilder_.clear();
+        }
+        if (launchPlansBuilder_ == null) {
+          launchPlans_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+        } else {
+          launchPlansBuilder_.clear();
         }
         return this;
       }
@@ -4076,6 +4892,15 @@ public final class Compiler {
           result.tasks_ = tasks_;
         } else {
           result.tasks_ = tasksBuilder_.build();
+        }
+        if (launchPlansBuilder_ == null) {
+          if (((bitField0_ & 0x00000008) != 0)) {
+            launchPlans_ = java.util.Collections.unmodifiableList(launchPlans_);
+            bitField0_ = (bitField0_ & ~0x00000008);
+          }
+          result.launchPlans_ = launchPlans_;
+        } else {
+          result.launchPlans_ = launchPlansBuilder_.build();
         }
         result.bitField0_ = to_bitField0_;
         onBuilt();
@@ -4178,6 +5003,32 @@ public final class Compiler {
                    getTasksFieldBuilder() : null;
             } else {
               tasksBuilder_.addAllMessages(other.tasks_);
+            }
+          }
+        }
+        if (launchPlansBuilder_ == null) {
+          if (!other.launchPlans_.isEmpty()) {
+            if (launchPlans_.isEmpty()) {
+              launchPlans_ = other.launchPlans_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+            } else {
+              ensureLaunchPlansIsMutable();
+              launchPlans_.addAll(other.launchPlans_);
+            }
+            onChanged();
+          }
+        } else {
+          if (!other.launchPlans_.isEmpty()) {
+            if (launchPlansBuilder_.isEmpty()) {
+              launchPlansBuilder_.dispose();
+              launchPlansBuilder_ = null;
+              launchPlans_ = other.launchPlans_;
+              bitField0_ = (bitField0_ & ~0x00000008);
+              launchPlansBuilder_ = 
+                com.google.protobuf.GeneratedMessageV3.alwaysUseFieldBuilders ?
+                   getLaunchPlansFieldBuilder() : null;
+            } else {
+              launchPlansBuilder_.addAllMessages(other.launchPlans_);
             }
           }
         }
@@ -5059,6 +5910,336 @@ public final class Compiler {
         }
         return tasksBuilder_;
       }
+
+      private java.util.List<flyteidl.core.Compiler.CompiledLaunchPlan> launchPlans_ =
+        java.util.Collections.emptyList();
+      private void ensureLaunchPlansIsMutable() {
+        if (!((bitField0_ & 0x00000008) != 0)) {
+          launchPlans_ = new java.util.ArrayList<flyteidl.core.Compiler.CompiledLaunchPlan>(launchPlans_);
+          bitField0_ |= 0x00000008;
+         }
+      }
+
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Compiler.CompiledLaunchPlan, flyteidl.core.Compiler.CompiledLaunchPlan.Builder, flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder> launchPlansBuilder_;
+
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public java.util.List<flyteidl.core.Compiler.CompiledLaunchPlan> getLaunchPlansList() {
+        if (launchPlansBuilder_ == null) {
+          return java.util.Collections.unmodifiableList(launchPlans_);
+        } else {
+          return launchPlansBuilder_.getMessageList();
+        }
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public int getLaunchPlansCount() {
+        if (launchPlansBuilder_ == null) {
+          return launchPlans_.size();
+        } else {
+          return launchPlansBuilder_.getCount();
+        }
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public flyteidl.core.Compiler.CompiledLaunchPlan getLaunchPlans(int index) {
+        if (launchPlansBuilder_ == null) {
+          return launchPlans_.get(index);
+        } else {
+          return launchPlansBuilder_.getMessage(index);
+        }
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder setLaunchPlans(
+          int index, flyteidl.core.Compiler.CompiledLaunchPlan value) {
+        if (launchPlansBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureLaunchPlansIsMutable();
+          launchPlans_.set(index, value);
+          onChanged();
+        } else {
+          launchPlansBuilder_.setMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder setLaunchPlans(
+          int index, flyteidl.core.Compiler.CompiledLaunchPlan.Builder builderForValue) {
+        if (launchPlansBuilder_ == null) {
+          ensureLaunchPlansIsMutable();
+          launchPlans_.set(index, builderForValue.build());
+          onChanged();
+        } else {
+          launchPlansBuilder_.setMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder addLaunchPlans(flyteidl.core.Compiler.CompiledLaunchPlan value) {
+        if (launchPlansBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureLaunchPlansIsMutable();
+          launchPlans_.add(value);
+          onChanged();
+        } else {
+          launchPlansBuilder_.addMessage(value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder addLaunchPlans(
+          int index, flyteidl.core.Compiler.CompiledLaunchPlan value) {
+        if (launchPlansBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          ensureLaunchPlansIsMutable();
+          launchPlans_.add(index, value);
+          onChanged();
+        } else {
+          launchPlansBuilder_.addMessage(index, value);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder addLaunchPlans(
+          flyteidl.core.Compiler.CompiledLaunchPlan.Builder builderForValue) {
+        if (launchPlansBuilder_ == null) {
+          ensureLaunchPlansIsMutable();
+          launchPlans_.add(builderForValue.build());
+          onChanged();
+        } else {
+          launchPlansBuilder_.addMessage(builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder addLaunchPlans(
+          int index, flyteidl.core.Compiler.CompiledLaunchPlan.Builder builderForValue) {
+        if (launchPlansBuilder_ == null) {
+          ensureLaunchPlansIsMutable();
+          launchPlans_.add(index, builderForValue.build());
+          onChanged();
+        } else {
+          launchPlansBuilder_.addMessage(index, builderForValue.build());
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder addAllLaunchPlans(
+          java.lang.Iterable<? extends flyteidl.core.Compiler.CompiledLaunchPlan> values) {
+        if (launchPlansBuilder_ == null) {
+          ensureLaunchPlansIsMutable();
+          com.google.protobuf.AbstractMessageLite.Builder.addAll(
+              values, launchPlans_);
+          onChanged();
+        } else {
+          launchPlansBuilder_.addAllMessages(values);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder clearLaunchPlans() {
+        if (launchPlansBuilder_ == null) {
+          launchPlans_ = java.util.Collections.emptyList();
+          bitField0_ = (bitField0_ & ~0x00000008);
+          onChanged();
+        } else {
+          launchPlansBuilder_.clear();
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public Builder removeLaunchPlans(int index) {
+        if (launchPlansBuilder_ == null) {
+          ensureLaunchPlansIsMutable();
+          launchPlans_.remove(index);
+          onChanged();
+        } else {
+          launchPlansBuilder_.remove(index);
+        }
+        return this;
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public flyteidl.core.Compiler.CompiledLaunchPlan.Builder getLaunchPlansBuilder(
+          int index) {
+        return getLaunchPlansFieldBuilder().getBuilder(index);
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder getLaunchPlansOrBuilder(
+          int index) {
+        if (launchPlansBuilder_ == null) {
+          return launchPlans_.get(index);  } else {
+          return launchPlansBuilder_.getMessageOrBuilder(index);
+        }
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public java.util.List<? extends flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder> 
+           getLaunchPlansOrBuilderList() {
+        if (launchPlansBuilder_ != null) {
+          return launchPlansBuilder_.getMessageOrBuilderList();
+        } else {
+          return java.util.Collections.unmodifiableList(launchPlans_);
+        }
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public flyteidl.core.Compiler.CompiledLaunchPlan.Builder addLaunchPlansBuilder() {
+        return getLaunchPlansFieldBuilder().addBuilder(
+            flyteidl.core.Compiler.CompiledLaunchPlan.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public flyteidl.core.Compiler.CompiledLaunchPlan.Builder addLaunchPlansBuilder(
+          int index) {
+        return getLaunchPlansFieldBuilder().addBuilder(
+            index, flyteidl.core.Compiler.CompiledLaunchPlan.getDefaultInstance());
+      }
+      /**
+       * <pre>
+       * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+       * with a given id, i.e., every launch plan has a unique id.
+       * </pre>
+       *
+       * <code>repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;</code>
+       */
+      public java.util.List<flyteidl.core.Compiler.CompiledLaunchPlan.Builder> 
+           getLaunchPlansBuilderList() {
+        return getLaunchPlansFieldBuilder().getBuilderList();
+      }
+      private com.google.protobuf.RepeatedFieldBuilderV3<
+          flyteidl.core.Compiler.CompiledLaunchPlan, flyteidl.core.Compiler.CompiledLaunchPlan.Builder, flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder> 
+          getLaunchPlansFieldBuilder() {
+        if (launchPlansBuilder_ == null) {
+          launchPlansBuilder_ = new com.google.protobuf.RepeatedFieldBuilderV3<
+              flyteidl.core.Compiler.CompiledLaunchPlan, flyteidl.core.Compiler.CompiledLaunchPlan.Builder, flyteidl.core.Compiler.CompiledLaunchPlanOrBuilder>(
+                  launchPlans_,
+                  ((bitField0_ & 0x00000008) != 0),
+                  getParentForChildren(),
+                  isClean());
+          launchPlans_ = null;
+        }
+        return launchPlansBuilder_;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -5138,6 +6319,11 @@ public final class Compiler {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_CompiledWorkflow_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_core_CompiledLaunchPlan_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_core_CompiledLaunchPlan_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_CompiledTask_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -5157,27 +6343,32 @@ public final class Compiler {
   static {
     java.lang.String[] descriptorData = {
       "\n\034flyteidl/core/compiler.proto\022\rflyteidl" +
-      ".core\032\034flyteidl/core/workflow.proto\032\031fly" +
-      "teidl/core/tasks.proto\"\324\002\n\rConnectionSet" +
-      "\022@\n\ndownstream\030\007 \003(\0132,.flyteidl.core.Con" +
-      "nectionSet.DownstreamEntry\022<\n\010upstream\030\010" +
-      " \003(\0132*.flyteidl.core.ConnectionSet.Upstr" +
-      "eamEntry\032\025\n\006IdList\022\013\n\003ids\030\001 \003(\t\032V\n\017Downs" +
-      "treamEntry\022\013\n\003key\030\001 \001(\t\0222\n\005value\030\002 \001(\0132#" +
-      ".flyteidl.core.ConnectionSet.IdList:\0028\001\032" +
-      "T\n\rUpstreamEntry\022\013\n\003key\030\001 \001(\t\0222\n\005value\030\002" +
-      " \001(\0132#.flyteidl.core.ConnectionSet.IdLis" +
-      "t:\0028\001\"x\n\020CompiledWorkflow\0221\n\010template\030\001 " +
-      "\001(\0132\037.flyteidl.core.WorkflowTemplate\0221\n\013" +
-      "connections\030\002 \001(\0132\034.flyteidl.core.Connec" +
-      "tionSet\"=\n\014CompiledTask\022-\n\010template\030\001 \001(" +
-      "\0132\033.flyteidl.core.TaskTemplate\"\257\001\n\027Compi" +
-      "ledWorkflowClosure\0220\n\007primary\030\001 \001(\0132\037.fl" +
-      "yteidl.core.CompiledWorkflow\0226\n\rsub_work" +
-      "flows\030\002 \003(\0132\037.flyteidl.core.CompiledWork" +
-      "flow\022*\n\005tasks\030\003 \003(\0132\033.flyteidl.core.Comp" +
-      "iledTaskB<Z:github.com/flyteorg/flyte/fl" +
-      "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
+      ".core\032\036flyteidl/core/identifier.proto\032\035f" +
+      "lyteidl/core/interface.proto\032\034flyteidl/c" +
+      "ore/workflow.proto\032\031flyteidl/core/tasks." +
+      "proto\"\324\002\n\rConnectionSet\022@\n\ndownstream\030\007 " +
+      "\003(\0132,.flyteidl.core.ConnectionSet.Downst" +
+      "reamEntry\022<\n\010upstream\030\010 \003(\0132*.flyteidl.c" +
+      "ore.ConnectionSet.UpstreamEntry\032\025\n\006IdLis" +
+      "t\022\013\n\003ids\030\001 \003(\t\032V\n\017DownstreamEntry\022\013\n\003key" +
+      "\030\001 \001(\t\0222\n\005value\030\002 \001(\0132#.flyteidl.core.Co" +
+      "nnectionSet.IdList:\0028\001\032T\n\rUpstreamEntry\022" +
+      "\013\n\003key\030\001 \001(\t\0222\n\005value\030\002 \001(\0132#.flyteidl.c" +
+      "ore.ConnectionSet.IdList:\0028\001\"x\n\020Compiled" +
+      "Workflow\0221\n\010template\030\001 \001(\0132\037.flyteidl.co" +
+      "re.WorkflowTemplate\0221\n\013connections\030\002 \001(\013" +
+      "2\034.flyteidl.core.ConnectionSet\"I\n\022Compil" +
+      "edLaunchPlan\0223\n\010template\030\001 \001(\0132!.flyteid" +
+      "l.core.LaunchPlanTemplate\"=\n\014CompiledTas" +
+      "k\022-\n\010template\030\001 \001(\0132\033.flyteidl.core.Task" +
+      "Template\"\350\001\n\027CompiledWorkflowClosure\0220\n\007" +
+      "primary\030\001 \001(\0132\037.flyteidl.core.CompiledWo" +
+      "rkflow\0226\n\rsub_workflows\030\002 \003(\0132\037.flyteidl" +
+      ".core.CompiledWorkflow\022*\n\005tasks\030\003 \003(\0132\033." +
+      "flyteidl.core.CompiledTask\0227\n\014launch_pla" +
+      "ns\030\004 \003(\0132!.flyteidl.core.CompiledLaunchP" +
+      "lanB<Z:github.com/flyteorg/flyte/flyteid" +
+      "l/gen/pb-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -5190,6 +6381,8 @@ public final class Compiler {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
+          flyteidl.core.IdentifierOuterClass.getDescriptor(),
+          flyteidl.core.Interface.getDescriptor(),
           flyteidl.core.Workflow.getDescriptor(),
           flyteidl.core.Tasks.getDescriptor(),
         }, assigner);
@@ -5223,18 +6416,26 @@ public final class Compiler {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_CompiledWorkflow_descriptor,
         new java.lang.String[] { "Template", "Connections", });
-    internal_static_flyteidl_core_CompiledTask_descriptor =
+    internal_static_flyteidl_core_CompiledLaunchPlan_descriptor =
       getDescriptor().getMessageTypes().get(2);
+    internal_static_flyteidl_core_CompiledLaunchPlan_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_core_CompiledLaunchPlan_descriptor,
+        new java.lang.String[] { "Template", });
+    internal_static_flyteidl_core_CompiledTask_descriptor =
+      getDescriptor().getMessageTypes().get(3);
     internal_static_flyteidl_core_CompiledTask_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_CompiledTask_descriptor,
         new java.lang.String[] { "Template", });
     internal_static_flyteidl_core_CompiledWorkflowClosure_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_flyteidl_core_CompiledWorkflowClosure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_CompiledWorkflowClosure_descriptor,
-        new java.lang.String[] { "Primary", "SubWorkflows", "Tasks", });
+        new java.lang.String[] { "Primary", "SubWorkflows", "Tasks", "LaunchPlans", });
+    flyteidl.core.IdentifierOuterClass.getDescriptor();
+    flyteidl.core.Interface.getDescriptor();
     flyteidl.core.Workflow.getDescriptor();
     flyteidl.core.Tasks.getDescriptor();
   }
