@@ -4,7 +4,7 @@
 
 .. tags:: Agent, Integration, Data, Advanced
 
-Discover the process of setting up Agents for Flyte.
+To set configure your Flyte deployment for agents, see the documentation below.
 
 ```{list-table}
 :header-rows: 0
