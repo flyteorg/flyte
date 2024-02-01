@@ -171,7 +171,7 @@ const char descriptor_table_protodef_flyteidl_2fservice_2fadmin_2eproto[] =
   "n.WorkflowExecutionGetDataResponse\"\216\001\202\323\344"
   "\223\002\207\001\022:/api/v1/data/executions/{id.projec"
   "t}/{id.domain}/{id.name}ZI\022G/api/v1/data"
-  "/executions/org/{id.org}/{id.project}/{i"
+  "/org/{id.org}/executions/{id.project}/{i"
   "d.domain}/{id.name}\022\305\001\n\016ListExecutions\022#"
   ".flyteidl.admin.ResourceListRequest\032\035.fl"
   "yteidl.admin.ExecutionList\"o\202\323\344\223\002i\022+/api"
