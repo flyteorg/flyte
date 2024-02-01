@@ -112,13 +112,13 @@ spec:
       kind: task
       name: t1
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t1" '
+      task: resource_type:TASK  name:"core.flyte_basics.imperative_wf_style.t1"
     n1:
       id: n1
       kind: task
       name: t2
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t2" '
+      task: resource_type:TASK  name:"core.flyte_basics.imperative_wf_style.t2"
     n2:
       id: n2
       inputBindings:
@@ -135,7 +135,7 @@ spec:
       kind: task
       name: t3
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t3" '
+      task: resource_type:TASK  name:"core.flyte_basics.imperative_wf_style.t3"
     start-node:
       id: start-node
       kind: start
@@ -168,7 +168,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t1" ':
+  resource_type:TASK  name:"core.flyte_basics.imperative_wf_style.t1":
     container:
       args:
       - pyflyte-execute
@@ -219,7 +219,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t2" ':
+  resource_type:TASK  name:"core.flyte_basics.imperative_wf_style.t2":
     container:
       args:
       - pyflyte-execute
@@ -262,7 +262,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.imperative_wf_style.t3" ':
+  resource_type:TASK  name:"core.flyte_basics.imperative_wf_style.t3":
     container:
       args:
       - pyflyte-execute

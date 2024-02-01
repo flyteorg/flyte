@@ -80,7 +80,7 @@ spec:
       kind: task
       name: greet
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.flyte_pickle.greet" '
+      task: resource_type:TASK  name:"core.type_system.flyte_pickle.greet"
     start-node:
       id: start-node
       kind: start
@@ -100,7 +100,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.type_system.flyte_pickle.greet" ':
+  resource_type:TASK  name:"core.type_system.flyte_pickle.greet":
     container:
       args:
       - pyflyte-execute

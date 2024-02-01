@@ -113,7 +113,7 @@ spec:
       kind: task
       name: normalize_columns
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.files.normalize_columns" '
+      task: resource_type:TASK  name:"core.flyte_basics.files.normalize_columns"
     start-node:
       id: start-node
       kind: start
@@ -132,7 +132,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.files.normalize_columns" ':
+  resource_type:TASK  name:"core.flyte_basics.files.normalize_columns":
     container:
       args:
       - pyflyte-execute

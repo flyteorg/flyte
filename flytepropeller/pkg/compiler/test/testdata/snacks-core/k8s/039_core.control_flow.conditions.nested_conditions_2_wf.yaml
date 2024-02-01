@@ -188,7 +188,7 @@ spec:
       kind: task
       name: double
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.double" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.double"
     n0-n0-n1:
       id: n0-n0-n1
       inputBindings:
@@ -200,7 +200,7 @@ spec:
       kind: task
       name: square
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.square" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.square"
     n0-n1:
       id: n0-n1
       inputBindings:
@@ -212,7 +212,7 @@ spec:
       kind: task
       name: square
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.square" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.square"
     n0-n2:
       id: n0-n2
       inputBindings:
@@ -224,7 +224,7 @@ spec:
       kind: task
       name: double
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.double" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.double"
     start-node:
       id: start-node
       kind: start
@@ -243,7 +243,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.conditions.double" ':
+  resource_type:TASK  name:"core.control_flow.conditions.double":
     container:
       args:
       - pyflyte-execute
@@ -294,7 +294,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.control_flow.conditions.square" ':
+  resource_type:TASK  name:"core.control_flow.conditions.square":
     container:
       args:
       - pyflyte-execute

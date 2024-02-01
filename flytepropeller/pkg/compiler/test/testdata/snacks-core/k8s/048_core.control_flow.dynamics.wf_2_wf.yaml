@@ -89,7 +89,7 @@ spec:
       kind: task
       name: count_characters
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.dynamics.count_characters" '
+      task: resource_type:TASK  name:"core.control_flow.dynamics.count_characters"
     start-node:
       id: start-node
       kind: start
@@ -108,7 +108,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.dynamics.count_characters" ':
+  resource_type:TASK  name:"core.control_flow.dynamics.count_characters":
     container:
       args:
       - pyflyte-execute

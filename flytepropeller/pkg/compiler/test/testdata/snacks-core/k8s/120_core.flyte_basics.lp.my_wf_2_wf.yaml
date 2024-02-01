@@ -80,7 +80,7 @@ spec:
       kind: task
       name: square
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.lp.square" '
+      task: resource_type:TASK  name:"core.flyte_basics.lp.square"
     start-node:
       id: start-node
       kind: start
@@ -99,7 +99,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.lp.square" ':
+  resource_type:TASK  name:"core.flyte_basics.lp.square":
     container:
       args:
       - pyflyte-execute

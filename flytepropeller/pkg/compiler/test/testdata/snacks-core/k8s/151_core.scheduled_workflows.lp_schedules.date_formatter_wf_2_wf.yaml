@@ -74,7 +74,7 @@ spec:
       kind: task
       name: format_date
       resources: {}
-      task: 'resource_type:TASK name:"core.scheduled_workflows.lp_schedules.format_date" '
+      task: resource_type:TASK  name:"core.scheduled_workflows.lp_schedules.format_date"
     start-node:
       id: start-node
       kind: start
@@ -83,7 +83,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.scheduled_workflows.lp_schedules.format_date" ':
+  resource_type:TASK  name:"core.scheduled_workflows.lp_schedules.format_date":
     container:
       args:
       - pyflyte-execute

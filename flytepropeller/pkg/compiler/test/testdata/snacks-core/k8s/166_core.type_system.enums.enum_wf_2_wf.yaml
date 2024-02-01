@@ -94,7 +94,7 @@ spec:
       kind: task
       name: enum_stringify
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.enums.enum_stringify" '
+      task: resource_type:TASK  name:"core.type_system.enums.enum_stringify"
     n1:
       id: n1
       inputBindings:
@@ -106,7 +106,7 @@ spec:
       kind: task
       name: string_to_enum
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.enums.string_to_enum" '
+      task: resource_type:TASK  name:"core.type_system.enums.string_to_enum"
     start-node:
       id: start-node
       kind: start
@@ -137,7 +137,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.type_system.enums.enum_stringify" ':
+  resource_type:TASK  name:"core.type_system.enums.enum_stringify":
     container:
       args:
       - pyflyte-execute
@@ -192,7 +192,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.enums.string_to_enum" ':
+  resource_type:TASK  name:"core.type_system.enums.string_to_enum":
     container:
       args:
       - pyflyte-execute

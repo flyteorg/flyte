@@ -82,7 +82,7 @@ spec:
       resources: {}
       retry:
         minAttempts: 4
-      task: 'resource_type:TASK name:"core.control_flow.checkpoint.use_checkpoint" '
+      task: resource_type:TASK  name:"core.control_flow.checkpoint.use_checkpoint"
     start-node:
       id: start-node
       kind: start
@@ -101,7 +101,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.checkpoint.use_checkpoint" ':
+  resource_type:TASK  name:"core.control_flow.checkpoint.use_checkpoint":
     container:
       args:
       - pyflyte-execute

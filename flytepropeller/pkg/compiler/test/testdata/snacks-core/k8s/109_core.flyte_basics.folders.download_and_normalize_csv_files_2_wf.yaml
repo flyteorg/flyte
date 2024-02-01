@@ -107,7 +107,7 @@ spec:
       kind: task
       name: download_files
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.folders.download_files" '
+      task: resource_type:TASK  name:"core.flyte_basics.folders.download_files"
     n1:
       id: n1
       inputBindings:
@@ -129,7 +129,7 @@ spec:
       kind: task
       name: normalize_all_files
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.folders.normalize_all_files" '
+      task: resource_type:TASK  name:"core.flyte_basics.folders.normalize_all_files"
     start-node:
       id: start-node
       kind: start
@@ -149,7 +149,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.folders.download_files" ':
+  resource_type:TASK  name:"core.flyte_basics.folders.download_files":
     container:
       args:
       - pyflyte-execute
@@ -202,7 +202,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.folders.normalize_all_files" ':
+  resource_type:TASK  name:"core.flyte_basics.folders.normalize_all_files":
     container:
       args:
       - pyflyte-execute

@@ -87,7 +87,7 @@ spec:
       kind: task
       name: uncached_data_reading_task
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.task_cache.uncached_data_reading_task" '
+      task: resource_type:TASK  name:"core.flyte_basics.task_cache.uncached_data_reading_task"
     n1:
       id: n1
       inputBindings:
@@ -99,7 +99,7 @@ spec:
       kind: task
       name: cached_data_processing_task
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.task_cache.cached_data_processing_task" '
+      task: resource_type:TASK  name:"core.flyte_basics.task_cache.cached_data_processing_task"
     n2:
       id: n2
       inputBindings:
@@ -111,7 +111,7 @@ spec:
       kind: task
       name: cached_data_processing_task
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.task_cache.cached_data_processing_task" '
+      task: resource_type:TASK  name:"core.flyte_basics.task_cache.cached_data_processing_task"
     n3:
       id: n3
       inputBindings:
@@ -128,7 +128,7 @@ spec:
       kind: task
       name: compare_dataframes
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.task_cache.compare_dataframes" '
+      task: resource_type:TASK  name:"core.flyte_basics.task_cache.compare_dataframes"
     start-node:
       id: start-node
       kind: start
@@ -137,7 +137,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.task_cache.cached_data_processing_task" ':
+  resource_type:TASK  name:"core.flyte_basics.task_cache.cached_data_processing_task":
     container:
       args:
       - pyflyte-execute
@@ -192,7 +192,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.task_cache.compare_dataframes" ':
+  resource_type:TASK  name:"core.flyte_basics.task_cache.compare_dataframes":
     container:
       args:
       - pyflyte-execute
@@ -244,7 +244,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.task_cache.uncached_data_reading_task" ':
+  resource_type:TASK  name:"core.flyte_basics.task_cache.uncached_data_reading_task":
     container:
       args:
       - pyflyte-execute

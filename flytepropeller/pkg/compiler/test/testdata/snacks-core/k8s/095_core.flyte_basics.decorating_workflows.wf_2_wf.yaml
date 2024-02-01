@@ -98,7 +98,7 @@ spec:
       kind: task
       name: setup
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.setup" '
+      task: resource_type:TASK  name:"core.flyte_basics.decorating_workflows.setup"
     n1:
       id: n1
       inputBindings:
@@ -110,7 +110,7 @@ spec:
       kind: task
       name: t1
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.t1" '
+      task: resource_type:TASK  name:"core.flyte_basics.decorating_workflows.t1"
     n2:
       id: n2
       inputBindings:
@@ -122,13 +122,13 @@ spec:
       kind: task
       name: t2
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.t2" '
+      task: resource_type:TASK  name:"core.flyte_basics.decorating_workflows.t2"
     n3:
       id: n3
       kind: task
       name: teardown
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.decorating_workflows.teardown" '
+      task: resource_type:TASK  name:"core.flyte_basics.decorating_workflows.teardown"
     start-node:
       id: start-node
       kind: start
@@ -147,7 +147,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.decorating_workflows.setup" ':
+  resource_type:TASK  name:"core.flyte_basics.decorating_workflows.setup":
     container:
       args:
       - pyflyte-execute
@@ -190,7 +190,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.decorating_workflows.t1" ':
+  resource_type:TASK  name:"core.flyte_basics.decorating_workflows.t1":
     container:
       args:
       - pyflyte-execute
@@ -241,7 +241,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.decorating_workflows.t2" ':
+  resource_type:TASK  name:"core.flyte_basics.decorating_workflows.t2":
     container:
       args:
       - pyflyte-execute
@@ -292,7 +292,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.flyte_basics.decorating_workflows.teardown" ':
+  resource_type:TASK  name:"core.flyte_basics.decorating_workflows.teardown":
     container:
       args:
       - pyflyte-execute

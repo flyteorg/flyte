@@ -116,7 +116,7 @@ spec:
       kind: task
       name: upload_result
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.custom_objects.upload_result" '
+      task: resource_type:TASK  name:"core.type_system.custom_objects.upload_result"
     n1:
       id: n1
       inputBindings:
@@ -128,7 +128,7 @@ spec:
       kind: task
       name: download_result
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.custom_objects.download_result" '
+      task: resource_type:TASK  name:"core.type_system.custom_objects.download_result"
     n2:
       id: n2
       inputBindings:
@@ -140,7 +140,7 @@ spec:
       kind: task
       name: stringify
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.custom_objects.stringify" '
+      task: resource_type:TASK  name:"core.type_system.custom_objects.stringify"
     n3:
       id: n3
       inputBindings:
@@ -152,7 +152,7 @@ spec:
       kind: task
       name: stringify
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.custom_objects.stringify" '
+      task: resource_type:TASK  name:"core.type_system.custom_objects.stringify"
     n4:
       id: n4
       inputBindings:
@@ -169,7 +169,7 @@ spec:
       kind: task
       name: add
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.custom_objects.add" '
+      task: resource_type:TASK  name:"core.type_system.custom_objects.add"
     start-node:
       id: start-node
       kind: start
@@ -196,7 +196,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.type_system.custom_objects.add" ':
+  resource_type:TASK  name:"core.type_system.custom_objects.add":
     container:
       args:
       - pyflyte-execute
@@ -250,7 +250,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.custom_objects.download_result" ':
+  resource_type:TASK  name:"core.type_system.custom_objects.download_result":
     container:
       args:
       - pyflyte-execute
@@ -297,7 +297,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.custom_objects.stringify" ':
+  resource_type:TASK  name:"core.type_system.custom_objects.stringify":
     container:
       args:
       - pyflyte-execute
@@ -348,7 +348,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.custom_objects.upload_result" ':
+  resource_type:TASK  name:"core.type_system.custom_objects.upload_result":
     container:
       args:
       - pyflyte-execute

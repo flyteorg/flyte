@@ -90,7 +90,7 @@ spec:
       resources: {}
       retry:
         minAttempts: 11
-      task: 'resource_type:TASK name:"my-objectstore-sensor" '
+      task: resource_type:TASK  name:"my-objectstore-sensor"
     n1:
       id: n1
       inputBindings:
@@ -102,7 +102,7 @@ spec:
       kind: task
       name: print_file
       resources: {}
-      task: 'resource_type:TASK name:"core.extend_flyte.custom_task_plugin.print_file" '
+      task: resource_type:TASK  name:"core.extend_flyte.custom_task_plugin.print_file"
     start-node:
       id: start-node
       kind: start
@@ -121,7 +121,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.extend_flyte.custom_task_plugin.print_file" ':
+  resource_type:TASK  name:"core.extend_flyte.custom_task_plugin.print_file":
     container:
       args:
       - pyflyte-execute
@@ -172,7 +172,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"my-objectstore-sensor" ':
+  resource_type:TASK  name:"my-objectstore-sensor":
     id:
       name: my-objectstore-sensor
       resourceType: TASK

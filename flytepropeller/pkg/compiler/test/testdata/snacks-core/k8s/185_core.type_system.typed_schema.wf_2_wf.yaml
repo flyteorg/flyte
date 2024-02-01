@@ -75,7 +75,7 @@ spec:
       kind: task
       name: t1
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.typed_schema.t1" '
+      task: resource_type:TASK  name:"core.type_system.typed_schema.t1"
     n1:
       id: n1
       inputBindings:
@@ -87,7 +87,7 @@ spec:
       kind: task
       name: t2
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.typed_schema.t2" '
+      task: resource_type:TASK  name:"core.type_system.typed_schema.t2"
     start-node:
       id: start-node
       kind: start
@@ -108,7 +108,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.type_system.typed_schema.t1" ':
+  resource_type:TASK  name:"core.type_system.typed_schema.t1":
     container:
       args:
       - pyflyte-execute
@@ -159,7 +159,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.typed_schema.t2" ':
+  resource_type:TASK  name:"core.type_system.typed_schema.t2":
     container:
       args:
       - pyflyte-execute

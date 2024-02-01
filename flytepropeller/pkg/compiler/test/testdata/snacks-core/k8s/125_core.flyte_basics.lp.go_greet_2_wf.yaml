@@ -98,7 +98,7 @@ spec:
       kind: task
       name: greet
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.lp.greet" '
+      task: resource_type:TASK  name:"core.flyte_basics.lp.greet"
     start-node:
       id: start-node
       kind: start
@@ -117,7 +117,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.lp.greet" ':
+  resource_type:TASK  name:"core.flyte_basics.lp.greet":
     container:
       args:
       - pyflyte-execute

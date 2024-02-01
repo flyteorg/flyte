@@ -75,13 +75,13 @@ func TestFileEvent(t *testing.T) {
 	assert.NoError(t, err)
 
 	expected := []string{
-		"[--WF EVENT--] project:\"FlyteTest\" domain:\"FlyteStaging\" name:\"Name\" , " +
+		"[--WF EVENT--] project:\"FlyteTest\"  domain:\"FlyteStaging\"  name:\"Name\", " +
 			"Phase: SUCCEEDED, OccuredAt: " + ptypes.TimestampString(now),
-		"[--NODE EVENT--] node_id:\"node1\" execution_id:<project:\"FlyteTest\" " +
-			"domain:\"FlyteStaging\" name:\"Name\" > , Phase: RUNNING, OccuredAt: " + ptypes.TimestampString(now),
-		"[--TASK EVENT--] resource_type:TASK project:\"FlyteTest\" domain:\"FlyteStaging\" " +
-			"name:\"Name\" ,node_id:\"node1\" execution_id:<project:\"FlyteTest\" domain:\"FlyteStaging\" " +
-			"name:\"Name\" > , Phase: FAILED, OccuredAt: " + ptypes.TimestampString(now),
+		"[--NODE EVENT--] node_id:\"node1\"  execution_id:{project:\"FlyteTest\" " +
+			" domain:\"FlyteStaging\"  name:\"Name\"}, Phase: RUNNING, OccuredAt: " + ptypes.TimestampString(now),
+		"[--TASK EVENT--] resource_type:TASK  project:\"FlyteTest\"  domain:\"FlyteStaging\" " +
+			" name:\"Name\",node_id:\"node1\"  execution_id:{project:\"FlyteTest\"  domain:\"FlyteStaging\" " +
+			" name:\"Name\"}, Phase: FAILED, OccuredAt: " + ptypes.TimestampString(now),
 	}
 
 	actual, err := readLinesFromFile(file)

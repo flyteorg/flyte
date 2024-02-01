@@ -92,7 +92,7 @@ spec:
       kind: task
       name: get_schema_df
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.structured_dataset.get_schema_df" '
+      task: resource_type:TASK  name:"core.type_system.structured_dataset.get_schema_df"
     n1:
       id: n1
       inputBindings:
@@ -104,7 +104,7 @@ spec:
       kind: task
       name: get_subset_df
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.structured_dataset.get_subset_df" '
+      task: resource_type:TASK  name:"core.type_system.structured_dataset.get_subset_df"
     n2:
       id: n2
       inputBindings:
@@ -116,7 +116,7 @@ spec:
       kind: task
       name: to_numpy
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.structured_dataset.to_numpy" '
+      task: resource_type:TASK  name:"core.type_system.structured_dataset.to_numpy"
     start-node:
       id: start-node
       kind: start
@@ -140,7 +140,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.type_system.structured_dataset.get_schema_df" ':
+  resource_type:TASK  name:"core.type_system.structured_dataset.get_schema_df":
     container:
       args:
       - pyflyte-execute
@@ -196,7 +196,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.structured_dataset.get_subset_df" ':
+  resource_type:TASK  name:"core.type_system.structured_dataset.get_subset_df":
     container:
       args:
       - pyflyte-execute
@@ -257,7 +257,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.structured_dataset.to_numpy" ':
+  resource_type:TASK  name:"core.type_system.structured_dataset.to_numpy":
     container:
       args:
       - pyflyte-execute

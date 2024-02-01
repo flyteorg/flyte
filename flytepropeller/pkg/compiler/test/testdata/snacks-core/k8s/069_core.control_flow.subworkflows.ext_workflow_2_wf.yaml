@@ -80,7 +80,7 @@ spec:
       kind: task
       name: count_freq_words
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.subworkflows.count_freq_words" '
+      task: resource_type:TASK  name:"core.control_flow.subworkflows.count_freq_words"
     start-node:
       id: start-node
       kind: start
@@ -99,7 +99,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.subworkflows.count_freq_words" ':
+  resource_type:TASK  name:"core.control_flow.subworkflows.count_freq_words":
     container:
       args:
       - pyflyte-execute

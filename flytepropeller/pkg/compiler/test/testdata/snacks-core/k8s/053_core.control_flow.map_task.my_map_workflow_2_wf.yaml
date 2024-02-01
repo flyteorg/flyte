@@ -94,7 +94,7 @@ spec:
           memory: 300Mi
       retry:
         minAttempts: 2
-      task: 'resource_type:TASK name:"core.control_flow.map_task.mapper_a_mappable_task_0" '
+      task: resource_type:TASK  name:"core.control_flow.map_task.mapper_a_mappable_task_0"
     n1:
       id: n1
       inputBindings:
@@ -106,7 +106,7 @@ spec:
       kind: task
       name: coalesce
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.map_task.coalesce" '
+      task: resource_type:TASK  name:"core.control_flow.map_task.coalesce"
     start-node:
       id: start-node
       kind: start
@@ -125,7 +125,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.map_task.coalesce" ':
+  resource_type:TASK  name:"core.control_flow.map_task.coalesce":
     container:
       args:
       - pyflyte-execute
@@ -177,7 +177,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.control_flow.map_task.mapper_a_mappable_task_0" ':
+  resource_type:TASK  name:"core.control_flow.map_task.mapper_a_mappable_task_0":
     container:
       args:
       - pyflyte-map-execute

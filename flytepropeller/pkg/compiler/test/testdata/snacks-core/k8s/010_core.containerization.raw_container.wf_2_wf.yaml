@@ -125,7 +125,7 @@ spec:
       kind: task
       name: ellipse-area-metadata-shell
       resources: {}
-      task: 'resource_type:TASK name:"ellipse-area-metadata-shell" '
+      task: resource_type:TASK  name:"ellipse-area-metadata-shell"
     n1:
       id: n1
       inputBindings:
@@ -142,7 +142,7 @@ spec:
       kind: task
       name: ellipse-area-metadata-python
       resources: {}
-      task: 'resource_type:TASK name:"ellipse-area-metadata-python" '
+      task: resource_type:TASK  name:"ellipse-area-metadata-python"
     n2:
       id: n2
       inputBindings:
@@ -159,7 +159,7 @@ spec:
       kind: task
       name: ellipse-area-metadata-r
       resources: {}
-      task: 'resource_type:TASK name:"ellipse-area-metadata-r" '
+      task: resource_type:TASK  name:"ellipse-area-metadata-r"
     n3:
       id: n3
       inputBindings:
@@ -176,7 +176,7 @@ spec:
       kind: task
       name: ellipse-area-metadata-haskell
       resources: {}
-      task: 'resource_type:TASK name:"ellipse-area-metadata-haskell" '
+      task: resource_type:TASK  name:"ellipse-area-metadata-haskell"
     n4:
       id: n4
       inputBindings:
@@ -193,7 +193,7 @@ spec:
       kind: task
       name: ellipse-area-metadata-julia
       resources: {}
-      task: 'resource_type:TASK name:"ellipse-area-metadata-julia" '
+      task: resource_type:TASK  name:"ellipse-area-metadata-julia"
     n5:
       id: n5
       inputBindings:
@@ -250,7 +250,7 @@ spec:
       kind: task
       name: report_all_calculated_areas
       resources: {}
-      task: 'resource_type:TASK name:"core.containerization.raw_container.report_all_calculated_areas" '
+      task: resource_type:TASK  name:"core.containerization.raw_container.report_all_calculated_areas"
     start-node:
       id: start-node
       kind: start
@@ -259,7 +259,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.containerization.raw_container.report_all_calculated_areas" ':
+  resource_type:TASK  name:"core.containerization.raw_container.report_all_calculated_areas":
     container:
       args:
       - pyflyte-execute
@@ -333,7 +333,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"ellipse-area-metadata-haskell" ':
+  resource_type:TASK  name:"ellipse-area-metadata-haskell":
     container:
       command:
       - ./calculate-ellipse-area
@@ -379,7 +379,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: raw-container
-  'resource_type:TASK name:"ellipse-area-metadata-julia" ':
+  resource_type:TASK  name:"ellipse-area-metadata-julia":
     container:
       command:
       - julia
@@ -426,7 +426,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: raw-container
-  'resource_type:TASK name:"ellipse-area-metadata-python" ':
+  resource_type:TASK  name:"ellipse-area-metadata-python":
     container:
       command:
       - python
@@ -473,7 +473,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: raw-container
-  'resource_type:TASK name:"ellipse-area-metadata-r" ':
+  resource_type:TASK  name:"ellipse-area-metadata-r":
     container:
       command:
       - Rscript
@@ -521,7 +521,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: raw-container
-  'resource_type:TASK name:"ellipse-area-metadata-shell" ':
+  resource_type:TASK  name:"ellipse-area-metadata-shell":
     container:
       command:
       - ./calculate-ellipse-area.sh

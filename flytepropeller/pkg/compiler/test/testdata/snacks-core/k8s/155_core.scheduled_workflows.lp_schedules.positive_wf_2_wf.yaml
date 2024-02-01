@@ -74,7 +74,7 @@ spec:
       kind: task
       name: be_positive
       resources: {}
-      task: 'resource_type:TASK name:"core.scheduled_workflows.lp_schedules.be_positive" '
+      task: resource_type:TASK  name:"core.scheduled_workflows.lp_schedules.be_positive"
     start-node:
       id: start-node
       kind: start
@@ -83,7 +83,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.scheduled_workflows.lp_schedules.be_positive" ':
+  resource_type:TASK  name:"core.scheduled_workflows.lp_schedules.be_positive":
     container:
       args:
       - pyflyte-execute

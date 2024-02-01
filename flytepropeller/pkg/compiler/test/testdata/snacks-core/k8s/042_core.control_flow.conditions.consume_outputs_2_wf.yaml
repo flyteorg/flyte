@@ -100,7 +100,7 @@ spec:
       kind: task
       name: coin_toss
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.coin_toss" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.coin_toss"
     n1:
       branch:
         else: n1-n1
@@ -134,7 +134,7 @@ spec:
       kind: task
       name: square
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.square" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.square"
     n1-n1:
       id: n1-n1
       inputBindings:
@@ -151,7 +151,7 @@ spec:
       kind: task
       name: calc_sum
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.calc_sum" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.calc_sum"
     n2:
       id: n2
       inputBindings:
@@ -163,7 +163,7 @@ spec:
       kind: task
       name: double
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.conditions.double" '
+      task: resource_type:TASK  name:"core.control_flow.conditions.double"
     start-node:
       id: start-node
       kind: start
@@ -182,7 +182,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.conditions.calc_sum" ':
+  resource_type:TASK  name:"core.control_flow.conditions.calc_sum":
     container:
       args:
       - pyflyte-execute
@@ -236,7 +236,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.control_flow.conditions.coin_toss" ':
+  resource_type:TASK  name:"core.control_flow.conditions.coin_toss":
     container:
       args:
       - pyflyte-execute
@@ -287,7 +287,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.control_flow.conditions.double" ':
+  resource_type:TASK  name:"core.control_flow.conditions.double":
     container:
       args:
       - pyflyte-execute
@@ -338,7 +338,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.control_flow.conditions.square" ':
+  resource_type:TASK  name:"core.control_flow.conditions.square":
     container:
       args:
       - pyflyte-execute

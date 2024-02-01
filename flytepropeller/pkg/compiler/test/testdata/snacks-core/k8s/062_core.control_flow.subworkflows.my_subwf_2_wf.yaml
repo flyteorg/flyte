@@ -94,7 +94,7 @@ spec:
       kind: task
       name: t1
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.subworkflows.t1" '
+      task: resource_type:TASK  name:"core.control_flow.subworkflows.t1"
     n1:
       id: n1
       inputBindings:
@@ -106,7 +106,7 @@ spec:
       kind: task
       name: t1
       resources: {}
-      task: 'resource_type:TASK name:"core.control_flow.subworkflows.t1" '
+      task: resource_type:TASK  name:"core.control_flow.subworkflows.t1"
     start-node:
       id: start-node
       kind: start
@@ -133,7 +133,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.control_flow.subworkflows.t1" ':
+  resource_type:TASK  name:"core.control_flow.subworkflows.t1":
     container:
       args:
       - pyflyte-execute

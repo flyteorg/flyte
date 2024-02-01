@@ -86,7 +86,7 @@ spec:
       kind: task
       name: get_df
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.schema.get_df" '
+      task: resource_type:TASK  name:"core.type_system.schema.get_df"
     n1:
       id: n1
       inputBindings:
@@ -98,7 +98,7 @@ spec:
       kind: task
       name: add_df
       resources: {}
-      task: 'resource_type:TASK name:"core.type_system.schema.add_df" '
+      task: resource_type:TASK  name:"core.type_system.schema.add_df"
     start-node:
       id: start-node
       kind: start
@@ -118,7 +118,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.type_system.schema.add_df" ':
+  resource_type:TASK  name:"core.type_system.schema.add_df":
     container:
       args:
       - pyflyte-execute
@@ -171,7 +171,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.type_system.schema.get_df" ':
+  resource_type:TASK  name:"core.type_system.schema.get_df":
     container:
       args:
       - pyflyte-execute

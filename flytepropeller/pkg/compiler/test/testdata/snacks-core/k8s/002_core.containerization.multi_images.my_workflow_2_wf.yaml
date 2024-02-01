@@ -75,7 +75,7 @@ spec:
       kind: task
       name: svm_trainer
       resources: {}
-      task: 'resource_type:TASK name:"core.containerization.multi_images.svm_trainer" '
+      task: resource_type:TASK  name:"core.containerization.multi_images.svm_trainer"
     n1:
       id: n1
       inputBindings:
@@ -102,7 +102,7 @@ spec:
       kind: task
       name: svm_predictor
       resources: {}
-      task: 'resource_type:TASK name:"core.containerization.multi_images.svm_predictor" '
+      task: resource_type:TASK  name:"core.containerization.multi_images.svm_predictor"
     start-node:
       id: start-node
       kind: start
@@ -121,7 +121,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.containerization.multi_images.svm_predictor" ':
+  resource_type:TASK  name:"core.containerization.multi_images.svm_predictor":
     container:
       args:
       - pyflyte-execute
@@ -185,7 +185,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.containerization.multi_images.svm_trainer" ':
+  resource_type:TASK  name:"core.containerization.multi_images.svm_trainer":
     container:
       args:
       - pyflyte-execute

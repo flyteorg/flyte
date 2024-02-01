@@ -90,7 +90,7 @@ spec:
       kind: task
       name: add_data
       resources: {}
-      task: 'resource_type:TASK name:"core.flyte_basics.documented_workflow.add_data" '
+      task: resource_type:TASK  name:"core.flyte_basics.documented_workflow.add_data"
     start-node:
       id: start-node
       kind: start
@@ -110,7 +110,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.flyte_basics.documented_workflow.add_data" ':
+  resource_type:TASK  name:"core.flyte_basics.documented_workflow.add_data":
     container:
       args:
       - pyflyte-execute

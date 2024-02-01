@@ -75,7 +75,7 @@ spec:
       kind: task
       name: generate
       resources: {}
-      task: 'resource_type:TASK name:"core.extend_flyte.custom_types.generate" '
+      task: resource_type:TASK  name:"core.extend_flyte.custom_types.generate"
     n1:
       id: n1
       inputBindings:
@@ -87,7 +87,7 @@ spec:
       kind: task
       name: consume
       resources: {}
-      task: 'resource_type:TASK name:"core.extend_flyte.custom_types.consume" '
+      task: resource_type:TASK  name:"core.extend_flyte.custom_types.consume"
     start-node:
       id: start-node
       kind: start
@@ -106,7 +106,7 @@ spec:
 status:
   phase: 0
 tasks:
-  'resource_type:TASK name:"core.extend_flyte.custom_types.consume" ':
+  resource_type:TASK  name:"core.extend_flyte.custom_types.consume":
     container:
       args:
       - pyflyte-execute
@@ -159,7 +159,7 @@ tasks:
         type: FLYTE_SDK
         version: 0.32.6
     type: python-task
-  'resource_type:TASK name:"core.extend_flyte.custom_types.generate" ':
+  resource_type:TASK  name:"core.extend_flyte.custom_types.generate":
     container:
       args:
       - pyflyte-execute
