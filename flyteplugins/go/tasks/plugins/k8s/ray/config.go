@@ -22,6 +22,7 @@ var (
 		IncludeDashboard:         true,
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
+		KubeRayCrdVersion:        "v1alpha1",
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
@@ -77,6 +78,9 @@ type Config struct {
 
 	// DeprecatedNodeIPAddress the IP address of the head node. By default, this is pod ip address.
 	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
+
+	// The KubeRay CRD version to use. By default, this will use v1alpha.
+	KubeRayCrdVersion string
 
 	// Remote Ray Cluster Config
 	RemoteClusterConfig  pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
