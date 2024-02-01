@@ -30,7 +30,7 @@ func TestCreateProject(t *testing.T) {
 		},
 	})
 	assert.EqualError(t, err, "rpc error: code = NotFound desc = missing entity of type TASK"+
-		" with identifier project:\"potato\" domain:\"development\" name:\"task\" version:\"1234\" ")
+		" with identifier project:\"potato\"  domain:\"development\"  name:\"task\"  version:\"1234\" ")
 	assert.Empty(t, task)
 
 	req := admin.ProjectRegisterRequest{
