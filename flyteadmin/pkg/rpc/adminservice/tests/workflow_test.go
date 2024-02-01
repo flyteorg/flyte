@@ -60,5 +60,5 @@ func TestCreateWorkflowError(t *testing.T) {
 	})
 	assert.Nil(t, resp)
 	assert.EqualError(t, err, "missing entity of type WORKFLOW with "+
-		"identifier resource_type:WORKFLOW project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\" ")
+		"identifier resource_type:WORKFLOW project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\"")
 }

@@ -66,7 +66,7 @@ func TestTaskError(t *testing.T) {
 	assert.Nil(t, resp)
 
 	assert.EqualError(t, err, "missing entity of type TASK with "+
-		"identifier project:\"project\" domain:\"staging\" name:\"name\" version:\"version\" ")
+		"identifier project:\"project\" domain:\"staging\" name:\"name\" version:\"version\"")
 }
 
 func TestListUniqueTaskIds(t *testing.T) {

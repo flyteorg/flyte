@@ -79,8 +79,8 @@ func TestCreateExecutionError(t *testing.T) {
 		Name:    "Name",
 	})
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "missing entity of type execution with "+
-		"identifier project:\"Project\" domain:\"Domain\" name:\"Name\" ")
+	assert.EqualError(t, err,
+		`missing entity of type execution with identifier project:"Project" domain:"Domain" name:"Name"`)
 }
 
 func TestRelaunchExecutionHappyCase(t *testing.T) {

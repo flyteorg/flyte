@@ -57,7 +57,7 @@ func TestGetTask(t *testing.T) {
 		Version: version,
 	})
 	assert.Empty(t, output)
-	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" ")
+	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\"")
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true

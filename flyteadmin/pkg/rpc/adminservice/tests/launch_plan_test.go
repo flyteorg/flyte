@@ -64,7 +64,7 @@ func TestCreateLaunchPlanError(t *testing.T) {
 	})
 	assert.Nil(t, resp)
 	assert.EqualError(t, err, "missing entity of type LAUNCH_PLAN with "+
-		"identifier resource_type:LAUNCH_PLAN project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\" ")
+		"identifier resource_type:LAUNCH_PLAN project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\"")
 }
 
 func TestGetActiveLaunchPlan(t *testing.T) {

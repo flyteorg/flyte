@@ -338,7 +338,7 @@ func TestAbort_MiscError(t *testing.T) {
 		ExecutionID: execID,
 		Cluster:     clusterID,
 	})
-	assert.EqualError(t, err, "failed to terminate execution: project:\"proj\" domain:\"domain\" name:\"name\"  with err call failed")
+	assert.EqualError(t, err, "failed to terminate execution: project:\"proj\" domain:\"domain\" name:\"name\" with err call failed")
 }
 
 func TestExecute_OffloadWorkflowClosure(t *testing.T) {
