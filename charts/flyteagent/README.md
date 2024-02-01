@@ -20,10 +20,12 @@ A Helm chart for Flyte agent
 | fullnameOverride | string | `""` |  |
 | image.pullPolicy | string | `"IfNotPresent"` | Docker image pull policy |
 | image.repository | string | `"ghcr.io/flyteorg/flyteagent"` | Docker image for flyteagent deployment |
-| image.tag | string | `"1.10.2"` | Docker image tag |
+| image.tag | string | `"1.10.3"` | Docker image tag |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` | nodeSelector for flyteagent deployment |
 | podAnnotations | object | `{}` | Annotations for flyteagent pods |
+| podEnv | object | `{}` | Additional flyteagent pod container environment variables |
+| podLabels | object | `{}` | Labels for flyteagent pods |
 | ports.containerPort | int | `8000` |  |
 | ports.name | string | `"agent-grpc"` |  |
 | priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |

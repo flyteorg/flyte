@@ -19,6 +19,7 @@
     "/api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "description": "Retrieve the active launch plan version specified by input request filters.",
         "operationId": "AdminService_GetActiveLaunchPlan2",
         "responses": {
           "200": {
@@ -72,6 +73,7 @@
     "/api/v1/active_launch_plans/org/{org}/{project}/{domain}": {
       "get": {
         "summary": "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "description": "Fetch the active launch plan versions specified by input request filters.",
         "operationId": "AdminService_ListActiveLaunchPlans2",
         "responses": {
           "200": {
@@ -152,6 +154,7 @@
     "/api/v1/active_launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "description": "Retrieve the active launch plan version specified by input request filters.",
         "operationId": "AdminService_GetActiveLaunchPlan",
         "responses": {
           "200": {
@@ -205,6 +208,7 @@
     "/api/v1/active_launch_plans/{project}/{domain}": {
       "get": {
         "summary": "List active versions of :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "description": "Fetch the active launch plan versions specified by input request filters.",
         "operationId": "AdminService_ListActiveLaunchPlans",
         "responses": {
           "200": {
@@ -282,7 +286,7 @@
         ]
       }
     },
-    "/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
+    "/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NodeExecution` launched by the reference :ref:`ref_flyteidl.admin.TaskExecution`.",
         "operationId": "AdminService_ListNodeExecutionsForTask2",
@@ -702,65 +706,6 @@
         ]
       }
     },
-    "/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
-      "get": {
-        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
-        "operationId": "AdminService_GetNodeExecutionData2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminNodeExecutionGetDataResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.execution_id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.execution_id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.execution_id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.execution_id.name",
-            "description": "User or system provided value for the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.node_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/data/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
@@ -820,9 +765,69 @@
         ]
       }
     },
-    "/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
+    "/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}": {
+      "get": {
+        "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.NodeExecution`.",
+        "operationId": "AdminService_GetNodeExecutionData2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminNodeExecutionGetDataResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.execution_id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.execution_id.name",
+            "description": "User or system provided value for the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.node_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "description": "Retrieve input and output data from an existing task execution.",
         "operationId": "AdminService_GetTaskExecutionData2",
         "responses": {
           "200": {
@@ -939,6 +944,7 @@
     "/api/v1/data/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "description": "Retrieve input and output data from an existing task execution.",
         "operationId": "AdminService_GetTaskExecutionData",
         "responses": {
           "200": {
@@ -1055,6 +1061,7 @@
     "/api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
+        "description": "Retrieve an existing description entity description.",
         "operationId": "AdminService_GetDescriptionEntity2",
         "responses": {
           "200": {
@@ -1126,9 +1133,228 @@
         ]
       }
     },
+    "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "description": "Fetch existing description entity definitions matching input filters.",
+        "operationId": "AdminService_ListDescriptionEntities4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntityList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "description": "Fetch existing description entity definitions matching input filters.",
+        "operationId": "AdminService_ListDescriptionEntities2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminDescriptionEntityList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "resource_type",
+            "description": "Identifies the specific type of resource that this identifier corresponds to.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "UNSPECIFIED",
+              "TASK",
+              "WORKFLOW",
+              "LAUNCH_PLAN",
+              "DATASET"
+            ]
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/description_entities/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.DescriptionEntity` object.",
+        "description": "Retrieve an existing description entity description.",
         "operationId": "AdminService_GetDescriptionEntity",
         "responses": {
           "200": {
@@ -1200,225 +1426,10 @@
         ]
       }
     },
-    "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
-        "operationId": "AdminService_ListDescriptionEntities4",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminDescriptionEntityList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "resource_type",
-            "description": "Identifies the specific type of resource that this identifier corresponds to.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "UNSPECIFIED",
-              "TASK",
-              "WORKFLOW",
-              "LAUNCH_PLAN",
-              "DATASET"
-            ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
-        "operationId": "AdminService_ListDescriptionEntities2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminDescriptionEntityList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "resource_type",
-            "description": "Identifies the specific type of resource that this identifier corresponds to.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "enum": [
-              "UNSPECIFIED",
-              "TASK",
-              "WORKFLOW",
-              "LAUNCH_PLAN",
-              "DATASET"
-            ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "description": "Fetch existing description entity definitions matching input filters.",
         "operationId": "AdminService_ListDescriptionEntities3",
         "responses": {
           "200": {
@@ -1527,6 +1538,7 @@
     "/api/v1/description_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.DescriptionEntity` definitions.",
+        "description": "Fetch existing description entity definitions matching input filters.",
         "operationId": "AdminService_ListDescriptionEntities",
         "responses": {
           "200": {
@@ -1635,6 +1647,7 @@
     "/api/v1/events/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
+        "description": "Create a node execution event recording a phase transition.",
         "operationId": "AdminService_CreateNodeEvent",
         "responses": {
           "200": {
@@ -1669,6 +1682,7 @@
     "/api/v1/events/org/{event.execution_id.org}/workflows": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
+        "description": "Create a workflow execution event recording a phase transition.",
         "operationId": "AdminService_CreateWorkflowEvent2",
         "responses": {
           "200": {
@@ -1709,6 +1723,7 @@
     "/api/v1/events/org/{event.id.execution_id.org}/nodes": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.NodeExecutionEvent` has occurred.",
+        "description": "Create a node execution event recording a phase transition.",
         "operationId": "AdminService_CreateNodeEvent2",
         "responses": {
           "200": {
@@ -1749,6 +1764,7 @@
     "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.",
+        "description": "Create a task execution event recording a phase transition.",
         "operationId": "AdminService_CreateTaskEvent2",
         "responses": {
           "200": {
@@ -1789,6 +1805,7 @@
     "/api/v1/events/tasks": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.TaskExecutionEvent` has occurred.",
+        "description": "Create a task execution event recording a phase transition.",
         "operationId": "AdminService_CreateTaskEvent",
         "responses": {
           "200": {
@@ -1823,6 +1840,7 @@
     "/api/v1/events/workflows": {
       "post": {
         "summary": "Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.",
+        "description": "Create a workflow execution event recording a phase transition.",
         "operationId": "AdminService_CreateWorkflowEvent",
         "responses": {
           "200": {
@@ -1857,6 +1875,7 @@
     "/api/v1/executions": {
       "post": {
         "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`",
+        "description": "Create a workflow execution.",
         "operationId": "AdminService_CreateExecution",
         "responses": {
           "200": {
@@ -1891,6 +1910,7 @@
     "/api/v1/executions/org/{id.org}/recover": {
       "post": {
         "summary": "Recreates a previously-run workflow execution that will only start executing from the last known failure point.\nIn Recover mode, users cannot change any input parameters or update the version of the execution.\nThis is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,\ndownstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.\nSee :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.",
+        "description": "Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.",
         "operationId": "AdminService_RecoverExecution2",
         "responses": {
           "200": {
@@ -1931,6 +1951,7 @@
     "/api/v1/executions/org/{id.org}/relaunch": {
       "post": {
         "summary": "Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`",
+        "description": "Relaunch a workflow execution.",
         "operationId": "AdminService_RelaunchExecution2",
         "responses": {
           "200": {
@@ -2065,6 +2086,7 @@
     "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Execution`.",
+        "description": "Retrieve an existing workflow execution.",
         "operationId": "AdminService_GetExecution2",
         "responses": {
           "200": {
@@ -2236,6 +2258,7 @@
     "/api/v1/executions/org/{org}": {
       "put": {
         "summary": "Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`",
+        "description": "Create a workflow execution.",
         "operationId": "AdminService_CreateExecution2",
         "responses": {
           "200": {
@@ -2276,6 +2299,7 @@
     "/api/v1/executions/recover": {
       "post": {
         "summary": "Recreates a previously-run workflow execution that will only start executing from the last known failure point.\nIn Recover mode, users cannot change any input parameters or update the version of the execution.\nThis is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures,\ndownstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.\nSee :ref:`ref_flyteidl.admin.ExecutionRecoverRequest` for more details.",
+        "description": "Recreates a previously-run workflow execution that will only start executing from the last known failure point. In Recover mode, users cannot change any input parameters or update the version of the execution. This is extremely useful to recover from system errors and byzantine faults like - Loss of K8s cluster, bugs in platform or instability, machine failures, downstream system failures (downstream services), or simply to recover executions that failed because of retry exhaustion and should complete if tried again.",
         "operationId": "AdminService_RecoverExecution",
         "responses": {
           "200": {
@@ -2310,6 +2334,7 @@
     "/api/v1/executions/relaunch": {
       "post": {
         "summary": "Triggers the creation of an identical :ref:`ref_flyteidl.admin.Execution`",
+        "description": "Relaunch a workflow execution.",
         "operationId": "AdminService_RelaunchExecution",
         "responses": {
           "200": {
@@ -2438,6 +2463,7 @@
     "/api/v1/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Execution`.",
+        "description": "Retrieve an existing workflow execution.",
         "operationId": "AdminService_GetExecution",
         "responses": {
           "200": {
@@ -2595,6 +2621,7 @@
     "/api/v1/launch_plan_ids/org/{org}/{project}/{domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.",
+        "description": "Fetch existing launch plan definition identifiers matching input filters.",
         "operationId": "AdminService_ListLaunchPlanIds2",
         "responses": {
           "200": {
@@ -2682,6 +2709,7 @@
     "/api/v1/launch_plan_ids/{project}/{domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.",
+        "description": "Fetch existing launch plan definition identifiers matching input filters.",
         "operationId": "AdminService_ListLaunchPlanIds",
         "responses": {
           "200": {
@@ -2769,6 +2797,7 @@
     "/api/v1/launch_plans": {
       "post": {
         "summary": "Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition",
+        "description": "Create and register a launch plan definition.",
         "operationId": "AdminService_CreateLaunchPlan",
         "responses": {
           "200": {
@@ -2776,6 +2805,14 @@
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanCreateResponse"
             }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response.",
@@ -2803,6 +2840,7 @@
     "/api/v1/launch_plans/org/{id.org}": {
       "post": {
         "summary": "Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition",
+        "description": "Create and register a launch plan definition.",
         "operationId": "AdminService_CreateLaunchPlan2",
         "responses": {
           "200": {
@@ -2810,6 +2848,14 @@
             "schema": {
               "$ref": "#/definitions/adminLaunchPlanCreateResponse"
             }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response.",
@@ -2843,6 +2889,7 @@
     "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans4",
         "responses": {
           "200": {
@@ -2937,6 +2984,7 @@
     "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans2",
         "responses": {
           "200": {
@@ -3031,6 +3079,7 @@
     "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.",
+        "description": "Retrieve an existing launch plan definition.",
         "operationId": "AdminService_GetLaunchPlan2",
         "responses": {
           "200": {
@@ -3104,6 +3153,7 @@
       },
       "put": {
         "summary": "Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "description": "Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.",
         "operationId": "AdminService_UpdateLaunchPlan2",
         "responses": {
           "200": {
@@ -3191,6 +3241,7 @@
     "/api/v1/launch_plans/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans3",
         "responses": {
           "200": {
@@ -3285,6 +3336,7 @@
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans",
         "responses": {
           "200": {
@@ -3379,6 +3431,7 @@
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.",
+        "description": "Retrieve an existing launch plan definition.",
         "operationId": "AdminService_GetLaunchPlan",
         "responses": {
           "200": {
@@ -3452,6 +3505,7 @@
       },
       "put": {
         "summary": "Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.",
+        "description": "Update the status of an existing launch plan definition. At most one launch plan version for a given {project, domain, name} can be active at a time. If this call sets a launch plan to active and existing version is already active, the result of this call will be that the formerly active launch plan will be made inactive and specified launch plan in this request will be made active. In the event that the formerly active launch plan had a schedule associated it with it, this schedule will be disabled. If the reference launch plan in this request is being set to active and has a schedule associated with it, the schedule will be enabled.",
         "operationId": "AdminService_UpdateLaunchPlan",
         "responses": {
           "200": {
@@ -3513,6 +3567,7 @@
     "/api/v1/matchable_attributes": {
       "get": {
         "summary": "Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.",
+        "description": "Retrieve a list of MatchableAttributesConfiguration objects.",
         "operationId": "AdminService_ListMatchableAttributes",
         "responses": {
           "200": {
@@ -3563,6 +3618,7 @@
     "/api/v1/matchable_attributes/org/{org}": {
       "get": {
         "summary": "Lists custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a specific resource type.",
+        "description": "Retrieve a list of MatchableAttributesConfiguration objects.",
         "operationId": "AdminService_ListMatchableAttributes2",
         "responses": {
           "200": {
@@ -3613,6 +3669,7 @@
     "/api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.",
+        "description": "Retrieve metrics from an existing workflow execution.",
         "operationId": "AdminService_GetExecutionMetrics2",
         "responses": {
           "200": {
@@ -3674,6 +3731,7 @@
     "/api/v1/metrics/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.",
+        "description": "Retrieve metrics from an existing workflow execution.",
         "operationId": "AdminService_GetExecutionMetrics",
         "responses": {
           "200": {
@@ -3732,9 +3790,10 @@
         ]
       }
     },
-    "/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+    "/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
+        "description": "Retrieve a NamedEntity object.",
         "operationId": "AdminService_GetNamedEntity2",
         "responses": {
           "200": {
@@ -3752,6 +3811,13 @@
         },
         "parameters": [
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Resource type of the metadata to get. One of Task, Workflow or LaunchPlan.\n+required",
             "in": "path",
@@ -3764,13 +3830,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "id.project",
@@ -3800,6 +3859,7 @@
       },
       "put": {
         "summary": "Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.",
+        "description": "Update the fields associated with a NamedEntity",
         "operationId": "AdminService_UpdateNamedEntity2",
         "responses": {
           "200": {
@@ -3817,6 +3877,13 @@
         },
         "parameters": [
           {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Resource type of the metadata to update\n+required",
             "in": "path",
@@ -3829,13 +3896,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "id.project",
@@ -3872,9 +3932,10 @@
         ]
       }
     },
-    "/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}": {
+    "/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}": {
       "get": {
         "summary": "Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.",
+        "description": "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.",
         "operationId": "AdminService_ListNamedEntities2",
         "responses": {
           "200": {
@@ -3892,6 +3953,13 @@
         },
         "parameters": [
           {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
             "name": "resource_type",
             "description": "Resource type of the metadata to query. One of Task, Workflow or LaunchPlan.\n+required",
             "in": "path",
@@ -3904,13 +3972,6 @@
               "LAUNCH_PLAN",
               "DATASET"
             ]
-          },
-          {
-            "name": "org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
           },
           {
             "name": "project",
@@ -3976,6 +4037,7 @@
     "/api/v1/named_entities/{resource_type}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Returns a :ref:`ref_flyteidl.admin.NamedEntity` object.",
+        "description": "Retrieve a NamedEntity object.",
         "operationId": "AdminService_GetNamedEntity",
         "responses": {
           "200": {
@@ -4041,6 +4103,7 @@
       },
       "put": {
         "summary": "Updates a :ref:`ref_flyteidl.admin.NamedEntity` object.",
+        "description": "Update the fields associated with a NamedEntity",
         "operationId": "AdminService_UpdateNamedEntity",
         "responses": {
           "200": {
@@ -4109,6 +4172,7 @@
     "/api/v1/named_entities/{resource_type}/{project}/{domain}": {
       "get": {
         "summary": "Returns a list of :ref:`ref_flyteidl.admin.NamedEntity` objects.",
+        "description": "Retrieve a list of NamedEntity objects sharing a common resource type, project, and domain.",
         "operationId": "AdminService_ListNamedEntities",
         "responses": {
           "200": {
@@ -4646,6 +4710,7 @@
     "/api/v1/project_attributes/{attributes.project}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level",
+        "description": "Update the customized resource attributes associated with a project",
         "operationId": "AdminService_UpdateProjectAttributes",
         "responses": {
           "200": {
@@ -4686,6 +4751,7 @@
     "/api/v1/project_attributes/{project}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Retrieve the customized resource attributes associated with a project",
         "operationId": "AdminService_GetProjectAttributes",
         "responses": {
           "200": {
@@ -4741,6 +4807,7 @@
       },
       "delete": {
         "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Delete the customized resource attributes associated with a project",
         "operationId": "AdminService_DeleteProjectAttributes",
         "responses": {
           "200": {
@@ -4781,6 +4848,7 @@
     "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` at the project level",
+        "description": "Update the customized resource attributes associated with a project",
         "operationId": "AdminService_UpdateProjectAttributes2",
         "responses": {
           "200": {
@@ -4828,6 +4896,7 @@
     "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Update the customized resource attributes associated with a project-domain combination",
         "operationId": "AdminService_UpdateProjectDomainAttributes2",
         "responses": {
           "200": {
@@ -4882,6 +4951,7 @@
     "/api/v1/project_domain_attributes/org/{org}/{project}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Retrieve the customized resource attributes associated with a project",
         "operationId": "AdminService_GetProjectAttributes2",
         "responses": {
           "200": {
@@ -4937,6 +5007,7 @@
       },
       "delete": {
         "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Delete the customized resource attributes associated with a project",
         "operationId": "AdminService_DeleteProjectAttributes2",
         "responses": {
           "200": {
@@ -4984,6 +5055,7 @@
     "/api/v1/project_domain_attributes/org/{org}/{project}/{domain}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Retrieve the customized resource attributes associated with a project-domain combination",
         "operationId": "AdminService_GetProjectDomainAttributes2",
         "responses": {
           "200": {
@@ -5046,6 +5118,7 @@
       },
       "delete": {
         "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Delete the customized resource attributes associated with a project-domain combination",
         "operationId": "AdminService_DeleteProjectDomainAttributes2",
         "responses": {
           "200": {
@@ -5100,6 +5173,7 @@
     "/api/v1/project_domain_attributes/{attributes.project}/{attributes.domain}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Update the customized resource attributes associated with a project-domain combination",
         "operationId": "AdminService_UpdateProjectDomainAttributes",
         "responses": {
           "200": {
@@ -5147,6 +5221,7 @@
     "/api/v1/project_domain_attributes/{project}/{domain}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Retrieve the customized resource attributes associated with a project-domain combination",
         "operationId": "AdminService_GetProjectDomainAttributes",
         "responses": {
           "200": {
@@ -5209,6 +5284,7 @@
       },
       "delete": {
         "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.",
+        "description": "Delete the customized resource attributes associated with a project-domain combination",
         "operationId": "AdminService_DeleteProjectDomainAttributes",
         "responses": {
           "200": {
@@ -5256,6 +5332,7 @@
     "/api/v1/projects": {
       "get": {
         "summary": "Fetches a list of :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch registered projects.",
         "operationId": "AdminService_ListProjects",
         "responses": {
           "200": {
@@ -5360,6 +5437,7 @@
     "/api/v1/projects/org/{org}": {
       "get": {
         "summary": "Fetches a list of :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch registered projects.",
         "operationId": "AdminService_ListProjects2",
         "responses": {
           "200": {
@@ -5433,6 +5511,7 @@
     "/api/v1/projects/org/{org}/{id}": {
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
+        "description": "Update a project.",
         "operationId": "AdminService_UpdateProject2",
         "responses": {
           "200": {
@@ -5520,6 +5599,7 @@
     "/api/v1/projects/{id}": {
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
+        "description": "Update a project.",
         "operationId": "AdminService_UpdateProject",
         "responses": {
           "200": {
@@ -5560,6 +5640,7 @@
     "/api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "description": "Retrieve an existing task execution.",
         "operationId": "AdminService_GetTaskExecution2",
         "responses": {
           "200": {
@@ -5676,6 +5757,7 @@
     "/api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}": {
       "get": {
         "summary": "Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "description": "Fetch existing task executions matching input filters.",
         "operationId": "AdminService_ListTaskExecutions2",
         "responses": {
           "200": {
@@ -5776,6 +5858,7 @@
     "/api/v1/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "description": "Retrieve an existing task execution.",
         "operationId": "AdminService_GetTaskExecution",
         "responses": {
           "200": {
@@ -5892,6 +5975,7 @@
     "/api/v1/task_executions/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}": {
       "get": {
         "summary": "Fetches a list of :ref:`ref_flyteidl.admin.TaskExecution`.",
+        "description": "Fetch existing task executions matching input filters.",
         "operationId": "AdminService_ListTaskExecutions",
         "responses": {
           "200": {
@@ -5992,6 +6076,7 @@
     "/api/v1/task_ids/{project}/{domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.",
+        "description": "Fetch existing task definition identifiers matching input filters.",
         "operationId": "AdminService_ListTaskIds",
         "responses": {
           "200": {
@@ -6170,6 +6255,7 @@
     "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks4",
         "responses": {
           "200": {
@@ -6264,6 +6350,7 @@
     "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks2",
         "responses": {
           "200": {
@@ -6358,6 +6445,7 @@
     "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Task` definition.",
+        "description": "Retrieve an existing task definition.",
         "operationId": "AdminService_GetTask2",
         "responses": {
           "200": {
@@ -6433,6 +6521,7 @@
     "/api/v1/tasks/org/{org}/{project}/{domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.",
+        "description": "Fetch existing task definition identifiers matching input filters.",
         "operationId": "AdminService_ListTaskIds2",
         "responses": {
           "200": {
@@ -6520,6 +6609,7 @@
     "/api/v1/tasks/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks3",
         "responses": {
           "200": {
@@ -6614,6 +6704,7 @@
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks",
         "responses": {
           "200": {
@@ -6708,6 +6799,7 @@
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Task` definition.",
+        "description": "Retrieve an existing task definition.",
         "operationId": "AdminService_GetTask",
         "responses": {
           "200": {
@@ -6782,6 +6874,7 @@
     },
     "/api/v1/version": {
       "get": {
+        "description": "Retrieve the Version (including the Build  information) for FlyteAdmin service",
         "operationId": "AdminService_GetVersion",
         "responses": {
           "200": {
@@ -6805,6 +6898,7 @@
     "/api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "description": "Update the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "AdminService_UpdateWorkflowAttributes2",
         "responses": {
           "200": {
@@ -6866,6 +6960,7 @@
     "/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "description": "Retrieve the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "AdminService_GetWorkflowAttributes2",
         "responses": {
           "200": {
@@ -6935,6 +7030,7 @@
       },
       "delete": {
         "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "description": "Delete the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "AdminService_DeleteWorkflowAttributes2",
         "responses": {
           "200": {
@@ -6996,6 +7092,7 @@
     "/api/v1/workflow_attributes/{attributes.project}/{attributes.domain}/{attributes.workflow}": {
       "put": {
         "summary": "Creates or updates custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "description": "Update the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "AdminService_UpdateWorkflowAttributes",
         "responses": {
           "200": {
@@ -7050,6 +7147,7 @@
     "/api/v1/workflow_attributes/{project}/{domain}/{workflow}": {
       "get": {
         "summary": "Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "description": "Retrieve the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "AdminService_GetWorkflowAttributes",
         "responses": {
           "200": {
@@ -7119,6 +7217,7 @@
       },
       "delete": {
         "summary": "Deletes custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project, domain and workflow.",
+        "description": "Delete the customized resource attributes associated with a project, domain and workflow combination",
         "operationId": "AdminService_DeleteWorkflowAttributes",
         "responses": {
           "200": {
@@ -7260,6 +7359,7 @@
     "/api/v1/workflows": {
       "post": {
         "summary": "Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition",
+        "description": "Create and register a workflow definition.",
         "operationId": "AdminService_CreateWorkflow",
         "responses": {
           "200": {
@@ -7267,6 +7367,14 @@
             "schema": {
               "$ref": "#/definitions/adminWorkflowCreateResponse"
             }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response.",
@@ -7293,6 +7401,7 @@
     "/api/v1/workflows/org/{id.org}": {
       "post": {
         "summary": "Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition",
+        "description": "Create and register a workflow definition.",
         "operationId": "AdminService_CreateWorkflow2",
         "responses": {
           "200": {
@@ -7300,6 +7409,14 @@
             "schema": {
               "$ref": "#/definitions/adminWorkflowCreateResponse"
             }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response.",
@@ -7333,6 +7450,7 @@
     "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows4",
         "responses": {
           "200": {
@@ -7427,6 +7545,7 @@
     "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows2",
         "responses": {
           "200": {
@@ -7521,6 +7640,7 @@
     "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.",
+        "description": "Retrieve an existing workflow definition.",
         "operationId": "AdminService_GetWorkflow2",
         "responses": {
           "200": {
@@ -7683,6 +7803,7 @@
     "/api/v1/workflows/{id.project}/{id.domain}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows3",
         "responses": {
           "200": {
@@ -7777,6 +7898,7 @@
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows",
         "responses": {
           "200": {
@@ -7871,6 +7993,7 @@
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.",
+        "description": "Retrieve an existing workflow definition.",
         "operationId": "AdminService_GetWorkflow",
         "responses": {
           "200": {

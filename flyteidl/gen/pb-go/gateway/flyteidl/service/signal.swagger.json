@@ -19,6 +19,7 @@
     "/api/v1/signals": {
       "post": {
         "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
+        "description": "Set a signal value.",
         "operationId": "SignalService_SetSignal",
         "responses": {
           "200": {
@@ -26,6 +27,14 @@
             "schema": {
               "$ref": "#/definitions/adminSignalSetResponse"
             }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response.",
@@ -52,6 +61,7 @@
     "/api/v1/signals/org/{id.execution_id.org}": {
       "post": {
         "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
+        "description": "Set a signal value.",
         "operationId": "SignalService_SetSignal2",
         "responses": {
           "200": {
@@ -59,6 +69,14 @@
             "schema": {
               "$ref": "#/definitions/adminSignalSetResponse"
             }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
           },
           "default": {
             "description": "An unexpected error response.",
@@ -92,6 +110,7 @@
     "/api/v1/signals/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.",
+        "description": "Fetch existing signal definitions matching the input signal id filters.",
         "operationId": "SignalService_ListSignals2",
         "responses": {
           "200": {
@@ -186,6 +205,7 @@
     "/api/v1/signals/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.",
+        "description": "Fetch existing signal definitions matching the input signal id filters.",
         "operationId": "SignalService_ListSignals",
         "responses": {
           "200": {

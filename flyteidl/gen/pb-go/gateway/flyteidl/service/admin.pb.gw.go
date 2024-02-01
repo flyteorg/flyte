@@ -10745,7 +10745,7 @@ func local_request_AdminService_ListNamedEntities_0(ctx context.Context, marshal
 }
 
 var (
-	filter_AdminService_ListNamedEntities_1 = &utilities.DoubleArray{Encoding: map[string]int{"resource_type": 0, "resourceType": 1, "org": 2, "project": 3, "domain": 4}, Base: []int{1, 1, 2, 4, 6, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 3, 4, 4, 5, 5, 6, 6}}
+	filter_AdminService_ListNamedEntities_1 = &utilities.DoubleArray{Encoding: map[string]int{"org": 0, "resource_type": 1, "resourceType": 2, "project": 3, "domain": 4}, Base: []int{1, 2, 3, 4, 6, 8, 0, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 2, 3, 4, 5, 5, 6, 6}}
 )
 
 func request_AdminService_ListNamedEntities_1(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -10760,6 +10760,16 @@ func request_AdminService_ListNamedEntities_1(ctx context.Context, marshaler run
 		_   = err
 	)
 
+	val, ok = pathParams["org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
+	}
+
+	protoReq.Org, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -10771,16 +10781,6 @@ func request_AdminService_ListNamedEntities_1(ctx context.Context, marshaler run
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
-	}
-
-	protoReq.Org, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
-	}
 
 	val, ok = pathParams["project"]
 	if !ok {
@@ -10826,6 +10826,16 @@ func local_request_AdminService_ListNamedEntities_1(ctx context.Context, marshal
 		_   = err
 	)
 
+	val, ok = pathParams["org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
+	}
+
+	protoReq.Org, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -10837,16 +10847,6 @@ func local_request_AdminService_ListNamedEntities_1(ctx context.Context, marshal
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "org")
-	}
-
-	protoReq.Org, err = runtime.String(val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "org", err)
-	}
 
 	val, ok = pathParams["project"]
 	if !ok {
@@ -11017,7 +11017,7 @@ func local_request_AdminService_GetNamedEntity_0(ctx context.Context, marshaler 
 }
 
 var (
-	filter_AdminService_GetNamedEntity_1 = &utilities.DoubleArray{Encoding: map[string]int{"resource_type": 0, "resourceType": 1, "id": 2, "org": 3, "project": 4, "domain": 5, "name": 6}, Base: []int{1, 1, 2, 10, 11, 12, 13, 14, 0, 0, 4, 0, 6, 0, 8, 0, 10, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 11, 4, 13, 4, 15, 4, 17, 5, 6, 7, 8}}
+	filter_AdminService_GetNamedEntity_1 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "org": 1, "resource_type": 2, "resourceType": 3, "project": 4, "domain": 5, "name": 6}, Base: []int{1, 8, 9, 10, 11, 12, 13, 14, 2, 0, 4, 0, 6, 0, 8, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 1, 2, 9, 2, 11, 2, 13, 2, 15, 3, 4, 5, 6, 7, 8}}
 )
 
 func request_AdminService_GetNamedEntity_1(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -11032,6 +11032,16 @@ func request_AdminService_GetNamedEntity_1(ctx context.Context, marshaler runtim
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -11043,16 +11053,6 @@ func request_AdminService_GetNamedEntity_1(ctx context.Context, marshaler runtim
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -11108,6 +11108,16 @@ func local_request_AdminService_GetNamedEntity_1(ctx context.Context, marshaler 
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -11119,16 +11129,6 @@ func local_request_AdminService_GetNamedEntity_1(ctx context.Context, marshaler 
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -11326,6 +11326,16 @@ func request_AdminService_UpdateNamedEntity_1(ctx context.Context, marshaler run
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -11337,16 +11347,6 @@ func request_AdminService_UpdateNamedEntity_1(ctx context.Context, marshaler run
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -11403,6 +11403,16 @@ func local_request_AdminService_UpdateNamedEntity_1(ctx context.Context, marshal
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -11414,16 +11424,6 @@ func local_request_AdminService_UpdateNamedEntity_1(ctx context.Context, marshal
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -11967,7 +11967,7 @@ func local_request_AdminService_ListDescriptionEntities_0(ctx context.Context, m
 }
 
 var (
-	filter_AdminService_ListDescriptionEntities_1 = &utilities.DoubleArray{Encoding: map[string]int{"resource_type": 0, "resourceType": 1, "id": 2, "org": 3, "project": 4, "domain": 5, "name": 6}, Base: []int{1, 1, 2, 10, 11, 12, 13, 14, 0, 0, 4, 0, 6, 0, 8, 0, 10, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 1, 2, 3, 4, 11, 4, 13, 4, 15, 4, 17, 5, 6, 7, 8}}
+	filter_AdminService_ListDescriptionEntities_1 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "org": 1, "resource_type": 2, "resourceType": 3, "project": 4, "domain": 5, "name": 6}, Base: []int{1, 8, 9, 10, 11, 12, 13, 14, 2, 0, 4, 0, 6, 0, 8, 0, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 1, 2, 9, 2, 11, 2, 13, 2, 15, 3, 4, 5, 6, 7, 8}}
 )
 
 func request_AdminService_ListDescriptionEntities_1(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -11982,6 +11982,16 @@ func request_AdminService_ListDescriptionEntities_1(ctx context.Context, marshal
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -11993,16 +12003,6 @@ func request_AdminService_ListDescriptionEntities_1(ctx context.Context, marshal
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -12058,6 +12058,16 @@ func local_request_AdminService_ListDescriptionEntities_1(ctx context.Context, m
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -12069,16 +12079,6 @@ func local_request_AdminService_ListDescriptionEntities_1(ctx context.Context, m
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -12239,7 +12239,7 @@ func local_request_AdminService_ListDescriptionEntities_2(ctx context.Context, m
 }
 
 var (
-	filter_AdminService_ListDescriptionEntities_3 = &utilities.DoubleArray{Encoding: map[string]int{"resource_type": 0, "resourceType": 1, "id": 2, "org": 3, "project": 4, "domain": 5}, Base: []int{1, 1, 2, 8, 9, 10, 11, 0, 0, 4, 0, 6, 0, 8, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 2, 3, 4, 10, 4, 12, 4, 14, 5, 6, 7}}
+	filter_AdminService_ListDescriptionEntities_3 = &utilities.DoubleArray{Encoding: map[string]int{"id": 0, "org": 1, "resource_type": 2, "resourceType": 3, "project": 4, "domain": 5}, Base: []int{1, 6, 7, 8, 9, 10, 11, 2, 0, 4, 0, 6, 0, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 1, 2, 8, 2, 10, 2, 12, 3, 4, 5, 6, 7}}
 )
 
 func request_AdminService_ListDescriptionEntities_3(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -12254,6 +12254,16 @@ func request_AdminService_ListDescriptionEntities_3(ctx context.Context, marshal
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -12265,16 +12275,6 @@ func request_AdminService_ListDescriptionEntities_3(ctx context.Context, marshal
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -12320,6 +12320,16 @@ func local_request_AdminService_ListDescriptionEntities_3(ctx context.Context, m
 		_   = err
 	)
 
+	val, ok = pathParams["id.org"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
+	}
+
+	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
+	}
+
 	val, ok = pathParams["resource_type"]
 	if !ok {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "resource_type")
@@ -12331,16 +12341,6 @@ func local_request_AdminService_ListDescriptionEntities_3(ctx context.Context, m
 	}
 
 	protoReq.ResourceType = extCore.ResourceType(e)
-
-	val, ok = pathParams["id.org"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id.org")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "id.org", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id.org", err)
-	}
 
 	val, ok = pathParams["id.project"]
 	if !ok {
@@ -14103,7 +14103,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNodeExecutionsForTask", runtime.WithHTTPPathPattern("/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNodeExecutionsForTask", runtime.WithHTTPPathPattern("/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -14153,7 +14153,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNodeExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNodeExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -14603,7 +14603,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -15153,7 +15153,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNamedEntities", runtime.WithHTTPPathPattern("/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNamedEntities", runtime.WithHTTPPathPattern("/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -15203,7 +15203,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -15253,7 +15253,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/UpdateNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/UpdateNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -15378,7 +15378,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -15428,7 +15428,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -16840,7 +16840,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNodeExecutionsForTask", runtime.WithHTTPPathPattern("/api/v1/children/task_executions/org/{task_execution_id.node_execution_id.execution_id.org}/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNodeExecutionsForTask", runtime.WithHTTPPathPattern("/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -16884,7 +16884,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNodeExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNodeExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -17280,7 +17280,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetTaskExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -17764,7 +17764,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNamedEntities", runtime.WithHTTPPathPattern("/api/v1/named_entities/{resource_type}/org/{org}/{project}/{domain}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListNamedEntities", runtime.WithHTTPPathPattern("/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -17808,7 +17808,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -17852,7 +17852,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/UpdateNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/UpdateNamedEntity", runtime.WithHTTPPathPattern("/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -17962,7 +17962,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -18006,7 +18006,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/{resource_type}/org/{id.org}/{id.project}/{id.domain}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/ListDescriptionEntities", runtime.WithHTTPPathPattern("/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -18188,11 +18188,11 @@ var (
 
 	pattern_AdminService_ListNodeExecutionsForTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "children", "task_executions", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
 
-	pattern_AdminService_ListNodeExecutionsForTask_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "children", "task_executions", "org", "task_execution_id.node_execution_id.execution_id.org", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
+	pattern_AdminService_ListNodeExecutionsForTask_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "children", "org", "task_execution_id.node_execution_id.execution_id.org", "task_executions", "task_execution_id.node_execution_id.execution_id.project", "task_execution_id.node_execution_id.execution_id.domain", "task_execution_id.node_execution_id.execution_id.name", "task_execution_id.node_execution_id.node_id", "task_execution_id.task_id.project", "task_execution_id.task_id.domain", "task_execution_id.task_id.name", "task_execution_id.task_id.version", "task_execution_id.retry_attempt"}, ""))
 
 	pattern_AdminService_GetNodeExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "data", "node_executions", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
 
-	pattern_AdminService_GetNodeExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v1", "data", "node_executions", "org", "id.execution_id.org", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
+	pattern_AdminService_GetNodeExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9}, []string{"api", "v1", "data", "org", "id.execution_id.org", "node_executions", "id.execution_id.project", "id.execution_id.domain", "id.execution_id.name", "id.node_id"}, ""))
 
 	pattern_AdminService_RegisterProject_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "projects"}, ""))
 
@@ -18228,7 +18228,7 @@ var (
 
 	pattern_AdminService_GetTaskExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12}, []string{"api", "v1", "data", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
-	pattern_AdminService_GetTaskExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "data", "task_executions", "org", "id.node_execution_id.execution_id.org", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
+	pattern_AdminService_GetTaskExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8, 1, 0, 4, 1, 5, 9, 1, 0, 4, 1, 5, 10, 1, 0, 4, 1, 5, 11, 1, 0, 4, 1, 5, 12, 1, 0, 4, 1, 5, 13, 1, 0, 4, 1, 5, 14}, []string{"api", "v1", "data", "org", "id.node_execution_id.execution_id.org", "task_executions", "id.node_execution_id.execution_id.project", "id.node_execution_id.execution_id.domain", "id.node_execution_id.execution_id.name", "id.node_execution_id.node_id", "id.task_id.project", "id.task_id.domain", "id.task_id.name", "id.task_id.version", "id.retry_attempt"}, ""))
 
 	pattern_AdminService_UpdateProjectDomainAttributes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "project_domain_attributes", "attributes.project", "attributes.domain"}, ""))
 
@@ -18272,15 +18272,15 @@ var (
 
 	pattern_AdminService_ListNamedEntities_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "named_entities", "resource_type", "project", "domain"}, ""))
 
-	pattern_AdminService_ListNamedEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "org", "project", "domain"}, ""))
+	pattern_AdminService_ListNamedEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "org", "resource_type", "project", "domain"}, ""))
 
 	pattern_AdminService_GetNamedEntity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "named_entities", "resource_type", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "named_entities", "org", "id.org", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_UpdateNamedEntity_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "named_entities", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_UpdateNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "named_entities", "resource_type", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_UpdateNamedEntity_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "named_entities", "org", "id.org", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_GetVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "version"}, ""))
 
@@ -18290,11 +18290,11 @@ var (
 
 	pattern_AdminService_ListDescriptionEntities_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "description_entities", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_ListDescriptionEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "description_entities", "resource_type", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_ListDescriptionEntities_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "description_entities", "org", "id.org", "resource_type", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListDescriptionEntities_2 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "description_entities", "resource_type", "id.project", "id.domain"}, ""))
 
-	pattern_AdminService_ListDescriptionEntities_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "description_entities", "resource_type", "org", "id.org", "id.project", "id.domain"}, ""))
+	pattern_AdminService_ListDescriptionEntities_3 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "description_entities", "org", "id.org", "resource_type", "id.project", "id.domain"}, ""))
 
 	pattern_AdminService_GetExecutionMetrics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "metrics", "executions", "id.project", "id.domain", "id.name"}, ""))
 

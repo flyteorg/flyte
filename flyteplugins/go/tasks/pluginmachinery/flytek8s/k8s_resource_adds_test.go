@@ -33,8 +33,8 @@ func TestGetTolerationsForResources(t *testing.T) {
 		Effect:   v12.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v12.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v12.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v12.TolerationOpExists,
 		Effect:   v12.TaintEffectNoSchedule,
@@ -55,8 +55,8 @@ func TestGetTolerationsForResources(t *testing.T) {
 			args{
 				v12.ResourceRequirements{
 					Limits: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
@@ -69,8 +69,8 @@ func TestGetTolerationsForResources(t *testing.T) {
 			args{
 				v12.ResourceRequirements{
 					Requests: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
@@ -83,12 +83,12 @@ func TestGetTolerationsForResources(t *testing.T) {
 			args{
 				v12.ResourceRequirements{
 					Limits: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 					Requests: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
@@ -101,84 +101,84 @@ func TestGetTolerationsForResources(t *testing.T) {
 			args{
 				v12.ResourceRequirements{
 					Limits: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
 			map[v12.ResourceName][]v12.Toleration{
-				v12.ResourceStorage: {tolStorage},
-				ResourceNvidiaGPU:   {tolGPU},
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
 			},
 			nil,
-			[]v12.Toleration{tolStorage},
+			[]v12.Toleration{tolEphemeralStorage},
 		},
 		{
 			"tolerations-req",
 			args{
 				v12.ResourceRequirements{
 					Requests: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
 			map[v12.ResourceName][]v12.Toleration{
-				v12.ResourceStorage: {tolStorage},
-				ResourceNvidiaGPU:   {tolGPU},
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
 			},
 			nil,
-			[]v12.Toleration{tolStorage},
+			[]v12.Toleration{tolEphemeralStorage},
 		},
 		{
 			"tolerations-both",
 			args{
 				v12.ResourceRequirements{
 					Limits: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 					Requests: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
 			map[v12.ResourceName][]v12.Toleration{
-				v12.ResourceStorage: {tolStorage},
-				ResourceNvidiaGPU:   {tolGPU},
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
 			},
 			nil,
-			[]v12.Toleration{tolStorage},
+			[]v12.Toleration{tolEphemeralStorage},
 		},
 		{
 			"no-tolerations-both",
 			args{
 				v12.ResourceRequirements{
 					Limits: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
-						ResourceNvidiaGPU:   resource.MustParse("1"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
+						ResourceNvidiaGPU:            resource.MustParse("1"),
 					},
 					Requests: v12.ResourceList{
-						v12.ResourceCPU:     resource.MustParse("1024m"),
-						v12.ResourceStorage: resource.MustParse("100M"),
+						v12.ResourceCPU:              resource.MustParse("1024m"),
+						v12.ResourceEphemeralStorage: resource.MustParse("100M"),
 					},
 				},
 			},
 			map[v12.ResourceName][]v12.Toleration{
-				v12.ResourceStorage: {tolStorage},
-				ResourceNvidiaGPU:   {tolGPU},
+				v12.ResourceEphemeralStorage: {tolEphemeralStorage},
+				ResourceNvidiaGPU:            {tolGPU},
 			},
 			nil,
-			[]v12.Toleration{tolStorage, tolGPU},
+			[]v12.Toleration{tolEphemeralStorage, tolGPU},
 		},
 		{
 			"default-tolerations",
 			args{},
 			nil,
-			[]v12.Toleration{tolStorage},
-			[]v12.Toleration{tolStorage},
+			[]v12.Toleration{tolEphemeralStorage},
+			[]v12.Toleration{tolEphemeralStorage},
 		},
 	}
 	for _, tt := range tests {

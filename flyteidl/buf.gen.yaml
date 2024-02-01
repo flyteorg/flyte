@@ -10,7 +10,6 @@ plugins:
     out: gen/pb_python
   - plugin: buf.build/community/neoeinstein-prost
     out: gen/pb_rust
-
   - plugin: buf.build/protocolbuffers/go:v1.30.0
     out: gen/pb-go
     opt:
@@ -32,3 +31,9 @@ plugins:
     opt:
       - json_names_for_fields=false
       - allow_delete_body=true
+  - plugin: buf.build/bufbuild/es
+    out: gen/pb-es
+    opt: target=ts
+  - plugin: buf.build/connectrpc/es
+    out: gen/pb-es
+    opt: target=ts
