@@ -64,7 +64,15 @@ func (s *SecretsMutator) Mutate(ctx context.Context, p *corev1.Pod) (newP *corev
 
 // NewSecretsMutator creates a new SecretsMutator with all available plugins. Depending on the selected plugins in the
 // config, only the global plugin and one other plugin can be enabled.
-func NewSecretsMutator(cfg *config.Config, _ promutils.Scope) *SecretsMutator {
+func NewSecretsMutator(ctx context.Context, cfg *config.Config, _ promutils.Scope) (*SecretsMutator, error) {
+	var embeddedSecretsManager SecretsInjector
+	if cfg.EmbeddedSecretManagerConfig.Enabled {
+		secretFetcher, err := NewSecretFetcherManager(ctx, cfg.EmbeddedSecretManagerConfig)
+		if err != nil {
+			return nil, err
+		}
+		embeddedSecretsManager = NewEmbeddedSecretManagerInjector(cfg.EmbeddedSecretManagerConfig, secretFetcher)
+	}
 	return &SecretsMutator{
 		cfg: cfg,
 		injectors: []SecretsInjector{
@@ -73,6 +81,7 @@ func NewSecretsMutator(cfg *config.Config, _ promutils.Scope) *SecretsMutator {
 			NewAWSSecretManagerInjector(cfg.AWSSecretManagerConfig),
 			NewGCPSecretManagerInjector(cfg.GCPSecretManagerConfig),
 			NewVaultSecretManagerInjector(cfg.VaultSecretManagerConfig),
+			embeddedSecretsManager,
 		},
-	}
+	}, nil
 }

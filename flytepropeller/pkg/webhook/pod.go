@@ -210,14 +210,19 @@ func (pm PodMutator) CreateMutationWebhookConfiguration(namespace string) (*admi
 	return mutateConfig, nil
 }
 
-func NewPodMutator(cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) *PodMutator {
+func NewPodMutator(ctx context.Context, cfg *config.Config, scheme *runtime.Scheme, scope promutils.Scope) (*PodMutator, error) {
+	secretsMutator, err := NewSecretsMutator(ctx, cfg, scope.NewSubScope("secrets"))
+	if err != nil {
+		return nil, err
+	}
+
 	return &PodMutator{
 		decoder: admission.NewDecoder(scheme),
 		cfg:     cfg,
 		Mutators: []MutatorConfig{
 			{
-				Mutator: NewSecretsMutator(cfg, scope.NewSubScope("secrets")),
+				Mutator: secretsMutator,
 			},
 		},
-	}
+	}, nil
 }

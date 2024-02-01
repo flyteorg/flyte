@@ -79,6 +79,11 @@ const (
 
 	// SecretManagerTypeVault defines a secret manager webhook that pulls secrets from Hashicorp Vault.
 	SecretManagerTypeVault
+
+	// SecretManagerTypeEmbedded defines an embedded secret manager webhook that pulls secrets from the configured secrets manager.
+	// Without using sidecar. This type directly calls into the secrets manager for the configured provider directly.
+	// Currently supported only for AWS.
+	SecretManagerTypeEmbedded
 )
 
 // Defines with KV Engine Version to use with VaultSecretManager - https://www.vaultproject.io/docs/secrets/kv#kv-secrets-engine
@@ -92,17 +97,41 @@ const (
 )
 
 type Config struct {
-	MetricsPrefix            string                   `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
-	CertDir                  string                   `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
-	LocalCert                bool                     `json:"localCert" pflag:",write certs locally. Defaults to false"`
-	ListenPort               int                      `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
-	ServiceName              string                   `json:"serviceName" pflag:",The name of the webhook service."`
-	ServicePort              int32                    `json:"servicePort" pflag:",The port on the service that hosting webhook."`
-	SecretName               string                   `json:"secretName" pflag:",Secret name to write generated certs to."`
-	SecretManagerType        SecretManagerType        `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
-	AWSSecretManagerConfig   AWSSecretManagerConfig   `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
-	GCPSecretManagerConfig   GCPSecretManagerConfig   `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
-	VaultSecretManagerConfig VaultSecretManagerConfig `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+	MetricsPrefix               string                      `json:"metrics-prefix" pflag:",An optional prefix for all published metrics."`
+	CertDir                     string                      `json:"certDir" pflag:",Certificate directory to use to write generated certs. Defaults to /etc/webhook/certs/"`
+	LocalCert                   bool                        `json:"localCert" pflag:",write certs locally. Defaults to false"`
+	ListenPort                  int                         `json:"listenPort" pflag:",The port to use to listen to webhook calls. Defaults to 9443"`
+	ServiceName                 string                      `json:"serviceName" pflag:",The name of the webhook service."`
+	ServicePort                 int32                       `json:"servicePort" pflag:",The port on the service that hosting webhook."`
+	SecretName                  string                      `json:"secretName" pflag:",Secret name to write generated certs to."`
+	SecretManagerType           SecretManagerType           `json:"secretManagerType" pflag:"-,Secret manager type to use if secrets are not found in global secrets."`
+	AWSSecretManagerConfig      AWSSecretManagerConfig      `json:"awsSecretManager" pflag:",AWS Secret Manager config."`
+	GCPSecretManagerConfig      GCPSecretManagerConfig      `json:"gcpSecretManager" pflag:",GCP Secret Manager config."`
+	VaultSecretManagerConfig    VaultSecretManagerConfig    `json:"vaultSecretManager" pflag:",Vault Secret Manager config."`
+	EmbeddedSecretManagerConfig EmbeddedSecretManagerConfig `json:"embeddedSecretManagerConfig" pflag:",Embedded Secret Manager config without sidecar and which calls into the supported providers directly."`
+}
+
+//go:generate enumer --type=EmbeddedSecretManagerType -json -yaml -trimprefix=EmbeddedSecretManagerType
+type EmbeddedSecretManagerType uint8
+
+const (
+	EmbeddedSecretManagerTypeAWS EmbeddedSecretManagerType = iota
+	EmbeddedSecretManagerTypeGCP
+)
+
+type EmbeddedSecretManagerConfig struct {
+	Enabled   bool                      `json:"enabled" pflag:",Enable secret manager service"`
+	Type      EmbeddedSecretManagerType `json:"type" pflags:"-,Type of embedded secret manager to initialize"`
+	AWSConfig AWSConfig                 `json:"awsConfig" pflag:",Config for AWS settings"`
+	GCPConfig GCPConfig                 `json:"gcpConfig" pflag:",Config for GCP settings"`
+}
+
+type AWSConfig struct {
+	Region string `json:"region" pflag:",AWS region"`
+}
+
+type GCPConfig struct {
+	Project string `json:"project" pflag:",GCP project to be used for secret manager"`
 }
 
 func (c Config) ExpandCertDir() string {

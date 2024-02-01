@@ -26,6 +26,20 @@ const (
 
 func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 	defaultNamespace string, scope *promutils.Scope, mgr manager.Manager) error {
+	err := RunWebhook(ctx, propellerCfg, cfg,
+		defaultNamespace, scope, mgr)
+	if err != nil {
+		return err
+	}
+
+	logger.Infof(ctx, "Started propeller webhook")
+	<-ctx.Done()
+
+	return nil
+}
+
+func RunWebhook(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
+	defaultNamespace string, scope *promutils.Scope, mgr manager.Manager) error {
 	raw, err := json.Marshal(cfg)
 	if err != nil {
 		return err
@@ -40,7 +54,10 @@ func Run(ctx context.Context, propellerCfg *config.Config, cfg *config2.Config,
 
 	webhookScope := (*scope).NewSubScope("webhook")
 
-	secretsWebhook := NewPodMutator(cfg, mgr.GetScheme(), webhookScope)
+	secretsWebhook, err := NewPodMutator(ctx, cfg, mgr.GetScheme(), webhookScope)
+	if err != nil {
+		return err
+	}
 
 	// Creates a MutationConfig to instruct ApiServer to call this service whenever a Pod is being created.
 	err = createMutationConfig(ctx, kubeClient, secretsWebhook, defaultNamespace)

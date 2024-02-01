@@ -239,4 +239,60 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_embeddedSecretManagerConfig.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("embeddedSecretManagerConfig.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.EmbeddedSecretManagerConfig.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_embeddedSecretManagerConfig.type", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.type", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.type"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.Type)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_embeddedSecretManagerConfig.awsConfig.region", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.awsConfig.region", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.awsConfig.region"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.AWSConfig.Region)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_embeddedSecretManagerConfig.gcpConfig.project", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("embeddedSecretManagerConfig.gcpConfig.project", testValue)
+			if vString, err := cmdFlags.GetString("embeddedSecretManagerConfig.gcpConfig.project"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.EmbeddedSecretManagerConfig.GCPConfig.Project)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

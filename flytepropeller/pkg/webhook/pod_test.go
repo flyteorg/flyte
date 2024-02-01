@@ -82,11 +82,12 @@ func TestPodMutator_Mutate(t *testing.T) {
 }
 
 func Test_CreateMutationWebhookConfiguration(t *testing.T) {
-	pm := NewPodMutator(&config.Config{
+	ctx := context.Background()
+	pm, err := NewPodMutator(ctx, &config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
 	}, latest.Scheme, promutils.NewTestScope())
-
+	assert.NoError(t, err)
 	t.Run("Empty namespace", func(t *testing.T) {
 		c, err := pm.CreateMutationWebhookConfiguration("")
 		assert.NoError(t, err)
@@ -101,11 +102,12 @@ func Test_CreateMutationWebhookConfiguration(t *testing.T) {
 }
 
 func Test_Handle(t *testing.T) {
-	pm := NewPodMutator(&config.Config{
+	ctx := context.Background()
+	pm, err := NewPodMutator(ctx, &config.Config{
 		CertDir:     "testdata",
 		ServiceName: "my-service",
 	}, latest.Scheme, promutils.NewTestScope())
-
+	assert.NoError(t, err)
 	req := admission.Request{
 		AdmissionRequest: admissionv1.AdmissionRequest{
 			Object: runtime.RawExtension{
