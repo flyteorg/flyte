@@ -62,7 +62,7 @@ func TestDeleteFailure(t *testing.T) {
 
 	err := reservationRepo.Delete(context.Background(), expectedReservation.ReservationKey, expectedReservation.OwnerID)
 	assert.Error(t, err)
-	assert.Equal(t, "missing entity of type Reservation with identifier dataset_id:{project:\"testProject\" name:\"testDataset\" domain:\"testDomain\" version:\"testVersion\"} tag_name:\"testTag\"", err.Error())
+	assert.Equal(t, "missing entity of type Reservation with identifier dataset_id:{project:\"testProject\"  name:\"testDataset\"  domain:\"testDomain\"  version:\"testVersion\"}  tag_name:\"testTag\"", err.Error())
 }
 
 func TestGet(t *testing.T) {
