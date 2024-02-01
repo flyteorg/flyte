@@ -53,8 +53,11 @@ Homepage = "https://github.com/flyteorg/flyte/tree/master/flyteidl"
 root = "../"
 tag_regex = '^(?:[\w-]+/)?(?P<version>[vV]?\d+(?:\.\d+){0,2}[^\+]*)(?:\+.*)?$'
 
-[tool.setuptools]
-include-package-data = false
+# https://github.com/pypa/setuptools/issues/3136 describes an extension to
+# setuptools that would involve a simpler way to specify this, but while
+# that does not happen we have to package the pyi files manually like so:
+[tool.setuptools.package-data]
+flyteidl = ["*.pyi", "**/*pyi"]
 
 [tool.setuptools.packages.find]
 include = ["gen/pb_python/*"]
