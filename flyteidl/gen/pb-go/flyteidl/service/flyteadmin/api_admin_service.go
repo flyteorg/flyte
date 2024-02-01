@@ -2768,7 +2768,7 @@ func (a *AdminServiceApiService) GetExecutionData2(ctx context.Context, idOrg st
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/data/org/{id.org}/executions/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
