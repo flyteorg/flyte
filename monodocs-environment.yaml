@@ -58,7 +58,6 @@ dependencies:
   - vaex-core                   # vaex
 
   - pip:
-    - -e ./flyteidl
     - readthedocs-sphinx-ext
     - sphinx-code-include
     - sphinxext-remoteliteralinclude
