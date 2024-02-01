@@ -43,13 +43,7 @@ doc_gen_deps:
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
-PLACEHOLDER := "__version__\ =\ \"0.0.0+develop\""
 PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
-
-.PHONY: update_pyversion
-update_pyversion:
-	grep "$(PLACEHOLDER)" "setup.py"
-	sed -i "s/$(PLACEHOLDER)/__version__ = \"${VERSION}\"/g" "setup.py"
 
 .PHONY: update_npmversion
 update_npmversion:
