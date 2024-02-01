@@ -371,7 +371,7 @@ service AdminService {
     option (google.api.http) = {
       get: "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}"
       additional_bindings {
-        get: "/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+        get: "/api/v1/data/org/{id.org}/executions/{id.project}/{id.domain}/{id.name}"
       }
     };
     // option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

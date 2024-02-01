@@ -13803,7 +13803,7 @@ func RegisterAdminServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AdminService/GetExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/org/{id.org}/executions/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -16576,7 +16576,7 @@ func RegisterAdminServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AdminService/GetExecutionData", runtime.WithHTTPPathPattern("/api/v1/data/org/{id.org}/executions/{id.project}/{id.domain}/{id.name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -18164,7 +18164,7 @@ var (
 
 	pattern_AdminService_GetExecutionData_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "data", "executions", "id.project", "id.domain", "id.name"}, ""))
 
-	pattern_AdminService_GetExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "data", "executions", "org", "id.org", "id.project", "id.domain", "id.name"}, ""))
+	pattern_AdminService_GetExecutionData_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 2, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7, 1, 0, 4, 1, 5, 8}, []string{"api", "v1", "data", "org", "id.org", "executions", "id.project", "id.domain", "id.name"}, ""))
 
 	pattern_AdminService_ListExecutions_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "executions", "id.project", "id.domain"}, ""))
 
