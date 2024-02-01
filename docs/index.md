@@ -134,11 +134,11 @@ Have questions or need support? The best way to reach us is through Slack:
 :maxdepth: 1
 :hidden:
 
-Introduction <introduction>
-Quickstart guide <flytesnacks/getting_started/quickstart_guide>
-Getting started with workflow development <flytesnacks/getting_started/getting_started_with_workflow_development>
-Flyte Fundamentals <flytesnacks/getting_started/flyte_fundamentals>
-Core Use Cases <flytesnacks/getting_started/core_use_cases>
+Introduction <introduction/index>
+Quickstart guide <introduction/quickstart_guide>
+Getting started with workflow development <introduction/getting_started_with_workflow_development/index>
+Flyte Fundamentals <introduction/flyte_fundamentals/index>
+Core Use Cases <introduction/core_use_cases/index>
 ```
 
 ```{toctree}
