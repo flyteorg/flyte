@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"testing"
 	"time"
 
@@ -321,9 +322,9 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 		})
 	taskExecManager := NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
 	resp, err := taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
-	assert.EqualError(t, err, "Failed to get existing node execution id: [node_id:\"node-id\""+
-		" execution_id:<project:\"project\" domain:\"domain\" name:\"name\" > ] "+
-		"with err: expected error")
+	utils.AssertEqualWithSanitizedRegex(t, "Failed to get existing node execution id: [node_id:\"node-id\""+
+		" execution_id:{project:\"project\" domain:\"domain\" name:\"name\" } ] "+
+		"with err: expected error", err.Error())
 	assert.Nil(t, resp)
 
 	repository.NodeExecutionRepo().(*repositoryMocks.MockNodeExecutionRepo).SetExistsCallback(
@@ -333,8 +334,8 @@ func TestCreateTaskEvent_MissingExecution(t *testing.T) {
 		})
 	taskExecManager = NewTaskExecutionManager(repository, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockTaskExecutionRemoteURL, nil, nil)
 	resp, err = taskExecManager.CreateTaskExecutionEvent(context.Background(), taskEventRequest)
-	assert.EqualError(t, err, "failed to get existing node execution id: [node_id:\"node-id\""+
-		" execution_id:<project:\"project\" domain:\"domain\" name:\"name\" > ]")
+	utils.AssertEqualWithSanitizedRegex(t, "failed to get existing node execution id: [node_id:\"node-id\""+
+		" execution_id:{project:\"project\" domain:\"domain\" name:\"name\" } ]", err.Error())
 	assert.Nil(t, resp)
 }
 

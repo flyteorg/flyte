@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"testing"
 	"time"
 
@@ -255,7 +256,7 @@ func TestCreateNodeEvent_MissingExecution(t *testing.T) {
 	})
 	nodeExecManager := NewNodeExecutionManager(repository, getMockExecutionsConfigProvider(), make([]string, 0), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockNodeExecutionRemoteURL, &mockPublisher, &mockPublisher, &eventWriterMocks.NodeExecutionEventWriter{})
 	resp, err := nodeExecManager.CreateNodeEvent(context.Background(), request)
-	assert.EqualError(t, err, "Failed to get existing execution id: [project:\"project\" domain:\"domain\" name:\"name\" ] with err: expected error")
+	utils.AssertEqualWithSanitizedRegex(t, "Failed to get existing execution id: [project:\"project\" domain:\"domain\" name:\"name\" ] with err: expected error", err.Error())
 	assert.Nil(t, resp)
 }
 
