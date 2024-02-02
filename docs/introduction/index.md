@@ -16,7 +16,7 @@ Flyte is a workflow orchestrator that unifies machine learning, data engineering
 * Easy tracking of data lineages
 * Built-in data and artifact visualization
 
-For a full list of feature, see the [Flyte features page](https://flyte.org/features).
+For a full list of features, see the [Flyte features page](https://flyte.org/features).
 
 ## Basic Flyte components
 
