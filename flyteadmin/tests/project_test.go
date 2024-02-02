@@ -5,6 +5,7 @@ package tests
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -29,8 +30,8 @@ func TestCreateProject(t *testing.T) {
 			ResourceType: core.ResourceType_TASK,
 		},
 	})
-	assert.EqualError(t, err, "rpc error: code = NotFound desc = missing entity of type TASK"+
-		" with identifier project:\"potato\"  domain:\"development\"  name:\"task\"  version:\"1234\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "rpc error: code = NotFound desc = missing entity of type TASK"+
+		" with identifier project:\"potato\"  domain:\"development\"  name:\"task\"  version:\"1234\" ", err.Error())
 	assert.Empty(t, task)
 
 	req := admin.ProjectRegisterRequest{
