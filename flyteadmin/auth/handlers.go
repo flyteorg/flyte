@@ -29,6 +29,7 @@ const (
 	RedirectURLParameter = "redirect_url"
 	FromHTTPKey          = "from_http"
 	FromHTTPVal          = "true"
+	IDPQueryParameter    = "idp"
 )
 
 type PreRedirectHookError struct {
@@ -153,6 +154,11 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 			} else {
 				logger.Errorf(ctx, "Was not able to create a redirect cookie")
 			}
+		}
+
+		// Add the IDPQueryParameter to the URL if it is present in the request
+		if queryParams.Get(IDPQueryParameter) != "" {
+			url = fmt.Sprintf("%s&%s=%s", url, IDPQueryParameter, queryParams.Get(IDPQueryParameter))
 		}
 		http.Redirect(writer, request, url, http.StatusTemporaryRedirect)
 	}
