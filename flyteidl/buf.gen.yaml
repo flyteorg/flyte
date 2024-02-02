@@ -26,14 +26,14 @@ plugins:
       - module=github.com/flyteorg/flyte/flyteidl/gen/pb-go
       - standalone=true
       - allow_delete_body=true
-  - plugin: buf.build/grpc-ecosystem/openapiv2
+  - plugin: buf.build/grpc-ecosystem/openapiv2:v2.19.1
     out: gen/pb-go/gateway
     opt:
       - json_names_for_fields=false
       - allow_delete_body=true
-  - plugin: buf.build/bufbuild/es
+  - plugin: buf.build/bufbuild/es:v1.7.2
     out: gen/pb-es
     opt: target=ts
-  - plugin: buf.build/connectrpc/es
+  - plugin: buf.build/connectrpc/es:v1.3.0
     out: gen/pb-es
     opt: target=ts
