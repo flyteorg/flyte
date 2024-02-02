@@ -2,7 +2,8 @@
 
 # Agent Setup
 
-.. tags:: Agent, Integration, Data, Advanced
+```{tags} Agent, Integration, Data, Advanced
+```
 
 To set configure your Flyte deployment for agents, see the documentation below.
 
@@ -10,14 +11,16 @@ To set configure your Flyte deployment for agents, see the documentation below.
 :header-rows: 0
 :widths: 20 30
 
+* - {ref}`Airflow Agent <deployment-agent-setup-airflow>`
+  - Configuring your Flyte deployment for the Airflow agent
 * - {ref}`Bigquery Agent <deployment-agent-setup-bigquery>`
-  - Guide to setting up the Bigquery agent.
-* - {ref}`MMCloud Agent <deployment-agent-setup-mmcloud>`
-  - Guide to setting up the MMCloud agent.
-* - {ref}`Sensor Agent <deployment-agent-setup-sensor>`
-  - Guide to setting up the Sensor agent.
+  - Configuring your Flyte deployment for the Bigquery agent.
 * - {ref}`Databricks Agent <deployment-agent-setup-databricks>`
-  - Guide to setting up the Databricks agent.
+  - Configuring your Flyte deployment for the Databricks agent.
+* - {ref}`MMCloud Agent <deployment-agent-setup-mmcloud>`
+  - Configuring your Flyte deployment for the MMCloud agent.
+* - {ref}`Sensor Agent <deployment-agent-setup-sensor>`
+  - Configuring your Flyte deployment for the sensor agent.
 ```
 
 ```{toctree}
@@ -25,8 +28,10 @@ To set configure your Flyte deployment for agents, see the documentation below.
 :name: Agent setup
 :hidden:
 
+airflow
 bigquery
-mmcloud
 databricks
+mmcloud
 sensor
+snowflake
 ```

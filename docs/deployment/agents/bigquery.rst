@@ -1,6 +1,6 @@
 .. _deployment-agent-setup-bigquery:
 
-Google BigQuery Agent
+Google BigQuery agent
 ======================
 
 This guide provides an overview of setting up BigQuery agent in your Flyte deployment.

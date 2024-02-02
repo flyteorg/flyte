@@ -1,6 +1,6 @@
 .. _deployment-agent-setup-databricks:
 
-Databricks Agent
+Databricks agent
 =================
 
 This guide provides an overview of how to set up Databricks agent in your Flyte deployment.
