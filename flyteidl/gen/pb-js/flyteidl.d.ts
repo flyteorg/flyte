@@ -17065,6 +17065,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectRequest. */
+        interface IProjectRequest {
+
+            /** ProjectRequest project */
+            project?: (flyteidl.admin.IProject|null);
+        }
+
+        /** Represents a ProjectRequest. */
+        class ProjectRequest implements IProjectRequest {
+
+            /**
+             * Constructs a new ProjectRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectRequest);
+
+            /** ProjectRequest project. */
+            public project?: (flyteidl.admin.IProject|null);
+
+            /**
+             * Creates a new ProjectRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectRequest): flyteidl.admin.ProjectRequest;
+
+            /**
+             * Encodes the specified ProjectRequest message. Does not implicitly {@link flyteidl.admin.ProjectRequest.verify|verify} messages.
+             * @param message ProjectRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectRequest;
+
+            /**
+             * Verifies a ProjectRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ProjectAttributes. */
         interface IProjectAttributes {
 

@@ -41203,6 +41203,118 @@
                 return ProjectUpdateResponse;
             })();
     
+            admin.ProjectRequest = (function() {
+    
+                /**
+                 * Properties of a ProjectRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IProjectRequest
+                 * @property {flyteidl.admin.IProject|null} [project] ProjectRequest project
+                 */
+    
+                /**
+                 * Constructs a new ProjectRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents a ProjectRequest.
+                 * @implements IProjectRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IProjectRequest=} [properties] Properties to set
+                 */
+                function ProjectRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ProjectRequest project.
+                 * @member {flyteidl.admin.IProject|null|undefined} project
+                 * @memberof flyteidl.admin.ProjectRequest
+                 * @instance
+                 */
+                ProjectRequest.prototype.project = null;
+    
+                /**
+                 * Creates a new ProjectRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ProjectRequest
+                 * @static
+                 * @param {flyteidl.admin.IProjectRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ProjectRequest} ProjectRequest instance
+                 */
+                ProjectRequest.create = function create(properties) {
+                    return new ProjectRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ProjectRequest message. Does not implicitly {@link flyteidl.admin.ProjectRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ProjectRequest
+                 * @static
+                 * @param {flyteidl.admin.IProjectRequest} message ProjectRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ProjectRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        $root.flyteidl.admin.Project.encode(message.project, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a ProjectRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ProjectRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ProjectRequest} ProjectRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ProjectRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ProjectRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.project = $root.flyteidl.admin.Project.decode(reader, reader.uint32());
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a ProjectRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ProjectRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ProjectRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.project != null && message.hasOwnProperty("project")) {
+                        var error = $root.flyteidl.admin.Project.verify(message.project);
+                        if (error)
+                            return "project." + error;
+                    }
+                    return null;
+                };
+    
+                return ProjectRequest;
+            })();
+    
             admin.ProjectAttributes = (function() {
     
                 /**

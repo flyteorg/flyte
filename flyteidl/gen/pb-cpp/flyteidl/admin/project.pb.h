@@ -43,7 +43,7 @@ struct TableStruct_flyteidl_2fadmin_2fproject_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -67,6 +67,9 @@ extern ProjectRegisterRequestDefaultTypeInternal _ProjectRegisterRequest_default
 class ProjectRegisterResponse;
 class ProjectRegisterResponseDefaultTypeInternal;
 extern ProjectRegisterResponseDefaultTypeInternal _ProjectRegisterResponse_default_instance_;
+class ProjectRequest;
+class ProjectRequestDefaultTypeInternal;
+extern ProjectRequestDefaultTypeInternal _ProjectRequest_default_instance_;
 class ProjectUpdateResponse;
 class ProjectUpdateResponseDefaultTypeInternal;
 extern ProjectUpdateResponseDefaultTypeInternal _ProjectUpdateResponse_default_instance_;
@@ -82,6 +85,7 @@ template<> ::flyteidl::admin::Project* Arena::CreateMaybeMessage<::flyteidl::adm
 template<> ::flyteidl::admin::ProjectListRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectListRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectRegisterRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRegisterRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectRegisterResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRegisterResponse>(Arena*);
+template<> ::flyteidl::admin::ProjectRequest* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectRequest>(Arena*);
 template<> ::flyteidl::admin::ProjectUpdateResponse* Arena::CreateMaybeMessage<::flyteidl::admin::ProjectUpdateResponse>(Arena*);
 template<> ::flyteidl::admin::Projects* Arena::CreateMaybeMessage<::flyteidl::admin::Projects>(Arena*);
 }  // namespace protobuf
@@ -1094,6 +1098,121 @@ class ProjectUpdateResponse final :
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ProjectRequest final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.admin.ProjectRequest) */ {
+ public:
+  ProjectRequest();
+  virtual ~ProjectRequest();
+
+  ProjectRequest(const ProjectRequest& from);
+
+  inline ProjectRequest& operator=(const ProjectRequest& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ProjectRequest(ProjectRequest&& from) noexcept
+    : ProjectRequest() {
+    *this = ::std::move(from);
+  }
+
+  inline ProjectRequest& operator=(ProjectRequest&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ProjectRequest& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ProjectRequest* internal_default_instance() {
+    return reinterpret_cast<const ProjectRequest*>(
+               &_ProjectRequest_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  void Swap(ProjectRequest* other);
+  friend void swap(ProjectRequest& a, ProjectRequest& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ProjectRequest* New() const final {
+    return CreateMaybeMessage<ProjectRequest>(nullptr);
+  }
+
+  ProjectRequest* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ProjectRequest>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ProjectRequest& from);
+  void MergeFrom(const ProjectRequest& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ProjectRequest* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.admin.Project project = 1;
+  bool has_project() const;
+  void clear_project();
+  static const int kProjectFieldNumber = 1;
+  const ::flyteidl::admin::Project& project() const;
+  ::flyteidl::admin::Project* release_project();
+  ::flyteidl::admin::Project* mutable_project();
+  void set_allocated_project(::flyteidl::admin::Project* project);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.admin.ProjectRequest)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::admin::Project* project_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fadmin_2fproject_2eproto;
+};
 // ===================================================================
 
 
@@ -1888,9 +2007,66 @@ inline void ProjectRegisterRequest::set_allocated_project(::flyteidl::admin::Pro
 
 // ProjectUpdateResponse
 
+// -------------------------------------------------------------------
+
+// ProjectRequest
+
+// .flyteidl.admin.Project project = 1;
+inline bool ProjectRequest::has_project() const {
+  return this != internal_default_instance() && project_ != nullptr;
+}
+inline void ProjectRequest::clear_project() {
+  if (GetArenaNoVirtual() == nullptr && project_ != nullptr) {
+    delete project_;
+  }
+  project_ = nullptr;
+}
+inline const ::flyteidl::admin::Project& ProjectRequest::project() const {
+  const ::flyteidl::admin::Project* p = project_;
+  // @@protoc_insertion_point(field_get:flyteidl.admin.ProjectRequest.project)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::admin::Project*>(
+      &::flyteidl::admin::_Project_default_instance_);
+}
+inline ::flyteidl::admin::Project* ProjectRequest::release_project() {
+  // @@protoc_insertion_point(field_release:flyteidl.admin.ProjectRequest.project)
+  
+  ::flyteidl::admin::Project* temp = project_;
+  project_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::admin::Project* ProjectRequest::mutable_project() {
+  
+  if (project_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::admin::Project>(GetArenaNoVirtual());
+    project_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.admin.ProjectRequest.project)
+  return project_;
+}
+inline void ProjectRequest::set_allocated_project(::flyteidl::admin::Project* project) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete project_;
+  }
+  if (project) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      project = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, project, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  project_ = project;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.admin.ProjectRequest.project)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

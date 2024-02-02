@@ -99,3 +99,9 @@ message ProjectRegisterResponse {
 // Purposefully empty, may be updated in the future.
 message ProjectUpdateResponse {
 }
+
+// Request to retrieve a single project matching the project id.
+// See :ref:`ref_flyteidl.admin.Project` for more details
+message ProjectRequest{
+    Project project = 1;
+}
