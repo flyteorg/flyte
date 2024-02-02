@@ -159,5 +159,4 @@ func TestToEmailMessageFromWorkflowExecutionEvent(t *testing.T) {
 	assert.True(t, emailMessage.SubjectLine == expected.SubjectLine)
 	assert.True(t, emailMessage.SenderEmail == expected.SenderEmail)
 	assert.True(t, len(emailMessage.RecipientsEmail) == len(expected.RecipientsEmail))
-	//assert.True(t, proto.Equal(emailMessage), fmt.Sprintf("%+v", emailMessage))
 }
