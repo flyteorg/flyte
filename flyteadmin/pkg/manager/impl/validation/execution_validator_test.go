@@ -98,7 +98,8 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 		lpRequest.Spec.FixedInputs,
 		lpRequest.Spec.DefaultInputs,
 	)
-	assert.EqualError(t, err, "invalid foo input wrong type. Expected simple:STRING , but got simple:INTEGER ")
+	expected := "invalid foo input wrong type. Expected simple:STRING , but got simple:INTEGER"
+	assert.Equal(t, regex(err.Error()), regex(expected))
 }
 
 func TestValidateExecInputsExtraInputs(t *testing.T) {
