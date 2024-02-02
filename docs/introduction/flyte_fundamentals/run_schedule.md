@@ -29,13 +29,13 @@ and production use cases.
 :class: important
 
 This guide assumes that you've completed the previous guides for
-{doc}`Creating a Flyte project <creating_a_flyte_project>` and
+{doc}`Creating a Flyte project <../getting_started_with_workflow_development/creating_a_flyte_project>` and
 {ref}`Packaging and Registering Workflows <getting_started_package_register>`.
 ```
 
 ## Create a `FlyteRemote` Object
 
-In {doc}`"Running a workflow locally" <running_a_workflow_locally>`, you saw
+In {doc}`"Running a workflow locally" <../getting_started_with_workflow_development/running_a_workflow_locally>`, you saw
 how to run Flyte workflows with `pyflyte run` in the case that you're working
 with standalone scripts.
 

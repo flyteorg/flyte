@@ -76,7 +76,7 @@ contribute its architecture and design. You can also access the
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`🔤 Intro to Flyte <introduction>`
+* - {doc}`🔤 Introduction to Flyte <introduction/index>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
 * - {doc}`📖 User Guide <flytesnacks/userguide>`

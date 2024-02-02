@@ -14,7 +14,7 @@ kernelspec:
 
 # Tasks, Workflows and LaunchPlans
 
-In {doc}`"Getting started with workflow development" <getting_started_with_workflow_development>`, we got a basic sense
+In {doc}`"Getting started with workflow development" <../getting_started_with_workflow_development/index>`, we got a basic sense
 of how Flyte works by creating and running a basic workflow made up of a few tasks.
 In this guide, you'll learn more about how tasks and workflows fit into the Flyte
 programming model.
@@ -271,10 +271,10 @@ Learn more about chaining flyte entities in the {ref}`User Guide <chain_flyte_en
 A Flyte {py:class}`~flytekit.LaunchPlan` is a partial or complete binding of
 inputs necessary to launch a workflow. You can think of it like
 the {py:func}`~functools.partial` function in the Python standard library where
-you can define default (overrideable) and fixed (non-overrideable) inputs.
+you can define default (overridable) and fixed (non-overridable) inputs.
 
 ```{note}
-Additionally, `LaunchPlan`s provides an interface for specifiying run-time
+Additionally, `LaunchPlan`s provides an interface for specifying run-time
 overrides such as notifications, schedules, and more.
 ```
 
@@ -312,7 +312,7 @@ for reproducibility purposes.
 
 ### LaunchPlans can be Embedded in Workflows
 
-Similar to subworkflows, launchplans can be used in a workflow definition:
+Similar to subworkflows, launch plans can be used in a workflow definition:
 
 ```{code-cell} ipython3
 @workflow

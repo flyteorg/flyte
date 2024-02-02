@@ -365,6 +365,7 @@ import_projects = [
                 "flytesnacks/auto_examples",
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
+                "flytesnacks/getting_started",
             ]
         ],
         "local": flytesnacks_local_path is not None,

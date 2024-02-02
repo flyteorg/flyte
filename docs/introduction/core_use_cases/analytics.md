@@ -94,7 +94,7 @@ def analytics_workflow():
     plot(df=clean_data())
 ```
 
-Running this workflow, we get an interative plot, courtesy of `plotly`:
+Running this workflow, we get an interactive plot, courtesy of `plotly`:
 
 ```{code-cell} ipython3
 ---

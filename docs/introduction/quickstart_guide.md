@@ -90,8 +90,8 @@ def hello_world_wf(name: str = 'world') -> str:
     return res
 ```
 
-To learn more about tasks and workflows, see the {ref}`"Workflow code" section<getting_started_workflow_code>` of {doc}`"Flyte project components"<flyte_project_components>`.
+To learn more about tasks and workflows, see the {ref}`"Workflow code" section<getting_started_workflow_code>` of {doc}`"Flyte project components"<getting_started_with_workflow_development/flyte_project_components>`.
 
 ## Next steps
 
-To create a productionizable Flyte project to structure your code according to software engineering best practices, and that can be used to package your code for deployment to a Flyte cluster, see {doc}`"Getting started with workflow development" <getting_started_with_workflow_development>`
+To create a productionizable Flyte project to structure your code according to software engineering best practices, and that can be used to package your code for deployment to a Flyte cluster, see {doc}`"Getting started with workflow development" <getting_started_with_workflow_development/index>`
