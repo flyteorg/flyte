@@ -40,6 +40,9 @@ workflow:
                       var: my_input
                 var: "n"
               metadata:
+                CacheSerializableValue: null
+                CacheVersionValue: null
+                CacheableValue: null
                 InterruptibleValue: null
                 name: square
                 retries: {}
@@ -87,6 +90,9 @@ workflow:
                       var: my_input
                 var: "n"
               metadata:
+                CacheSerializableValue: null
+                CacheVersionValue: null
+                CacheableValue: null
                 InterruptibleValue: null
                 name: double
                 retries: {}
@@ -98,6 +104,9 @@ workflow:
             var: my_input
       var: .my_input
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: fractions
       retries: {}

@@ -93,6 +93,9 @@ primary:
               var: df
         var: df
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: add_data
         retries: {}

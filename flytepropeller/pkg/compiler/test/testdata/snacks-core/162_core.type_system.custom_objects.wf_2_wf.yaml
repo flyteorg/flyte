@@ -100,6 +100,9 @@ workflow:
         overrides: {}
     id: n0
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: upload_result
       retries: {}
@@ -119,6 +122,9 @@ workflow:
             var: o0
       var: res
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: download_result
       retries: {}
@@ -139,6 +145,9 @@ workflow:
             var: x
       var: x
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: stringify
       retries: {}
@@ -157,6 +166,9 @@ workflow:
             var: "y"
       var: x
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: stringify
       retries: {}
@@ -182,6 +194,9 @@ workflow:
             var: o0
       var: "y"
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: add
       retries: {}

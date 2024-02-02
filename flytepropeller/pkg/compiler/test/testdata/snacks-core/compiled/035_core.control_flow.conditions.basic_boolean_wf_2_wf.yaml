@@ -69,6 +69,9 @@ primary:
               var: seed
         var: seed
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: coin_toss
         retries: {}
@@ -86,6 +89,9 @@ primary:
                     overrides: {}
                 id: n1-n1
                 metadata:
+                  CacheSerializableValue: null
+                  CacheVersionValue: null
+                  CacheableValue: null
                   InterruptibleValue: null
                   name: failed
                   retries: {}
@@ -111,6 +117,9 @@ primary:
                     overrides: {}
                 id: n1-n0
                 metadata:
+                  CacheSerializableValue: null
+                  CacheVersionValue: null
+                  CacheableValue: null
                   InterruptibleValue: null
                   name: success
                   retries: {}
@@ -123,6 +132,9 @@ primary:
               var: o0
         var: n0.o0
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: test
         retries: {}

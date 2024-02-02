@@ -89,6 +89,9 @@ primary:
               var: a
         var: a
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: t1
         retries: {}
@@ -114,6 +117,9 @@ primary:
               var: b
         var: b
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: t2
         retries: {}

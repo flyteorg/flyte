@@ -81,6 +81,9 @@ primary:
               var: a
         var: a
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: get_df
         retries: {}
@@ -100,6 +103,9 @@ primary:
               var: o0
         var: df
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: get_subset_df
         retries: {}
@@ -121,6 +127,9 @@ primary:
               var: o0
         var: ds
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: to_numpy
         retries: {}

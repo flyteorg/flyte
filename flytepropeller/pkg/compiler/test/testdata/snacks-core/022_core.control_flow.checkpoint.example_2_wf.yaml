@@ -35,6 +35,9 @@ workflow:
             var: n_iterations
       var: n_iterations
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: use_checkpoint
       retries:

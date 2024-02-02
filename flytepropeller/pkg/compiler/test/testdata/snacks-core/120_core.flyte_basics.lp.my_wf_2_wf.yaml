@@ -35,6 +35,9 @@ workflow:
             var: val
       var: val
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: square
       retries: {}

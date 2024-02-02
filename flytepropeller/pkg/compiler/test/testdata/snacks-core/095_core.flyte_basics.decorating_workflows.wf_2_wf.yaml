@@ -29,6 +29,9 @@ workflow:
         overrides: {}
     id: n0
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: setup
       retries: {}
@@ -47,6 +50,9 @@ workflow:
             var: x
       var: x
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t1
       retries: {}
@@ -68,6 +74,9 @@ workflow:
             var: o0
       var: x
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t2
       retries: {}
@@ -82,6 +91,9 @@ workflow:
         overrides: {}
     id: n3
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: teardown
       retries: {}

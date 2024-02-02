@@ -69,6 +69,9 @@ workflow:
             var: output_location
       var: output_location
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: normalize_columns
       retries: {}

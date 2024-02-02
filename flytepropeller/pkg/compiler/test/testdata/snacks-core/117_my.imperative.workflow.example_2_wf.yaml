@@ -47,6 +47,9 @@ workflow:
             var: in1
       var: a
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t1
       retries: {}
@@ -59,6 +62,9 @@ workflow:
         overrides: {}
     id: n1
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t2
       retries: {}
@@ -83,6 +89,9 @@ workflow:
                   var: in2
       var: a
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t3
       retries: {}

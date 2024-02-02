@@ -55,6 +55,9 @@ workflow:
             var: number
       var: number
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: greet
       retries: {}

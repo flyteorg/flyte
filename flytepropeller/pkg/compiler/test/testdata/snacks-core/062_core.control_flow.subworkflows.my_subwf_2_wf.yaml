@@ -40,6 +40,9 @@ workflow:
             var: a
       var: a
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t1
       retries: {}
@@ -59,6 +62,9 @@ workflow:
             var: t1_int_output
       var: a
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: t1
       retries: {}

@@ -69,6 +69,9 @@ primary:
               var: path
         var: path
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: my-objectstore-sensor
         retries:
@@ -91,6 +94,9 @@ primary:
               var: path
         var: path
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: print_file
         retries: {}

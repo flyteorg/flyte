@@ -61,6 +61,9 @@ primary:
                     overrides: {}
                 id: n0-n1
                 metadata:
+                  CacheSerializableValue: null
+                  CacheVersionValue: null
+                  CacheableValue: null
                   InterruptibleValue: null
                   name: failed
                   retries: {}
@@ -86,6 +89,9 @@ primary:
                     overrides: {}
                 id: n0-n0
                 metadata:
+                  CacheSerializableValue: null
+                  CacheVersionValue: null
+                  CacheableValue: null
                   InterruptibleValue: null
                   name: success
                   retries: {}
@@ -98,6 +104,9 @@ primary:
               var: b
         var: .b
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: test
         retries: {}

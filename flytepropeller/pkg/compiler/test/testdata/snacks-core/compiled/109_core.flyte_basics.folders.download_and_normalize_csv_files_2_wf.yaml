@@ -92,6 +92,9 @@ primary:
               var: csv_urls
         var: csv_urls
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: download_files
         retries: {}
@@ -123,6 +126,9 @@ primary:
               var: o0
         var: csv_files_dir
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: normalize_all_files
         retries: {}

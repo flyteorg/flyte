@@ -78,6 +78,9 @@ primary:
               var: a
         var: a
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: mapper_a_mappable_task_0
         retries:
@@ -98,6 +101,9 @@ primary:
               var: o0
         var: b
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: coalesce
         retries: {}

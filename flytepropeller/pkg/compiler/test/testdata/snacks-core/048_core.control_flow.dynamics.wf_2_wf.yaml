@@ -45,6 +45,9 @@ workflow:
             var: s2
       var: s2
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: count_characters
       retries: {}

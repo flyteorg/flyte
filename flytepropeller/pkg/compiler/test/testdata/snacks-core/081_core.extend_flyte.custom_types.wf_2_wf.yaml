@@ -23,6 +23,9 @@ workflow:
         overrides: {}
     id: n0
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: generate
       retries: {}
@@ -42,6 +45,9 @@ workflow:
             var: o0
       var: d
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: consume
       retries: {}

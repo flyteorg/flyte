@@ -90,6 +90,9 @@ primary:
               var: c
         var: c
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: enum_stringify
         retries: {}
@@ -109,6 +112,9 @@ primary:
               var: o0
         var: c
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: string_to_enum
         retries: {}

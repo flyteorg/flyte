@@ -163,6 +163,9 @@ primary:
           overrides: {}
       id: n0
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: upload_result
         retries: {}
@@ -182,6 +185,9 @@ primary:
               var: o0
         var: res
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: download_result
         retries: {}
@@ -203,6 +209,9 @@ primary:
               var: x
         var: x
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: stringify
         retries: {}
@@ -222,6 +231,9 @@ primary:
               var: "y"
         var: x
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: stringify
         retries: {}
@@ -247,6 +259,9 @@ primary:
               var: o0
         var: "y"
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: add
         retries: {}

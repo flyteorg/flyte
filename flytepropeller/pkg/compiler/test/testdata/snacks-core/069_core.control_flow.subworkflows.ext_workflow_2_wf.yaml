@@ -35,6 +35,9 @@ workflow:
             var: my_input
       var: input_string1
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: count_freq_words
       retries: {}

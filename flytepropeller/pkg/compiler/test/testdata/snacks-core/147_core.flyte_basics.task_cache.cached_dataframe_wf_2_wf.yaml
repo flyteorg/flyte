@@ -17,6 +17,9 @@ workflow:
         overrides: {}
     id: n0
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: uncached_data_reading_task
       retries: {}
@@ -36,6 +39,9 @@ workflow:
             var: o0
       var: df
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: cached_data_processing_task
       retries: {}
@@ -57,6 +63,9 @@ workflow:
             var: o0
       var: df
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: cached_data_processing_task
       retries: {}
@@ -85,6 +94,9 @@ workflow:
             var: o0
       var: df2
     metadata:
+      CacheSerializableValue: null
+      CacheVersionValue: null
+      CacheableValue: null
       InterruptibleValue: null
       name: compare_dataframes
       retries: {}

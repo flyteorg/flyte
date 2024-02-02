@@ -78,6 +78,9 @@ primary:
           overrides: {}
       id: n0
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: setup
         retries: {}
@@ -97,6 +100,9 @@ primary:
               var: x
         var: x
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: t1
         retries: {}
@@ -118,6 +124,9 @@ primary:
               var: o0
         var: x
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: t2
         retries: {}
@@ -132,6 +141,9 @@ primary:
           overrides: {}
       id: n3
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: teardown
         retries: {}

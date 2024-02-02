@@ -86,6 +86,9 @@ primary:
               var: seed
         var: seed
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: coin_toss
         retries: {}
@@ -116,6 +119,9 @@ primary:
                         var: my_input
                   var: b
                 metadata:
+                  CacheSerializableValue: null
+                  CacheVersionValue: null
+                  CacheableValue: null
                   InterruptibleValue: null
                   name: calc_sum
                   retries: {}
@@ -148,6 +154,9 @@ primary:
                         var: my_input
                   var: "n"
                 metadata:
+                  CacheSerializableValue: null
+                  CacheVersionValue: null
+                  CacheableValue: null
                   InterruptibleValue: null
                   name: square
                   retries: {}
@@ -160,6 +169,9 @@ primary:
               var: o0
         var: n0.o0
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: double_or_square
         retries: {}
@@ -181,6 +193,9 @@ primary:
               var: o0
         var: "n"
       metadata:
+        CacheSerializableValue: null
+        CacheVersionValue: null
+        CacheableValue: null
         InterruptibleValue: null
         name: double
         retries: {}
