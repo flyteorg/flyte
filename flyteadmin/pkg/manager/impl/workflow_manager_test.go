@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/flyteorg/flyte/flytestdlib/utils"
-
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
@@ -31,6 +29,7 @@ import (
 	engine "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const remoteClosureIdentifier = "s3://flyte/metadata/admin/remote closure id"
