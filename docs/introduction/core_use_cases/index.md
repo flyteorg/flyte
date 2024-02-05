@@ -8,7 +8,7 @@ next-page-title: Data Engineering
 # Core Use Cases
 
 This section of the **Getting Started** documentation will take you through the
-core use cases for which that Flyte is designed. Within the context of these guides,
+core use cases for which Flyte is designed. Within the context of these guides,
 we're going to assume that the discipline of data science can be broken down into
 at least three specializations: data engineering, machine learning (or
 statistical modeling more broadly), and analytics.
