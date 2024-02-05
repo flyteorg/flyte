@@ -205,10 +205,10 @@ func NewProvider(ctx context.Context, cfg config.AuthorizationServer, sm core.Se
 
 	// Try to load old key to validate tokens using it to support key rotation.
 	privateKeyPEM, err = sm.Get(ctx, cfg.OldTokenSigningRSAKeySecretName)
-	if privateKeyPEM == "" {
-		return Provider{}, fmt.Errorf("failed to read PKCS1PrivateKey. Error: empty value")
-	}
 	if err == nil {
+		if privateKeyPEM == "" {
+			return Provider{}, fmt.Errorf("failed to read PKCS1PrivateKey. Error: empty value")
+		}
 		block, _ = pem.Decode([]byte(privateKeyPEM))
 		if block == nil {
 			return Provider{}, fmt.Errorf("failed to decode PKCS1PrivateKey. Error: no PEM data found")
