@@ -1,3 +1,10 @@
+---
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
 (getting_started_optimizing_tasks)=
 
 # Optimizing Tasks

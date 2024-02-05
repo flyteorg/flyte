@@ -1,3 +1,10 @@
+---
+kernelspec:
+  display_name: Python 3
+  language: python
+  name: python3
+---
+
 (getting_started_run_and_schedule)=
 
 # Running and Scheduling Workflows
