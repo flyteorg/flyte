@@ -37,6 +37,7 @@ import (
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
+	"github.com/flyteorg/flyte/flyteidl/clients/go/assets"
 	grpcService "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/gateway/flyteidl/service"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/task/secretmanager"
@@ -167,6 +168,10 @@ func GetHandleOpenapiSpec(ctx context.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// TODO: find a better way to point to admin.swagger.json
 		w.WriteHeader(http.StatusOK)
+		_, err := w.Write(assets.AdminSwaggerFile)
+		if err != nil {
+			logger.Errorf(ctx, "failed to write openAPI information, error: %s", err.Error())
+		}
 	}
 }
 
