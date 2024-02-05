@@ -35,8 +35,10 @@ jobs:
           conda install -c conda-forge conda-lock
           conda-lock install -n monodocs-env monodocs-environment.lock.yaml
       - shell: bash -el {0}
+        working-directory: ${{ github.workspace }}/flyte
         run: |
           conda activate monodocs-env
+          pip install ./flyteidl
           conda info
           conda list
           conda config --show-sources
