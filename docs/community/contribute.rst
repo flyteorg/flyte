@@ -227,7 +227,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
     * - `Repo <https://github.com/flyteorg/flytekit>`__
     * - **Purpose**: Python SDK & Tools
     * - **Language**: Python
-    * - **Guidelines**: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/projects/flytekit/en/latest/contributing.html>`__
+    * - **Guidelines**: Refer to the `Flytekit Contribution Guide <https://docs.flyte.org/en/latest/api/flytekit/contributing.html>`__
 
 ``flyteconsole``
 ****************
