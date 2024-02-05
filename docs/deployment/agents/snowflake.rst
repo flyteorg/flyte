@@ -5,8 +5,8 @@ Snowflake agent
 
 This guide provides an overview of how to set up the Snowflake agent in your Flyte deployment.
 
-1. Setup the key pair authentication in snowflake. For more details, you can refer to `here <https://docs.snowflake.com/en/user-guide/key-pair-auth>`__.
-2. Create a secret with the group "snowflake" and the key "private_key". For more details, you can refer to `here <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/use_secrets.html#secrets>`__.
+1. Set up the key pair authentication in Snowflake. For more details, see the `Snowflake key-pair authentication and key-pair rotation guide <https://docs.snowflake.com/en/user-guide/key-pair-auth>`__.
+2. Create a secret with the group "snowflake" and the key "private_key". For more details, see `"Using Secrets in a Task" <https://https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/use_secrets.html>`__.
 
 .. code-block:: bash
    kubectl create secret generic snowflake-private-key --namespace=flytesnacks-development --from-file=your_private_key_above
@@ -99,4 +99,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For Snowflake plugin on the Flyte cluster, please refer to `Snowflake Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_plugin/snowflake.html>`_
+For Snowflake plugin on the Flyte cluster, see `Snowflake Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_plugin/snowflake.html>`_

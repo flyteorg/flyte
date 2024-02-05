@@ -4,8 +4,8 @@ Airflow agent
 =================
 
 This guide provides an overview of how to set up the Airflow agent in your Flyte deployment.
-Please note that the you don't need an Airflow cluster to run the airflow tasks. Flytekit will
-automatically compile it to a Flyte task and execute it on the Flyte cluster.
+Please note that the you don't need an Airflow cluster to run the Airflow tasks, since Flytekit will
+automatically compile Airflow tasks to Flyte tasks and execute them on the Flyte cluster.
 
 Specify agent configuration
 ----------------------------
@@ -94,4 +94,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For Airflow plugin on the Flyte cluster, please refer to `Airflow Plugin Example <TODO: Add airflow plugin example>`_
+For Airflow plugin on the Flyte cluster, see `Airflow Plugin Example <TODO: Add airflow plugin example>`_

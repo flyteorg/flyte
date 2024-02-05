@@ -291,4 +291,4 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-For databricks plugin on the Flyte cluster, please refer to `Databricks Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/databricks_plugin/index.html>`_
+For databricks plugin on the Flyte cluster, see `Databricks Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/databricks_plugin/index.html>`_

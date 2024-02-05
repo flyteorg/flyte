@@ -103,4 +103,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For BigQuery plugin on the Flyte cluster, please refer to `BigQuery Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/bigquery_plugin/bigquery.html>`_
+For BigQuery plugin on the Flyte cluster, see `BigQuery Plugin Example <https://docs.flyte.org/en/latest/flytesnacks/examples/bigquery_plugin/bigquery.html>`_
