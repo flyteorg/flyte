@@ -103,6 +103,9 @@ spec:
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
+      {{- with .Values.flytepropeller.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
 ---
 # Service
 apiVersion: v1
@@ -154,6 +157,9 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end}}
 {{- end }}
+  {{- with .Values.webhook.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
 ---
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding
