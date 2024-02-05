@@ -279,11 +279,11 @@ func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T)
 	assert.EqualError(t, err, "project_name cannot exceed 64 characters")
 }
 
-func TestGetProject(t *testing.T) {
-	repository := repositoryMocks.NewMockRepository()
+func TestProjectManager_TestGetProject(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
 	mockedProject := &admin.Project{Id: project}
 	activeState := int32(admin.Project_ACTIVE)
-	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
 
 		return models.Project{
 			BaseModel:   models.BaseModel{},
@@ -294,7 +294,7 @@ func TestGetProject(t *testing.T) {
 		}, nil
 	}
 
-	projectManager := NewProjectManager(repository, runtimeMocks.NewMockConfigurationProvider(
+	projectManager := NewProjectManager(mockRepository, runtimeMocks.NewMockConfigurationProvider(
 		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 
 	resp, _ := projectManager.GetProject(context.Background(),
@@ -304,4 +304,20 @@ func TestGetProject(t *testing.T) {
 	assert.Equal(t, "a-mocked-project", resp.Name)
 	assert.Equal(t, "A mocked project", resp.Description)
 	assert.Equal(t, admin.Project_ProjectState(0), resp.State)
+}
+
+func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockedProject := &admin.Project{Id: project}
+	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
+		return models.Project{}, errors.New("project " + projectID + " not found")
+	}
+
+	projectManager := NewProjectManager(mockRepository, runtimeMocks.NewMockConfigurationProvider(
+		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+
+	_, err := projectManager.GetProject(context.Background(),
+		admin.ProjectRequest{Project: mockedProject})
+
+	assert.Equal(t, errors.New("project "+project+" not found"), err)
 }
