@@ -18,6 +18,10 @@ spec:
         {{- end }}
       labels: {{ include "flyteconsole.podLabels" . | nindent 8 }}
     spec:
+    {{- with .Values.flyteconsole.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       securityContext:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"

@@ -157,6 +157,9 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end}}
 {{- end }}
+  {{- with .Values.webhook.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
 ---
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding
