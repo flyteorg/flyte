@@ -911,7 +911,7 @@
       "properties": {
         "statement": {
           "type": "string",
-          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
+          "title": "The actual query to run, the query can have templated parameters.\nWe use Flyte's Golang templating format for Query templating.\nRefer to the templating documentation.\nhttps://docs.flyte.org/en/latest/flytesnacks/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py\nFor example,\ninsert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet\nselect *\nfrom my_table\nwhere ds = '{{ .Inputs.ds }}'"
         },
         "dialect": {
           "$ref": "#/definitions/SqlDialect"

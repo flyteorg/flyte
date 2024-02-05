@@ -18,8 +18,8 @@ This specification is used to generate client stubs for `Flytekit <https://flyte
    :hidden:
 
    |plane| Getting Started <https://docs.flyte.org/en/latest/getting_started.html>
-   |book-reader| User Guide <https://docs.flyte.org/projects/cookbook/en/latest/user_guide.html>
-   |chalkboard| Tutorials <https://docs.flyte.org/projects/cookbook/en/latest/tutorials.html>
+   |book-reader| User Guide <https://docs.flyte.org/en/latest/flytesnacks/user_guide.html>
+   |chalkboard| Tutorials <https://docs.flyte.org/en/latest/flytesnacks/tutorials.html>
    |project-diagram| Concepts <https://docs.flyte.org/en/latest/concepts/basics.html>
    |rocket| Deployment <https://docs.flyte.org/en/latest/deployment/index.html>
    |book| API Reference <https://docs.flyte.org/en/latest/reference/index.html>
