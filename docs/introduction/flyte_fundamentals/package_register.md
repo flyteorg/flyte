@@ -14,7 +14,7 @@ kernelspec:
 
 # Registering Workflows
 
-In this guide, you'll learn how to package and register your tasks and
+In this guide, you'll learn how to package and register (that is, deploy) your tasks and
 workflows to a Flyte cluster. This will enable you to scale your workloads with
 larger memory and compute requirements, schedule your workflows to run on a
 pre-defined cadence, and leverage the Flyte backend plugins like Spark.

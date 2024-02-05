@@ -74,7 +74,7 @@ that you have connection credentials available in the configured
 Next, we parse the raw `timestamp`s and represent the time as separate `date`
 and `time` columns. Notice that we can encode the assumptions we have about this
 task's resource requirements with the {py:class}`~flytekit.Resources` object.
-If those assumptions ever change we can update the resource request here, or
+If those assumptions ever change, we can update the resource request here, or
 override it at the workflow-level with the {ref}`with_overrides <resource_with_overrides>` method.
 
 ```{code-cell} ipython3

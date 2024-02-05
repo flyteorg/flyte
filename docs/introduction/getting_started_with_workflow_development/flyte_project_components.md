@@ -8,7 +8,7 @@ jupytext:
 
 # Flyte project components
 
-A Flyte project is a directory containing task and workflow code, internal Python source code, configuration files, and other artifacts needed to package up your code so that it can be run on a Flyte cluster.
+A Flyte project is a directory containing task and workflow code, internal Python source code, configuration files, and other artifacts required to package up your code so that it can be run on a Flyte cluster.
 
 ## Directory structure
 

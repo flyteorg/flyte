@@ -9,7 +9,7 @@ next-page-title: Tasks, Workflows and LaunchPlans
 
 # Flyte Fundamentals
 
-This section of the **Getting Started** documentation will take you through the
+This section of the documentation will take you through the
 fundamental concepts of Flyte: tasks, workflows, and launch plans.
 
 You'll learn about the full development lifecycle of creating a project,

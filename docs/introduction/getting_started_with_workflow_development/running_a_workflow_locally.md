@@ -10,7 +10,7 @@ jupytext:
 
 You can run a workflow locally in two ways:
 
-* **{ref}`In a local Python environment <getting_started_running_workflow_local_python_environment>`:** To develop and test your code quickly without the overhead of setting up a local Flyte cluster, you can run your workflow in a local Python environment.
+* **{ref}`In a local Python environment <getting_started_running_workflow_local_python_environment>`:** To develop and test your code quickly without the overhead of setting up a local Flyte cluster, you can run your workflow in your local Python environment.
 * **{ref}`In a local Flyte cluster <getting_started_running_workflow_local_cluster>`:** To test your code in a more production-like setting, you can run your workflow in a local cluster, such as the demo Flyte cluster.
 
 (getting_started_running_workflow_local_python_environment)=

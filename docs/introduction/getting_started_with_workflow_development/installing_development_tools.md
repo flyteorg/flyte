@@ -10,7 +10,7 @@ jupytext:
 
 # Installing development tools
 
-To create and run workflows in Flyte, you must install Python and Flytekit. We recommend installing conda or another Python virtual environment manager to manage Flytekit and other dependencies, but if you do not, you can install Flytekit with pip.
+To create and run workflows in Flyte, you must install Python and Flytekit. We recommend installing conda or another Python virtual environment manager to manage Flytekit and other dependencies, but if you do not, you can simply install Flytekit with pip.
 
 ## 1. Install Python
 

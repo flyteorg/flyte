@@ -10,7 +10,7 @@ jupytext:
 
 ## About Flyte projects
 
-A Flyte project is a directory containing task and workflow code, internal Python source code, configuration files, and other artifacts structured according to software engineering best practices that enables you to package up your code so that it can be registered to a Flyte cluster.
+A Flyte project is a directory containing task and workflow code, internal Python source code, configuration files, and other artifacts needed to package up your code so that it can be registered to a Flyte cluster.
 
 ## Prerequisites
 

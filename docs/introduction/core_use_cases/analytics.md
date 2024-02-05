@@ -23,7 +23,7 @@ processing and visualization tools.
 
 ## Cleaning Data
 
-In this example, we're going to analyze some covid vaccination data:
+In this example, we are going to analyze some covid vaccination data:
 
 ```{code-cell} ipython3
 import pandas as pd

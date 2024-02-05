@@ -20,7 +20,7 @@ or machine-learning-driven applications.
 
 Running your workflows locally is great for the initial stages of testing, but
 what if you need to make sure that they run as intended on a Flyte cluster?
-What if you need to run them on a regular cadence?
+And, what if you need to run them on a regular cadence?
 
 In this guide we'll cover how to run and schedule workflows for both development
 and production use cases.

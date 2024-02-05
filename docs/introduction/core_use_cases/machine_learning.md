@@ -22,7 +22,7 @@ optimization.
 
 In this simple example, we train a binary classification model on the
 [wine dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#wine-dataset)
-that's available through the `scikit-learn` package:
+that is available through the `scikit-learn` package:
 
 ```{code-cell} ipython3
 import pandas as pd

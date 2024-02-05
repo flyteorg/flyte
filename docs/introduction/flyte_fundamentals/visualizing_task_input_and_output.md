@@ -14,7 +14,7 @@ kernelspec:
 
 # Visualizing task input and output
 
-Flyte {py:class}`~flytekit.deck.Deck`s are one of the first-class constructs in
+Flyte {py:class}`~flytekit.deck.Deck`s are a first-class construct in
 Flyte, allowing you to generate static HTML reports associated with any of the
 outputs materialized within your tasks.
 

@@ -35,8 +35,8 @@ However, the types that ship with Flyte or one of Flyte's
 {ref}`first-party integrations <integrations>` may not fulfill your needs. In
 this case, you'll need to create your own.
 
-The easiest way to do with is with the {py:mod}`dataclasses` module, which
-let you compose several Flyte-supported types into a single object. For
+The easiest way to do this is with the {py:mod}`dataclasses` module, which
+lets you compose several Flyte-supported types into a single object. For
 example, suppose you want to support a coordinates data type with arbitrary
 metadata:
 
