@@ -7,7 +7,6 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
-	"fmt"
 	"testing"
 	"time"
 
@@ -34,7 +33,7 @@ func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
 	var buf bytes.Buffer
 	assert.NoError(t, pem.Encode(&buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: privBytes}))
 	sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
-	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return("", fmt.Errorf("not found"))
+	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
 	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
 	assert.NoError(t, err)
@@ -47,7 +46,7 @@ func TestNewProvider(t *testing.T) {
 
 func TestProvider_KeySet(t *testing.T) {
 	p, _ := newMockProvider(t)
-	assert.Equal(t, 1, p.KeySet().Len())
+	assert.Equal(t, 2, p.KeySet().Len())
 }
 
 func TestProvider_NewJWTSessionToken(t *testing.T) {
@@ -64,7 +63,7 @@ func TestProvider_NewJWTSessionToken(t *testing.T) {
 
 func TestProvider_PublicKeys(t *testing.T) {
 	p, _ := newMockProvider(t)
-	assert.Len(t, p.PublicKeys(), 1)
+	assert.Len(t, p.PublicKeys(), 2)
 }
 
 type CustomClaimsExample struct {
@@ -175,7 +174,7 @@ func TestProvider_ValidateAccessToken(t *testing.T) {
 		var buf bytes.Buffer
 		assert.NoError(t, pem.Encode(&buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: privBytes}))
 		sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
-		sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return("", fmt.Errorf("not found"))
+		sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
 
 		p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
 		assert.NoError(t, err)
