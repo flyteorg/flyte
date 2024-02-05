@@ -49668,6 +49668,39 @@
                  */
     
                 /**
+                 * Callback as used by {@link flyteidl.service.AdminService#getProject}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef GetProjectCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.Project} [response] Project
+                 */
+    
+                /**
+                 * Calls GetProject.
+                 * @function getProject
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IProjectRequest} request ProjectRequest message or plain object
+                 * @param {flyteidl.service.AdminService.GetProjectCallback} callback Node-style callback called with the error, if any, and Project
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.getProject = function getProject(request, callback) {
+                    return this.rpcCall(getProject, $root.flyteidl.admin.ProjectRequest, $root.flyteidl.admin.Project, request, callback);
+                }, "name", { value: "GetProject" });
+    
+                /**
+                 * Calls GetProject.
+                 * @function getProject
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IProjectRequest} request ProjectRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.Project>} Promise
+                 * @variation 2
+                 */
+    
+                /**
                  * Callback as used by {@link flyteidl.service.AdminService#listProjects}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef ListProjectsCallback

@@ -4950,6 +4950,65 @@
         ]
       }
     },
+    "/api/v1/projects/org/{project.id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "operationId": "GetProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project.id",
+            "description": "Globally unique project name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project.name",
+            "description": "Display name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "project.description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "project.state",
+            "description": " - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED",
+              "SYSTEM_GENERATED"
+            ],
+            "default": "ACTIVE"
+          },
+          {
+            "name": "project.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/projects/org/{project.org}": {
       "post": {
         "summary": "Registers a :ref:`ref_flyteidl.admin.Project` with the Flyte deployment.",

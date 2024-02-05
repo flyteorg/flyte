@@ -4657,6 +4657,119 @@ class AdminServiceApi(object):
             _request_timeout=params.get('_request_timeout'),
             collection_formats=collection_formats)
 
+    def get_project2(self, project_id, **kwargs):  # noqa: E501
+        """Fetches a :ref:`ref_flyteidl.admin.Project`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_project2(project_id, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project_id: Globally unique project name. (required)
+        :param str project_name: Display name.
+        :param str project_description:
+        :param str project_state:  - ACTIVE: By default, all projects are considered active.  - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.  - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.
+        :param str project_org: Optional, org key applied to the resource.
+        :return: AdminProject
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+        kwargs['_return_http_data_only'] = True
+        if kwargs.get('async_req'):
+            return self.get_project2_with_http_info(project_id, **kwargs)  # noqa: E501
+        else:
+            (data) = self.get_project2_with_http_info(project_id, **kwargs)  # noqa: E501
+            return data
+
+    def get_project2_with_http_info(self, project_id, **kwargs):  # noqa: E501
+        """Fetches a :ref:`ref_flyteidl.admin.Project`  # noqa: E501
+
+        This method makes a synchronous HTTP request by default. To make an
+        asynchronous HTTP request, please pass async_req=True
+        >>> thread = api.get_project2_with_http_info(project_id, async_req=True)
+        >>> result = thread.get()
+
+        :param async_req bool
+        :param str project_id: Globally unique project name. (required)
+        :param str project_name: Display name.
+        :param str project_description:
+        :param str project_state:  - ACTIVE: By default, all projects are considered active.  - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.  - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.
+        :param str project_org: Optional, org key applied to the resource.
+        :return: AdminProject
+                 If the method is called asynchronously,
+                 returns the request thread.
+        """
+
+        all_params = ['project_id', 'project_name', 'project_description', 'project_state', 'project_org']  # noqa: E501
+        all_params.append('async_req')
+        all_params.append('_return_http_data_only')
+        all_params.append('_preload_content')
+        all_params.append('_request_timeout')
+
+        params = locals()
+        for key, val in six.iteritems(params['kwargs']):
+            if key not in all_params:
+                raise TypeError(
+                    "Got an unexpected keyword argument '%s'"
+                    " to method get_project2" % key
+                )
+            params[key] = val
+        del params['kwargs']
+        # verify the required parameter 'project_id' is set
+        if ('project_id' not in params or
+                params['project_id'] is None):
+            raise ValueError("Missing the required parameter `project_id` when calling `get_project2`")  # noqa: E501
+
+        collection_formats = {}
+
+        path_params = {}
+        if 'project_id' in params:
+            path_params['project.id'] = params['project_id']  # noqa: E501
+
+        query_params = []
+        if 'project_name' in params:
+            query_params.append(('project.name', params['project_name']))  # noqa: E501
+        if 'project_description' in params:
+            query_params.append(('project.description', params['project_description']))  # noqa: E501
+        if 'project_state' in params:
+            query_params.append(('project.state', params['project_state']))  # noqa: E501
+        if 'project_org' in params:
+            query_params.append(('project.org', params['project_org']))  # noqa: E501
+
+        header_params = {}
+
+        form_params = []
+        local_var_files = {}
+
+        body_params = None
+        # HTTP header `Accept`
+        header_params['Accept'] = self.api_client.select_header_accept(
+            ['application/json'])  # noqa: E501
+
+        # HTTP header `Content-Type`
+        header_params['Content-Type'] = self.api_client.select_header_content_type(  # noqa: E501
+            ['application/json'])  # noqa: E501
+
+        # Authentication setting
+        auth_settings = []  # noqa: E501
+
+        return self.api_client.call_api(
+            '/api/v1/projects/org/{project.id}', 'GET',
+            path_params,
+            query_params,
+            header_params,
+            body=body_params,
+            post_params=form_params,
+            files=local_var_files,
+            response_type='AdminProject',  # noqa: E501
+            auth_settings=auth_settings,
+            async_req=params.get('async_req'),
+            _return_http_data_only=params.get('_return_http_data_only'),
+            _preload_content=params.get('_preload_content', True),
+            _request_timeout=params.get('_request_timeout'),
+            collection_formats=collection_formats)
+
     def get_project_attributes(self, project, **kwargs):  # noqa: E501
         """Fetches custom :ref:`ref_flyteidl.admin.MatchableAttributesConfiguration` for a project and domain.  # noqa: E501
 

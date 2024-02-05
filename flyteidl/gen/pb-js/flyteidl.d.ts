@@ -20738,6 +20738,20 @@ export namespace flyteidl {
             public updateProject(request: flyteidl.admin.IProject): Promise<flyteidl.admin.ProjectUpdateResponse>;
 
             /**
+             * Calls GetProject.
+             * @param request ProjectRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and Project
+             */
+            public getProject(request: flyteidl.admin.IProjectRequest, callback: flyteidl.service.AdminService.GetProjectCallback): void;
+
+            /**
+             * Calls GetProject.
+             * @param request ProjectRequest message or plain object
+             * @returns Promise
+             */
+            public getProject(request: flyteidl.admin.IProjectRequest): Promise<flyteidl.admin.Project>;
+
+            /**
              * Calls ListProjects.
              * @param request ProjectListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and Projects
@@ -21285,6 +21299,13 @@ export namespace flyteidl {
              * @param [response] ProjectUpdateResponse
              */
             type UpdateProjectCallback = (error: (Error|null), response?: flyteidl.admin.ProjectUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getProject}.
+             * @param error Error, if any
+             * @param [response] Project
+             */
+            type GetProjectCallback = (error: (Error|null), response?: flyteidl.admin.Project) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listProjects}.

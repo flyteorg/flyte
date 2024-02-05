@@ -504,6 +504,19 @@ service AdminService {
     // };
   }
 
+  // Fetches a :ref:`ref_flyteidl.admin.Project`
+  rpc GetProject (flyteidl.admin.ProjectRequest) returns (flyteidl.admin.Project) {
+    option (google.api.http) = {
+      get: "/api/v1/projects"
+      additional_bindings {
+        get: "/api/v1/projects/org/{project.id}"
+      }
+    };
+    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+    //   description: "Fetch a registered project."
+    // };
+  }
+
   // Fetches a list of :ref:`ref_flyteidl.admin.Project`
   rpc ListProjects (flyteidl.admin.ProjectListRequest) returns (flyteidl.admin.Projects) {
     option (google.api.http) = {
