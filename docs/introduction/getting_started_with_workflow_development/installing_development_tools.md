@@ -1,11 +1,3 @@
----
-jupytext:
-  formats: md:myst
-  text_representation:
-    extension: .md
-    format_name: myst
----
-
 (getting_started_installing_development_tools)=
 
 # Installing development tools

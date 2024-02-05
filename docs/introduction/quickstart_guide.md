@@ -1,11 +1,3 @@
----
-# override the toc-determined page navigation order
-prev-page: index
-prev-page-title: Introduction to Flyte
-next-page: getting_started/getting_started_with_workflow_development
-next-page-title: Getting started with workflow development
----
-
 (getting_started_quickstart_guide)=
 # Quickstart guide
 

@@ -1,9 +1,3 @@
----
-# override the toc-determined page navigation order
-prev-page: getting_started/quickstart_guide
-prev-page-title: Quickstart guide
----
-
 (getting_started_workflow_development)=
 # Getting started with workflow development
 

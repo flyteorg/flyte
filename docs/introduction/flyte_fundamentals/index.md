@@ -1,10 +1,3 @@
----
-prev-page: getting_started/creating_and_running_a_flyte_launch_plan
-prev-page-title: Creating and running a Flyte Launch Plan
-next-page: getting_started/tasks_and_workflows
-next-page-title: Tasks, Workflows and LaunchPlans
----
-
 (getting_started_fundamentals)=
 
 # Flyte Fundamentals

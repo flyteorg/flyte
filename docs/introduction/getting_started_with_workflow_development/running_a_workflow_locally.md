@@ -1,11 +1,3 @@
----
-jupytext:
-  formats: md:myst
-  text_representation:
-    extension: .md
-    format_name: myst
----
-
 # Running a workflow locally
 
 You can run a workflow locally in two ways:
