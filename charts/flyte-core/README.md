@@ -189,6 +189,8 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.serviceMonitor.scrapeTimeout | string | `"30s"` | Sets the timeout after which request to scrape metrics will time out |
 | flyteadmin.tolerations | list | `[]` | tolerations for Flyteadmin deployment |
 | flyteagent.enabled | bool | `false` |  |
+| flyteagent.plugin_config.plugins.agentService.defaultAgent.endpoint | string | `"dns:///flyteagent.flyte.svc.cluster.local:8000"` |  |
+| flyteagent.plugin_config.plugins.agentService.defaultAgent.insecure | bool | `true` |  |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |

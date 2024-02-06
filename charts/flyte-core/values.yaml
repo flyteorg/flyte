@@ -249,6 +249,12 @@ datacatalog:
 
 flyteagent:
   enabled: false
+  plugin_config:
+    plugins:
+      agentService:
+        defaultAgent:
+          endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          insecure: true
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -752,11 +758,6 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      # Uncomment and modify to include configuration for Flyte Agent
-      # agent-service:
-      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
-      #   supportedTaskTypes:
-      #     - bigquery_query_job_task
   remoteData:
     remoteData:
       region: "us-east-1"

@@ -547,12 +547,6 @@ flyte:
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
           default-memory: 200Mi
-        agent-service:
-          defaultAgent:
-            endpoint: dns:///flyteagent.flyte.svc.cluster.local:8000
-            insecure: true
-          supportedTaskTypes:
-            - bigquery_query_job_task
 
     # -- Logger configuration
     logger:
