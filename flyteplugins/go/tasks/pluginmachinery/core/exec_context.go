@@ -3,6 +3,8 @@ package core
 import (
 	"context"
 
+	_struct "github.com/golang/protobuf/ptypes/struct"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/catalog"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -66,7 +68,8 @@ type TaskExecutionContext interface {
 	EventsRecorder() EventsRecorder
 
 	// GetExecutionEnv returns the execution environment for the given environment type (if exists).
-	GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment
+	//GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment TODO @hamersaw
+	GetExecutionEnv(string) *_struct.Struct
 }
 
 // A simple fire-and-forget func

@@ -17533,8 +17533,9 @@
                  * @interface IExecutionEnvironmentAssignment
                  * @property {string|null} [id] ExecutionEnvironmentAssignment id
                  * @property {Array.<string>|null} [nodeIds] ExecutionEnvironmentAssignment nodeIds
-                 * @property {flyteidl.core.IExecutionEnvironment|null} [environment] ExecutionEnvironmentAssignment environment
-                 * @property {flyteidl.core.IExecutionEnvironmentSpec|null} [environmentSpec] ExecutionEnvironmentAssignment environmentSpec
+                 * @property {string|null} [type] ExecutionEnvironmentAssignment type
+                 * @property {google.protobuf.IStruct|null} [environment] ExecutionEnvironmentAssignment environment
+                 * @property {google.protobuf.IStruct|null} [environmentSpec] ExecutionEnvironmentAssignment environmentSpec
                  */
     
                 /**
@@ -17570,8 +17571,16 @@
                 ExecutionEnvironmentAssignment.prototype.nodeIds = $util.emptyArray;
     
                 /**
+                 * ExecutionEnvironmentAssignment type.
+                 * @member {string} type
+                 * @memberof flyteidl.core.ExecutionEnvironmentAssignment
+                 * @instance
+                 */
+                ExecutionEnvironmentAssignment.prototype.type = "";
+    
+                /**
                  * ExecutionEnvironmentAssignment environment.
-                 * @member {flyteidl.core.IExecutionEnvironment|null|undefined} environment
+                 * @member {google.protobuf.IStruct|null|undefined} environment
                  * @memberof flyteidl.core.ExecutionEnvironmentAssignment
                  * @instance
                  */
@@ -17579,7 +17588,7 @@
     
                 /**
                  * ExecutionEnvironmentAssignment environmentSpec.
-                 * @member {flyteidl.core.IExecutionEnvironmentSpec|null|undefined} environmentSpec
+                 * @member {google.protobuf.IStruct|null|undefined} environmentSpec
                  * @memberof flyteidl.core.ExecutionEnvironmentAssignment
                  * @instance
                  */
@@ -17628,10 +17637,12 @@
                     if (message.nodeIds != null && message.nodeIds.length)
                         for (var i = 0; i < message.nodeIds.length; ++i)
                             writer.uint32(/* id 2, wireType 2 =*/18).string(message.nodeIds[i]);
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.type);
                     if (message.environment != null && message.hasOwnProperty("environment"))
-                        $root.flyteidl.core.ExecutionEnvironment.encode(message.environment, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                        $root.google.protobuf.Struct.encode(message.environment, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.environmentSpec != null && message.hasOwnProperty("environmentSpec"))
-                        $root.flyteidl.core.ExecutionEnvironmentSpec.encode(message.environmentSpec, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                        $root.google.protobuf.Struct.encode(message.environmentSpec, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -17662,10 +17673,13 @@
                             message.nodeIds.push(reader.string());
                             break;
                         case 3:
-                            message.environment = $root.flyteidl.core.ExecutionEnvironment.decode(reader, reader.uint32());
+                            message.type = reader.string();
                             break;
                         case 4:
-                            message.environmentSpec = $root.flyteidl.core.ExecutionEnvironmentSpec.decode(reader, reader.uint32());
+                            message.environment = $root.google.protobuf.Struct.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.environmentSpec = $root.google.protobuf.Struct.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -17697,10 +17711,13 @@
                             if (!$util.isString(message.nodeIds[i]))
                                 return "nodeIds: string[] expected";
                     }
+                    if (message.type != null && message.hasOwnProperty("type"))
+                        if (!$util.isString(message.type))
+                            return "type: string expected";
                     if (message.environment != null && message.hasOwnProperty("environment")) {
                         properties.assignment = 1;
                         {
-                            var error = $root.flyteidl.core.ExecutionEnvironment.verify(message.environment);
+                            var error = $root.google.protobuf.Struct.verify(message.environment);
                             if (error)
                                 return "environment." + error;
                         }
@@ -17710,7 +17727,7 @@
                             return "assignment: multiple values";
                         properties.assignment = 1;
                         {
-                            var error = $root.flyteidl.core.ExecutionEnvironmentSpec.verify(message.environmentSpec);
+                            var error = $root.google.protobuf.Struct.verify(message.environmentSpec);
                             if (error)
                                 return "environmentSpec." + error;
                         }
@@ -17719,555 +17736,6 @@
                 };
     
                 return ExecutionEnvironmentAssignment;
-            })();
-    
-            /**
-             * EnvironmentType enum.
-             * @name flyteidl.core.EnvironmentType
-             * @enum {string}
-             * @property {number} FAST_TASK=0 FAST_TASK value
-             */
-            core.EnvironmentType = (function() {
-                var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "FAST_TASK"] = 0;
-                return values;
-            })();
-    
-            core.ExecutionEnvironment = (function() {
-    
-                /**
-                 * Properties of an ExecutionEnvironment.
-                 * @memberof flyteidl.core
-                 * @interface IExecutionEnvironment
-                 * @property {flyteidl.core.EnvironmentType|null} [type] ExecutionEnvironment type
-                 * @property {flyteidl.core.IFastTaskEnvironment|null} [fastTask] ExecutionEnvironment fastTask
-                 */
-    
-                /**
-                 * Constructs a new ExecutionEnvironment.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents an ExecutionEnvironment.
-                 * @implements IExecutionEnvironment
-                 * @constructor
-                 * @param {flyteidl.core.IExecutionEnvironment=} [properties] Properties to set
-                 */
-                function ExecutionEnvironment(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ExecutionEnvironment type.
-                 * @member {flyteidl.core.EnvironmentType} type
-                 * @memberof flyteidl.core.ExecutionEnvironment
-                 * @instance
-                 */
-                ExecutionEnvironment.prototype.type = 0;
-    
-                /**
-                 * ExecutionEnvironment fastTask.
-                 * @member {flyteidl.core.IFastTaskEnvironment|null|undefined} fastTask
-                 * @memberof flyteidl.core.ExecutionEnvironment
-                 * @instance
-                 */
-                ExecutionEnvironment.prototype.fastTask = null;
-    
-                /**
-                 * Creates a new ExecutionEnvironment instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.ExecutionEnvironment
-                 * @static
-                 * @param {flyteidl.core.IExecutionEnvironment=} [properties] Properties to set
-                 * @returns {flyteidl.core.ExecutionEnvironment} ExecutionEnvironment instance
-                 */
-                ExecutionEnvironment.create = function create(properties) {
-                    return new ExecutionEnvironment(properties);
-                };
-    
-                /**
-                 * Encodes the specified ExecutionEnvironment message. Does not implicitly {@link flyteidl.core.ExecutionEnvironment.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.ExecutionEnvironment
-                 * @static
-                 * @param {flyteidl.core.IExecutionEnvironment} message ExecutionEnvironment message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ExecutionEnvironment.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.type != null && message.hasOwnProperty("type"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
-                    if (message.fastTask != null && message.hasOwnProperty("fastTask"))
-                        $root.flyteidl.core.FastTaskEnvironment.encode(message.fastTask, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an ExecutionEnvironment message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.ExecutionEnvironment
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.ExecutionEnvironment} ExecutionEnvironment
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ExecutionEnvironment.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ExecutionEnvironment();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.type = reader.int32();
-                            break;
-                        case 2:
-                            message.fastTask = $root.flyteidl.core.FastTaskEnvironment.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an ExecutionEnvironment message.
-                 * @function verify
-                 * @memberof flyteidl.core.ExecutionEnvironment
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ExecutionEnvironment.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.type != null && message.hasOwnProperty("type"))
-                        switch (message.type) {
-                        default:
-                            return "type: enum value expected";
-                        case 0:
-                            break;
-                        }
-                    if (message.fastTask != null && message.hasOwnProperty("fastTask")) {
-                        var error = $root.flyteidl.core.FastTaskEnvironment.verify(message.fastTask);
-                        if (error)
-                            return "fastTask." + error;
-                    }
-                    return null;
-                };
-    
-                return ExecutionEnvironment;
-            })();
-    
-            core.FastTaskEnvironment = (function() {
-    
-                /**
-                 * Properties of a FastTaskEnvironment.
-                 * @memberof flyteidl.core
-                 * @interface IFastTaskEnvironment
-                 * @property {string|null} [queueId] FastTaskEnvironment queueId
-                 * @property {string|null} [namespace] FastTaskEnvironment namespace
-                 * @property {string|null} [podName] FastTaskEnvironment podName
-                 */
-    
-                /**
-                 * Constructs a new FastTaskEnvironment.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents a FastTaskEnvironment.
-                 * @implements IFastTaskEnvironment
-                 * @constructor
-                 * @param {flyteidl.core.IFastTaskEnvironment=} [properties] Properties to set
-                 */
-                function FastTaskEnvironment(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * FastTaskEnvironment queueId.
-                 * @member {string} queueId
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @instance
-                 */
-                FastTaskEnvironment.prototype.queueId = "";
-    
-                /**
-                 * FastTaskEnvironment namespace.
-                 * @member {string} namespace
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @instance
-                 */
-                FastTaskEnvironment.prototype.namespace = "";
-    
-                /**
-                 * FastTaskEnvironment podName.
-                 * @member {string} podName
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @instance
-                 */
-                FastTaskEnvironment.prototype.podName = "";
-    
-                /**
-                 * Creates a new FastTaskEnvironment instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @static
-                 * @param {flyteidl.core.IFastTaskEnvironment=} [properties] Properties to set
-                 * @returns {flyteidl.core.FastTaskEnvironment} FastTaskEnvironment instance
-                 */
-                FastTaskEnvironment.create = function create(properties) {
-                    return new FastTaskEnvironment(properties);
-                };
-    
-                /**
-                 * Encodes the specified FastTaskEnvironment message. Does not implicitly {@link flyteidl.core.FastTaskEnvironment.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @static
-                 * @param {flyteidl.core.IFastTaskEnvironment} message FastTaskEnvironment message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                FastTaskEnvironment.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.queueId != null && message.hasOwnProperty("queueId"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.queueId);
-                    if (message.namespace != null && message.hasOwnProperty("namespace"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.namespace);
-                    if (message.podName != null && message.hasOwnProperty("podName"))
-                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.podName);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a FastTaskEnvironment message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.FastTaskEnvironment} FastTaskEnvironment
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                FastTaskEnvironment.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.FastTaskEnvironment();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.queueId = reader.string();
-                            break;
-                        case 2:
-                            message.namespace = reader.string();
-                            break;
-                        case 3:
-                            message.podName = reader.string();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a FastTaskEnvironment message.
-                 * @function verify
-                 * @memberof flyteidl.core.FastTaskEnvironment
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                FastTaskEnvironment.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.queueId != null && message.hasOwnProperty("queueId"))
-                        if (!$util.isString(message.queueId))
-                            return "queueId: string expected";
-                    if (message.namespace != null && message.hasOwnProperty("namespace"))
-                        if (!$util.isString(message.namespace))
-                            return "namespace: string expected";
-                    if (message.podName != null && message.hasOwnProperty("podName"))
-                        if (!$util.isString(message.podName))
-                            return "podName: string expected";
-                    return null;
-                };
-    
-                return FastTaskEnvironment;
-            })();
-    
-            core.ExecutionEnvironmentSpec = (function() {
-    
-                /**
-                 * Properties of an ExecutionEnvironmentSpec.
-                 * @memberof flyteidl.core
-                 * @interface IExecutionEnvironmentSpec
-                 * @property {flyteidl.core.EnvironmentType|null} [type] ExecutionEnvironmentSpec type
-                 * @property {flyteidl.core.IFastTaskEnvironmentSpec|null} [fastTask] ExecutionEnvironmentSpec fastTask
-                 */
-    
-                /**
-                 * Constructs a new ExecutionEnvironmentSpec.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents an ExecutionEnvironmentSpec.
-                 * @implements IExecutionEnvironmentSpec
-                 * @constructor
-                 * @param {flyteidl.core.IExecutionEnvironmentSpec=} [properties] Properties to set
-                 */
-                function ExecutionEnvironmentSpec(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * ExecutionEnvironmentSpec type.
-                 * @member {flyteidl.core.EnvironmentType} type
-                 * @memberof flyteidl.core.ExecutionEnvironmentSpec
-                 * @instance
-                 */
-                ExecutionEnvironmentSpec.prototype.type = 0;
-    
-                /**
-                 * ExecutionEnvironmentSpec fastTask.
-                 * @member {flyteidl.core.IFastTaskEnvironmentSpec|null|undefined} fastTask
-                 * @memberof flyteidl.core.ExecutionEnvironmentSpec
-                 * @instance
-                 */
-                ExecutionEnvironmentSpec.prototype.fastTask = null;
-    
-                /**
-                 * Creates a new ExecutionEnvironmentSpec instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.ExecutionEnvironmentSpec
-                 * @static
-                 * @param {flyteidl.core.IExecutionEnvironmentSpec=} [properties] Properties to set
-                 * @returns {flyteidl.core.ExecutionEnvironmentSpec} ExecutionEnvironmentSpec instance
-                 */
-                ExecutionEnvironmentSpec.create = function create(properties) {
-                    return new ExecutionEnvironmentSpec(properties);
-                };
-    
-                /**
-                 * Encodes the specified ExecutionEnvironmentSpec message. Does not implicitly {@link flyteidl.core.ExecutionEnvironmentSpec.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.ExecutionEnvironmentSpec
-                 * @static
-                 * @param {flyteidl.core.IExecutionEnvironmentSpec} message ExecutionEnvironmentSpec message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                ExecutionEnvironmentSpec.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.type != null && message.hasOwnProperty("type"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
-                    if (message.fastTask != null && message.hasOwnProperty("fastTask"))
-                        $root.flyteidl.core.FastTaskEnvironmentSpec.encode(message.fastTask, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an ExecutionEnvironmentSpec message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.ExecutionEnvironmentSpec
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.ExecutionEnvironmentSpec} ExecutionEnvironmentSpec
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                ExecutionEnvironmentSpec.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.ExecutionEnvironmentSpec();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.type = reader.int32();
-                            break;
-                        case 2:
-                            message.fastTask = $root.flyteidl.core.FastTaskEnvironmentSpec.decode(reader, reader.uint32());
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an ExecutionEnvironmentSpec message.
-                 * @function verify
-                 * @memberof flyteidl.core.ExecutionEnvironmentSpec
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                ExecutionEnvironmentSpec.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.type != null && message.hasOwnProperty("type"))
-                        switch (message.type) {
-                        default:
-                            return "type: enum value expected";
-                        case 0:
-                            break;
-                        }
-                    if (message.fastTask != null && message.hasOwnProperty("fastTask")) {
-                        var error = $root.flyteidl.core.FastTaskEnvironmentSpec.verify(message.fastTask);
-                        if (error)
-                            return "fastTask." + error;
-                    }
-                    return null;
-                };
-    
-                return ExecutionEnvironmentSpec;
-            })();
-    
-            core.FastTaskEnvironmentSpec = (function() {
-    
-                /**
-                 * Properties of a FastTaskEnvironmentSpec.
-                 * @memberof flyteidl.core
-                 * @interface IFastTaskEnvironmentSpec
-                 * @property {string|null} [image] FastTaskEnvironmentSpec image
-                 * @property {number|null} [replicaCount] FastTaskEnvironmentSpec replicaCount
-                 */
-    
-                /**
-                 * Constructs a new FastTaskEnvironmentSpec.
-                 * @memberof flyteidl.core
-                 * @classdesc Represents a FastTaskEnvironmentSpec.
-                 * @implements IFastTaskEnvironmentSpec
-                 * @constructor
-                 * @param {flyteidl.core.IFastTaskEnvironmentSpec=} [properties] Properties to set
-                 */
-                function FastTaskEnvironmentSpec(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * FastTaskEnvironmentSpec image.
-                 * @member {string} image
-                 * @memberof flyteidl.core.FastTaskEnvironmentSpec
-                 * @instance
-                 */
-                FastTaskEnvironmentSpec.prototype.image = "";
-    
-                /**
-                 * FastTaskEnvironmentSpec replicaCount.
-                 * @member {number} replicaCount
-                 * @memberof flyteidl.core.FastTaskEnvironmentSpec
-                 * @instance
-                 */
-                FastTaskEnvironmentSpec.prototype.replicaCount = 0;
-    
-                /**
-                 * Creates a new FastTaskEnvironmentSpec instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.core.FastTaskEnvironmentSpec
-                 * @static
-                 * @param {flyteidl.core.IFastTaskEnvironmentSpec=} [properties] Properties to set
-                 * @returns {flyteidl.core.FastTaskEnvironmentSpec} FastTaskEnvironmentSpec instance
-                 */
-                FastTaskEnvironmentSpec.create = function create(properties) {
-                    return new FastTaskEnvironmentSpec(properties);
-                };
-    
-                /**
-                 * Encodes the specified FastTaskEnvironmentSpec message. Does not implicitly {@link flyteidl.core.FastTaskEnvironmentSpec.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.core.FastTaskEnvironmentSpec
-                 * @static
-                 * @param {flyteidl.core.IFastTaskEnvironmentSpec} message FastTaskEnvironmentSpec message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                FastTaskEnvironmentSpec.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.image != null && message.hasOwnProperty("image"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.image);
-                    if (message.replicaCount != null && message.hasOwnProperty("replicaCount"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.replicaCount);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes a FastTaskEnvironmentSpec message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.core.FastTaskEnvironmentSpec
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.core.FastTaskEnvironmentSpec} FastTaskEnvironmentSpec
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                FastTaskEnvironmentSpec.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.FastTaskEnvironmentSpec();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.image = reader.string();
-                            break;
-                        case 2:
-                            message.replicaCount = reader.int32();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies a FastTaskEnvironmentSpec message.
-                 * @function verify
-                 * @memberof flyteidl.core.FastTaskEnvironmentSpec
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                FastTaskEnvironmentSpec.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.image != null && message.hasOwnProperty("image"))
-                        if (!$util.isString(message.image))
-                            return "image: string expected";
-                    if (message.replicaCount != null && message.hasOwnProperty("replicaCount"))
-                        if (!$util.isInteger(message.replicaCount))
-                            return "replicaCount: integer expected";
-                    return null;
-                };
-    
-                return FastTaskEnvironmentSpec;
             })();
     
             core.Span = (function() {

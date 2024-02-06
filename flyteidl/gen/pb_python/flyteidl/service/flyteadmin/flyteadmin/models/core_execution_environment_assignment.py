@@ -16,8 +16,7 @@ import re  # noqa: F401
 
 import six
 
-from flyteadmin.models.core_execution_environment import CoreExecutionEnvironment  # noqa: F401,E501
-from flyteadmin.models.core_execution_environment_spec import CoreExecutionEnvironmentSpec  # noqa: F401,E501
+from flyteadmin.models.protobuf_struct import ProtobufStruct  # noqa: F401,E501
 
 
 class CoreExecutionEnvironmentAssignment(object):
@@ -36,22 +35,25 @@ class CoreExecutionEnvironmentAssignment(object):
     swagger_types = {
         'id': 'str',
         'node_ids': 'list[str]',
-        'environment': 'CoreExecutionEnvironment',
-        'environment_spec': 'CoreExecutionEnvironmentSpec'
+        'type': 'str',
+        'environment': 'ProtobufStruct',
+        'environment_spec': 'ProtobufStruct'
     }
 
     attribute_map = {
         'id': 'id',
         'node_ids': 'node_ids',
+        'type': 'type',
         'environment': 'environment',
         'environment_spec': 'environment_spec'
     }
 
-    def __init__(self, id=None, node_ids=None, environment=None, environment_spec=None):  # noqa: E501
+    def __init__(self, id=None, node_ids=None, type=None, environment=None, environment_spec=None):  # noqa: E501
         """CoreExecutionEnvironmentAssignment - a model defined in Swagger"""  # noqa: E501
 
         self._id = None
         self._node_ids = None
+        self._type = None
         self._environment = None
         self._environment_spec = None
         self.discriminator = None
@@ -60,6 +62,8 @@ class CoreExecutionEnvironmentAssignment(object):
             self.id = id
         if node_ids is not None:
             self.node_ids = node_ids
+        if type is not None:
+            self.type = type
         if environment is not None:
             self.environment = environment
         if environment_spec is not None:
@@ -108,12 +112,33 @@ class CoreExecutionEnvironmentAssignment(object):
         self._node_ids = node_ids
 
     @property
+    def type(self):
+        """Gets the type of this CoreExecutionEnvironmentAssignment.  # noqa: E501
+
+
+        :return: The type of this CoreExecutionEnvironmentAssignment.  # noqa: E501
+        :rtype: str
+        """
+        return self._type
+
+    @type.setter
+    def type(self, type):
+        """Sets the type of this CoreExecutionEnvironmentAssignment.
+
+
+        :param type: The type of this CoreExecutionEnvironmentAssignment.  # noqa: E501
+        :type: str
+        """
+
+        self._type = type
+
+    @property
     def environment(self):
         """Gets the environment of this CoreExecutionEnvironmentAssignment.  # noqa: E501
 
 
         :return: The environment of this CoreExecutionEnvironmentAssignment.  # noqa: E501
-        :rtype: CoreExecutionEnvironment
+        :rtype: ProtobufStruct
         """
         return self._environment
 
@@ -123,7 +148,7 @@ class CoreExecutionEnvironmentAssignment(object):
 
 
         :param environment: The environment of this CoreExecutionEnvironmentAssignment.  # noqa: E501
-        :type: CoreExecutionEnvironment
+        :type: ProtobufStruct
         """
 
         self._environment = environment
@@ -134,7 +159,7 @@ class CoreExecutionEnvironmentAssignment(object):
 
 
         :return: The environment_spec of this CoreExecutionEnvironmentAssignment.  # noqa: E501
-        :rtype: CoreExecutionEnvironmentSpec
+        :rtype: ProtobufStruct
         """
         return self._environment_spec
 
@@ -144,7 +169,7 @@ class CoreExecutionEnvironmentAssignment(object):
 
 
         :param environment_spec: The environment_spec of this CoreExecutionEnvironmentAssignment.  # noqa: E501
-        :type: CoreExecutionEnvironmentSpec
+        :type: ProtobufStruct
         """
 
         self._environment_spec = environment_spec

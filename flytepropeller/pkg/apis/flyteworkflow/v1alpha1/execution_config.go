@@ -1,6 +1,9 @@
 package v1alpha1
 
 import (
+	"bytes"
+
+	"github.com/golang/protobuf/jsonpb"
 	"k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -66,8 +69,18 @@ type TaskResources struct {
 // ExecutionEnvironmentAssignment is a wrapper around core.ExecutionEnvironmentAssignment to define
 // and assign an execution environment to a collection of workflow nodes.
 type ExecutionEnvironmentAssignment struct {
-	Id              string   `json:"id,omitempty"`
-	NodeIds         []string `json:"node_ids,omitempty"`
-	Environment     *core.ExecutionEnvironment `json:"environment,omitempty"`
-	EnvironmentSpec *core.ExecutionEnvironmentSpec `json:"environment_spec,omitempty"`
+	*core.ExecutionEnvironmentAssignment
+}
+
+func (in *ExecutionEnvironmentAssignment) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	if err := marshaler.Marshal(&buf, in.ExecutionEnvironmentAssignment); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (in *ExecutionEnvironmentAssignment) UnmarshalJSON(b []byte) error {
+	in.ExecutionEnvironmentAssignment = &core.ExecutionEnvironmentAssignment{}
+	return jsonpb.Unmarshal(bytes.NewReader(b), in.ExecutionEnvironmentAssignment)
 }

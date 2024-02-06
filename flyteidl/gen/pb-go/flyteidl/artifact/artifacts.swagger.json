@@ -1422,13 +1422,6 @@
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
-    "coreEnvironmentType": {
-      "type": "string",
-      "enum": [
-        "FAST_TASK"
-      ],
-      "default": "FAST_TASK"
-    },
     "coreError": {
       "type": "object",
       "properties": {
@@ -1443,17 +1436,6 @@
       },
       "description": "Represents an error thrown from a node."
     },
-    "coreExecutionEnvironment": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/coreEnvironmentType"
-        },
-        "fast_task": {
-          "$ref": "#/definitions/coreFastTaskEnvironment"
-        }
-      }
-    },
     "coreExecutionEnvironmentAssignment": {
       "type": "object",
       "properties": {
@@ -1466,48 +1448,14 @@
             "type": "string"
           }
         },
+        "type": {
+          "type": "string"
+        },
         "environment": {
-          "$ref": "#/definitions/coreExecutionEnvironment"
+          "$ref": "#/definitions/protobufStruct"
         },
         "environment_spec": {
-          "$ref": "#/definitions/coreExecutionEnvironmentSpec"
-        }
-      }
-    },
-    "coreExecutionEnvironmentSpec": {
-      "type": "object",
-      "properties": {
-        "type": {
-          "$ref": "#/definitions/coreEnvironmentType"
-        },
-        "fast_task": {
-          "$ref": "#/definitions/coreFastTaskEnvironmentSpec"
-        }
-      }
-    },
-    "coreFastTaskEnvironment": {
-      "type": "object",
-      "properties": {
-        "queue_id": {
-          "type": "string"
-        },
-        "namespace": {
-          "type": "string"
-        },
-        "pod_name": {
-          "type": "string"
-        }
-      }
-    },
-    "coreFastTaskEnvironmentSpec": {
-      "type": "object",
-      "properties": {
-        "image": {
-          "type": "string"
-        },
-        "replica_count": {
-          "type": "integer",
-          "format": "int32"
+          "$ref": "#/definitions/protobufStruct"
         }
       }
     },

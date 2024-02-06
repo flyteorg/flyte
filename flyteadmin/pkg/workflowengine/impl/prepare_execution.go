@@ -75,11 +75,9 @@ func addExecutionOverrides(taskPluginOverrides []*admin.PluginOverride,
 		}
 
 		for _, executionEnvironment := range workflowExecutionConfig.GetExecutionEnvs() {
+			executionEnv := *executionEnvironment
 			executionConfig.ExecutionEnvs = append(executionConfig.ExecutionEnvs, v1alpha1.ExecutionEnvironmentAssignment{
-				Id:              executionEnvironment.GetId(),
-				NodeIds:         executionEnvironment.GetNodeIds(),
-				Environment:     executionEnvironment.GetEnvironment(),
-				EnvironmentSpec: executionEnvironment.GetEnvironmentSpec(),
+				ExecutionEnvironmentAssignment: &executionEnv,
 			})
 		}
 	}

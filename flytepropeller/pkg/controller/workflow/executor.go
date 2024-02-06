@@ -137,7 +137,7 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 
 	// start execution environments
 	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
-		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+		if envSpec := executionEnv.GetEnvironmentSpec(); envSpec != nil {
 			if err := c.executionEnvClient.CreateEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
 				return StatusReady, err
 			}
@@ -158,7 +158,7 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 
 	// confirm execution environments
 	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
-		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+		if envSpec := executionEnv.GetEnvironmentSpec(); envSpec != nil {
 			if err := c.executionEnvClient.ConfirmEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
 				return StatusRunning, err
 			}
@@ -248,7 +248,7 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 
 	// delete execution environments
 	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
-		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+		if envSpec := executionEnv.GetEnvironmentSpec(); envSpec != nil {
 			if err := c.executionEnvClient.DeleteEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
 				return StatusFailing(execErr), err
 			}
@@ -274,7 +274,7 @@ func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1al
 
 	// delete execution environments
 	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
-		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+		if envSpec := executionEnv.GetEnvironmentSpec(); envSpec != nil {
 			if err := c.executionEnvClient.DeleteEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
 				return StatusSucceeding, err
 			}

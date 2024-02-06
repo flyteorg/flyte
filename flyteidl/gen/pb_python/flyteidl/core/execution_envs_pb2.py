@@ -11,10 +11,10 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from flyteidl.core import identifier_pb2 as flyteidl_dot_core_dot_identifier__pb2
+from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"flyteidl/core/execution_envs.proto\x12\rflyteidl.core\x1a\x1e\x66lyteidl/core/identifier.proto\"\xf8\x01\n\x1e\x45xecutionEnvironmentAssignment\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n\x08node_ids\x18\x02 \x03(\tR\x07nodeIds\x12G\n\x0b\x65nvironment\x18\x03 \x01(\x0b\x32#.flyteidl.core.ExecutionEnvironmentH\x00R\x0b\x65nvironment\x12T\n\x10\x65nvironment_spec\x18\x04 \x01(\x0b\x32\'.flyteidl.core.ExecutionEnvironmentSpecH\x00R\x0f\x65nvironmentSpecB\x0c\n\nassignment\"\x8b\x01\n\x14\x45xecutionEnvironment\x12\x32\n\x04type\x18\x01 \x01(\x0e\x32\x1e.flyteidl.core.EnvironmentTypeR\x04type\x12?\n\tfast_task\x18\x02 \x01(\x0b\x32\".flyteidl.core.FastTaskEnvironmentR\x08\x66\x61stTask\"i\n\x13\x46\x61stTaskEnvironment\x12\x19\n\x08queue_id\x18\x01 \x01(\tR\x07queueId\x12\x1c\n\tnamespace\x18\x02 \x01(\tR\tnamespace\x12\x19\n\x08pod_name\x18\x03 \x01(\tR\x07podName\"\x93\x01\n\x18\x45xecutionEnvironmentSpec\x12\x32\n\x04type\x18\x01 \x01(\x0e\x32\x1e.flyteidl.core.EnvironmentTypeR\x04type\x12\x43\n\tfast_task\x18\x02 \x01(\x0b\x32&.flyteidl.core.FastTaskEnvironmentSpecR\x08\x66\x61stTask\"T\n\x17\x46\x61stTaskEnvironmentSpec\x12\x14\n\x05image\x18\x01 \x01(\tR\x05image\x12#\n\rreplica_count\x18\x02 \x01(\x05R\x0creplicaCount* \n\x0f\x45nvironmentType\x12\r\n\tFAST_TASK\x10\x00\x42\xb8\x01\n\x11\x63om.flyteidl.coreB\x12\x45xecutionEnvsProtoP\x01Z:github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\"flyteidl/core/execution_envs.proto\x12\rflyteidl.core\x1a\x1cgoogle/protobuf/struct.proto\"\xf0\x01\n\x1e\x45xecutionEnvironmentAssignment\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\x12\x19\n\x08node_ids\x18\x02 \x03(\tR\x07nodeIds\x12\x12\n\x04type\x18\x03 \x01(\tR\x04type\x12;\n\x0b\x65nvironment\x18\x04 \x01(\x0b\x32\x17.google.protobuf.StructH\x00R\x0b\x65nvironment\x12\x44\n\x10\x65nvironment_spec\x18\x05 \x01(\x0b\x32\x17.google.protobuf.StructH\x00R\x0f\x65nvironmentSpecB\x0c\n\nassignmentB\xb8\x01\n\x11\x63om.flyteidl.coreB\x12\x45xecutionEnvsProtoP\x01Z:github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core\xa2\x02\x03\x46\x43X\xaa\x02\rFlyteidl.Core\xca\x02\rFlyteidl\\Core\xe2\x02\x19\x46lyteidl\\Core\\GPBMetadata\xea\x02\x0e\x46lyteidl::Coreb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -23,16 +23,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\021com.flyteidl.coreB\022ExecutionEnvsProtoP\001Z:github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core\242\002\003FCX\252\002\rFlyteidl.Core\312\002\rFlyteidl\\Core\342\002\031Flyteidl\\Core\\GPBMetadata\352\002\016Flyteidl::Core'
-  _globals['_ENVIRONMENTTYPE']._serialized_start=821
-  _globals['_ENVIRONMENTTYPE']._serialized_end=853
-  _globals['_EXECUTIONENVIRONMENTASSIGNMENT']._serialized_start=86
-  _globals['_EXECUTIONENVIRONMENTASSIGNMENT']._serialized_end=334
-  _globals['_EXECUTIONENVIRONMENT']._serialized_start=337
-  _globals['_EXECUTIONENVIRONMENT']._serialized_end=476
-  _globals['_FASTTASKENVIRONMENT']._serialized_start=478
-  _globals['_FASTTASKENVIRONMENT']._serialized_end=583
-  _globals['_EXECUTIONENVIRONMENTSPEC']._serialized_start=586
-  _globals['_EXECUTIONENVIRONMENTSPEC']._serialized_end=733
-  _globals['_FASTTASKENVIRONMENTSPEC']._serialized_start=735
-  _globals['_FASTTASKENVIRONMENTSPEC']._serialized_end=819
+  _globals['_EXECUTIONENVIRONMENTASSIGNMENT']._serialized_start=84
+  _globals['_EXECUTIONENVIRONMENTASSIGNMENT']._serialized_end=324
 # @@protoc_insertion_point(module_scope)

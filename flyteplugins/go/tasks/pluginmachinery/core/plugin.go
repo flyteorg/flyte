@@ -3,8 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 //go:generate mockery -all -case=underscore
@@ -41,7 +39,8 @@ type PluginProperties struct {
 	// ExecutionEnvType specifies the execution environment type for the plugin. If not specified,
 	// the plugin does not support persistent execution environments and will be execution in an
 	// ephemeral environment.
-	ExecutionEnvType *core.EnvironmentType
+	//ExecutionEnvType *core.EnvironmentType TODO @hamersaw
+	ExecutionEnvType *string
 }
 
 // Interface for the core Flyte plugin

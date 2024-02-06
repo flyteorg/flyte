@@ -4,38 +4,14 @@ package flyteidl.core;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
-import "flyteidl/core/identifier.proto";
+import "google/protobuf/struct.proto";
 
 message ExecutionEnvironmentAssignment {
   string id = 1;
   repeated string node_ids = 2;
+  string type = 3;
   oneof assignment {
-    ExecutionEnvironment environment = 3;
-    ExecutionEnvironmentSpec environment_spec = 4;
+    google.protobuf.Struct environment = 4;
+    google.protobuf.Struct environment_spec = 5;
   }
-}
-
-enum EnvironmentType {
-  FAST_TASK = 0;
-}
-
-message ExecutionEnvironment {
-  EnvironmentType type = 1;
-  FastTaskEnvironment fast_task = 2;
-}
-
-message FastTaskEnvironment {
-  string queue_id = 1;
-  string namespace = 2;
-  string pod_name = 3;
-}
-
-message ExecutionEnvironmentSpec {
-  EnvironmentType type = 1;
-  FastTaskEnvironmentSpec fast_task = 2;
-}
-
-message FastTaskEnvironmentSpec {
-  string image = 1;
-  int32 replica_count = 2;
 }

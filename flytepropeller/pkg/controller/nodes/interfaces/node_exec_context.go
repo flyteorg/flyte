@@ -3,6 +3,7 @@ package interfaces
 import (
 	"context"
 
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -71,5 +72,5 @@ type NodeExecutionContext interface {
 	// Deprecated
 	NodeStatus() v1alpha1.ExecutableNodeStatus
 
-	GetExecutionEnv(core.EnvironmentType) *core.ExecutionEnvironment
+	GetExecutionEnv(string) *_struct.Struct
 }

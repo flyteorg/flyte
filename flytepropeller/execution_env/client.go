@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	_struct "github.com/golang/protobuf/ptypes/struct"
+
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/nodes/interfaces"
@@ -13,13 +15,13 @@ import (
 type ExecutionEnvironmentClient struct {
 }
 
-func (e *ExecutionEnvironmentClient) GetEnvironment(nCtx interfaces.NodeExecutionContext, executionEnvID string) *core.ExecutionEnvironment {
+func (e *ExecutionEnvironmentClient) GetEnvironment(nCtx interfaces.NodeExecutionContext, executionEnvID string) *_struct.Struct {
 	fmt.Printf("HAMERSAW - GetEnvironment for node '%s'\n", nCtx.NodeID())
 	return nil
 }
 
 func (e *ExecutionEnvironmentClient) CreateEnvironment(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
-	executionEnvID string, executionEnvSpec *core.ExecutionEnvironmentSpec) error {
+	executionEnvID string, executionEnvSpec *_struct.Struct) error {
 
 	fmt.Printf("HAMERSAW - CreateEnvironment '%s'\n", executionEnvID)
 	/*switch executionEnvSpec.Type {
@@ -33,7 +35,7 @@ func (e *ExecutionEnvironmentClient) CreateEnvironment(ctx context.Context, exec
 }
 
 func (e *ExecutionEnvironmentClient) DeleteEnvironment(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
-	executionEnvID string, executionEnvSpec *core.ExecutionEnvironmentSpec) error {
+	executionEnvID string, executionEnvSpec *_struct.Struct) error {
 
 	fmt.Printf("HAMERSAW - DeleteEnvironment '%s'\n", executionEnvID)
 	/*switch executionEnvSpec.Type {
@@ -47,7 +49,7 @@ func (e *ExecutionEnvironmentClient) DeleteEnvironment(ctx context.Context, exec
 }
 
 func (e *ExecutionEnvironmentClient) ConfirmEnvironment(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
-	executionEnvID string, executionEnvSpec *core.ExecutionEnvironmentSpec) error {
+	executionEnvID string, executionEnvSpec *_struct.Struct) error {
 
 	fmt.Printf("HAMERSAW - ConfirmEnvironment '%s'\n", executionEnvID)
 	/*switch executionEnvSpec.Type {

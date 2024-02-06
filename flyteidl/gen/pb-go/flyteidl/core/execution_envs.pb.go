@@ -6,6 +6,7 @@ package core
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	math "math"
 )
 
@@ -20,31 +21,10 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
-type EnvironmentType int32
-
-const (
-	EnvironmentType_FAST_TASK EnvironmentType = 0
-)
-
-var EnvironmentType_name = map[int32]string{
-	0: "FAST_TASK",
-}
-
-var EnvironmentType_value = map[string]int32{
-	"FAST_TASK": 0,
-}
-
-func (x EnvironmentType) String() string {
-	return proto.EnumName(EnvironmentType_name, int32(x))
-}
-
-func (EnvironmentType) EnumDescriptor() ([]byte, []int) {
-	return fileDescriptor_850f074241de0d78, []int{0}
-}
-
 type ExecutionEnvironmentAssignment struct {
 	Id      string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	NodeIds []string `protobuf:"bytes,2,rep,name=node_ids,json=nodeIds,proto3" json:"node_ids,omitempty"`
+	Type    string   `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
 	// Types that are valid to be assigned to Assignment:
 	//	*ExecutionEnvironmentAssignment_Environment
 	//	*ExecutionEnvironmentAssignment_EnvironmentSpec
@@ -93,16 +73,23 @@ func (m *ExecutionEnvironmentAssignment) GetNodeIds() []string {
 	return nil
 }
 
+func (m *ExecutionEnvironmentAssignment) GetType() string {
+	if m != nil {
+		return m.Type
+	}
+	return ""
+}
+
 type isExecutionEnvironmentAssignment_Assignment interface {
 	isExecutionEnvironmentAssignment_Assignment()
 }
 
 type ExecutionEnvironmentAssignment_Environment struct {
-	Environment *ExecutionEnvironment `protobuf:"bytes,3,opt,name=environment,proto3,oneof"`
+	Environment *_struct.Struct `protobuf:"bytes,4,opt,name=environment,proto3,oneof"`
 }
 
 type ExecutionEnvironmentAssignment_EnvironmentSpec struct {
-	EnvironmentSpec *ExecutionEnvironmentSpec `protobuf:"bytes,4,opt,name=environment_spec,json=environmentSpec,proto3,oneof"`
+	EnvironmentSpec *_struct.Struct `protobuf:"bytes,5,opt,name=environment_spec,json=environmentSpec,proto3,oneof"`
 }
 
 func (*ExecutionEnvironmentAssignment_Environment) isExecutionEnvironmentAssignment_Assignment() {}
@@ -116,14 +103,14 @@ func (m *ExecutionEnvironmentAssignment) GetAssignment() isExecutionEnvironmentA
 	return nil
 }
 
-func (m *ExecutionEnvironmentAssignment) GetEnvironment() *ExecutionEnvironment {
+func (m *ExecutionEnvironmentAssignment) GetEnvironment() *_struct.Struct {
 	if x, ok := m.GetAssignment().(*ExecutionEnvironmentAssignment_Environment); ok {
 		return x.Environment
 	}
 	return nil
 }
 
-func (m *ExecutionEnvironmentAssignment) GetEnvironmentSpec() *ExecutionEnvironmentSpec {
+func (m *ExecutionEnvironmentAssignment) GetEnvironmentSpec() *_struct.Struct {
 	if x, ok := m.GetAssignment().(*ExecutionEnvironmentAssignment_EnvironmentSpec); ok {
 		return x.EnvironmentSpec
 	}
@@ -138,241 +125,29 @@ func (*ExecutionEnvironmentAssignment) XXX_OneofWrappers() []interface{} {
 	}
 }
 
-type ExecutionEnvironment struct {
-	Type                 EnvironmentType      `protobuf:"varint,1,opt,name=type,proto3,enum=flyteidl.core.EnvironmentType" json:"type,omitempty"`
-	FastTask             *FastTaskEnvironment `protobuf:"bytes,2,opt,name=fast_task,json=fastTask,proto3" json:"fast_task,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
-}
-
-func (m *ExecutionEnvironment) Reset()         { *m = ExecutionEnvironment{} }
-func (m *ExecutionEnvironment) String() string { return proto.CompactTextString(m) }
-func (*ExecutionEnvironment) ProtoMessage()    {}
-func (*ExecutionEnvironment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_850f074241de0d78, []int{1}
-}
-
-func (m *ExecutionEnvironment) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ExecutionEnvironment.Unmarshal(m, b)
-}
-func (m *ExecutionEnvironment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ExecutionEnvironment.Marshal(b, m, deterministic)
-}
-func (m *ExecutionEnvironment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExecutionEnvironment.Merge(m, src)
-}
-func (m *ExecutionEnvironment) XXX_Size() int {
-	return xxx_messageInfo_ExecutionEnvironment.Size(m)
-}
-func (m *ExecutionEnvironment) XXX_DiscardUnknown() {
-	xxx_messageInfo_ExecutionEnvironment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ExecutionEnvironment proto.InternalMessageInfo
-
-func (m *ExecutionEnvironment) GetType() EnvironmentType {
-	if m != nil {
-		return m.Type
-	}
-	return EnvironmentType_FAST_TASK
-}
-
-func (m *ExecutionEnvironment) GetFastTask() *FastTaskEnvironment {
-	if m != nil {
-		return m.FastTask
-	}
-	return nil
-}
-
-type FastTaskEnvironment struct {
-	QueueId              string   `protobuf:"bytes,1,opt,name=queue_id,json=queueId,proto3" json:"queue_id,omitempty"`
-	Namespace            string   `protobuf:"bytes,2,opt,name=namespace,proto3" json:"namespace,omitempty"`
-	PodName              string   `protobuf:"bytes,3,opt,name=pod_name,json=podName,proto3" json:"pod_name,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *FastTaskEnvironment) Reset()         { *m = FastTaskEnvironment{} }
-func (m *FastTaskEnvironment) String() string { return proto.CompactTextString(m) }
-func (*FastTaskEnvironment) ProtoMessage()    {}
-func (*FastTaskEnvironment) Descriptor() ([]byte, []int) {
-	return fileDescriptor_850f074241de0d78, []int{2}
-}
-
-func (m *FastTaskEnvironment) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FastTaskEnvironment.Unmarshal(m, b)
-}
-func (m *FastTaskEnvironment) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FastTaskEnvironment.Marshal(b, m, deterministic)
-}
-func (m *FastTaskEnvironment) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FastTaskEnvironment.Merge(m, src)
-}
-func (m *FastTaskEnvironment) XXX_Size() int {
-	return xxx_messageInfo_FastTaskEnvironment.Size(m)
-}
-func (m *FastTaskEnvironment) XXX_DiscardUnknown() {
-	xxx_messageInfo_FastTaskEnvironment.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FastTaskEnvironment proto.InternalMessageInfo
-
-func (m *FastTaskEnvironment) GetQueueId() string {
-	if m != nil {
-		return m.QueueId
-	}
-	return ""
-}
-
-func (m *FastTaskEnvironment) GetNamespace() string {
-	if m != nil {
-		return m.Namespace
-	}
-	return ""
-}
-
-func (m *FastTaskEnvironment) GetPodName() string {
-	if m != nil {
-		return m.PodName
-	}
-	return ""
-}
-
-type ExecutionEnvironmentSpec struct {
-	Type                 EnvironmentType          `protobuf:"varint,1,opt,name=type,proto3,enum=flyteidl.core.EnvironmentType" json:"type,omitempty"`
-	FastTask             *FastTaskEnvironmentSpec `protobuf:"bytes,2,opt,name=fast_task,json=fastTask,proto3" json:"fast_task,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}                 `json:"-"`
-	XXX_unrecognized     []byte                   `json:"-"`
-	XXX_sizecache        int32                    `json:"-"`
-}
-
-func (m *ExecutionEnvironmentSpec) Reset()         { *m = ExecutionEnvironmentSpec{} }
-func (m *ExecutionEnvironmentSpec) String() string { return proto.CompactTextString(m) }
-func (*ExecutionEnvironmentSpec) ProtoMessage()    {}
-func (*ExecutionEnvironmentSpec) Descriptor() ([]byte, []int) {
-	return fileDescriptor_850f074241de0d78, []int{3}
-}
-
-func (m *ExecutionEnvironmentSpec) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_ExecutionEnvironmentSpec.Unmarshal(m, b)
-}
-func (m *ExecutionEnvironmentSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_ExecutionEnvironmentSpec.Marshal(b, m, deterministic)
-}
-func (m *ExecutionEnvironmentSpec) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_ExecutionEnvironmentSpec.Merge(m, src)
-}
-func (m *ExecutionEnvironmentSpec) XXX_Size() int {
-	return xxx_messageInfo_ExecutionEnvironmentSpec.Size(m)
-}
-func (m *ExecutionEnvironmentSpec) XXX_DiscardUnknown() {
-	xxx_messageInfo_ExecutionEnvironmentSpec.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_ExecutionEnvironmentSpec proto.InternalMessageInfo
-
-func (m *ExecutionEnvironmentSpec) GetType() EnvironmentType {
-	if m != nil {
-		return m.Type
-	}
-	return EnvironmentType_FAST_TASK
-}
-
-func (m *ExecutionEnvironmentSpec) GetFastTask() *FastTaskEnvironmentSpec {
-	if m != nil {
-		return m.FastTask
-	}
-	return nil
-}
-
-type FastTaskEnvironmentSpec struct {
-	Image                string   `protobuf:"bytes,1,opt,name=image,proto3" json:"image,omitempty"`
-	ReplicaCount         int32    `protobuf:"varint,2,opt,name=replica_count,json=replicaCount,proto3" json:"replica_count,omitempty"`
-	XXX_NoUnkeyedLiteral struct{} `json:"-"`
-	XXX_unrecognized     []byte   `json:"-"`
-	XXX_sizecache        int32    `json:"-"`
-}
-
-func (m *FastTaskEnvironmentSpec) Reset()         { *m = FastTaskEnvironmentSpec{} }
-func (m *FastTaskEnvironmentSpec) String() string { return proto.CompactTextString(m) }
-func (*FastTaskEnvironmentSpec) ProtoMessage()    {}
-func (*FastTaskEnvironmentSpec) Descriptor() ([]byte, []int) {
-	return fileDescriptor_850f074241de0d78, []int{4}
-}
-
-func (m *FastTaskEnvironmentSpec) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_FastTaskEnvironmentSpec.Unmarshal(m, b)
-}
-func (m *FastTaskEnvironmentSpec) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_FastTaskEnvironmentSpec.Marshal(b, m, deterministic)
-}
-func (m *FastTaskEnvironmentSpec) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_FastTaskEnvironmentSpec.Merge(m, src)
-}
-func (m *FastTaskEnvironmentSpec) XXX_Size() int {
-	return xxx_messageInfo_FastTaskEnvironmentSpec.Size(m)
-}
-func (m *FastTaskEnvironmentSpec) XXX_DiscardUnknown() {
-	xxx_messageInfo_FastTaskEnvironmentSpec.DiscardUnknown(m)
-}
-
-var xxx_messageInfo_FastTaskEnvironmentSpec proto.InternalMessageInfo
-
-func (m *FastTaskEnvironmentSpec) GetImage() string {
-	if m != nil {
-		return m.Image
-	}
-	return ""
-}
-
-func (m *FastTaskEnvironmentSpec) GetReplicaCount() int32 {
-	if m != nil {
-		return m.ReplicaCount
-	}
-	return 0
-}
-
 func init() {
-	proto.RegisterEnum("flyteidl.core.EnvironmentType", EnvironmentType_name, EnvironmentType_value)
 	proto.RegisterType((*ExecutionEnvironmentAssignment)(nil), "flyteidl.core.ExecutionEnvironmentAssignment")
-	proto.RegisterType((*ExecutionEnvironment)(nil), "flyteidl.core.ExecutionEnvironment")
-	proto.RegisterType((*FastTaskEnvironment)(nil), "flyteidl.core.FastTaskEnvironment")
-	proto.RegisterType((*ExecutionEnvironmentSpec)(nil), "flyteidl.core.ExecutionEnvironmentSpec")
-	proto.RegisterType((*FastTaskEnvironmentSpec)(nil), "flyteidl.core.FastTaskEnvironmentSpec")
 }
 
 func init() { proto.RegisterFile("flyteidl/core/execution_envs.proto", fileDescriptor_850f074241de0d78) }
 
 var fileDescriptor_850f074241de0d78 = []byte{
-	// 448 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x53, 0x5d, 0x6b, 0x13, 0x41,
-	0x14, 0xcd, 0xa6, 0xad, 0xe9, 0xde, 0x36, 0x6d, 0x19, 0x0b, 0xae, 0x22, 0x21, 0x6c, 0x41, 0x83,
-	0xe0, 0x2e, 0xc4, 0x37, 0x11, 0x24, 0x2d, 0xad, 0x2d, 0x82, 0x0f, 0x93, 0x7d, 0xf2, 0x65, 0x99,
-	0xec, 0xdc, 0xac, 0x43, 0xb3, 0x33, 0xe3, 0xce, 0x6c, 0x31, 0xbf, 0xc1, 0x47, 0xff, 0xac, 0x8f,
-	0xb2, 0x93, 0xb4, 0xf9, 0x30, 0x41, 0xe9, 0xdb, 0xdc, 0xc3, 0xb9, 0xf7, 0xdc, 0x73, 0x86, 0x0b,
-	0xe1, 0x78, 0x32, 0xb5, 0x28, 0xf8, 0x24, 0xce, 0x54, 0x89, 0x31, 0xfe, 0xc0, 0xac, 0xb2, 0x42,
-	0xc9, 0x14, 0xe5, 0x9d, 0x89, 0x74, 0xa9, 0xac, 0x22, 0xed, 0x7b, 0x4e, 0x54, 0x73, 0x5e, 0x74,
-	0x56, 0x5b, 0x04, 0x47, 0x69, 0xc5, 0x58, 0x60, 0x39, 0xa3, 0x87, 0xbf, 0x3d, 0xe8, 0x5c, 0xde,
-	0xcf, 0xb9, 0x94, 0x77, 0xa2, 0x54, 0xb2, 0x40, 0x69, 0x07, 0xc6, 0x88, 0xdc, 0xbd, 0xc8, 0x11,
-	0x34, 0x05, 0x0f, 0xbc, 0xae, 0xd7, 0xf3, 0x69, 0x53, 0x70, 0xf2, 0x1c, 0xf6, 0xa5, 0xe2, 0x98,
-	0x0a, 0x6e, 0x82, 0x66, 0x77, 0xa7, 0xe7, 0xd3, 0x56, 0x5d, 0xdf, 0x70, 0x43, 0x3e, 0xc1, 0x01,
-	0x2e, 0x66, 0x04, 0x3b, 0x5d, 0xaf, 0x77, 0xd0, 0x3f, 0x8b, 0x56, 0x56, 0x8a, 0x36, 0xc9, 0x5d,
-	0x37, 0xe8, 0x72, 0x27, 0x49, 0xe0, 0x64, 0xa9, 0x4c, 0x8d, 0xc6, 0x2c, 0xd8, 0x75, 0xd3, 0x5e,
-	0xff, 0xc7, 0xb4, 0xa1, 0xc6, 0xec, 0xba, 0x41, 0x8f, 0x71, 0x15, 0x3a, 0x3f, 0x04, 0x60, 0x0f,
-	0xbe, 0xc2, 0x9f, 0x1e, 0x9c, 0x6e, 0xea, 0x26, 0x7d, 0xd8, 0xb5, 0x53, 0x8d, 0xce, 0xf2, 0x51,
-	0xbf, 0xb3, 0x2e, 0xb8, 0x60, 0x26, 0x53, 0x8d, 0xd4, 0x71, 0xc9, 0x47, 0xf0, 0xc7, 0xcc, 0xd8,
-	0xd4, 0x32, 0x73, 0x1b, 0x34, 0xdd, 0xa6, 0xe1, 0x5a, 0xe3, 0x15, 0x33, 0x36, 0x61, 0xe6, 0x76,
-	0x69, 0x00, 0xdd, 0x1f, 0xcf, 0xc1, 0x50, 0xc0, 0xd3, 0x0d, 0x84, 0x3a, 0xec, 0xef, 0x15, 0x56,
-	0x75, 0xda, 0xf3, 0x2f, 0x68, 0xb9, 0xfa, 0x86, 0x93, 0x97, 0xe0, 0x4b, 0x56, 0xa0, 0xd1, 0x2c,
-	0x43, 0x27, 0xe9, 0xd3, 0x05, 0x50, 0x37, 0x6a, 0xc5, 0xd3, 0x1a, 0x70, 0xff, 0xe0, 0xd3, 0x96,
-	0x56, 0xfc, 0x0b, 0x2b, 0x30, 0xfc, 0xe5, 0x41, 0xb0, 0x2d, 0xb6, 0x47, 0x99, 0xbf, 0xf8, 0xdb,
-	0xfc, 0xab, 0x7f, 0x9b, 0xaf, 0xe5, 0x96, 0x02, 0x48, 0xe0, 0xd9, 0x16, 0x12, 0x39, 0x85, 0x3d,
-	0x51, 0xb0, 0x1c, 0xe7, 0x09, 0xcc, 0x0a, 0x72, 0x06, 0xed, 0x12, 0xf5, 0x44, 0x64, 0x2c, 0xcd,
-	0x54, 0x25, 0xad, 0x53, 0xde, 0xa3, 0x87, 0x73, 0xf0, 0xa2, 0xc6, 0xde, 0x74, 0xe1, 0x78, 0x6d,
-	0x67, 0xd2, 0x06, 0xff, 0x6a, 0x30, 0x4c, 0xd2, 0x64, 0x30, 0xfc, 0x7c, 0xd2, 0x38, 0xff, 0xf0,
-	0xf5, 0x7d, 0x2e, 0xec, 0xb7, 0x6a, 0x14, 0x65, 0xaa, 0x88, 0xdd, 0xd6, 0xaa, 0xcc, 0x67, 0x8f,
-	0xf8, 0xe1, 0x7a, 0x72, 0x94, 0xb1, 0x1e, 0xbd, 0xcd, 0x55, 0xbc, 0x72, 0x50, 0xa3, 0x27, 0xee,
-	0x8c, 0xde, 0xfd, 0x09, 0x00, 0x00, 0xff, 0xff, 0x0c, 0xe7, 0x2d, 0x6f, 0x9b, 0x03, 0x00, 0x00,
+	// 265 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x84, 0x90, 0x3d, 0x4f, 0xc3, 0x30,
+	0x18, 0x84, 0x49, 0x5b, 0x3e, 0xea, 0xf2, 0x25, 0x2f, 0x04, 0x84, 0x50, 0xd4, 0x29, 0x0b, 0xb6,
+	0x04, 0x1b, 0xb0, 0x50, 0x51, 0x09, 0xd6, 0x74, 0x63, 0x89, 0x88, 0xfd, 0xd6, 0x58, 0x4a, 0xfd,
+	0x5a, 0xb6, 0x53, 0xd1, 0x7f, 0xcd, 0x4f, 0x40, 0x75, 0x94, 0x12, 0x26, 0xb6, 0x3b, 0xf9, 0xf1,
+	0xf9, 0x7c, 0x64, 0xba, 0xac, 0x37, 0x01, 0xb4, 0xac, 0xb9, 0x40, 0x07, 0x1c, 0xbe, 0x40, 0x34,
+	0x41, 0xa3, 0x29, 0xc1, 0xac, 0x3d, 0xb3, 0x0e, 0x03, 0xd2, 0x93, 0x8e, 0x61, 0x5b, 0xe6, 0xea,
+	0x5a, 0x21, 0xaa, 0x1a, 0x78, 0x3c, 0xac, 0x9a, 0x25, 0xf7, 0xc1, 0x35, 0x22, 0xb4, 0xf0, 0xf4,
+	0x3b, 0x21, 0x37, 0xf3, 0x2e, 0x65, 0x6e, 0xd6, 0xda, 0xa1, 0x59, 0x81, 0x09, 0xcf, 0xde, 0x6b,
+	0x15, 0x15, 0x3d, 0x25, 0x03, 0x2d, 0xd3, 0x24, 0x4b, 0xf2, 0x71, 0x31, 0xd0, 0x92, 0x5e, 0x92,
+	0x23, 0x83, 0x12, 0x4a, 0x2d, 0x7d, 0x3a, 0xc8, 0x86, 0xf9, 0xb8, 0x38, 0xdc, 0xfa, 0x37, 0xe9,
+	0x29, 0x25, 0xa3, 0xb0, 0xb1, 0x90, 0x0e, 0x23, 0x1c, 0x35, 0x7d, 0x24, 0x13, 0xf8, 0xcd, 0x4d,
+	0x47, 0x59, 0x92, 0x4f, 0xee, 0x2e, 0x58, 0xdb, 0x8a, 0x75, 0xad, 0xd8, 0x22, 0xb6, 0x7a, 0xdd,
+	0x2b, 0xfa, 0x34, 0x7d, 0x21, 0xe7, 0x3d, 0x5b, 0x7a, 0x0b, 0x22, 0xdd, 0xff, 0x2f, 0xe1, 0xac,
+	0x77, 0x65, 0x61, 0x41, 0xcc, 0x8e, 0x09, 0xf9, 0xd8, 0xfd, 0x67, 0xf6, 0xf4, 0xfe, 0xa0, 0x74,
+	0xf8, 0x6c, 0x2a, 0x26, 0x70, 0xc5, 0xe3, 0x58, 0xe8, 0x54, 0x2b, 0xf8, 0x6e, 0x5f, 0x05, 0x86,
+	0xdb, 0xea, 0x56, 0x21, 0xff, 0x33, 0x79, 0x75, 0x10, 0xdf, 0xbb, 0xff, 0x09, 0x00, 0x00, 0xff,
+	0xff, 0x2b, 0x91, 0x44, 0xca, 0x8a, 0x01, 0x00, 0x00,
 }

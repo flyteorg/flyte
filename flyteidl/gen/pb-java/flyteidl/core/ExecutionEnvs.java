@@ -14,95 +14,6 @@ public final class ExecutionEnvs {
     registerAllExtensions(
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
-  /**
-   * Protobuf enum {@code flyteidl.core.EnvironmentType}
-   */
-  public enum EnvironmentType
-      implements com.google.protobuf.ProtocolMessageEnum {
-    /**
-     * <code>FAST_TASK = 0;</code>
-     */
-    FAST_TASK(0),
-    UNRECOGNIZED(-1),
-    ;
-
-    /**
-     * <code>FAST_TASK = 0;</code>
-     */
-    public static final int FAST_TASK_VALUE = 0;
-
-
-    public final int getNumber() {
-      if (this == UNRECOGNIZED) {
-        throw new java.lang.IllegalArgumentException(
-            "Can't get the number of an unknown enum value.");
-      }
-      return value;
-    }
-
-    /**
-     * @deprecated Use {@link #forNumber(int)} instead.
-     */
-    @java.lang.Deprecated
-    public static EnvironmentType valueOf(int value) {
-      return forNumber(value);
-    }
-
-    public static EnvironmentType forNumber(int value) {
-      switch (value) {
-        case 0: return FAST_TASK;
-        default: return null;
-      }
-    }
-
-    public static com.google.protobuf.Internal.EnumLiteMap<EnvironmentType>
-        internalGetValueMap() {
-      return internalValueMap;
-    }
-    private static final com.google.protobuf.Internal.EnumLiteMap<
-        EnvironmentType> internalValueMap =
-          new com.google.protobuf.Internal.EnumLiteMap<EnvironmentType>() {
-            public EnvironmentType findValueByNumber(int number) {
-              return EnvironmentType.forNumber(number);
-            }
-          };
-
-    public final com.google.protobuf.Descriptors.EnumValueDescriptor
-        getValueDescriptor() {
-      return getDescriptor().getValues().get(ordinal());
-    }
-    public final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptorForType() {
-      return getDescriptor();
-    }
-    public static final com.google.protobuf.Descriptors.EnumDescriptor
-        getDescriptor() {
-      return flyteidl.core.ExecutionEnvs.getDescriptor().getEnumTypes().get(0);
-    }
-
-    private static final EnvironmentType[] VALUES = values();
-
-    public static EnvironmentType valueOf(
-        com.google.protobuf.Descriptors.EnumValueDescriptor desc) {
-      if (desc.getType() != getDescriptor()) {
-        throw new java.lang.IllegalArgumentException(
-          "EnumValueDescriptor is not for this type.");
-      }
-      if (desc.getIndex() == -1) {
-        return UNRECOGNIZED;
-      }
-      return VALUES[desc.getIndex()];
-    }
-
-    private final int value;
-
-    private EnvironmentType(int value) {
-      this.value = value;
-    }
-
-    // @@protoc_insertion_point(enum_scope:flyteidl.core.EnvironmentType)
-  }
-
   public interface ExecutionEnvironmentAssignmentOrBuilder extends
       // @@protoc_insertion_point(interface_extends:flyteidl.core.ExecutionEnvironmentAssignment)
       com.google.protobuf.MessageOrBuilder {
@@ -137,30 +48,40 @@ public final class ExecutionEnvs {
         getNodeIdsBytes(int index);
 
     /**
-     * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+     * <code>string type = 3;</code>
+     */
+    java.lang.String getType();
+    /**
+     * <code>string type = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getTypeBytes();
+
+    /**
+     * <code>.google.protobuf.Struct environment = 4;</code>
      */
     boolean hasEnvironment();
     /**
-     * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+     * <code>.google.protobuf.Struct environment = 4;</code>
      */
-    flyteidl.core.ExecutionEnvs.ExecutionEnvironment getEnvironment();
+    com.google.protobuf.Struct getEnvironment();
     /**
-     * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+     * <code>.google.protobuf.Struct environment = 4;</code>
      */
-    flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder getEnvironmentOrBuilder();
+    com.google.protobuf.StructOrBuilder getEnvironmentOrBuilder();
 
     /**
-     * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+     * <code>.google.protobuf.Struct environment_spec = 5;</code>
      */
     boolean hasEnvironmentSpec();
     /**
-     * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+     * <code>.google.protobuf.Struct environment_spec = 5;</code>
      */
-    flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec getEnvironmentSpec();
+    com.google.protobuf.Struct getEnvironmentSpec();
     /**
-     * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+     * <code>.google.protobuf.Struct environment_spec = 5;</code>
      */
-    flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder getEnvironmentSpecOrBuilder();
+    com.google.protobuf.StructOrBuilder getEnvironmentSpecOrBuilder();
 
     public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentAssignment.AssignmentCase getAssignmentCase();
   }
@@ -179,6 +100,7 @@ public final class ExecutionEnvs {
     private ExecutionEnvironmentAssignment() {
       id_ = "";
       nodeIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
+      type_ = "";
     }
 
     @java.lang.Override
@@ -221,31 +143,37 @@ public final class ExecutionEnvs {
               break;
             }
             case 26: {
-              flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder subBuilder = null;
-              if (assignmentCase_ == 3) {
-                subBuilder = ((flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_).toBuilder();
-              }
-              assignment_ =
-                  input.readMessage(flyteidl.core.ExecutionEnvs.ExecutionEnvironment.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_);
-                assignment_ = subBuilder.buildPartial();
-              }
-              assignmentCase_ = 3;
+              java.lang.String s = input.readStringRequireUtf8();
+
+              type_ = s;
               break;
             }
             case 34: {
-              flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder subBuilder = null;
+              com.google.protobuf.Struct.Builder subBuilder = null;
               if (assignmentCase_ == 4) {
-                subBuilder = ((flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_).toBuilder();
+                subBuilder = ((com.google.protobuf.Struct) assignment_).toBuilder();
               }
               assignment_ =
-                  input.readMessage(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.parser(), extensionRegistry);
+                  input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom((flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_);
+                subBuilder.mergeFrom((com.google.protobuf.Struct) assignment_);
                 assignment_ = subBuilder.buildPartial();
               }
               assignmentCase_ = 4;
+              break;
+            }
+            case 42: {
+              com.google.protobuf.Struct.Builder subBuilder = null;
+              if (assignmentCase_ == 5) {
+                subBuilder = ((com.google.protobuf.Struct) assignment_).toBuilder();
+              }
+              assignment_ =
+                  input.readMessage(com.google.protobuf.Struct.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom((com.google.protobuf.Struct) assignment_);
+                assignment_ = subBuilder.buildPartial();
+              }
+              assignmentCase_ = 5;
               break;
             }
             default: {
@@ -288,8 +216,8 @@ public final class ExecutionEnvs {
     private java.lang.Object assignment_;
     public enum AssignmentCase
         implements com.google.protobuf.Internal.EnumLite {
-      ENVIRONMENT(3),
-      ENVIRONMENT_SPEC(4),
+      ENVIRONMENT(4),
+      ENVIRONMENT_SPEC(5),
       ASSIGNMENT_NOT_SET(0);
       private final int value;
       private AssignmentCase(int value) {
@@ -305,8 +233,8 @@ public final class ExecutionEnvs {
 
       public static AssignmentCase forNumber(int value) {
         switch (value) {
-          case 3: return ENVIRONMENT;
-          case 4: return ENVIRONMENT_SPEC;
+          case 4: return ENVIRONMENT;
+          case 5: return ENVIRONMENT_SPEC;
           case 0: return ASSIGNMENT_NOT_SET;
           default: return null;
         }
@@ -385,56 +313,90 @@ public final class ExecutionEnvs {
       return nodeIds_.getByteString(index);
     }
 
-    public static final int ENVIRONMENT_FIELD_NUMBER = 3;
+    public static final int TYPE_FIELD_NUMBER = 3;
+    private volatile java.lang.Object type_;
     /**
-     * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+     * <code>string type = 3;</code>
      */
-    public boolean hasEnvironment() {
-      return assignmentCase_ == 3;
+    public java.lang.String getType() {
+      java.lang.Object ref = type_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        type_ = s;
+        return s;
+      }
     }
     /**
-     * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+     * <code>string type = 3;</code>
      */
-    public flyteidl.core.ExecutionEnvs.ExecutionEnvironment getEnvironment() {
-      if (assignmentCase_ == 3) {
-         return (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_;
+    public com.google.protobuf.ByteString
+        getTypeBytes() {
+      java.lang.Object ref = type_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        type_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
       }
-      return flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
-    }
-    /**
-     * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder getEnvironmentOrBuilder() {
-      if (assignmentCase_ == 3) {
-         return (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_;
-      }
-      return flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
     }
 
-    public static final int ENVIRONMENT_SPEC_FIELD_NUMBER = 4;
+    public static final int ENVIRONMENT_FIELD_NUMBER = 4;
     /**
-     * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+     * <code>.google.protobuf.Struct environment = 4;</code>
      */
-    public boolean hasEnvironmentSpec() {
+    public boolean hasEnvironment() {
       return assignmentCase_ == 4;
     }
     /**
-     * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+     * <code>.google.protobuf.Struct environment = 4;</code>
      */
-    public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec getEnvironmentSpec() {
+    public com.google.protobuf.Struct getEnvironment() {
       if (assignmentCase_ == 4) {
-         return (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_;
+         return (com.google.protobuf.Struct) assignment_;
       }
-      return flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
+      return com.google.protobuf.Struct.getDefaultInstance();
     }
     /**
-     * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+     * <code>.google.protobuf.Struct environment = 4;</code>
      */
-    public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder getEnvironmentSpecOrBuilder() {
+    public com.google.protobuf.StructOrBuilder getEnvironmentOrBuilder() {
       if (assignmentCase_ == 4) {
-         return (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_;
+         return (com.google.protobuf.Struct) assignment_;
       }
-      return flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
+      return com.google.protobuf.Struct.getDefaultInstance();
+    }
+
+    public static final int ENVIRONMENT_SPEC_FIELD_NUMBER = 5;
+    /**
+     * <code>.google.protobuf.Struct environment_spec = 5;</code>
+     */
+    public boolean hasEnvironmentSpec() {
+      return assignmentCase_ == 5;
+    }
+    /**
+     * <code>.google.protobuf.Struct environment_spec = 5;</code>
+     */
+    public com.google.protobuf.Struct getEnvironmentSpec() {
+      if (assignmentCase_ == 5) {
+         return (com.google.protobuf.Struct) assignment_;
+      }
+      return com.google.protobuf.Struct.getDefaultInstance();
+    }
+    /**
+     * <code>.google.protobuf.Struct environment_spec = 5;</code>
+     */
+    public com.google.protobuf.StructOrBuilder getEnvironmentSpecOrBuilder() {
+      if (assignmentCase_ == 5) {
+         return (com.google.protobuf.Struct) assignment_;
+      }
+      return com.google.protobuf.Struct.getDefaultInstance();
     }
 
     private byte memoizedIsInitialized = -1;
@@ -457,11 +419,14 @@ public final class ExecutionEnvs {
       for (int i = 0; i < nodeIds_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 2, nodeIds_.getRaw(i));
       }
-      if (assignmentCase_ == 3) {
-        output.writeMessage(3, (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_);
+      if (!getTypeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, type_);
       }
       if (assignmentCase_ == 4) {
-        output.writeMessage(4, (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_);
+        output.writeMessage(4, (com.google.protobuf.Struct) assignment_);
+      }
+      if (assignmentCase_ == 5) {
+        output.writeMessage(5, (com.google.protobuf.Struct) assignment_);
       }
       unknownFields.writeTo(output);
     }
@@ -483,13 +448,16 @@ public final class ExecutionEnvs {
         size += dataSize;
         size += 1 * getNodeIdsList().size();
       }
-      if (assignmentCase_ == 3) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_);
+      if (!getTypeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, type_);
       }
       if (assignmentCase_ == 4) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_);
+          .computeMessageSize(4, (com.google.protobuf.Struct) assignment_);
+      }
+      if (assignmentCase_ == 5) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(5, (com.google.protobuf.Struct) assignment_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -510,13 +478,15 @@ public final class ExecutionEnvs {
           .equals(other.getId())) return false;
       if (!getNodeIdsList()
           .equals(other.getNodeIdsList())) return false;
+      if (!getType()
+          .equals(other.getType())) return false;
       if (!getAssignmentCase().equals(other.getAssignmentCase())) return false;
       switch (assignmentCase_) {
-        case 3:
+        case 4:
           if (!getEnvironment()
               .equals(other.getEnvironment())) return false;
           break;
-        case 4:
+        case 5:
           if (!getEnvironmentSpec()
               .equals(other.getEnvironmentSpec())) return false;
           break;
@@ -540,12 +510,14 @@ public final class ExecutionEnvs {
         hash = (37 * hash) + NODE_IDS_FIELD_NUMBER;
         hash = (53 * hash) + getNodeIdsList().hashCode();
       }
+      hash = (37 * hash) + TYPE_FIELD_NUMBER;
+      hash = (53 * hash) + getType().hashCode();
       switch (assignmentCase_) {
-        case 3:
+        case 4:
           hash = (37 * hash) + ENVIRONMENT_FIELD_NUMBER;
           hash = (53 * hash) + getEnvironment().hashCode();
           break;
-        case 4:
+        case 5:
           hash = (37 * hash) + ENVIRONMENT_SPEC_FIELD_NUMBER;
           hash = (53 * hash) + getEnvironmentSpec().hashCode();
           break;
@@ -689,6 +661,8 @@ public final class ExecutionEnvs {
 
         nodeIds_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000002);
+        type_ = "";
+
         assignmentCase_ = 0;
         assignment_ = null;
         return this;
@@ -725,14 +699,15 @@ public final class ExecutionEnvs {
           bitField0_ = (bitField0_ & ~0x00000002);
         }
         result.nodeIds_ = nodeIds_;
-        if (assignmentCase_ == 3) {
+        result.type_ = type_;
+        if (assignmentCase_ == 4) {
           if (environmentBuilder_ == null) {
             result.assignment_ = assignment_;
           } else {
             result.assignment_ = environmentBuilder_.build();
           }
         }
-        if (assignmentCase_ == 4) {
+        if (assignmentCase_ == 5) {
           if (environmentSpecBuilder_ == null) {
             result.assignment_ = assignment_;
           } else {
@@ -801,6 +776,10 @@ public final class ExecutionEnvs {
             ensureNodeIdsIsMutable();
             nodeIds_.addAll(other.nodeIds_);
           }
+          onChanged();
+        }
+        if (!other.getType().isEmpty()) {
+          type_ = other.type_;
           onChanged();
         }
         switch (other.getAssignmentCase()) {
@@ -1024,34 +1003,103 @@ public final class ExecutionEnvs {
         return this;
       }
 
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.ExecutionEnvironment, flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder> environmentBuilder_;
+      private java.lang.Object type_ = "";
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>string type = 3;</code>
        */
-      public boolean hasEnvironment() {
-        return assignmentCase_ == 3;
-      }
-      /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironment getEnvironment() {
-        if (environmentBuilder_ == null) {
-          if (assignmentCase_ == 3) {
-            return (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_;
-          }
-          return flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
+      public java.lang.String getType() {
+        java.lang.Object ref = type_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          type_ = s;
+          return s;
         } else {
-          if (assignmentCase_ == 3) {
-            return environmentBuilder_.getMessage();
-          }
-          return flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
+          return (java.lang.String) ref;
         }
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>string type = 3;</code>
        */
-      public Builder setEnvironment(flyteidl.core.ExecutionEnvs.ExecutionEnvironment value) {
+      public com.google.protobuf.ByteString
+          getTypeBytes() {
+        java.lang.Object ref = type_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          type_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string type = 3;</code>
+       */
+      public Builder setType(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        type_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string type = 3;</code>
+       */
+      public Builder clearType() {
+        
+        type_ = getDefaultInstance().getType();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string type = 3;</code>
+       */
+      public Builder setTypeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        type_ = value;
+        onChanged();
+        return this;
+      }
+
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> environmentBuilder_;
+      /**
+       * <code>.google.protobuf.Struct environment = 4;</code>
+       */
+      public boolean hasEnvironment() {
+        return assignmentCase_ == 4;
+      }
+      /**
+       * <code>.google.protobuf.Struct environment = 4;</code>
+       */
+      public com.google.protobuf.Struct getEnvironment() {
+        if (environmentBuilder_ == null) {
+          if (assignmentCase_ == 4) {
+            return (com.google.protobuf.Struct) assignment_;
+          }
+          return com.google.protobuf.Struct.getDefaultInstance();
+        } else {
+          if (assignmentCase_ == 4) {
+            return environmentBuilder_.getMessage();
+          }
+          return com.google.protobuf.Struct.getDefaultInstance();
+        }
+      }
+      /**
+       * <code>.google.protobuf.Struct environment = 4;</code>
+       */
+      public Builder setEnvironment(com.google.protobuf.Struct value) {
         if (environmentBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1061,57 +1109,57 @@ public final class ExecutionEnvs {
         } else {
           environmentBuilder_.setMessage(value);
         }
-        assignmentCase_ = 3;
+        assignmentCase_ = 4;
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>.google.protobuf.Struct environment = 4;</code>
        */
       public Builder setEnvironment(
-          flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder builderForValue) {
+          com.google.protobuf.Struct.Builder builderForValue) {
         if (environmentBuilder_ == null) {
           assignment_ = builderForValue.build();
           onChanged();
         } else {
           environmentBuilder_.setMessage(builderForValue.build());
         }
-        assignmentCase_ = 3;
+        assignmentCase_ = 4;
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>.google.protobuf.Struct environment = 4;</code>
        */
-      public Builder mergeEnvironment(flyteidl.core.ExecutionEnvs.ExecutionEnvironment value) {
+      public Builder mergeEnvironment(com.google.protobuf.Struct value) {
         if (environmentBuilder_ == null) {
-          if (assignmentCase_ == 3 &&
-              assignment_ != flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance()) {
-            assignment_ = flyteidl.core.ExecutionEnvs.ExecutionEnvironment.newBuilder((flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_)
+          if (assignmentCase_ == 4 &&
+              assignment_ != com.google.protobuf.Struct.getDefaultInstance()) {
+            assignment_ = com.google.protobuf.Struct.newBuilder((com.google.protobuf.Struct) assignment_)
                 .mergeFrom(value).buildPartial();
           } else {
             assignment_ = value;
           }
           onChanged();
         } else {
-          if (assignmentCase_ == 3) {
+          if (assignmentCase_ == 4) {
             environmentBuilder_.mergeFrom(value);
           }
           environmentBuilder_.setMessage(value);
         }
-        assignmentCase_ = 3;
+        assignmentCase_ = 4;
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>.google.protobuf.Struct environment = 4;</code>
        */
       public Builder clearEnvironment() {
         if (environmentBuilder_ == null) {
-          if (assignmentCase_ == 3) {
+          if (assignmentCase_ == 4) {
             assignmentCase_ = 0;
             assignment_ = null;
             onChanged();
           }
         } else {
-          if (assignmentCase_ == 3) {
+          if (assignmentCase_ == 4) {
             assignmentCase_ = 0;
             assignment_ = null;
           }
@@ -1120,74 +1168,74 @@ public final class ExecutionEnvs {
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>.google.protobuf.Struct environment = 4;</code>
        */
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder getEnvironmentBuilder() {
+      public com.google.protobuf.Struct.Builder getEnvironmentBuilder() {
         return getEnvironmentFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>.google.protobuf.Struct environment = 4;</code>
        */
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder getEnvironmentOrBuilder() {
-        if ((assignmentCase_ == 3) && (environmentBuilder_ != null)) {
+      public com.google.protobuf.StructOrBuilder getEnvironmentOrBuilder() {
+        if ((assignmentCase_ == 4) && (environmentBuilder_ != null)) {
           return environmentBuilder_.getMessageOrBuilder();
         } else {
-          if (assignmentCase_ == 3) {
-            return (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_;
+          if (assignmentCase_ == 4) {
+            return (com.google.protobuf.Struct) assignment_;
           }
-          return flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
+          return com.google.protobuf.Struct.getDefaultInstance();
         }
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironment environment = 3;</code>
+       * <code>.google.protobuf.Struct environment = 4;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.ExecutionEnvironment, flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder> 
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> 
           getEnvironmentFieldBuilder() {
         if (environmentBuilder_ == null) {
-          if (!(assignmentCase_ == 3)) {
-            assignment_ = flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
+          if (!(assignmentCase_ == 4)) {
+            assignment_ = com.google.protobuf.Struct.getDefaultInstance();
           }
           environmentBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.ExecutionEnvs.ExecutionEnvironment, flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder>(
-                  (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) assignment_,
+              com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder>(
+                  (com.google.protobuf.Struct) assignment_,
                   getParentForChildren(),
                   isClean());
           assignment_ = null;
         }
-        assignmentCase_ = 3;
+        assignmentCase_ = 4;
         onChanged();;
         return environmentBuilder_;
       }
 
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder> environmentSpecBuilder_;
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> environmentSpecBuilder_;
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
       public boolean hasEnvironmentSpec() {
-        return assignmentCase_ == 4;
+        return assignmentCase_ == 5;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec getEnvironmentSpec() {
+      public com.google.protobuf.Struct getEnvironmentSpec() {
         if (environmentSpecBuilder_ == null) {
-          if (assignmentCase_ == 4) {
-            return (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_;
+          if (assignmentCase_ == 5) {
+            return (com.google.protobuf.Struct) assignment_;
           }
-          return flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
+          return com.google.protobuf.Struct.getDefaultInstance();
         } else {
-          if (assignmentCase_ == 4) {
+          if (assignmentCase_ == 5) {
             return environmentSpecBuilder_.getMessage();
           }
-          return flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
+          return com.google.protobuf.Struct.getDefaultInstance();
         }
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
-      public Builder setEnvironmentSpec(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec value) {
+      public Builder setEnvironmentSpec(com.google.protobuf.Struct value) {
         if (environmentSpecBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
@@ -1197,57 +1245,57 @@ public final class ExecutionEnvs {
         } else {
           environmentSpecBuilder_.setMessage(value);
         }
-        assignmentCase_ = 4;
+        assignmentCase_ = 5;
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
       public Builder setEnvironmentSpec(
-          flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder builderForValue) {
+          com.google.protobuf.Struct.Builder builderForValue) {
         if (environmentSpecBuilder_ == null) {
           assignment_ = builderForValue.build();
           onChanged();
         } else {
           environmentSpecBuilder_.setMessage(builderForValue.build());
         }
-        assignmentCase_ = 4;
+        assignmentCase_ = 5;
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
-      public Builder mergeEnvironmentSpec(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec value) {
+      public Builder mergeEnvironmentSpec(com.google.protobuf.Struct value) {
         if (environmentSpecBuilder_ == null) {
-          if (assignmentCase_ == 4 &&
-              assignment_ != flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance()) {
-            assignment_ = flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.newBuilder((flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_)
+          if (assignmentCase_ == 5 &&
+              assignment_ != com.google.protobuf.Struct.getDefaultInstance()) {
+            assignment_ = com.google.protobuf.Struct.newBuilder((com.google.protobuf.Struct) assignment_)
                 .mergeFrom(value).buildPartial();
           } else {
             assignment_ = value;
           }
           onChanged();
         } else {
-          if (assignmentCase_ == 4) {
+          if (assignmentCase_ == 5) {
             environmentSpecBuilder_.mergeFrom(value);
           }
           environmentSpecBuilder_.setMessage(value);
         }
-        assignmentCase_ = 4;
+        assignmentCase_ = 5;
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
       public Builder clearEnvironmentSpec() {
         if (environmentSpecBuilder_ == null) {
-          if (assignmentCase_ == 4) {
+          if (assignmentCase_ == 5) {
             assignmentCase_ = 0;
             assignment_ = null;
             onChanged();
           }
         } else {
-          if (assignmentCase_ == 4) {
+          if (assignmentCase_ == 5) {
             assignmentCase_ = 0;
             assignment_ = null;
           }
@@ -1256,42 +1304,42 @@ public final class ExecutionEnvs {
         return this;
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder getEnvironmentSpecBuilder() {
+      public com.google.protobuf.Struct.Builder getEnvironmentSpecBuilder() {
         return getEnvironmentSpecFieldBuilder().getBuilder();
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder getEnvironmentSpecOrBuilder() {
-        if ((assignmentCase_ == 4) && (environmentSpecBuilder_ != null)) {
+      public com.google.protobuf.StructOrBuilder getEnvironmentSpecOrBuilder() {
+        if ((assignmentCase_ == 5) && (environmentSpecBuilder_ != null)) {
           return environmentSpecBuilder_.getMessageOrBuilder();
         } else {
-          if (assignmentCase_ == 4) {
-            return (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_;
+          if (assignmentCase_ == 5) {
+            return (com.google.protobuf.Struct) assignment_;
           }
-          return flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
+          return com.google.protobuf.Struct.getDefaultInstance();
         }
       }
       /**
-       * <code>.flyteidl.core.ExecutionEnvironmentSpec environment_spec = 4;</code>
+       * <code>.google.protobuf.Struct environment_spec = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder> 
+          com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder> 
           getEnvironmentSpecFieldBuilder() {
         if (environmentSpecBuilder_ == null) {
-          if (!(assignmentCase_ == 4)) {
-            assignment_ = flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
+          if (!(assignmentCase_ == 5)) {
+            assignment_ = com.google.protobuf.Struct.getDefaultInstance();
           }
           environmentSpecBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder>(
-                  (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) assignment_,
+              com.google.protobuf.Struct, com.google.protobuf.Struct.Builder, com.google.protobuf.StructOrBuilder>(
+                  (com.google.protobuf.Struct) assignment_,
                   getParentForChildren(),
                   isClean());
           assignment_ = null;
         }
-        assignmentCase_ = 4;
+        assignmentCase_ = 5;
         onChanged();;
         return environmentSpecBuilder_;
       }
@@ -1348,2865 +1396,11 @@ public final class ExecutionEnvs {
 
   }
 
-  public interface ExecutionEnvironmentOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.core.ExecutionEnvironment)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    int getTypeValue();
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    flyteidl.core.ExecutionEnvs.EnvironmentType getType();
-
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-     */
-    boolean hasFastTask();
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-     */
-    flyteidl.core.ExecutionEnvs.FastTaskEnvironment getFastTask();
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-     */
-    flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder getFastTaskOrBuilder();
-  }
-  /**
-   * Protobuf type {@code flyteidl.core.ExecutionEnvironment}
-   */
-  public  static final class ExecutionEnvironment extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.core.ExecutionEnvironment)
-      ExecutionEnvironmentOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use ExecutionEnvironment.newBuilder() to construct.
-    private ExecutionEnvironment(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private ExecutionEnvironment() {
-      type_ = 0;
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private ExecutionEnvironment(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-              int rawValue = input.readEnum();
-
-              type_ = rawValue;
-              break;
-            }
-            case 18: {
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder subBuilder = null;
-              if (fastTask_ != null) {
-                subBuilder = fastTask_.toBuilder();
-              }
-              fastTask_ = input.readMessage(flyteidl.core.ExecutionEnvs.FastTaskEnvironment.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(fastTask_);
-                fastTask_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironment_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironment_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              flyteidl.core.ExecutionEnvs.ExecutionEnvironment.class, flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder.class);
-    }
-
-    public static final int TYPE_FIELD_NUMBER = 1;
-    private int type_;
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    public int getTypeValue() {
-      return type_;
-    }
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.EnvironmentType getType() {
-      @SuppressWarnings("deprecation")
-      flyteidl.core.ExecutionEnvs.EnvironmentType result = flyteidl.core.ExecutionEnvs.EnvironmentType.valueOf(type_);
-      return result == null ? flyteidl.core.ExecutionEnvs.EnvironmentType.UNRECOGNIZED : result;
-    }
-
-    public static final int FAST_TASK_FIELD_NUMBER = 2;
-    private flyteidl.core.ExecutionEnvs.FastTaskEnvironment fastTask_;
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-     */
-    public boolean hasFastTask() {
-      return fastTask_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.FastTaskEnvironment getFastTask() {
-      return fastTask_ == null ? flyteidl.core.ExecutionEnvs.FastTaskEnvironment.getDefaultInstance() : fastTask_;
-    }
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder getFastTaskOrBuilder() {
-      return getFastTask();
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (type_ != flyteidl.core.ExecutionEnvs.EnvironmentType.FAST_TASK.getNumber()) {
-        output.writeEnum(1, type_);
-      }
-      if (fastTask_ != null) {
-        output.writeMessage(2, getFastTask());
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (type_ != flyteidl.core.ExecutionEnvs.EnvironmentType.FAST_TASK.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, type_);
-      }
-      if (fastTask_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getFastTask());
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof flyteidl.core.ExecutionEnvs.ExecutionEnvironment)) {
-        return super.equals(obj);
-      }
-      flyteidl.core.ExecutionEnvs.ExecutionEnvironment other = (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) obj;
-
-      if (type_ != other.type_) return false;
-      if (hasFastTask() != other.hasFastTask()) return false;
-      if (hasFastTask()) {
-        if (!getFastTask()
-            .equals(other.getFastTask())) return false;
-      }
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + type_;
-      if (hasFastTask()) {
-        hash = (37 * hash) + FAST_TASK_FIELD_NUMBER;
-        hash = (53 * hash) + getFastTask().hashCode();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(flyteidl.core.ExecutionEnvs.ExecutionEnvironment prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code flyteidl.core.ExecutionEnvironment}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.core.ExecutionEnvironment)
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironmentOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironment_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironment_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                flyteidl.core.ExecutionEnvs.ExecutionEnvironment.class, flyteidl.core.ExecutionEnvs.ExecutionEnvironment.Builder.class);
-      }
-
-      // Construct using flyteidl.core.ExecutionEnvs.ExecutionEnvironment.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        type_ = 0;
-
-        if (fastTaskBuilder_ == null) {
-          fastTask_ = null;
-        } else {
-          fastTask_ = null;
-          fastTaskBuilder_ = null;
-        }
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironment_descriptor;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironment getDefaultInstanceForType() {
-        return flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironment build() {
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironment result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironment buildPartial() {
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironment result = new flyteidl.core.ExecutionEnvs.ExecutionEnvironment(this);
-        result.type_ = type_;
-        if (fastTaskBuilder_ == null) {
-          result.fastTask_ = fastTask_;
-        } else {
-          result.fastTask_ = fastTaskBuilder_.build();
-        }
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.core.ExecutionEnvs.ExecutionEnvironment) {
-          return mergeFrom((flyteidl.core.ExecutionEnvs.ExecutionEnvironment)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(flyteidl.core.ExecutionEnvs.ExecutionEnvironment other) {
-        if (other == flyteidl.core.ExecutionEnvs.ExecutionEnvironment.getDefaultInstance()) return this;
-        if (other.type_ != 0) {
-          setTypeValue(other.getTypeValue());
-        }
-        if (other.hasFastTask()) {
-          mergeFastTask(other.getFastTask());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironment parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.core.ExecutionEnvs.ExecutionEnvironment) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private int type_ = 0;
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public int getTypeValue() {
-        return type_;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public Builder setTypeValue(int value) {
-        type_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.EnvironmentType getType() {
-        @SuppressWarnings("deprecation")
-        flyteidl.core.ExecutionEnvs.EnvironmentType result = flyteidl.core.ExecutionEnvs.EnvironmentType.valueOf(type_);
-        return result == null ? flyteidl.core.ExecutionEnvs.EnvironmentType.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public Builder setType(flyteidl.core.ExecutionEnvs.EnvironmentType value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        
-        type_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public Builder clearType() {
-        
-        type_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private flyteidl.core.ExecutionEnvs.FastTaskEnvironment fastTask_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.FastTaskEnvironment, flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder> fastTaskBuilder_;
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public boolean hasFastTask() {
-        return fastTaskBuilder_ != null || fastTask_ != null;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironment getFastTask() {
-        if (fastTaskBuilder_ == null) {
-          return fastTask_ == null ? flyteidl.core.ExecutionEnvs.FastTaskEnvironment.getDefaultInstance() : fastTask_;
-        } else {
-          return fastTaskBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public Builder setFastTask(flyteidl.core.ExecutionEnvs.FastTaskEnvironment value) {
-        if (fastTaskBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          fastTask_ = value;
-          onChanged();
-        } else {
-          fastTaskBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public Builder setFastTask(
-          flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder builderForValue) {
-        if (fastTaskBuilder_ == null) {
-          fastTask_ = builderForValue.build();
-          onChanged();
-        } else {
-          fastTaskBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public Builder mergeFastTask(flyteidl.core.ExecutionEnvs.FastTaskEnvironment value) {
-        if (fastTaskBuilder_ == null) {
-          if (fastTask_ != null) {
-            fastTask_ =
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironment.newBuilder(fastTask_).mergeFrom(value).buildPartial();
-          } else {
-            fastTask_ = value;
-          }
-          onChanged();
-        } else {
-          fastTaskBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public Builder clearFastTask() {
-        if (fastTaskBuilder_ == null) {
-          fastTask_ = null;
-          onChanged();
-        } else {
-          fastTask_ = null;
-          fastTaskBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder getFastTaskBuilder() {
-        
-        onChanged();
-        return getFastTaskFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder getFastTaskOrBuilder() {
-        if (fastTaskBuilder_ != null) {
-          return fastTaskBuilder_.getMessageOrBuilder();
-        } else {
-          return fastTask_ == null ?
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironment.getDefaultInstance() : fastTask_;
-        }
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironment fast_task = 2;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.FastTaskEnvironment, flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder> 
-          getFastTaskFieldBuilder() {
-        if (fastTaskBuilder_ == null) {
-          fastTaskBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironment, flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder>(
-                  getFastTask(),
-                  getParentForChildren(),
-                  isClean());
-          fastTask_ = null;
-        }
-        return fastTaskBuilder_;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:flyteidl.core.ExecutionEnvironment)
-    }
-
-    // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionEnvironment)
-    private static final flyteidl.core.ExecutionEnvs.ExecutionEnvironment DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new flyteidl.core.ExecutionEnvs.ExecutionEnvironment();
-    }
-
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironment getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ExecutionEnvironment>
-        PARSER = new com.google.protobuf.AbstractParser<ExecutionEnvironment>() {
-      @java.lang.Override
-      public ExecutionEnvironment parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExecutionEnvironment(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<ExecutionEnvironment> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ExecutionEnvironment> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public flyteidl.core.ExecutionEnvs.ExecutionEnvironment getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface FastTaskEnvironmentOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.core.FastTaskEnvironment)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>string queue_id = 1;</code>
-     */
-    java.lang.String getQueueId();
-    /**
-     * <code>string queue_id = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getQueueIdBytes();
-
-    /**
-     * <code>string namespace = 2;</code>
-     */
-    java.lang.String getNamespace();
-    /**
-     * <code>string namespace = 2;</code>
-     */
-    com.google.protobuf.ByteString
-        getNamespaceBytes();
-
-    /**
-     * <code>string pod_name = 3;</code>
-     */
-    java.lang.String getPodName();
-    /**
-     * <code>string pod_name = 3;</code>
-     */
-    com.google.protobuf.ByteString
-        getPodNameBytes();
-  }
-  /**
-   * Protobuf type {@code flyteidl.core.FastTaskEnvironment}
-   */
-  public  static final class FastTaskEnvironment extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.core.FastTaskEnvironment)
-      FastTaskEnvironmentOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use FastTaskEnvironment.newBuilder() to construct.
-    private FastTaskEnvironment(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private FastTaskEnvironment() {
-      queueId_ = "";
-      namespace_ = "";
-      podName_ = "";
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private FastTaskEnvironment(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              queueId_ = s;
-              break;
-            }
-            case 18: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              namespace_ = s;
-              break;
-            }
-            case 26: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              podName_ = s;
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironment_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironment_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironment.class, flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder.class);
-    }
-
-    public static final int QUEUE_ID_FIELD_NUMBER = 1;
-    private volatile java.lang.Object queueId_;
-    /**
-     * <code>string queue_id = 1;</code>
-     */
-    public java.lang.String getQueueId() {
-      java.lang.Object ref = queueId_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        queueId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string queue_id = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getQueueIdBytes() {
-      java.lang.Object ref = queueId_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        queueId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int NAMESPACE_FIELD_NUMBER = 2;
-    private volatile java.lang.Object namespace_;
-    /**
-     * <code>string namespace = 2;</code>
-     */
-    public java.lang.String getNamespace() {
-      java.lang.Object ref = namespace_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        namespace_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string namespace = 2;</code>
-     */
-    public com.google.protobuf.ByteString
-        getNamespaceBytes() {
-      java.lang.Object ref = namespace_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        namespace_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int POD_NAME_FIELD_NUMBER = 3;
-    private volatile java.lang.Object podName_;
-    /**
-     * <code>string pod_name = 3;</code>
-     */
-    public java.lang.String getPodName() {
-      java.lang.Object ref = podName_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        podName_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string pod_name = 3;</code>
-     */
-    public com.google.protobuf.ByteString
-        getPodNameBytes() {
-      java.lang.Object ref = podName_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        podName_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!getQueueIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, queueId_);
-      }
-      if (!getNamespaceBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 2, namespace_);
-      }
-      if (!getPodNameBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, podName_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!getQueueIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, queueId_);
-      }
-      if (!getNamespaceBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(2, namespace_);
-      }
-      if (!getPodNameBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, podName_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof flyteidl.core.ExecutionEnvs.FastTaskEnvironment)) {
-        return super.equals(obj);
-      }
-      flyteidl.core.ExecutionEnvs.FastTaskEnvironment other = (flyteidl.core.ExecutionEnvs.FastTaskEnvironment) obj;
-
-      if (!getQueueId()
-          .equals(other.getQueueId())) return false;
-      if (!getNamespace()
-          .equals(other.getNamespace())) return false;
-      if (!getPodName()
-          .equals(other.getPodName())) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + QUEUE_ID_FIELD_NUMBER;
-      hash = (53 * hash) + getQueueId().hashCode();
-      hash = (37 * hash) + NAMESPACE_FIELD_NUMBER;
-      hash = (53 * hash) + getNamespace().hashCode();
-      hash = (37 * hash) + POD_NAME_FIELD_NUMBER;
-      hash = (53 * hash) + getPodName().hashCode();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(flyteidl.core.ExecutionEnvs.FastTaskEnvironment prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code flyteidl.core.FastTaskEnvironment}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.core.FastTaskEnvironment)
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironmentOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironment_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironment_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                flyteidl.core.ExecutionEnvs.FastTaskEnvironment.class, flyteidl.core.ExecutionEnvs.FastTaskEnvironment.Builder.class);
-      }
-
-      // Construct using flyteidl.core.ExecutionEnvs.FastTaskEnvironment.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        queueId_ = "";
-
-        namespace_ = "";
-
-        podName_ = "";
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironment_descriptor;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironment getDefaultInstanceForType() {
-        return flyteidl.core.ExecutionEnvs.FastTaskEnvironment.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironment build() {
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironment result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironment buildPartial() {
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironment result = new flyteidl.core.ExecutionEnvs.FastTaskEnvironment(this);
-        result.queueId_ = queueId_;
-        result.namespace_ = namespace_;
-        result.podName_ = podName_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.core.ExecutionEnvs.FastTaskEnvironment) {
-          return mergeFrom((flyteidl.core.ExecutionEnvs.FastTaskEnvironment)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(flyteidl.core.ExecutionEnvs.FastTaskEnvironment other) {
-        if (other == flyteidl.core.ExecutionEnvs.FastTaskEnvironment.getDefaultInstance()) return this;
-        if (!other.getQueueId().isEmpty()) {
-          queueId_ = other.queueId_;
-          onChanged();
-        }
-        if (!other.getNamespace().isEmpty()) {
-          namespace_ = other.namespace_;
-          onChanged();
-        }
-        if (!other.getPodName().isEmpty()) {
-          podName_ = other.podName_;
-          onChanged();
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironment parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.core.ExecutionEnvs.FastTaskEnvironment) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private java.lang.Object queueId_ = "";
-      /**
-       * <code>string queue_id = 1;</code>
-       */
-      public java.lang.String getQueueId() {
-        java.lang.Object ref = queueId_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          queueId_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string queue_id = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getQueueIdBytes() {
-        java.lang.Object ref = queueId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          queueId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string queue_id = 1;</code>
-       */
-      public Builder setQueueId(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        queueId_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string queue_id = 1;</code>
-       */
-      public Builder clearQueueId() {
-        
-        queueId_ = getDefaultInstance().getQueueId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string queue_id = 1;</code>
-       */
-      public Builder setQueueIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        queueId_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object namespace_ = "";
-      /**
-       * <code>string namespace = 2;</code>
-       */
-      public java.lang.String getNamespace() {
-        java.lang.Object ref = namespace_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          namespace_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string namespace = 2;</code>
-       */
-      public com.google.protobuf.ByteString
-          getNamespaceBytes() {
-        java.lang.Object ref = namespace_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          namespace_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string namespace = 2;</code>
-       */
-      public Builder setNamespace(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        namespace_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string namespace = 2;</code>
-       */
-      public Builder clearNamespace() {
-        
-        namespace_ = getDefaultInstance().getNamespace();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string namespace = 2;</code>
-       */
-      public Builder setNamespaceBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        namespace_ = value;
-        onChanged();
-        return this;
-      }
-
-      private java.lang.Object podName_ = "";
-      /**
-       * <code>string pod_name = 3;</code>
-       */
-      public java.lang.String getPodName() {
-        java.lang.Object ref = podName_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          podName_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string pod_name = 3;</code>
-       */
-      public com.google.protobuf.ByteString
-          getPodNameBytes() {
-        java.lang.Object ref = podName_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          podName_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string pod_name = 3;</code>
-       */
-      public Builder setPodName(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        podName_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string pod_name = 3;</code>
-       */
-      public Builder clearPodName() {
-        
-        podName_ = getDefaultInstance().getPodName();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string pod_name = 3;</code>
-       */
-      public Builder setPodNameBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        podName_ = value;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:flyteidl.core.FastTaskEnvironment)
-    }
-
-    // @@protoc_insertion_point(class_scope:flyteidl.core.FastTaskEnvironment)
-    private static final flyteidl.core.ExecutionEnvs.FastTaskEnvironment DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new flyteidl.core.ExecutionEnvs.FastTaskEnvironment();
-    }
-
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironment getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<FastTaskEnvironment>
-        PARSER = new com.google.protobuf.AbstractParser<FastTaskEnvironment>() {
-      @java.lang.Override
-      public FastTaskEnvironment parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new FastTaskEnvironment(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<FastTaskEnvironment> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<FastTaskEnvironment> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public flyteidl.core.ExecutionEnvs.FastTaskEnvironment getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface ExecutionEnvironmentSpecOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.core.ExecutionEnvironmentSpec)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    int getTypeValue();
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    flyteidl.core.ExecutionEnvs.EnvironmentType getType();
-
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-     */
-    boolean hasFastTask();
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-     */
-    flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec getFastTask();
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-     */
-    flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder getFastTaskOrBuilder();
-  }
-  /**
-   * Protobuf type {@code flyteidl.core.ExecutionEnvironmentSpec}
-   */
-  public  static final class ExecutionEnvironmentSpec extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.core.ExecutionEnvironmentSpec)
-      ExecutionEnvironmentSpecOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use ExecutionEnvironmentSpec.newBuilder() to construct.
-    private ExecutionEnvironmentSpec(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private ExecutionEnvironmentSpec() {
-      type_ = 0;
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private ExecutionEnvironmentSpec(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 8: {
-              int rawValue = input.readEnum();
-
-              type_ = rawValue;
-              break;
-            }
-            case 18: {
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder subBuilder = null;
-              if (fastTask_ != null) {
-                subBuilder = fastTask_.toBuilder();
-              }
-              fastTask_ = input.readMessage(flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.parser(), extensionRegistry);
-              if (subBuilder != null) {
-                subBuilder.mergeFrom(fastTask_);
-                fastTask_ = subBuilder.buildPartial();
-              }
-
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironmentSpec_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironmentSpec_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.class, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder.class);
-    }
-
-    public static final int TYPE_FIELD_NUMBER = 1;
-    private int type_;
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    public int getTypeValue() {
-      return type_;
-    }
-    /**
-     * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.EnvironmentType getType() {
-      @SuppressWarnings("deprecation")
-      flyteidl.core.ExecutionEnvs.EnvironmentType result = flyteidl.core.ExecutionEnvs.EnvironmentType.valueOf(type_);
-      return result == null ? flyteidl.core.ExecutionEnvs.EnvironmentType.UNRECOGNIZED : result;
-    }
-
-    public static final int FAST_TASK_FIELD_NUMBER = 2;
-    private flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec fastTask_;
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-     */
-    public boolean hasFastTask() {
-      return fastTask_ != null;
-    }
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec getFastTask() {
-      return fastTask_ == null ? flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.getDefaultInstance() : fastTask_;
-    }
-    /**
-     * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-     */
-    public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder getFastTaskOrBuilder() {
-      return getFastTask();
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (type_ != flyteidl.core.ExecutionEnvs.EnvironmentType.FAST_TASK.getNumber()) {
-        output.writeEnum(1, type_);
-      }
-      if (fastTask_ != null) {
-        output.writeMessage(2, getFastTask());
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (type_ != flyteidl.core.ExecutionEnvs.EnvironmentType.FAST_TASK.getNumber()) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeEnumSize(1, type_);
-      }
-      if (fastTask_ != null) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(2, getFastTask());
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec)) {
-        return super.equals(obj);
-      }
-      flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec other = (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) obj;
-
-      if (type_ != other.type_) return false;
-      if (hasFastTask() != other.hasFastTask()) return false;
-      if (hasFastTask()) {
-        if (!getFastTask()
-            .equals(other.getFastTask())) return false;
-      }
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + TYPE_FIELD_NUMBER;
-      hash = (53 * hash) + type_;
-      if (hasFastTask()) {
-        hash = (37 * hash) + FAST_TASK_FIELD_NUMBER;
-        hash = (53 * hash) + getFastTask().hashCode();
-      }
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code flyteidl.core.ExecutionEnvironmentSpec}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.core.ExecutionEnvironmentSpec)
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpecOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironmentSpec_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironmentSpec_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.class, flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.Builder.class);
-      }
-
-      // Construct using flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        type_ = 0;
-
-        if (fastTaskBuilder_ == null) {
-          fastTask_ = null;
-        } else {
-          fastTask_ = null;
-          fastTaskBuilder_ = null;
-        }
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_ExecutionEnvironmentSpec_descriptor;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec getDefaultInstanceForType() {
-        return flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec build() {
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec buildPartial() {
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec result = new flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec(this);
-        result.type_ = type_;
-        if (fastTaskBuilder_ == null) {
-          result.fastTask_ = fastTask_;
-        } else {
-          result.fastTask_ = fastTaskBuilder_.build();
-        }
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) {
-          return mergeFrom((flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec other) {
-        if (other == flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec.getDefaultInstance()) return this;
-        if (other.type_ != 0) {
-          setTypeValue(other.getTypeValue());
-        }
-        if (other.hasFastTask()) {
-          mergeFastTask(other.getFastTask());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private int type_ = 0;
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public int getTypeValue() {
-        return type_;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public Builder setTypeValue(int value) {
-        type_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.EnvironmentType getType() {
-        @SuppressWarnings("deprecation")
-        flyteidl.core.ExecutionEnvs.EnvironmentType result = flyteidl.core.ExecutionEnvs.EnvironmentType.valueOf(type_);
-        return result == null ? flyteidl.core.ExecutionEnvs.EnvironmentType.UNRECOGNIZED : result;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public Builder setType(flyteidl.core.ExecutionEnvs.EnvironmentType value) {
-        if (value == null) {
-          throw new NullPointerException();
-        }
-        
-        type_ = value.getNumber();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.EnvironmentType type = 1;</code>
-       */
-      public Builder clearType() {
-        
-        type_ = 0;
-        onChanged();
-        return this;
-      }
-
-      private flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec fastTask_;
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder> fastTaskBuilder_;
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public boolean hasFastTask() {
-        return fastTaskBuilder_ != null || fastTask_ != null;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec getFastTask() {
-        if (fastTaskBuilder_ == null) {
-          return fastTask_ == null ? flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.getDefaultInstance() : fastTask_;
-        } else {
-          return fastTaskBuilder_.getMessage();
-        }
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public Builder setFastTask(flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec value) {
-        if (fastTaskBuilder_ == null) {
-          if (value == null) {
-            throw new NullPointerException();
-          }
-          fastTask_ = value;
-          onChanged();
-        } else {
-          fastTaskBuilder_.setMessage(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public Builder setFastTask(
-          flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder builderForValue) {
-        if (fastTaskBuilder_ == null) {
-          fastTask_ = builderForValue.build();
-          onChanged();
-        } else {
-          fastTaskBuilder_.setMessage(builderForValue.build());
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public Builder mergeFastTask(flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec value) {
-        if (fastTaskBuilder_ == null) {
-          if (fastTask_ != null) {
-            fastTask_ =
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.newBuilder(fastTask_).mergeFrom(value).buildPartial();
-          } else {
-            fastTask_ = value;
-          }
-          onChanged();
-        } else {
-          fastTaskBuilder_.mergeFrom(value);
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public Builder clearFastTask() {
-        if (fastTaskBuilder_ == null) {
-          fastTask_ = null;
-          onChanged();
-        } else {
-          fastTask_ = null;
-          fastTaskBuilder_ = null;
-        }
-
-        return this;
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder getFastTaskBuilder() {
-        
-        onChanged();
-        return getFastTaskFieldBuilder().getBuilder();
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder getFastTaskOrBuilder() {
-        if (fastTaskBuilder_ != null) {
-          return fastTaskBuilder_.getMessageOrBuilder();
-        } else {
-          return fastTask_ == null ?
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.getDefaultInstance() : fastTask_;
-        }
-      }
-      /**
-       * <code>.flyteidl.core.FastTaskEnvironmentSpec fast_task = 2;</code>
-       */
-      private com.google.protobuf.SingleFieldBuilderV3<
-          flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder> 
-          getFastTaskFieldBuilder() {
-        if (fastTaskBuilder_ == null) {
-          fastTaskBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder>(
-                  getFastTask(),
-                  getParentForChildren(),
-                  isClean());
-          fastTask_ = null;
-        }
-        return fastTaskBuilder_;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:flyteidl.core.ExecutionEnvironmentSpec)
-    }
-
-    // @@protoc_insertion_point(class_scope:flyteidl.core.ExecutionEnvironmentSpec)
-    private static final flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec();
-    }
-
-    public static flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<ExecutionEnvironmentSpec>
-        PARSER = new com.google.protobuf.AbstractParser<ExecutionEnvironmentSpec>() {
-      @java.lang.Override
-      public ExecutionEnvironmentSpec parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new ExecutionEnvironmentSpec(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<ExecutionEnvironmentSpec> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<ExecutionEnvironmentSpec> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public flyteidl.core.ExecutionEnvs.ExecutionEnvironmentSpec getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
-  public interface FastTaskEnvironmentSpecOrBuilder extends
-      // @@protoc_insertion_point(interface_extends:flyteidl.core.FastTaskEnvironmentSpec)
-      com.google.protobuf.MessageOrBuilder {
-
-    /**
-     * <code>string image = 1;</code>
-     */
-    java.lang.String getImage();
-    /**
-     * <code>string image = 1;</code>
-     */
-    com.google.protobuf.ByteString
-        getImageBytes();
-
-    /**
-     * <code>int32 replica_count = 2;</code>
-     */
-    int getReplicaCount();
-  }
-  /**
-   * Protobuf type {@code flyteidl.core.FastTaskEnvironmentSpec}
-   */
-  public  static final class FastTaskEnvironmentSpec extends
-      com.google.protobuf.GeneratedMessageV3 implements
-      // @@protoc_insertion_point(message_implements:flyteidl.core.FastTaskEnvironmentSpec)
-      FastTaskEnvironmentSpecOrBuilder {
-  private static final long serialVersionUID = 0L;
-    // Use FastTaskEnvironmentSpec.newBuilder() to construct.
-    private FastTaskEnvironmentSpec(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
-      super(builder);
-    }
-    private FastTaskEnvironmentSpec() {
-      image_ = "";
-    }
-
-    @java.lang.Override
-    public final com.google.protobuf.UnknownFieldSet
-    getUnknownFields() {
-      return this.unknownFields;
-    }
-    private FastTaskEnvironmentSpec(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      this();
-      if (extensionRegistry == null) {
-        throw new java.lang.NullPointerException();
-      }
-      int mutable_bitField0_ = 0;
-      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
-          com.google.protobuf.UnknownFieldSet.newBuilder();
-      try {
-        boolean done = false;
-        while (!done) {
-          int tag = input.readTag();
-          switch (tag) {
-            case 0:
-              done = true;
-              break;
-            case 10: {
-              java.lang.String s = input.readStringRequireUtf8();
-
-              image_ = s;
-              break;
-            }
-            case 16: {
-
-              replicaCount_ = input.readInt32();
-              break;
-            }
-            default: {
-              if (!parseUnknownField(
-                  input, unknownFields, extensionRegistry, tag)) {
-                done = true;
-              }
-              break;
-            }
-          }
-        }
-      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-        throw e.setUnfinishedMessage(this);
-      } catch (java.io.IOException e) {
-        throw new com.google.protobuf.InvalidProtocolBufferException(
-            e).setUnfinishedMessage(this);
-      } finally {
-        this.unknownFields = unknownFields.build();
-        makeExtensionsImmutable();
-      }
-    }
-    public static final com.google.protobuf.Descriptors.Descriptor
-        getDescriptor() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironmentSpec_descriptor;
-    }
-
-    @java.lang.Override
-    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-        internalGetFieldAccessorTable() {
-      return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironmentSpec_fieldAccessorTable
-          .ensureFieldAccessorsInitialized(
-              flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.class, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder.class);
-    }
-
-    public static final int IMAGE_FIELD_NUMBER = 1;
-    private volatile java.lang.Object image_;
-    /**
-     * <code>string image = 1;</code>
-     */
-    public java.lang.String getImage() {
-      java.lang.Object ref = image_;
-      if (ref instanceof java.lang.String) {
-        return (java.lang.String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        java.lang.String s = bs.toStringUtf8();
-        image_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>string image = 1;</code>
-     */
-    public com.google.protobuf.ByteString
-        getImageBytes() {
-      java.lang.Object ref = image_;
-      if (ref instanceof java.lang.String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (java.lang.String) ref);
-        image_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
-    }
-
-    public static final int REPLICA_COUNT_FIELD_NUMBER = 2;
-    private int replicaCount_;
-    /**
-     * <code>int32 replica_count = 2;</code>
-     */
-    public int getReplicaCount() {
-      return replicaCount_;
-    }
-
-    private byte memoizedIsInitialized = -1;
-    @java.lang.Override
-    public final boolean isInitialized() {
-      byte isInitialized = memoizedIsInitialized;
-      if (isInitialized == 1) return true;
-      if (isInitialized == 0) return false;
-
-      memoizedIsInitialized = 1;
-      return true;
-    }
-
-    @java.lang.Override
-    public void writeTo(com.google.protobuf.CodedOutputStream output)
-                        throws java.io.IOException {
-      if (!getImageBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, image_);
-      }
-      if (replicaCount_ != 0) {
-        output.writeInt32(2, replicaCount_);
-      }
-      unknownFields.writeTo(output);
-    }
-
-    @java.lang.Override
-    public int getSerializedSize() {
-      int size = memoizedSize;
-      if (size != -1) return size;
-
-      size = 0;
-      if (!getImageBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, image_);
-      }
-      if (replicaCount_ != 0) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, replicaCount_);
-      }
-      size += unknownFields.getSerializedSize();
-      memoizedSize = size;
-      return size;
-    }
-
-    @java.lang.Override
-    public boolean equals(final java.lang.Object obj) {
-      if (obj == this) {
-       return true;
-      }
-      if (!(obj instanceof flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec)) {
-        return super.equals(obj);
-      }
-      flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec other = (flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec) obj;
-
-      if (!getImage()
-          .equals(other.getImage())) return false;
-      if (getReplicaCount()
-          != other.getReplicaCount()) return false;
-      if (!unknownFields.equals(other.unknownFields)) return false;
-      return true;
-    }
-
-    @java.lang.Override
-    public int hashCode() {
-      if (memoizedHashCode != 0) {
-        return memoizedHashCode;
-      }
-      int hash = 41;
-      hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + IMAGE_FIELD_NUMBER;
-      hash = (53 * hash) + getImage().hashCode();
-      hash = (37 * hash) + REPLICA_COUNT_FIELD_NUMBER;
-      hash = (53 * hash) + getReplicaCount();
-      hash = (29 * hash) + unknownFields.hashCode();
-      memoizedHashCode = hash;
-      return hash;
-    }
-
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        java.nio.ByteBuffer data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        java.nio.ByteBuffer data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        com.google.protobuf.ByteString data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        com.google.protobuf.ByteString data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(byte[] data)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        byte[] data,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws com.google.protobuf.InvalidProtocolBufferException {
-      return PARSER.parseFrom(data, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseDelimitedFrom(java.io.InputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseDelimitedFrom(
-        java.io.InputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        com.google.protobuf.CodedInputStream input)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input);
-    }
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parseFrom(
-        com.google.protobuf.CodedInputStream input,
-        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-        throws java.io.IOException {
-      return com.google.protobuf.GeneratedMessageV3
-          .parseWithIOException(PARSER, input, extensionRegistry);
-    }
-
-    @java.lang.Override
-    public Builder newBuilderForType() { return newBuilder(); }
-    public static Builder newBuilder() {
-      return DEFAULT_INSTANCE.toBuilder();
-    }
-    public static Builder newBuilder(flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec prototype) {
-      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
-    }
-    @java.lang.Override
-    public Builder toBuilder() {
-      return this == DEFAULT_INSTANCE
-          ? new Builder() : new Builder().mergeFrom(this);
-    }
-
-    @java.lang.Override
-    protected Builder newBuilderForType(
-        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-      Builder builder = new Builder(parent);
-      return builder;
-    }
-    /**
-     * Protobuf type {@code flyteidl.core.FastTaskEnvironmentSpec}
-     */
-    public static final class Builder extends
-        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
-        // @@protoc_insertion_point(builder_implements:flyteidl.core.FastTaskEnvironmentSpec)
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpecOrBuilder {
-      public static final com.google.protobuf.Descriptors.Descriptor
-          getDescriptor() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironmentSpec_descriptor;
-      }
-
-      @java.lang.Override
-      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-          internalGetFieldAccessorTable() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironmentSpec_fieldAccessorTable
-            .ensureFieldAccessorsInitialized(
-                flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.class, flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.Builder.class);
-      }
-
-      // Construct using flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.newBuilder()
-      private Builder() {
-        maybeForceBuilderInitialization();
-      }
-
-      private Builder(
-          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
-        super(parent);
-        maybeForceBuilderInitialization();
-      }
-      private void maybeForceBuilderInitialization() {
-        if (com.google.protobuf.GeneratedMessageV3
-                .alwaysUseFieldBuilders) {
-        }
-      }
-      @java.lang.Override
-      public Builder clear() {
-        super.clear();
-        image_ = "";
-
-        replicaCount_ = 0;
-
-        return this;
-      }
-
-      @java.lang.Override
-      public com.google.protobuf.Descriptors.Descriptor
-          getDescriptorForType() {
-        return flyteidl.core.ExecutionEnvs.internal_static_flyteidl_core_FastTaskEnvironmentSpec_descriptor;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec getDefaultInstanceForType() {
-        return flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.getDefaultInstance();
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec build() {
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec result = buildPartial();
-        if (!result.isInitialized()) {
-          throw newUninitializedMessageException(result);
-        }
-        return result;
-      }
-
-      @java.lang.Override
-      public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec buildPartial() {
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec result = new flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec(this);
-        result.image_ = image_;
-        result.replicaCount_ = replicaCount_;
-        onBuilt();
-        return result;
-      }
-
-      @java.lang.Override
-      public Builder clone() {
-        return super.clone();
-      }
-      @java.lang.Override
-      public Builder setField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.setField(field, value);
-      }
-      @java.lang.Override
-      public Builder clearField(
-          com.google.protobuf.Descriptors.FieldDescriptor field) {
-        return super.clearField(field);
-      }
-      @java.lang.Override
-      public Builder clearOneof(
-          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
-        return super.clearOneof(oneof);
-      }
-      @java.lang.Override
-      public Builder setRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          int index, java.lang.Object value) {
-        return super.setRepeatedField(field, index, value);
-      }
-      @java.lang.Override
-      public Builder addRepeatedField(
-          com.google.protobuf.Descriptors.FieldDescriptor field,
-          java.lang.Object value) {
-        return super.addRepeatedField(field, value);
-      }
-      @java.lang.Override
-      public Builder mergeFrom(com.google.protobuf.Message other) {
-        if (other instanceof flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec) {
-          return mergeFrom((flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec)other);
-        } else {
-          super.mergeFrom(other);
-          return this;
-        }
-      }
-
-      public Builder mergeFrom(flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec other) {
-        if (other == flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec.getDefaultInstance()) return this;
-        if (!other.getImage().isEmpty()) {
-          image_ = other.image_;
-          onChanged();
-        }
-        if (other.getReplicaCount() != 0) {
-          setReplicaCount(other.getReplicaCount());
-        }
-        this.mergeUnknownFields(other.unknownFields);
-        onChanged();
-        return this;
-      }
-
-      @java.lang.Override
-      public final boolean isInitialized() {
-        return true;
-      }
-
-      @java.lang.Override
-      public Builder mergeFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws java.io.IOException {
-        flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec parsedMessage = null;
-        try {
-          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
-        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
-          parsedMessage = (flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec) e.getUnfinishedMessage();
-          throw e.unwrapIOException();
-        } finally {
-          if (parsedMessage != null) {
-            mergeFrom(parsedMessage);
-          }
-        }
-        return this;
-      }
-
-      private java.lang.Object image_ = "";
-      /**
-       * <code>string image = 1;</code>
-       */
-      public java.lang.String getImage() {
-        java.lang.Object ref = image_;
-        if (!(ref instanceof java.lang.String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          java.lang.String s = bs.toStringUtf8();
-          image_ = s;
-          return s;
-        } else {
-          return (java.lang.String) ref;
-        }
-      }
-      /**
-       * <code>string image = 1;</code>
-       */
-      public com.google.protobuf.ByteString
-          getImageBytes() {
-        java.lang.Object ref = image_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (java.lang.String) ref);
-          image_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>string image = 1;</code>
-       */
-      public Builder setImage(
-          java.lang.String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        image_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string image = 1;</code>
-       */
-      public Builder clearImage() {
-        
-        image_ = getDefaultInstance().getImage();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>string image = 1;</code>
-       */
-      public Builder setImageBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        image_ = value;
-        onChanged();
-        return this;
-      }
-
-      private int replicaCount_ ;
-      /**
-       * <code>int32 replica_count = 2;</code>
-       */
-      public int getReplicaCount() {
-        return replicaCount_;
-      }
-      /**
-       * <code>int32 replica_count = 2;</code>
-       */
-      public Builder setReplicaCount(int value) {
-        
-        replicaCount_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>int32 replica_count = 2;</code>
-       */
-      public Builder clearReplicaCount() {
-        
-        replicaCount_ = 0;
-        onChanged();
-        return this;
-      }
-      @java.lang.Override
-      public final Builder setUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.setUnknownFields(unknownFields);
-      }
-
-      @java.lang.Override
-      public final Builder mergeUnknownFields(
-          final com.google.protobuf.UnknownFieldSet unknownFields) {
-        return super.mergeUnknownFields(unknownFields);
-      }
-
-
-      // @@protoc_insertion_point(builder_scope:flyteidl.core.FastTaskEnvironmentSpec)
-    }
-
-    // @@protoc_insertion_point(class_scope:flyteidl.core.FastTaskEnvironmentSpec)
-    private static final flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec DEFAULT_INSTANCE;
-    static {
-      DEFAULT_INSTANCE = new flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec();
-    }
-
-    public static flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec getDefaultInstance() {
-      return DEFAULT_INSTANCE;
-    }
-
-    private static final com.google.protobuf.Parser<FastTaskEnvironmentSpec>
-        PARSER = new com.google.protobuf.AbstractParser<FastTaskEnvironmentSpec>() {
-      @java.lang.Override
-      public FastTaskEnvironmentSpec parsePartialFrom(
-          com.google.protobuf.CodedInputStream input,
-          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
-          throws com.google.protobuf.InvalidProtocolBufferException {
-        return new FastTaskEnvironmentSpec(input, extensionRegistry);
-      }
-    };
-
-    public static com.google.protobuf.Parser<FastTaskEnvironmentSpec> parser() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public com.google.protobuf.Parser<FastTaskEnvironmentSpec> getParserForType() {
-      return PARSER;
-    }
-
-    @java.lang.Override
-    public flyteidl.core.ExecutionEnvs.FastTaskEnvironmentSpec getDefaultInstanceForType() {
-      return DEFAULT_INSTANCE;
-    }
-
-  }
-
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_flyteidl_core_ExecutionEnvironmentAssignment_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_core_ExecutionEnvironmentAssignment_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_core_ExecutionEnvironment_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_core_ExecutionEnvironment_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_core_FastTaskEnvironment_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_core_FastTaskEnvironment_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_core_ExecutionEnvironmentSpec_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_core_ExecutionEnvironmentSpec_fieldAccessorTable;
-  private static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_flyteidl_core_FastTaskEnvironmentSpec_descriptor;
-  private static final 
-    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
-      internal_static_flyteidl_core_FastTaskEnvironmentSpec_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -4217,25 +1411,14 @@ public final class ExecutionEnvs {
   static {
     java.lang.String[] descriptorData = {
       "\n\"flyteidl/core/execution_envs.proto\022\rfl" +
-      "yteidl.core\032\036flyteidl/core/identifier.pr" +
-      "oto\"\315\001\n\036ExecutionEnvironmentAssignment\022\n" +
-      "\n\002id\030\001 \001(\t\022\020\n\010node_ids\030\002 \003(\t\022:\n\013environm" +
-      "ent\030\003 \001(\0132#.flyteidl.core.ExecutionEnvir" +
-      "onmentH\000\022C\n\020environment_spec\030\004 \001(\0132\'.fly" +
-      "teidl.core.ExecutionEnvironmentSpecH\000B\014\n" +
-      "\nassignment\"{\n\024ExecutionEnvironment\022,\n\004t" +
-      "ype\030\001 \001(\0162\036.flyteidl.core.EnvironmentTyp" +
-      "e\0225\n\tfast_task\030\002 \001(\0132\".flyteidl.core.Fas" +
-      "tTaskEnvironment\"L\n\023FastTaskEnvironment\022" +
-      "\020\n\010queue_id\030\001 \001(\t\022\021\n\tnamespace\030\002 \001(\t\022\020\n\010" +
-      "pod_name\030\003 \001(\t\"\203\001\n\030ExecutionEnvironmentS" +
-      "pec\022,\n\004type\030\001 \001(\0162\036.flyteidl.core.Enviro" +
-      "nmentType\0229\n\tfast_task\030\002 \001(\0132&.flyteidl." +
-      "core.FastTaskEnvironmentSpec\"?\n\027FastTask" +
-      "EnvironmentSpec\022\r\n\005image\030\001 \001(\t\022\025\n\rreplic" +
-      "a_count\030\002 \001(\005* \n\017EnvironmentType\022\r\n\tFAST" +
-      "_TASK\020\000B<Z:github.com/flyteorg/flyte/fly" +
-      "teidl/gen/pb-go/flyteidl/coreb\006proto3"
+      "yteidl.core\032\034google/protobuf/struct.prot" +
+      "o\"\277\001\n\036ExecutionEnvironmentAssignment\022\n\n\002" +
+      "id\030\001 \001(\t\022\020\n\010node_ids\030\002 \003(\t\022\014\n\004type\030\003 \001(\t" +
+      "\022.\n\013environment\030\004 \001(\0132\027.google.protobuf." +
+      "StructH\000\0223\n\020environment_spec\030\005 \001(\0132\027.goo" +
+      "gle.protobuf.StructH\000B\014\n\nassignmentB<Z:g" +
+      "ithub.com/flyteorg/flyte/flyteidl/gen/pb" +
+      "-go/flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -4248,39 +1431,15 @@ public final class ExecutionEnvs {
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
-          flyteidl.core.IdentifierOuterClass.getDescriptor(),
+          com.google.protobuf.StructProto.getDescriptor(),
         }, assigner);
     internal_static_flyteidl_core_ExecutionEnvironmentAssignment_descriptor =
       getDescriptor().getMessageTypes().get(0);
     internal_static_flyteidl_core_ExecutionEnvironmentAssignment_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ExecutionEnvironmentAssignment_descriptor,
-        new java.lang.String[] { "Id", "NodeIds", "Environment", "EnvironmentSpec", "Assignment", });
-    internal_static_flyteidl_core_ExecutionEnvironment_descriptor =
-      getDescriptor().getMessageTypes().get(1);
-    internal_static_flyteidl_core_ExecutionEnvironment_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_core_ExecutionEnvironment_descriptor,
-        new java.lang.String[] { "Type", "FastTask", });
-    internal_static_flyteidl_core_FastTaskEnvironment_descriptor =
-      getDescriptor().getMessageTypes().get(2);
-    internal_static_flyteidl_core_FastTaskEnvironment_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_core_FastTaskEnvironment_descriptor,
-        new java.lang.String[] { "QueueId", "Namespace", "PodName", });
-    internal_static_flyteidl_core_ExecutionEnvironmentSpec_descriptor =
-      getDescriptor().getMessageTypes().get(3);
-    internal_static_flyteidl_core_ExecutionEnvironmentSpec_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_core_ExecutionEnvironmentSpec_descriptor,
-        new java.lang.String[] { "Type", "FastTask", });
-    internal_static_flyteidl_core_FastTaskEnvironmentSpec_descriptor =
-      getDescriptor().getMessageTypes().get(4);
-    internal_static_flyteidl_core_FastTaskEnvironmentSpec_fieldAccessorTable = new
-      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
-        internal_static_flyteidl_core_FastTaskEnvironmentSpec_descriptor,
-        new java.lang.String[] { "Image", "ReplicaCount", });
-    flyteidl.core.IdentifierOuterClass.getDescriptor();
+        new java.lang.String[] { "Id", "NodeIds", "Type", "Environment", "EnvironmentSpec", "Assignment", });
+    com.google.protobuf.StructProto.getDescriptor();
   }
 
   // @@protoc_insertion_point(outer_class_scope)

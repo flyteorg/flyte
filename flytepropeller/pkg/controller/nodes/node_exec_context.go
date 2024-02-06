@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strconv"
 
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/types"
 
@@ -135,7 +136,7 @@ type nodeExecContext struct {
 	shardSelector       ioutils.ShardSelector
 	nl                  executors.NodeLookup
 	ic                  executors.ExecutionContext
-	executionEnv		*core.ExecutionEnvironment
+	executionEnv		*_struct.Struct
 	executionEnvClient  *executionenv.ExecutionEnvironmentClient
 }
 
@@ -207,7 +208,7 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 	return e.maxDatasetSizeBytes
 }
 
-func (e nodeExecContext) GetExecutionEnv(envType core.EnvironmentType) *core.ExecutionEnvironment {
+func (e nodeExecContext) GetExecutionEnv(envType string) *_struct.Struct {
 	if e.executionEnv != nil {
 		return e.executionEnv
 	}
@@ -216,16 +217,17 @@ func (e nodeExecContext) GetExecutionEnv(envType core.EnvironmentType) *core.Exe
 	config := e.ExecutionContext().GetExecutionConfig()
 	for _, executionEnvAssignment := range config.ExecutionEnvs {
 		if slices.Contains(executionEnvAssignment.NodeIds, e.NodeID()) {
-			if env := executionEnvAssignment.Environment; env != nil {
-				if envType != env.Type {
+			// TODO @hamersaw - probably make this switch on executionEnvAssignment.Assignment
+			if env := executionEnvAssignment.GetEnvironment(); env != nil {
+				if envType != executionEnvAssignment.Type {
 					continue
 				}
 
 				// if execution environment exists then use it
 				e.executionEnv = env
 				break
-			} else if envSpec := executionEnvAssignment.EnvironmentSpec; envSpec != nil {
-				if envType != envSpec.Type {
+			} else if envSpec := executionEnvAssignment.GetEnvironmentSpec(); envSpec != nil {
+				if envType != executionEnvAssignment.Type {
 					continue
 				}
 
