@@ -256,6 +256,12 @@ func PhaseInfoRunning(version uint32, info *TaskInfo) PhaseInfo {
 	return phaseInfo(PhaseRunning, version, nil, info, false)
 }
 
+func PhaseInfoRunningWithTaskInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
+	pi := phaseInfo(PhaseRunning, version, nil, info, false)
+	pi.reason = reason
+	return pi
+}
+
 func PhaseInfoSuccess(info *TaskInfo) PhaseInfo {
 	return phaseInfo(PhaseSuccess, DefaultPhaseVersion, nil, info, false)
 }

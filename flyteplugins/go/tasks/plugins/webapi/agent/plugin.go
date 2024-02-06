@@ -175,7 +175,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case flyteIdl.TaskExecution_INITIALIZING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_RUNNING:
-		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+		return core.PhaseInfoRunningWithTaskInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
 		err = writeOutput(ctx, taskCtx, resource)
 		if err != nil {
@@ -199,7 +199,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_PENDING:
 		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_RUNNING:
-		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+		return core.PhaseInfoRunningWithTaskInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
 		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	case admin.State_RETRYABLE_FAILURE:
