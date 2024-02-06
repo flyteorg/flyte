@@ -61,6 +61,11 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        {{- if .Values.flytepropeller.podEnv -}}
+        {{- with .Values.flytepropeller.podEnv -}}
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -89,6 +94,8 @@ spec:
         {{- toYaml . | nindent 12 }}
         {{- end }}
         {{- end }}
+          ports:
+          - containerPort: 9443
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config

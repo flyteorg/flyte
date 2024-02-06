@@ -37,7 +37,9 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        {{- if or .Values.flyteconsole.ga.enabled .Values.flyteconsole.podEnv }}
         env:
+        {{- end }}
         {{- if .Values.flyteconsole.ga.enabled }}
         - name: ENABLE_GA
           value: "{{ .Values.flyteconsole.ga.enabled }}"
