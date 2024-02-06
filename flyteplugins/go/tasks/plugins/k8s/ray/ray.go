@@ -29,14 +29,15 @@ import (
 )
 
 const (
-	rayStateMountPath               = "/tmp/ray"
-	defaultRayStateVolName          = "system-ray-state"
-	rayTaskType                     = "ray"
-	KindRayJob                      = "RayJob"
-	IncludeDashboard                = "include-dashboard"
-	NodeIPAddress                   = "node-ip-address"
-	DashboardHost                   = "dashboard-host"
-	DisableUsageStatsStartParameter = "disable-usage-stats"
+	rayStateMountPath                  = "/tmp/ray"
+	defaultRayStateVolName             = "system-ray-state"
+	rayTaskType                        = "ray"
+	KindRayJob                         = "RayJob"
+	IncludeDashboard                   = "include-dashboard"
+	NodeIPAddress                      = "node-ip-address"
+	DashboardHost                      = "dashboard-host"
+	DisableUsageStatsStartParameter    = "disable-usage-stats"
+	DisableUsageStatsStartParameterVal = "true"
 )
 
 var logTemplateRegexes = struct {
@@ -110,7 +111,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	if _, exists := headNodeRayStartParams[DisableUsageStatsStartParameter]; !exists && !cfg.EnableUsageStats {
-		headNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
+		headNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 	}
 
 	headPodSpec := podSpec.DeepCopy()
@@ -164,7 +165,7 @@ func constructV1Alpha1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugi
 		}
 
 		if _, exists := workerNodeRayStartParams[DisableUsageStatsStartParameter]; !exists && !cfg.EnableUsageStats {
-			workerNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
+			workerNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 		}
 
 		minReplicas := spec.MinReplicas
@@ -261,7 +262,7 @@ func constructV1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ray
 		}
 
 		if _, exists := workerNodeRayStartParams[DisableUsageStatsStartParameter]; !exists && !cfg.EnableUsageStats {
-			workerNodeRayStartParams[DisableUsageStatsStartParameter] = "true"
+			workerNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 		}
 
 		minReplicas := spec.MinReplicas
@@ -670,9 +671,9 @@ func (plugin rayJobResourceHandler) GetTaskPhase(ctx context.Context, pluginCont
 	crdVersion := GetConfig().KubeRayCrdVersion
 	if crdVersion == "v1" {
 		return plugin.GetTaskPhaseV1(ctx, pluginContext, resource)
-	} else {
-		return plugin.GetTaskPhaseV1Alpha1(ctx, pluginContext, resource)
 	}
+
+	return plugin.GetTaskPhaseV1Alpha1(ctx, pluginContext, resource)
 }
 
 func (plugin rayJobResourceHandler) GetTaskPhaseV1(ctx context.Context, pluginContext k8s.PluginContext, resource client.Object) (pluginsCore.PhaseInfo, error) {
