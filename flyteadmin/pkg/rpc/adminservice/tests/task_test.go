@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var taskIdentifier = core.Identifier{
@@ -65,8 +66,8 @@ func TestTaskError(t *testing.T) {
 	})
 	assert.Nil(t, resp)
 
-	assert.EqualError(t, err, "missing entity of type TASK with "+
-		"identifier project:\"project\" domain:\"staging\" name:\"name\" version:\"version\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type TASK with "+
+		"identifier project:\"project\" domain:\"staging\" name:\"name\" version:\"version\"", err.Error())
 }
 
 func TestListUniqueTaskIds(t *testing.T) {
