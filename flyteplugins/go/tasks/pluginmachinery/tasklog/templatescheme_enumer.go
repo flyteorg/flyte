@@ -7,9 +7,9 @@ import (
 	"fmt"
 )
 
-const _TemplateSchemeName = "PodTaskExecutionFlyin"
+const _TemplateSchemeName = "PodTaskExecution"
 
-var _TemplateSchemeIndex = [...]uint8{0, 3, 16, 21}
+var _TemplateSchemeIndex = [...]uint8{0, 3, 16}
 
 func (i TemplateScheme) String() string {
 	if i < 0 || i >= TemplateScheme(len(_TemplateSchemeIndex)-1) {
@@ -18,12 +18,11 @@ func (i TemplateScheme) String() string {
 	return _TemplateSchemeName[_TemplateSchemeIndex[i]:_TemplateSchemeIndex[i+1]]
 }
 
-var _TemplateSchemeValues = []TemplateScheme{0, 1, 2}
+var _TemplateSchemeValues = []TemplateScheme{0, 1}
 
 var _TemplateSchemeNameToValueMap = map[string]TemplateScheme{
-	_TemplateSchemeName[0:3]:   0,
-	_TemplateSchemeName[3:16]:  1,
-	_TemplateSchemeName[16:21]: 2,
+	_TemplateSchemeName[0:3]:  0,
+	_TemplateSchemeName[3:16]: 1,
 }
 
 // TemplateSchemeString retrieves an enum value from the enum constants string name.

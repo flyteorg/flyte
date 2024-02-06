@@ -84,6 +84,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 		},
 	})
 	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	taskMetadata.On("GetTaskExecutionID").Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
