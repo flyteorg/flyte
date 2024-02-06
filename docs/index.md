@@ -147,7 +147,7 @@ Core use cases <core_use_cases/index>
 :name: examples-guides
 :hidden:
 
-User Guide <flytesnacks/userguide>
+User Guide <user_guide/index>
 Tutorials <flytesnacks/tutorials>
 Integrations <flytesnacks/integrations>
 ```
