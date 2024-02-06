@@ -7,7 +7,7 @@ kernelspec:
 
 (getting_started_optimizing_tasks)=
 
-# Optimizing Tasks
+# Optimizing tasks
 
 There are many ways to optimize your tasks and workflows in Flyte, and this guide
 will take you through some of the common methods for doing so.
@@ -94,7 +94,7 @@ def compute_mean(data: List[float]) -> float:
 Notice that the `timeout` argument takes a built-in Python
 {py:class}`~datetime.timedelta` object.
 
-## Map Tasks
+## Map tasks
 
 If you need to parallelize a task, you can use the {py:func}`~flytekit.map_task`
 construct. A mappable task is one that takes in a single argument and produces
@@ -145,7 +145,7 @@ def parallelized_compute_mean(data: List[float], n_partitions: int = 10) -> floa
 parallelized_compute_mean(data=[float(x) for x in range(10_000)])
 ```
 
-## Resource Allocation
+## Resource allocation
 
 As one of the core features of Flyte, workflows can be composed of tasks that
 potentially have heterogeneous resource requirements. You can express this with
@@ -165,7 +165,7 @@ def heavy_task() -> float:
     ...
 ```
 
-## Multi-image Workflows
+## Multi-image workflows
 
 In addition to task-level resource configuration, you can
 also specify different images per task. This is particularly useful if some
@@ -211,7 +211,7 @@ You can also configure the container images dynamically. See the
 ```
 
 
-## Declarative Infrastructure
+## Declarative infrastructure
 
 Finally, staying with the theme of Flyte's ability to handle heterogeneous
 workloads at the most granular level, you can configure tasks to leverage
@@ -252,7 +252,7 @@ so its plugin system enables you to call out to third-party services and
 infrastructure when needed so that you can embed existing workloads into the
 Flyte programming paradigm.
 
-## What's Next?
+## What's next?
 
 In this guide, you learned the various ways in which you can optimize your
 tasks and workflows to make them more scalable and robust. In the final stop of

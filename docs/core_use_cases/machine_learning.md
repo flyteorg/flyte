@@ -7,13 +7,13 @@ kernelspec:
 
 (getting_started_machine_learning)=
 
-# Machine Learning
+# Machine learning
 
 Flyte can handle a full spectrum of machine learning workloads, from
 training small models to gpu-accelerated deep learning and hyperparameter
 optimization.
 
-## Getting the Data
+## Getting the data
 
 In this simple example, we train a binary classification model on the
 [wine dataset](https://scikit-learn.org/stable/datasets/toy_dataset.html#wine-dataset)
@@ -34,7 +34,7 @@ def get_data() -> pd.DataFrame:
     return load_wine(as_frame=True).frame
 ```
 
-## Define a Training Workflow
+## Define a training workflow
 
 Then, we define `process_data` and `train_model` tasks along with a
 `training_workflow` to put all the pieces together for a model-training
@@ -76,7 +76,7 @@ type-safe launch forms on the Flyte UI. Learn more in the
 {ref}`Extending Flyte <customizing_flyte_types>` guide.
 ```
 
-## Computing Predictions
+## Computing predictions
 
 Executing this workflow locally, we can call the `model.predict` method to make
 sure we can use our newly trained model to make predictions based on some
@@ -88,7 +88,7 @@ X, _ = load_wine(as_frame=True, return_X_y=True)
 model.predict(X.sample(10, random_state=41))
 ```
 
-## Extending your ML Workloads
+## Extending your ML workloads
 
 There are many ways to extend your workloads:
 
@@ -119,7 +119,7 @@ There are many ways to extend your workloads:
     supports ScikitLearn, TensorFlow, and PyTorch.
 ```
 
-```{admonition} Learn More
+```{admonition} Learn more
 :class: important
 
 See the {ref}`Tutorials <tutorials>` for more machine learning examples.

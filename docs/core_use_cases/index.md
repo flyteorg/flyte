@@ -1,8 +1,8 @@
 (getting_started_core_use_cases)=
 
-# Core Use Cases
+# Core use cases
 
-This section of the **Getting Started** documentation will take you through the
+This section of the documentation will take you through the
 core use cases for which Flyte is designed. Within the context of these guides,
 we're going to assume that the discipline of data science can be broken down into
 at least three specializations: data engineering, machine learning (or
@@ -16,9 +16,9 @@ practice.
 :header-rows: 0
 :widths: 10 30
 
-* - {doc}`🛠 Data Engineering <data_engineering>`
+* - {doc}`🛠 Data engineering <data_engineering>`
   - Create an ETL workflow for processing data with SQLAlchemy and Pandas.
-* - {doc}`🤖 Machine Learning <machine_learning>`
+* - {doc}`🤖 Machine learning <machine_learning>`
   - Train a classifier with Scikit-Learn and Pandas.
 * - {doc}`📈 Analytics <analytics>`
   - Develop a data cleaning and plotting pipeline with Plotly and Pandas.
