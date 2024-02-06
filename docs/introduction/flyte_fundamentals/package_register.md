@@ -27,7 +27,7 @@ You can also update the Dockerfile (if using a Dockerfile) or the [ImageSpec con
 want to use a different base image or if the additional Python dependencies
 require installing binaries or packages from other languages.
 
-# Registration Patterns
+## Registration Patterns
 
 There are different methods of registering your workflows to a Flyte cluster
 where each method fulfills a particular use case during the workflow development
