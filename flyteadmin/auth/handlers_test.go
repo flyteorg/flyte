@@ -245,7 +245,11 @@ func TestGetLoginHandler(t *testing.T) {
 		Scopes:   []string{"openid", "other"},
 	}
 	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{})
+	mockAuthCtx.OnOptions().Return(&config.Config{
+		UserAuth: config.UserAuthConfig{
+			IDPQueryParameter: "idp",
+		},
+	})
 	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
 	handler := GetLoginHandler(ctx, &mockAuthCtx)
 
@@ -265,7 +269,7 @@ func TestGetLoginHandler(t *testing.T) {
 			expectedSetCookie:  "flyte_csrf_state=",
 		},
 		{
-			name:               "with idp parameter",
+			name:               "with idp parameter config",
 			url:                "/login?idp=dummyIDP",
 			expectedStatusCode: 307,
 			expectedLocation:   "dummyIDP",

@@ -29,7 +29,6 @@ const (
 	RedirectURLParameter = "redirect_url"
 	FromHTTPKey          = "from_http"
 	FromHTTPVal          = "true"
-	IDPQueryParameter    = "idp"
 )
 
 type PreRedirectHookError struct {
@@ -157,8 +156,9 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 		}
 
 		// Add the IDPQueryParameter to the URL if it is present in the request
-		if queryParams.Get(IDPQueryParameter) != "" {
-			url = fmt.Sprintf("%s&%s=%s", url, IDPQueryParameter, queryParams.Get(IDPQueryParameter))
+		idpQueryParam := authCtx.Options().UserAuth.IDPQueryParameter
+		if len(idpQueryParam) > 0 && queryParams.Get(idpQueryParam) != "" {
+			url = fmt.Sprintf("%s&%s=%s", url, idpQueryParam, queryParams.Get(idpQueryParam))
 		}
 		http.Redirect(writer, request, url, http.StatusTemporaryRedirect)
 	}
