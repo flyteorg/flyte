@@ -10,6 +10,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytepropeller/execution_env"
 	"github.com/flyteorg/flyte/flytepropeller/events"
 	eventsErr "github.com/flyteorg/flyte/flytepropeller/events/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
@@ -59,15 +60,16 @@ func StatusFailed(err *core.ExecutionError) Status {
 }
 
 type workflowExecutor struct {
-	enqueueWorkflow v1alpha1.EnqueueWorkflow
-	store           *storage.DataStore
-	wfRecorder      events.WorkflowEventRecorder
-	k8sRecorder     record.EventRecorder
-	metadataPrefix  storage.DataReference
-	nodeExecutor    interfaces.Node
-	metrics         *workflowMetrics
-	eventConfig     *config.EventConfig
-	clusterID       string
+	enqueueWorkflow    v1alpha1.EnqueueWorkflow
+	store              *storage.DataStore
+	wfRecorder         events.WorkflowEventRecorder
+	k8sRecorder        record.EventRecorder
+	metadataPrefix     storage.DataReference
+	nodeExecutor       interfaces.Node
+	metrics            *workflowMetrics
+	eventConfig        *config.EventConfig
+	clusterID          string
+	executionEnvClient *executionenv.ExecutionEnvironmentClient
 }
 
 func (c *workflowExecutor) constructWorkflowMetadataPrefix(ctx context.Context, w *v1alpha1.FlyteWorkflow) (storage.DataReference, error) {
@@ -132,6 +134,16 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	if s.HasFailed() {
 		return StatusFailing(s.Err), nil
 	}
+
+	// start execution environments
+	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
+		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+			if err := c.executionEnvClient.CreateEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
+				return StatusReady, err
+			}
+		}
+	}
+
 	return StatusRunning, nil
 }
 
@@ -143,6 +155,16 @@ func (c *workflowExecutor) handleRunningWorkflow(ctx context.Context, w *v1alpha
 			Code:    errors.IllegalStateError.String(),
 			Message: "Start node not found"}), nil
 	}
+
+	// confirm execution environments
+	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
+		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+			if err := c.executionEnvClient.ConfirmEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
+				return StatusRunning, err
+			}
+		}
+	}
+
 	execcontext := executors.NewExecutionContext(w, w, w, nil, executors.InitializeControlFlow())
 	state, err := c.nodeExecutor.RecursiveNodeHandler(ctx, execcontext, w, w, startNode)
 
@@ -224,6 +246,15 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 		return StatusFailing(execErr), err
 	}
 
+	// delete execution environments
+	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
+		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+			if err := c.executionEnvClient.DeleteEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
+				return StatusFailing(execErr), err
+			}
+		}
+	}
+
 	failureNode := w.GetOnFailureNode()
 	if failureNode != nil {
 		return StatusFailureNode(execErr), nil
@@ -232,7 +263,7 @@ func (c *workflowExecutor) handleFailingWorkflow(ctx context.Context, w *v1alpha
 	return StatusFailed(execErr), nil
 }
 
-func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) Status {
+func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1alpha1.FlyteWorkflow) (Status, error) {
 	logger.Infof(ctx, "Workflow completed successfully")
 	endNodeStatus := w.GetNodeExecutionStatus(ctx, v1alpha1.EndNodeID)
 	if endNodeStatus.GetPhase() == v1alpha1.NodePhaseSucceeded {
@@ -240,7 +271,17 @@ func (c *workflowExecutor) handleSucceedingWorkflow(ctx context.Context, w *v1al
 			w.Status.SetOutputReference(v1alpha1.GetOutputsFile(endNodeStatus.GetOutputDir()))
 		}
 	}
-	return StatusSuccess
+
+	// delete execution environments
+	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
+		if envSpec := executionEnv.EnvironmentSpec; envSpec != nil {
+			if err := c.executionEnvClient.DeleteEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
+				return StatusSucceeding, err
+			}
+		}
+	}
+
+	return StatusSuccess, nil
 }
 
 func convertToExecutionError(err *core.ExecutionError, alternateErr *core.ExecutionError) *event.WorkflowExecutionEvent_Error {
@@ -408,7 +449,11 @@ func (c *workflowExecutor) HandleFlyteWorkflow(ctx context.Context, w *v1alpha1.
 		}
 		return nil
 	case v1alpha1.WorkflowPhaseSucceeding:
-		newStatus := c.handleSucceedingWorkflow(ctx, w)
+		newStatus, err := c.handleSucceedingWorkflow(ctx, w)
+		if err != nil {
+			logger.Warningf(ctx, "Error in handling succeeding workflow [%v]", err.Error())
+			return err
+		}
 
 		if err := c.TransitionToPhase(ctx, w.ExecutionID.WorkflowExecutionIdentifier, wStatus, newStatus); err != nil {
 			return err
@@ -504,7 +549,7 @@ func (c *workflowExecutor) cleanupRunningNodes(ctx context.Context, w v1alpha1.E
 
 func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	k8sEventRecorder record.EventRecorder, metadataPrefix string, nodeExecutor interfaces.Node, eventConfig *config.EventConfig,
-	clusterID string, scope promutils.Scope) (executors.Workflow, error) {
+	clusterID string, executionEnvClient *executionenv.ExecutionEnvironmentClient, scope promutils.Scope) (executors.Workflow, error) {
 	basePrefix := store.GetBaseContainerFQN(ctx)
 	if metadataPrefix != "" {
 		var err error
@@ -518,15 +563,16 @@ func NewExecutor(ctx context.Context, store *storage.DataStore, enQWorkflow v1al
 	workflowScope := scope.NewSubScope("workflow")
 
 	return &workflowExecutor{
-		nodeExecutor:    nodeExecutor,
-		store:           store,
-		enqueueWorkflow: enQWorkflow,
-		wfRecorder:      events.NewWorkflowEventRecorder(eventSink, workflowScope, store),
-		k8sRecorder:     k8sEventRecorder,
-		metadataPrefix:  basePrefix,
-		metrics:         newMetrics(workflowScope),
-		eventConfig:     eventConfig,
-		clusterID:       clusterID,
+		nodeExecutor:       nodeExecutor,
+		store:              store,
+		enqueueWorkflow:    enQWorkflow,
+		wfRecorder:         events.NewWorkflowEventRecorder(eventSink, workflowScope, store),
+		k8sRecorder:        k8sEventRecorder,
+		metadataPrefix:     basePrefix,
+		metrics:            newMetrics(workflowScope),
+		eventConfig:        eventConfig,
+		clusterID:          clusterID,
+		executionEnvClient: executionEnvClient,
 	}, nil
 }
 

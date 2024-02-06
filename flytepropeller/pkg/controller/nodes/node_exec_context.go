@@ -136,7 +136,7 @@ type nodeExecContext struct {
 	nl                  executors.NodeLookup
 	ic                  executors.ExecutionContext
 	executionEnv		*core.ExecutionEnvironment
-	executionEnvService *executionenv.ExecutionEnvironmentService
+	executionEnvClient  *executionenv.ExecutionEnvironmentClient
 }
 
 func (e nodeExecContext) ExecutionContext() executors.ExecutionContext {
@@ -230,7 +230,7 @@ func (e nodeExecContext) GetExecutionEnv(envType core.EnvironmentType) *core.Exe
 				}
 
 				// if execution environment spec exists then retrieve execution environment
-				e.executionEnv = e.executionEnvService.GetEnvironment(e, executionEnvAssignment.Id)
+				e.executionEnv = e.executionEnvClient.GetEnvironment(e, executionEnvAssignment.Id)
 				break
 			}
 		}
@@ -249,7 +249,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 	node v1alpha1.ExecutableNode, nodeStatus v1alpha1.ExecutableNodeStatus, inputs io.InputReader, interruptible bool, interruptibleFailureThreshold int32,
 	maxDatasetSize int64, taskEventRecorder events.TaskEventRecorder, nodeEventRecorder events.NodeEventRecorder, tr interfaces.TaskReader,
 	nsm *nodeStateManager, enqueueOwner func() error, rawOutputPrefix storage.DataReference, outputShardSelector ioutils.ShardSelector,
-	executionEnvService *executionenv.ExecutionEnvironmentService) *nodeExecContext {
+	executionEnvClient *executionenv.ExecutionEnvironmentClient) *nodeExecContext {
 
 	md := nodeExecMetadata{
 		Meta: execContext,
@@ -291,7 +291,7 @@ func newNodeExecContext(_ context.Context, store *storage.DataStore, execContext
 		shardSelector:       outputShardSelector,
 		nl:                  nl,
 		ic:                  execContext,
-		executionEnvService: executionEnvService,
+		executionEnvClient:  executionEnvClient,
 	}
 }
 
@@ -383,6 +383,6 @@ func (c *nodeExecutor) BuildNodeExecutionContext(ctx context.Context, executionC
 		workflowEnqueuer,
 		rawOutputPrefix,
 		c.shardSelector,
-		c.executionEnvService,
+		c.executionEnvClient,
 	), nil
 }

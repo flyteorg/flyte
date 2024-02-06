@@ -438,16 +438,16 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}
 
-	executionEnvService := executionenv.NewExecutionEnvironmentService(ctx, kubeClient, scope)
+	executionEnvClient := executionenv.NewExecutionEnvironmentClient(ctx, kubeClient, scope)
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
 		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
-		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, executionEnvService, scope)
+		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, executionEnvClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}
 
-	workflowExecutor, err := workflow.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink, controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, scope)
+	workflowExecutor, err := workflow.NewExecutor(ctx, store, controller.enqueueWorkflowForNodeUpdates, eventSink, controller.recorder, cfg.MetadataPrefix, nodeExecutor, &cfg.EventConfig, cfg.ClusterID, executionEnvClient, scope)
 	if err != nil {
 		return nil, err
 	}
