@@ -135,6 +135,7 @@ type nodeExecContext struct {
 	shardSelector       ioutils.ShardSelector
 	nl                  executors.NodeLookup
 	ic                  executors.ExecutionContext
+	executionEnv		*core.ExecutionEnvironment
 	executionEnvService *executionenv.ExecutionEnvironmentService
 }
 
@@ -207,6 +208,10 @@ func (e nodeExecContext) MaxDatasetSizeBytes() int64 {
 }
 
 func (e nodeExecContext) GetExecutionEnv(envType core.EnvironmentType) *core.ExecutionEnvironment {
+	if e.executionEnv != nil {
+		return e.executionEnv
+	}
+
 	// check if there is an explicit execution environment assignment for this node in the ExecutionConfig
 	config := e.ExecutionContext().GetExecutionConfig()
 	for _, executionEnvAssignment := range config.ExecutionEnvs {
@@ -217,16 +222,22 @@ func (e nodeExecContext) GetExecutionEnv(envType core.EnvironmentType) *core.Exe
 				}
 
 				// if execution environment exists then use it
-				return env
+				e.executionEnv = env
+				break
 			} else if envSpec := executionEnvAssignment.EnvironmentSpec; envSpec != nil {
 				if envType != envSpec.Type {
 					continue
 				}
 
 				// if execution environment spec exists then retrieve execution environment
-				return e.executionEnvService.GetEnvironment(e, executionEnvAssignment.Id)
+				e.executionEnv = e.executionEnvService.GetEnvironment(e, executionEnvAssignment.Id)
+				break
 			}
 		}
+	}
+
+	if e.executionEnv != nil {
+		return e.executionEnv
 	}
 
 	// TODO - if no explicit assignment, then use ExecutionEnvironmentService to check for default
