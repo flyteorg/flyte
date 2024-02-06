@@ -156,7 +156,7 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 			}
 		}
 
-		idpUrl, err := url.Parse(urlString)
+		idpURL, err := url.Parse(urlString)
 		if err != nil {
 			logger.Errorf(ctx, "failed to parse url %q: %v", urlString, err)
 			writer.WriteHeader(http.StatusInternalServerError)
@@ -166,12 +166,12 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 		idpQueryParam := authCtx.Options().UserAuth.IDPQueryParameter
 		if len(idpQueryParam) > 0 && queryParams.Get(idpQueryParam) != "" {
 			logger.Infof(ctx, "Adding IDP Query Parameter to the URL")
-			query := idpUrl.Query() // Gets a copy of query parameters
+			query := idpURL.Query() // Gets a copy of query parameters
 			query.Add(idpQueryParam, queryParams.Get(idpQueryParam))
 			// Updates the rawquery with the new query parameters
-			idpUrl.RawQuery = query.Encode()
+			idpURL.RawQuery = query.Encode()
 		}
-		http.Redirect(writer, request, idpUrl.String(), http.StatusTemporaryRedirect)
+		http.Redirect(writer, request, idpURL.String(), http.StatusTemporaryRedirect)
 	}
 }
 
