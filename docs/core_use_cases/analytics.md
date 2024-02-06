@@ -13,7 +13,7 @@ Flyte is ideal for data cleaning, statistical summarization, and plotting
 because with `flytekit` you can leverage the rich Python ecosystem of data
 processing and visualization tools.
 
-## Cleaning Data
+## Cleaning data
 
 In this example, we are going to analyze some covid vaccination data:
 
@@ -41,7 +41,7 @@ As you can see, we're using `pandas` for data processing, and in the task
 below we use `plotly` to create a choropleth map of the percent of a country's
 population that has received at least one COVID-19 vaccination.
 
-## Rendering Plots
+## Rendering plots
 
 We can use {ref}`Flyte Decks <decks>` for rendering a static HTML report
 of the map. In this case, we normalize the `people_vaccinated` by the
@@ -158,7 +158,7 @@ logger.removeFilter(deck_filter)
 HTML(filename=cp_deck(deck_filter.deck_files["plot"]))
 ```
 
-## Custom Flyte Deck Renderers
+## Custom Flyte deck renderers
 
 You can also create your own {ref}`custom Flyte Deck renderers <getting_started_customer_renderers>`
 to visualize data with any plotting/visualization library of your choice, as

@@ -7,7 +7,7 @@ kernelspec:
 
 (getting_started_data_engineering)=
 
-# Data Engineering
+# Data engineering
 
 Flyte is well-suited for data engineering use cases, where you can interleave
 SQL queries with data processing logic implemented in Python with whichever
@@ -100,7 +100,7 @@ def load(df: pd.DataFrame) -> CSVFile:
     return CSVFile(path=csv_file)
 ```
 
-## ETL Workflow
+## ETL workflow
 
 Putting all the pieces together, we create an `etl_workflow` that produces a
 dataset based on the parameters you give it.
@@ -130,7 +130,7 @@ csv_file = etl_workflow(limit=5)
 pd.read_csv(csv_file)
 ```
 
-## Workflows as Reusable Components
+## Workflows as reusable components
 
 Because Flyte tasks and workflows are simply functions, we can embed
 `etl_workflow` as part of a larger workflow, where it's used to create a

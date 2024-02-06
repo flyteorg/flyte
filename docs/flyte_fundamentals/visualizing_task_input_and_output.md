@@ -20,9 +20,9 @@ tabs. By default, every task has three decks: an **input**, an **output**, and a
 Flyte materializes Decks via `Renderer`s, which are specific implementations of
 how to generate an HTML report from some Python object.
 
-## Enabling Flyte Decks
+## Enabling Flyte decks
 
-To enable Flyte Decks, simply set `disable_deck=False` in the `@task` decorator:
+To enable Flyte decks, simply set `disable_deck=False` in the `@task` decorator:
 
 ```{code-cell} ipython3
 import pandas as pd
@@ -37,7 +37,7 @@ def iris_data() -> pd.DataFrame:
 Specifying this flag indicates that Decks should be rendered whenever this task
 is invoked.
 
-## Rendering Task Inputs and Outputs
+## Rendering task inputs and outputs
 
 By default, Flyte will render the inputs and outputs of tasks with the built-in
 renderers in the corresponding **input** and **output** {py:class}`~flytekit.deck.Deck`s,
@@ -153,7 +153,7 @@ to `20`. Doing so will emit logs that look like the above print statement,
 where the `deck.html` filepath can be found in the `message` key.
 ```
 
-## Rendering In-line Decks
+## Rendering in-line decks
 
 You can render Decks inside the task function body by using the **default**
 deck, which you can access with the {py:func}`~flytekit.current_context`
@@ -191,7 +191,7 @@ should contain the markdown text we specified.
 
 (getting_started_customer_renderers)=
 
-## Custom Renderers
+## Custom renderers
 
 What if we don't want to show raw data values in the Flyte Deck? We can create a
 pandas dataframe renderer that summarizes the data instead of showing raw values
@@ -283,7 +283,7 @@ into some HTML representation.
 Learn more about Flyte Decks in the {ref}`User Guide <decks>`.
 ```
 
-## What's Next?
+## What's next?
 
 In this guide, you learned how to generate static HTML reports to gain more
 visibility into Flyte tasks. In the next guide, you'll learn how to optimize

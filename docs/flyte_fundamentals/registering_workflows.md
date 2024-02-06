@@ -1,6 +1,6 @@
 (getting_started_package_register)=
 
-# Registering Workflows
+# Registering workflows
 
 In this guide, you'll learn how to package and register (that is, deploy) your tasks and
 workflows to a Flyte cluster. This will enable you to scale your workloads with
@@ -17,7 +17,7 @@ This guide assumes that you:
   guide to create a minimal Flyte project.
 ```
 
-## Custom Dependencies
+## Custom dependencies
 
 If you have custom Python dependencies, update the `requirements.txt` file that
 ships with the {ref}`project template <getting_started_python_dependencies>`
@@ -27,7 +27,7 @@ You can also update the Dockerfile (if using a Dockerfile) or the [ImageSpec con
 want to use a different base image or if the additional Python dependencies
 require installing binaries or packages from other languages.
 
-## Registration Patterns
+## Registration patterns
 
 There are different methods of registering your workflows to a Flyte cluster
 where each method fulfills a particular use case during the workflow development
@@ -45,7 +45,7 @@ The following diagram provides a summarized view of the different registration p
 
 (getting_started_register_pyflyte_run)=
 
-## Iterating on a Single Task or Workflow
+## Iterating on a single task or workflow
 
 The quickest way to register a task or workflow to a Flyte cluster is with the
 `pyflyte run` CLI command. Assuming that you're inside the `my_project` directory
@@ -80,7 +80,7 @@ contain additional tasks or workflows.
 
 (getting_started_pyflyte_register)=
 
-### Iterating on a Flyte Project
+### Iterating on a Flyte project
 
 One of Flyte's benefits is its functional design, which means that you can
 import and reuse tasks and workflows like you would Python functions when you
@@ -137,7 +137,7 @@ Once you've successfully registered your workflows, you can execute them by
 going to the Flyte console. If you're using a local Flyte demo cluster, you can
 go to the browser at `localhost:30080/console` and do the following:
 
-  - Navigate to the **flytesnacks** > **development** domain.
+- Navigate to the **flytesnacks** > **development** domain.
 - Click on the **Workflows** section of the left-hand sidebar.
 - Click on the **workflows.example.wf** card on the workflows list.
 - Click on the **Launch Workflow** button on the top-right corner.
@@ -149,7 +149,7 @@ go to the browser at `localhost:30080/console` and do the following:
 In the next guide you'll learn about how to run your workflows programmatically.
 ```
 
-#### Fast Registration
+#### Fast registration
 
 `pyflyte register` packages up your code through a mechanism called
 **fast registration**. Fast registration is useful when you already have a
@@ -182,7 +182,7 @@ You can do so by specifying these files in a `.gitignore` or `.dockerignore`
 file in the root directory of your project.
 ```
 
-### Productionizing your Workflows
+### Productionizing your workflows
 
 Flyte's core design decision is to make workflows reproducible and repeatable.
 One way it achieves this is by providing a way for you to bake-in user-defined
@@ -200,7 +200,7 @@ are immutable.
 
 (containerizing_your_project)=
 
-#### Containerizing your Project
+#### Containerizing your project
 
 Flyte relies on OCI-compatible containers to package up your code and third-party
 dependencies. When you invoke `pyflyte init`, the resulting template project
@@ -242,7 +242,7 @@ docker login ghcr.io
 docker push <tag>
 ```
 
-```{admonition} Pulling Private Images
+```{admonition} Pulling private images
 :class: important
 
 For many projects it's convenient to make your images public, but in the case
@@ -252,7 +252,7 @@ metadata/configuration, it's more secure if they're private.
 Learn more about how to pull private image in the {ref}`User Guide <private_images>`.
 ```
 
-#### Package your Project with `pyflyte package`
+#### Package your project with `pyflyte package`
 
 You can package your project with the `pyflyte package` command like so:
 
@@ -350,7 +350,7 @@ two GitHub actions that facilitates this:
   of Flyte packages, for example, the `.tgz` archives that are created by
   `pyflyte package`.
 
-## What's Next?
+## What's next?
 
 In this guide, you learned about the Flyte demo cluster, Flyte configuration, and
 the different registration patterns you can leverage during the workflow

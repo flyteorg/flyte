@@ -19,7 +19,7 @@ the Flyte type system and Flyte tasks.
 
 (customizing_flyte_types)=
 
-## Customizing Flyte Types
+## Customizing Flyte types
 
 Flyte has a {ref}`rich type system <data_types_and_io>` that automatically
 handles the serialization and deserialization of objects so that when you pass
@@ -80,7 +80,7 @@ See the {ref}`User Guide <advanced_custom_types>` for an example of a custom
 type.
 ```
 
-## Customizing Flyte Tasks
+## Customizing Flyte tasks
 
 The easiest way to extend Flyte tasks is to use Python decorators. Since Flyte
 tasks are simply functions, you can wrap the task function in a custom
@@ -130,7 +130,7 @@ allows you to enable/disable services at the beginning/end of your workflows.
 See the {ref}`User Guide <decorating_workflows>` for more details.
 ```
 
-## The Plugin Hierarchy of Needs
+## The plugin hierarchy of needs
 
 The decorator approach is great for many surface-level use cases, but there are
 many more ways to customize Flyte tasks:
@@ -154,7 +154,7 @@ many more ways to customize Flyte tasks:
     external services like Sagemaker, Snowflake, BigQuery, etc.
 ```
 
-## What's Next?
+## What's next?
 
 Congratulations! 🎉 You've just completed the Flyte Fundamentals tour.
 

@@ -7,7 +7,7 @@ kernelspec:
 
 (getting_started_tasks_and_workflows)=
 
-# Tasks, Workflows and LaunchPlans
+# Tasks, workflows and launch plans
 
 In {doc}`"Getting started with workflow development" <../getting_started_with_workflow_development/index>`, we got a basic sense
 of how Flyte works by creating and running a workflow made up of a few tasks.
@@ -18,7 +18,7 @@ programming model.
 
 Flyte tasks are the core building blocks of larger, more complex workflows.
 
-### Tasks are Containerized Blocks of Compute
+### Tasks are containerized blocks of compute
 
 You can think of a Flyte task as a containerized block of compute. When a task
 runs on a Flyte backend, it's isolated within its own container, separate from
@@ -51,7 +51,7 @@ There are three important things to note here:
   Flyte orchestrates what task to run at what time in the context of a workflow.
 ```
 
-### Tasks are Strongly Typed
+### Tasks are strongly typed
 
 You might also notice that the `mean` function signature is type-annotated with
 Python type hints. Flyte uses these annotations to check the input and output
@@ -88,7 +88,7 @@ of computation to produce some useful set of outputs or outcomes.
 Suppose the `mean` task is just one building block of a larger computation.
 This is where Flyte workflows can help us manage the added complexity.
 
-### Workflows Build Execution Graphs
+### Workflows build execution graphs
 
 Suppose that we want to mean-center and standard-deviation-scale a set of
 values. In addition to a `mean` function, we also need to compute standard
@@ -130,7 +130,7 @@ standard_scale_workflow(values=[float(i) for i in range(1, 11)])
 
 (workflows_versus_task_syntax)=
 
-### Workflows versus Tasks Under the Hood
+### Workflows versus tasks under the hood
 
 Although Flyte workflow syntax looks like Python code, it's actually a
 [domain-specific language (DSL)](https://en.wikipedia.org/wiki/Domain-specific_language)
@@ -153,7 +153,7 @@ In contrast to workflow code, the code within tasks is actually executed by a
 Python interpreter when it's run locally or inside a container when run on a
 Flyte cluster.
 
-### Workflows Deal with Promises
+### Workflows deal with promises
 
 A promise is essentially a placeholder for a value that hasn't been
 materialized yet. To show you what this means concretely, let's re-define
@@ -177,7 +177,7 @@ _it doesn't actually run the computations yet_. Therefore, when Flyte compiles a
 workflow, the outputs of task calls are actually promises and not regular python
 values.
 
-### Workflows are Strongly Typed Too
+### Workflows are strongly typed too
 
 Since both tasks and workflows are strongly typed, Flyte can actually catch
 type errors! When we learn more about packaging and registering in the next few
@@ -208,7 +208,7 @@ except Exception as e:
     print(e)
 ```
 
-### Workflows can be Embedded in Other Workflows
+### Workflows can be embedded in other workflows
 
 When a workflow uses another workflow as part of the execution graph, we call
 the inner workflow a **subworkflow**. Subworkflows are strongly typed and can
@@ -238,7 +238,7 @@ workflow_with_subworkflow(num_samples=10, seed=3)
 Learn more about subworkflows in the {ref}`User Guide <subworkflow>`.
 ```
 
-### Specifying Dependencies without Passing Data
+### Specifying dependencies without passing data
 
 You can also specify dependencies between tasks and subworkflows without passing
 data from the upstream entity to the downstream entity using the `>>` right shift
@@ -269,7 +269,7 @@ the {py:func}`~functools.partial` function in the Python standard library where
 you can define default (overridable) and fixed (non-overridable) inputs.
 
 ```{note}
-Additionally, `LaunchPlan`s provides an interface for specifying run-time
+Additionally, `LaunchPlan` provides an interface for specifying run-time
 overrides such as notifications, schedules, and more.
 ```
 
@@ -285,9 +285,9 @@ standard_scale_launch_plan = LaunchPlan.get_or_create(
 )
 ```
 
-### Invoking LaunchPlans Locally
+### Invoking launch plans locally
 
-You can run a `LaunchPlan` locally. This is, using the local Python interpreter (REPL). It will use the `default_inputs` dictionary
+You can run a launch plan locally. This is, using the local Python interpreter (REPL). It will use the `default_inputs` dictionary
 whenever it's invoked:
 
 ```{code-cell} ipython3
@@ -305,7 +305,7 @@ the time being you can think of them as a way for you to templatize workflows
 for some set of related use cases, such as model training with a fixed dataset
 for reproducibility purposes.
 
-### LaunchPlans can be Embedded in Workflows
+### Launch plans can be embedded in workflows
 
 Similar to subworkflows, launch plans can be used in a workflow definition:
 
@@ -327,7 +327,7 @@ context of the parent workflow's execution context.
 Learn more about subworkflows in the {ref}`User Guide <launch_plan>`.
 ```
 
-## What's Next?
+## What's next?
 
 So far we've been working with small code snippets and self-contained scripts.
 Next, we'll see how to organize a Flyte project that follows software
