@@ -6,6 +6,7 @@ import (
 	"time"
 
 	structpb "github.com/golang/protobuf/ptypes/struct"
+	rayv1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1"
 	rayv1alpha1 "github.com/ray-project/kuberay/ray-operator/apis/ray/v1alpha1"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -179,6 +180,9 @@ func TestBuildResourceRay(t *testing.T) {
 
 	assert.NotNil(t, RayResource)
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
+	assert.True(t, ok)
+
+	rayV1, ok := RayResource.(*rayv1.RayJob)
 	assert.True(t, ok)
 
 	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
@@ -706,6 +710,50 @@ func TestGetTaskPhase(t *testing.T) {
 	}
 }
 
+func TestGetTaskPhase_V1(t *testing.T) {
+	ctx := context.Background()
+	rayJobResourceHandler := rayJobResourceHandler{}
+	pluginCtx := newPluginContext()
+
+	testCases := []struct {
+		rayJobPhase       rayv.JobStatus
+		rayClusterPhase   rayv1.JobDeploymentStatus
+		expectedCorePhase pluginsCore.Phase
+		expectedError     bool
+	}{
+		{"", rayv1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusWaitForDashboardReady, pluginsCore.PhaseRunning, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusWaitForK8sJob, pluginsCore.PhaseRunning, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1.JobStatusPending, rayv1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseRunning, false},
+		{rayv1.JobStatusRunning, rayv1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
+		{rayv1.JobStatusFailed, rayv1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure, false},
+		{rayv1.JobStatusSucceeded, rayv1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess, false},
+		{rayv1.JobStatusSucceeded, rayv1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
+		{rayv1.JobStatusStopped, rayv1.JobDeploymentStatusSuspended, pluginsCore.PhaseRunning, false},
+	}
+
+	for _, tc := range testCases {
+		t.Run("TestGetTaskPhase_"+string(tc.rayJobPhase), func(t *testing.T) {
+			rayObject := &rayv1.RayJob{}
+			rayObject.Status.JobStatus = tc.rayJobPhase
+			rayObject.Status.JobDeploymentStatus = tc.rayClusterPhase
+			startTime := metav1.NewTime(time.Now())
+			rayObject.Status.StartTime = &startTime
+			phaseInfo, err := rayJobResourceHandler.GetTaskPhaseV1(ctx, pluginCtx, rayObject)
+			if tc.expectedError {
+				assert.Error(t, err)
+			} else {
+				assert.Nil(t, err)
+			}
+			assert.Equal(t, tc.expectedCorePhase.String(), phaseInfo.Phase().String())
+		})
+	}
+}
+
 func TestGetEventInfo_LogTemplates(t *testing.T) {
 	pluginCtx := newPluginContext()
 	testCases := []struct {
@@ -805,7 +853,7 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 	}
 }
 
-func TestGetEventInfo_LogTemplatesV1(t *testing.T) {
+func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 	pluginCtx := newPluginContext()
 	testCases := []struct {
 		name             string
@@ -950,6 +998,58 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
 			ti, err := getEventInfoForRayJob(logs.LogConfig{}, pluginCtx, &tc.rayJob)
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
+		})
+	}
+}
+
+func TestGetEventInfo_DashboardURL_V1(t *testing.T) {
+	pluginCtx := newPluginContext()
+	testCases := []struct {
+		name                 string
+		rayJob               rayv1.RayJob
+		dashboardURLTemplate tasklog.TemplateLogPlugin
+		expectedTaskLogs     []*core.TaskLog
+	}{
+		{
+			name: "dashboard URL displayed",
+			rayJob: rayv1.RayJob{
+				Status: rayv1.RayJobStatus{
+					DashboardURL: "exists",
+					JobStatus:    rayv1.JobStatusRunning,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "Ray Dashboard",
+				TemplateURIs: []tasklog.TemplateURI{"http://test/{{.generatedName}}"},
+			},
+			expectedTaskLogs: []*core.TaskLog{
+				{
+					Name: "Ray Dashboard",
+					Uri:  "http://test/generated-name",
+				},
+			},
+		},
+		{
+			name: "dashboard URL is not displayed",
+			rayJob: rayv1.RayJob{
+				Status: rayv1.RayJobStatus{
+					JobStatus: rayv1.JobStatusPending,
+				},
+			},
+			dashboardURLTemplate: tasklog.TemplateLogPlugin{
+				DisplayName:  "dummy",
+				TemplateURIs: []tasklog.TemplateURI{"http://dummy"},
+			},
+			expectedTaskLogs: nil,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			assert.NoError(t, SetConfig(&Config{DashboardURLTemplate: &tc.dashboardURLTemplate}))
+			ti, err := getEventInfoForRayJobV1(logs.LogConfig{}, pluginCtx, &tc.rayJob)
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expectedTaskLogs, ti.Logs)
 		})
