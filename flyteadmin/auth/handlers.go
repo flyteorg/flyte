@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -50,7 +50,7 @@ func (e *PreRedirectHookError) Error() string {
 type PreRedirectHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) *PreRedirectHookError
 type LogoutHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) error
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
-type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error
+type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m proto.Message) error
 
 type AuthenticatedClientMeta struct {
 	ClientIds     []string
@@ -496,7 +496,7 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 }
 
 func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
-	return func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error {
+	return func(ctx context.Context, w http.ResponseWriter, m proto.Message) error {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
 			if info.AdditionalClaims != nil {

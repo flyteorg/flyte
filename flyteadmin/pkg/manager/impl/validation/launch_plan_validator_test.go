@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var lpApplicationConfig = testutils.GetApplicationConfigWithDefaultDomains()
@@ -100,7 +101,9 @@ func TestValidateLpDefaultInputsWrongType(t *testing.T) {
 	request := testutils.GetLaunchPlanRequest()
 	request.Spec.DefaultInputs.Parameters["foo"].Var.Type = &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_FLOAT}}
 	err := ValidateLaunchPlan(context.Background(), request, testutils.GetRepoWithDefaultProject(), lpApplicationConfig, getWorkflowInterface())
-	assert.EqualError(t, err, "Type mismatch for Parameter foo in default_inputs has type simple:FLOAT , expected simple:STRING ")
+
+	expected := "Type mismatch for Parameter foo in default_inputs has type simple:FLOAT , expected simple:STRING "
+	utils.AssertEqualWithSanitizedRegex(t, expected, err.Error())
 }
 
 func TestValidateLpDefaultInputsEmptyName(t *testing.T) {
@@ -180,7 +183,7 @@ func TestGetLpExpectedInvalidDefaultInputType(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
 
-	assert.EqualError(t, err, "invalid default_input wrong type foo, expected simple:STRING , got simple:BINARY  instead")
+	utils.AssertEqualWithSanitizedRegex(t, "invalid default_input wrong type foo, expected simple:STRING , got simple:BINARY  instead", err.Error())
 	assert.Nil(t, actualMap)
 }
 
@@ -200,7 +203,7 @@ func TestGetLpExpectedInvalidFixedInputType(t *testing.T) {
 		request.GetSpec().GetFixedInputs(), request.GetSpec().GetDefaultInputs(),
 	)
 
-	assert.EqualError(t, err, "invalid fixed_input wrong type bar, expected simple:BINARY , got simple:STRING  instead")
+	utils.AssertEqualWithSanitizedRegex(t, "invalid fixed_input wrong type bar, expected simple:BINARY , got simple:STRING  instead", err.Error())
 	assert.Nil(t, actualMap)
 }
 
