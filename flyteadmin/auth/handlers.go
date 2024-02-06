@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -139,7 +140,7 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 
 		state := HashCsrfState(csrfToken)
 		logger.Debugf(ctx, "Setting CSRF state cookie to %s and state to %s\n", csrfToken, state)
-		url := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
+		urlString := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
 		queryParams := request.URL.Query()
 		if !GetRedirectURLAllowed(ctx, queryParams.Get(RedirectURLParameter), authCtx.Options()) {
 			logger.Infof(ctx, "unauthorized redirect URI")
@@ -154,7 +155,23 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 				logger.Errorf(ctx, "Was not able to create a redirect cookie")
 			}
 		}
-		http.Redirect(writer, request, url, http.StatusTemporaryRedirect)
+
+		idpURL, err := url.Parse(urlString)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse url %q: %v", urlString, err)
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
+
+		// Add the IDPQueryParameter to the URL if it is present in the request
+		idpQueryParam := authCtx.Options().UserAuth.IDPQueryParameter
+		if len(idpQueryParam) > 0 && queryParams.Get(idpQueryParam) != "" {
+			logger.Infof(ctx, "Adding IDP Query Parameter to the URL")
+			query := idpURL.Query() // Gets a copy of query parameters
+			query.Add(idpQueryParam, queryParams.Get(idpQueryParam))
+			// Updates the rawquery with the new query parameters
+			idpURL.RawQuery = query.Encode()
+		}
+		http.Redirect(writer, request, idpURL.String(), http.StatusTemporaryRedirect)
 	}
 }
 

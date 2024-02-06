@@ -245,16 +245,49 @@ func TestGetLoginHandler(t *testing.T) {
 		Scopes:   []string{"openid", "other"},
 	}
 	mockAuthCtx := mocks.AuthenticationContext{}
-	mockAuthCtx.OnOptions().Return(&config.Config{})
+	mockAuthCtx.OnOptions().Return(&config.Config{
+		UserAuth: config.UserAuthConfig{
+			IDPQueryParameter: "idp",
+		},
+	})
 	mockAuthCtx.OnOAuth2ClientConfigMatch(mock.Anything).Return(&dummyOAuth2Config)
 	handler := GetLoginHandler(ctx, &mockAuthCtx)
-	req, err := http.NewRequest("GET", "/login", nil)
-	assert.NoError(t, err)
-	w := httptest.NewRecorder()
-	handler(w, req)
-	assert.Equal(t, 307, w.Code)
-	assert.True(t, strings.Contains(w.Header().Get("Location"), "response_type=code&scope=openid+other"))
-	assert.True(t, strings.Contains(w.Header().Get("Set-Cookie"), "flyte_csrf_state="))
+
+	type test struct {
+		name               string
+		url                string
+		expectedStatusCode int
+		expectedLocation   string
+		expectedSetCookie  string
+	}
+	tests := []test{
+		{
+			name:               "no idp parameter",
+			url:                "/login",
+			expectedStatusCode: 307,
+			expectedLocation:   "response_type=code&scope=openid+other",
+			expectedSetCookie:  "flyte_csrf_state=",
+		},
+		{
+			name:               "with idp parameter config",
+			url:                "/login?idp=dummyIDP",
+			expectedStatusCode: 307,
+			expectedLocation:   "dummyIDP",
+			expectedSetCookie:  "flyte_csrf_state=",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req, err := http.NewRequest("GET", tt.url, nil)
+			assert.NoError(t, err)
+			w := httptest.NewRecorder()
+			handler(w, req)
+			assert.Equal(t, tt.expectedStatusCode, w.Code)
+			assert.True(t, strings.Contains(w.Header().Get("Location"), tt.expectedLocation))
+			assert.True(t, strings.Contains(w.Header().Get("Set-Cookie"), tt.expectedSetCookie))
+		})
+	}
 }
 
 func TestGetLogoutHandler(t *testing.T) {
