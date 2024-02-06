@@ -564,13 +564,13 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	input := tasklog.Input{
-		Namespace:                 rayJob.Namespace,
-		TaskExecutionID:           taskExecID,
-		ExtraTemplateVarsByScheme: &tasklog.TemplateVarsByScheme{},
+		Namespace:         rayJob.Namespace,
+		TaskExecutionID:   taskExecID,
+		ExtraTemplateVars: []tasklog.TemplateVar{},
 	}
 	if rayJob.Status.JobId != "" {
-		input.ExtraTemplateVarsByScheme.Common = append(
-			input.ExtraTemplateVarsByScheme.Common,
+		input.ExtraTemplateVars = append(
+			input.ExtraTemplateVars,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayJobID,
 				Value: rayJob.Status.JobId,
@@ -578,8 +578,8 @@ func getEventInfoForRayJob(logConfig logs.LogConfig, pluginContext k8s.PluginCon
 		)
 	}
 	if rayJob.Status.RayClusterName != "" {
-		input.ExtraTemplateVarsByScheme.Common = append(
-			input.ExtraTemplateVarsByScheme.Common,
+		input.ExtraTemplateVars = append(
+			input.ExtraTemplateVars,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayClusterName,
 				Value: rayJob.Status.RayClusterName,
@@ -620,13 +620,13 @@ func getEventInfoForRayJobV1(logConfig logs.LogConfig, pluginContext k8s.PluginC
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	input := tasklog.Input{
-		Namespace:                 rayJob.Namespace,
-		TaskExecutionID:           taskExecID,
-		ExtraTemplateVarsByScheme: &tasklog.TemplateVarsByScheme{},
+		Namespace:         rayJob.Namespace,
+		TaskExecutionID:   taskExecID,
+		ExtraTemplateVars: []tasklog.TemplateVar{},
 	}
 	if rayJob.Status.JobId != "" {
-		input.ExtraTemplateVarsByScheme.Common = append(
-			input.ExtraTemplateVarsByScheme.Common,
+		input.ExtraTemplateVars = append(
+			input.ExtraTemplateVars,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayJobID,
 				Value: rayJob.Status.JobId,
@@ -634,8 +634,8 @@ func getEventInfoForRayJobV1(logConfig logs.LogConfig, pluginContext k8s.PluginC
 		)
 	}
 	if rayJob.Status.RayClusterName != "" {
-		input.ExtraTemplateVarsByScheme.Common = append(
-			input.ExtraTemplateVarsByScheme.Common,
+		input.ExtraTemplateVars = append(
+			input.ExtraTemplateVars,
 			tasklog.TemplateVar{
 				Regex: logTemplateRegexes.RayClusterName,
 				Value: rayJob.Status.RayClusterName,
@@ -696,7 +696,9 @@ func (plugin rayJobResourceHandler) GetTaskPhaseV1(ctx context.Context, pluginCo
 	case rayv1.JobDeploymentStatusFailedJobDeploy:
 		reason := fmt.Sprintf("Failed to submit Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
 		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
-	case rayv1.JobDeploymentStatusWaitForDashboard, rayv1.JobDeploymentStatusFailedToGetJobStatus:
+	// JobDeploymentStatusSuspended is used when the suspend flag is set in rayJob. The suspend flag allows the temporary suspension of a Job's execution, which can be resumed later.
+	// Certain versions of KubeRay use a K8s job to submit a Ray job to the Ray cluster. JobDeploymentStatusWaitForK8sJob indicates that the K8s job is under creation.
+	case rayv1.JobDeploymentStatusWaitForDashboard, rayv1.JobDeploymentStatusFailedToGetJobStatus, rayv1.JobDeploymentStatusWaitForDashboardReady, rayv1.JobDeploymentStatusWaitForK8sJob, rayv1.JobDeploymentStatusSuspended:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	case rayv1.JobDeploymentStatusRunning, rayv1.JobDeploymentStatusComplete:
 		switch rayJob.Status.JobStatus {
@@ -705,7 +707,8 @@ func (plugin rayJobResourceHandler) GetTaskPhaseV1(ctx context.Context, pluginCo
 			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
 		case rayv1.JobStatusSucceeded:
 			return pluginsCore.PhaseInfoSuccess(info), nil
-		case rayv1.JobStatusPending:
+		// JobStatusStopped can occur when the suspend flag is set in rayJob.
+		case rayv1.JobStatusPending, rayv1.JobStatusStopped:
 			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 		case rayv1.JobStatusRunning:
 			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
@@ -713,9 +716,6 @@ func (plugin rayJobResourceHandler) GetTaskPhaseV1(ctx context.Context, pluginCo
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 			return phaseInfo, nil
-		case rayv1.JobStatusStopped:
-			// There is no current usage of this job status in KubeRay. It's unclear what it represents
-			fallthrough
 		default:
 			// We already handle all known job status, so this should never happen unless a future version of ray
 			// introduced a new job status.
@@ -749,7 +749,9 @@ func (plugin rayJobResourceHandler) GetTaskPhaseV1Alpha1(ctx context.Context, pl
 	case rayv1alpha1.JobDeploymentStatusFailedJobDeploy:
 		reason := fmt.Sprintf("Failed to submit Ray job %s with error: %s", rayJob.Name, rayJob.Status.Message)
 		return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
-	case rayv1alpha1.JobDeploymentStatusWaitForDashboard, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus:
+	// JobDeploymentStatusSuspended is used when the suspend flag is set in rayJob. The suspend flag allows the temporary suspension of a Job's execution, which can be resumed later.
+	// Certain versions of KubeRay use a K8s job to submit a Ray job to the Ray cluster. JobDeploymentStatusWaitForK8sJob indicates that the K8s job is under creation.
+	case rayv1alpha1.JobDeploymentStatusWaitForDashboard, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, rayv1alpha1.JobDeploymentStatusWaitForDashboardReady, rayv1alpha1.JobDeploymentStatusWaitForK8sJob, rayv1alpha1.JobDeploymentStatusSuspended:
 		return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 	case rayv1alpha1.JobDeploymentStatusRunning, rayv1alpha1.JobDeploymentStatusComplete:
 		switch rayJob.Status.JobStatus {
@@ -758,7 +760,8 @@ func (plugin rayJobResourceHandler) GetTaskPhaseV1Alpha1(ctx context.Context, pl
 			return pluginsCore.PhaseInfoFailure(flyteerr.TaskFailedWithError, reason, info), nil
 		case rayv1alpha1.JobStatusSucceeded:
 			return pluginsCore.PhaseInfoSuccess(info), nil
-		case rayv1alpha1.JobStatusPending:
+		// JobStatusStopped can occur when the suspend flag is set in rayJob.
+		case rayv1alpha1.JobStatusPending, rayv1alpha1.JobStatusStopped:
 			return pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info), nil
 		case rayv1alpha1.JobStatusRunning:
 			phaseInfo := pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, info)
@@ -766,9 +769,6 @@ func (plugin rayJobResourceHandler) GetTaskPhaseV1Alpha1(ctx context.Context, pl
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 			return phaseInfo, nil
-		case rayv1alpha1.JobStatusStopped:
-			// There is no current usage of this job status in KubeRay. It's unclear what it represents
-			fallthrough
 		default:
 			// We already handle all known job status, so this should never happen unless a future version of ray
 			// introduced a new job status.

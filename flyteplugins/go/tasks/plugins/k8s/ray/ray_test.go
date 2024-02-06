@@ -182,8 +182,8 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
 
-	rayV1, ok := RayResource.(*rayv1.RayJob)
-	assert.True(t, ok)
+	// ray, ok := RayResource.(*rayv1.RayJob)
+	// assert.True(t, ok)
 
 	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
 	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
@@ -716,7 +716,7 @@ func TestGetTaskPhase_V1(t *testing.T) {
 	pluginCtx := newPluginContext()
 
 	testCases := []struct {
-		rayJobPhase       rayv.JobStatus
+		rayJobPhase       rayv1.JobStatus
 		rayClusterPhase   rayv1.JobDeploymentStatus
 		expectedCorePhase pluginsCore.Phase
 		expectedError     bool
@@ -857,7 +857,7 @@ func TestGetEventInfo_LogTemplates_V1(t *testing.T) {
 	pluginCtx := newPluginContext()
 	testCases := []struct {
 		name             string
-		rayJob           rayv1alpha1.RayJob
+		rayJob           rayv1.RayJob
 		logPlugin        tasklog.TemplateLogPlugin
 		expectedTaskLogs []*core.TaskLog
 	}{
