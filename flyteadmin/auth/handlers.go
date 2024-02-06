@@ -158,8 +158,7 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 
 		idpUrl, err := url.Parse(urlString)
 		if err != nil {
-			errString := fmt.Sprintf("failed to parse url %q: %v", urlString, err)
-			logger.Error(ctx, errString)
+			logger.Errorf(ctx, "failed to parse url %q: %v", urlString, err)
 			writer.WriteHeader(http.StatusInternalServerError)
 		}
 
