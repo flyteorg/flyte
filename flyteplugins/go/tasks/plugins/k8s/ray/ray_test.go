@@ -182,9 +182,6 @@ func TestBuildResourceRay(t *testing.T) {
 	ray, ok := RayResource.(*rayv1alpha1.RayJob)
 	assert.True(t, ok)
 
-	// ray, ok := RayResource.(*rayv1.RayJob)
-	// assert.True(t, ok)
-
 	assert.Equal(t, *ray.Spec.RayClusterSpec.EnableInTreeAutoscaling, true)
 	assert.Equal(t, ray.Spec.ShutdownAfterJobFinishes, true)
 	assert.Equal(t, *ray.Spec.TTLSecondsAfterFinished, int32(120))
