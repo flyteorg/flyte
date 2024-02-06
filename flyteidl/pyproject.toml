@@ -13,7 +13,7 @@ requires-python = ">=3.8,<3.13"
 dependencies = [
     'googleapis-common-protos',
     'protoc_gen_swagger',
-    'protobuf>=4.21.1,<5.0.0'
+    'protobuf>=4.21.1,<5.0.0',
     # Packages in here should rarely be pinned. This is because these
     # packages (at the specified version) are required for project
     # consuming this library. By pinning to a specific version you are the
@@ -43,7 +43,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development",
     "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development :: Libraries :: Python Modules"
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 [project.urls]
@@ -53,26 +53,6 @@ Homepage = "https://github.com/flyteorg/flyte/tree/master/flyteidl"
 root = "../"
 tag_regex = '^(?:[\w-]+/)?(?P<version>[vV]?\d+(?:\.\d+){0,2}[^\+]*)(?:\+.*)?$'
 
-# https://github.com/pypa/setuptools/issues/3136 describes an extension to
-# setuptools that would involve a simpler way to specify this, but while
-# that does not happen we have to package the pyi files manually like so:
-[tool.setuptools.package-data]
-flyteidl = ["*.pyi", "**/*pyi"]
-
 [tool.setuptools.packages.find]
-include = ["gen/pb_python/*"]
-exclude = [
-    "_templates",
-    "tmp",
-    "boilerplate",
-    "clients",
-    "docs",
-    "jsonschema",
-    "protos",
-    "scripts",
-    "gen/pb-cpp",
-    "gen/pb-go",
-    "gen/pb-java",
-    "gen/pb-js",
-    "gen/pb-rust",
-]
+where = ["gen/pb_python"]
+include = ["flyteidl*"]
