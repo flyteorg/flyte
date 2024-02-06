@@ -68,7 +68,7 @@ and ML Engineers in the industry use Flyte to create:
 ## Learn Flyte
 
 The following guides will take you through Flyte, whether you want to write
-workflows, deploy the Flyte platform to your K8s cluster, or extend and
+workflows, deploy the Flyte platform to your Kubernetes cluster, or extend and
 contribute its architecture and design. You can also access the
 {ref}`docs pages by tag <tagoverview>`.
 
