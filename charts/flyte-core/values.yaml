@@ -374,6 +374,8 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
+   # -- ImagePullSecrets to assign to the Flyteconsole deployment
+  imagePullSecrets: []
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -845,6 +847,8 @@ cluster_resource_manager:
   podEnv: {}
   # -- Labels for ClusterResource pods
   podLabels: {}
+  # -- nodeSelector for ClusterResource deployment
+  nodeSelector: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters
