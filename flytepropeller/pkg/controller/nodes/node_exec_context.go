@@ -232,7 +232,7 @@ func (e nodeExecContext) GetExecutionEnv(envType string) *_struct.Struct {
 				}
 
 				// if execution environment spec exists then retrieve execution environment
-				e.executionEnv = e.executionEnvClient.GetEnvironment(e, executionEnvAssignment.Id)
+				e.executionEnv = e.executionEnvClient.GetEnvironment(e.ExecutionContext().GetExecutionID().WorkflowExecutionIdentifier, executionEnvAssignment.Id)
 				break
 			}
 		}
