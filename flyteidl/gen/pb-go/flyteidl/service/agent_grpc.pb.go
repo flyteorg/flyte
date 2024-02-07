@@ -20,18 +20,21 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AsyncAgentService_CreateTask_FullMethodName     = "/flyteidl.service.AsyncAgentService/CreateTask"
-	AsyncAgentService_GetTask_FullMethodName        = "/flyteidl.service.AsyncAgentService/GetTask"
-	AsyncAgentService_DeleteTask_FullMethodName     = "/flyteidl.service.AsyncAgentService/DeleteTask"
-	AsyncAgentService_GetTaskMetrics_FullMethodName = "/flyteidl.service.AsyncAgentService/GetTaskMetrics"
-	AsyncAgentService_GetTaskLogs_FullMethodName    = "/flyteidl.service.AsyncAgentService/GetTaskLogs"
+	AsyncAgentService_ExecuteTaskSync_FullMethodName = "/flyteidl.service.AsyncAgentService/ExecuteTaskSync"
+	AsyncAgentService_CreateTask_FullMethodName      = "/flyteidl.service.AsyncAgentService/CreateTask"
+	AsyncAgentService_GetTask_FullMethodName         = "/flyteidl.service.AsyncAgentService/GetTask"
+	AsyncAgentService_DeleteTask_FullMethodName      = "/flyteidl.service.AsyncAgentService/DeleteTask"
+	AsyncAgentService_GetTaskMetrics_FullMethodName  = "/flyteidl.service.AsyncAgentService/GetTaskMetrics"
+	AsyncAgentService_GetTaskLogs_FullMethodName     = "/flyteidl.service.AsyncAgentService/GetTaskLogs"
 )
 
 // AsyncAgentServiceClient is the client API for AsyncAgentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AsyncAgentServiceClient interface {
-	// Send a task create request to the agent server.
+	// ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+	ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (AsyncAgentService_ExecuteTaskSyncClient, error)
+	// CreateTask sends a task create request to the agent service.
 	CreateTask(ctx context.Context, in *admin.CreateTaskRequest, opts ...grpc.CallOption) (*admin.CreateTaskResponse, error)
 	// Get job status.
 	GetTask(ctx context.Context, in *admin.GetTaskRequest, opts ...grpc.CallOption) (*admin.GetTaskResponse, error)
@@ -44,7 +47,7 @@ type AsyncAgentServiceClient interface {
 	//   - various other errors
 	GetTaskMetrics(ctx context.Context, in *admin.GetTaskMetricsRequest, opts ...grpc.CallOption) (*admin.GetTaskMetricsResponse, error)
 	// GetTaskLogs returns task execution logs, if available.
-	GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error)
+	GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncAgentService_GetTaskLogsClient, error)
 }
 
 type asyncAgentServiceClient struct {
@@ -53,6 +56,37 @@ type asyncAgentServiceClient struct {
 
 func NewAsyncAgentServiceClient(cc grpc.ClientConnInterface) AsyncAgentServiceClient {
 	return &asyncAgentServiceClient{cc}
+}
+
+func (c *asyncAgentServiceClient) ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (AsyncAgentService_ExecuteTaskSyncClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AsyncAgentService_ServiceDesc.Streams[0], AsyncAgentService_ExecuteTaskSync_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &asyncAgentServiceExecuteTaskSyncClient{stream}
+	return x, nil
+}
+
+type AsyncAgentService_ExecuteTaskSyncClient interface {
+	Send(*admin.ExecuteTaskSyncRequest) error
+	Recv() (*admin.ExecuteTaskSyncResponse, error)
+	grpc.ClientStream
+}
+
+type asyncAgentServiceExecuteTaskSyncClient struct {
+	grpc.ClientStream
+}
+
+func (x *asyncAgentServiceExecuteTaskSyncClient) Send(m *admin.ExecuteTaskSyncRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *asyncAgentServiceExecuteTaskSyncClient) Recv() (*admin.ExecuteTaskSyncResponse, error) {
+	m := new(admin.ExecuteTaskSyncResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *asyncAgentServiceClient) CreateTask(ctx context.Context, in *admin.CreateTaskRequest, opts ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
@@ -91,20 +125,45 @@ func (c *asyncAgentServiceClient) GetTaskMetrics(ctx context.Context, in *admin.
 	return out, nil
 }
 
-func (c *asyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (*admin.GetTaskLogsResponse, error) {
-	out := new(admin.GetTaskLogsResponse)
-	err := c.cc.Invoke(ctx, AsyncAgentService_GetTaskLogs_FullMethodName, in, out, opts...)
+func (c *asyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncAgentService_GetTaskLogsClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AsyncAgentService_ServiceDesc.Streams[1], AsyncAgentService_GetTaskLogs_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &asyncAgentServiceGetTaskLogsClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type AsyncAgentService_GetTaskLogsClient interface {
+	Recv() (*admin.GetTaskLogsResponse, error)
+	grpc.ClientStream
+}
+
+type asyncAgentServiceGetTaskLogsClient struct {
+	grpc.ClientStream
+}
+
+func (x *asyncAgentServiceGetTaskLogsClient) Recv() (*admin.GetTaskLogsResponse, error) {
+	m := new(admin.GetTaskLogsResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // AsyncAgentServiceServer is the server API for AsyncAgentService service.
 // All implementations should embed UnimplementedAsyncAgentServiceServer
 // for forward compatibility
 type AsyncAgentServiceServer interface {
-	// Send a task create request to the agent server.
+	// ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+	ExecuteTaskSync(AsyncAgentService_ExecuteTaskSyncServer) error
+	// CreateTask sends a task create request to the agent service.
 	CreateTask(context.Context, *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error)
 	// Get job status.
 	GetTask(context.Context, *admin.GetTaskRequest) (*admin.GetTaskResponse, error)
@@ -117,13 +176,16 @@ type AsyncAgentServiceServer interface {
 	//   - various other errors
 	GetTaskMetrics(context.Context, *admin.GetTaskMetricsRequest) (*admin.GetTaskMetricsResponse, error)
 	// GetTaskLogs returns task execution logs, if available.
-	GetTaskLogs(context.Context, *admin.GetTaskLogsRequest) (*admin.GetTaskLogsResponse, error)
+	GetTaskLogs(*admin.GetTaskLogsRequest, AsyncAgentService_GetTaskLogsServer) error
 }
 
 // UnimplementedAsyncAgentServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedAsyncAgentServiceServer struct {
 }
 
+func (UnimplementedAsyncAgentServiceServer) ExecuteTaskSync(AsyncAgentService_ExecuteTaskSyncServer) error {
+	return status.Errorf(codes.Unimplemented, "method ExecuteTaskSync not implemented")
+}
 func (UnimplementedAsyncAgentServiceServer) CreateTask(context.Context, *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
 }
@@ -136,8 +198,8 @@ func (UnimplementedAsyncAgentServiceServer) DeleteTask(context.Context, *admin.D
 func (UnimplementedAsyncAgentServiceServer) GetTaskMetrics(context.Context, *admin.GetTaskMetricsRequest) (*admin.GetTaskMetricsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTaskMetrics not implemented")
 }
-func (UnimplementedAsyncAgentServiceServer) GetTaskLogs(context.Context, *admin.GetTaskLogsRequest) (*admin.GetTaskLogsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetTaskLogs not implemented")
+func (UnimplementedAsyncAgentServiceServer) GetTaskLogs(*admin.GetTaskLogsRequest, AsyncAgentService_GetTaskLogsServer) error {
+	return status.Errorf(codes.Unimplemented, "method GetTaskLogs not implemented")
 }
 
 // UnsafeAsyncAgentServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -149,6 +211,32 @@ type UnsafeAsyncAgentServiceServer interface {
 
 func RegisterAsyncAgentServiceServer(s grpc.ServiceRegistrar, srv AsyncAgentServiceServer) {
 	s.RegisterService(&AsyncAgentService_ServiceDesc, srv)
+}
+
+func _AsyncAgentService_ExecuteTaskSync_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AsyncAgentServiceServer).ExecuteTaskSync(&asyncAgentServiceExecuteTaskSyncServer{stream})
+}
+
+type AsyncAgentService_ExecuteTaskSyncServer interface {
+	Send(*admin.ExecuteTaskSyncResponse) error
+	Recv() (*admin.ExecuteTaskSyncRequest, error)
+	grpc.ServerStream
+}
+
+type asyncAgentServiceExecuteTaskSyncServer struct {
+	grpc.ServerStream
+}
+
+func (x *asyncAgentServiceExecuteTaskSyncServer) Send(m *admin.ExecuteTaskSyncResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *asyncAgentServiceExecuteTaskSyncServer) Recv() (*admin.ExecuteTaskSyncRequest, error) {
+	m := new(admin.ExecuteTaskSyncRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _AsyncAgentService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -223,22 +311,25 @@ func _AsyncAgentService_GetTaskMetrics_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AsyncAgentService_GetTaskLogs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.GetTaskLogsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _AsyncAgentService_GetTaskLogs_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(admin.GetTaskLogsRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(AsyncAgentServiceServer).GetTaskLogs(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AsyncAgentService_GetTaskLogs_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AsyncAgentServiceServer).GetTaskLogs(ctx, req.(*admin.GetTaskLogsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(AsyncAgentServiceServer).GetTaskLogs(m, &asyncAgentServiceGetTaskLogsServer{stream})
+}
+
+type AsyncAgentService_GetTaskLogsServer interface {
+	Send(*admin.GetTaskLogsResponse) error
+	grpc.ServerStream
+}
+
+type asyncAgentServiceGetTaskLogsServer struct {
+	grpc.ServerStream
+}
+
+func (x *asyncAgentServiceGetTaskLogsServer) Send(m *admin.GetTaskLogsResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 // AsyncAgentService_ServiceDesc is the grpc.ServiceDesc for AsyncAgentService service.
@@ -264,12 +355,20 @@ var AsyncAgentService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetTaskMetrics",
 			Handler:    _AsyncAgentService_GetTaskMetrics_Handler,
 		},
+	},
+	Streams: []grpc.StreamDesc{
 		{
-			MethodName: "GetTaskLogs",
-			Handler:    _AsyncAgentService_GetTaskLogs_Handler,
+			StreamName:    "ExecuteTaskSync",
+			Handler:       _AsyncAgentService_ExecuteTaskSync_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+		{
+			StreamName:    "GetTaskLogs",
+			Handler:       _AsyncAgentService_GetTaskLogs_Handler,
+			ServerStreams: true,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
 	Metadata: "flyteidl/service/agent.proto",
 }
 

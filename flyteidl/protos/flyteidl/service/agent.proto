@@ -17,7 +17,7 @@ service AsyncAgentService {
   };
 
   // CreateTask sends a task create request to the agent service.
-  rpc CreateTask (stream flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){
+  rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){
     option (google.api.http) = {
       post: "/api/v1/agent/task"
       body: "*"
@@ -25,7 +25,7 @@ service AsyncAgentService {
   };
 
   // Get job status.
-  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (stream flyteidl.admin.GetTaskResponse){
+  rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){
     option (google.api.http) = {
       get: "/api/v1/agent/task/{task_type.name}/{task_type.version}/{resource_meta}"
     };
