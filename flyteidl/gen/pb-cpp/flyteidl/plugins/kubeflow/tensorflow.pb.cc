@@ -18,7 +18,8 @@
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_RunPolicy_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_DistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_DistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto;
 namespace flyteidl {
 namespace plugins {
 namespace kubeflow {
@@ -26,6 +27,10 @@ class DistributedTensorflowTrainingTaskDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<DistributedTensorflowTrainingTask> _instance;
 } _DistributedTensorflowTrainingTask_default_instance_;
+class DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> _instance;
+} _DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_;
 class DistributedTensorflowTrainingReplicaSpecDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<DistributedTensorflowTrainingReplicaSpec> _instance;
@@ -49,6 +54,19 @@ static void InitDefaultsDistributedTensorflowTrainingTask_flyteidl_2fplugins_2fk
       &scc_info_DistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto.base,
       &scc_info_RunPolicy_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto.base,}};
 
+static void InitDefaultsDistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_;
+    new (ptr) ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse();
+  }
+  ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsDistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto}, {}};
+
 static void InitDefaultsDistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -60,16 +78,18 @@ static void InitDefaultsDistributedTensorflowTrainingReplicaSpec_flyteidl_2fplug
   ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_DistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsDistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto}, {
-      &scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_DistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsDistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto}, {
+      &scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto.base,
+      &scc_info_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_DistributedTensorflowTrainingTask_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_DistributedTensorflowTrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto[2];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto[3];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto = nullptr;
 
@@ -84,6 +104,15 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fkubeflow_2ften
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, chief_replicas_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, run_policy_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask, evaluator_replicas_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, value_),
+  0,
+  1,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -93,21 +122,24 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fkubeflow_2ften
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec, image_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec, resources_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec, restart_policy_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec, node_selectors_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask)},
-  { 10, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec)},
+  { 10, 17, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse)},
+  { 19, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingTask_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingReplicaSpec_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto = {
   {}, AddDescriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, "flyteidl/plugins/kubeflow/tensorflow.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto::offsets,
-  file_level_metadata_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 2, file_level_enum_descriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto,
+  file_level_metadata_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 3, file_level_enum_descriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto[] =
@@ -126,18 +158,22 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_
   "eidl.plugins.kubeflow.RunPolicy\022_\n\022evalu"
   "ator_replicas\030\005 \001(\0132C.flyteidl.plugins.k"
   "ubeflow.DistributedTensorflowTrainingRep"
-  "licaSpec\"\272\001\n(DistributedTensorflowTraini"
+  "licaSpec\"\340\002\n(DistributedTensorflowTraini"
   "ngReplicaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image"
   "\030\002 \001(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.cor"
   "e.Resources\022@\n\016restart_policy\030\004 \001(\0162(.fl"
-  "yteidl.plugins.kubeflow.RestartPolicyB\?Z"
-  "=github.com/flyteorg/flyte/flyteidl/gen/"
-  "pb-go/flyteidl/pluginsb\006proto3"
+  "yteidl.plugins.kubeflow.RestartPolicy\022n\n"
+  "\016node_selectors\030\005 \003(\0132V.flyteidl.plugins"
+  ".kubeflow.DistributedTensorflowTrainingR"
+  "eplicaSpec.NodeSelectorsEntry\0324\n\022NodeSel"
+  "ectorsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:"
+  "\0028\001B\?Z=github.com/flyteorg/flyte/flyteid"
+  "l/gen/pb-go/flyteidl/pluginsb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto,
-  "flyteidl/plugins/kubeflow/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 870,
+  "flyteidl/plugins/kubeflow/tensorflow.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto, 1036,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto() {
@@ -716,6 +752,47 @@ void DistributedTensorflowTrainingTask::InternalSwap(DistributedTensorflowTraini
 
 // ===================================================================
 
+DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse() {}
+DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
+void DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::MergeFrom(const DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fkubeflow_2ftensorflow_2eproto[1];
+}
+void DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+
+// ===================================================================
+
 void DistributedTensorflowTrainingReplicaSpec::InitAsDefaultInstance() {
   ::flyteidl::plugins::kubeflow::_DistributedTensorflowTrainingReplicaSpec_default_instance_._instance.get_mutable()->resources_ = const_cast< ::flyteidl::core::Resources*>(
       ::flyteidl::core::Resources::internal_default_instance());
@@ -740,6 +817,7 @@ const int DistributedTensorflowTrainingReplicaSpec::kReplicasFieldNumber;
 const int DistributedTensorflowTrainingReplicaSpec::kImageFieldNumber;
 const int DistributedTensorflowTrainingReplicaSpec::kResourcesFieldNumber;
 const int DistributedTensorflowTrainingReplicaSpec::kRestartPolicyFieldNumber;
+const int DistributedTensorflowTrainingReplicaSpec::kNodeSelectorsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 DistributedTensorflowTrainingReplicaSpec::DistributedTensorflowTrainingReplicaSpec()
@@ -751,6 +829,7 @@ DistributedTensorflowTrainingReplicaSpec::DistributedTensorflowTrainingReplicaSp
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  node_selectors_.MergeFrom(from.node_selectors_);
   image_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.image().size() > 0) {
     image_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.image_);
@@ -800,6 +879,7 @@ void DistributedTensorflowTrainingReplicaSpec::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  node_selectors_.Clear();
   image_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && resources_ != nullptr) {
     delete resources_;
@@ -866,6 +946,25 @@ const char* DistributedTensorflowTrainingReplicaSpec::_InternalParse(const char*
         ::google::protobuf::uint64 val = ::google::protobuf::internal::ReadVarint(&ptr);
         msg->set_restart_policy(static_cast<::flyteidl::plugins::kubeflow::RestartPolicy>(val));
         GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        break;
+      }
+      // map<string, string> node_selectors = 5;
+      case 5: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 42) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->node_selectors_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
         break;
       }
       default: {
@@ -955,6 +1054,32 @@ bool DistributedTensorflowTrainingReplicaSpec::MergePartialFromCodedStream(
         break;
       }
 
+      // map<string, string> node_selectors = 5;
+      case 5: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (42 & 0xFF)) {
+          DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse,
+              ::std::string, ::std::string,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&node_selectors_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.key"));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.value().data(), static_cast<int>(parser.value().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.value"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -1009,6 +1134,55 @@ void DistributedTensorflowTrainingReplicaSpec::SerializeWithCachedSizes(
       4, this->restart_policy(), output);
   }
 
+  // map<string, string> node_selectors = 5;
+  if (!this->node_selectors().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.value");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->node_selectors().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->node_selectors().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(node_selectors_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(5, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it) {
+        entry.reset(node_selectors_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(5, *entry, output);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1051,6 +1225,55 @@ void DistributedTensorflowTrainingReplicaSpec::SerializeWithCachedSizes(
       4, this->restart_policy(), target);
   }
 
+  // map<string, string> node_selectors = 5;
+  if (!this->node_selectors().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec.NodeSelectorsEntry.value");
+      }
+    };
+
+    if (false &&
+        this->node_selectors().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->node_selectors().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(node_selectors_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(5, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it) {
+        entry.reset(node_selectors_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(5, *entry, target);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1071,6 +1294,20 @@ size_t DistributedTensorflowTrainingReplicaSpec::ByteSizeLong() const {
   ::google::protobuf::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // map<string, string> node_selectors = 5;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->node_selectors_size());
+  {
+    ::std::unique_ptr<DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+        it = this->node_selectors().begin();
+        it != this->node_selectors().end(); ++it) {
+      entry.reset(node_selectors_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
+  }
 
   // string image = 2;
   if (this->image().size() > 0) {
@@ -1126,6 +1363,7 @@ void DistributedTensorflowTrainingReplicaSpec::MergeFrom(const DistributedTensor
   ::google::protobuf::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  node_selectors_.MergeFrom(from.node_selectors_);
   if (from.image().size() > 0) {
 
     image_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.image_);
@@ -1166,6 +1404,7 @@ void DistributedTensorflowTrainingReplicaSpec::Swap(DistributedTensorflowTrainin
 void DistributedTensorflowTrainingReplicaSpec::InternalSwap(DistributedTensorflowTrainingReplicaSpec* other) {
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
+  node_selectors_.Swap(&other->node_selectors_);
   image_.Swap(&other->image_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(resources_, other->resources_);
@@ -1187,6 +1426,9 @@ namespace google {
 namespace protobuf {
 template<> PROTOBUF_NOINLINE ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask* Arena::CreateMaybeMessage< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingTask >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec* Arena::CreateMaybeMessage< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::plugins::kubeflow::DistributedTensorflowTrainingReplicaSpec >(arena);

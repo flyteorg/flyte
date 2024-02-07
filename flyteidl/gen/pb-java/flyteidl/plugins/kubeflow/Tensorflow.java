@@ -1806,6 +1806,60 @@ public final class Tensorflow {
      * <code>.flyteidl.plugins.kubeflow.RestartPolicy restart_policy = 4;</code>
      */
     flyteidl.plugins.kubeflow.Common.RestartPolicy getRestartPolicy();
+
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+    int getNodeSelectorsCount();
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+    boolean containsNodeSelectors(
+        java.lang.String key);
+    /**
+     * Use {@link #getNodeSelectorsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getNodeSelectors();
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getNodeSelectorsMap();
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+
+    java.lang.String getNodeSelectorsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+
+    java.lang.String getNodeSelectorsOrThrow(
+        java.lang.String key);
   }
   /**
    * Protobuf type {@code flyteidl.plugins.kubeflow.DistributedTensorflowTrainingReplicaSpec}
@@ -1878,6 +1932,19 @@ public final class Tensorflow {
               restartPolicy_ = rawValue;
               break;
             }
+            case 42: {
+              if (!((mutable_bitField0_ & 0x00000010) != 0)) {
+                nodeSelectors_ = com.google.protobuf.MapField.newMapField(
+                    NodeSelectorsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000010;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              nodeSelectors__ = input.readMessage(
+                  NodeSelectorsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              nodeSelectors_.getMutableMap().put(
+                  nodeSelectors__.getKey(), nodeSelectors__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -1902,6 +1969,18 @@ public final class Tensorflow {
       return flyteidl.plugins.kubeflow.Tensorflow.internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 5:
+          return internalGetNodeSelectors();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -1910,6 +1989,7 @@ public final class Tensorflow {
               flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.class, flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec.Builder.class);
     }
 
+    private int bitField0_;
     public static final int REPLICAS_FIELD_NUMBER = 1;
     private int replicas_;
     /**
@@ -2023,6 +2103,98 @@ public final class Tensorflow {
       return result == null ? flyteidl.plugins.kubeflow.Common.RestartPolicy.UNRECOGNIZED : result;
     }
 
+    public static final int NODE_SELECTORS_FIELD_NUMBER = 5;
+    private static final class NodeSelectorsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.plugins.kubeflow.Tensorflow.internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> nodeSelectors_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetNodeSelectors() {
+      if (nodeSelectors_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            NodeSelectorsDefaultEntryHolder.defaultEntry);
+      }
+      return nodeSelectors_;
+    }
+
+    public int getNodeSelectorsCount() {
+      return internalGetNodeSelectors().getMap().size();
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+
+    public boolean containsNodeSelectors(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetNodeSelectors().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getNodeSelectorsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getNodeSelectors() {
+      return getNodeSelectorsMap();
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getNodeSelectorsMap() {
+      return internalGetNodeSelectors().getMap();
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+
+    public java.lang.String getNodeSelectorsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetNodeSelectors().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+     */
+
+    public java.lang.String getNodeSelectorsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetNodeSelectors().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -2049,6 +2221,12 @@ public final class Tensorflow {
       if (restartPolicy_ != flyteidl.plugins.kubeflow.Common.RestartPolicy.RESTART_POLICY_NEVER.getNumber()) {
         output.writeEnum(4, restartPolicy_);
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetNodeSelectors(),
+          NodeSelectorsDefaultEntryHolder.defaultEntry,
+          5);
       unknownFields.writeTo(output);
     }
 
@@ -2072,6 +2250,16 @@ public final class Tensorflow {
       if (restartPolicy_ != flyteidl.plugins.kubeflow.Common.RestartPolicy.RESTART_POLICY_NEVER.getNumber()) {
         size += com.google.protobuf.CodedOutputStream
           .computeEnumSize(4, restartPolicy_);
+      }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetNodeSelectors().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        nodeSelectors__ = NodeSelectorsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(5, nodeSelectors__);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -2098,6 +2286,8 @@ public final class Tensorflow {
             .equals(other.getResources())) return false;
       }
       if (restartPolicy_ != other.restartPolicy_) return false;
+      if (!internalGetNodeSelectors().equals(
+          other.internalGetNodeSelectors())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -2119,6 +2309,10 @@ public final class Tensorflow {
       }
       hash = (37 * hash) + RESTART_POLICY_FIELD_NUMBER;
       hash = (53 * hash) + restartPolicy_;
+      if (!internalGetNodeSelectors().getMap().isEmpty()) {
+        hash = (37 * hash) + NODE_SELECTORS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetNodeSelectors().hashCode();
+      }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -2226,6 +2420,28 @@ public final class Tensorflow {
         return flyteidl.plugins.kubeflow.Tensorflow.internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 5:
+            return internalGetNodeSelectors();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 5:
+            return internalGetMutableNodeSelectors();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -2264,6 +2480,7 @@ public final class Tensorflow {
         }
         restartPolicy_ = 0;
 
+        internalGetMutableNodeSelectors().clear();
         return this;
       }
 
@@ -2290,6 +2507,8 @@ public final class Tensorflow {
       @java.lang.Override
       public flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec buildPartial() {
         flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec result = new flyteidl.plugins.kubeflow.Tensorflow.DistributedTensorflowTrainingReplicaSpec(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
         result.replicas_ = replicas_;
         result.image_ = image_;
         if (resourcesBuilder_ == null) {
@@ -2298,6 +2517,9 @@ public final class Tensorflow {
           result.resources_ = resourcesBuilder_.build();
         }
         result.restartPolicy_ = restartPolicy_;
+        result.nodeSelectors_ = internalGetNodeSelectors();
+        result.nodeSelectors_.makeImmutable();
+        result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
       }
@@ -2359,6 +2581,8 @@ public final class Tensorflow {
         if (other.restartPolicy_ != 0) {
           setRestartPolicyValue(other.getRestartPolicyValue());
         }
+        internalGetMutableNodeSelectors().mergeFrom(
+            other.internalGetNodeSelectors());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -2387,6 +2611,7 @@ public final class Tensorflow {
         }
         return this;
       }
+      private int bitField0_;
 
       private int replicas_ ;
       /**
@@ -2732,6 +2957,157 @@ public final class Tensorflow {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> nodeSelectors_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetNodeSelectors() {
+        if (nodeSelectors_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              NodeSelectorsDefaultEntryHolder.defaultEntry);
+        }
+        return nodeSelectors_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableNodeSelectors() {
+        onChanged();;
+        if (nodeSelectors_ == null) {
+          nodeSelectors_ = com.google.protobuf.MapField.newMapField(
+              NodeSelectorsDefaultEntryHolder.defaultEntry);
+        }
+        if (!nodeSelectors_.isMutable()) {
+          nodeSelectors_ = nodeSelectors_.copy();
+        }
+        return nodeSelectors_;
+      }
+
+      public int getNodeSelectorsCount() {
+        return internalGetNodeSelectors().getMap().size();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+
+      public boolean containsNodeSelectors(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetNodeSelectors().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getNodeSelectorsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getNodeSelectors() {
+        return getNodeSelectorsMap();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getNodeSelectorsMap() {
+        return internalGetNodeSelectors().getMap();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+
+      public java.lang.String getNodeSelectorsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetNodeSelectors().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+
+      public java.lang.String getNodeSelectorsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetNodeSelectors().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearNodeSelectors() {
+        internalGetMutableNodeSelectors().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+
+      public Builder removeNodeSelectors(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableNodeSelectors().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableNodeSelectors() {
+        return internalGetMutableNodeSelectors().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+      public Builder putNodeSelectors(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableNodeSelectors().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 5;</code>
+       */
+
+      public Builder putAllNodeSelectors(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableNodeSelectors().getMutableMap()
+            .putAll(values);
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -2795,6 +3171,11 @@ public final class Tensorflow {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2819,13 +3200,17 @@ public final class Tensorflow {
       "eidl.plugins.kubeflow.RunPolicy\022_\n\022evalu" +
       "ator_replicas\030\005 \001(\0132C.flyteidl.plugins.k" +
       "ubeflow.DistributedTensorflowTrainingRep" +
-      "licaSpec\"\272\001\n(DistributedTensorflowTraini" +
+      "licaSpec\"\340\002\n(DistributedTensorflowTraini" +
       "ngReplicaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image" +
       "\030\002 \001(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.cor" +
       "e.Resources\022@\n\016restart_policy\030\004 \001(\0162(.fl" +
-      "yteidl.plugins.kubeflow.RestartPolicyB?Z" +
-      "=github.com/flyteorg/flyte/flyteidl/gen/" +
-      "pb-go/flyteidl/pluginsb\006proto3"
+      "yteidl.plugins.kubeflow.RestartPolicy\022n\n" +
+      "\016node_selectors\030\005 \003(\0132V.flyteidl.plugins" +
+      ".kubeflow.DistributedTensorflowTrainingR" +
+      "eplicaSpec.NodeSelectorsEntry\0324\n\022NodeSel" +
+      "ectorsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030\002 \001(\t:" +
+      "\0028\001B?Z=github.com/flyteorg/flyte/flyteid" +
+      "l/gen/pb-go/flyteidl/pluginsb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2852,7 +3237,13 @@ public final class Tensorflow {
     internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_descriptor,
-        new java.lang.String[] { "Replicas", "Image", "Resources", "RestartPolicy", });
+        new java.lang.String[] { "Replicas", "Image", "Resources", "RestartPolicy", "NodeSelectors", });
+    internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_descriptor =
+      internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_plugins_kubeflow_DistributedTensorflowTrainingReplicaSpec_NodeSelectorsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     flyteidl.core.Tasks.getDescriptor();
     flyteidl.plugins.kubeflow.Common.getDescriptor();
   }

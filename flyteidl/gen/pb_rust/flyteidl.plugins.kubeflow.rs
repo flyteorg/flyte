@@ -201,5 +201,8 @@ pub struct DistributedTensorflowTrainingReplicaSpec {
     /// RestartPolicy Determines whether pods will be restarted when they exit
     #[prost(enumeration="RestartPolicy", tag="4")]
     pub restart_policy: i32,
+    /// Node selectors for the replica group
+    #[prost(map="string, string", tag="5")]
+    pub node_selectors: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 // @@protoc_insertion_point(module)
