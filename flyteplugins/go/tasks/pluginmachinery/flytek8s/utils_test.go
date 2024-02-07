@@ -33,7 +33,6 @@ func TestToK8sResourceList(t *testing.T) {
 			{Name: core.Resources_CPU, Value: "250m"},
 			{Name: core.Resources_GPU, Value: "1"},
 			{Name: core.Resources_MEMORY, Value: "1024Mi"},
-			{Name: core.Resources_STORAGE, Value: "1024Mi"},
 			{Name: core.Resources_EPHEMERAL_STORAGE, Value: "1024Mi"},
 		})
 
@@ -43,7 +42,6 @@ func TestToK8sResourceList(t *testing.T) {
 		assert.Equal(t, resource.MustParse("250m"), r[v1.ResourceCPU])
 		assert.Equal(t, resource.MustParse("1"), r[ResourceNvidiaGPU])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceMemory])
-		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceStorage])
 		assert.Equal(t, resource.MustParse("1024Mi"), r[v1.ResourceEphemeralStorage])
 	}
 	{

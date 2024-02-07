@@ -16,6 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const requestID = "request id"
@@ -79,8 +80,8 @@ func TestCreateExecutionError(t *testing.T) {
 		Name:    "Name",
 	})
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "missing entity of type execution with "+
-		"identifier project:\"Project\" domain:\"Domain\" name:\"Name\" ")
+	utils.AssertEqualWithSanitizedRegex(t,
+		`missing entity of type execution with identifier project:"Project" domain:"Domain" name:"Name"`, err.Error())
 }
 
 func TestRelaunchExecutionHappyCase(t *testing.T) {

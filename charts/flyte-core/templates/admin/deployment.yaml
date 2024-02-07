@@ -16,7 +16,7 @@ spec:
         {{- with .Values.flyteadmin.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteadmin.labels" . | nindent 8 }}
+      labels: {{ include "flyteadmin.podLabels" . | nindent 8 }}
     spec:
       securityContext:
         fsGroup: 65534
@@ -38,6 +38,12 @@ spec:
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: base-config-volume
+          {{- if .Values.flyteadmin.env }}
+          env:
+            {{- with .Values.flyteadmin.env -}}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+            {{- end }}
         {{- if .Values.flyteadmin.initialProjects }}
         - command:
           - flyteadmin
@@ -54,6 +60,12 @@ spec:
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: base-config-volume
+          {{- if .Values.flyteadmin.env }}
+          env:
+            {{- with .Values.flyteadmin.env -}}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+            {{- end }}
         {{- end }}
         {{- if and (.Values.cluster_resource_manager.enabled) (not .Values.cluster_resource_manager.standalone_deploy) }}
         - command:
@@ -77,6 +89,12 @@ spec:
           {{ tpl (toYaml .) $ | nindent 10 }}
           {{- end }}
           {{- end }}
+          {{- if .Values.flyteadmin.env }}
+          env:
+            {{- with .Values.flyteadmin.env -}}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
+            {{- end }}
         {{- end }}
         - name: generate-secrets
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
@@ -96,6 +114,9 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            {{- with .Values.flyteadmin.env -}}
+            {{- tpl (toYaml .) $ | nindent 12 }}
+            {{- end }}
       containers:
       - command:
         - flyteadmin

@@ -693,12 +693,12 @@ func TestApplyGPUNodeSelectors(t *testing.T) {
 func updatePod(t *testing.T) {
 	taskExecutionMetadata := dummyTaskExecutionMetadata(&v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
 		Requests: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
 	}, nil)
 
@@ -809,13 +809,13 @@ func toK8sPodInterruptible(t *testing.T) {
 
 	x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 		Limits: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
-			ResourceNvidiaGPU:  resource.MustParse("1"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+			ResourceNvidiaGPU:           resource.MustParse("1"),
 		},
 		Requests: v1.ResourceList{
-			v1.ResourceCPU:     resource.MustParse("1024m"),
-			v1.ResourceStorage: resource.MustParse("100M"),
+			v1.ResourceCPU:              resource.MustParse("1024m"),
+			v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 		},
 	}, nil)
 
@@ -853,8 +853,8 @@ func TestToK8sPod(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
@@ -862,8 +862,8 @@ func TestToK8sPod(t *testing.T) {
 
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
-			ResourceNvidiaGPU:  {tolGPU},
+			v1.ResourceEphemeralStorage: {tolEphemeralStorage},
+			ResourceNvidiaGPU:           {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
 		DefaultMemoryRequest: resource.MustParse("1024Mi"),
@@ -876,48 +876,48 @@ func TestToK8sPod(t *testing.T) {
 	t.Run("WithGPU", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
-				ResourceNvidiaGPU:  resource.MustParse("1"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+				ResourceNvidiaGPU:           resource.MustParse("1"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+			},
+		}, nil)
+
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+		assert.NoError(t, err)
+		assert.Equal(t, len(p.Tolerations), 2)
+	})
+
+	t.Run("NoGPU", func(t *testing.T) {
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
+			Limits: v1.ResourceList{
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
+			},
+			Requests: v1.ResourceList{
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
 		}, nil)
 
 		p, _, _, err := ToK8sPodSpec(ctx, x)
 		assert.NoError(t, err)
 		assert.Equal(t, len(p.Tolerations), 1)
-	})
-
-	t.Run("NoGPU", func(t *testing.T) {
-		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
-			Limits: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
-			},
-			Requests: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
-			},
-		}, nil)
-
-		p, _, _, err := ToK8sPodSpec(ctx, x)
-		assert.NoError(t, err)
-		assert.Equal(t, len(p.Tolerations), 0)
 		assert.Equal(t, "some-acceptable-name", p.Containers[0].Name)
 	})
 
 	t.Run("Default toleration, selector, scheduler", func(t *testing.T) {
 		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{
 			Limits: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
 			Requests: v1.ResourceList{
-				v1.ResourceCPU:     resource.MustParse("1024m"),
-				v1.ResourceStorage: resource.MustParse("100M"),
+				v1.ResourceCPU:              resource.MustParse("1024m"),
+				v1.ResourceEphemeralStorage: resource.MustParse("100M"),
 			},
 		}, nil)
 
@@ -1728,7 +1728,7 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		}, info)
 		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
 		assert.Equal(t, "foo", phaseInfo.Err().Code)
-		assert.Equal(t, "foo failed", phaseInfo.Err().Message)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (1). Reason [foo]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 	t.Run("primary container succeeded", func(t *testing.T) {
 		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
@@ -1750,6 +1750,23 @@ func TestDeterminePrimaryContainerPhase(t *testing.T) {
 		assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
 		assert.Equal(t, PrimaryContainerNotFound, phaseInfo.Err().Code)
 		assert.Equal(t, "Primary container [primary] not found in pod's container statuses", phaseInfo.Err().Message)
+	})
+	t.Run("primary container failed with OOMKilled", func(t *testing.T) {
+		phaseInfo := DeterminePrimaryContainerPhase(primaryContainerName, []v1.ContainerStatus{
+			secondaryContainer, {
+				Name: primaryContainerName,
+				State: v1.ContainerState{
+					Terminated: &v1.ContainerStateTerminated{
+						ExitCode: 0,
+						Reason:   OOMKilled,
+						Message:  "foo failed",
+					},
+				},
+			},
+		}, info)
+		assert.Equal(t, pluginsCore.PhaseRetryableFailure, phaseInfo.Phase())
+		assert.Equal(t, OOMKilled, phaseInfo.Err().Code)
+		assert.Equal(t, "\r\n[primary] terminated with exit code (0). Reason [OOMKilled]. Message: \nfoo failed.", phaseInfo.Err().Message)
 	})
 }
 

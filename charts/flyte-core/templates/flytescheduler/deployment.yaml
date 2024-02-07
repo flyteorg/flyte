@@ -17,7 +17,7 @@ spec:
         {{- with .Values.flytescheduler.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flytescheduler.labels" . | nindent 8 }}
+      labels: {{ include "flytescheduler.podLabels" . | nindent 8 }}
     spec:
       securityContext:
         fsGroup: 65534
@@ -33,6 +33,12 @@ spec:
         - precheck
         - --config
         - {{ .Values.flytescheduler.configPath }}
+        {{- if .Values.flytescheduler.podEnv }}
+        env:
+          {{- with .Values.flytescheduler.podEnv -}}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
         image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
         imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
         name: flytescheduler-check
@@ -48,6 +54,12 @@ spec:
         - run
         - --config
         - {{ .Values.flytescheduler.configPath }}
+        {{- if .Values.flytescheduler.podEnv }}
+        env:
+          {{- with .Values.flytescheduler.podEnv -}}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
         image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
         imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
         name: flytescheduler
