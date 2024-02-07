@@ -297,6 +297,8 @@ message TaskNodeOverrides {
     // Overrides for all non-standard resources, not captured by
     // v1.ResourceRequirements, to allocate to a task.
     ExtendedResources extended_resources = 2;
+
+    string container_image = 3;
 }
 
 // A structure that uniquely identifies a launch plan in the system.

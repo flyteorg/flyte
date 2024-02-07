@@ -3899,12 +3899,19 @@
                 /**
                  * Properties of a Parameter.
                  * @memberof flyteidl.core
+<<<<<<< HEAD
                  * @interface IParameter
                  * @property {flyteidl.core.IVariable|null} ["var"] Parameter var
                  * @property {flyteidl.core.ILiteral|null} ["default"] Parameter default
                  * @property {boolean|null} [required] Parameter required
                  * @property {flyteidl.core.IArtifactQuery|null} [artifactQuery] Parameter artifactQuery
                  * @property {flyteidl.core.IArtifactID|null} [artifactId] Parameter artifactId
+=======
+                 * @interface ITaskNodeOverrides
+                 * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
+                 * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
+                 * @property {string|null} [containerImage] TaskNodeOverrides containerImage
+>>>>>>> b88b170a7 (Add container image to TaskNodeOverrides proto)
                  */
     
                 /**
@@ -3939,9 +3946,147 @@
                 Parameter.prototype["default"] = null;
     
                 /**
+<<<<<<< HEAD
                  * Parameter required.
                  * @member {boolean} required
                  * @memberof flyteidl.core.Parameter
+=======
+                 * TaskNodeOverrides containerImage.
+                 * @member {string} containerImage
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.containerImage = "";
+    
+                /**
+                 * Creates a new TaskNodeOverrides instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @static
+                 * @param {flyteidl.core.ITaskNodeOverrides=} [properties] Properties to set
+                 * @returns {flyteidl.core.TaskNodeOverrides} TaskNodeOverrides instance
+                 */
+                TaskNodeOverrides.create = function create(properties) {
+                    return new TaskNodeOverrides(properties);
+                };
+    
+                /**
+                 * Encodes the specified TaskNodeOverrides message. Does not implicitly {@link flyteidl.core.TaskNodeOverrides.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @static
+                 * @param {flyteidl.core.ITaskNodeOverrides} message TaskNodeOverrides message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                TaskNodeOverrides.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.resources != null && message.hasOwnProperty("resources"))
+                        $root.flyteidl.core.Resources.encode(message.resources, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.extendedResources != null && message.hasOwnProperty("extendedResources"))
+                        $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.containerImage != null && message.hasOwnProperty("containerImage"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a TaskNodeOverrides message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.TaskNodeOverrides} TaskNodeOverrides
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                TaskNodeOverrides.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TaskNodeOverrides();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.resources = $root.flyteidl.core.Resources.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.extendedResources = $root.flyteidl.core.ExtendedResources.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.containerImage = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a TaskNodeOverrides message.
+                 * @function verify
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                TaskNodeOverrides.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.resources != null && message.hasOwnProperty("resources")) {
+                        var error = $root.flyteidl.core.Resources.verify(message.resources);
+                        if (error)
+                            return "resources." + error;
+                    }
+                    if (message.extendedResources != null && message.hasOwnProperty("extendedResources")) {
+                        var error = $root.flyteidl.core.ExtendedResources.verify(message.extendedResources);
+                        if (error)
+                            return "extendedResources." + error;
+                    }
+                    if (message.containerImage != null && message.hasOwnProperty("containerImage"))
+                        if (!$util.isString(message.containerImage))
+                            return "containerImage: string expected";
+                    return null;
+                };
+    
+                return TaskNodeOverrides;
+            })();
+    
+            core.ComparisonExpression = (function() {
+    
+                /**
+                 * Properties of a ComparisonExpression.
+                 * @memberof flyteidl.core
+                 * @interface IComparisonExpression
+                 * @property {flyteidl.core.ComparisonExpression.Operator|null} [operator] ComparisonExpression operator
+                 * @property {flyteidl.core.IOperand|null} [leftValue] ComparisonExpression leftValue
+                 * @property {flyteidl.core.IOperand|null} [rightValue] ComparisonExpression rightValue
+                 */
+    
+                /**
+                 * Constructs a new ComparisonExpression.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a ComparisonExpression.
+                 * @implements IComparisonExpression
+                 * @constructor
+                 * @param {flyteidl.core.IComparisonExpression=} [properties] Properties to set
+                 */
+                function ComparisonExpression(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ComparisonExpression operator.
+                 * @member {flyteidl.core.ComparisonExpression.Operator} operator
+                 * @memberof flyteidl.core.ComparisonExpression
+>>>>>>> b88b170a7 (Add container image to TaskNodeOverrides proto)
                  * @instance
                  */
                 Parameter.prototype.required = false;
