@@ -354,8 +354,10 @@ Apply OIDC Configuration
 
 .. note::
 
-   For `multi-cluster deployments <https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html>`__, this secret definition has to be added to the `values-dataplane.yaml` file.
-   There's no need to create this secret in the control plane cluster if you're not running `flytepropeller` there.
+   In a `multi-cluster deployment <https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html>`__, 
+   this secret must be present at each cluster where `flytepropeller` is enabled (be it control plane or data plane). 
+   You can add the above block to the `values-dataplane.yaml` file to let Helm manage this secret.
+   If you are not running `flytepropeller` in the control plane cluster, you do not need to create this secret there.
 
       8. Save and exit your editor.
 
@@ -365,7 +367,7 @@ Apply OIDC Configuration
 
          helm upgrade <release-name> flyteorg/flyte-binary -n <your-namespace> --values <your-values-file>.yaml
 
-      10. Verify that the `flytepropeller`, `flytescheduler` and `flyteadmin` Pods are restarted and Running: 
+      10. Verify that the `flytepropeller`, `flytescheduler` and `flyteadmin` Pods are restarted and running: 
 
       .. prompt:: bash $
 
