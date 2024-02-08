@@ -297,22 +297,60 @@ func TestValidateSchedule_NoSchedule(t *testing.T) {
 }
 
 func TestValidateSchedule_ArgNotFixed(t *testing.T) {
-	request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
-	inputMap := &core.ParameterMap{
-		Parameters: map[string]*core.Parameter{
-			"foo": {
-				Var: &core.Variable{
-					Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
-				},
-				Behavior: &core.Parameter_Required{
-					Required: true,
+	t.Run("with deprecated cron expression", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithDeprecatedCronSchedule("* * * * * *")
+		inputMap := &core.ParameterMap{
+			Parameters: map[string]*core.Parameter{
+				"foo": {
+					Var: &core.Variable{
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+					Behavior: &core.Parameter_Required{
+						Required: true,
+					},
 				},
 			},
-		},
-	}
+		}
 
-	err := validateSchedule(request, inputMap)
-	assert.NotNil(t, err)
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+	t.Run("with rate", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithFixedRateSchedule(2, admin.FixedRateUnit_HOUR)
+		inputMap := &core.ParameterMap{
+			Parameters: map[string]*core.Parameter{
+				"foo": {
+					Var: &core.Variable{
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+					Behavior: &core.Parameter_Required{
+						Required: true,
+					},
+				},
+			},
+		}
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
+	t.Run("with cron schedule", func(t *testing.T) {
+		request := testutils.GetLaunchPlanRequestWithCronSchedule("* * * * * *")
+		inputMap := &core.ParameterMap{
+			Parameters: map[string]*core.Parameter{
+				"foo": {
+					Var: &core.Variable{
+						Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+					},
+					Behavior: &core.Parameter_Required{
+						Required: true,
+					},
+				},
+			},
+		}
+
+		err := validateSchedule(request, inputMap)
+		assert.NotNil(t, err)
+	})
 }
 
 func TestValidateSchedule_KickoffTimeArgDoesNotExist(t *testing.T) {
