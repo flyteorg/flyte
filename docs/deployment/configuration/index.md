@@ -65,4 +65,5 @@ monitoring
 notifications
 performance
 cloud_event
+resource_manager
 ```

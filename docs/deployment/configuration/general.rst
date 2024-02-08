@@ -96,7 +96,7 @@ PodTemplate name will be used.
 
 
 Set the ``default-pod-template-name`` in FlytePropeller
---------------------------------------------------------
+=======================================================
 
 This `option <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#default-pod-template-name-string>`__
 initializes a K8s informer internally to track system PodTemplate updates
@@ -119,7 +119,7 @@ An example configuration is:
         default-pod-template-name: <your_template_name>
  
 Create a PodTemplate resource
-------------------------------
+=============================
 
 Flyte recognizes PodTemplate definitions with the ``default-pod-template-name`` at two granularities. 
 
@@ -154,7 +154,7 @@ set to anything. However, we recommend using a real image, for example
 ``docker.io/rwgrim/docker-noop``.
 
 Using ``pod_template_name`` in a Task
---------------------------------------
+=====================================
 
 It's also possible to use PodTemplate in tasks by specifying ``pod_template_name`` in the task definition. For example:
 

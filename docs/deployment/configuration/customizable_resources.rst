@@ -266,6 +266,8 @@ You can view all custom execution cluster attributes by visiting
 ``protocol://<host/api/v1/matchable_attributes?resource_type=3>`` and substitute
 the protocol and host appropriately.
 
+.. _deployment-customizable-resources-execution-queues:
+
 Execution Queues
 ================
 Background

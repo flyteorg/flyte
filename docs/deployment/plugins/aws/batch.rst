@@ -113,7 +113,7 @@ with distinct attributes and matching logic based on project/domain/workflowName
          - default
 
 These settings can also be dynamically altered through ``flytectl`` (or FlyteAdmin API).
-Learn about the :ref:`core concept here <divedeep-admin-matchable-resources>`.
+Learn about the :ref:`core concept here <deployment-customizable-resources-execution-queues>`.
 For guidance on how to dynamically update these configurations, refer to the :ref:`Flytectl docs <flytectl:flytectl_update_execution-queue-attribute>`.
 
 Update FlytePropeller's configuration
