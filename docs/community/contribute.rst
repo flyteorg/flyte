@@ -168,7 +168,7 @@ This will set up the Python virtual environment for building the docs. Here we c
 To actually build the docs, activate ``monodocs-env`` and (in the ``flyteorg/flyte`` root directory) run:
     * ``make docs``
 
-The resulting ``html`` files will be in ``docs/_build/html``.
+The resulting ``html`` files will be in ``docs/_build/html``. You can view them by running `open docs/_build/html/index.html`
 
 ``flyteidl``
 ************
