@@ -165,7 +165,7 @@ To build the Flyte docs locally you will need the following prerequisites:
 
 This will set up the Python virtual environment for building the docs. Here we called it ``monodocs-env``.
 
-To actually build the docs, activate ``monodocs_env`` and (in the ``flyteorg/flyte`` root directory) run:
+To actually build the docs, activate ``monodocs-env`` and (in the ``flyteorg/flyte`` root directory) run:
     * ``make docs``
 
 The resulting ``html`` files will be in ``docs/_build/html``.
