@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/tasks.pb.h"
 #include "flyteidl/plugins/kubeflow/common.pb.h"
@@ -43,7 +46,7 @@ struct TableStruct_flyteidl_2fplugins_2fkubeflow_2fpytorch_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[3]
+  static const ::google::protobuf::internal::ParseTable schema[4]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -56,6 +59,9 @@ namespace kubeflow {
 class DistributedPyTorchTrainingReplicaSpec;
 class DistributedPyTorchTrainingReplicaSpecDefaultTypeInternal;
 extern DistributedPyTorchTrainingReplicaSpecDefaultTypeInternal _DistributedPyTorchTrainingReplicaSpec_default_instance_;
+class DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse;
+class DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUseDefaultTypeInternal;
+extern DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUseDefaultTypeInternal _DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_;
 class DistributedPyTorchTrainingTask;
 class DistributedPyTorchTrainingTaskDefaultTypeInternal;
 extern DistributedPyTorchTrainingTaskDefaultTypeInternal _DistributedPyTorchTrainingTask_default_instance_;
@@ -68,6 +74,7 @@ extern ElasticConfigDefaultTypeInternal _ElasticConfig_default_instance_;
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::plugins::kubeflow::DistributedPyTorchTrainingReplicaSpec* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedPyTorchTrainingReplicaSpec>(Arena*);
+template<> ::flyteidl::plugins::kubeflow::DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::plugins::kubeflow::DistributedPyTorchTrainingTask* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedPyTorchTrainingTask>(Arena*);
 template<> ::flyteidl::plugins::kubeflow::ElasticConfig* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::ElasticConfig>(Arena*);
 }  // namespace protobuf
@@ -371,6 +378,30 @@ class DistributedPyTorchTrainingTask final :
 };
 // -------------------------------------------------------------------
 
+class DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > SuperType;
+  DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse();
+  DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse& other);
+  static const DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse*>(&_DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
 class DistributedPyTorchTrainingReplicaSpec final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpec) */ {
  public:
@@ -409,7 +440,7 @@ class DistributedPyTorchTrainingReplicaSpec final :
                &_DistributedPyTorchTrainingReplicaSpec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   void Swap(DistributedPyTorchTrainingReplicaSpec* other);
   friend void swap(DistributedPyTorchTrainingReplicaSpec& a, DistributedPyTorchTrainingReplicaSpec& b) {
@@ -464,7 +495,17 @@ class DistributedPyTorchTrainingReplicaSpec final :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
+
+  // map<string, string> node_selectors = 5;
+  int node_selectors_size() const;
+  void clear_node_selectors();
+  static const int kNodeSelectorsFieldNumber = 5;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      node_selectors() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_node_selectors();
 
   // string image = 2;
   void clear_image();
@@ -506,6 +547,12 @@ class DistributedPyTorchTrainingReplicaSpec final :
   class HasBitSetters;
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::MapField<
+      DistributedPyTorchTrainingReplicaSpec_NodeSelectorsEntry_DoNotUse,
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > node_selectors_;
   ::google::protobuf::internal::ArenaStringPtr image_;
   ::flyteidl::core::Resources* resources_;
   ::google::protobuf::int32 replicas_;
@@ -837,6 +884,8 @@ inline void DistributedPyTorchTrainingTask::set_allocated_elastic_config(::flyte
 
 // -------------------------------------------------------------------
 
+// -------------------------------------------------------------------
+
 // DistributedPyTorchTrainingReplicaSpec
 
 // int32 replicas = 1;
@@ -965,9 +1014,29 @@ inline void DistributedPyTorchTrainingReplicaSpec::set_restart_policy(::flyteidl
   // @@protoc_insertion_point(field_set:flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpec.restart_policy)
 }
 
+// map<string, string> node_selectors = 5;
+inline int DistributedPyTorchTrainingReplicaSpec::node_selectors_size() const {
+  return node_selectors_.size();
+}
+inline void DistributedPyTorchTrainingReplicaSpec::clear_node_selectors() {
+  node_selectors_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+DistributedPyTorchTrainingReplicaSpec::node_selectors() const {
+  // @@protoc_insertion_point(field_map:flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpec.node_selectors)
+  return node_selectors_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+DistributedPyTorchTrainingReplicaSpec::mutable_node_selectors() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.plugins.kubeflow.DistributedPyTorchTrainingReplicaSpec.node_selectors)
+  return node_selectors_.MutableMap();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

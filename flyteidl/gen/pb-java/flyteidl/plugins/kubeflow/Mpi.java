@@ -1415,6 +1415,60 @@ public final class Mpi {
      */
     com.google.protobuf.ByteString
         getCommandBytes(int index);
+
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+    int getNodeSelectorsCount();
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+    boolean containsNodeSelectors(
+        java.lang.String key);
+    /**
+     * Use {@link #getNodeSelectorsMap()} instead.
+     */
+    @java.lang.Deprecated
+    java.util.Map<java.lang.String, java.lang.String>
+    getNodeSelectors();
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+    java.util.Map<java.lang.String, java.lang.String>
+    getNodeSelectorsMap();
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+
+    java.lang.String getNodeSelectorsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue);
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+
+    java.lang.String getNodeSelectorsOrThrow(
+        java.lang.String key);
   }
   /**
    * <pre>
@@ -1501,6 +1555,19 @@ public final class Mpi {
               command_.add(s);
               break;
             }
+            case 50: {
+              if (!((mutable_bitField0_ & 0x00000020) != 0)) {
+                nodeSelectors_ = com.google.protobuf.MapField.newMapField(
+                    NodeSelectorsDefaultEntryHolder.defaultEntry);
+                mutable_bitField0_ |= 0x00000020;
+              }
+              com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+              nodeSelectors__ = input.readMessage(
+                  NodeSelectorsDefaultEntryHolder.defaultEntry.getParserForType(), extensionRegistry);
+              nodeSelectors_.getMutableMap().put(
+                  nodeSelectors__.getKey(), nodeSelectors__.getValue());
+              break;
+            }
             default: {
               if (!parseUnknownField(
                   input, unknownFields, extensionRegistry, tag)) {
@@ -1528,6 +1595,18 @@ public final class Mpi {
       return flyteidl.plugins.kubeflow.Mpi.internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_descriptor;
     }
 
+    @SuppressWarnings({"rawtypes"})
+    @java.lang.Override
+    protected com.google.protobuf.MapField internalGetMapField(
+        int number) {
+      switch (number) {
+        case 6:
+          return internalGetNodeSelectors();
+        default:
+          throw new RuntimeException(
+              "Invalid map field number: " + number);
+      }
+    }
     @java.lang.Override
     protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
         internalGetFieldAccessorTable() {
@@ -1695,6 +1774,98 @@ public final class Mpi {
       return command_.getByteString(index);
     }
 
+    public static final int NODE_SELECTORS_FIELD_NUMBER = 6;
+    private static final class NodeSelectorsDefaultEntryHolder {
+      static final com.google.protobuf.MapEntry<
+          java.lang.String, java.lang.String> defaultEntry =
+              com.google.protobuf.MapEntry
+              .<java.lang.String, java.lang.String>newDefaultInstance(
+                  flyteidl.plugins.kubeflow.Mpi.internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_descriptor, 
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "",
+                  com.google.protobuf.WireFormat.FieldType.STRING,
+                  "");
+    }
+    private com.google.protobuf.MapField<
+        java.lang.String, java.lang.String> nodeSelectors_;
+    private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+    internalGetNodeSelectors() {
+      if (nodeSelectors_ == null) {
+        return com.google.protobuf.MapField.emptyMapField(
+            NodeSelectorsDefaultEntryHolder.defaultEntry);
+      }
+      return nodeSelectors_;
+    }
+
+    public int getNodeSelectorsCount() {
+      return internalGetNodeSelectors().getMap().size();
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+
+    public boolean containsNodeSelectors(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      return internalGetNodeSelectors().getMap().containsKey(key);
+    }
+    /**
+     * Use {@link #getNodeSelectorsMap()} instead.
+     */
+    @java.lang.Deprecated
+    public java.util.Map<java.lang.String, java.lang.String> getNodeSelectors() {
+      return getNodeSelectorsMap();
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+
+    public java.util.Map<java.lang.String, java.lang.String> getNodeSelectorsMap() {
+      return internalGetNodeSelectors().getMap();
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+
+    public java.lang.String getNodeSelectorsOrDefault(
+        java.lang.String key,
+        java.lang.String defaultValue) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetNodeSelectors().getMap();
+      return map.containsKey(key) ? map.get(key) : defaultValue;
+    }
+    /**
+     * <pre>
+     * Node selectors for the replica group
+     * </pre>
+     *
+     * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+     */
+
+    public java.lang.String getNodeSelectorsOrThrow(
+        java.lang.String key) {
+      if (key == null) { throw new java.lang.NullPointerException(); }
+      java.util.Map<java.lang.String, java.lang.String> map =
+          internalGetNodeSelectors().getMap();
+      if (!map.containsKey(key)) {
+        throw new java.lang.IllegalArgumentException();
+      }
+      return map.get(key);
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -1724,6 +1895,12 @@ public final class Mpi {
       for (int i = 0; i < command_.size(); i++) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 5, command_.getRaw(i));
       }
+      com.google.protobuf.GeneratedMessageV3
+        .serializeStringMapTo(
+          output,
+          internalGetNodeSelectors(),
+          NodeSelectorsDefaultEntryHolder.defaultEntry,
+          6);
       unknownFields.writeTo(output);
     }
 
@@ -1756,6 +1933,16 @@ public final class Mpi {
         size += dataSize;
         size += 1 * getCommandList().size();
       }
+      for (java.util.Map.Entry<java.lang.String, java.lang.String> entry
+           : internalGetNodeSelectors().getMap().entrySet()) {
+        com.google.protobuf.MapEntry<java.lang.String, java.lang.String>
+        nodeSelectors__ = NodeSelectorsDefaultEntryHolder.defaultEntry.newBuilderForType()
+            .setKey(entry.getKey())
+            .setValue(entry.getValue())
+            .build();
+        size += com.google.protobuf.CodedOutputStream
+            .computeMessageSize(6, nodeSelectors__);
+      }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
       return size;
@@ -1783,6 +1970,8 @@ public final class Mpi {
       if (restartPolicy_ != other.restartPolicy_) return false;
       if (!getCommandList()
           .equals(other.getCommandList())) return false;
+      if (!internalGetNodeSelectors().equals(
+          other.internalGetNodeSelectors())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -1807,6 +1996,10 @@ public final class Mpi {
       if (getCommandCount() > 0) {
         hash = (37 * hash) + COMMAND_FIELD_NUMBER;
         hash = (53 * hash) + getCommandList().hashCode();
+      }
+      if (!internalGetNodeSelectors().getMap().isEmpty()) {
+        hash = (37 * hash) + NODE_SELECTORS_FIELD_NUMBER;
+        hash = (53 * hash) + internalGetNodeSelectors().hashCode();
       }
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
@@ -1919,6 +2112,28 @@ public final class Mpi {
         return flyteidl.plugins.kubeflow.Mpi.internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_descriptor;
       }
 
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMapField(
+          int number) {
+        switch (number) {
+          case 6:
+            return internalGetNodeSelectors();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
+      @SuppressWarnings({"rawtypes"})
+      protected com.google.protobuf.MapField internalGetMutableMapField(
+          int number) {
+        switch (number) {
+          case 6:
+            return internalGetMutableNodeSelectors();
+          default:
+            throw new RuntimeException(
+                "Invalid map field number: " + number);
+        }
+      }
       @java.lang.Override
       protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
           internalGetFieldAccessorTable() {
@@ -1959,6 +2174,7 @@ public final class Mpi {
 
         command_ = com.google.protobuf.LazyStringArrayList.EMPTY;
         bitField0_ = (bitField0_ & ~0x00000010);
+        internalGetMutableNodeSelectors().clear();
         return this;
       }
 
@@ -2000,6 +2216,8 @@ public final class Mpi {
           bitField0_ = (bitField0_ & ~0x00000010);
         }
         result.command_ = command_;
+        result.nodeSelectors_ = internalGetNodeSelectors();
+        result.nodeSelectors_.makeImmutable();
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -2072,6 +2290,8 @@ public final class Mpi {
           }
           onChanged();
         }
+        internalGetMutableNodeSelectors().mergeFrom(
+            other.internalGetNodeSelectors());
         this.mergeUnknownFields(other.unknownFields);
         onChanged();
         return this;
@@ -2576,6 +2796,157 @@ public final class Mpi {
         onChanged();
         return this;
       }
+
+      private com.google.protobuf.MapField<
+          java.lang.String, java.lang.String> nodeSelectors_;
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetNodeSelectors() {
+        if (nodeSelectors_ == null) {
+          return com.google.protobuf.MapField.emptyMapField(
+              NodeSelectorsDefaultEntryHolder.defaultEntry);
+        }
+        return nodeSelectors_;
+      }
+      private com.google.protobuf.MapField<java.lang.String, java.lang.String>
+      internalGetMutableNodeSelectors() {
+        onChanged();;
+        if (nodeSelectors_ == null) {
+          nodeSelectors_ = com.google.protobuf.MapField.newMapField(
+              NodeSelectorsDefaultEntryHolder.defaultEntry);
+        }
+        if (!nodeSelectors_.isMutable()) {
+          nodeSelectors_ = nodeSelectors_.copy();
+        }
+        return nodeSelectors_;
+      }
+
+      public int getNodeSelectorsCount() {
+        return internalGetNodeSelectors().getMap().size();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+
+      public boolean containsNodeSelectors(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        return internalGetNodeSelectors().getMap().containsKey(key);
+      }
+      /**
+       * Use {@link #getNodeSelectorsMap()} instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String> getNodeSelectors() {
+        return getNodeSelectorsMap();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+
+      public java.util.Map<java.lang.String, java.lang.String> getNodeSelectorsMap() {
+        return internalGetNodeSelectors().getMap();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+
+      public java.lang.String getNodeSelectorsOrDefault(
+          java.lang.String key,
+          java.lang.String defaultValue) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetNodeSelectors().getMap();
+        return map.containsKey(key) ? map.get(key) : defaultValue;
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+
+      public java.lang.String getNodeSelectorsOrThrow(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        java.util.Map<java.lang.String, java.lang.String> map =
+            internalGetNodeSelectors().getMap();
+        if (!map.containsKey(key)) {
+          throw new java.lang.IllegalArgumentException();
+        }
+        return map.get(key);
+      }
+
+      public Builder clearNodeSelectors() {
+        internalGetMutableNodeSelectors().getMutableMap()
+            .clear();
+        return this;
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+
+      public Builder removeNodeSelectors(
+          java.lang.String key) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableNodeSelectors().getMutableMap()
+            .remove(key);
+        return this;
+      }
+      /**
+       * Use alternate mutation accessors instead.
+       */
+      @java.lang.Deprecated
+      public java.util.Map<java.lang.String, java.lang.String>
+      getMutableNodeSelectors() {
+        return internalGetMutableNodeSelectors().getMutableMap();
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+      public Builder putNodeSelectors(
+          java.lang.String key,
+          java.lang.String value) {
+        if (key == null) { throw new java.lang.NullPointerException(); }
+        if (value == null) { throw new java.lang.NullPointerException(); }
+        internalGetMutableNodeSelectors().getMutableMap()
+            .put(key, value);
+        return this;
+      }
+      /**
+       * <pre>
+       * Node selectors for the replica group
+       * </pre>
+       *
+       * <code>map&lt;string, string&gt; node_selectors = 6;</code>
+       */
+
+      public Builder putAllNodeSelectors(
+          java.util.Map<java.lang.String, java.lang.String> values) {
+        internalGetMutableNodeSelectors().getMutableMap()
+            .putAll(values);
+        return this;
+      }
       @java.lang.Override
       public final Builder setUnknownFields(
           final com.google.protobuf.UnknownFieldSet unknownFields) {
@@ -2639,6 +3010,11 @@ public final class Mpi {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -2658,14 +3034,18 @@ public final class Mpi {
       "lyteidl.plugins.kubeflow.DistributedMPIT" +
       "rainingReplicaSpec\0228\n\nrun_policy\030\003 \001(\0132$" +
       ".flyteidl.plugins.kubeflow.RunPolicy\022\r\n\005" +
-      "slots\030\004 \001(\005\"\304\001\n!DistributedMPITrainingRe" +
+      "slots\030\004 \001(\005\"\343\002\n!DistributedMPITrainingRe" +
       "plicaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image\030\002 \001" +
       "(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.core.Re" +
       "sources\022@\n\016restart_policy\030\004 \001(\0162(.flytei" +
       "dl.plugins.kubeflow.RestartPolicy\022\017\n\007com" +
-      "mand\030\005 \003(\tB?Z=github.com/flyteorg/flyte/" +
-      "flyteidl/gen/pb-go/flyteidl/pluginsb\006pro" +
-      "to3"
+      "mand\030\005 \003(\t\022g\n\016node_selectors\030\006 \003(\0132O.fly" +
+      "teidl.plugins.kubeflow.DistributedMPITra" +
+      "iningReplicaSpec.NodeSelectorsEntry\0324\n\022N" +
+      "odeSelectorsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030" +
+      "\002 \001(\t:\0028\001B?Z=github.com/flyteorg/flyte/f" +
+      "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot" +
+      "o3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -2692,7 +3072,13 @@ public final class Mpi {
     internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_descriptor,
-        new java.lang.String[] { "Replicas", "Image", "Resources", "RestartPolicy", "Command", });
+        new java.lang.String[] { "Replicas", "Image", "Resources", "RestartPolicy", "Command", "NodeSelectors", });
+    internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_descriptor =
+      internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_descriptor.getNestedTypes().get(0);
+    internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_flyteidl_plugins_kubeflow_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_descriptor,
+        new java.lang.String[] { "Key", "Value", });
     flyteidl.core.Tasks.getDescriptor();
     flyteidl.plugins.kubeflow.Common.getDescriptor();
   }

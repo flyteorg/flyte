@@ -18,7 +18,8 @@
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_RunPolicy_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto;
-extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_DistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_DistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto;
 namespace flyteidl {
 namespace plugins {
 namespace kubeflow {
@@ -26,6 +27,10 @@ class DistributedMPITrainingTaskDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<DistributedMPITrainingTask> _instance;
 } _DistributedMPITrainingTask_default_instance_;
+class DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUseDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> _instance;
+} _DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_;
 class DistributedMPITrainingReplicaSpecDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<DistributedMPITrainingReplicaSpec> _instance;
@@ -49,6 +54,19 @@ static void InitDefaultsDistributedMPITrainingTask_flyteidl_2fplugins_2fkubeflow
       &scc_info_DistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto.base,
       &scc_info_RunPolicy_flyteidl_2fplugins_2fkubeflow_2fcommon_2eproto.base,}};
 
+static void InitDefaultsDistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::plugins::kubeflow::_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_;
+    new (ptr) ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse();
+  }
+  ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<0> scc_info_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsDistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto}, {}};
+
 static void InitDefaultsDistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -60,16 +78,18 @@ static void InitDefaultsDistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fk
   ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<1> scc_info_DistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsDistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto}, {
-      &scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto.base,}};
+::google::protobuf::internal::SCCInfo<2> scc_info_DistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsDistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto}, {
+      &scc_info_Resources_flyteidl_2fcore_2ftasks_2eproto.base,
+      &scc_info_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_DistributedMPITrainingTask_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_DistributedMPITrainingReplicaSpec_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto[2];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto[3];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto = nullptr;
 
@@ -83,6 +103,15 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fkubeflow_2fmpi
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingTask, launcher_replicas_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingTask, run_policy_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingTask, slots_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, _has_bits_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, key_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, value_),
+  0,
+  1,
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -93,21 +122,24 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fplugins_2fkubeflow_2fmpi
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec, resources_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec, restart_policy_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec, command_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec, node_selectors_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedMPITrainingTask)},
-  { 9, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec)},
+  { 9, 16, sizeof(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse)},
+  { 18, -1, sizeof(::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::kubeflow::_DistributedMPITrainingTask_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::kubeflow::_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::plugins::kubeflow::_DistributedMPITrainingReplicaSpec_default_instance_),
 };
 
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto = {
   {}, AddDescriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, "flyteidl/plugins/kubeflow/mpi.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto::offsets,
-  file_level_metadata_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 2, file_level_enum_descriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto,
+  file_level_metadata_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 3, file_level_enum_descriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, file_level_service_descriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto[] =
@@ -121,19 +153,23 @@ const char descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto
   "lyteidl.plugins.kubeflow.DistributedMPIT"
   "rainingReplicaSpec\0228\n\nrun_policy\030\003 \001(\0132$"
   ".flyteidl.plugins.kubeflow.RunPolicy\022\r\n\005"
-  "slots\030\004 \001(\005\"\304\001\n!DistributedMPITrainingRe"
+  "slots\030\004 \001(\005\"\343\002\n!DistributedMPITrainingRe"
   "plicaSpec\022\020\n\010replicas\030\001 \001(\005\022\r\n\005image\030\002 \001"
   "(\t\022+\n\tresources\030\003 \001(\0132\030.flyteidl.core.Re"
   "sources\022@\n\016restart_policy\030\004 \001(\0162(.flytei"
   "dl.plugins.kubeflow.RestartPolicy\022\017\n\007com"
-  "mand\030\005 \003(\tB\?Z=github.com/flyteorg/flyte/"
-  "flyteidl/gen/pb-go/flyteidl/pluginsb\006pro"
-  "to3"
+  "mand\030\005 \003(\t\022g\n\016node_selectors\030\006 \003(\0132O.fly"
+  "teidl.plugins.kubeflow.DistributedMPITra"
+  "iningReplicaSpec.NodeSelectorsEntry\0324\n\022N"
+  "odeSelectorsEntry\022\013\n\003key\030\001 \001(\t\022\r\n\005value\030"
+  "\002 \001(\t:\0028\001B\?Z=github.com/flyteorg/flyte/f"
+  "lyteidl/gen/pb-go/flyteidl/pluginsb\006prot"
+  "o3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto = {
   false, InitDefaults_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 
   descriptor_table_protodef_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto,
-  "flyteidl/plugins/kubeflow/mpi.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 683,
+  "flyteidl/plugins/kubeflow/mpi.proto", &assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto, 842,
 };
 
 void AddDescriptors_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto() {
@@ -624,6 +660,47 @@ void DistributedMPITrainingTask::InternalSwap(DistributedMPITrainingTask* other)
 
 // ===================================================================
 
+DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse() {}
+DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse(::google::protobuf::Arena* arena)
+    : SuperType(arena) {}
+void DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::MergeFrom(const DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse& other) {
+  MergeFromInternal(other);
+}
+::google::protobuf::Metadata DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto);
+  return ::file_level_metadata_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto[1];
+}
+void DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::MergeFrom(
+    const ::google::protobuf::Message& other) {
+  ::google::protobuf::Message::MergeFrom(other);
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::_ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx) {
+  using MF = ::google::protobuf::internal::MapField<
+      DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, EntryKeyType, EntryValueType,
+      kEntryKeyFieldType, kEntryValueFieldType,
+      kEntryDefaultEnumValue>;
+  auto mf = static_cast<MF*>(object);
+  Parser<MF, ::google::protobuf::Map<EntryKeyType, EntryValueType>> parser(mf);
+#define DO_(x) if (!(x)) return false
+  DO_(parser.ParseMap(begin, end));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.key().data(), static_cast<int>(parser.key().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.key"));
+  DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+    parser.value().data(), static_cast<int>(parser.value().length()),
+    ::google::protobuf::internal::WireFormatLite::PARSE,
+    "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.value"));
+#undef DO_
+  return true;
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+
+// ===================================================================
+
 void DistributedMPITrainingReplicaSpec::InitAsDefaultInstance() {
   ::flyteidl::plugins::kubeflow::_DistributedMPITrainingReplicaSpec_default_instance_._instance.get_mutable()->resources_ = const_cast< ::flyteidl::core::Resources*>(
       ::flyteidl::core::Resources::internal_default_instance());
@@ -649,6 +726,7 @@ const int DistributedMPITrainingReplicaSpec::kImageFieldNumber;
 const int DistributedMPITrainingReplicaSpec::kResourcesFieldNumber;
 const int DistributedMPITrainingReplicaSpec::kRestartPolicyFieldNumber;
 const int DistributedMPITrainingReplicaSpec::kCommandFieldNumber;
+const int DistributedMPITrainingReplicaSpec::kNodeSelectorsFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 DistributedMPITrainingReplicaSpec::DistributedMPITrainingReplicaSpec()
@@ -661,6 +739,7 @@ DistributedMPITrainingReplicaSpec::DistributedMPITrainingReplicaSpec(const Distr
       _internal_metadata_(nullptr),
       command_(from.command_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
+  node_selectors_.MergeFrom(from.node_selectors_);
   image_.UnsafeSetDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (from.image().size() > 0) {
     image_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.image_);
@@ -711,6 +790,7 @@ void DistributedMPITrainingReplicaSpec::Clear() {
   (void) cached_has_bits;
 
   command_.Clear();
+  node_selectors_.Clear();
   image_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   if (GetArenaNoVirtual() == nullptr && resources_ != nullptr) {
     delete resources_;
@@ -796,6 +876,25 @@ const char* DistributedMPITrainingReplicaSpec::_InternalParse(const char* begin,
           ptr += size;
           if (ptr >= end) break;
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 42 && (ptr += 1));
+        break;
+      }
+      // map<string, string> node_selectors = 6;
+      case 6: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 50) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::google::protobuf::internal::SlowMapEntryParser;
+          auto parse_map = ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::_ParseMap;
+          ctx->extra_parse_data().payload.clear();
+          ctx->extra_parse_data().parse_map = parse_map;
+          object = &msg->node_selectors_;
+          if (size > end - ptr) goto len_delim_till_end;
+          auto newend = ptr + size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(parse_map(ptr, newend, object, ctx));
+          ptr = newend;
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 50 && (ptr += 1));
         break;
       }
       default: {
@@ -901,6 +1000,32 @@ bool DistributedMPITrainingReplicaSpec::MergePartialFromCodedStream(
         break;
       }
 
+      // map<string, string> node_selectors = 6;
+      case 6: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (50 & 0xFF)) {
+          DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse::Parser< ::google::protobuf::internal::MapField<
+              DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse,
+              ::std::string, ::std::string,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+              0 >,
+            ::google::protobuf::Map< ::std::string, ::std::string > > parser(&node_selectors_);
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessageNoVirtual(
+              input, &parser));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.key().data(), static_cast<int>(parser.key().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.key"));
+          DO_(::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+            parser.value().data(), static_cast<int>(parser.value().length()),
+            ::google::protobuf::internal::WireFormatLite::PARSE,
+            "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.value"));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -965,6 +1090,55 @@ void DistributedMPITrainingReplicaSpec::SerializeWithCachedSizes(
       5, this->command(i), output);
   }
 
+  // map<string, string> node_selectors = 6;
+  if (!this->node_selectors().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.value");
+      }
+    };
+
+    if (output->IsSerializationDeterministic() &&
+        this->node_selectors().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->node_selectors().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(node_selectors_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(6, *entry, output);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it) {
+        entry.reset(node_selectors_.NewEntryWrapper(it->first, it->second));
+        ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(6, *entry, output);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -1017,6 +1191,55 @@ void DistributedMPITrainingReplicaSpec::SerializeWithCachedSizes(
       WriteStringToArray(5, this->command(i), target);
   }
 
+  // map<string, string> node_selectors = 6;
+  if (!this->node_selectors().empty()) {
+    typedef ::google::protobuf::Map< ::std::string, ::std::string >::const_pointer
+        ConstPtr;
+    typedef ConstPtr SortItem;
+    typedef ::google::protobuf::internal::CompareByDerefFirst<SortItem> Less;
+    struct Utf8Check {
+      static void Check(ConstPtr p) {
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->first.data(), static_cast<int>(p->first.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.key");
+        ::google::protobuf::internal::WireFormatLite::VerifyUtf8String(
+          p->second.data(), static_cast<int>(p->second.length()),
+          ::google::protobuf::internal::WireFormatLite::SERIALIZE,
+          "flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.NodeSelectorsEntry.value");
+      }
+    };
+
+    if (false &&
+        this->node_selectors().size() > 1) {
+      ::std::unique_ptr<SortItem[]> items(
+          new SortItem[this->node_selectors().size()]);
+      typedef ::google::protobuf::Map< ::std::string, ::std::string >::size_type size_type;
+      size_type n = 0;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it, ++n) {
+        items[static_cast<ptrdiff_t>(n)] = SortItem(&*it);
+      }
+      ::std::sort(&items[0], &items[static_cast<ptrdiff_t>(n)], Less());
+      ::std::unique_ptr<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (size_type i = 0; i < n; i++) {
+        entry.reset(node_selectors_.NewEntryWrapper(items[static_cast<ptrdiff_t>(i)]->first, items[static_cast<ptrdiff_t>(i)]->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(6, *entry, target);
+        Utf8Check::Check(&(*items[static_cast<ptrdiff_t>(i)]));
+      }
+    } else {
+      ::std::unique_ptr<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+      for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+          it = this->node_selectors().begin();
+          it != this->node_selectors().end(); ++it) {
+        entry.reset(node_selectors_.NewEntryWrapper(it->first, it->second));
+        target = ::google::protobuf::internal::WireFormatLite::InternalWriteMessageNoVirtualToArray(6, *entry, target);
+        Utf8Check::Check(&(*it));
+      }
+    }
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields(), target);
@@ -1044,6 +1267,20 @@ size_t DistributedMPITrainingReplicaSpec::ByteSizeLong() const {
   for (int i = 0, n = this->command_size(); i < n; i++) {
     total_size += ::google::protobuf::internal::WireFormatLite::StringSize(
       this->command(i));
+  }
+
+  // map<string, string> node_selectors = 6;
+  total_size += 1 *
+      ::google::protobuf::internal::FromIntSize(this->node_selectors_size());
+  {
+    ::std::unique_ptr<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse> entry;
+    for (::google::protobuf::Map< ::std::string, ::std::string >::const_iterator
+        it = this->node_selectors().begin();
+        it != this->node_selectors().end(); ++it) {
+      entry.reset(node_selectors_.NewEntryWrapper(it->first, it->second));
+      total_size += ::google::protobuf::internal::WireFormatLite::
+          MessageSizeNoVirtual(*entry);
+    }
   }
 
   // string image = 2;
@@ -1101,6 +1338,7 @@ void DistributedMPITrainingReplicaSpec::MergeFrom(const DistributedMPITrainingRe
   (void) cached_has_bits;
 
   command_.MergeFrom(from.command_);
+  node_selectors_.MergeFrom(from.node_selectors_);
   if (from.image().size() > 0) {
 
     image_.AssignWithDefault(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), from.image_);
@@ -1142,6 +1380,7 @@ void DistributedMPITrainingReplicaSpec::InternalSwap(DistributedMPITrainingRepli
   using std::swap;
   _internal_metadata_.Swap(&other->_internal_metadata_);
   command_.InternalSwap(CastToBase(&other->command_));
+  node_selectors_.Swap(&other->node_selectors_);
   image_.Swap(&other->image_, &::google::protobuf::internal::GetEmptyStringAlreadyInited(),
     GetArenaNoVirtual());
   swap(resources_, other->resources_);
@@ -1163,6 +1402,9 @@ namespace google {
 namespace protobuf {
 template<> PROTOBUF_NOINLINE ::flyteidl::plugins::kubeflow::DistributedMPITrainingTask* Arena::CreateMaybeMessage< ::flyteidl::plugins::kubeflow::DistributedMPITrainingTask >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::plugins::kubeflow::DistributedMPITrainingTask >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse* Arena::CreateMaybeMessage< ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec* Arena::CreateMaybeMessage< ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec >(arena);

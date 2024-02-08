@@ -20,15 +20,24 @@ class DistributedMPITrainingTask(_message.Message):
     def __init__(self, worker_replicas: _Optional[_Union[DistributedMPITrainingReplicaSpec, _Mapping]] = ..., launcher_replicas: _Optional[_Union[DistributedMPITrainingReplicaSpec, _Mapping]] = ..., run_policy: _Optional[_Union[_common_pb2.RunPolicy, _Mapping]] = ..., slots: _Optional[int] = ...) -> None: ...
 
 class DistributedMPITrainingReplicaSpec(_message.Message):
-    __slots__ = ["replicas", "image", "resources", "restart_policy", "command"]
+    __slots__ = ["replicas", "image", "resources", "restart_policy", "command", "node_selectors"]
+    class NodeSelectorsEntry(_message.Message):
+        __slots__ = ["key", "value"]
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
     REPLICAS_FIELD_NUMBER: _ClassVar[int]
     IMAGE_FIELD_NUMBER: _ClassVar[int]
     RESOURCES_FIELD_NUMBER: _ClassVar[int]
     RESTART_POLICY_FIELD_NUMBER: _ClassVar[int]
     COMMAND_FIELD_NUMBER: _ClassVar[int]
+    NODE_SELECTORS_FIELD_NUMBER: _ClassVar[int]
     replicas: int
     image: str
     resources: _tasks_pb2.Resources
     restart_policy: _common_pb2.RestartPolicy
     command: _containers.RepeatedScalarFieldContainer[str]
-    def __init__(self, replicas: _Optional[int] = ..., image: _Optional[str] = ..., resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., restart_policy: _Optional[_Union[_common_pb2.RestartPolicy, str]] = ..., command: _Optional[_Iterable[str]] = ...) -> None: ...
+    node_selectors: _containers.ScalarMap[str, str]
+    def __init__(self, replicas: _Optional[int] = ..., image: _Optional[str] = ..., resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., restart_policy: _Optional[_Union[_common_pb2.RestartPolicy, str]] = ..., command: _Optional[_Iterable[str]] = ..., node_selectors: _Optional[_Mapping[str, str]] = ...) -> None: ...
