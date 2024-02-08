@@ -29,8 +29,9 @@ type Plugin struct {
 }
 
 type ResourceWrapper struct {
-	Phase    flyteIdl.TaskExecution_Phase
-	State    admin.State // This is deprecated.
+	Phase flyteIdl.TaskExecution_Phase
+	// Deprecated: Please Use Phase instead.
+	State    admin.State
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
@@ -84,9 +85,9 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
 
-	client := p.cs.agentClients[agent.Endpoint]
-	if client == nil {
-		return nil, nil, fmt.Errorf("default agent is not connected, please check if endpoint:[%v] is up and running", agent.Endpoint)
+	client, ok := p.cs.agentClients[agent.Endpoint]
+	if !ok {
+		return nil, nil, fmt.Errorf("endpoint [%s] not found in the client set", agent.Endpoint)
 	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
@@ -103,21 +104,6 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		taskTemplate.GetContainer().Args = argTemplate
 	}
 
-	// If the agent returned a resource, we assume this is a synchronous task.
-	// The state should be a terminal state, for example, SUCCEEDED, PERMANENT_FAILURE, or RETRYABLE_FAILURE.
-	if res.GetResource() != nil {
-		logger.Infof(ctx, "Agent is executing a synchronous task.")
-		return nil,
-			ResourceWrapper{
-				Phase:    res.GetResource().Phase,
-				State:    res.GetResource().State,
-				Outputs:  res.GetResource().Outputs,
-				Message:  res.GetResource().Message,
-				LogLinks: res.GetResource().LogLinks,
-			}, nil
-	}
-
-	logger.Infof(ctx, "Agent is executing an asynchronous task.")
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
@@ -131,10 +117,15 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
 
 	client := p.cs.agentClients[agent.Endpoint]
+	client, ok := p.cs.agentClients[agent.Endpoint]
+	if !ok {
+		return nil, fmt.Errorf("endpoint [%s] not found in the client set", agent.Endpoint)
+	}
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	taskType := &admin.TaskType{Name: metadata.TaskType}
+	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: taskType, ResourceMeta: metadata.AgentResourceMeta})
 	if err != nil {
 		return nil, err
 	}
@@ -155,11 +146,15 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
 
-	client := p.cs.agentClients[agent.Endpoint]
+	client, ok := p.cs.agentClients[agent.Endpoint]
+	if !ok {
+		return fmt.Errorf("endpoint [%s] not found in the client set", agent.Endpoint)
+	}
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	_, err := client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	taskType := &admin.TaskType{Name: metadata.TaskType}
+	_, err := client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: taskType, ResourceMeta: metadata.AgentResourceMeta})
 	return err
 }
 
@@ -213,6 +208,10 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		return core.PhaseInfoSuccess(taskInfo), nil
 	}
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
+}
+
+func (p Plugin) Do(ctx context.Context, tCtx webapi.TaskExecutionContext) (phase core.PhaseInfo, err error) {
+	return core.PhaseInfo{}, nil
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
