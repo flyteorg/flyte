@@ -28,6 +28,8 @@ type LogConfig struct {
 	StackdriverLogResourceName string              `json:"stackdriver-logresourcename" pflag:",Name of the logresource in stackdriver"`
 	StackDriverTemplateURI     tasklog.TemplateURI `json:"stackdriver-template-uri" pflag:",Template Uri to use when building stackdriver log links"`
 
+	DynamicLogLinks map[string]tasklog.TemplateLogPlugin `json:"dynamic-log-links" pflag:"-,Map of dynamic log links"`
+
 	Templates []tasklog.TemplateLogPlugin `json:"templates" pflag:"-,"`
 }
 

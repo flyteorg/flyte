@@ -5,6 +5,7 @@ import (
 	stdErrors "errors"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -236,7 +238,7 @@ func TestCreateArtifact(t *testing.T) {
 		var value core.Literal
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestArtifact().Data[0].Value)
+		assert.True(t, proto.Equal(&value, getTestArtifact().Data[0].Value))
 	})
 
 	t.Run("Dataset does not exist", func(t *testing.T) {
@@ -639,6 +641,12 @@ func TestUpdateArtifact(t *testing.T) {
 					artifactKey.DatasetVersion == expectedArtifact.Dataset.Version
 			})).Return(mockArtifactModel, nil)
 
+		metaData := &datacatalog.Metadata{
+			KeyMap: map[string]string{"key2": "value2"},
+		}
+		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
+
 		dcRepo.MockArtifactRepo.On("Update",
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			mock.MatchedBy(func(artifact models.Artifact) bool {
@@ -646,7 +654,8 @@ func TestUpdateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
-					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
+					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
 
 		request := &datacatalog.UpdateArtifactRequest{
@@ -664,6 +673,9 @@ func TestUpdateArtifact(t *testing.T) {
 					Value: getTestStringLiteralWithValue("value3"),
 				},
 			},
+			Metadata: &datacatalog.Metadata{
+				KeyMap: map[string]string{"key2": "value2"},
+			},
 		}
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
@@ -671,6 +683,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
 		assert.Equal(t, expectedArtifact.Id, artifactResponse.GetArtifactId())
+		dcRepo.MockArtifactRepo.AssertExpectations(t)
 
 		// check that the datastore has the updated artifactData available
 		// data1 should contain updated value
@@ -679,7 +692,7 @@ func TestUpdateArtifact(t *testing.T) {
 		var value core.Literal
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value11"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value11")))
 
 		// data2 was not included in update payload, should be removed
 		dataRef, err = getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data2")
@@ -693,13 +706,19 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value3"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value3")))
 	})
 
 	t.Run("Update by artifact tag", func(t *testing.T) {
 		ctx := context.Background()
 		datastore := createInmemoryDataStore(t, mockScope.NewTestScope())
 		mockArtifactModel := getExpectedArtifactModel(ctx, t, datastore, expectedArtifact)
+
+		metaData := &datacatalog.Metadata{
+			KeyMap: map[string]string{"key2": "value2"},
+		}
+		serializedMetadata, err := transformers.SerializedMetadata(metaData)
+		assert.NoError(t, err)
 
 		dcRepo := newMockDataCatalogRepo()
 		dcRepo.MockArtifactRepo.On("Update",
@@ -709,7 +728,8 @@ func TestUpdateArtifact(t *testing.T) {
 					artifact.ArtifactKey.DatasetProject == expectedArtifact.Dataset.Project &&
 					artifact.ArtifactKey.DatasetDomain == expectedArtifact.Dataset.Domain &&
 					artifact.ArtifactKey.DatasetName == expectedArtifact.Dataset.Name &&
-					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version
+					artifact.ArtifactKey.DatasetVersion == expectedArtifact.Dataset.Version &&
+					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
 
 		dcRepo.MockTagRepo.On("Get", mock.Anything,
@@ -747,6 +767,9 @@ func TestUpdateArtifact(t *testing.T) {
 					Value: getTestStringLiteralWithValue("value3"),
 				},
 			},
+			Metadata: &datacatalog.Metadata{
+				KeyMap: map[string]string{"key2": "value2"},
+			},
 		}
 
 		artifactManager := NewArtifactManager(dcRepo, datastore, testStoragePrefix, mockScope.NewTestScope())
@@ -754,6 +777,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		assert.NotNil(t, artifactResponse)
 		assert.Equal(t, expectedArtifact.Id, artifactResponse.GetArtifactId())
+		dcRepo.MockArtifactRepo.AssertExpectations(t)
 
 		// check that the datastore has the updated artifactData available
 		// data1 should contain updated value
@@ -762,7 +786,7 @@ func TestUpdateArtifact(t *testing.T) {
 		var value core.Literal
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value11"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value11")))
 
 		// data2 was not included in update payload, should be removed
 		dataRef, err = getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data2")
@@ -776,7 +800,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value3"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value3")))
 	})
 
 	t.Run("Artifact not found", func(t *testing.T) {

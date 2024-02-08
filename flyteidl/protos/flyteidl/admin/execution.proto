@@ -7,6 +7,7 @@ import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
+import "flyteidl/core/artifact_id.proto";
 import "flyteidl/core/identifier.proto";
 import "flyteidl/core/metrics.proto";
 import "flyteidl/core/security.proto";
@@ -38,6 +39,9 @@ message ExecutionCreateRequest {
     // included in this map. If not required and not provided, defaults apply.
     // +optional
     core.LiteralMap inputs = 5;
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 // Request to relaunch the referenced execution.
@@ -245,6 +249,10 @@ message ExecutionMetadata {
     // Optional, platform-specific metadata about the execution.
     // In this the future this may be gated behind an ACL or some sort of authorization.
     SystemMetadata system_metadata = 17;
+
+    // Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
+    // since we don't have a structure to handle nested ones anyways.
+    repeated core.ArtifactID artifact_ids = 18;
 }
 
 message NotificationList {
@@ -316,6 +324,7 @@ message ExecutionSpec {
 
     // Environment variables to be set for the execution.
     Envs envs = 23;
+
     // Tags to be set for the execution.
     repeated string tags = 24;
 }

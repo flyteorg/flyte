@@ -46,12 +46,13 @@ type namedEntityEndpointMetrics struct {
 type nodeExecutionEndpointMetrics struct {
 	scope promutils.Scope
 
-	createEvent  util.RequestMetrics
-	get          util.RequestMetrics
-	getData      util.RequestMetrics
-	getMetrics   util.RequestMetrics
-	list         util.RequestMetrics
-	listChildren util.RequestMetrics
+	createEvent            util.RequestMetrics
+	get                    util.RequestMetrics
+	getData                util.RequestMetrics
+	getMetrics             util.RequestMetrics
+	list                   util.RequestMetrics
+	listChildren           util.RequestMetrics
+	getDynamicNodeWorkflow util.RequestMetrics
 }
 
 type projectEndpointMetrics struct {
@@ -161,13 +162,14 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			update: util.NewRequestMetrics(adminScope, "update_named_entity"),
 		},
 		nodeExecutionEndpointMetrics: nodeExecutionEndpointMetrics{
-			scope:        adminScope,
-			createEvent:  util.NewRequestMetrics(adminScope, "create_node_execution_event"),
-			get:          util.NewRequestMetrics(adminScope, "get_node_execution"),
-			getData:      util.NewRequestMetrics(adminScope, "get_node_execution_data"),
-			getMetrics:   util.NewRequestMetrics(adminScope, "get_node_execution_metrics"),
-			list:         util.NewRequestMetrics(adminScope, "list_node_execution"),
-			listChildren: util.NewRequestMetrics(adminScope, "list_children_node_executions"),
+			scope:                  adminScope,
+			createEvent:            util.NewRequestMetrics(adminScope, "create_node_execution_event"),
+			get:                    util.NewRequestMetrics(adminScope, "get_node_execution"),
+			getData:                util.NewRequestMetrics(adminScope, "get_node_execution_data"),
+			getMetrics:             util.NewRequestMetrics(adminScope, "get_node_execution_metrics"),
+			list:                   util.NewRequestMetrics(adminScope, "list_node_execution"),
+			listChildren:           util.NewRequestMetrics(adminScope, "list_children_node_executions"),
+			getDynamicNodeWorkflow: util.NewRequestMetrics(adminScope, "get_dynamic_node_workflow"),
 		},
 		projectEndpointMetrics: projectEndpointMetrics{
 			scope:    adminScope,

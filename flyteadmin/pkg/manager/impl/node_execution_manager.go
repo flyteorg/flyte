@@ -288,12 +288,38 @@ func (m *NodeExecutionManager) CreateNodeEvent(ctx context.Context, request admi
 	}
 
 	go func() {
-		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		ceCtx := context.TODO()
+		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
 	}()
 
 	return &admin.NodeExecutionEventResponse{}, nil
+}
+
+func (m *NodeExecutionManager) GetDynamicNodeWorkflow(ctx context.Context, request admin.GetDynamicNodeWorkflowRequest) (*admin.DynamicNodeWorkflowResponse, error) {
+	if err := validation.ValidateNodeExecutionIdentifier(request.Id); err != nil {
+		logger.Debugf(ctx, "can't get node execution data with invalid identifier [%+v]: %v", request.Id, err)
+	}
+
+	ctx = getNodeExecutionContext(ctx, request.Id)
+	nodeExecutionModel, err := util.GetNodeExecutionModel(ctx, m.db, request.Id)
+	if err != nil {
+		logger.Errorf(ctx, "failed to get node execution with id [%+v] with err %v",
+			request.Id, err)
+		return nil, err
+	}
+
+	if nodeExecutionModel.DynamicWorkflowRemoteClosureReference == "" {
+		return &admin.DynamicNodeWorkflowResponse{}, errors.NewFlyteAdminErrorf(codes.NotFound, "node does not contain dynamic workflow")
+	}
+
+	closure, err := m.fetchDynamicWorkflowClosure(ctx, nodeExecutionModel.DynamicWorkflowRemoteClosureReference)
+	if err != nil {
+		return nil, err
+	}
+
+	return &admin.DynamicNodeWorkflowResponse{CompiledWorkflow: closure}, nil
 }
 
 // Handles making additional database calls, if necessary, to populate IsParent & IsDynamic data using the historical pattern of
@@ -515,23 +541,15 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	}
 
 	if len(nodeExecutionModel.DynamicWorkflowRemoteClosureReference) > 0 {
-		closure := &core.CompiledWorkflowClosure{}
-		err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(nodeExecutionModel.DynamicWorkflowRemoteClosureReference), closure)
+		closure, err := m.fetchDynamicWorkflowClosure(ctx, nodeExecutionModel.DynamicWorkflowRemoteClosureReference)
 		if err != nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal,
-				"Unable to read WorkflowClosure from location %s : %v", nodeExecutionModel.DynamicWorkflowRemoteClosureReference, err)
+			return nil, err
 		}
 
-		if wf := closure.Primary; wf == nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow definition in loaded dynamic workflow model.")
-		} else if template := wf.Template; template == nil {
-			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow template in loaded dynamic workflow model.")
-		} else {
-			response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
-				Id:                closure.Primary.Template.Id,
-				CompiledWorkflow:  closure,
-				DynamicJobSpecUri: nodeExecution.Closure.DynamicJobSpecUri,
-			}
+		response.DynamicWorkflow = &admin.DynamicWorkflowNodeMetadata{
+			Id:                closure.Primary.Template.Id,
+			CompiledWorkflow:  closure,
+			DynamicJobSpecUri: nodeExecution.Closure.DynamicJobSpecUri,
 		}
 	}
 
@@ -543,6 +561,21 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	}
 
 	return response, nil
+}
+
+func (m *NodeExecutionManager) fetchDynamicWorkflowClosure(ctx context.Context, ref string) (*core.CompiledWorkflowClosure, error) {
+	closure := &core.CompiledWorkflowClosure{}
+	err := m.storageClient.ReadProtobuf(ctx, storage.DataReference(ref), closure)
+	if err != nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Unable to read WorkflowClosure from location %s : %v", ref, err)
+	}
+
+	if wf := closure.Primary; wf == nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow definition in loaded dynamic workflow model.")
+	} else if template := wf.Template; template == nil {
+		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "Empty primary workflow template in loaded dynamic workflow model.")
+	}
+	return closure, nil
 }
 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,

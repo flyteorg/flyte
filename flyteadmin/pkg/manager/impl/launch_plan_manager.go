@@ -111,6 +111,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	}
 	m.metrics.SpecSizeBytes.Observe(float64(len(launchPlanModel.Spec)))
 	m.metrics.ClosureSizeBytes.Observe(float64(len(launchPlanModel.Closure)))
+
 	return &admin.LaunchPlanCreateResponse{}, nil
 }
 

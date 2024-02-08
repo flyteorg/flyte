@@ -1,0 +1,23 @@
+/* Algolia Docs Search Style */
+.docsearch {
+    width: 100% !important;
+}
+
+.DocSearch-Button {
+    height: 60px !important;
+    width: 100% !important;
+    margin: 0px !important;
+    border-radius: 0 !important;
+    border-bottom: 1px solid var(--color-header-border) !important;
+    background: var(--color-sidebar-background) !important;
+    padding: 0 15px !important;
+}
+
+.DocSearch-Button:hover, .DocSearch-Button:active {
+    box-shadow: none !important;
+    background: var(--docsearch-searchbox-background) !important;
+}
+
+.sidebar-search-container::before {
+    content: none;
+}

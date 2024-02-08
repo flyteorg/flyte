@@ -385,4 +385,77 @@ pub mod task_execution_metadata {
         }
     }
 }
+/// This is the cloud event parallel to the raw WorkflowExecutionEvent message. It's filled in with additional
+/// information that downstream consumers may find useful.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventWorkflowExecution {
+    #[prost(message, optional, tag="1")]
+    pub raw_event: ::core::option::Option<WorkflowExecutionEvent>,
+    #[prost(message, optional, tag="2")]
+    pub output_interface: ::core::option::Option<super::core::TypedInterface>,
+    /// The following are ExecutionMetadata fields
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(message, repeated, tag="3")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    #[prost(message, optional, tag="4")]
+    pub reference_execution: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    #[prost(string, tag="5")]
+    pub principal: ::prost::alloc::string::String,
+    /// The ID of the LP that generated the execution that generated the Artifact.
+    /// Here for provenance information.
+    /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+    #[prost(message, optional, tag="6")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventNodeExecution {
+    #[prost(message, optional, tag="1")]
+    pub raw_event: ::core::option::Option<NodeExecutionEvent>,
+    /// The relevant task execution if applicable
+    #[prost(message, optional, tag="2")]
+    pub task_exec_id: ::core::option::Option<super::core::TaskExecutionIdentifier>,
+    /// The typed interface for the task that produced the event.
+    #[prost(message, optional, tag="3")]
+    pub output_interface: ::core::option::Option<super::core::TypedInterface>,
+    /// The following are ExecutionMetadata fields
+    /// We can't have the ExecutionMetadata object directly because of import cycle
+    #[prost(message, repeated, tag="4")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    #[prost(string, tag="5")]
+    pub principal: ::prost::alloc::string::String,
+    /// The ID of the LP that generated the execution that generated the Artifact.
+    /// Here for provenance information.
+    /// Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+    #[prost(message, optional, tag="6")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventTaskExecution {
+    #[prost(message, optional, tag="1")]
+    pub raw_event: ::core::option::Option<TaskExecutionEvent>,
+}
+/// This event is to be sent by Admin after it creates an execution.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CloudEventExecutionStart {
+    /// The execution created.
+    #[prost(message, optional, tag="1")]
+    pub execution_id: ::core::option::Option<super::core::WorkflowExecutionIdentifier>,
+    /// The launch plan used.
+    #[prost(message, optional, tag="2")]
+    pub launch_plan_id: ::core::option::Option<super::core::Identifier>,
+    #[prost(message, optional, tag="3")]
+    pub workflow_id: ::core::option::Option<super::core::Identifier>,
+    /// Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
+    #[prost(message, repeated, tag="4")]
+    pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    /// Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
+    #[prost(string, repeated, tag="5")]
+    pub artifact_trackers: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    #[prost(string, tag="6")]
+    pub principal: ::prost::alloc::string::String,
+}
 // @@protoc_insertion_point(module)

@@ -102,16 +102,18 @@ class ListDatasetsResponse(_message.Message):
     def __init__(self, datasets: _Optional[_Iterable[_Union[Dataset, _Mapping]]] = ..., next_token: _Optional[str] = ...) -> None: ...
 
 class UpdateArtifactRequest(_message.Message):
-    __slots__ = ["dataset", "artifact_id", "tag_name", "data"]
+    __slots__ = ["dataset", "artifact_id", "tag_name", "data", "metadata"]
     DATASET_FIELD_NUMBER: _ClassVar[int]
     ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     TAG_NAME_FIELD_NUMBER: _ClassVar[int]
     DATA_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     dataset: DatasetID
     artifact_id: str
     tag_name: str
     data: _containers.RepeatedCompositeFieldContainer[ArtifactData]
-    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ..., data: _Optional[_Iterable[_Union[ArtifactData, _Mapping]]] = ...) -> None: ...
+    metadata: Metadata
+    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ..., data: _Optional[_Iterable[_Union[ArtifactData, _Mapping]]] = ..., metadata: _Optional[_Union[Metadata, _Mapping]] = ...) -> None: ...
 
 class UpdateArtifactResponse(_message.Message):
     __slots__ = ["artifact_id"]
@@ -188,18 +190,20 @@ class Partition(_message.Message):
     def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
 class DatasetID(_message.Message):
-    __slots__ = ["project", "name", "domain", "version", "UUID"]
+    __slots__ = ["project", "name", "domain", "version", "UUID", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
     UUID_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     name: str
     domain: str
     version: str
     UUID: str
-    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., UUID: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., UUID: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class Artifact(_message.Message):
     __slots__ = ["id", "dataset", "data", "metadata", "partitions", "tags", "created_at"]
@@ -301,16 +305,18 @@ class KeyValuePair(_message.Message):
     def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
 
 class DatasetPropertyFilter(_message.Message):
-    __slots__ = ["project", "name", "domain", "version"]
+    __slots__ = ["project", "name", "domain", "version", "org"]
     PROJECT_FIELD_NUMBER: _ClassVar[int]
     NAME_FIELD_NUMBER: _ClassVar[int]
     DOMAIN_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
     project: str
     name: str
     domain: str
     version: str
-    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ...) -> None: ...
+    org: str
+    def __init__(self, project: _Optional[str] = ..., name: _Optional[str] = ..., domain: _Optional[str] = ..., version: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class PaginationOptions(_message.Message):
     __slots__ = ["limit", "token", "sortKey", "sortOrder"]

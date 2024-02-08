@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/gogo/protobuf/jsonpb"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/wrappers"
@@ -51,6 +51,11 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+)
+
+const (
+	principal = "principal"
+	rawOutput = "raw_output"
 )
 
 var spec = testutils.GetExecutionRequest().Spec
@@ -296,8 +301,6 @@ func TestCreateExecution(t *testing.T) {
 			Labels: &labels}), nil
 	}
 
-	principal := "principal"
-	rawOutput := "raw_output"
 	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCreateCallback(
 		func(ctx context.Context, input models.Execution) error {
@@ -338,10 +341,11 @@ func TestCreateExecution(t *testing.T) {
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
 		tasks := data.WorkflowClosure.GetTasks()
 		for _, task := range tasks {
-			assert.EqualValues(t, resources.Requests,
-				task.Template.GetContainer().Resources.Requests)
-			assert.EqualValues(t, resources.Requests,
-				task.Template.GetContainer().Resources.Limits)
+			assert.Equal(t, len(resources.Requests), len(task.Template.GetContainer().Resources.Requests))
+			for i, request := range resources.Requests {
+				assert.True(t, proto.Equal(request, task.Template.GetContainer().Resources.Requests[i]))
+				assert.True(t, proto.Equal(request, task.Template.GetContainer().Resources.Limits[i]))
+			}
 		}
 
 		return true
@@ -390,7 +394,7 @@ func TestCreateExecution(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse.Id, response.Id))
 
 	// TODO: Check for offloaded inputs
 }
@@ -421,7 +425,6 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		},
 	)
 
-	principal := "feeny"
 	getExecutionCalled := false
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(
 		func(ctx context.Context, input interfaces.Identifier) (models.Execution, error) {
@@ -484,7 +487,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecution_NoAssignedName(t *testing.T) {
@@ -568,7 +571,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionValidationError(t *testing.T) {
@@ -618,6 +621,7 @@ func TestCreateExecutionInCompatibleInputs(t *testing.T) {
 }
 
 func TestCreateExecutionPropellerFailure(t *testing.T) {
+	clusterAssignment := admin.ClusterAssignment{ClusterPoolName: "gpu"}
 	repository := getMockRepositoryForExecTest()
 	setDefaultLpCallbackForExecTest(repository)
 	expectedErr := flyteAdminErrors.NewFlyteAdminErrorf(codes.Internal, "ABC")
@@ -626,13 +630,44 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	mockExecutor.OnID().Return("customMockExecutor")
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &mockExecutor)
-	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+	qosProvider := &runtimeIFaceMocks.QualityOfServiceConfiguration{}
+	qosProvider.OnGetTierExecutionValues().Return(map[core.QualityOfService_Tier]core.QualityOfServiceSpec{
+		core.QualityOfService_HIGH: {
+			QueueingBudget: ptypes.DurationProto(10 * time.Minute),
+		},
+		core.QualityOfService_MEDIUM: {
+			QueueingBudget: ptypes.DurationProto(20 * time.Minute),
+		},
+		core.QualityOfService_LOW: {
+			QueueingBudget: ptypes.DurationProto(30 * time.Minute),
+		},
+	})
+
+	qosProvider.OnGetDefaultTiers().Return(map[string]core.QualityOfService_Tier{
+		"domain": core.QualityOfService_HIGH,
+	})
+
+	mockConfig := getMockExecutionsConfigProvider()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).AddQualityOfServiceConfiguration(qosProvider)
 
 	request := testutils.GetExecutionRequest()
+	request.Spec.Metadata = &admin.ExecutionMetadata{
+		Principal: "unused - populated from authenticated context",
+	}
+	request.Spec.RawOutputDataConfig = &admin.RawOutputDataConfig{OutputLocationPrefix: rawOutput}
+	request.Spec.ClusterAssignment = &clusterAssignment
 
-	response, err := execManager.CreateExecution(context.Background(), request, requestedAt)
-	assert.EqualError(t, err, expectedErr.Error())
-	assert.Nil(t, response)
+	identity, err := auth.NewIdentityContext("", principal, "", time.Now(), sets.NewString(), nil, nil)
+	assert.NoError(t, err)
+	ctx := identity.WithContext(context.Background())
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{})
+
+	expectedResponse := &admin.ExecutionCreateResponse{Id: &executionIdentifier}
+
+	response, err := execManager.CreateExecution(ctx, request, requestedAt)
+
+	assert.NoError(t, err)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionDatabaseFailure(t *testing.T) {
@@ -919,7 +954,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionInterruptible(t *testing.T) {
@@ -3379,7 +3414,6 @@ func TestTerminateExecution(t *testing.T) {
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
 
 	abortCause := "abort cause"
-	principal := "principal"
 	updateExecutionFunc := func(
 		context context.Context, execution models.Execution) error {
 		assert.Equal(t, "project", execution.Project)
@@ -3856,7 +3890,7 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestRelaunchExecution_LegacyModel(t *testing.T) {
@@ -5685,5 +5719,96 @@ func TestAddStateFilter(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "state <> ?", expression.Query)
 	})
+}
 
+func TestQueryTemplate(t *testing.T) {
+	ctx := context.Background()
+
+	aTime := time.Date(
+		2063, 4, 5, 00, 00, 00, 0, time.UTC)
+
+	rawInputs := map[string]interface{}{
+		"aStr":   "hello world",
+		"anInt":  1,
+		"aFloat": 1.3,
+		"aTime":  aTime,
+	}
+
+	otherInputs, err := coreutils.MakeLiteralMap(rawInputs)
+	assert.NoError(t, err)
+
+	m := ExecutionManager{}
+
+	ak := &core.ArtifactKey{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "testname",
+	}
+
+	t.Run("test all present, nothing to fill in", func(t *testing.T) {
+		pMap := map[string]*core.LabelValue{
+			"partition1": {Value: &core.LabelValue_StaticValue{StaticValue: "my value"}},
+			"partition2": {Value: &core.LabelValue_StaticValue{StaticValue: "my value 2"}},
+		}
+		p := &core.Partitions{Value: pMap}
+
+		q := core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey:   ak,
+					Partitions:    p,
+					TimePartition: nil,
+				},
+			},
+		}
+
+		filledQuery, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&q, &filledQuery))
+	})
+
+	t.Run("template date-times, both in explicit tp and not", func(t *testing.T) {
+		pMap := map[string]*core.LabelValue{
+			"partition1": {Value: &core.LabelValue_InputBinding{InputBinding: &core.InputBindingData{Var: "aTime"}}},
+			"partition2": {Value: &core.LabelValue_StaticValue{StaticValue: "my value 2"}},
+		}
+		p := &core.Partitions{Value: pMap}
+
+		q := core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey:   ak,
+					Partitions:    p,
+					TimePartition: &core.TimePartition{Value: &core.LabelValue{Value: &core.LabelValue_InputBinding{InputBinding: &core.InputBindingData{Var: "aTime"}}}},
+				},
+			},
+		}
+
+		filledQuery, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.NoError(t, err)
+		staticTime := filledQuery.GetArtifactId().Partitions.Value["partition1"].GetStaticValue()
+		assert.Equal(t, "2063-04-05", staticTime)
+		assert.Equal(t, int64(2942956800), filledQuery.GetArtifactId().TimePartition.Value.GetTimeValue().Seconds)
+	})
+
+	t.Run("something missing", func(t *testing.T) {
+		pMap := map[string]*core.LabelValue{
+			"partition1": {Value: &core.LabelValue_StaticValue{StaticValue: "my value"}},
+			"partition2": {Value: &core.LabelValue_StaticValue{StaticValue: "my value 2"}},
+		}
+		p := &core.Partitions{Value: pMap}
+
+		q := core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey:   ak,
+					Partitions:    p,
+					TimePartition: &core.TimePartition{Value: &core.LabelValue{Value: &core.LabelValue_InputBinding{InputBinding: &core.InputBindingData{Var: "wrong var"}}}},
+				},
+			},
+		}
+
+		_, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.Error(t, err)
+	})
 }

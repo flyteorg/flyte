@@ -126,7 +126,9 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
-	podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	if len(podSpec.ServiceAccountName) == 0 {
+		podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	}
 
 	pod := flytek8s.BuildIdentityPod()
 	pod.ObjectMeta = *objectMeta
@@ -144,9 +146,14 @@ func (p plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContex
 	return p.GetTaskPhaseWithLogs(ctx, pluginContext, r, logPlugin, " (User)", nil)
 }
 
-func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme) (pluginsCore.PhaseInfo, error) {
+func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme []tasklog.TemplateVar) (pluginsCore.PhaseInfo, error) {
 	pluginState := k8s.PluginState{}
 	_, err := pluginContext.PluginStateReader().Get(&pluginState)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -166,7 +173,7 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 
 	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
-		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme)
+		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
 		if err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
 		}

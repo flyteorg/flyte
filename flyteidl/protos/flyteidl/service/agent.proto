@@ -2,9 +2,11 @@ syntax = "proto3";
 package flyteidl.service;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
+
+import "google/api/annotations.proto";
 import "flyteidl/admin/agent.proto";
 
-// AgentService defines an RPC Service that allows propeller to send the request to the agent server.
+// AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
 service AsyncAgentService {
   // Send a task create request to the agent server.
   rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){};
@@ -12,4 +14,32 @@ service AsyncAgentService {
   rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){};
   // Delete the task resource.
   rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){};
+
+  // GetTaskMetrics returns one or more task execution metrics, if available.
+  //
+  // Errors include
+  //  * OutOfRange if metrics are not available for the specified task time range
+  //  * various other errors
+  rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){};
+
+  // GetTaskLogs returns task execution logs, if available.
+  rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (flyteidl.admin.GetTaskLogsResponse){};
+}
+
+// AgentMetadataService defines an RPC service that is also served over HTTP via grpc-gateway.
+// This service allows propeller or users to get the metadata of agents.
+service AgentMetadataService {
+  // Fetch a :ref:`ref_flyteidl.admin.Agent` definition.
+  rpc GetAgent (flyteidl.admin.GetAgentRequest) returns (flyteidl.admin.GetAgentResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/{name}" 
+    };
+  };
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.Agent` definitions.
+  rpc ListAgents (flyteidl.admin.ListAgentsRequest) returns (flyteidl.admin.ListAgentsResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agents"
+    };
+  };
 }

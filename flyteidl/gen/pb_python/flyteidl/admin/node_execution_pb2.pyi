@@ -158,3 +158,15 @@ class NodeExecutionGetDataResponse(_message.Message):
     dynamic_workflow: DynamicWorkflowNodeMetadata
     flyte_urls: _common_pb2.FlyteURLs
     def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., dynamic_workflow: _Optional[_Union[DynamicWorkflowNodeMetadata, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...
+
+class GetDynamicNodeWorkflowRequest(_message.Message):
+    __slots__ = ["id"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    id: _identifier_pb2.NodeExecutionIdentifier
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
+
+class DynamicNodeWorkflowResponse(_message.Message):
+    __slots__ = ["compiled_workflow"]
+    COMPILED_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
+    compiled_workflow: _compiler_pb2.CompiledWorkflowClosure
+    def __init__(self, compiled_workflow: _Optional[_Union[_compiler_pb2.CompiledWorkflowClosure, _Mapping]] = ...) -> None: ...

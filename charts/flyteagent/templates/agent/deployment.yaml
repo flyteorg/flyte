@@ -14,15 +14,24 @@ spec:
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteagent.labels" . | nindent 8 }}
+      labels: {{ include "flyteagent.podLabels" . | nindent 8 }}
     spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
       {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
       - command:
         - pyflyte
         - serve
+        - agent
+        {{- if .Values.podEnv }}
+        env:
+        {{- with .Values.podEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- end }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         name: flyteagent
@@ -30,6 +39,8 @@ spec:
         ports:
         - containerPort: {{ .Values.ports.containerPort }}
           name: {{ .Values.ports.name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
         {{- with .Values.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}

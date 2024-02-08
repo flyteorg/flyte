@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+package flyteidl.event;
+
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event";
+
+import "flyteidl/event/event.proto";
+import "flyteidl/core/literals.proto";
+import "flyteidl/core/interface.proto";
+import "flyteidl/core/artifact_id.proto";
+import "flyteidl/core/identifier.proto";
+import "google/protobuf/timestamp.proto";
+
+// This is the cloud event parallel to the raw WorkflowExecutionEvent message. It's filled in with additional
+// information that downstream consumers may find useful.
+message CloudEventWorkflowExecution {
+  event.WorkflowExecutionEvent raw_event = 1;
+
+  core.TypedInterface output_interface = 2;
+
+  // The following are ExecutionMetadata fields
+  // We can't have the ExecutionMetadata object directly because of import cycle
+  repeated core.ArtifactID artifact_ids = 3;
+  core.WorkflowExecutionIdentifier reference_execution = 4;
+  string principal = 5;
+
+  // The ID of the LP that generated the execution that generated the Artifact.
+  // Here for provenance information.
+  // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+  core.Identifier launch_plan_id = 6;
+}
+
+message CloudEventNodeExecution {
+  event.NodeExecutionEvent raw_event = 1;
+
+  // The relevant task execution if applicable
+  core.TaskExecutionIdentifier task_exec_id = 2;
+
+  // The typed interface for the task that produced the event.
+  core.TypedInterface output_interface = 3;
+
+  // The following are ExecutionMetadata fields
+  // We can't have the ExecutionMetadata object directly because of import cycle
+  repeated core.ArtifactID artifact_ids = 4;
+  string principal = 5;
+
+  // The ID of the LP that generated the execution that generated the Artifact.
+  // Here for provenance information.
+  // Launch plan IDs are easier to get than workflow IDs so we'll use these for now.
+  core.Identifier launch_plan_id = 6;
+}
+
+message CloudEventTaskExecution {
+  event.TaskExecutionEvent raw_event = 1;
+}
+
+// This event is to be sent by Admin after it creates an execution.
+message CloudEventExecutionStart {
+  // The execution created.
+  core.WorkflowExecutionIdentifier execution_id = 1;
+  // The launch plan used.
+  core.Identifier launch_plan_id = 2;
+
+  core.Identifier workflow_id = 3;
+
+  // Artifact inputs to the workflow execution for which we have the full Artifact ID. These are likely the result of artifact queries that are run.
+  repeated core.ArtifactID artifact_ids = 4;
+
+  // Artifact inputs to the workflow execution for which we only have the tracking bit that's installed into the Literal's metadata by the Artifact service.
+  repeated string artifact_trackers = 5;
+
+  string principal = 6;
+}

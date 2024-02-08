@@ -10,7 +10,7 @@ on:
     branches:
       - master
 env:
-  GO_VERSION: "1.19"
+  GO_VERSION: "1.21"
 jobs:
   unpack-envvars:
     runs-on: ubuntu-latest
@@ -50,3 +50,5 @@ jobs:
     with:
       component: flyteidl
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}

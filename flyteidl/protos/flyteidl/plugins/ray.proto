@@ -11,6 +11,10 @@ message RayJob {
   // runtime_env is base64 encoded.
   // Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments
   string runtime_env = 2;
+  // shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.
+  bool shutdown_after_job_finishes = 3;
+  // ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
+  int32 ttl_seconds_after_finished = 4;
 }
 
 // Define Ray cluster defines the desired state of RayCluster
@@ -19,6 +23,8 @@ message RayCluster {
   HeadGroupSpec head_group_spec = 1;
   // WorkerGroupSpecs are the specs for the worker pods
   repeated WorkerGroupSpec worker_group_spec = 2;
+  // Whether to enable autoscaling.
+  bool enable_autoscaling = 3;
 }
 
 // HeadGroupSpec are the spec for the head pod

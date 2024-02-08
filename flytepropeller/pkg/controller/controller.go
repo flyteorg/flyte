@@ -324,10 +324,21 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 		logger.Errorf(ctx, "failed to initialize Admin client, err :%s", err.Error())
 		return nil, err
 	}
+
+	sCfg := storage.GetConfig()
+	if sCfg == nil {
+		logger.Errorf(ctx, "Storage configuration missing.")
+	}
+
+	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
+	if err != nil {
+		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
+	}
+
 	var launchPlanActor launchplan.FlyteAdmin
 	if cfg.EnableAdminLauncher {
 		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
-			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"))
+			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"), store)
 		if err != nil {
 			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
 			return nil, err
@@ -400,16 +411,6 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 	}
 
 	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(podNamespace)
-
-	sCfg := storage.GetConfig()
-	if sCfg == nil {
-		logger.Errorf(ctx, "Storage configuration missing.")
-	}
-
-	store, err := storage.NewDataStore(sCfg, scope.NewSubScope("metastore"))
-	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to create Metadata storage")
-	}
 
 	logger.Info(ctx, "Setting up Catalog client.")
 	catalogClient, err := catalog.NewCatalogClient(ctx, authOpts...)
@@ -525,8 +526,7 @@ func SharedInformerOptions(cfg *config.Config, defaultNamespace string) []inform
 	return opts
 }
 
-func CreateControllerManager(ctx context.Context, cfg *config.Config, options manager.Options) (*manager.Manager, error) {
-
+func CreateControllerManager(ctx context.Context, cfg *config.Config, options manager.Options) (manager.Manager, error) {
 	_, kubecfg, err := utils.GetKubeConfig(ctx, cfg)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error building Kubernetes Clientset")
@@ -536,22 +536,23 @@ func CreateControllerManager(ctx context.Context, cfg *config.Config, options ma
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to initialize controller-runtime manager")
 	}
-	return &mgr, nil
+
+	return mgr, nil
 }
 
 // StartControllerManager Start controller runtime manager to start listening to resource changes.
 // K8sPluginManager uses controller runtime to create informers for the CRDs being monitored by plugins. The informer
 // EventHandler enqueues the owner workflow for reevaluation. These informer events allow propeller to detect
 // workflow changes faster than the default sync interval for workflow CRDs.
-func StartControllerManager(ctx context.Context, mgr *manager.Manager) error {
+func StartControllerManager(ctx context.Context, mgr manager.Manager) error {
 	ctx = contextutils.WithGoroutineLabel(ctx, "controller-runtime-manager")
 	pprof.SetGoroutineLabels(ctx)
 	logger.Infof(ctx, "Starting controller-runtime manager")
-	return (*mgr).Start(ctx)
+	return mgr.Start(ctx)
 }
 
 // StartController creates a new FlytePropeller Controller and starts it
-func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string, mgr *manager.Manager, scope *promutils.Scope) error {
+func StartController(ctx context.Context, cfg *config.Config, defaultNamespace string, mgr manager.Manager, scope *promutils.Scope) error {
 	// Setup cancel on the context
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -591,7 +592,7 @@ func StartController(ctx context.Context, cfg *config.Config, defaultNamespace s
 
 	informerFactory := k8sInformers.NewSharedInformerFactoryWithOptions(kubeClient, flyteK8sConfig.GetK8sPluginConfig().DefaultPodTemplateResync.Duration)
 
-	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, *mgr, *scope)
+	c, err := New(ctx, cfg, kubeClient, flyteworkflowClient, flyteworkflowInformerFactory, informerFactory, mgr, *scope)
 	if err != nil {
 		return errors.Wrap(err, "failed to start FlytePropeller")
 	} else if c == nil {

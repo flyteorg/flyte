@@ -26,9 +26,12 @@ spec:
         app: {{ template "flyte-pod-webhook.name" . }}
         app.kubernetes.io/name: {{ template "flyte-pod-webhook.name" . }}
         app.kubernetes.io/version: {{ .Values.flytepropeller.image.tag }}
+        {{- with .Values.flytepropeller.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       annotations:
         configChecksum: {{ include (print .Template.BasePath "/propeller/configmap.yaml") . | sha256sum | trunc 63 | quote }}
-        {{- with .Values.flyteadmin.podAnnotations }}
+        {{- with .Values.flytepropeller.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -58,9 +61,14 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        {{- if .Values.flytepropeller.podEnv -}}
+        {{- with .Values.flytepropeller.podEnv -}}
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
         volumeMounts:
           - name: config-volume
-            mountPath: /etc/flyte/config      
+            mountPath: /etc/flyte/config
 {{- end }}
       containers:
         - name: webhook
@@ -81,6 +89,13 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+        {{- if .Values.flytepropeller.podEnv -}}
+        {{- with .Values.flytepropeller.podEnv -}}
+        {{- toYaml . | nindent 12 }}
+        {{- end }}
+        {{- end }}
+          ports:
+          - containerPort: 9443
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -95,6 +110,9 @@ spec:
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
+      {{- with .Values.flytepropeller.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
 ---
 # Service
 apiVersion: v1
@@ -146,6 +164,9 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end}}
 {{- end }}
+  {{- with .Values.webhook.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
 ---
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding

@@ -262,6 +262,7 @@ func NewTaskManager(
 	db repoInterfaces.Repository,
 	config runtimeInterfaces.Configuration, compiler workflowengine.Compiler,
 	scope promutils.Scope) interfaces.TaskInterface {
+
 	metrics := taskMetrics{
 		Scope:            scope,
 		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized task closure"),

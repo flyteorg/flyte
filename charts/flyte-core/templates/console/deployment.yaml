@@ -16,8 +16,12 @@ spec:
         {{- with .Values.flyteconsole.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteconsole.labels" . | nindent 8 }}
+      labels: {{ include "flyteconsole.podLabels" . | nindent 8 }}
     spec:
+    {{- with .Values.flyteconsole.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       securityContext:
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
@@ -33,12 +37,19 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
-        {{- if .Values.flyteconsole.ga.enabled }}
+        {{- if or .Values.flyteconsole.ga.enabled .Values.flyteconsole.podEnv }}
         env:
+        {{- end }}
+        {{- if .Values.flyteconsole.ga.enabled }}
         - name: ENABLE_GA
           value: "{{ .Values.flyteconsole.ga.enabled }}"
         - name: GA_TRACKING_ID
           value: "{{ .Values.flyteconsole.ga.tracking_id }}"
+        {{- end }}
+        {{- if .Values.flyteconsole.podEnv -}}
+        {{- with .Values.flyteconsole.podEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         {{- end }}
         resources: {{ toYaml .Values.flyteconsole.resources | nindent 10 }}
         volumeMounts:

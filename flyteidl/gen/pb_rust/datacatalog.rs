@@ -150,6 +150,9 @@ pub struct UpdateArtifactRequest {
     /// ArtifactData entries will be removed from the underlying blob storage and database.
     #[prost(message, repeated, tag="4")]
     pub data: ::prost::alloc::vec::Vec<ArtifactData>,
+    /// Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+    #[prost(message, optional, tag="5")]
+    pub metadata: ::core::option::Option<Metadata>,
     /// Either ID of artifact or name of tag to retrieve existing artifact from
     #[prost(oneof="update_artifact_request::QueryHandle", tags="2, 3")]
     pub query_handle: ::core::option::Option<update_artifact_request::QueryHandle>,
@@ -287,6 +290,9 @@ pub struct DatasetId {
     /// UUID for the dataset (if set the above fields are optional)
     #[prost(string, tag="5")]
     pub uuid: ::prost::alloc::string::String,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="6")]
+    pub org: ::prost::alloc::string::String,
 }
 ///
 /// Artifact message. It is composed of several string fields.
@@ -466,7 +472,7 @@ pub struct KeyValuePair {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DatasetPropertyFilter {
-    #[prost(oneof="dataset_property_filter::Property", tags="1, 2, 3, 4")]
+    #[prost(oneof="dataset_property_filter::Property", tags="1, 2, 3, 4, 5")]
     pub property: ::core::option::Option<dataset_property_filter::Property>,
 }
 /// Nested message and enum types in `DatasetPropertyFilter`.
@@ -482,6 +488,9 @@ pub mod dataset_property_filter {
         Domain(::prost::alloc::string::String),
         #[prost(string, tag="4")]
         Version(::prost::alloc::string::String),
+        /// Optional, org key applied to the dataset.
+        #[prost(string, tag="5")]
+        Org(::prost::alloc::string::String),
     }
 }
 /// Pagination options for making list requests
