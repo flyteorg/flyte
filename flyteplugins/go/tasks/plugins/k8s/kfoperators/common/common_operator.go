@@ -252,7 +252,7 @@ func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) commonOp.Res
 
 // OverrideContainerSpec overrides the specified container's properties in the given podSpec. The function
 // updates the image and command arguments of the container that matches the given containerName.
-func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, args []string) error {
+func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, args []string, nodeSelectors map[string]string) error {
 	for idx, c := range podSpec.Containers {
 		if c.Name == containerName {
 			if image != "" {
@@ -264,6 +264,13 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
 		}
 	}
 
+
+	if nodeSelectors != nil {
+        panic("nodeSelectors is not nil")
+    } else {
+        panic("nodeSelectors is nil")
+    }
+	
 	// Add node selectors if the map is not nil
 	if nodeSelectors != nil {
         if podSpec.NodeSelector == nil {
