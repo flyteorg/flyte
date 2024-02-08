@@ -52,6 +52,18 @@ func NewCookieManager(ctx context.Context, hashKeyEncoded, blockKeyEncoded strin
 	}, nil
 }
 
+func (c CookieManager) RetrieveAccessToken(ctx context.Context, request *http.Request) (string, error) {
+	accessTokenFirstHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieName, c.hashKey, c.blockKey)
+	if err != nil {
+		return "", err
+	}
+	accessTokenSecondHalf, err := retrieveSecureCookie(ctx, request, accessTokenCookieNameSplit, c.hashKey, c.blockKey)
+	if err != nil {
+		return "", err
+	}
+	return accessTokenFirstHalf + accessTokenSecondHalf, nil
+}
+
 // TODO: Separate refresh token from access token, remove named returns, and use stdlib errors.
 // RetrieveTokenValues retrieves id, access and refresh tokens from cookies if they exist. The existence of a refresh token
 // in a cookie is optional and hence failure to find or read that cookie is tolerated. An error is returned in case of failure
@@ -64,7 +76,7 @@ func (c CookieManager) RetrieveTokenValues(ctx context.Context, request *http.Re
 		return "", "", "", err
 	}
 
-	accessToken, err = retrieveSecureCookie(ctx, request, accessTokenCookieName, c.hashKey, c.blockKey)
+	accessToken, err = c.RetrieveAccessToken(ctx, request)
 	if err != nil {
 		return "", "", "", err
 	}
@@ -135,19 +147,32 @@ func (c CookieManager) SetAuthCodeCookie(ctx context.Context, writer http.Respon
 	return nil
 }
 
+func (c CookieManager) StoreAccessToken(ctx context.Context, accessToken string, writer http.ResponseWriter) error {
+	midpoint := len(accessToken) / 2
+	firstHalf := accessToken[:midpoint]
+	secondHalf := accessToken[midpoint:]
+	atCookie, err := NewSecureCookie(accessTokenCookieName, firstHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	if err != nil {
+		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie first half %s", err)
+		return err
+	}
+	http.SetCookie(writer, &atCookie)
+	atCookieSplit, err := NewSecureCookie(accessTokenCookieNameSplit, secondHalf, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
+	if err != nil {
+		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie second half %s", err)
+		return err
+	}
+	http.SetCookie(writer, &atCookieSplit)
+	return nil
+}
+
 func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.ResponseWriter, token *oauth2.Token) error {
 	if token == nil {
 		logger.Errorf(ctx, "Attempting to set cookies with nil token")
 		return errors.Errorf(ErrTokenNil, "Attempting to set cookies with nil token")
 	}
 
-	atCookie, err := NewSecureCookie(accessTokenCookieName, token.AccessToken, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
-	if err != nil {
-		logger.Errorf(ctx, "Error generating encrypted accesstoken cookie %s", err)
-		return err
-	}
-
-	http.SetCookie(writer, &atCookie)
+	c.StoreAccessToken(ctx, token.AccessToken, writer)
 
 	if idTokenRaw, converted := token.Extra(idTokenExtra).(string); converted {
 		idCookie, err := NewSecureCookie(idTokenCookieName, idTokenRaw, c.hashKey, c.blockKey, c.domain, c.getHTTPSameSitePolicy())
@@ -188,6 +213,7 @@ func (c *CookieManager) getLogoutCookie(name string) *http.Cookie {
 
 func (c CookieManager) DeleteCookies(_ context.Context, writer http.ResponseWriter) {
 	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieName))
+	http.SetCookie(writer, c.getLogoutCookie(accessTokenCookieNameSplit))
 	http.SetCookie(writer, c.getLogoutCookie(refreshTokenCookieName))
 	http.SetCookie(writer, c.getLogoutCookie(idTokenCookieName))
 }
