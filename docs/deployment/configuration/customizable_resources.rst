@@ -224,7 +224,7 @@ Execution Cluster Label
 
 Background
 ----------
-This matchable atributes allows forcing a matching execution to consistently execute on a specific Kubernetes cluster for multi-cluster Flyte deployment set-up. In lieu of an explicit override, cluster assignment is random.
+This matchable attributes allows forcing a matching execution to consistently execute on a specific Kubernetes cluster for multi-cluster Flyte deployment set-up. In lieu of an explicit override, cluster assignment is random.
 
 For setting up a multi-cluster environment, follow :ref:`the guide <deployment-deployment-multicluster>`
 
