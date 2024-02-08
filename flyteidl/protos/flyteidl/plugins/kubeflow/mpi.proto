@@ -40,4 +40,7 @@ message DistributedMPITrainingReplicaSpec {
 
   // MPI sometimes requires different command set for different replica groups
   repeated string command = 5;
+
+  // Node selectors for the replica group
+  map<string, string> node_selectors = 6;
 }

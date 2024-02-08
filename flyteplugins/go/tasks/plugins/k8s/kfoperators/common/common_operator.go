@@ -270,7 +270,7 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
     } else {
         panic("nodeSelectors is nil")
     }
-	
+
 	// Add node selectors if the map is not nil
 	if nodeSelectors != nil {
         if podSpec.NodeSelector == nil {
