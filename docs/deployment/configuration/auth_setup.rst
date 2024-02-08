@@ -354,9 +354,8 @@ Apply OIDC Configuration
 
 .. note::
 
-   In a `multi-cluster deployment <https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html>`__, 
-   this secret must be present at each cluster where `flytepropeller` is enabled (be it control plane or data plane). 
-   You can add the above block to the `values-dataplane.yaml` file to let Helm manage this secret.
+   For `multi-cluster deployments <https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html>`__, 
+   you must add this Secret definition block to the `values-dataplane.yaml` file.
    If you are not running `flytepropeller` in the control plane cluster, you do not need to create this secret there.
 
       8. Save and exit your editor.
