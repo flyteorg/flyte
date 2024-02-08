@@ -138,6 +138,7 @@ Introduction <introduction>
 Quickstart guide <quickstart_guide>
 Getting started with workflow development <getting_started_with_workflow_development/index>
 Flyte fundamentals <flyte_fundamentals/index>
+Migrating to Flyte <migrating_to_flyte/index>
 Core use cases <core_use_cases/index>
 ```
 
