@@ -1,16 +1,12 @@
 name: Build & Push Flyte Single Binary Images
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 on:
-  pull_request:
-  push:
-    branches:
-      - master
-      - rc/*
+  workflow_call:
   workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   test-bootstrap:
@@ -51,19 +47,28 @@ jobs:
       - name: Set versions
         id: set_version
         run: |
-          # TODO: Find a better way to determine the flyteconsole version
           echo "FLYTECONSOLE_VERSION=$(yq eval '.flyteconsole.image.tag' charts/flyte-core/values.yaml)" >> $GITHUB_ENV
           echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::558384610515:role/github-actions-flyte-fork
+          aws-region: us-east-1 # public ECR is only available in us-east-1
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
       - name: Prepare Image Names
         id: image-names
         uses: docker/metadata-action@v3
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/${{ github.repository_owner }}/flyte-binary
+            ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-            type=sha,format=long
+            type=sha,format=long,prefix=
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -98,26 +103,17 @@ jobs:
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
-      # NOTE: Disable publishing
-      # - name: Login to GitHub Container Registry
-      #   if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ghcr.io
-      #     username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-      #     password: "${{ secrets.FLYTE_BOT_PAT }}"
-      # - name: Build and push Image
-      #   if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: .
-      #     platforms: linux/arm64, linux/amd64
-      #     tags: ${{ steps.image-names.outputs.tags }}
-      #     build-args: |
-      #       FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
-      #       FLYTE_VERSION=${{ env.FLYTE_VERSION }}
-      #     file: Dockerfile
-      #     push: true
+      - name: Build and push Image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ steps.image-names.outputs.tags }}
+          build-args: |
+            FLYTECONSOLE_VERSION=${{ env.FLYTECONSOLE_VERSION }}
+            FLYTE_VERSION=${{ env.FLYTE_VERSION }}
+          file: Dockerfile
+          push: true
 
   sandbox-bundled-functional-tests:
     runs-on: ubuntu-latest
@@ -201,7 +197,6 @@ jobs:
           make end2end_execute
 
   build-and-push-sandbox-bundled-image:
-    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     needs: [build-and-push-single-binary-image]
     steps:
@@ -222,29 +217,32 @@ jobs:
         id: set_version
         run: |
           echo "FLYTE_SANDBOX_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::558384610515:role/github-actions-flyte-fork
+          aws-region: us-east-1 # public ECR is only available in us-east-1
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
       - name: Prepare Image Names
         id: image-names
         uses: docker/metadata-action@v3
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/${{ github.repository_owner }}/flyte-sandbox-bundled
+            ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-sandbox-bundled
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-            type=sha,format=long,
-      # NOTE: Disable publishing
-      # - name: Login to GitHub Container Registry
-      #   uses: docker/login-action@v2
-      #   with:
-      #     registry: ghcr.io
-      #     username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-      #     password: "${{ secrets.FLYTE_BOT_PAT }}"
-      # - name: Build and push multi-arch image
-      #   uses: docker/build-push-action@v3
-      #   with:
-      #     context: docker/sandbox-bundled
-      #     allow: "security.insecure"
-      #     platforms: linux/arm64, linux/amd64
-      #     tags: ${{ steps.image-names.outputs.tags }}
-      #     build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
-      #     push: true
+            type=sha,format=long,prefix=
+      - name: Build and push multi-arch image
+        uses: docker/build-push-action@v3
+        with:
+          context: docker/sandbox-bundled
+          allow: "security.insecure"
+          platforms: linux/arm64, linux/amd64
+          tags: ${{ steps.image-names.outputs.tags }}
+          build-args: "FLYTE_SANDBOX_VERSION=${{ env.FLYTE_SANDBOX_VERSION }}"
+          push: true

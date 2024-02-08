@@ -11,10 +11,6 @@ on:
         description: "Dockerfile name"
         required: true
         type: string
-      version:
-        description: "Version of image"
-        required: true
-        type: string
       push:
         description: "Push to registry"
         required: true
@@ -23,11 +19,11 @@ on:
         description: "Script to run before build"
         required: false
         type: string
-    secrets:
-      FLYTE_BOT_USERNAME:
-        required: true
-      FLYTE_BOT_PAT:
-        required: true
+
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   push-github:
     name: Push to Github Registry
@@ -40,21 +36,23 @@ jobs:
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Login to GitHub Container Registry
-        if: ${{ inputs.push }}
-        uses: docker/login-action@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          registry: ghcr.io
-          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
-          password: "${{ secrets.FLYTE_BOT_PAT }}"
+          role-to-assume: arn:aws:iam::558384610515:role/github-actions-flyte-fork
+          aws-region: us-east-1 # public ECR is only available in us-east-1
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
       - name: Prepare Image Tags
         id: tags
         uses: docker/metadata-action@v3
         with:
-          images: ghcr.io/${{ github.repository_owner }}/${{ inputs.component }}
+          images: ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ inputs.component }}
           tags: |
-            type=raw,value=latest
-            type=raw,value=${{ inputs.version }}
+            type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
             type=sha,format=long,prefix=
       - name: Before Build
         run: ${{ inputs.before-build }}

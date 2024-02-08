@@ -1,0 +1,95 @@
+name: Create a flyte release
+
+on:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-docker-images:
+    uses: ./.github/workflows/publish-images.yml
+    with:
+      push: true
+
+  publish-flyte-binary-image:
+    name: Publish flyte binary image for the release version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::558384610515:role/github-actions-flyte-fork
+          aws-region: us-east-1 # public ECR is only available in us-east-1
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Tag image to release version (sha)
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary-release:${{ github.sha }}" \
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary:${{ github.sha }}"
+
+      - name: Tag image to release version (latest)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary-release:latest" \
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary:${{ github.sha }}"
+
+  publish-flyte-component-image:
+    name: Publish flyte component image for the release version
+    runs-on: ubuntu-latest
+    needs:
+      - build-docker-images
+    strategy:
+      matrix:
+        component:
+          [
+              datacatalog,
+              flyteadmin,
+              flytecopilot,
+              flytepropeller,
+              flytescheduler,
+          ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: "0"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::558384610515:role/github-actions-flyte-fork
+          aws-region: us-east-1 # public ECR is only available in us-east-1
+
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registry-type: public
+
+      - name: Tag image to release version (sha)
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}-release:${{ github.sha }}" \
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}:${{ github.sha }}"
+      
+      - name: Tag image to release version (latest)
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
+        run: |
+          docker buildx imagetools create \
+            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}-release:latest" \
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}:${{ github.sha }}"
