@@ -163,7 +163,7 @@ To build the Flyte docs locally you will need the following prerequisites:
     * ``conda activate monodocs-env``
     * ``pip install ./flyteidl``
 
-This will set up the Python virtual environment for building the docs. Here we called it ``monodocs_env``.
+This will set up the Python virtual environment for building the docs. Here we called it ``monodocs-env``.
 
 To actually build the docs, activate ``monodocs_env`` and (in the ``flyteorg/flyte`` root directory) run:
     * ``make docs``
