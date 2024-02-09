@@ -71,11 +71,14 @@ spec:
         helm.sh/chart: flyteagent-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
+      securityContext:
+        {}
       containers:
       - command:
         - pyflyte
         - serve
-        image: "ghcr.io/flyteorg/flyteagent:1.10.2"
+        - agent
+        image: "ghcr.io/flyteorg/flyteagent:1.10.3"
         imagePullPolicy: "IfNotPresent"
         name: flyteagent
         volumeMounts:
@@ -84,6 +87,8 @@ spec:
         ports:
         - containerPort: 8000
           name: agent-grpc
+        securityContext:
+            allowPrivilegeEscalation: false
         resources:
           limits:
             cpu: 500m

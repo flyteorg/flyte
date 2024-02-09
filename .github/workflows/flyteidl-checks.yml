@@ -50,3 +50,5 @@ jobs:
     with:
       component: flyteidl
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
+    secrets:
+      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}

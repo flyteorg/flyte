@@ -211,13 +211,11 @@ func TestApplyResourceOverrides_RemoveStorage(t *testing.T) {
 	requestedResourceQuantity := resource.MustParse("1")
 	overrides := ApplyResourceOverrides(v1.ResourceRequirements{
 		Requests: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceCPU:              requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
@@ -261,7 +259,6 @@ func TestMergeResources_EmptyIn(t *testing.T) {
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
@@ -280,7 +277,6 @@ func TestMergeResources_EmptyOut(t *testing.T) {
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},
 		Limits: v1.ResourceList{
-			v1.ResourceStorage:          requestedResourceQuantity,
 			v1.ResourceMemory:           requestedResourceQuantity,
 			v1.ResourceEphemeralStorage: requestedResourceQuantity,
 		},

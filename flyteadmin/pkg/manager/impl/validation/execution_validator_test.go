@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var execConfig = testutils.GetApplicationConfigWithDefaultDomains()
@@ -110,7 +111,7 @@ func TestValidateExecInputsWrongType(t *testing.T) {
 		lpRequest.Spec.DefaultInputs,
 	)
 
-	assert.EqualError(t, err, "invalid foo input wrong type. Expected simple:STRING , but got simple:INTEGER ")
+	utils.AssertEqualWithSanitizedRegex(t, "invalid foo input wrong type. Expected simple:STRING, but got simple:INTEGER", err.Error())
 }
 
 func TestValidateExecInputsExtraInputs(t *testing.T) {

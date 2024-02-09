@@ -379,6 +379,7 @@ func dummySparkTaskContext(taskTemplate *core.TaskTemplate, interruptible bool) 
 		},
 	})
 	tID.On("GetGeneratedName").Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
 	overrides.On("GetResources").Return(&corev1.ResourceRequirements{})

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
-	"github.com/gogo/protobuf/jsonpb"
+	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/wrappers"
@@ -353,10 +353,11 @@ func TestCreateExecution(t *testing.T) {
 	mockExecutor.OnExecuteMatch(mock.Anything, mock.MatchedBy(func(data workflowengineInterfaces.ExecutionData) bool {
 		tasks := data.WorkflowClosure.GetTasks()
 		for _, task := range tasks {
-			assert.EqualValues(t, resources.Requests,
-				task.Template.GetContainer().Resources.Requests)
-			assert.EqualValues(t, resources.Requests,
-				task.Template.GetContainer().Resources.Limits)
+			assert.Equal(t, len(resources.Requests), len(task.Template.GetContainer().Resources.Requests))
+			for i, request := range resources.Requests {
+				assert.True(t, proto.Equal(request, task.Template.GetContainer().Resources.Requests[i]))
+				assert.True(t, proto.Equal(request, task.Template.GetContainer().Resources.Limits[i]))
+			}
 		}
 
 		return true
@@ -408,7 +409,7 @@ func TestCreateExecution(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse.Id, response.Id))
 
 	// TODO: Check for offloaded inputs
 }
@@ -501,7 +502,7 @@ func TestCreateExecutionFromWorkflowNode(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecution_NoAssignedName(t *testing.T) {
@@ -585,7 +586,7 @@ func TestCreateExecution_TaggedQueue(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionValidationError(t *testing.T) {
@@ -687,7 +688,7 @@ func TestCreateExecutionPropellerFailure(t *testing.T) {
 	response, err := execManager.CreateExecution(ctx, request, requestedAt)
 
 	assert.NoError(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionDatabaseFailure(t *testing.T) {
@@ -973,7 +974,7 @@ func TestCreateExecutionDynamicLabelsAndAnnotations(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateExecutionInterruptible(t *testing.T) {
@@ -3951,7 +3952,7 @@ func TestCreateExecution_LegacyClient(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestRelaunchExecution_LegacyModel(t *testing.T) {

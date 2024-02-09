@@ -146,7 +146,7 @@ func (p plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContex
 	return p.GetTaskPhaseWithLogs(ctx, pluginContext, r, logPlugin, " (User)", nil)
 }
 
-func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme) (pluginsCore.PhaseInfo, error) {
+func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme []tasklog.TemplateVar) (pluginsCore.PhaseInfo, error) {
 	pluginState := k8s.PluginState{}
 	_, err := pluginContext.PluginStateReader().Get(&pluginState)
 	if err != nil {

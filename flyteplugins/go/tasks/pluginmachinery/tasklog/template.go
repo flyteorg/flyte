@@ -13,6 +13,12 @@ func MustCreateRegex(varName string) *regexp.Regexp {
 	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*[\.$]%s\s*}}`, varName))
 }
 
+var taskConfigVarRegex = regexp.MustCompile(`(?i){{\s*.taskConfig[\.$]([a-zA-Z_]+)\s*}}`)
+
+func MustCreateDynamicLogRegex(varName string) *regexp.Regexp {
+	return regexp.MustCompile(fmt.Sprintf(`(?i){{\s*.taskConfig[\.$]%s\s*}}`, varName))
+}
+
 type templateRegexes struct {
 	LogName              *regexp.Regexp
 	PodName              *regexp.Regexp
@@ -35,7 +41,6 @@ type templateRegexes struct {
 	ExecutionProject     *regexp.Regexp
 	ExecutionDomain      *regexp.Regexp
 	GeneratedName        *regexp.Regexp
-	Port                 *regexp.Regexp
 }
 
 func initDefaultRegexes() templateRegexes {
@@ -61,13 +66,12 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("executionProject"),
 		MustCreateRegex("executionDomain"),
 		MustCreateRegex("generatedName"),
-		MustCreateRegex("port"),
 	}
 }
 
 var defaultRegexes = initDefaultRegexes()
 
-func replaceAll(template string, vars TemplateVars) string {
+func replaceAll(template string, vars []TemplateVar) string {
 	for _, v := range vars {
 		if len(v.Value) > 0 {
 			template = v.Regex.ReplaceAllLiteralString(template, v.Value)
@@ -76,48 +80,33 @@ func replaceAll(template string, vars TemplateVars) string {
 	return template
 }
 
-func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
-	vars := TemplateVars{
-		{defaultRegexes.LogName, input.LogName},
+func (input Input) templateVars() []TemplateVar {
+	vars := []TemplateVar{
+		TemplateVar{defaultRegexes.LogName, input.LogName},
 	}
 
-	gotExtraTemplateVars := input.ExtraTemplateVarsByScheme != nil
+	gotExtraTemplateVars := input.ExtraTemplateVars != nil
 	if gotExtraTemplateVars {
-		vars = append(vars, input.ExtraTemplateVarsByScheme.Common...)
+		vars = append(vars, input.ExtraTemplateVars...)
 	}
 
-	switch scheme {
-	case TemplateSchemeFlyin:
-		port := input.TaskTemplate.GetConfig()["port"]
-		if port == "" {
-			port = "8080"
-		}
-		vars = append(
-			vars,
-			TemplateVar{defaultRegexes.Port, port},
-		)
-		fallthrough
-	case TemplateSchemePod:
-		// Container IDs are prefixed with docker://, cri-o://, etc. which is stripped by fluentd before pushing to a log
-		// stream. Therefore, we must also strip the prefix.
-		containerID := input.ContainerID
-		stripDelimiter := "://"
-		if split := strings.Split(input.ContainerID, stripDelimiter); len(split) > 1 {
-			containerID = split[1]
-		}
-		vars = append(
-			vars,
-			TemplateVar{defaultRegexes.PodName, input.PodName},
-			TemplateVar{defaultRegexes.PodUID, input.PodUID},
-			TemplateVar{defaultRegexes.Namespace, input.Namespace},
-			TemplateVar{defaultRegexes.ContainerName, input.ContainerName},
-			TemplateVar{defaultRegexes.ContainerID, containerID},
-			TemplateVar{defaultRegexes.Hostname, input.HostName},
-		)
-		if gotExtraTemplateVars {
-			vars = append(vars, input.ExtraTemplateVarsByScheme.Pod...)
-		}
-	case TemplateSchemeTaskExecution:
+	// Container IDs are prefixed with docker://, cri-o://, etc. which is stripped by fluentd before pushing to a log
+	// stream. Therefore, we must also strip the prefix.
+	containerID := input.ContainerID
+	stripDelimiter := "://"
+	if split := strings.Split(input.ContainerID, stripDelimiter); len(split) > 1 {
+		containerID = split[1]
+	}
+	vars = append(
+		vars,
+		TemplateVar{defaultRegexes.PodName, input.PodName},
+		TemplateVar{defaultRegexes.PodUID, input.PodUID},
+		TemplateVar{defaultRegexes.Namespace, input.Namespace},
+		TemplateVar{defaultRegexes.ContainerName, input.ContainerName},
+		TemplateVar{defaultRegexes.ContainerID, containerID},
+		TemplateVar{defaultRegexes.Hostname, input.HostName},
+	)
+	if input.TaskExecutionID != nil {
 		taskExecutionIdentifier := input.TaskExecutionID.GetID()
 		vars = append(
 			vars,
@@ -172,9 +161,6 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 				},
 			)
 		}
-		if gotExtraTemplateVars {
-			vars = append(vars, input.ExtraTemplateVarsByScheme.TaskExecution...)
-		}
 	}
 
 	vars = append(
@@ -194,30 +180,49 @@ func (input Input) templateVarsForScheme(scheme TemplateScheme) TemplateVars {
 	return vars
 }
 
-func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
-	templateVars := input.templateVarsForScheme(p.Scheme)
-	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
-
-	// Grab metadata from task template and check if key "link_type" is set to "vscode".
-	// If so, add a vscode link to the task logs.
-	isFlyin := false
-	if input.TaskTemplate != nil && input.TaskTemplate.GetConfig() != nil {
-		config := input.TaskTemplate.GetConfig()
-		if config != nil && config["link_type"] == "vscode" {
-			isFlyin = true
-		}
+func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
+	if taskTemplate == nil {
+		return nil
 	}
+	config := taskTemplate.GetConfig()
+	if config == nil {
+		return nil
+	}
+	linkType := config["link_type"]
+	if linkType == "" {
+		return nil
+	}
+	return strings.Split(linkType, ",")
+}
+
+func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
+	templateVars := input.templateVars()
+	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
 	for _, templateURI := range p.TemplateURIs {
-		// Skip Flyin logs if plugin is enabled but no metadata is defined in input's task template.
-		// This is to prevent Flyin logs from being generated for tasks that don't have a Flyin metadata section.
-		if p.DisplayName == "Flyin Logs" && !isFlyin {
-			continue
-		}
 		taskLogs = append(taskLogs, &core.TaskLog{
 			Uri:           replaceAll(templateURI, templateVars),
 			Name:          p.DisplayName + input.LogName,
 			MessageFormat: p.MessageFormat,
 		})
+	}
+
+	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
+		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
+			if p.Name == dynamicLogLinkType {
+				for _, match := range taskConfigVarRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
+					if len(match) > 1 {
+						if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {
+							templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
+						}
+					}
+				}
+				taskLogs = append(taskLogs, &core.TaskLog{
+					Uri:           replaceAll(dynamicTemplateURI, templateVars),
+					Name:          p.DisplayName + input.LogName,
+					MessageFormat: p.MessageFormat,
+				})
+			}
+		}
 	}
 
 	return Output{TaskLogs: taskLogs}, nil

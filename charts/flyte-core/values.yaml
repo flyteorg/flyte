@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.10.7-b2 # FLYTEADMIN_TAG
+    tag: v1.10.7-b4 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -134,7 +134,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.10.7-b2 # FLYTESCHEDULER_TAG
+    tag: v1.10.7-b4 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -192,7 +192,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.10.7-b2 # DATACATALOG_TAG
+    tag: v1.10.7-b4 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -249,6 +249,12 @@ datacatalog:
 
 flyteagent:
   enabled: false
+  plugin_config:
+    plugins:
+      agentService:
+        defaultAgent:
+          endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+          insecure: true
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -264,7 +270,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.10.7-b2 # FLYTEPROPELLER_TAG
+    tag: v1.10.7-b4 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -374,6 +380,8 @@ flyteconsole:
     tracking_id: "G-0QW4DJWJ20"
   # -- Sets priorityClassName for flyte console pod(s).
   priorityClassName: ""
+   # -- ImagePullSecrets to assign to the Flyteconsole deployment
+  imagePullSecrets: []
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -424,6 +432,8 @@ common:
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
+    # --- Sets the ingressClassName
+    ingressClassName:
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
@@ -671,7 +681,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b2 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b4 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration
@@ -750,11 +760,6 @@ configmap:
         #  DEFAULT_ENV_VAR: VALUE
         default-cpus: 100m
         default-memory: 100Mi
-      # Uncomment and modify to include configuration for Flyte Agent
-      # agent-service:
-      #   defaultGrpcEndpoint: flyteagent.flyte.svc.cluster.local:8000
-      #   supportedTaskTypes:
-      #     - bigquery_query_job_task
   remoteData:
     remoteData:
       region: "us-east-1"
@@ -845,6 +850,8 @@ cluster_resource_manager:
   podEnv: {}
   # -- Labels for ClusterResource pods
   podLabels: {}
+  # -- nodeSelector for ClusterResource deployment
+  nodeSelector: {}
   # -- Configmap for ClusterResource parameters
   config:
     # -- ClusterResource parameters

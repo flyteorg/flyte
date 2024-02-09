@@ -676,6 +676,8 @@ func TestGetTaskPhase(t *testing.T) {
 		{"", rayv1alpha1.JobDeploymentStatusInitializing, pluginsCore.PhaseInitializing, false},
 		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetOrCreateRayCluster, pluginsCore.PhasePermanentFailure, false},
 		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboard, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForDashboardReady, pluginsCore.PhaseRunning, false},
+		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusWaitForK8sJob, pluginsCore.PhaseRunning, false},
 		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedJobDeploy, pluginsCore.PhasePermanentFailure, false},
 		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseRunning, false},
 		{rayv1alpha1.JobStatusPending, rayv1alpha1.JobDeploymentStatusFailedToGetJobStatus, pluginsCore.PhaseRunning, false},
@@ -683,7 +685,7 @@ func TestGetTaskPhase(t *testing.T) {
 		{rayv1alpha1.JobStatusFailed, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhasePermanentFailure, false},
 		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusRunning, pluginsCore.PhaseSuccess, false},
 		{rayv1alpha1.JobStatusSucceeded, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseSuccess, false},
-		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusComplete, pluginsCore.PhaseUndefined, true},
+		{rayv1alpha1.JobStatusStopped, rayv1alpha1.JobDeploymentStatusSuspended, pluginsCore.PhaseRunning, false},
 	}
 
 	for _, tc := range testCases {
@@ -738,7 +740,6 @@ func TestGetEventInfo_LogTemplates(t *testing.T) {
 				TemplateURIs: []tasklog.TemplateURI{
 					"http://test/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}",
 				},
-				Scheme: tasklog.TemplateSchemeTaskExecution,
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{
@@ -823,7 +824,6 @@ func TestGetEventInfo_DashboardURL(t *testing.T) {
 			dashboardURLTemplate: tasklog.TemplateLogPlugin{
 				DisplayName:  "Ray Dashboard",
 				TemplateURIs: []tasklog.TemplateURI{"http://test/{{.generatedName}}"},
-				Scheme:       tasklog.TemplateSchemeTaskExecution,
 			},
 			expectedTaskLogs: []*core.TaskLog{
 				{

@@ -4,7 +4,7 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
-// import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
 import "flyteidl/core/identifier.proto";
@@ -164,9 +164,9 @@ service DataProxyService {
       post: "/api/v1/dataproxy/artifact_urn"
       body: "*"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Creates a write-only http location that is accessible for tasks at runtime."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Creates a write-only http location that is accessible for tasks at runtime."
+    };
   }
 
   // CreateDownloadLocation creates a signed url to download artifacts.
@@ -175,9 +175,9 @@ service DataProxyService {
     option (google.api.http) = {
       get: "/api/v1/dataproxy/artifact_urn"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Deprecated: Please use CreateDownloadLink instead. Creates a read-only http location that is accessible for tasks at runtime."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Deprecated: Please use CreateDownloadLink instead. Creates a read-only http location that is accessible for tasks at runtime."
+    };
   }
 
   // CreateDownloadLocation creates a signed url to download artifacts.
@@ -186,9 +186,9 @@ service DataProxyService {
       post: "/api/v1/dataproxy/artifact_link"
       body: "*"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Creates a read-only http location that is accessible for tasks at runtime."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Creates a read-only http location that is accessible for tasks at runtime."
+    };
   }
 
   rpc GetData (GetDataRequest) returns (GetDataResponse) {
