@@ -432,6 +432,8 @@ common:
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
+    # --- Sets the ingressClassName
+    ingressClassName:
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
