@@ -5,6 +5,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"io"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -15,7 +16,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	flyteIO "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -89,24 +90,28 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	taskType := admin.TaskType{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
 	agent := getFinalAgent(&taskType, p.cfg, p.agentRegistry)
-	client, err := p.getAsyncAgentClient(ctx, agent)
-	if err != nil {
-		return nil, nil, err
-	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
 
-	//if agent.IsSync {
-	//	stream, err := client.ExecuteTaskSync(ctx)
-	//	if err != nil {
-	//		return nil, nil, err
-	//	}
-	//	stream
-	//}
-
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
+
+	if agent.IsSync {
+		client, err := p.getSyncAgentClient(ctx, agent)
+		if err != nil {
+			return nil, nil, err
+		}
+		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
+	}
+
+	// Use async agent client
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return nil, nil, err
+	}
+	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -118,8 +123,70 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}, nil, nil
 }
 
-func (p Plugin) ExecuteTaskSync(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta, webapi.Resource, error) {
-	return nil, nil, nil
+func (p Plugin) ExecuteTaskSync(
+	ctx context.Context,
+	client service.SyncAgentServiceClient,
+	header *admin.CreateRequestHeader,
+	inputs *flyteIdl.LiteralMap,
+) (webapi.ResourceMeta, webapi.Resource, error) {
+	stream, err := client.ExecuteTaskSync(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+	waitChan := make(chan struct{})
+	resourceChan := make(chan *admin.Resource)
+
+	go func() {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			// read done.
+			close(waitChan)
+			return
+		}
+		if err != nil {
+			logger.Errorf(ctx, "Error reading from stream: %v", err)
+		}
+		header := in.GetHeader()
+		resource := header.GetResource()
+
+		for {
+			in, err := stream.Recv()
+			if err == io.EOF {
+				// read done.
+				resourceChan <- resource
+				close(waitChan)
+				return
+			}
+			if err != nil {
+				logger.Errorf(ctx, "Error reading from stream: %v", err)
+			}
+			literals := in.GetOutputs().GetLiterals()
+			logger.Infof(ctx, "Got literals: %v", literals)
+			// TODO: how to combine the literals?
+			// log.Printf("Got message %s at point(%d, %d)", in.Message, in.Location.Latitude, in.Location.Longitude)
+		}
+	}()
+	headerProto := &admin.ExecuteTaskSyncRequest{
+		Part: &admin.ExecuteTaskSyncRequest_Header{
+			Header: header,
+		},
+	}
+
+	err = stream.Send(headerProto)
+	if err == nil {
+		inputsProto := &admin.ExecuteTaskSyncRequest{
+			Part: &admin.ExecuteTaskSyncRequest_Inputs{
+				Inputs: inputs,
+			},
+		}
+		err = stream.Send(inputsProto)
+	}
+
+	stream.CloseSend()
+	resource := <-resourceChan
+	<-waitChan
+
+	return nil, resource, err
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
@@ -217,6 +284,19 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
+func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Agent) (service.SyncAgentServiceClient, error) {
+	client, ok := p.cs.syncAgentClients[agent.Endpoint]
+	if !ok {
+		conn, err := getGrpcConnection(ctx, agent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+		}
+		client = service.NewSyncAgentServiceClient(conn)
+		p.cs.syncAgentClients[agent.Endpoint] = client
+	}
+	return client, nil
+}
+
 func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Agent) (service.AsyncAgentServiceClient, error) {
 	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
 	if !ok {
@@ -241,7 +321,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 		return nil
 	}
 
-	var opReader io.OutputReader
+	var opReader flyteIO.OutputReader
 	if resource.Outputs != nil {
 		logger.Debugf(ctx, "Agent returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)

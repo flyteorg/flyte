@@ -23,8 +23,9 @@ const defaultTaskTypeVersion = 0
 
 // ClientSet contains the clients exposed to communicate with various agent services.
 type ClientSet struct {
-	asyncAgentClients    map[string]service.AsyncAgentServiceClient    // map[endpoint] => client
-	agentMetadataClients map[string]service.AgentMetadataServiceClient // map[endpoint] => client
+	asyncAgentClients    map[string]service.AsyncAgentServiceClient    // map[endpoint] => AsyncAgentServiceClient
+	syncAgentClients     map[string]service.SyncAgentServiceClient     // map[endpoint] => SyncAgentServiceClient
+	agentMetadataClients map[string]service.AgentMetadataServiceClient // map[endpoint] => AgentMetadataServiceClient
 }
 
 func getGrpcConnection(ctx context.Context, agent *Agent) (*grpc.ClientConn, error) {
@@ -135,7 +136,8 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]map[int32]*Agent, error)
 }
 
 func initializeClients(ctx context.Context) (*ClientSet, error) {
-	agentClients := make(map[string]service.AsyncAgentServiceClient)
+	asyncAgentClients := make(map[string]service.AsyncAgentServiceClient)
+	syncAgentClients := make(map[string]service.SyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
 
 	var agentDeployments []*Agent
@@ -150,12 +152,17 @@ func initializeClients(ctx context.Context) (*ClientSet, error) {
 		if err != nil {
 			return nil, err
 		}
-		agentClients[agentDeployment.Endpoint] = service.NewAsyncAgentServiceClient(conn)
+		if agentDeployment.IsSync {
+			syncAgentClients[agentDeployment.Endpoint] = service.NewSyncAgentServiceClient(conn)
+		} else {
+			asyncAgentClients[agentDeployment.Endpoint] = service.NewAsyncAgentServiceClient(conn)
+		}
 		agentMetadataClients[agentDeployment.Endpoint] = service.NewAgentMetadataServiceClient(conn)
 	}
 
 	return &ClientSet{
-		asyncAgentClients:    agentClients,
+		syncAgentClients:     syncAgentClients,
+		asyncAgentClients:    asyncAgentClients,
 		agentMetadataClients: agentMetadataClients,
 	}, nil
 }
