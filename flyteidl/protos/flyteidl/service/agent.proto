@@ -38,6 +38,12 @@ service AsyncAgentService {
     };
   };
 
+  rpc GetTaskResourceRequirements(flyteidl.admin.GetTaskResourceRequirementsRequest) returns (flyteidl.admin.GetTaskResourceRequirementsResponse){
+    option (google.api.http) = {
+      get: "/api/v1/agent/task/resource-requirements/{task_type.name}/{task_type.version}/{resource_meta}"
+    };
+  };
+
   // GetTaskMetrics returns one or more task execution metrics, if available.
   //
   // Errors include

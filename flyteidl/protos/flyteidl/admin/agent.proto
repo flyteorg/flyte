@@ -124,6 +124,22 @@ message Resource {
   core.TaskExecution.Phase phase = 5;
 }
 
+message GetTaskResourceRequirementsRequest {
+  // The inputs required to start the execution. All required inputs must be
+  // included in this map. If not required and not provided, defaults apply.
+  // +optional
+  core.LiteralMap inputs = 1;
+  // Template of the task that encapsulates all the metadata of the task.
+  core.TaskTemplate template = 2;
+  // subset of runtime task execution metadata.
+  TaskExecutionMetadata task_execution_metadata = 4;
+}
+
+message GetTaskResourceRequirementsResponse {
+  // ResourceRequirements is the resource requirements for the task.
+  core.Resources resource_requirements = 1;
+}
+
 // A message used to delete a task.
 message DeleteTaskRequest {
   // A predefined yet extensible Task type identifier.
@@ -142,6 +158,17 @@ message Agent {
   
   // SupportedTaskTypes are the types of the tasks that the agent can handle.
   repeated TaskType supported_task_types = 2;
+
+  // ResourceManagementPolicy is the policy for resource management.
+  ResourceManagementPolicy resource_management_policy = 3;
+}
+
+message ResourceManagementPolicy {
+  // UniformSizedTasks indicates whether all resources are the same size. You should set this to true if the agent
+  // communicates with a service that treats all tasks with the same weight (e.g. each task is a request).
+  // When set to false, propeller will call GetTaskResourceRequirements to determine the resource requirements for each
+  // task.
+  bool uniform_sized_tasks = 1;
 }
 
 message TaskType {
