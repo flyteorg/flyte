@@ -118,6 +118,7 @@ func dummyContainerTaskMetadata(resources *v1.ResourceRequirements, extendedReso
 	to := &pluginsCoreMock.TaskOverrides{}
 	to.On("GetResources").Return(resources)
 	to.On("GetExtendedResources").Return(extendedResources)
+	to.OnGetContainerImage().Return("")
 	taskMetadata.On("GetOverrides").Return(to)
 	taskMetadata.On("IsInterruptible").Return(true)
 	taskMetadata.On("GetEnvironmentVariables").Return(nil)
