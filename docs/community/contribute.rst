@@ -18,19 +18,19 @@ TL;DR: Find the repo-specific contribution guidelines in the `Component Referenc
 
 An issue tagged with `good first issue <https://github.com/flyteorg/flyte/labels/good%20first%20issue>`__ is the best place to start for first-time contributors.
 
-**Appetizer for every repo: Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.** 
+**Appetizer for every repo: Fork and clone the concerned repository. Create a new branch on your fork and make the required changes. Create a pull request once your work is ready for review.**
 
 .. note::
-    To open a pull request, refer to `GitHub's guide <https://guides.github.com/activities/forking/>`__ for detailed instructions. 
+    To open a pull request, refer to `GitHub's guide <https://guides.github.com/activities/forking/>`__ for detailed instructions.
 
-Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__. 
-A couple of checks are introduced to help maintain the robustness of the project. 
+Example PR for your reference: `GitHub PR <https://github.com/flyteorg/flytepropeller/pull/242>`__.
+A couple of checks are introduced to help maintain the robustness of the project.
 
-#. To get through DCO, sign off on every commit (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__) 
+#. To get through DCO, sign off on every commit (`Reference <https://github.com/src-d/guide/blob/master/developer-community/fix-DCO.md>`__)
 #. To improve code coverage, write unit tests to test your code
 #. Make sure all the tests pass. If you face any issues, please let us know
 
-On a side note, format your Go code with ``golangci-lint`` followed by ``goimports`` (use ``make lint`` and ``make goimports``), and Python code with ``black`` and ``isort`` (use ``make fmt``). 
+On a side note, format your Go code with ``golangci-lint`` followed by ``goimports`` (use ``make lint`` and ``make goimports``), and Python code with ``black`` and ``isort`` (use ``make fmt``).
 If make targets are not available, you can manually format the code.
 Refer to `Effective Go <https://golang.org/doc/effective_go>`__, `Black <https://github.com/psf/black>`__, and `Isort <https://github.com/PyCQA/isort>`__ for full coding standards.
 
@@ -42,10 +42,10 @@ but there is a medium term effort to move all development to forks.
 
 Flyte uses Sphinx for documentation. ``protoc-gen-doc`` is used to generate the documentation from ``.proto`` files.
 
-Sphinx spans multiple repositories under `flyteorg <https://github.com/flyteorg>`__. It uses reStructured Text (rst) files to store the documentation content. 
-For API- and code-related content, it extracts docstrings from the code files. 
+Sphinx spans multiple repositories under `flyteorg <https://github.com/flyteorg>`__. It uses reStructured Text (rst) files to store the documentation content.
+For API- and code-related content, it extracts docstrings from the code files.
 
-To get started, refer to the `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__. 
+To get started, refer to the `reStructuredText reference <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html#rst-index>`__.
 
 For minor edits that don't require a local setup, you can edit the GitHub page in the documentation to propose improvements.
 
@@ -54,9 +54,9 @@ Intersphinx
 
 `Intersphinx <https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html>`__ can generate automatic links to the documentation of objects in other projects.
 
-To establish a reference to any other documentation from Flyte or within it, use Intersphinx. 
+To establish a reference to any other documentation from Flyte or within it, use Intersphinx.
 
-To do so, create an ``intersphinx_mapping`` in the ``conf.py`` file which should be present in the respective ``docs`` repository. 
+To do so, create an ``intersphinx_mapping`` in the ``conf.py`` file which should be present in the respective ``docs`` repository.
 For example, ``rsts`` is the docs repository for the ``flyte`` repo.
 
 For example:
@@ -68,10 +68,10 @@ For example:
         "flytekit": ("https://flyte.readthedocs.io/projects/flytekit/en/master/", None),
     }
 
-The key refers to the name used to refer to the file (while referencing the documentation), and the URL denotes the precise location. 
+The key refers to the name used to refer to the file (while referencing the documentation), and the URL denotes the precise location.
 
 Here is an example using ``:std:doc``:
- 
+
 * Direct reference
 
   .. code-block:: text
@@ -94,7 +94,7 @@ Here is an example using ``:std:doc``:
 
 |
 
-You can cross-reference multiple Python objects. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more. 
+You can cross-reference multiple Python objects. Check out this `section <https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html#cross-referencing-python-objects>`__ to learn more.
 
 |
 
@@ -150,15 +150,25 @@ To understand how the below components interact with each other, refer to :ref:`
 .. list-table::
 
     * - `Repo <https://github.com/flyteorg/flyte>`__
-    * - **Purpose**: Deployment, Documentation, and Issues 
+    * - **Purpose**: Deployment, Documentation, and Issues
     * - **Languages**: Kustomize & RST
-  
-.. note::
-    For the ``flyte`` repo, run the following command in the repo's root to generate documentation locally.
 
-    .. code-block:: console
+To build the Flyte docs locally you will need the following prerequisites:
 
-        make -C rsts html
+* Install ``conda``.
+    *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
+* Install `conda-lock <https://github.com/conda/conda-lock>`__.
+* In the ``flyteorg/flyte`` root directory run:
+    * ``conda-lock install --name monodocs-env monodocs-environment.lock.yaml``
+    * ``conda activate monodocs-env``
+    * ``pip install ./flyteidl``
+
+This will set up the Python virtual environment for building the docs. Here we called it ``monodocs-env``.
+
+To actually build the docs, activate ``monodocs-env`` and (in the ``flyteorg/flyte`` root directory) run:
+    * ``make docs``
+
+The resulting ``html`` files will be in ``docs/_build/html``. You can view them by running `open docs/_build/html/index.html`
 
 ``flyteidl``
 ************
@@ -169,7 +179,7 @@ To understand how the below components interact with each other, refer to :ref:`
     * - **Purpose**: Flyte workflow specification is in `protocol buffers <https://developers.google.com/protocol-buffers>`__ which forms the core of Flyte
     * - **Language**: Protobuf
     * - **Guidelines**: Refer to the `README <https://github.com/flyteorg/flyteidl#generate-code-from-protobuf>`__
- 
+
 ``flytepropeller``
 ******************
 
@@ -281,21 +291,21 @@ To understand how the below components interact with each other, refer to :ref:`
     * - `Repo <https://github.com/flyteorg/flytectl>`__
     * - **Purpose**: A standalone Flyte CLI
     * - **Language**: Go
-    * - **Guidelines**: Refer to the `FlyteCTL Contribution Guide <https://docs.flyte.org/projects/flytectl/en/stable/contribute.html>`__    
+    * - **Guidelines**: Refer to the `FlyteCTL Contribution Guide <https://docs.flyte.org/projects/flytectl/en/stable/contribute.html>`__
 
 
 🔮 Development Environment Setup Guide
 ======================================
 
-This guide provides a step-by-step approach to setting up a local development environment for 
-`flyteidl <https://github.com/flyteorg/flyteidl>`_, `flyteadmin <https://github.com/flyteorg/flyteadmin>`_, 
-`flyteplugins <https://github.com/flyteorg/flyteplugins>`_, `flytepropeller <https://github.com/flyteorg/flytepropeller>`_, 
+This guide provides a step-by-step approach to setting up a local development environment for
+`flyteidl <https://github.com/flyteorg/flyteidl>`_, `flyteadmin <https://github.com/flyteorg/flyteadmin>`_,
+`flyteplugins <https://github.com/flyteorg/flyteplugins>`_, `flytepropeller <https://github.com/flyteorg/flytepropeller>`_,
 `flytekit <https://github.com/flyteorg/flytekit>`_ , `flyteconsole <https://github.com/flyteorg/flyteconsole>`_,
 `datacatalog <https://github.com/flyteorg/datacatalog>`_, and `flytestdlib <https://github.com/flyteorg/flytestdlib>`_.
 
 The video below is a tutorial on how to set up a local development environment for Flyte.
 
-..  youtube:: V-KlVQmQAjE 
+..  youtube:: V-KlVQmQAjE
 
 Requirements
 ************
@@ -352,9 +362,9 @@ How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropel
 
    # Step1: Start k3s cluster, create Pods for postgres and minio. Note: We cannot access Flyte UI yet! but we can access the minio console now.
    flytectl demo start --dev
-   # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉 
+   # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉
    # ❇️ Run the following command to export demo environment variables for accessing flytectl
-   #         export FLYTECTL_CONFIG=/home/ubuntu/.flyte/config-sandbox.yaml 
+   #         export FLYTECTL_CONFIG=/home/ubuntu/.flyte/config-sandbox.yaml
    # 🐋 Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000
    # 📂 The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console
 
@@ -410,7 +420,7 @@ that integrates all Flyte components into a single binary.
      name: '{{ namespace }}'" > $HOME/.flyte/sandbox/cluster-resource-templates/namespace.yaml
 
    # Step5: Running the single binary.
-   # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly. 
+   # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly.
    # You may encounter an error due to `ERROR: duplicate key value violates unique constraint`. Running the command again will solve the problem.
    POD_NAMESPACE=flyte ./flyte start --config flyte-single-binary-local.yaml
    # All logs from flyteadmin, flyteplugins, flytepropeller, etc. will appear in the terminal.
@@ -470,7 +480,7 @@ The following instructions provide guidance on how to build single binary with y
    # context removed for "flyte-sandbox".
    # 🧹 🧹 Sandbox cluster is removed successfully.
    # ❇️ Run the following command to unset sandbox environment variables for accessing flytectl
-   #        unset FLYTECTL_CONFIG 
+   #        unset FLYTECTL_CONFIG
 
 How to setup dev environment for flytekit?
 *******************************************
@@ -478,7 +488,7 @@ How to setup dev environment for flytekit?
 **1. Set up local Flyte Cluster.**
 
 
-If you are also modifying the code for flyteidl, flyteadmin, flyteplugins, flytepropeller datacatalog, or flytestdlib, 
+If you are also modifying the code for flyteidl, flyteadmin, flyteplugins, flytepropeller datacatalog, or flytestdlib,
 refer to the instructions in the  `previous section <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__ to set up a local Flyte cluster.
 
 If not, we can start backends with a single command.
@@ -497,9 +507,9 @@ If not, we can start backends with a single command.
    # Step3: Starts the Flyte demo cluster. This will setup a k3s cluster running minio, postgres Pods, and all Flyte components: flyteadmin, flyteplugins, flytepropeller, etc.
    # See https://docs.flyte.org/projects/flytectl/en/latest/gen/flytectl_demo_start.html for more details.
    flytectl demo start
-   # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉 
+   # 👨‍💻 Flyte is ready! Flyte UI is available at http://localhost:30080/console 🚀 🚀 🎉
    # ❇️ Run the following command to export demo environment variables for accessing flytectl
-   #         export FLYTECTL_CONFIG=/home/ubuntu/.flyte/config-sandbox.yaml 
+   #         export FLYTECTL_CONFIG=/home/ubuntu/.flyte/config-sandbox.yaml
    # 🐋 Flyte sandbox ships with a Docker registry. Tag and push custom workflow images to localhost:30000
    # 📂 The Minio API is hosted on localhost:30002. Use http://localhost:30080/minio/login for Minio console
 
@@ -515,7 +525,7 @@ If not, we can start backends with a single command.
    source ~/.virtualenvs/flytekit/bin/activate
    make setup
    pip install -e .
-   
+
    # If you are also developing the plugins, consider the following:
 
    # Installing Specific Plugins:
@@ -545,10 +555,10 @@ If not, we can start backends with a single command.
 **3. Run workflow in sandbox.**
 
 
-Before running your workflow in the sandbox, make sure you're able to successfully run it locally. 
-To deploy the workflow in the sandbox, you'll need to build a Flytekit image. 
-Create a Dockerfile in your Flytekit directory with the minimum required configuration to run a task, as shown below. 
-If your task requires additional components, such as plugins, you may find it useful to refer to the construction of the `officail flitekit image <https://github.com/flyteorg/flytekit/blob/master/Dockerfile>`__ 
+Before running your workflow in the sandbox, make sure you're able to successfully run it locally.
+To deploy the workflow in the sandbox, you'll need to build a Flytekit image.
+Create a Dockerfile in your Flytekit directory with the minimum required configuration to run a task, as shown below.
+If your task requires additional components, such as plugins, you may find it useful to refer to the construction of the `officail flitekit image <https://github.com/flyteorg/flytekit/blob/master/Dockerfile>`__
 
 .. code:: Dockerfile
 
@@ -656,10 +666,10 @@ This section presumes a local Flyte cluster is already setup. If it isn't, refer
 - `How to setup dev environment for flyteidl, flyteadmin, flyteplugins, flytepropeller, datacatalog and flytestdlib? <#how-to-setup-dev-environment-for-flyteidl-flyteadmin-flyteplugins-flytepropeller-datacatalog-and-flytestdlib>`__
 
 
-**1. Access the Flyte UI.** 
+**1. Access the Flyte UI.**
 
 
-`Flyte UI <https://docs.flyte.org/en/latest/concepts/flyte_console.html>`__ is a web-based user interface for Flyte that lets you interact with Flyte objects and build directed acyclic graphs (DAGs) for your workflows. 
+`Flyte UI <https://docs.flyte.org/en/latest/concepts/flyte_console.html>`__ is a web-based user interface for Flyte that lets you interact with Flyte objects and build directed acyclic graphs (DAGs) for your workflows.
 
 You can access it via http://localhost:30080/console.
 
@@ -681,7 +691,7 @@ Access the minio console at: http://localhost:30080/minio/login. The default cre
 FlyteAdmin and datacatalog use postgres to store persistent records, and you can interact with postgres on port ``30001``. Here is an example of using `psql` to connect:
 
 .. code:: shell
-    
+
     # Step1: Install the PostgreSQL client.
     sudo apt-get update
     sudo apt-get install postgresql-client
@@ -690,7 +700,7 @@ FlyteAdmin and datacatalog use postgres to store persistent records, and you can
     psql -h localhost -p 30001 -U postgres -d flyte
 
 
-**4. Access the k3s dashboard.** 
+**4. Access the k3s dashboard.**
 
 
 Access the k3s dashboard at: http://localhost:30080/kubernetes-dashboard.
@@ -734,4 +744,4 @@ We use `GitHub Issues <https://github.com/flyteorg/flyte/issues>`__ for issue tr
 If none of the above fit your requirements, file a `blank <https://github.com/flyteorg/flyte/issues/new>`__ issue.
 Also, add relevant labels to your issue. For example, if you are filing a Flytekit plugin request, add the ``flytekit`` label.
 
-For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__. 
+For feedback at any point in the contribution process, feel free to reach out to us on `Slack <https://slack.flyte.org/>`__.
