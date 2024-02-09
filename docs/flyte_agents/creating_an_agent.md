@@ -11,6 +11,8 @@ jupytext:
 
 The Flyte agent framework enables rapid agent development, since agents are decoupled from the core FlytePropeller engine. Agents can be written in Python, easing development for data scientists. Agents can be tested independently and deployed privately, making maintenance easier and giving you more flexibility and control over development.
 
+TK - may need to add content about async vs sync agents here (and possibly in index.md)
+
 If you need to create a new type of task, we recommend creating a new agent to run it rather than running the task in a pod. After testing the new agent, you can update your FlytePropeller configMap to specify the type of task that the agent should run.
 
 :::{note}
@@ -21,7 +23,9 @@ While agents can be written in any programming language, we currently only suppo
 
 ## Flytekit interface specification
 
-To create a new agent, extend the `AgentBase` class in the `flytekit.backend` module and implement `create`, `get`, and `delete` methods. All calls must be idempotent.
+### Async agent interface
+
+To create a new async agent, extend the `AgentBase` class in the `flytekit.backend` module and implement `create`, `get`, and `delete` methods. All calls must be idempotent.
 
 - `create`: This method is used to initiate a new task. Users have the flexibility to use gRPC, REST, or an SDK to create a task.
 - `get`: This method allows retrieving the job Resource (jobID or output literal) associated with the task, such as a BigQuery Job ID or Databricks task ID.
@@ -87,3 +91,7 @@ AgentRegistry.register(CustomAgent())
 ```
 
 For an example implementation, see the [BigQuery Agent](https://github.com/flyteorg/flytekit/blob/9977aac26242ebbede8e00d476c2fbc59ac5487a/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L35).
+
+### Sync agent interface
+
+TK - just need to implement `execute()` method
