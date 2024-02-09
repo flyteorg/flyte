@@ -366,6 +366,17 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
+     * Fetches a :ref:`ref_flyteidl.admin.Project`
+     *
+     * @generated from rpc flyteidl.service.AdminService.GetProject
+     */
+    getProject: {
+      name: "GetProject",
+      I: Project,
+      O: Project,
+      kind: MethodKind.Unary,
+    },
+    /**
      * Fetches a list of :ref:`ref_flyteidl.admin.Project`
      *
      * @generated from rpc flyteidl.service.AdminService.ListProjects

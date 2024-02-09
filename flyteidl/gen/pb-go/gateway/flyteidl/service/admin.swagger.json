@@ -5511,12 +5511,18 @@
     "/api/v1/projects/org/{org}/{id}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
-        "operationId": "GetProject2",
+        "operationId": "AdminService_GetProject2",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -5544,6 +5550,13 @@
           },
           {
             "name": "description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "labels.values[string][string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
             "in": "query",
             "required": false,
             "type": "string"
@@ -5656,12 +5669,18 @@
     "/api/v1/projects/{id}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
-        "operationId": "GetProject",
+        "operationId": "AdminService_GetProject",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/adminProject"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
             }
           }
         },
@@ -5682,6 +5701,13 @@
           },
           {
             "name": "description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "labels.values[string]",
+            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
             "in": "query",
             "required": false,
             "type": "string"
@@ -9768,7 +9794,7 @@
     "adminLabels": {
       "type": "object",
       "properties": {
-        "values": {
+        "values[string][string]": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
