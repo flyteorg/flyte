@@ -7,8 +7,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
-
 	grpcRetry "github.com/grpc-ecosystem/go-grpc-middleware/retry"
 	grpcPrometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"google.golang.org/grpc"
@@ -17,6 +15,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
@@ -32,7 +31,7 @@ type Clientset struct {
 	identityServiceClient     service.IdentityServiceClient
 	dataProxyServiceClient    service.DataProxyServiceClient
 	signalServiceClient       service.SignalServiceClient
-	artifactServiceClient     artifact.ArtifactRegistryClient
+	artifactServiceClient     artifacts.ArtifactRegistryClient
 }
 
 // AdminClient retrieves the AdminServiceClient
@@ -62,7 +61,7 @@ func (c Clientset) SignalServiceClient() service.SignalServiceClient {
 	return c.signalServiceClient
 }
 
-func (c Clientset) ArtifactServiceClient() artifact.ArtifactRegistryClient {
+func (c Clientset) ArtifactServiceClient() artifacts.ArtifactRegistryClient {
 	return c.artifactServiceClient
 }
 
@@ -206,7 +205,7 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	cs.healthServiceClient = grpc_health_v1.NewHealthClient(adminConnection)
 	cs.dataProxyServiceClient = service.NewDataProxyServiceClient(adminConnection)
 	cs.signalServiceClient = service.NewSignalServiceClient(adminConnection)
-	cs.artifactServiceClient = artifact.NewArtifactRegistryClient(adminConnection)
+	cs.artifactServiceClient = artifacts.NewArtifactRegistryClient(adminConnection)
 
 	return &cs, nil
 }

@@ -8,14 +8,14 @@ import (
 
 	admin2 "github.com/flyteorg/flyte/flyteidl/clients/go/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifact"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 // ArtifactRegistry contains a client to talk to an Artifact service and has helper methods
 type ArtifactRegistry struct {
-	client artifact.ArtifactRegistryClient
+	client artifacts.ArtifactRegistryClient
 }
 
 func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *core.Identifier, ti core.TypedInterface) {
@@ -24,12 +24,12 @@ func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *cor
 		return
 	}
 
-	ap := &artifact.ArtifactProducer{
+	ap := &artifacts.ArtifactProducer{
 		EntityId: id,
 		Outputs:  ti.Outputs,
 	}
-	_, err := a.client.RegisterProducer(ctx, &artifact.RegisterProducerRequest{
-		Producers: []*artifact.ArtifactProducer{ap},
+	_, err := a.client.RegisterProducer(ctx, &artifacts.RegisterProducerRequest{
+		Producers: []*artifacts.ArtifactProducer{ap},
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to register artifact producer for task [%+v] with err: %v", id, err)
@@ -42,12 +42,12 @@ func (a *ArtifactRegistry) RegisterArtifactConsumer(ctx context.Context, id *cor
 		logger.Debugf(ctx, "Artifact client not configured, skipping registration for consumer [%+v]", id)
 		return
 	}
-	ac := &artifact.ArtifactConsumer{
+	ac := &artifacts.ArtifactConsumer{
 		EntityId: id,
 		Inputs:   &pm,
 	}
-	_, err := a.client.RegisterConsumer(ctx, &artifact.RegisterConsumerRequest{
-		Consumers: []*artifact.ArtifactConsumer{ac},
+	_, err := a.client.RegisterConsumer(ctx, &artifacts.RegisterConsumerRequest{
+		Consumers: []*artifacts.ArtifactConsumer{ac},
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to register artifact consumer for entity [%+v] with err: %v", id, err)
@@ -60,7 +60,7 @@ func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.Laun
 		logger.Debugf(ctx, "Artifact client not configured, skipping trigger [%+v]", plan)
 		return fmt.Errorf("artifact client not configured")
 	}
-	_, err := a.client.CreateTrigger(ctx, &artifact.CreateTriggerRequest{
+	_, err := a.client.CreateTrigger(ctx, &artifacts.CreateTriggerRequest{
 		TriggerLaunchPlan: plan,
 	})
 	if err != nil {
@@ -71,7 +71,7 @@ func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.Laun
 	return nil
 }
 
-func (a *ArtifactRegistry) GetClient() artifact.ArtifactRegistryClient {
+func (a *ArtifactRegistry) GetClient() artifacts.ArtifactRegistryClient {
 	if a == nil {
 		return nil
 	}

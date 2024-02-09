@@ -5720,5 +5720,96 @@ func TestAddStateFilter(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, "state <> ?", expression.Query)
 	})
+}
 
+func TestQueryTemplate(t *testing.T) {
+	ctx := context.Background()
+
+	aTime := time.Date(
+		2063, 4, 5, 00, 00, 00, 0, time.UTC)
+
+	rawInputs := map[string]interface{}{
+		"aStr":   "hello world",
+		"anInt":  1,
+		"aFloat": 1.3,
+		"aTime":  aTime,
+	}
+
+	otherInputs, err := coreutils.MakeLiteralMap(rawInputs)
+	assert.NoError(t, err)
+
+	m := ExecutionManager{}
+
+	ak := &core.ArtifactKey{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "testname",
+	}
+
+	t.Run("test all present, nothing to fill in", func(t *testing.T) {
+		pMap := map[string]*core.LabelValue{
+			"partition1": {Value: &core.LabelValue_StaticValue{StaticValue: "my value"}},
+			"partition2": {Value: &core.LabelValue_StaticValue{StaticValue: "my value 2"}},
+		}
+		p := &core.Partitions{Value: pMap}
+
+		q := core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey:   ak,
+					Partitions:    p,
+					TimePartition: nil,
+				},
+			},
+		}
+
+		filledQuery, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(&q, &filledQuery))
+	})
+
+	t.Run("template date-times, both in explicit tp and not", func(t *testing.T) {
+		pMap := map[string]*core.LabelValue{
+			"partition1": {Value: &core.LabelValue_InputBinding{InputBinding: &core.InputBindingData{Var: "aTime"}}},
+			"partition2": {Value: &core.LabelValue_StaticValue{StaticValue: "my value 2"}},
+		}
+		p := &core.Partitions{Value: pMap}
+
+		q := core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey:   ak,
+					Partitions:    p,
+					TimePartition: &core.TimePartition{Value: &core.LabelValue{Value: &core.LabelValue_InputBinding{InputBinding: &core.InputBindingData{Var: "aTime"}}}},
+				},
+			},
+		}
+
+		filledQuery, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.NoError(t, err)
+		staticTime := filledQuery.GetArtifactId().Partitions.Value["partition1"].GetStaticValue()
+		assert.Equal(t, "2063-04-05", staticTime)
+		assert.Equal(t, int64(2942956800), filledQuery.GetArtifactId().TimePartition.Value.GetTimeValue().Seconds)
+	})
+
+	t.Run("something missing", func(t *testing.T) {
+		pMap := map[string]*core.LabelValue{
+			"partition1": {Value: &core.LabelValue_StaticValue{StaticValue: "my value"}},
+			"partition2": {Value: &core.LabelValue_StaticValue{StaticValue: "my value 2"}},
+		}
+		p := &core.Partitions{Value: pMap}
+
+		q := core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey:   ak,
+					Partitions:    p,
+					TimePartition: &core.TimePartition{Value: &core.LabelValue{Value: &core.LabelValue_InputBinding{InputBinding: &core.InputBindingData{Var: "wrong var"}}}},
+				},
+			},
+		}
+
+		_, err := m.fillInTemplateArgs(ctx, q, otherInputs.Literals)
+		assert.Error(t, err)
+	})
 }
