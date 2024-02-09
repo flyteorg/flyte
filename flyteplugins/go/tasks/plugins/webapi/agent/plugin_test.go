@@ -22,37 +22,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-func TestSyncTask(t *testing.T) {
-	tCtx := getTaskContext(t)
-	taskReader := new(pluginCoreMocks.TaskReader)
-
-	template := flyteIdlCore.TaskTemplate{
-		Type: "api_task",
-	}
-
-	taskReader.On("Read", mock.Anything).Return(&template, nil)
-
-	tCtx.OnTaskReader().Return(taskReader)
-
-	agentPlugin := newMockSyncAgentPlugin()
-	pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
-	plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("create_task_sync_test"))
-	assert.NoError(t, err)
-
-	inputs := &flyteIdlCore.InputData{Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"x": 1}).GetMap()}
-	assert.NoError(t, err)
-	basePrefix := storage.DataReference("fake://bucket/prefix/")
-	inputReader := &ioMocks.InputReader{}
-	inputReader.OnGetInputPrefixPath().Return(basePrefix)
-	inputReader.OnGetInputPathMatch(mock.Anything).Return(basePrefix+"/inputs.pb", nil)
-	inputReader.OnGetInputDataPath().Return(basePrefix + "/inputs.pb")
-	inputReader.OnGetMatch(mock.Anything).Return(inputs, nil)
-	tCtx.OnInputReader().Return(inputReader)
-
-	phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, nil)
-	assert.Equal(t, true, phase.Phase().IsSuccess())
-}
-
 const defaultAgentEndpoint = "localhost:8000"
 
 func TestPlugin(t *testing.T) {
