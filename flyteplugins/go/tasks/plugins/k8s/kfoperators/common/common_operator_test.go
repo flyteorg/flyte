@@ -278,23 +278,27 @@ func dummyPodSpec() v1.PodSpec {
 
 func TestOverrideContainerSpec(t *testing.T) {
 	podSpec := dummyPodSpec()
+	nodeSelectors := map[string]string{"key1": "value1", "key2": "value2"}
 	err := OverrideContainerSpec(
 		&podSpec, "primary container", "testing-image",
 		[]string{"python", "-m", "run.py"},
+		nodeSelectors,
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(podSpec.Containers))
 	assert.Equal(t, "testing-image", podSpec.Containers[0].Image)
 	assert.Equal(t, []string{"python", "-m", "run.py"}, podSpec.Containers[0].Args)
+	assert.Equal(t, nodeSelectors, podSpec.NodeSelector)
 }
 
 func TestOverrideContainerSpecEmptyFields(t *testing.T) {
 	podSpec := dummyPodSpec()
-	err := OverrideContainerSpec(&podSpec, "primary container", "", []string{})
+	err := OverrideContainerSpec(&podSpec, "primary container", "", []string{}, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, len(podSpec.Containers))
 	assert.Equal(t, "dummy-image", podSpec.Containers[0].Image)
 	assert.Equal(t, []string{"pyflyte-execute", "--task-module", "tests.flytekit.unit.sdk.tasks.test_sidecar_tasks", "--task-name", "simple_sidecar_task", "--inputs", "{{.input}}", "--output-prefix", "{{.outputPrefix}}"}, podSpec.Containers[0].Args)
+	assert.Nil(t, podSpec.NodeSelector)
 }
 
 func dummyTaskContext() pluginsCore.TaskExecutionContext {

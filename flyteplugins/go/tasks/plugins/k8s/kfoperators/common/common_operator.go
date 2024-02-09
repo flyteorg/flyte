@@ -266,13 +266,13 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
 
 	// Add node selectors if the map is not nil
 	if nodeSelectors != nil {
-        if podSpec.NodeSelector == nil {
-            podSpec.NodeSelector = make(map[string]string)
-        }
-        for key, value := range nodeSelectors {
-            podSpec.NodeSelector[key] = value
-        }
-    }
+		if podSpec.NodeSelector == nil {
+			podSpec.NodeSelector = make(map[string]string)
+		}
+		for key, value := range nodeSelectors {
+			podSpec.NodeSelector[key] = value
+		}
+	}
 	return nil
 }
 

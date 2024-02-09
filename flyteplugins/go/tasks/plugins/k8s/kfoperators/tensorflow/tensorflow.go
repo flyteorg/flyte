@@ -72,7 +72,7 @@ func (tensorflowOperatorResourceHandler) BuildResource(ctx context.Context, task
 			kubeflowv1.TFJobReplicaTypeChief:  tensorflowTaskExtraArgs.GetChiefReplicas(),
 			kubeflowv1.TFJobReplicaTypeWorker: tensorflowTaskExtraArgs.GetWorkers(),
 			kubeflowv1.TFJobReplicaTypePS:     tensorflowTaskExtraArgs.GetPsReplicas(),
-			kubeflowv1.TFJobReplicaTypeEval:   tensorflowTaskExtraArgs.GetEvaluatorReplicas(),	
+			kubeflowv1.TFJobReplicaTypeEval:   tensorflowTaskExtraArgs.GetEvaluatorReplicas(),
 		}
 
 		for t, r := range replicaNumMap {
