@@ -141,21 +141,21 @@ func TestBuildNodeSpec(t *testing.T) {
 	})
 
 	t.Run("node with container image override", func(t *testing.T) {
-		expected_container_image := "test-image:latest"
+		expectedContainerImage := "test-image:latest"
 		n.Node.Target = &core.Node_TaskNode{
 			TaskNode: &core.TaskNode{
 				Reference: &core.TaskNode_ReferenceId{
 					ReferenceId: &core.Identifier{Name: "ref_2"},
 				},
 				Overrides: &core.TaskNodeOverrides{
-					ContainerImage: expected_container_image,
+					ContainerImage: expectedContainerImage,
 				},
 			},
 		}
 
 		spec := mustBuild(t, n, 1, errs.NewScope())
 		assert.NotNil(t, spec.GetContainerImage())
-		assert.Equal(t, expected_container_image, spec.GetContainerImage())
+		assert.Equal(t, expectedContainerImage, spec.GetContainerImage())
 	})
 
 	t.Run("LaunchPlanRef", func(t *testing.T) {
