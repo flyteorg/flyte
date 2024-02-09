@@ -38,6 +38,12 @@ spec:
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        {{- if .Values.datacatalog.podEnv }}
+        env:
+          {{- with .Values.datacatalog.podEnv }}
+          {{- toYaml . | nindent 8 }}
+          {{- end }}
+        {{- end }}
       containers:
       - command:
         - datacatalog

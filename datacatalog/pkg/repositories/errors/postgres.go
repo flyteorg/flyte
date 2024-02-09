@@ -3,7 +3,6 @@ package errors
 import (
 	"errors"
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/database"
 	"reflect"
 
 	"github.com/jackc/pgconn"
@@ -11,6 +10,7 @@ import (
 	"gorm.io/gorm"
 
 	catalogErrors "github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/flytestdlib/database"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 

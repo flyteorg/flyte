@@ -233,6 +233,7 @@ type UserAuthConfig struct {
 	CookieHashKeySecretName  string         `json:"cookieHashKeySecretName" pflag:",OPTIONAL: Secret name to use for cookie hash key."`
 	CookieBlockKeySecretName string         `json:"cookieBlockKeySecretName" pflag:",OPTIONAL: Secret name to use for cookie block key."`
 	CookieSetting            CookieSettings `json:"cookieSetting" pflag:", settings used by cookies created for user auth"`
+	IDPQueryParameter        string         `json:"idpQueryParameter" pflag:", idp query parameter used for selecting a particular IDP for doing user authentication. Eg: for Okta passing idp=<IDP-ID> forces the authentication to happen with IDP-ID"`
 }
 
 //go:generate enumer --type=SameSite --trimprefix=SameSite -json

@@ -403,11 +403,11 @@ that integrates all Flyte components into a single binary.
    # We will now create a simple template that allows the automatic creation of required namespaces for projects.
    # For example, with Flyte's default project "flytesnacks", the controller will auto-create the following namespaces:
    # flytesnacks-staging, flytesnacks-development, and flytesnacks-production.
-   mkdir $HOME/.flyte/cluster-resource-templates/
+   mkdir $HOME/.flyte/sandbox/cluster-resource-templates/
    echo "apiVersion: v1
    kind: Namespace
    metadata:
-     name: '{{ namespace }}'" > $HOME/.flyte/cluster-resource-templates/namespace.yaml
+     name: '{{ namespace }}'" > $HOME/.flyte/sandbox/cluster-resource-templates/namespace.yaml
 
    # Step5: Running the single binary.
    # The POD_NAMESPACE environment variable is necessary for the webhook to function correctly. 

@@ -35,7 +35,7 @@ author = "Flyte"
 # The short X.Y version
 version = ""
 # The full version, including alpha/beta/rc tags
-release = "1.10.7-b3"
+release = "1.10.7-b4"
 
 # -- General configuration ---------------------------------------------------
 
@@ -94,7 +94,7 @@ extlinks = {
 
 
 autosummary_generate = True
-suppress_warnings = ["autosectionlabel.*"]
+suppress_warnings = ["autosectionlabel.*", "myst.header"]
 autodoc_typehints = "description"
 
 # The master toctree document.
@@ -294,6 +294,9 @@ nb_execution_excludepatterns = [
     "flytesnacks/**/*",
     "examples/**/*",
 ]
+nb_custom_formats = {
+    ".md": ["jupytext.reads", {"fmt": "md:myst"}],
+}
 
 # Pattern for removing intersphinx references from source files.
 # This should handle cases like:
@@ -365,6 +368,7 @@ import_projects = [
                 "flytesnacks/auto_examples",
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
+                "flytesnacks/getting_started",
             ]
         ],
         "local": flytesnacks_local_path is not None,
@@ -446,6 +450,7 @@ class CustomWarningSuppressor(logging.Filter):
             "Definition list ends without a blank line",
             "autodoc: failed to import module 'awssagemaker' from module 'flytekitplugins'",
             "Enumerated list ends without a blank line",
+            'Unknown directive type "toc".',  # need to fix flytesnacks/contribute.md
         )
 
         if msg.strip().startswith(filter_out):
