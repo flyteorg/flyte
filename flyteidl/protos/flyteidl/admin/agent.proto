@@ -14,6 +14,7 @@ import "google/protobuf/timestamp.proto";
 
 // The state of the execution is used to control its visibility in the UI/CLI.
 enum State {
+  option deprecated = true;
   RETRYABLE_FAILURE = 0;
   PERMANENT_FAILURE = 1;
   PENDING = 2;

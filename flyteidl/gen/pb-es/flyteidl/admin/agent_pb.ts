@@ -16,6 +16,7 @@ import { ExecutionMetricResult } from "../core/metrics_pb.js";
  * The state of the execution is used to control its visibility in the UI/CLI.
  *
  * @generated from enum flyteidl.admin.State
+ * @deprecated
  */
 export enum State {
   /**
