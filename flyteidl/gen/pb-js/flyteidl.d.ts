@@ -9613,6 +9613,9 @@ export namespace flyteidl {
 
             /** Agent supportedTaskTypes */
             supportedTaskTypes?: (flyteidl.admin.ITaskType[]|null);
+
+            /** Agent isSync */
+            isSync?: (boolean|null);
         }
 
         /** Represents an Agent. */
@@ -9629,6 +9632,9 @@ export namespace flyteidl {
 
             /** Agent supportedTaskTypes. */
             public supportedTaskTypes: flyteidl.admin.ITaskType[];
+
+            /** Agent isSync. */
+            public isSync: boolean;
 
             /**
              * Creates a new Agent instance using the specified properties.
@@ -21827,6 +21833,51 @@ export namespace flyteidl {
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
         }
 
+        /** Represents a SyncAgentService */
+        class SyncAgentService extends $protobuf.rpc.Service {
+
+            /**
+             * Constructs a new SyncAgentService service.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             */
+            constructor(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean);
+
+            /**
+             * Creates new SyncAgentService service using the specified rpc implementation.
+             * @param rpcImpl RPC implementation
+             * @param [requestDelimited=false] Whether requests are length-delimited
+             * @param [responseDelimited=false] Whether responses are length-delimited
+             * @returns RPC service. Useful where requests and/or responses are streamed.
+             */
+            public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): SyncAgentService;
+
+            /**
+             * Calls ExecuteTaskSync.
+             * @param request ExecuteTaskSyncRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ExecuteTaskSyncResponse
+             */
+            public executeTaskSync(request: flyteidl.admin.IExecuteTaskSyncRequest, callback: flyteidl.service.SyncAgentService.ExecuteTaskSyncCallback): void;
+
+            /**
+             * Calls ExecuteTaskSync.
+             * @param request ExecuteTaskSyncRequest message or plain object
+             * @returns Promise
+             */
+            public executeTaskSync(request: flyteidl.admin.IExecuteTaskSyncRequest): Promise<flyteidl.admin.ExecuteTaskSyncResponse>;
+        }
+
+        namespace SyncAgentService {
+
+            /**
+             * Callback as used by {@link flyteidl.service.SyncAgentService#executeTaskSync}.
+             * @param error Error, if any
+             * @param [response] ExecuteTaskSyncResponse
+             */
+            type ExecuteTaskSyncCallback = (error: (Error|null), response?: flyteidl.admin.ExecuteTaskSyncResponse) => void;
+        }
+
         /** Represents an AsyncAgentService */
         class AsyncAgentService extends $protobuf.rpc.Service {
 
@@ -21846,20 +21897,6 @@ export namespace flyteidl {
              * @returns RPC service. Useful where requests and/or responses are streamed.
              */
             public static create(rpcImpl: $protobuf.RPCImpl, requestDelimited?: boolean, responseDelimited?: boolean): AsyncAgentService;
-
-            /**
-             * Calls ExecuteTaskSync.
-             * @param request ExecuteTaskSyncRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and ExecuteTaskSyncResponse
-             */
-            public executeTaskSync(request: flyteidl.admin.IExecuteTaskSyncRequest, callback: flyteidl.service.AsyncAgentService.ExecuteTaskSyncCallback): void;
-
-            /**
-             * Calls ExecuteTaskSync.
-             * @param request ExecuteTaskSyncRequest message or plain object
-             * @returns Promise
-             */
-            public executeTaskSync(request: flyteidl.admin.IExecuteTaskSyncRequest): Promise<flyteidl.admin.ExecuteTaskSyncResponse>;
 
             /**
              * Calls CreateTask.
@@ -21933,13 +21970,6 @@ export namespace flyteidl {
         }
 
         namespace AsyncAgentService {
-
-            /**
-             * Callback as used by {@link flyteidl.service.AsyncAgentService#executeTaskSync}.
-             * @param error Error, if any
-             * @param [response] ExecuteTaskSyncResponse
-             */
-            type ExecuteTaskSyncCallback = (error: (Error|null), response?: flyteidl.admin.ExecuteTaskSyncResponse) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AsyncAgentService#createTask}.

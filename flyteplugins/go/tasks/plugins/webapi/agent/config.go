@@ -88,6 +88,13 @@ type Agent struct {
 
 	// DefaultTimeout gives the default RPC timeout if a more specific one is not defined in Timeouts; if neither DefaultTimeout nor Timeouts is defined for an operation, RPC timeout will not be enforced
 	DefaultTimeout config.Duration `json:"defaultTimeout"`
+
+	// IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
+	// results synchronously when called by propeller. Given that sync agents can affect the performance
+	// of the system, it's important to enforce strict timeout policies.
+	// An Async agent, on the other hand, is required to be able to identify jobs by an
+	// identifier and query for job statuses as jobs progress.
+	IsSync bool `json:"isSync"`
 }
 
 func GetConfig() *Config {

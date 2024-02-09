@@ -20,20 +20,139 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	AsyncAgentService_ExecuteTaskSync_FullMethodName = "/flyteidl.service.AsyncAgentService/ExecuteTaskSync"
-	AsyncAgentService_CreateTask_FullMethodName      = "/flyteidl.service.AsyncAgentService/CreateTask"
-	AsyncAgentService_GetTask_FullMethodName         = "/flyteidl.service.AsyncAgentService/GetTask"
-	AsyncAgentService_DeleteTask_FullMethodName      = "/flyteidl.service.AsyncAgentService/DeleteTask"
-	AsyncAgentService_GetTaskMetrics_FullMethodName  = "/flyteidl.service.AsyncAgentService/GetTaskMetrics"
-	AsyncAgentService_GetTaskLogs_FullMethodName     = "/flyteidl.service.AsyncAgentService/GetTaskLogs"
+	SyncAgentService_ExecuteTaskSync_FullMethodName = "/flyteidl.service.SyncAgentService/ExecuteTaskSync"
+)
+
+// SyncAgentServiceClient is the client API for SyncAgentService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type SyncAgentServiceClient interface {
+	// ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+	ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (SyncAgentService_ExecuteTaskSyncClient, error)
+}
+
+type syncAgentServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewSyncAgentServiceClient(cc grpc.ClientConnInterface) SyncAgentServiceClient {
+	return &syncAgentServiceClient{cc}
+}
+
+func (c *syncAgentServiceClient) ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (SyncAgentService_ExecuteTaskSyncClient, error) {
+	stream, err := c.cc.NewStream(ctx, &SyncAgentService_ServiceDesc.Streams[0], SyncAgentService_ExecuteTaskSync_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &syncAgentServiceExecuteTaskSyncClient{stream}
+	return x, nil
+}
+
+type SyncAgentService_ExecuteTaskSyncClient interface {
+	Send(*admin.ExecuteTaskSyncRequest) error
+	Recv() (*admin.ExecuteTaskSyncResponse, error)
+	grpc.ClientStream
+}
+
+type syncAgentServiceExecuteTaskSyncClient struct {
+	grpc.ClientStream
+}
+
+func (x *syncAgentServiceExecuteTaskSyncClient) Send(m *admin.ExecuteTaskSyncRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *syncAgentServiceExecuteTaskSyncClient) Recv() (*admin.ExecuteTaskSyncResponse, error) {
+	m := new(admin.ExecuteTaskSyncResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// SyncAgentServiceServer is the server API for SyncAgentService service.
+// All implementations should embed UnimplementedSyncAgentServiceServer
+// for forward compatibility
+type SyncAgentServiceServer interface {
+	// ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
+	ExecuteTaskSync(SyncAgentService_ExecuteTaskSyncServer) error
+}
+
+// UnimplementedSyncAgentServiceServer should be embedded to have forward compatible implementations.
+type UnimplementedSyncAgentServiceServer struct {
+}
+
+func (UnimplementedSyncAgentServiceServer) ExecuteTaskSync(SyncAgentService_ExecuteTaskSyncServer) error {
+	return status.Errorf(codes.Unimplemented, "method ExecuteTaskSync not implemented")
+}
+
+// UnsafeSyncAgentServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to SyncAgentServiceServer will
+// result in compilation errors.
+type UnsafeSyncAgentServiceServer interface {
+	mustEmbedUnimplementedSyncAgentServiceServer()
+}
+
+func RegisterSyncAgentServiceServer(s grpc.ServiceRegistrar, srv SyncAgentServiceServer) {
+	s.RegisterService(&SyncAgentService_ServiceDesc, srv)
+}
+
+func _SyncAgentService_ExecuteTaskSync_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(SyncAgentServiceServer).ExecuteTaskSync(&syncAgentServiceExecuteTaskSyncServer{stream})
+}
+
+type SyncAgentService_ExecuteTaskSyncServer interface {
+	Send(*admin.ExecuteTaskSyncResponse) error
+	Recv() (*admin.ExecuteTaskSyncRequest, error)
+	grpc.ServerStream
+}
+
+type syncAgentServiceExecuteTaskSyncServer struct {
+	grpc.ServerStream
+}
+
+func (x *syncAgentServiceExecuteTaskSyncServer) Send(m *admin.ExecuteTaskSyncResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *syncAgentServiceExecuteTaskSyncServer) Recv() (*admin.ExecuteTaskSyncRequest, error) {
+	m := new(admin.ExecuteTaskSyncRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
+// SyncAgentService_ServiceDesc is the grpc.ServiceDesc for SyncAgentService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var SyncAgentService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "flyteidl.service.SyncAgentService",
+	HandlerType: (*SyncAgentServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ExecuteTaskSync",
+			Handler:       _SyncAgentService_ExecuteTaskSync_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
+	Metadata: "flyteidl/service/agent.proto",
+}
+
+const (
+	AsyncAgentService_CreateTask_FullMethodName     = "/flyteidl.service.AsyncAgentService/CreateTask"
+	AsyncAgentService_GetTask_FullMethodName        = "/flyteidl.service.AsyncAgentService/GetTask"
+	AsyncAgentService_DeleteTask_FullMethodName     = "/flyteidl.service.AsyncAgentService/DeleteTask"
+	AsyncAgentService_GetTaskMetrics_FullMethodName = "/flyteidl.service.AsyncAgentService/GetTaskMetrics"
+	AsyncAgentService_GetTaskLogs_FullMethodName    = "/flyteidl.service.AsyncAgentService/GetTaskLogs"
 )
 
 // AsyncAgentServiceClient is the client API for AsyncAgentService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AsyncAgentServiceClient interface {
-	// ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
-	ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (AsyncAgentService_ExecuteTaskSyncClient, error)
 	// CreateTask sends a task create request to the agent service.
 	CreateTask(ctx context.Context, in *admin.CreateTaskRequest, opts ...grpc.CallOption) (*admin.CreateTaskResponse, error)
 	// Get job status.
@@ -56,37 +175,6 @@ type asyncAgentServiceClient struct {
 
 func NewAsyncAgentServiceClient(cc grpc.ClientConnInterface) AsyncAgentServiceClient {
 	return &asyncAgentServiceClient{cc}
-}
-
-func (c *asyncAgentServiceClient) ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (AsyncAgentService_ExecuteTaskSyncClient, error) {
-	stream, err := c.cc.NewStream(ctx, &AsyncAgentService_ServiceDesc.Streams[0], AsyncAgentService_ExecuteTaskSync_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &asyncAgentServiceExecuteTaskSyncClient{stream}
-	return x, nil
-}
-
-type AsyncAgentService_ExecuteTaskSyncClient interface {
-	Send(*admin.ExecuteTaskSyncRequest) error
-	Recv() (*admin.ExecuteTaskSyncResponse, error)
-	grpc.ClientStream
-}
-
-type asyncAgentServiceExecuteTaskSyncClient struct {
-	grpc.ClientStream
-}
-
-func (x *asyncAgentServiceExecuteTaskSyncClient) Send(m *admin.ExecuteTaskSyncRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *asyncAgentServiceExecuteTaskSyncClient) Recv() (*admin.ExecuteTaskSyncResponse, error) {
-	m := new(admin.ExecuteTaskSyncResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
 
 func (c *asyncAgentServiceClient) CreateTask(ctx context.Context, in *admin.CreateTaskRequest, opts ...grpc.CallOption) (*admin.CreateTaskResponse, error) {
@@ -126,7 +214,7 @@ func (c *asyncAgentServiceClient) GetTaskMetrics(ctx context.Context, in *admin.
 }
 
 func (c *asyncAgentServiceClient) GetTaskLogs(ctx context.Context, in *admin.GetTaskLogsRequest, opts ...grpc.CallOption) (AsyncAgentService_GetTaskLogsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &AsyncAgentService_ServiceDesc.Streams[1], AsyncAgentService_GetTaskLogs_FullMethodName, opts...)
+	stream, err := c.cc.NewStream(ctx, &AsyncAgentService_ServiceDesc.Streams[0], AsyncAgentService_GetTaskLogs_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -161,8 +249,6 @@ func (x *asyncAgentServiceGetTaskLogsClient) Recv() (*admin.GetTaskLogsResponse,
 // All implementations should embed UnimplementedAsyncAgentServiceServer
 // for forward compatibility
 type AsyncAgentServiceServer interface {
-	// ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
-	ExecuteTaskSync(AsyncAgentService_ExecuteTaskSyncServer) error
 	// CreateTask sends a task create request to the agent service.
 	CreateTask(context.Context, *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error)
 	// Get job status.
@@ -183,9 +269,6 @@ type AsyncAgentServiceServer interface {
 type UnimplementedAsyncAgentServiceServer struct {
 }
 
-func (UnimplementedAsyncAgentServiceServer) ExecuteTaskSync(AsyncAgentService_ExecuteTaskSyncServer) error {
-	return status.Errorf(codes.Unimplemented, "method ExecuteTaskSync not implemented")
-}
 func (UnimplementedAsyncAgentServiceServer) CreateTask(context.Context, *admin.CreateTaskRequest) (*admin.CreateTaskResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
 }
@@ -211,32 +294,6 @@ type UnsafeAsyncAgentServiceServer interface {
 
 func RegisterAsyncAgentServiceServer(s grpc.ServiceRegistrar, srv AsyncAgentServiceServer) {
 	s.RegisterService(&AsyncAgentService_ServiceDesc, srv)
-}
-
-func _AsyncAgentService_ExecuteTaskSync_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(AsyncAgentServiceServer).ExecuteTaskSync(&asyncAgentServiceExecuteTaskSyncServer{stream})
-}
-
-type AsyncAgentService_ExecuteTaskSyncServer interface {
-	Send(*admin.ExecuteTaskSyncResponse) error
-	Recv() (*admin.ExecuteTaskSyncRequest, error)
-	grpc.ServerStream
-}
-
-type asyncAgentServiceExecuteTaskSyncServer struct {
-	grpc.ServerStream
-}
-
-func (x *asyncAgentServiceExecuteTaskSyncServer) Send(m *admin.ExecuteTaskSyncResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *asyncAgentServiceExecuteTaskSyncServer) Recv() (*admin.ExecuteTaskSyncRequest, error) {
-	m := new(admin.ExecuteTaskSyncRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
 
 func _AsyncAgentService_CreateTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -357,12 +414,6 @@ var AsyncAgentService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "ExecuteTaskSync",
-			Handler:       _AsyncAgentService_ExecuteTaskSync_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
 		{
 			StreamName:    "GetTaskLogs",
 			Handler:       _AsyncAgentService_GetTaskLogs_Handler,

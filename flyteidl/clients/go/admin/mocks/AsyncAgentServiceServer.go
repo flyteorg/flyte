@@ -99,38 +99,6 @@ func (_m *AsyncAgentServiceServer) DeleteTask(_a0 context.Context, _a1 *admin.De
 	return r0, r1
 }
 
-type AsyncAgentServiceServer_ExecuteTaskSync struct {
-	*mock.Call
-}
-
-func (_m AsyncAgentServiceServer_ExecuteTaskSync) Return(_a0 error) *AsyncAgentServiceServer_ExecuteTaskSync {
-	return &AsyncAgentServiceServer_ExecuteTaskSync{Call: _m.Call.Return(_a0)}
-}
-
-func (_m *AsyncAgentServiceServer) OnExecuteTaskSync(_a0 service.AsyncAgentService_ExecuteTaskSyncServer) *AsyncAgentServiceServer_ExecuteTaskSync {
-	c_call := _m.On("ExecuteTaskSync", _a0)
-	return &AsyncAgentServiceServer_ExecuteTaskSync{Call: c_call}
-}
-
-func (_m *AsyncAgentServiceServer) OnExecuteTaskSyncMatch(matchers ...interface{}) *AsyncAgentServiceServer_ExecuteTaskSync {
-	c_call := _m.On("ExecuteTaskSync", matchers...)
-	return &AsyncAgentServiceServer_ExecuteTaskSync{Call: c_call}
-}
-
-// ExecuteTaskSync provides a mock function with given fields: _a0
-func (_m *AsyncAgentServiceServer) ExecuteTaskSync(_a0 service.AsyncAgentService_ExecuteTaskSyncServer) error {
-	ret := _m.Called(_a0)
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(service.AsyncAgentService_ExecuteTaskSyncServer) error); ok {
-		r0 = rf(_a0)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
 type AsyncAgentServiceServer_GetTask struct {
 	*mock.Call
 }

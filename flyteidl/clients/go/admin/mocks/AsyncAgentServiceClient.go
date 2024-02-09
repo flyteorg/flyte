@@ -115,54 +115,6 @@ func (_m *AsyncAgentServiceClient) DeleteTask(ctx context.Context, in *admin.Del
 	return r0, r1
 }
 
-type AsyncAgentServiceClient_ExecuteTaskSync struct {
-	*mock.Call
-}
-
-func (_m AsyncAgentServiceClient_ExecuteTaskSync) Return(_a0 service.AsyncAgentService_ExecuteTaskSyncClient, _a1 error) *AsyncAgentServiceClient_ExecuteTaskSync {
-	return &AsyncAgentServiceClient_ExecuteTaskSync{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AsyncAgentServiceClient) OnExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) *AsyncAgentServiceClient_ExecuteTaskSync {
-	c_call := _m.On("ExecuteTaskSync", ctx, opts)
-	return &AsyncAgentServiceClient_ExecuteTaskSync{Call: c_call}
-}
-
-func (_m *AsyncAgentServiceClient) OnExecuteTaskSyncMatch(matchers ...interface{}) *AsyncAgentServiceClient_ExecuteTaskSync {
-	c_call := _m.On("ExecuteTaskSync", matchers...)
-	return &AsyncAgentServiceClient_ExecuteTaskSync{Call: c_call}
-}
-
-// ExecuteTaskSync provides a mock function with given fields: ctx, opts
-func (_m *AsyncAgentServiceClient) ExecuteTaskSync(ctx context.Context, opts ...grpc.CallOption) (service.AsyncAgentService_ExecuteTaskSyncClient, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 service.AsyncAgentService_ExecuteTaskSyncClient
-	if rf, ok := ret.Get(0).(func(context.Context, ...grpc.CallOption) service.AsyncAgentService_ExecuteTaskSyncClient); ok {
-		r0 = rf(ctx, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.AsyncAgentService_ExecuteTaskSyncClient)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
 type AsyncAgentServiceClient_GetTask struct {
 	*mock.Call
 }

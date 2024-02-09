@@ -13,6 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/utils/strings/slices"
 
+	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -24,7 +25,6 @@ import (
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	ioMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
-	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flyteplugins/tests"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -92,7 +92,7 @@ func TestEndToEnd(t *testing.T) {
 				metricScope: iCtx.MetricsScope(),
 				cfg:         GetConfig(),
 				cs: &ClientSet{
-					agentClients:         map[string]service.AsyncAgentServiceClient{},
+					asyncAgentClients:    map[string]service.AsyncAgentServiceClient{},
 					agentMetadataClients: map[string]service.AgentMetadataServiceClient{},
 				},
 			}, nil
@@ -226,24 +226,22 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 
 func newMockAgentPlugin() webapi.PluginEntry {
 
-	agentClient := new(agentMocks.AsyncAgentServiceClient)
+	asyncAgentClient := new(agentMocks.AsyncAgentServiceClient)
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
 		expectedArgs := []string{"pyflyte-fast-execute", "--output-prefix", "/tmp/123"}
 		return slices.Equal(request.Template.GetContainer().Args, expectedArgs)
 	})
-	agentClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&admin.CreateTaskResponse{
-		Res: &admin.CreateTaskResponse_ResourceMeta{
-			ResourceMeta: []byte{1, 2, 3, 4},
-		}}, nil)
+	asyncAgentClient.On("CreateTask", mock.Anything, mockCreateRequestMatcher).Return(&admin.CreateTaskResponse{
+		ResourceMeta: []byte{1, 2, 3, 4}}, nil)
 
 	mockGetRequestMatcher := mock.MatchedBy(func(request *admin.GetTaskRequest) bool {
-		return request.GetTaskType() == "spark"
+		return request.GetTaskType().GetName() == "spark"
 	})
-	agentClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
+	asyncAgentClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
 		&admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil)
 
-	agentClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
+	asyncAgentClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
 		&admin.DeleteTaskResponse{}, nil)
 
 	cfg := defaultConfig
@@ -257,8 +255,8 @@ func newMockAgentPlugin() webapi.PluginEntry {
 				metricScope: iCtx.MetricsScope(),
 				cfg:         &cfg,
 				cs: &ClientSet{
-					agentClients: map[string]service.AsyncAgentServiceClient{
-						"localhost:8000": agentClient,
+					asyncAgentClients: map[string]service.AsyncAgentServiceClient{
+						defaultAgentEndpoint: asyncAgentClient,
 					},
 				},
 			}, nil

@@ -740,6 +740,17 @@ export class Agent extends Message<Agent> {
    */
   supportedTaskTypes: TaskType[] = [];
 
+  /**
+   * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
+   * results synchronously when called by propeller. Given that sync agents can affect the performance
+   * of the system, it's important to enforce strict timeout policies.
+   * An Async agent, on the other hand, is required to be able to identify jobs by an
+   * identifier and query for job statuses as jobs progress.
+   *
+   * @generated from field: bool is_sync = 3;
+   */
+  isSync = false;
+
   constructor(data?: PartialMessage<Agent>) {
     super();
     proto3.util.initPartial(data, this);
@@ -750,6 +761,7 @@ export class Agent extends Message<Agent> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "supported_task_types", kind: "message", T: TaskType, repeated: true },
+    { no: 3, name: "is_sync", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Agent {

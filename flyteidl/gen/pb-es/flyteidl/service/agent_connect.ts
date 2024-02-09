@@ -7,17 +7,17 @@ import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskRes
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
- * AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
+ * AgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
  *
- * @generated from service flyteidl.service.AsyncAgentService
+ * @generated from service flyteidl.service.SyncAgentService
  */
-export const AsyncAgentService = {
-  typeName: "flyteidl.service.AsyncAgentService",
+export const SyncAgentService = {
+  typeName: "flyteidl.service.SyncAgentService",
   methods: {
     /**
      * ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
      *
-     * @generated from rpc flyteidl.service.AsyncAgentService.ExecuteTaskSync
+     * @generated from rpc flyteidl.service.SyncAgentService.ExecuteTaskSync
      */
     executeTaskSync: {
       name: "ExecuteTaskSync",
@@ -25,6 +25,17 @@ export const AsyncAgentService = {
       O: ExecuteTaskSyncResponse,
       kind: MethodKind.BiDiStreaming,
     },
+  }
+} as const;
+
+/**
+ * AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
+ *
+ * @generated from service flyteidl.service.AsyncAgentService
+ */
+export const AsyncAgentService = {
+  typeName: "flyteidl.service.AsyncAgentService",
+  methods: {
     /**
      * CreateTask sends a task create request to the agent service.
      *

@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/exp/maps"
 
+	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -17,7 +18,6 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
-	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -59,12 +59,15 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agentRegistry := map[string]*Agent{"spark": {Endpoint: "localhost:80"}}
-		agent := getFinalAgent("spark", &cfg, agentRegistry)
+		agentRegistry := map[string]map[int32]*Agent{"spark": {defaultTaskTypeVersion: &Agent{Endpoint: "localhost:80"}}}
+		spark := &admin.TaskType{Name: "spark", Version: defaultTaskTypeVersion}
+		foo := &admin.TaskType{Name: "foo", Version: defaultTaskTypeVersion}
+		bar := &admin.TaskType{Name: "bar", Version: defaultTaskTypeVersion}
+		agent := getFinalAgent(spark, &cfg, agentRegistry)
 		assert.Equal(t, agent.Endpoint, "localhost:80")
-		agent = getFinalAgent("foo", &cfg, agentRegistry)
+		agent = getFinalAgent(foo, &cfg, agentRegistry)
 		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
-		agent = getFinalAgent("bar", &cfg, agentRegistry)
+		agent = getFinalAgent(bar, &cfg, agentRegistry)
 		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
@@ -270,11 +273,15 @@ func TestPlugin(t *testing.T) {
 func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
 	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
 	mockRequest := &admin.ListAgentsRequest{}
+	suppoertedTaskTypes := make([]*admin.TaskType, 3)
+	suppoertedTaskTypes[0] = &admin.TaskType{Name: "task1", Version: defaultTaskTypeVersion}
+	suppoertedTaskTypes[1] = &admin.TaskType{Name: "task2", Version: defaultTaskTypeVersion}
+	suppoertedTaskTypes[2] = &admin.TaskType{Name: "task3", Version: defaultTaskTypeVersion}
 	mockResponse := &admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
 				Name:               "test-agent",
-				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+				SupportedTaskTypes: suppoertedTaskTypes,
 			},
 		},
 	}
@@ -290,7 +297,7 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	agentMetadataClients[defaultAgentEndpoint] = getMockMetadataServiceClient()
 
 	cs := &ClientSet{
-		agentClients:         agentClients,
+		asyncAgentClients:    agentClients,
 		agentMetadataClients: agentMetadataClients,
 	}
 

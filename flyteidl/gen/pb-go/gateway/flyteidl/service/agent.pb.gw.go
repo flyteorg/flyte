@@ -33,7 +33,7 @@ var _ = runtime.String
 var _ = utilities.NewDoubleArray
 var _ = metadata.Join
 
-func request_AsyncAgentService_ExecuteTaskSync_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (extService.AsyncAgentService_ExecuteTaskSyncClient, runtime.ServerMetadata, error) {
+func request_SyncAgentService_ExecuteTaskSync_0(ctx context.Context, marshaler runtime.Marshaler, client extService.SyncAgentServiceClient, req *http.Request, pathParams map[string]string) (extService.SyncAgentService_ExecuteTaskSyncClient, runtime.ServerMetadata, error) {
 	var metadata runtime.ServerMetadata
 	stream, err := client.ExecuteTaskSync(ctx)
 	if err != nil {
@@ -575,18 +575,27 @@ func local_request_AgentMetadataService_ListAgents_0(ctx context.Context, marsha
 
 }
 
-// RegisterAsyncAgentServiceHandlerServer registers the http handlers for service AsyncAgentService to "mux".
-// UnaryRPC     :call AsyncAgentServiceServer directly.
+// RegisterSyncAgentServiceHandlerServer registers the http handlers for service SyncAgentService to "mux".
+// UnaryRPC     :call SyncAgentServiceServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
-// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAsyncAgentServiceHandlerFromEndpoint instead.
-func RegisterAsyncAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server extService.AsyncAgentServiceServer) error {
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterSyncAgentServiceHandlerFromEndpoint instead.
+func RegisterSyncAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server extService.SyncAgentServiceServer) error {
 
-	mux.Handle("POST", pattern_AsyncAgentService_ExecuteTaskSync_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("POST", pattern_SyncAgentService_ExecuteTaskSync_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		err := status.Error(codes.Unimplemented, "streaming calls are not yet supported in the in-process transport")
 		_, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		return
 	})
+
+	return nil
+}
+
+// RegisterAsyncAgentServiceHandlerServer registers the http handlers for service AsyncAgentService to "mux".
+// UnaryRPC     :call AsyncAgentServiceServer directly.
+// StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
+// Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterAsyncAgentServiceHandlerFromEndpoint instead.
+func RegisterAsyncAgentServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server extService.AsyncAgentServiceServer) error {
 
 	mux.Handle("POST", pattern_AsyncAgentService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -757,6 +766,77 @@ func RegisterAgentMetadataServiceHandlerServer(ctx context.Context, mux *runtime
 	return nil
 }
 
+// RegisterSyncAgentServiceHandlerFromEndpoint is same as RegisterSyncAgentServiceHandler but
+// automatically dials to "endpoint" and closes the connection when "ctx" gets done.
+func RegisterSyncAgentServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
+	conn, err := grpc.DialContext(ctx, endpoint, opts...)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err != nil {
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+			return
+		}
+		go func() {
+			<-ctx.Done()
+			if cerr := conn.Close(); cerr != nil {
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
+			}
+		}()
+	}()
+
+	return RegisterSyncAgentServiceHandler(ctx, mux, conn)
+}
+
+// RegisterSyncAgentServiceHandler registers the http handlers for service SyncAgentService to "mux".
+// The handlers forward requests to the grpc endpoint over "conn".
+func RegisterSyncAgentServiceHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	return RegisterSyncAgentServiceHandlerClient(ctx, mux, extService.NewSyncAgentServiceClient(conn))
+}
+
+// RegisterSyncAgentServiceHandlerClient registers the http handlers for service SyncAgentService
+// to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "extService.SyncAgentServiceClient".
+// Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "extService.SyncAgentServiceClient"
+// doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
+// "extService.SyncAgentServiceClient" to call the correct interceptors.
+func RegisterSyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client extService.SyncAgentServiceClient) error {
+
+	mux.Handle("POST", pattern_SyncAgentService_ExecuteTaskSync_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		var annotatedContext context.Context
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.SyncAgentService/ExecuteTaskSync", runtime.WithHTTPPathPattern("/api/v1/agent/task/stream"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_SyncAgentService_ExecuteTaskSync_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_SyncAgentService_ExecuteTaskSync_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
+
+	})
+
+	return nil
+}
+
+var (
+	pattern_SyncAgentService_ExecuteTaskSync_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "agent", "task", "stream"}, ""))
+)
+
+var (
+	forward_SyncAgentService_ExecuteTaskSync_0 = runtime.ForwardResponseStream
+)
+
 // RegisterAsyncAgentServiceHandlerFromEndpoint is same as RegisterAsyncAgentServiceHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterAsyncAgentServiceHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
@@ -794,28 +874,6 @@ func RegisterAsyncAgentServiceHandler(ctx context.Context, mux *runtime.ServeMux
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "extService.AsyncAgentServiceClient" to call the correct interceptors.
 func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client extService.AsyncAgentServiceClient) error {
-
-	mux.Handle("POST", pattern_AsyncAgentService_ExecuteTaskSync_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		var err error
-		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/ExecuteTaskSync", runtime.WithHTTPPathPattern("/api/v1/agent/task/stream"))
-		if err != nil {
-			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		resp, md, err := request_AsyncAgentService_ExecuteTaskSync_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-
-		forward_AsyncAgentService_ExecuteTaskSync_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
-
-	})
 
 	mux.Handle("POST", pattern_AsyncAgentService_CreateTask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -931,8 +989,6 @@ func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.Se
 }
 
 var (
-	pattern_AsyncAgentService_ExecuteTaskSync_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "v1", "agent", "task", "stream"}, ""))
-
 	pattern_AsyncAgentService_CreateTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "agent", "task"}, ""))
 
 	pattern_AsyncAgentService_GetTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "agent", "task", "task_type.name", "task_type.version", "resource_meta"}, ""))
@@ -945,8 +1001,6 @@ var (
 )
 
 var (
-	forward_AsyncAgentService_ExecuteTaskSync_0 = runtime.ForwardResponseStream
-
 	forward_AsyncAgentService_CreateTask_0 = runtime.ForwardResponseMessage
 
 	forward_AsyncAgentService_GetTask_0 = runtime.ForwardResponseMessage

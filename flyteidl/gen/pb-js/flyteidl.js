@@ -23537,6 +23537,7 @@
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
                  * @property {Array.<flyteidl.admin.ITaskType>|null} [supportedTaskTypes] Agent supportedTaskTypes
+                 * @property {boolean|null} [isSync] Agent isSync
                  */
     
                 /**
@@ -23572,6 +23573,14 @@
                 Agent.prototype.supportedTaskTypes = $util.emptyArray;
     
                 /**
+                 * Agent isSync.
+                 * @member {boolean} isSync
+                 * @memberof flyteidl.admin.Agent
+                 * @instance
+                 */
+                Agent.prototype.isSync = false;
+    
+                /**
                  * Creates a new Agent instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Agent
@@ -23600,6 +23609,8 @@
                     if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
                         for (var i = 0; i < message.supportedTaskTypes.length; ++i)
                             $root.flyteidl.admin.TaskType.encode(message.supportedTaskTypes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.isSync != null && message.hasOwnProperty("isSync"))
+                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
                     return writer;
                 };
     
@@ -23628,6 +23639,9 @@
                             if (!(message.supportedTaskTypes && message.supportedTaskTypes.length))
                                 message.supportedTaskTypes = [];
                             message.supportedTaskTypes.push($root.flyteidl.admin.TaskType.decode(reader, reader.uint32()));
+                            break;
+                        case 3:
+                            message.isSync = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23660,6 +23674,9 @@
                                 return "supportedTaskTypes." + error;
                         }
                     }
+                    if (message.isSync != null && message.hasOwnProperty("isSync"))
+                        if (typeof message.isSync !== "boolean")
+                            return "isSync: boolean expected";
                     return null;
                 };
     
@@ -51348,6 +51365,74 @@
                 return AdminService;
             })();
     
+            service.SyncAgentService = (function() {
+    
+                /**
+                 * Constructs a new SyncAgentService service.
+                 * @memberof flyteidl.service
+                 * @classdesc Represents a SyncAgentService
+                 * @extends $protobuf.rpc.Service
+                 * @constructor
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 */
+                function SyncAgentService(rpcImpl, requestDelimited, responseDelimited) {
+                    $protobuf.rpc.Service.call(this, rpcImpl, requestDelimited, responseDelimited);
+                }
+    
+                (SyncAgentService.prototype = Object.create($protobuf.rpc.Service.prototype)).constructor = SyncAgentService;
+    
+                /**
+                 * Creates new SyncAgentService service using the specified rpc implementation.
+                 * @function create
+                 * @memberof flyteidl.service.SyncAgentService
+                 * @static
+                 * @param {$protobuf.RPCImpl} rpcImpl RPC implementation
+                 * @param {boolean} [requestDelimited=false] Whether requests are length-delimited
+                 * @param {boolean} [responseDelimited=false] Whether responses are length-delimited
+                 * @returns {SyncAgentService} RPC service. Useful where requests and/or responses are streamed.
+                 */
+                SyncAgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
+                    return new this(rpcImpl, requestDelimited, responseDelimited);
+                };
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.SyncAgentService#executeTaskSync}.
+                 * @memberof flyteidl.service.SyncAgentService
+                 * @typedef ExecuteTaskSyncCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.ExecuteTaskSyncResponse} [response] ExecuteTaskSyncResponse
+                 */
+    
+                /**
+                 * Calls ExecuteTaskSync.
+                 * @function executeTaskSync
+                 * @memberof flyteidl.service.SyncAgentService
+                 * @instance
+                 * @param {flyteidl.admin.IExecuteTaskSyncRequest} request ExecuteTaskSyncRequest message or plain object
+                 * @param {flyteidl.service.SyncAgentService.ExecuteTaskSyncCallback} callback Node-style callback called with the error, if any, and ExecuteTaskSyncResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(SyncAgentService.prototype.executeTaskSync = function executeTaskSync(request, callback) {
+                    return this.rpcCall(executeTaskSync, $root.flyteidl.admin.ExecuteTaskSyncRequest, $root.flyteidl.admin.ExecuteTaskSyncResponse, request, callback);
+                }, "name", { value: "ExecuteTaskSync" });
+    
+                /**
+                 * Calls ExecuteTaskSync.
+                 * @function executeTaskSync
+                 * @memberof flyteidl.service.SyncAgentService
+                 * @instance
+                 * @param {flyteidl.admin.IExecuteTaskSyncRequest} request ExecuteTaskSyncRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.ExecuteTaskSyncResponse>} Promise
+                 * @variation 2
+                 */
+    
+                return SyncAgentService;
+            })();
+    
             service.AsyncAgentService = (function() {
     
                 /**
@@ -51379,39 +51464,6 @@
                 AsyncAgentService.create = function create(rpcImpl, requestDelimited, responseDelimited) {
                     return new this(rpcImpl, requestDelimited, responseDelimited);
                 };
-    
-                /**
-                 * Callback as used by {@link flyteidl.service.AsyncAgentService#executeTaskSync}.
-                 * @memberof flyteidl.service.AsyncAgentService
-                 * @typedef ExecuteTaskSyncCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.ExecuteTaskSyncResponse} [response] ExecuteTaskSyncResponse
-                 */
-    
-                /**
-                 * Calls ExecuteTaskSync.
-                 * @function executeTaskSync
-                 * @memberof flyteidl.service.AsyncAgentService
-                 * @instance
-                 * @param {flyteidl.admin.IExecuteTaskSyncRequest} request ExecuteTaskSyncRequest message or plain object
-                 * @param {flyteidl.service.AsyncAgentService.ExecuteTaskSyncCallback} callback Node-style callback called with the error, if any, and ExecuteTaskSyncResponse
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(AsyncAgentService.prototype.executeTaskSync = function executeTaskSync(request, callback) {
-                    return this.rpcCall(executeTaskSync, $root.flyteidl.admin.ExecuteTaskSyncRequest, $root.flyteidl.admin.ExecuteTaskSyncResponse, request, callback);
-                }, "name", { value: "ExecuteTaskSync" });
-    
-                /**
-                 * Calls ExecuteTaskSync.
-                 * @function executeTaskSync
-                 * @memberof flyteidl.service.AsyncAgentService
-                 * @instance
-                 * @param {flyteidl.admin.IExecuteTaskSyncRequest} request ExecuteTaskSyncRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.ExecuteTaskSyncResponse>} Promise
-                 * @variation 2
-                 */
     
                 /**
                  * Callback as used by {@link flyteidl.service.AsyncAgentService#createTask}.

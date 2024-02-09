@@ -6,6 +6,9 @@
   },
   "tags": [
     {
+      "name": "SyncAgentService"
+    },
+    {
       "name": "AsyncAgentService"
     },
     {
@@ -211,7 +214,7 @@
     "/api/v1/agent/task/stream": {
       "post": {
         "summary": "ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.",
-        "operationId": "AsyncAgentService_ExecuteTaskSync",
+        "operationId": "SyncAgentService_ExecuteTaskSync",
         "responses": {
           "200": {
             "description": "A successful response.(streaming responses)",
@@ -247,7 +250,7 @@
           }
         ],
         "tags": [
-          "AsyncAgentService"
+          "SyncAgentService"
         ]
       }
     },
@@ -574,6 +577,10 @@
             "$ref": "#/definitions/adminTaskType"
           },
           "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
+        },
+        "is_sync": {
+          "type": "boolean",
+          "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their\nresults synchronously when called by propeller. Given that sync agents can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async agent, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
         }
       },
       "description": "A message containing the agent metadata."

@@ -19,9 +19,11 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
+const defaultTaskTypeVersion = 0
+
 // ClientSet contains the clients exposed to communicate with various agent services.
 type ClientSet struct {
-	agentClients         map[string]service.AsyncAgentServiceClient    // map[endpoint] => client
+	asyncAgentClients    map[string]service.AsyncAgentServiceClient    // map[endpoint] => client
 	agentMetadataClients map[string]service.AgentMetadataServiceClient // map[endpoint] => client
 }
 
@@ -84,14 +86,14 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 	return context.WithTimeout(ctx, timeout)
 }
 
-func initializeAgentRegistry(cs *ClientSet) (map[string]*Agent, error) {
-	agentRegistry := make(map[string]*Agent)
+func initializeAgentRegistry(cs *ClientSet) (map[string]map[int32]*Agent, error) {
+	agentRegistry := make(map[string]map[int32]*Agent)
 	cfg := GetConfig()
 	var agentDeployments []*Agent
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
-		agentRegistry[taskType] = cfg.Agents[agentID]
+		agentRegistry[taskType] = map[int32]*Agent{0: cfg.Agents[agentID]}
 	}
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
@@ -124,7 +126,7 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]*Agent, error) {
 		for _, agent := range agents {
 			supportedTaskTypes := agent.SupportedTaskTypes
 			for _, supportedTaskType := range supportedTaskTypes {
-				agentRegistry[supportedTaskType] = agentDeployment
+				agentRegistry[supportedTaskType.GetName()] = map[int32]*Agent{supportedTaskType.Version: agentDeployment}
 			}
 		}
 	}
@@ -153,7 +155,7 @@ func initializeClients(ctx context.Context) (*ClientSet, error) {
 	}
 
 	return &ClientSet{
-		agentClients:         agentClients,
+		asyncAgentClients:    agentClients,
 		agentMetadataClients: agentMetadataClients,
 	}, nil
 }

@@ -6,8 +6,8 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/servi
 import "google/api/annotations.proto";
 import "flyteidl/admin/agent.proto";
 
-// AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server.
-service AsyncAgentService {
+// AgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+service SyncAgentService {
   // ExecuteTaskSync streams the create request and inputs to the agent service and streams the outputs back.
   rpc ExecuteTaskSync (stream flyteidl.admin.ExecuteTaskSyncRequest) returns (stream flyteidl.admin.ExecuteTaskSyncResponse){
     option (google.api.http) = {
@@ -15,7 +15,10 @@ service AsyncAgentService {
       body: "*"
     };
   };
+}
 
+// AsyncAgentService defines an RPC Service that allows propeller to send the request to the agent server asynchronously.
+service AsyncAgentService {
   // CreateTask sends a task create request to the agent service.
   rpc CreateTask (flyteidl.admin.CreateTaskRequest) returns (flyteidl.admin.CreateTaskResponse){
     option (google.api.http) = {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -25,7 +26,7 @@ type Plugin struct {
 	metricScope   promutils.Scope
 	cfg           *Config
 	cs            *ClientSet
-	agentRegistry map[string]*Agent // map[taskType] => Agent
+	agentRegistry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 }
 
 type ResourceWrapper struct {
@@ -39,9 +40,8 @@ type ResourceWrapper struct {
 
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
-	Token             string
 	AgentResourceMeta []byte
-	TaskType          string
+	TaskType          admin.TaskType
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -80,18 +80,30 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 			return nil, nil, err
 		}
 		taskTemplate.GetContainer().Args = modifiedArgs
+		defer func() {
+			// Restore unrendered template for subsequent renders.
+			taskTemplate.GetContainer().Args = argTemplate
+		}()
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
-
-	client, ok := p.cs.agentClients[agent.Endpoint]
-	if !ok {
-		return nil, nil, fmt.Errorf("endpoint [%s] not found in the client set", agent.Endpoint)
+	taskType := admin.TaskType{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
+	agent := getFinalAgent(&taskType, p.cfg, p.agentRegistry)
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return nil, nil, err
 	}
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
+
+	//if agent.IsSync {
+	//	stream, err := client.ExecuteTaskSync(ctx)
+	//	if err != nil {
+	//		return nil, nil, err
+	//	}
+	//	stream
+	//}
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
@@ -99,33 +111,29 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		return nil, nil, err
 	}
 
-	// Restore unrendered template for subsequent renders.
-	if taskTemplate.GetContainer() != nil {
-		taskTemplate.GetContainer().Args = argTemplate
-	}
-
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
-		Token:             "",
-		TaskType:          taskTemplate.Type,
+		TaskType:          taskType,
 	}, nil, nil
+}
+
+func (p Plugin) ExecuteTaskSync(ctx context.Context, taskCtx webapi.TaskExecutionContextReader) (webapi.ResourceMeta, webapi.Resource, error) {
+	return nil, nil, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+	agent := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
 
-	client := p.cs.agentClients[agent.Endpoint]
-	client, ok := p.cs.agentClients[agent.Endpoint]
-	if !ok {
-		return nil, fmt.Errorf("endpoint [%s] not found in the client set", agent.Endpoint)
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return nil, err
 	}
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	taskType := &admin.TaskType{Name: metadata.TaskType}
-	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: taskType, ResourceMeta: metadata.AgentResourceMeta})
+	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: &metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
 	if err != nil {
 		return nil, err
 	}
@@ -144,17 +152,16 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+	agent := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
 
-	client, ok := p.cs.agentClients[agent.Endpoint]
-	if !ok {
-		return fmt.Errorf("endpoint [%s] not found in the client set", agent.Endpoint)
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return err
 	}
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	taskType := &admin.TaskType{Name: metadata.TaskType}
-	_, err := client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: taskType, ResourceMeta: metadata.AgentResourceMeta})
+	_, err = client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: &metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
 	return err
 }
 
@@ -210,8 +217,17 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p Plugin) Do(ctx context.Context, tCtx webapi.TaskExecutionContext) (phase core.PhaseInfo, err error) {
-	return core.PhaseInfo{}, nil
+func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Agent) (service.AsyncAgentServiceClient, error) {
+	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
+	if !ok {
+		conn, err := getGrpcConnection(ctx, agent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+		}
+		client = service.NewAsyncAgentServiceClient(conn)
+		p.cs.asyncAgentClients[agent.Endpoint] = client
+	}
+	return client, nil
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
@@ -236,8 +252,8 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType string, cfg *Config, agentRegistry map[string]*Agent) *Agent {
-	if agent, exists := agentRegistry[taskType]; exists {
+func getFinalAgent(taskType *admin.TaskType, cfg *Config, agentRegistry map[string]map[int32]*Agent) *Agent {
+	if agent, exists := agentRegistry[taskType.Name][taskType.Version]; exists {
 		return agent
 	}
 
