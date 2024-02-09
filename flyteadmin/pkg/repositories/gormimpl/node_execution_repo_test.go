@@ -65,7 +65,7 @@ func TestUpdateNodeExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	// Only match on queries that append the name filter
 	nodeExecutionQuery := GlobalMock.NewMock()
-	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE "execution_project" = $14 AND "execution_domain" = $15 AND "execution_name" = $16 AND "node_id" = $17`)
+	nodeExecutionQuery.WithQuery(`UPDATE "node_executions" SET "id"=$1,"updated_at"=$2,"execution_project"=$3,"execution_domain"=$4,"execution_name"=$5,"node_id"=$6,"phase"=$7,"input_uri"=$8,"closure"=$9,"started_at"=$10,"node_execution_created_at"=$11,"node_execution_updated_at"=$12,"duration"=$13 WHERE "execution_org" = $14 AND "execution_project" = $15 AND "execution_domain" = $16 AND "execution_name" = $17 AND "node_id" = $18`)
 	err := nodeExecutionRepo.Update(context.Background(),
 		&models.NodeExecution{
 			BaseModel: models.BaseModel{ID: 1},
@@ -138,7 +138,7 @@ func TestGetNodeExecution(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
+		`SELECT * FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 AND "execution_org" = $5 LIMIT 1`).WithReply(nodeExecutions)
 	output, err := nodeExecutionRepo.Get(context.Background(), interfaces.NodeExecutionResource{
 		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
 			NodeId: "1",
@@ -362,7 +362,7 @@ func TestNodeExecutionExists(t *testing.T) {
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.NewMock().WithQuery(
-		`SELECT "id" FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 LIMIT 1`).WithReply(nodeExecutions)
+		`SELECT "id" FROM "node_executions" WHERE "node_executions"."execution_project" = $1 AND "node_executions"."execution_domain" = $2 AND "node_executions"."execution_name" = $3 AND "node_executions"."node_id" = $4 AND "execution_org" = $5 LIMIT 1`).WithReply(nodeExecutions)
 	exists, err := nodeExecutionRepo.Exists(context.Background(), interfaces.NodeExecutionResource{
 		NodeExecutionIdentifier: core.NodeExecutionIdentifier{
 			NodeId: "1",

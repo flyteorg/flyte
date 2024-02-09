@@ -116,3 +116,16 @@ func applyScopedFilters(tx *gorm.DB, inlineFilters []common.InlineFilter, mapFil
 	}
 	return tx, nil
 }
+
+const (
+	orgColumn          = "org"
+	executionOrgColumn = "execution_org"
+)
+
+func getOrgFilter(org string) map[string]interface{} {
+	return map[string]interface{}{orgColumn: org}
+}
+
+func getExecutionOrgFilter(executionOrg string) map[string]interface{} {
+	return map[string]interface{}{executionOrgColumn: executionOrg}
+}

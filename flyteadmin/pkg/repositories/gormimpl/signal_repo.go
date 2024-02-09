@@ -27,7 +27,7 @@ func (s *SignalRepo) Get(ctx context.Context, input models.SignalKey) (models.Si
 	timer := s.metrics.GetDuration.Start()
 	tx := s.db.Where(&models.Signal{
 		SignalKey: input,
-	}).Take(&signal)
+	}).Where(getExecutionOrgFilter(input.Org)).Take(&signal)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Signal{}, adminerrors.NewFlyteAdminError(codes.NotFound, "signal does not exist")
@@ -41,7 +41,7 @@ func (s *SignalRepo) Get(ctx context.Context, input models.SignalKey) (models.Si
 // GetOrCreate returns a signal if it already exists, if not it creates a new one given the input
 func (s *SignalRepo) GetOrCreate(ctx context.Context, input *models.Signal) error {
 	timer := s.metrics.CreateDuration.Start()
-	tx := s.db.FirstOrCreate(&input, input)
+	tx := s.db.Where(getExecutionOrgFilter(input.Org)).FirstOrCreate(&input, input)
 	timer.Stop()
 	if tx.Error != nil {
 		return s.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -85,7 +85,7 @@ func (s *SignalRepo) Update(ctx context.Context, input models.SignalKey, value [
 	}
 
 	timer := s.metrics.GetDuration.Start()
-	tx := s.db.Model(&signal).Select("value").Updates(signal)
+	tx := s.db.Model(&signal).Where(getExecutionOrgFilter(input.Org)).Select("value").Updates(signal)
 	timer.Stop()
 	if tx.Error != nil {
 		return s.errorTransformer.ToFlyteAdminError(tx.Error)

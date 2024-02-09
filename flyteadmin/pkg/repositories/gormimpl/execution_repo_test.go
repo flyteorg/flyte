@@ -47,10 +47,7 @@ func TestUpdateExecution(t *testing.T) {
 	updated := false
 
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`UPDATE "executions" SET "updated_at"=$1,"execution_project"=$2,` +
-		`"execution_domain"=$3,"execution_name"=$4,"launch_plan_id"=$5,"workflow_id"=$6,"phase"=$7,"closure"=$8,` +
-		`"spec"=$9,"started_at"=$10,"execution_created_at"=$11,"execution_updated_at"=$12,"duration"=$13 WHERE "` +
-		`execution_project" = $14 AND "execution_domain" = $15 AND "execution_name" = $16`).WithCallback(
+	GlobalMock.NewMock().WithQuery(`UPDATE "executions" SET "updated_at"=$1,"execution_project"=$2,"execution_domain"=$3,"execution_name"=$4,"launch_plan_id"=$5,"workflow_id"=$6,"phase"=$7,"closure"=$8,"spec"=$9,"started_at"=$10,"execution_created_at"=$11,"execution_updated_at"=$12,"duration"=$13 WHERE "execution_org" = $14 AND "execution_project" = $15 AND "execution_domain" = $16 AND "execution_name" = $17`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			updated = true
 		},
@@ -129,13 +126,12 @@ func TestGetExecution(t *testing.T) {
 	GlobalMock.Logging = true
 
 	// Only match on queries that append expected filters
-	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions" WHERE "executions"."execution_project" = $1 AND "executions"."execution_domain" = $2 AND "executions"."execution_name" = $3 AND "executions"."execution_org" = $4 LIMIT 1`).WithReply(executions)
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "executions" WHERE "executions"."execution_project" = $1 AND "executions"."execution_domain" = $2 AND "executions"."execution_name" = $3 AND "execution_org" = $4 LIMIT 1`).WithReply(executions)
 
 	output, err := executionRepo.Get(context.Background(), interfaces.Identifier{
 		Project: "project",
 		Domain:  "domain",
 		Name:    "1",
-		Org:     testOrg,
 	})
 	assert.NoError(t, err)
 	assert.EqualValues(t, expectedExecution, output)

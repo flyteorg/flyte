@@ -85,7 +85,7 @@ func TestUpdateTaskExecution(t *testing.T) {
 	GlobalMock.Logging = true
 
 	taskExecutionQuery := GlobalMock.NewMock()
-	taskExecutionQuery.WithQuery(`UPDATE "task_executions" SET "updated_at"=$1,"phase"=$2,"input_uri"=$3,"closure"=$4,"started_at"=$5,"task_execution_created_at"=$6,"task_execution_updated_at"=$7,"duration"=$8 WHERE "project" = $9 AND "domain" = $10 AND "name" = $11 AND "version" = $12 AND "execution_project" = $13 AND "execution_domain" = $14 AND "execution_name" = $15 AND "node_id" = $16 AND "retry_attempt" = $17`)
+	taskExecutionQuery.WithQuery(`UPDATE "task_executions" SET "updated_at"=$1,"phase"=$2,"input_uri"=$3,"closure"=$4,"started_at"=$5,"task_execution_created_at"=$6,"task_execution_updated_at"=$7,"duration"=$8 WHERE "org" = $9 AND "execution_org" = $10 AND "project" = $11 AND "domain" = $12 AND "name" = $13 AND "version" = $14 AND "execution_project" = $15 AND "execution_domain" = $16 AND "execution_name" = $17 AND "node_id" = $18 AND "retry_attempt" = $19`)
 	err := taskExecutionRepo.Update(context.Background(), testTaskExecution)
 	assert.NoError(t, err)
 	assert.True(t, taskExecutionQuery.Triggered)
@@ -100,7 +100,7 @@ func TestGetTaskExecution(t *testing.T) {
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "task_executions" WHERE "task_executions"."project" = $1 AND "task_executions"."domain" = $2 AND "task_executions"."name" = $3 AND "task_executions"."version" = $4 AND "task_executions"."execution_project" = $5 AND "task_executions"."execution_domain" = $6 AND "task_executions"."execution_name" = $7 AND "task_executions"."node_id" = $8 AND "task_executions"."retry_attempt" = $9 LIMIT 1`).
+		`SELECT * FROM "task_executions" WHERE "task_executions"."project" = $1 AND "task_executions"."domain" = $2 AND "task_executions"."name" = $3 AND "task_executions"."version" = $4 AND "task_executions"."execution_project" = $5 AND "task_executions"."execution_domain" = $6 AND "task_executions"."execution_name" = $7 AND "task_executions"."node_id" = $8 AND "task_executions"."retry_attempt" = $9 AND "execution_org" = $10 AND "org" = $11 LIMIT 1`).
 		WithReply(taskExecutions)
 
 	output, err := taskExecutionRepo.Get(context.Background(), interfaces.GetTaskExecutionInput{

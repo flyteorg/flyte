@@ -41,7 +41,7 @@ func (r *LaunchPlanRepo) Create(ctx context.Context, input models.LaunchPlan) er
 
 func (r *LaunchPlanRepo) Update(ctx context.Context, input models.LaunchPlan) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&input).Updates(input)
+	tx := r.db.WithContext(ctx).Model(&input).Where(getOrgFilter(input.Org)).Updates(input)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -58,9 +58,8 @@ func (r *LaunchPlanRepo) Get(ctx context.Context, input interfaces.Identifier) (
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
-			Org:     input.Org,
 		},
-	}).Take(&launchPlan)
+	}).Where(getOrgFilter(input.Org)).Take(&launchPlan)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -90,7 +89,7 @@ func (r *LaunchPlanRepo) SetActive(
 
 	// There is a launch plan to disable as part of this transaction
 	if toDisable != nil {
-		tx.Model(&toDisable).UpdateColumns(toDisable)
+		tx.Model(&toDisable).Where(getOrgFilter(toDisable.Org)).UpdateColumns(toDisable)
 		if err := tx.Error; err != nil {
 			tx.Rollback()
 			return r.errorTransformer.ToFlyteAdminError(err)
@@ -98,7 +97,7 @@ func (r *LaunchPlanRepo) SetActive(
 	}
 
 	// And update the desired version.
-	tx.Model(&toEnable).UpdateColumns(toEnable)
+	tx.Model(&toEnable).Where(getOrgFilter(toEnable.Org)).UpdateColumns(toEnable)
 	if err := tx.Error; err != nil {
 		tx.Rollback()
 		return r.errorTransformer.ToFlyteAdminError(err)

@@ -66,7 +66,7 @@ func TestGetSignal(t *testing.T) {
 
 	mockSelectQuery := GlobalMock.NewMock()
 	mockSelectQuery.WithQuery(
-		`SELECT * FROM "signals" WHERE "signals"."execution_project" = $1 AND "signals"."execution_domain" = $2 AND "signals"."execution_name" = $3 AND "signals"."signal_id" = $4 LIMIT 1`)
+		`SELECT * FROM "signals" WHERE "signals"."execution_project" = $1 AND "signals"."execution_domain" = $2 AND "signals"."execution_name" = $3 AND "signals"."signal_id" = $4 AND "execution_org" = $5 LIMIT 1`)
 
 	// retrieve non-existent signalModel
 	lookupSignalModel, err := signalRepo.Get(ctx, signalModel.SignalKey)
@@ -110,7 +110,7 @@ func TestGetOrCreateSignal(t *testing.T) {
 	signalModels := []map[string]interface{}{toSignalMap(*signalModel)}
 	mockSelectQuery := GlobalMock.NewMock()
 	mockSelectQuery.WithQuery(
-		`SELECT * FROM "signals" WHERE "signals"."id" = $1 AND "signals"."created_at" = $2 AND "signals"."updated_at" = $3 AND "signals"."execution_project" = $4 AND "signals"."execution_domain" = $5 AND "signals"."execution_name" = $6 AND "signals"."signal_id" = $7 AND "signals"."execution_project" = $8 AND "signals"."execution_domain" = $9 AND "signals"."execution_name" = $10 AND "signals"."signal_id" = $11 ORDER BY "signals"."id" LIMIT 1`).WithReply(signalModels)
+		`SELECT * FROM "signals" WHERE "execution_org" = $1 AND "signals"."id" = $2 AND "signals"."created_at" = $3 AND "signals"."updated_at" = $4 AND "signals"."execution_project" = $5 AND "signals"."execution_domain" = $6 AND "signals"."execution_name" = $7 AND "signals"."signal_id" = $8 AND "signals"."execution_project" = $9 AND "signals"."execution_domain" = $10 AND "signals"."execution_name" = $11 AND "signals"."signal_id" = $12 ORDER BY "signals"."id" LIMIT 1`).WithReply(signalModels)
 
 	// retrieve existing signalModel
 	lookupSignalModel := &models.Signal{}
@@ -165,7 +165,7 @@ func TestUpdateSignal(t *testing.T) {
 	// update signalModel does not exits
 	mockUpdateQuery := GlobalMock.NewMock()
 	mockUpdateQuery.WithQuery(
-		`UPDATE "signals" SET "updated_at"=$1,"value"=$2 WHERE "execution_project" = $3 AND "execution_domain" = $4 AND "execution_name" = $5 AND "signal_id" = $6`).WithRowsNum(0)
+		`UPDATE "signals" SET "updated_at"=$1,"value"=$2 WHERE "execution_org" = $3 AND "execution_project" = $4 AND "execution_domain" = $5 AND "execution_name" = $6 AND "signal_id" = $7`).WithRowsNum(0)
 
 	err := signalRepo.Update(ctx, signalModel.SignalKey, signalModel.Value)
 	assert.Error(t, err)

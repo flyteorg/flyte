@@ -49,9 +49,8 @@ func (r *WorkflowRepo) Get(ctx context.Context, input interfaces.Identifier) (mo
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
-			Org:     input.Org,
 		},
-	}).Take(&workflow)
+	}).Where(getOrgFilter(input.Org)).Take(&workflow)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {

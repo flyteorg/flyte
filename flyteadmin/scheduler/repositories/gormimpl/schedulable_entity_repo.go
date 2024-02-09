@@ -24,7 +24,7 @@ type SchedulableEntityRepo struct {
 func (r *SchedulableEntityRepo) Create(ctx context.Context, input models.SchedulableEntity) error {
 	timer := r.metrics.GetDuration.Start()
 	var record models.SchedulableEntity
-	tx := r.db.Omit("id").FirstOrCreate(&record, input)
+	tx := r.db.Omit("id").FirstOrCreate(&record, input).Where(getOrgFilter(input.Org))
 	timer.Stop()
 	if tx.Error != nil {
 		return r.errorTransformer.ToFlyteAdminError(tx.Error)
@@ -42,9 +42,8 @@ func (r *SchedulableEntityRepo) Activate(ctx context.Context, input models.Sched
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
-			Org:     input.Org,
 		},
-	}).Take(&schedulableEntity)
+	}).Where(getOrgFilter(input.Org)).Take(&schedulableEntity)
 	timer.Stop()
 
 	if tx.Error != nil {
@@ -92,9 +91,8 @@ func (r *SchedulableEntityRepo) Get(ctx context.Context, ID models.SchedulableEn
 			Domain:  ID.Domain,
 			Name:    ID.Name,
 			Version: ID.Version,
-			Org:     ID.Org,
 		},
-	}).Take(&schedulableEntity)
+	}).Where(getOrgFilter(ID.Org)).Take(&schedulableEntity)
 	timer.Stop()
 
 	if tx.Error != nil {
@@ -123,9 +121,8 @@ func activateOrDeactivate(r *SchedulableEntityRepo, ID models.SchedulableEntityK
 			Domain:  ID.Domain,
 			Name:    ID.Name,
 			Version: ID.Version,
-			Org:     ID.Org,
 		},
-	}).Update("active", activate)
+	}).Where(getOrgFilter(ID.Org)).Update("active", activate)
 	timer.Stop()
 	if tx.Error != nil {
 		if errors.Is(tx.Error, gorm.ErrRecordNotFound) {

@@ -46,13 +46,23 @@ func getMockApplicationConfigForProjectManagerTest() runtimeInterfaces.Applicati
 	return &mockApplicationConfig
 }
 
-func testListProjects(request admin.ProjectListRequest, token string, orderExpr string, queryExpr *common.GormQueryExpr, t *testing.T) {
+func expectedOrgQueryExpr() *common.GormQueryExpr {
+	return &common.GormQueryExpr{
+		Query: "org = ?",
+		Args:  "",
+	}
+}
+
+func testListProjects(request admin.ProjectListRequest, token string, orderExpr string, queryExprs []*common.GormQueryExpr, t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	repository.ProjectRepo().(*repositoryMocks.MockProjectRepo).ListProjectsFunction = func(
 		ctx context.Context, input interfaces.ListResourceInput) ([]models.Project, error) {
 		if len(input.InlineFilters) != 0 {
-			q, _ := input.InlineFilters[0].GetGormQueryExpr()
-			assert.Equal(t, *queryExpr, q)
+			for idx, inlineFilter := range input.InlineFilters {
+				q, _ := inlineFilter.GetGormQueryExpr()
+				assert.Equal(t, *queryExprs[idx], q)
+			}
+
 		}
 		assert.Equal(t, orderExpr, input.SortParameter.GetGormOrderExpr())
 		activeState := int32(admin.Project_ACTIVE)
@@ -82,7 +92,7 @@ func TestListProjects_NoFilters_LimitOne(t *testing.T) {
 	testListProjects(admin.ProjectListRequest{
 		Token: "1",
 		Limit: 1,
-	}, "2", "identifier asc", nil, t)
+	}, "2", "identifier asc", []*common.GormQueryExpr{expectedOrgQueryExpr()}, t)
 }
 
 func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
@@ -94,14 +104,17 @@ func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
 			Key:       "name",
 			Direction: admin.Sort_DESCENDING,
 		},
-	}, "", "name desc", &common.GormQueryExpr{
-		Query: "name = ?",
-		Args:  "foo",
+	}, "", "name desc", []*common.GormQueryExpr{
+		expectedOrgQueryExpr(),
+		{
+			Query: "name = ?",
+			Args:  "foo",
+		},
 	}, t)
 }
 
 func TestListProjects_NoToken_NoLimit(t *testing.T) {
-	testListProjects(admin.ProjectListRequest{}, "", "identifier asc", nil, t)
+	testListProjects(admin.ProjectListRequest{}, "", "identifier asc", []*common.GormQueryExpr{expectedOrgQueryExpr()}, t)
 }
 
 func TestProjectManager_CreateProject(t *testing.T) {

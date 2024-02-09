@@ -64,7 +64,7 @@ func TestGetTask(t *testing.T) {
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 AND "tasks"."version" = $4 AND "tasks"."org" = $5 LIMIT 1`).
+		`SELECT * FROM "tasks" WHERE "tasks"."project" = $1 AND "tasks"."domain" = $2 AND "tasks"."name" = $3 AND "tasks"."version" = $4 AND "org" = $5`).
 		WithReply(tasks)
 	output, err = taskRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,

@@ -40,9 +40,8 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 			Project: input.Project,
 			Domain:  input.Domain,
 			Name:    input.Name,
-			Org:     input.Org,
 		},
-	}).Take(&execution)
+	}).Where(getExecutionOrgFilter(input.Org)).Take(&execution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -60,7 +59,7 @@ func (r *ExecutionRepo) Get(ctx context.Context, input interfaces.Identifier) (m
 
 func (r *ExecutionRepo) Update(ctx context.Context, execution models.Execution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&execution).Updates(execution)
+	tx := r.db.WithContext(ctx).Model(&execution).Where(getExecutionOrgFilter(execution.Org)).Updates(execution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)

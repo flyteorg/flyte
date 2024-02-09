@@ -54,6 +54,33 @@ func TestGetDescriptionEntity(t *testing.T) {
 	assert.Equal(t, shortDescription, output.ShortDescription)
 }
 
+func TestGetDescriptionEntityNoOrg(t *testing.T) {
+	descriptionEntityRepo := NewDescriptionEntityRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	descriptionEntities := make([]map[string]interface{}, 0)
+	descriptionEntity := getMockDescriptionEntityResponseFromDb(version, []byte{1, 2})
+	descriptionEntities = append(descriptionEntities, descriptionEntity)
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	// Only match on queries that append expected filters
+	GlobalMock.NewMock().WithQuery(`SELECT * FROM "description_entities" WHERE project = $1 AND domain = $2 AND name = $3 AND version = $4 AND org = $5 LIMIT 1`).
+		WithReply(descriptionEntities)
+	output, err := descriptionEntityRepo.Get(context.Background(), interfaces.GetDescriptionEntityInput{
+		ResourceType: resourceType,
+		Project:      project,
+		Domain:       domain,
+		Name:         name,
+		Version:      version,
+	})
+	assert.Empty(t, err)
+	assert.Equal(t, project, output.Project)
+	assert.Equal(t, domain, output.Domain)
+	assert.Equal(t, name, output.Name)
+	assert.Equal(t, version, output.Version)
+	assert.Equal(t, shortDescription, output.ShortDescription)
+}
+
 func TestListDescriptionEntities(t *testing.T) {
 	descriptionEntityRepo := NewDescriptionEntityRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
 
@@ -65,7 +92,8 @@ func TestListDescriptionEntities(t *testing.T) {
 	}
 
 	GlobalMock := mocket.Catcher.Reset()
-	GlobalMock.NewMock().WithReply(descriptionEntities)
+	GlobalMock.Logging = true
+	GlobalMock.NewMock().WithQuery("SELECT * FROM \"description_entities\" WHERE project = $1 AND domain = $2 AND name = $3 AND org = $4").WithReply(descriptionEntities)
 
 	collection, err := descriptionEntityRepo.List(context.Background(), interfaces.ListResourceInput{})
 	assert.Equal(t, 0, len(collection.Entities))
@@ -76,6 +104,7 @@ func TestListDescriptionEntities(t *testing.T) {
 			getEqualityFilter(common.Workflow, "project", project),
 			getEqualityFilter(common.Workflow, "domain", domain),
 			getEqualityFilter(common.Workflow, "name", name),
+			getEqualityFilter(common.Workflow, "org", ""),
 		},
 		Limit: 20,
 	})

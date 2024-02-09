@@ -37,7 +37,6 @@ func TestGetNamedEntity(t *testing.T) {
 			Project:      project,
 			Domain:       domain,
 			Name:         name,
-			Org:          testOrg,
 		},
 		NamedEntityMetadataFields: models.NamedEntityMetadataFields{
 			Description: description,
@@ -62,7 +61,6 @@ func TestGetNamedEntity(t *testing.T) {
 	assert.Equal(t, name, output.Name)
 	assert.Equal(t, resourceType, output.ResourceType)
 	assert.Equal(t, description, output.Description)
-	assert.Equal(t, testOrg, output.Org)
 }
 
 func TestUpdateNamedEntity_WithExisting(t *testing.T) {

@@ -36,8 +36,7 @@ func (r *ProjectRepo) Get(ctx context.Context, projectID, org string) (models.Pr
 	timer := r.metrics.GetDuration.Start()
 	tx := r.db.WithContext(ctx).Where(&models.Project{
 		Identifier: projectID,
-		Org:        org,
-	}).Take(&project)
+	}).Where(getOrgFilter(org)).Take(&project)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Project{}, flyteAdminErrors.NewFlyteAdminErrorf(codes.NotFound, "project [%s] not found", projectID)

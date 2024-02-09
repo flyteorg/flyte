@@ -10,7 +10,6 @@ import (
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
@@ -41,23 +40,14 @@ func (r *NodeExecutionRepo) Get(ctx context.Context, input interfaces.NodeExecut
 				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
-				Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 			},
 		},
-	}).Take(&nodeExecution)
+	}).Where(getExecutionOrgFilter(input.NodeExecutionIdentifier.ExecutionId.Org)).Take(&nodeExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
-					Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
-				},
-			})
+			adminErrors.GetMissingEntityError("node execution", &input.NodeExecutionIdentifier)
 	} else if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -75,23 +65,14 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
-				Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 			},
 		},
-	}).Preload("ChildNodeExecutions").Take(&nodeExecution)
+	}).Where(getExecutionOrgFilter(input.NodeExecutionIdentifier.ExecutionId.Org)).Preload("ChildNodeExecutions").Take(&nodeExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.NodeExecution{},
-			adminErrors.GetMissingEntityError("node execution", &core.NodeExecutionIdentifier{
-				NodeId: input.NodeExecutionIdentifier.NodeId,
-				ExecutionId: &core.WorkflowExecutionIdentifier{
-					Project: input.NodeExecutionIdentifier.ExecutionId.Project,
-					Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
-					Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
-					Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
-				},
-			})
+			adminErrors.GetMissingEntityError("node execution", &input.NodeExecutionIdentifier)
 	} else if tx.Error != nil {
 		return models.NodeExecution{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
@@ -101,7 +82,7 @@ func (r *NodeExecutionRepo) GetWithChildren(ctx context.Context, input interface
 
 func (r *NodeExecutionRepo) Update(ctx context.Context, nodeExecution *models.NodeExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).Model(&nodeExecution).Updates(nodeExecution)
+	tx := r.db.WithContext(ctx).Model(&nodeExecution).Where(getExecutionOrgFilter(nodeExecution.Org)).Updates(nodeExecution)
 	timer.Stop()
 	if err := tx.Error; err != nil {
 		return r.errorTransformer.ToFlyteAdminError(err)
@@ -155,10 +136,9 @@ func (r *NodeExecutionRepo) Exists(ctx context.Context, input interfaces.NodeExe
 				Project: input.NodeExecutionIdentifier.ExecutionId.Project,
 				Domain:  input.NodeExecutionIdentifier.ExecutionId.Domain,
 				Name:    input.NodeExecutionIdentifier.ExecutionId.Name,
-				Org:     input.NodeExecutionIdentifier.ExecutionId.Org,
 			},
 		},
-	}).Take(&nodeExecution)
+	}).Where(getExecutionOrgFilter(input.NodeExecutionIdentifier.ExecutionId.Org)).Take(&nodeExecution)
 	timer.Stop()
 	if tx.Error != nil {
 		return false, r.errorTransformer.ToFlyteAdminError(tx.Error)

@@ -64,7 +64,6 @@ func TestGetLaunchPlan(t *testing.T) {
 			Domain:  domain,
 			Name:    name,
 			Version: version,
-			Org:     testOrg,
 		},
 		Spec:       launchPlanSpec,
 		WorkflowID: workflowID,
@@ -77,20 +76,18 @@ func TestGetLaunchPlan(t *testing.T) {
 	GlobalMock.Logging = true
 	// Only match on queries that append expected filters
 	GlobalMock.NewMock().WithQuery(
-		`SELECT * FROM "launch_plans" WHERE "launch_plans"."project" = $1 AND "launch_plans"."domain" = $2 AND "launch_plans"."name" = $3 AND "launch_plans"."version" = $4 AND "launch_plans"."org" = $5 LIMIT 1`).WithReply(launchPlans)
+		`SELECT * FROM "launch_plans" WHERE "launch_plans"."project" = $1 AND "launch_plans"."domain" = $2 AND "launch_plans"."name" = $3 AND "launch_plans"."version" = $4 AND "org" = $5 LIMIT 1`).WithReply(launchPlans)
 	output, err := launchPlanRepo.Get(context.Background(), interfaces.Identifier{
 		Project: project,
 		Domain:  domain,
 		Name:    name,
 		Version: version,
-		Org:     testOrg,
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, project, output.Project)
 	assert.Equal(t, domain, output.Domain)
 	assert.Equal(t, name, output.Name)
 	assert.Equal(t, version, output.Version)
-	assert.Equal(t, testOrg, output.Org)
 	assert.Equal(t, launchPlanSpec, output.Spec)
 }
 
@@ -102,7 +99,7 @@ func TestSetInactiveLaunchPlan(t *testing.T) {
 	mockDb := GlobalMock.NewMock()
 	updated := false
 	mockDb.WithQuery(
-		`UPDATE "launch_plans" SET "id"=$1,"updated_at"=$2,"project"=$3,"domain"=$4,"name"=$5,"version"=$6,"closure"=$7,"state"=$8 WHERE "project" = $9 AND "domain" = $10 AND "name" = $11 AND "version" = $12`).WithCallback(
+		`UPDATE "launch_plans" SET "id"=$1,"updated_at"=$2,"project"=$3,"domain"=$4,"name"=$5,"version"=$6,"closure"=$7,"state"=$8 WHERE "org" = $9 AND "project" = $10 AND "domain" = $11 AND "name" = $12 AND "version" = $13`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			updated = true
 		},
@@ -133,7 +130,7 @@ func TestSetActiveLaunchPlan(t *testing.T) {
 	mockQuery := GlobalMock.NewMock()
 	updated := false
 	mockQuery.WithQuery(
-		`UPDATE "launch_plans" SET "id"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"closure"=$6,"state"=$7 WHERE "project" = $8 AND "domain" = $9 AND "name" = $10 AND "version" = $11`).WithCallback(
+		`UPDATE "launch_plans" SET "id"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"closure"=$6,"state"=$7 WHERE "org" = $8 AND "project" = $9 AND "domain" = $10 AND "name" = $11 AND "version" = $12`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			updated = true
 		},
@@ -176,7 +173,7 @@ func TestSetActiveLaunchPlan_NoCurrentlyActiveLaunchPlan(t *testing.T) {
 	mockQuery := GlobalMock.NewMock()
 	updated := false
 	mockQuery.WithQuery(
-		`UPDATE "launch_plans" SET "id"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"closure"=$6,"state"=$7 WHERE "project" = $8 AND "domain" = $9 AND "name" = $10 AND "version" = $11`).WithCallback(
+		`UPDATE "launch_plans" SET "id"=$1,"project"=$2,"domain"=$3,"name"=$4,"version"=$5,"closure"=$6,"state"=$7 WHERE "org" = $8 AND "project" = $9 AND "domain" = $10 AND "name" = $11 AND "version" = $12`).WithCallback(
 		func(s string, values []driver.NamedValue) {
 			updated = true
 		},

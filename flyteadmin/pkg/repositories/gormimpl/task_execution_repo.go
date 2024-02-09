@@ -40,7 +40,6 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 				Domain:  input.TaskExecutionID.TaskId.Domain,
 				Name:    input.TaskExecutionID.TaskId.Name,
 				Version: input.TaskExecutionID.TaskId.Version,
-				Org:     input.TaskExecutionID.TaskId.Org,
 			},
 			NodeExecutionKey: models.NodeExecutionKey{
 				NodeID: input.TaskExecutionID.NodeExecutionId.NodeId,
@@ -48,12 +47,12 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 					Project: input.TaskExecutionID.NodeExecutionId.ExecutionId.Project,
 					Domain:  input.TaskExecutionID.NodeExecutionId.ExecutionId.Domain,
 					Name:    input.TaskExecutionID.NodeExecutionId.ExecutionId.Name,
-					Org:     input.TaskExecutionID.NodeExecutionId.ExecutionId.Org,
 				},
 			},
 			RetryAttempt: &input.TaskExecutionID.RetryAttempt,
 		},
-	}).Preload("ChildNodeExecution").Take(&taskExecution)
+	}).Where(getExecutionOrgFilter(input.TaskExecutionID.NodeExecutionId.ExecutionId.Org)).
+		Where(getOrgFilter(input.TaskExecutionID.TaskId.Org)).Preload("ChildNodeExecution").Take(&taskExecution)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -82,7 +81,8 @@ func (r *TaskExecutionRepo) Get(ctx context.Context, input interfaces.GetTaskExe
 
 func (r *TaskExecutionRepo) Update(ctx context.Context, execution models.TaskExecution) error {
 	timer := r.metrics.UpdateDuration.Start()
-	tx := r.db.WithContext(ctx).WithContext(ctx).Updates(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
+	tx := r.db.WithContext(ctx).WithContext(ctx).Where(getOrgFilter(execution.Org)).Where(getExecutionOrgFilter(execution.ExecutionKey.Org)).
+		Updates(&execution) // TODO @hmaersaw - need to add WithContext to all db calls to link otel spans
 	timer.Stop()
 
 	if err := tx.Error; err != nil {

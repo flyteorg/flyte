@@ -63,7 +63,7 @@ func TestUpdateWorkflowAttributes_WithExisting(t *testing.T) {
 
 	mockSelectQuery := GlobalMock.NewMock()
 	mockSelectQuery.WithQuery(
-		`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."org" = $3 AND "resources"."resource_type" = $4 AND "resources"."priority" = $5 ORDER BY "resources"."id" LIMIT 1`).WithReply(results)
+		`SELECT * FROM "resources" WHERE "org" = $1 AND "resources"."project" = $2 AND "resources"."domain" = $3 AND "resources"."resource_type" = $4 AND "resources"."priority" = $5 ORDER BY "resources"."id" LIMIT 1`).WithReply(results)
 
 	mockSaveQuery := GlobalMock.NewMock()
 	mockSaveQuery.WithQuery(
@@ -73,7 +73,6 @@ func TestUpdateWorkflowAttributes_WithExisting(t *testing.T) {
 		ResourceType: resourceType.String(),
 		Project:      project,
 		Domain:       domain,
-		Org:          testOrg,
 		Priority:     2,
 	})
 	assert.NoError(t, err)
@@ -174,7 +173,7 @@ func TestGetRawWorkflowAttributes(t *testing.T) {
 	response["attributes"] = []byte("attrs")
 
 	query := GlobalMock.NewMock()
-	query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."workflow" = $3 AND "resources"."launch_plan" = $4 AND "resources"."resource_type" = $5 ORDER BY "resources"."id" LIMIT 1`).WithReply(
+	query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."project" = $1 AND "resources"."domain" = $2 AND "resources"."workflow" = $3 AND "resources"."launch_plan" = $4 AND "resources"."resource_type" = $5 AND "org" = $6 ORDER BY "resources"."id" LIMIT 1`).WithReply(
 		[]map[string]interface{}{
 			response,
 		})
@@ -217,7 +216,7 @@ func TestListAll(t *testing.T) {
 	response["launch_plan"] = "launch_plan"
 	response["attributes"] = []byte("attrs")
 
-	fakeResponse := query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."org" = $1 AND "resources"."resource_type" = $2 ORDER BY priority desc`).WithReply(
+	fakeResponse := query.WithQuery(`SELECT * FROM "resources" WHERE "resources"."resource_type" = $1 AND "org" = $2 ORDER BY priority desc`).WithReply(
 		[]map[string]interface{}{response})
 	output, err := resourceRepo.ListAll(context.Background(), "resource", "org")
 	assert.Nil(t, err)

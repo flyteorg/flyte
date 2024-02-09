@@ -210,13 +210,12 @@ type FilterSpec struct {
 func getIdentifierFilters(entity common.Entity, spec FilterSpec) ([]common.InlineFilter, error) {
 	filters := make([]common.InlineFilter, 0)
 
-	if spec.Org != "" {
-		orgFilter, err := GetSingleValueEqualityFilter(entity, shared.Org, spec.Org)
-		if err != nil {
-			return nil, err
-		}
-		filters = append(filters, orgFilter)
+	// Always apply the org filter even when it's omitted
+	orgFilter, err := GetSingleValueEqualityFilter(entity, shared.Org, spec.Org)
+	if err != nil {
+		return nil, err
 	}
+	filters = append(filters, orgFilter)
 
 	if spec.Project != "" {
 		projectFilter, err := GetSingleValueEqualityFilter(entity, shared.Project, spec.Project)

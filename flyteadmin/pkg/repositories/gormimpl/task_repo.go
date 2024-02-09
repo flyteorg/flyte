@@ -55,9 +55,8 @@ func (r *TaskRepo) Get(ctx context.Context, input interfaces.Identifier) (models
 			Domain:  input.Domain,
 			Name:    input.Name,
 			Version: input.Version,
-			Org:     input.Org,
 		},
-	}).Take(&task)
+	}).Where(getOrgFilter(input.Org)).Take(&task)
 	timer.Stop()
 	if errors.Is(tx.Error, gorm.ErrRecordNotFound) {
 		return models.Task{}, flyteAdminDbErrors.GetMissingEntityError(core.ResourceType_TASK.String(), &core.Identifier{

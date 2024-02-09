@@ -62,7 +62,7 @@ func (r *ResourceRepo) CreateOrUpdate(ctx context.Context, input models.Resource
 	}
 	timer := r.metrics.GetDuration.Start()
 	var record models.Resource
-	tx := r.db.WithContext(ctx).FirstOrCreate(&record, models.Resource{
+	tx := r.db.WithContext(ctx).Where(getOrgFilter(input.Org)).FirstOrCreate(&record, models.Resource{
 		Project:      input.Project,
 		Domain:       input.Domain,
 		Workflow:     input.Workflow,
@@ -171,8 +171,7 @@ func (r *ResourceRepo) GetRaw(ctx context.Context, ID interfaces.ResourceID) (mo
 		Workflow:     ID.Workflow,
 		LaunchPlan:   ID.LaunchPlan,
 		ResourceType: ID.ResourceType,
-		Org:          ID.Org,
-	}).First(&model)
+	}).Where(getOrgFilter(ID.Org)).First(&model)
 	timer.Stop()
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {
@@ -188,7 +187,7 @@ func (r *ResourceRepo) ListAll(ctx context.Context, resourceType, org string) ([
 	var resources []models.Resource
 	timer := r.metrics.ListDuration.Start()
 
-	tx := r.db.WithContext(ctx).Where(&models.Resource{Org: org, ResourceType: resourceType}).Order(priorityDescending).Find(&resources)
+	tx := r.db.WithContext(ctx).Where(&models.Resource{ResourceType: resourceType}).Where(getOrgFilter(org)).Order(priorityDescending).Find(&resources)
 	timer.Stop()
 
 	if tx.Error != nil {
@@ -206,8 +205,7 @@ func (r *ResourceRepo) Delete(ctx context.Context, ID interfaces.ResourceID) err
 			Workflow:     ID.Workflow,
 			LaunchPlan:   ID.LaunchPlan,
 			ResourceType: ID.ResourceType,
-			Org:          ID.Org,
-		}).Unscoped().Delete(models.Resource{})
+		}).Where(getOrgFilter(ID.Org)).Unscoped().Delete(models.Resource{})
 	})
 
 	if tx.Error != nil && errors.Is(tx.Error, gorm.ErrRecordNotFound) {

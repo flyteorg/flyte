@@ -155,12 +155,14 @@ func TestGetDbFilters(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Init expected values for filters.
+	orgFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Org, "")
 	projectFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Project, "project")
 	domainFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Domain, "domain")
 	nameFilter, _ := GetSingleValueEqualityFilter(common.LaunchPlan, shared.Name, "name")
 	versionFilter, _ := common.NewSingleValueFilter(common.LaunchPlan, common.NotEqual, shared.Version, "TheWorst")
 	workflowNameFilter, _ := common.NewSingleValueFilter(common.Workflow, common.Equal, shared.Name, "workflow")
 	expectedFilters := []common.InlineFilter{
+		orgFilter,
 		projectFilter,
 		domainFilter,
 		nameFilter,
