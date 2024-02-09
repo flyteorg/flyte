@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import { WorkflowTemplate } from "./workflow_pb.js";
+import { LaunchPlanTemplate, WorkflowTemplate } from "./workflow_pb.js";
 import { TaskTemplate } from "./tasks_pb.js";
 
 /**
@@ -145,6 +145,47 @@ export class CompiledWorkflow extends Message<CompiledWorkflow> {
 }
 
 /**
+ * Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer
+ *
+ * @generated from message flyteidl.core.CompiledLaunchPlan
+ */
+export class CompiledLaunchPlan extends Message<CompiledLaunchPlan> {
+  /**
+   * Completely contained LaunchPlan Template
+   *
+   * @generated from field: flyteidl.core.LaunchPlanTemplate template = 1;
+   */
+  template?: LaunchPlanTemplate;
+
+  constructor(data?: PartialMessage<CompiledLaunchPlan>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.CompiledLaunchPlan";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "template", kind: "message", T: LaunchPlanTemplate },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CompiledLaunchPlan {
+    return new CompiledLaunchPlan().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CompiledLaunchPlan {
+    return new CompiledLaunchPlan().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CompiledLaunchPlan {
+    return new CompiledLaunchPlan().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CompiledLaunchPlan | PlainMessage<CompiledLaunchPlan> | undefined, b: CompiledLaunchPlan | PlainMessage<CompiledLaunchPlan> | undefined): boolean {
+    return proto3.util.equals(CompiledLaunchPlan, a, b);
+  }
+}
+
+/**
  * Output of the Compilation step. This object represent one Task. We store more metadata at this layer
  *
  * @generated from message flyteidl.core.CompiledTask
@@ -219,6 +260,14 @@ export class CompiledWorkflowClosure extends Message<CompiledWorkflowClosure> {
    */
   tasks: CompiledTask[] = [];
 
+  /**
+   * A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+   * with a given id, i.e., every launch plan has a unique id.
+   *
+   * @generated from field: repeated flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+   */
+  launchPlans: CompiledLaunchPlan[] = [];
+
   constructor(data?: PartialMessage<CompiledWorkflowClosure>) {
     super();
     proto3.util.initPartial(data, this);
@@ -230,6 +279,7 @@ export class CompiledWorkflowClosure extends Message<CompiledWorkflowClosure> {
     { no: 1, name: "primary", kind: "message", T: CompiledWorkflow },
     { no: 2, name: "sub_workflows", kind: "message", T: CompiledWorkflow, repeated: true },
     { no: 3, name: "tasks", kind: "message", T: CompiledTask, repeated: true },
+    { no: 4, name: "launch_plans", kind: "message", T: CompiledLaunchPlan, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CompiledWorkflowClosure {
