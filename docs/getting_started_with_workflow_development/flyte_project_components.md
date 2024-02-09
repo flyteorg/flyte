@@ -55,17 +55,13 @@ The workflow directory also contains an `__init__.py` file to indicate that the 
 The workflow code file in the basic template includes an optional ImageSpec configuration. ImageSpec is a Flyte feature that enables you to build a custom container image without having to write a Dockerfile. To learn more, see the [ImageSpec documentation](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/customizing_dependencies/image_spec.html#image-spec-example)
 
 ```python
-# basic_image = ImageSpec(
-#    name="flytekit",  # rename this to your docker image name
-#    base_image="ghcr.io/flyteorg/flytekit:py3.11-1.10.2",
-#    # the base image that flytekit will use to build your image
-#    packages=["example-package"],  # packages to add to the base image
-#    # remove "example-package" before using.
-#    registry="ghcr.io/unionai-oss",
-#    # the registry your image will be pushed to
-#    python_version="3.11"
-#    # the python version; optional if not different from the base image
-# )
+basic_image = ImageSpec(
+   name="flytekit",  # default docker image name
+   base_image="ghcr.io/flyteorg/flytekit:py3.11-1.10.2",  # the base image that flytekit will use to build your image
+   packages=["pandas"],  # python packages to install
+   registry="ghcr.io/unionai-oss", # the registry your image will be pushed to.
+   python_version="3.11"  # Optional if python is installed in the base image
+)
 ```
 
 ```{note}
