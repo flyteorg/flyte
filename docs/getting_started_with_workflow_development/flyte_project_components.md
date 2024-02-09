@@ -56,11 +56,11 @@ The workflow code file in the basic template includes an optional ImageSpec conf
 
 ```python
 basic_image = ImageSpec(
-   name="flytekit",  # default docker image name
-   base_image="ghcr.io/flyteorg/flytekit:py3.11-1.10.2",  # the base image that flytekit will use to build your image
-   packages=["pandas"],  # python packages to install
+   name="flytekit",  # default docker image name.
+   base_image="ghcr.io/flyteorg/flytekit:py3.11-1.10.2",  # the base image that flytekit will use to build your image.
+   packages=["pandas"],  # python packages to install.
    registry="ghcr.io/unionai-oss", # the registry your image will be pushed to.
-   python_version="3.11"  # Optional if python is installed in the base image
+   python_version="3.11"  # Optional if python is installed in the base image.
 )
 ```
 
