@@ -252,7 +252,7 @@ func ParseRestartPolicy(flyteRestartPolicy kfplugins.RestartPolicy) commonOp.Res
 
 // OverrideContainerSpec overrides the specified container's properties in the given podSpec. The function
 // updates the image and command arguments of the container that matches the given containerName.
-func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, args []string) error {
+func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image string, args []string, nodeSelectors map[string]string) error {
 	for idx, c := range podSpec.Containers {
 		if c.Name == containerName {
 			if image != "" {
@@ -263,11 +263,22 @@ func OverrideContainerSpec(podSpec *v1.PodSpec, containerName string, image stri
 			}
 		}
 	}
+
+	// Add node selectors if the map is not nil
+	if nodeSelectors != nil {
+        if podSpec.NodeSelector == nil {
+            podSpec.NodeSelector = make(map[string]string)
+        }
+        for key, value := range nodeSelectors {
+            podSpec.NodeSelector[key] = value
+        }
+    }
 	return nil
 }
 
 func ToReplicaSpec(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext, primaryContainerName string) (*commonOp.ReplicaSpec, error) {
 	podSpec, objectMeta, oldPrimaryContainerName, err := flytek8s.ToK8sPodSpec(ctx, taskCtx)
+
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
@@ -294,6 +305,7 @@ type kfDistributedReplicaSpec interface {
 	GetImage() string
 	GetResources() *core.Resources
 	GetRestartPolicy() kfplugins.RestartPolicy
+	GetNodeSelectors() map[string]string
 }
 
 type allowsCommandOverride interface {
@@ -326,11 +338,17 @@ func ToReplicaSpecWithOverrides(ctx context.Context, taskCtx pluginsCore.TaskExe
 		if v, ok := rs.(allowsCommandOverride); ok {
 			command = v.GetCommand()
 		}
+
+		var nodeSelectors map[string]string
+		if rs.GetNodeSelectors() != nil {
+			nodeSelectors = rs.GetNodeSelectors()
+		}
 		if err := OverrideContainerSpec(
 			&replicaSpec.Template.Spec,
 			primaryContainerName,
 			rs.GetImage(),
 			command,
+			nodeSelectors,
 		); err != nil {
 			return nil, err
 		}

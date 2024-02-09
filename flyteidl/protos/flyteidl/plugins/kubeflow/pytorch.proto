@@ -46,4 +46,7 @@ message DistributedPyTorchTrainingReplicaSpec {
   
   // RestartPolicy determines whether pods will be restarted when they exit
   RestartPolicy restart_policy = 4;
+
+  // Node selectors for the replica group
+  map<string, string> node_selectors = 5;
 }

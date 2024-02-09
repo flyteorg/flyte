@@ -30,6 +30,9 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>  // IWYU pragma: export
 #include <google/protobuf/extension_set.h>  // IWYU pragma: export
+#include <google/protobuf/map.h>  // IWYU pragma: export
+#include <google/protobuf/map_entry.h>
+#include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
 #include "flyteidl/core/tasks.pb.h"
 #include "flyteidl/plugins/kubeflow/common.pb.h"
@@ -43,7 +46,7 @@ struct TableStruct_flyteidl_2fplugins_2fkubeflow_2fmpi_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[2]
+  static const ::google::protobuf::internal::ParseTable schema[3]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -56,6 +59,9 @@ namespace kubeflow {
 class DistributedMPITrainingReplicaSpec;
 class DistributedMPITrainingReplicaSpecDefaultTypeInternal;
 extern DistributedMPITrainingReplicaSpecDefaultTypeInternal _DistributedMPITrainingReplicaSpec_default_instance_;
+class DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse;
+class DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUseDefaultTypeInternal;
+extern DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUseDefaultTypeInternal _DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_;
 class DistributedMPITrainingTask;
 class DistributedMPITrainingTaskDefaultTypeInternal;
 extern DistributedMPITrainingTaskDefaultTypeInternal _DistributedMPITrainingTask_default_instance_;
@@ -65,6 +71,7 @@ extern DistributedMPITrainingTaskDefaultTypeInternal _DistributedMPITrainingTask
 namespace google {
 namespace protobuf {
 template<> ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec>(Arena*);
+template<> ::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse>(Arena*);
 template<> ::flyteidl::plugins::kubeflow::DistributedMPITrainingTask* Arena::CreateMaybeMessage<::flyteidl::plugins::kubeflow::DistributedMPITrainingTask>(Arena*);
 }  // namespace protobuf
 }  // namespace google
@@ -216,6 +223,30 @@ class DistributedMPITrainingTask final :
 };
 // -------------------------------------------------------------------
 
+class DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse : public ::google::protobuf::internal::MapEntry<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > {
+public:
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+static bool _ParseMap(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  typedef ::google::protobuf::internal::MapEntry<DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse, 
+    ::std::string, ::std::string,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+    0 > SuperType;
+  DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse();
+  DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse(::google::protobuf::Arena* arena);
+  void MergeFrom(const DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse& other);
+  static const DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse* internal_default_instance() { return reinterpret_cast<const DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse*>(&_DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse_default_instance_); }
+  void MergeFrom(const ::google::protobuf::Message& other) final;
+  ::google::protobuf::Metadata GetMetadata() const;
+};
+
+// -------------------------------------------------------------------
+
 class DistributedMPITrainingReplicaSpec final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec) */ {
  public:
@@ -254,7 +285,7 @@ class DistributedMPITrainingReplicaSpec final :
                &_DistributedMPITrainingReplicaSpec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    1;
+    2;
 
   void Swap(DistributedMPITrainingReplicaSpec* other);
   friend void swap(DistributedMPITrainingReplicaSpec& a, DistributedMPITrainingReplicaSpec& b) {
@@ -309,6 +340,7 @@ class DistributedMPITrainingReplicaSpec final :
 
   // nested types ----------------------------------------------------
 
+
   // accessors -------------------------------------------------------
 
   // repeated string command = 5;
@@ -332,6 +364,15 @@ class DistributedMPITrainingReplicaSpec final :
   void add_command(const char* value, size_t size);
   const ::google::protobuf::RepeatedPtrField<::std::string>& command() const;
   ::google::protobuf::RepeatedPtrField<::std::string>* mutable_command();
+
+  // map<string, string> node_selectors = 6;
+  int node_selectors_size() const;
+  void clear_node_selectors();
+  static const int kNodeSelectorsFieldNumber = 6;
+  const ::google::protobuf::Map< ::std::string, ::std::string >&
+      node_selectors() const;
+  ::google::protobuf::Map< ::std::string, ::std::string >*
+      mutable_node_selectors();
 
   // string image = 2;
   void clear_image();
@@ -374,6 +415,12 @@ class DistributedMPITrainingReplicaSpec final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField<::std::string> command_;
+  ::google::protobuf::internal::MapField<
+      DistributedMPITrainingReplicaSpec_NodeSelectorsEntry_DoNotUse,
+      ::std::string, ::std::string,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      ::google::protobuf::internal::WireFormatLite::TYPE_STRING,
+      0 > node_selectors_;
   ::google::protobuf::internal::ArenaStringPtr image_;
   ::flyteidl::core::Resources* resources_;
   ::google::protobuf::int32 replicas_;
@@ -552,6 +599,8 @@ inline void DistributedMPITrainingTask::set_slots(::google::protobuf::int32 valu
   slots_ = value;
   // @@protoc_insertion_point(field_set:flyteidl.plugins.kubeflow.DistributedMPITrainingTask.slots)
 }
+
+// -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
 
@@ -752,9 +801,29 @@ DistributedMPITrainingReplicaSpec::mutable_command() {
   return &command_;
 }
 
+// map<string, string> node_selectors = 6;
+inline int DistributedMPITrainingReplicaSpec::node_selectors_size() const {
+  return node_selectors_.size();
+}
+inline void DistributedMPITrainingReplicaSpec::clear_node_selectors() {
+  node_selectors_.Clear();
+}
+inline const ::google::protobuf::Map< ::std::string, ::std::string >&
+DistributedMPITrainingReplicaSpec::node_selectors() const {
+  // @@protoc_insertion_point(field_map:flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.node_selectors)
+  return node_selectors_.GetMap();
+}
+inline ::google::protobuf::Map< ::std::string, ::std::string >*
+DistributedMPITrainingReplicaSpec::mutable_node_selectors() {
+  // @@protoc_insertion_point(field_mutable_map:flyteidl.plugins.kubeflow.DistributedMPITrainingReplicaSpec.node_selectors)
+  return node_selectors_.MutableMap();
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 

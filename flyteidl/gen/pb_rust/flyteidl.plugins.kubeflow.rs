@@ -112,6 +112,9 @@ pub struct DistributedMpiTrainingReplicaSpec {
     /// MPI sometimes requires different command set for different replica groups
     #[prost(string, repeated, tag="5")]
     pub command: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    /// Node selectors for the replica group
+    #[prost(map="string, string", tag="6")]
+    pub node_selectors: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Custom proto for torch elastic config for distributed training using 
 /// <https://github.com/kubeflow/training-operator/blob/master/pkg/apis/kubeflow.org/v1/pytorch_types.go>
@@ -163,6 +166,9 @@ pub struct DistributedPyTorchTrainingReplicaSpec {
     /// RestartPolicy determines whether pods will be restarted when they exit
     #[prost(enumeration="RestartPolicy", tag="4")]
     pub restart_policy: i32,
+    /// Node selectors for the replica group
+    #[prost(map="string, string", tag="5")]
+    pub node_selectors: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// Proto for plugin that enables distributed training using <https://github.com/kubeflow/tf-operator>
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -201,5 +207,8 @@ pub struct DistributedTensorflowTrainingReplicaSpec {
     /// RestartPolicy Determines whether pods will be restarted when they exit
     #[prost(enumeration="RestartPolicy", tag="4")]
     pub restart_policy: i32,
+    /// Node selectors for the replica group
+    #[prost(map="string, string", tag="5")]
+    pub node_selectors: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 // @@protoc_insertion_point(module)

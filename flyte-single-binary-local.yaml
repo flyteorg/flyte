@@ -6,6 +6,7 @@ admin:
   # and _also_, admin to talk to artifacts
   endpoint: localhost:30080
   insecure: true
+  insecureSkipVerify: true
 
 catalog-cache:
   endpoint: localhost:8081
@@ -14,7 +15,7 @@ catalog-cache:
 
 cluster_resources:
   standaloneDeployment: false
-  templatePath: $HOME/.flyte/sandbox/cluster-resource-templates
+  templatePath: /Users/alykhantejani/.flyte/cluster-resource-templates
 
 logger:
   show-source: true
@@ -22,14 +23,14 @@ logger:
 
 propeller:
   create-flyteworkflow-crd: true
-  kube-config: $HOME/.flyte/sandbox/kubeconfig
+  kube-config: /Users/alykhantejani/.flyte/sandbox/kubeconfig
   rawoutput-prefix: s3://my-s3-bucket/data
 
 server:
-  kube-config: $HOME/.flyte/sandbox/kubeconfig
+  kube-config: /Users/alykhantejani/.flyte/sandbox/kubeconfig
 
 webhook:
-  certDir: $HOME/.flyte/webhook-certs
+  certDir: /Users/alykhantejani/.flyte/webhook-certs
   localCert: true
   secretName: flyte-sandbox-webhook-secret
   serviceName: flyte-sandbox-local
@@ -41,10 +42,12 @@ tasks:
       - container
       - sidecar
       - K8S-ARRAY
+      - Tensorflow
     default-for-task-types:
       - container: container
       - container_array: K8S-ARRAY
-
+      - sidecar: sidecar
+      - Tensorflow: Tensorflow
 plugins:
   logs:
     kubernetes-enabled: true
