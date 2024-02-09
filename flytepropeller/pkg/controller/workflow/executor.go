@@ -138,7 +138,8 @@ func (c *workflowExecutor) handleReadyWorkflow(ctx context.Context, w *v1alpha1.
 	// start execution environments
 	for _, executionEnv := range w.ExecutionConfig.ExecutionEnvs {
 		if envSpec := executionEnv.GetEnvironmentSpec(); envSpec != nil {
-			if err := c.executionEnvClient.CreateEnvironment(ctx, w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
+			if err := c.executionEnvClient.CreateEnvironment(ctx, execcontext.GetOwnerReference(),
+					w.ExecutionID.WorkflowExecutionIdentifier, executionEnv.Id, envSpec); err != nil {
 				return StatusReady, err
 			}
 		}

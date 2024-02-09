@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	_struct "github.com/golang/protobuf/ptypes/struct"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/executors"
@@ -25,7 +26,7 @@ func (e *ExecutionEnvironmentClient) GetEnvironment(executionID *core.WorkflowEx
 	return env
 }
 
-func (e *ExecutionEnvironmentClient) CreateEnvironment(ctx context.Context, executionID *core.WorkflowExecutionIdentifier,
+func (e *ExecutionEnvironmentClient) CreateEnvironment(ctx context.Context, ownerReference metav1.OwnerReference, executionID *core.WorkflowExecutionIdentifier,
 	executionEnvID string, executionEnvSpec *_struct.Struct) error {
 
 	id := buildID(executionID, executionEnvID)
@@ -36,7 +37,7 @@ func (e *ExecutionEnvironmentClient) CreateEnvironment(ctx context.Context, exec
 		return nil
 	}
 
-	env, err := e.fastTaskEnvBuilder.CreateEnvironment(ctx, id, executionEnvSpec)
+	env, err := e.fastTaskEnvBuilder.CreateEnvironment(ctx, ownerReference, executionID, executionEnvID, executionEnvSpec)
 	if err != nil {
 		return err
 	}
@@ -51,7 +52,7 @@ func (e *ExecutionEnvironmentClient) DeleteEnvironment(ctx context.Context, exec
 	id := buildID(executionID, executionEnvID)
 	fmt.Printf("HAMERSAW - DeleteEnvironment '%s'\n", id)
 
-	if err := e.fastTaskEnvBuilder.DeleteEnvironment(ctx, id, executionEnvSpec); err != nil {
+	if err := e.fastTaskEnvBuilder.DeleteEnvironment(ctx, executionID, executionEnvID, executionEnvSpec); err != nil {
 		return err
 	}
 
