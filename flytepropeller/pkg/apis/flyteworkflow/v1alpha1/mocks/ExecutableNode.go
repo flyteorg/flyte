@@ -222,6 +222,41 @@ func (_m *ExecutableNode) GetExtendedResources() *core.ExtendedResources {
 	return r0
 }
 
+type ExecutableNode_GetContainerImage struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetContainerImage) Return(_a0 string) *ExecutableNode_GetContainerImage {
+	return &ExecutableNode_GetContainerImage{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetContainerImage() *ExecutableNode_GetContainerImage {
+	c_call := _m.On("GetContainerImage")
+	return &ExecutableNode_GetContainerImage{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetContainerImageMatch(matchers ...interface{}) *ExecutableNode_GetContainerImage {
+	c_call := _m.On("GetContainerImage", matchers...)
+	return &ExecutableNode_GetContainerImage{Call: c_call}
+}
+
+// GetContainerImage provides a mock function with given fields:
+func (_m *ExecutableNode) GetContainerImage() string {
+	ret := _m.Called()
+
+	var r0 string
+	if rf, ok := ret.Get(0).(func() string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(string)
+		}
+	}
+
+	return r0
+}
+
+
 type ExecutableNode_GetGateNode struct {
 	*mock.Call
 }
