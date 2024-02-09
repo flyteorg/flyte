@@ -9,7 +9,7 @@ import (
 type CreateProjectFunc func(ctx context.Context, request admin.ProjectRegisterRequest) (*admin.ProjectRegisterResponse, error)
 type ListProjectFunc func(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error)
 type UpdateProjectFunc func(ctx context.Context, request admin.Project) (*admin.ProjectUpdateResponse, error)
-type GetProjectFunc func(ctx context.Context, request admin.ProjectRequest) (*admin.Project, error)
+type GetProjectFunc func(ctx context.Context, request admin.Project) (*admin.Project, error)
 
 type MockProjectManager struct {
 	listProjectFunc   ListProjectFunc
@@ -52,7 +52,7 @@ func (m *MockProjectManager) SetGetCallBack(getProjectFunc GetProjectFunc) {
 	m.getProjectFunc = getProjectFunc
 }
 
-func (m *MockProjectManager) GetProject(ctx context.Context, request admin.ProjectRequest) (*admin.Project, error) {
+func (m *MockProjectManager) GetProject(ctx context.Context, request admin.Project) (*admin.Project, error) {
 	if m.getProjectFunc != nil {
 		return m.getProjectFunc(ctx, request)
 	}

@@ -981,11 +981,11 @@ void AdminService::Stub::experimental_async::UpdateProject(::grpc::ClientContext
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::ProjectUpdateResponse>::Create(channel_.get(), cq, rpcmethod_UpdateProject_, context, request, false);
 }
 
-::grpc::Status AdminService::Stub::GetProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRequest& request, ::flyteidl::admin::Project* response) {
+::grpc::Status AdminService::Stub::GetProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::flyteidl::admin::Project* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetProject_, context, request, response);
 }
 
-void AdminService::Stub::experimental_async::GetProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRequest* request, ::flyteidl::admin::Project* response, std::function<void(::grpc::Status)> f) {
+void AdminService::Stub::experimental_async::GetProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::Project* response, std::function<void(::grpc::Status)> f) {
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetProject_, context, request, response, std::move(f));
 }
 
@@ -993,7 +993,7 @@ void AdminService::Stub::experimental_async::GetProject(::grpc::ClientContext* c
   ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetProject_, context, request, response, std::move(f));
 }
 
-void AdminService::Stub::experimental_async::GetProject(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRequest* request, ::flyteidl::admin::Project* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+void AdminService::Stub::experimental_async::GetProject(::grpc::ClientContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::Project* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetProject_, context, request, response, reactor);
 }
 
@@ -1001,11 +1001,11 @@ void AdminService::Stub::experimental_async::GetProject(::grpc::ClientContext* c
   ::grpc::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_GetProject_, context, request, response, reactor);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Project>* AdminService::Stub::AsyncGetProjectRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Project>* AdminService::Stub::AsyncGetProjectRaw(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::Project>::Create(channel_.get(), cq, rpcmethod_GetProject_, context, request, true);
 }
 
-::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Project>* AdminService::Stub::PrepareAsyncGetProjectRaw(::grpc::ClientContext* context, const ::flyteidl::admin::ProjectRequest& request, ::grpc::CompletionQueue* cq) {
+::grpc::ClientAsyncResponseReader< ::flyteidl::admin::Project>* AdminService::Stub::PrepareAsyncGetProjectRaw(::grpc::ClientContext* context, const ::flyteidl::admin::Project& request, ::grpc::CompletionQueue* cq) {
   return ::grpc::internal::ClientAsyncResponseReaderFactory< ::flyteidl::admin::Project>::Create(channel_.get(), cq, rpcmethod_GetProject_, context, request, false);
 }
 
@@ -1835,7 +1835,7 @@ AdminService::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[30],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::ProjectRequest, ::flyteidl::admin::Project>(
+      new ::grpc::internal::RpcMethodHandler< AdminService::Service, ::flyteidl::admin::Project, ::flyteidl::admin::Project>(
           std::mem_fn(&AdminService::Service::GetProject), this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       AdminService_method_names[31],
@@ -2172,7 +2172,7 @@ AdminService::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status AdminService::Service::GetProject(::grpc::ServerContext* context, const ::flyteidl::admin::ProjectRequest* request, ::flyteidl::admin::Project* response) {
+::grpc::Status AdminService::Service::GetProject(::grpc::ServerContext* context, const ::flyteidl::admin::Project* request, ::flyteidl::admin::Project* response) {
   (void) context;
   (void) request;
   (void) response;

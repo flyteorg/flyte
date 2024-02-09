@@ -76,9 +76,3 @@ class ProjectRegisterResponse(_message.Message):
 class ProjectUpdateResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
-
-class ProjectRequest(_message.Message):
-    __slots__ = ["project"]
-    PROJECT_FIELD_NUMBER: _ClassVar[int]
-    project: Project
-    def __init__(self, project: _Optional[_Union[Project, _Mapping]] = ...) -> None: ...

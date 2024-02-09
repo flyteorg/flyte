@@ -182,7 +182,7 @@ class AdminServiceStub(object):
                 )
         self.GetProject = channel.unary_unary(
                 '/flyteidl.service.AdminService/GetProject',
-                request_serializer=flyteidl_dot_admin_dot_project__pb2.ProjectRequest.SerializeToString,
+                request_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
                 )
         self.ListProjects = channel.unary_unary(
@@ -857,7 +857,7 @@ def add_AdminServiceServicer_to_server(servicer, server):
             ),
             'GetProject': grpc.unary_unary_rpc_method_handler(
                     servicer.GetProject,
-                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.ProjectRequest.FromString,
+                    request_deserializer=flyteidl_dot_admin_dot_project__pb2.Project.FromString,
                     response_serializer=flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
             ),
             'ListProjects': grpc.unary_unary_rpc_method_handler(
@@ -1514,7 +1514,7 @@ class AdminService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetProject',
-            flyteidl_dot_admin_dot_project__pb2.ProjectRequest.SerializeToString,
+            flyteidl_dot_admin_dot_project__pb2.Project.SerializeToString,
             flyteidl_dot_admin_dot_project__pb2.Project.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

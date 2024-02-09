@@ -298,7 +298,7 @@ func TestProjectManager_TestGetProject(t *testing.T) {
 		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 
 	resp, _ := projectManager.GetProject(context.Background(),
-		admin.ProjectRequest{Project: mockedProject})
+		*mockedProject)
 
 	assert.Equal(t, mockedProject.Id, resp.Id)
 	assert.Equal(t, "a-mocked-project", resp.Name)
@@ -317,7 +317,7 @@ func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
 		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
 
 	_, err := projectManager.GetProject(context.Background(),
-		admin.ProjectRequest{Project: mockedProject})
+		*mockedProject)
 
 	assert.Equal(t, errors.New("project "+project+" not found"), err)
 }

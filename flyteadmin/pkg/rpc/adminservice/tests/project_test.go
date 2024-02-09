@@ -62,11 +62,11 @@ func TestListProjects(t *testing.T) {
 func TestGetProject(t *testing.T) {
 	mockProjectManager := mocks.MockProjectManager{}
 	project := &admin.Project{Id: "project id", Name: "project"}
-	mockProjectManager.SetGetCallBack(func(ctx context.Context, request admin.ProjectRequest) (*admin.Project, error) {
+	mockProjectManager.SetGetCallBack(func(ctx context.Context, request admin.Project) (*admin.Project, error) {
 		assert.NotNil(t, request)
 		return project, nil
 	})
-	resp, err := mockProjectManager.GetProject(context.Background(), admin.ProjectRequest{})
+	resp, err := mockProjectManager.GetProject(context.Background(), admin.Project{})
 	assert.Nil(t, err)
 	assert.True(t, proto.Equal(project, resp))
 }

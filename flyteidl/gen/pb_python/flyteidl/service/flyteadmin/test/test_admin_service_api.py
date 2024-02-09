@@ -309,6 +309,13 @@ class TestAdminServiceApi(unittest.TestCase):
         """
         pass
 
+    def test_get_project(self):
+        """Test case for get_project
+
+        Fetches a :ref:`ref_flyteidl.admin.Project`  # noqa: E501
+        """
+        pass
+
     def test_get_project2(self):
         """Test case for get_project2
 

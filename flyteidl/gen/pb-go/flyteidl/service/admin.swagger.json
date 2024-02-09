@@ -4910,6 +4910,63 @@
       }
     },
     "/api/v1/projects/org/{org}/{id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "operationId": "GetProject2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id",
+            "description": "Globally unique project name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Display name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "description": " - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED",
+              "SYSTEM_GENERATED"
+            ],
+            "default": "ACTIVE"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "operationId": "UpdateProject2",
@@ -4943,65 +5000,6 @@
             "schema": {
               "$ref": "#/definitions/adminProject"
             }
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/projects/org/{project.id}": {
-      "get": {
-        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
-        "operationId": "GetProject2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminProject"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "project.id",
-            "description": "Globally unique project name.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "project.name",
-            "description": "Display name.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "project.description",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "project.state",
-            "description": " - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "ARCHIVED",
-              "SYSTEM_GENERATED"
-            ],
-            "default": "ACTIVE"
-          },
-          {
-            "name": "project.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [
@@ -5044,6 +5042,63 @@
       }
     },
     "/api/v1/projects/{id}": {
+      "get": {
+        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "operationId": "GetProject",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminProject"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "Globally unique project name.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Display name.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "state",
+            "description": " - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ACTIVE",
+              "ARCHIVED",
+              "SYSTEM_GENERATED"
+            ],
+            "default": "ACTIVE"
+          },
+          {
+            "name": "org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      },
       "put": {
         "summary": "Updates an existing :ref:`ref_flyteidl.admin.Project`\nflyteidl.admin.Project should be passed but the domains property should be empty;\nit will be ignored in the handler as domains cannot be updated via this API.",
         "operationId": "UpdateProject",

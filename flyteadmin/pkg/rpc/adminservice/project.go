@@ -64,7 +64,7 @@ func (m *AdminService) UpdateProject(ctx context.Context, request *admin.Project
 	return response, nil
 }
 
-func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectRequest) (*admin.Project, error) {
+func (m *AdminService) GetProject(ctx context.Context, request *admin.Project) (*admin.Project, error) {
 	defer m.interceptPanic(ctx, request)
 	if request == nil {
 		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
