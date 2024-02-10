@@ -25,7 +25,7 @@ The ResourceManager provides a task-type-specific pooling system for Flyte tasks
 
 A plugin defines a collection of resource pools using its configuration. Flyte uses tokens as a placeholder to represent a unit of resource.
 
-How does a Flyte plugin request for resources?
+How Flyte plugins request resources
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 The Flyte plugin registers the resource and the desired quota of every resource with the **ResourceRegistrar** when setting up FlytePropeller. When a plugin is invoked, FlytePropeller provides a proxy for the plugin. This proxy facilitates the plugin's view of the resource pool by controlling operations to allocate and deallocate resources.
