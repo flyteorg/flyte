@@ -97,7 +97,7 @@ Wherein the placeholders are occupied by:
 
    err := ReleaseResource(ctx, "default_cluster", "flkgiwd13-akjdoe-0")
 
-Below is an example interface that shows allocation and deallocation of resources.
+See below for an example interface that shows allocation and deallocation of resources:
 
 .. code-block:: go
 
