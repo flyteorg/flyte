@@ -4,7 +4,15 @@
 Flyte ResourceManager
 #####################
 
-**Flyte ResourceManager** is a configurable component that allows plugins to manage resource allocations independently. It helps track resource utilization of tasks that run on Flyte. The default deployments are configured as ``noop``, which indicates that the ResourceManager provided by Flyte is disabled and plugins rely on each independent platform to manage resource utilization. In situations like the K8s plugin, where the platform has a robust mechanism to manage resource scheduling, this may work well. However, in a scenario like a simple web API plugin, the rate at which Flyte sends requests may overwhelm a service and benefit from additional resource management.
+**Flyte ResourceManager** is a configurable component that helps track resource utilization of tasks that run on Flyte and allows plugins to manage resource allocations independently. Default deployments are configured with the ResourceManager disabled, which means plugins rely on each independent platform to manage resource utilization. See below for the default ResourceManager configuration:
+
+.. code-block:: yaml
+
+    resourcemanager:
+      type: noop
+
+When using a plugin that connects to a platform with a robust resource scheduling mechanism, like the K8s plugin, we recommend leaving the default ``flyteresourcemanager`` configuration in place. However, with web API plugins (for example), the rate at which Flyte sends requests may overwhelm a service, and we recommend changing the ``resourcemanager`` configuration.
+
 
 The below attribute is configurable within FlytePropeller, which can be disabled with:
 
