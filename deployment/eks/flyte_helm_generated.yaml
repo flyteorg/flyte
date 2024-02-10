@@ -462,7 +462,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b2
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b4
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -898,7 +898,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - migrate
           - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
           volumeMounts:
@@ -915,7 +915,7 @@ spec:
           - flytesnacks
           - flytetester
           - flyteexamples
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
           volumeMounts:
@@ -929,7 +929,7 @@ spec:
           - /etc/flyte/config/*.yaml
           - clusterresource
           - sync
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -942,7 +942,7 @@ spec:
           - mountPath: /etc/secrets/
             name: admin-secrets
         - name: generate-secrets
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           command: ["/bin/sh", "-c"]
           args:
@@ -965,7 +965,7 @@ spec:
         - --config
         - /etc/flyte/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: flyteadmin
         ports:
@@ -1066,7 +1066,7 @@ spec:
             - /etc/flyte/config/*.yaml
             - clusterresource
             - run
-          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b2"
+          image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
           volumeMounts:
@@ -1127,7 +1127,6 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
-        env:
         resources: 
           limits:
             cpu: 250m
@@ -1187,7 +1186,7 @@ spec:
         - /etc/datacatalog/config/*.yaml
         - migrate
         - run
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: run-migrations
         volumeMounts:
@@ -1201,7 +1200,7 @@ spec:
         - --config
         - /etc/datacatalog/config/*.yaml
         - serve
-        image: "cr.flyte.org/flyteorg/datacatalog:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/datacatalog:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: datacatalog
         ports:
@@ -1277,7 +1276,7 @@ spec:
         - precheck
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
         volumeMounts:
@@ -1293,7 +1292,7 @@ spec:
         - run
         - --config
         - /etc/flyte/config/*.yaml
-        image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler
         ports:
@@ -1348,7 +1347,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ea2c2cd8898cdabd21a443862894799a49efd108e5118f4605b5e7c94008e0a"
+        configChecksum: "799320510466012ad23a7380ea4ac9ff51fd8ed6e56d9c543179b6bb6a9bcf1"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1374,7 +1373,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -1428,9 +1427,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.10.7-b2
+        app.kubernetes.io/version: v1.10.7-b4
       annotations:
-        configChecksum: "ea2c2cd8898cdabd21a443862894799a49efd108e5118f4605b5e7c94008e0a"
+        configChecksum: "799320510466012ad23a7380ea4ac9ff51fd8ed6e56d9c543179b6bb6a9bcf1"
     spec:
       securityContext:
         fsGroup: 65534
@@ -1439,7 +1438,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7-b2"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -1462,7 +1461,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7-b2"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
@@ -1479,6 +1478,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+          ports:
+          - containerPort: 9443
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -1512,6 +1513,7 @@ metadata:
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
 spec:
+  ingressClassName: 
   rules:
     - http:
         paths:
@@ -1667,9 +1669,10 @@ kind: Ingress
 metadata:
   name: flyte-core-grpc
   namespace: flyte
-  annotations:
+  annotations: 
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig":
       { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     alb.ingress.kubernetes.io/certificate-arn: '<CERTIFICATE_ARN>'
     alb.ingress.kubernetes.io/group.name: flyte
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
@@ -1678,9 +1681,9 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     nginx.ingress.kubernetes.io/app-root: /console
-    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
     nginx.ingress.kubernetes.io/backend-protocol: GRPC
 spec:
+  ingressClassName: 
   rules:
     - host: null
       http:
