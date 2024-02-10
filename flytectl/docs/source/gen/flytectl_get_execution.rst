@@ -75,7 +75,7 @@ Task execution view is available in YAML/JSON format too. The following example 
 
 ::
 
- flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodID n0 -o yaml
+ flytectl get execution -p flytesnacks -d development oeh94k9r2r --nodeID n0 -o yaml
 
 Usage
 
