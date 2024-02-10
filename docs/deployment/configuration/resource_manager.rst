@@ -57,7 +57,7 @@ During runtime, the ResourceManager:
 Plugin resource allocation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-When a Flyte task execution needs to send a request to an external service, the plugin claims a unit of the corresponding resource. This is done using a **ResourceName**, which is a unique token and a fully qualified resource request (which is typically an integer). The execution generates this unique token and registers this token with the ResourceManager by calling the ResourceManager’s **"AllocateResource function"**. If the resource pool has sufficient capacity to fulfil your request, then the resources requested are allocated, and the plugin proceeds further.
+When a Flyte task execution needs to send a request to an external service, the plugin claims a unit of the corresponding resource using a **ResourceName**, which is a unique token and a fully qualified resource request (typically an integer). The task execution generates this unique token and registers the token with the ResourceManager by calling the ResourceManager’s ``AllocateResource`` function. If the resource pool has sufficient capacity to fulfill the request, then the requested resources are allocated, and the plugin proceeds further.
 
 When the status is **"AllocationGranted"**, the execution moves forward and sends out the request for those resources.
 
