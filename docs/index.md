@@ -76,7 +76,7 @@ contribute its architecture and design. You can also access the
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`🔤 Intro to Flyte <introduction>`
+* - {doc}`🔤 Introduction to Flyte <introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
 * - {doc}`📖 User Guide <flytesnacks/userguide>`
@@ -135,10 +135,10 @@ Have questions or need support? The best way to reach us is through Slack:
 :hidden:
 
 Introduction <introduction>
-Quickstart guide <flytesnacks/getting_started/quickstart_guide>
-Getting started with workflow development <flytesnacks/getting_started/getting_started_with_workflow_development>
-Flyte Fundamentals <flytesnacks/getting_started/flyte_fundamentals>
-Core Use Cases <flytesnacks/getting_started/core_use_cases>
+Quickstart guide <quickstart_guide>
+Getting started with workflow development <getting_started_with_workflow_development/index>
+Flyte fundamentals <flyte_fundamentals/index>
+Core use cases <core_use_cases/index>
 ```
 
 ```{toctree}

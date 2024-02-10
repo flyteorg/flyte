@@ -8,7 +8,7 @@ pip-compile $(1) --upgrade --verbose
 endef
 
 .PHONY: generate
-generate: install doc_gen_deps # install tools, generate protos, mock, pflags and  get doc dependencies
+generate: install # install tools, generate protos, mock, pflags and  get doc dependencies
 	./generate_protos.sh
 	./generate_mocks.sh
 	go generate ./...
@@ -34,22 +34,11 @@ build_python:
 install-piptools:
 	pip install -U pip-tools
 
-.PHONY: doc_gen_deps # these dependencies are required by protoc gen doc for the protos which have external library dependencies. 
-# which includes grpc-gateway, googleapis, k8.io/api and apimachinery, protocolbuffers 
-doc_gen_deps:
-	./scripts/doc_gen_deps.sh
-
 .PHONY: doc-requirements.txt
 doc-requirements.txt: doc-requirements.in install-piptools
 	$(call PIP_COMPILE,doc-requirements.in)
 
-PLACEHOLDER := "__version__\ =\ \"0.0.0+develop\""
 PLACEHOLDER_NPM := \"version\": \"0.0.0-develop\"
-
-.PHONY: update_pyversion
-update_pyversion:
-	grep "$(PLACEHOLDER)" "setup.py"
-	sed -i "s/$(PLACEHOLDER)/__version__ = \"${VERSION}\"/g" "setup.py"
 
 .PHONY: update_npmversion
 update_npmversion:

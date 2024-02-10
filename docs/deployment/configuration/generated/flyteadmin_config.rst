@@ -5337,7 +5337,6 @@ defaults (`interfaces.TaskResourceSet`_)
   ephemeralStorage: "0"
   gpu: "0"
   memory: 200Mi
-  storage: "0"
   
 
 limits (`interfaces.TaskResourceSet`_)
@@ -5351,7 +5350,6 @@ limits (`interfaces.TaskResourceSet`_)
   ephemeralStorage: "0"
   gpu: "1"
   memory: 1Gi
-  storage: "0"
   
 
 interfaces.TaskResourceSet
@@ -5385,16 +5383,6 @@ memory (`resource.Quantity`_)
 .. code-block:: yaml
 
   200Mi
-  
-
-storage (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
   
 
 ephemeralStorage (`resource.Quantity`_)
