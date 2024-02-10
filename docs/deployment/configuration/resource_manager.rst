@@ -112,7 +112,7 @@ See below for an example interface that shows allocation and deallocation of res
     ReleaseResource(ctx context.Context, namespace ResourceNamespace, allocationToken string) error
     }
 
-How can you force ResourceManager to force runtime quota allocation constraints?
+Configuring ResourceManager to force runtime quota allocation constraints
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Runtime quota allocation constraints can be achieved using ResourceConstraintsSpec. It is a contact that a plugin can specify at different project and namespace levels.
 
