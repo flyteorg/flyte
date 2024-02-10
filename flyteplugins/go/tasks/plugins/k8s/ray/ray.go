@@ -54,7 +54,7 @@ func (rayJobResourceHandler) GetProperties() k8s.PluginProperties {
 	return k8s.PluginProperties{}
 }
 
-// BuildResource Creates a new ray job resource.
+// BuildResource Creates a new ray job resource for v1 or v1alpha1.
 func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecutionContext) (client.Object, error) {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
