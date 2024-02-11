@@ -12871,6 +12871,9 @@ export namespace flyteidl {
 
             /** AbortMetadata principal */
             principal?: (string|null);
+
+            /** AbortMetadata identity */
+            identity?: (flyteidl.admin.IIdentity|null);
         }
 
         /** Represents an AbortMetadata. */
@@ -12887,6 +12890,9 @@ export namespace flyteidl {
 
             /** AbortMetadata principal. */
             public principal: string;
+
+            /** AbortMetadata identity. */
+            public identity?: (flyteidl.admin.IIdentity|null);
 
             /**
              * Creates a new AbortMetadata instance using the specified properties.
@@ -13138,6 +13144,9 @@ export namespace flyteidl {
 
             /** ExecutionMetadata artifactIds */
             artifactIds?: (flyteidl.core.IArtifactID[]|null);
+
+            /** ExecutionMetadata identity */
+            identity?: (flyteidl.admin.IIdentity|null);
         }
 
         /** Represents an ExecutionMetadata. */
@@ -13172,6 +13181,9 @@ export namespace flyteidl {
 
             /** ExecutionMetadata artifactIds. */
             public artifactIds: flyteidl.core.IArtifactID[];
+
+            /** ExecutionMetadata identity. */
+            public identity?: (flyteidl.admin.IIdentity|null);
 
             /**
              * Creates a new ExecutionMetadata instance using the specified properties.
@@ -13723,6 +13735,9 @@ export namespace flyteidl {
 
             /** ExecutionStateChangeDetails principal */
             principal?: (string|null);
+
+            /** ExecutionStateChangeDetails identity */
+            identity?: (flyteidl.admin.IIdentity|null);
         }
 
         /** Represents an ExecutionStateChangeDetails. */
@@ -13742,6 +13757,9 @@ export namespace flyteidl {
 
             /** ExecutionStateChangeDetails principal. */
             public principal: string;
+
+            /** ExecutionStateChangeDetails identity. */
+            public identity?: (flyteidl.admin.IIdentity|null);
 
             /**
              * Creates a new ExecutionStateChangeDetails instance using the specified properties.
@@ -13926,6 +13944,189 @@ export namespace flyteidl {
 
             /**
              * Verifies a WorkflowExecutionGetMetricsResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a User. */
+        interface IUser {
+
+            /** User firstName */
+            firstName?: (string|null);
+
+            /** User lastName */
+            lastName?: (string|null);
+
+            /** User email */
+            email?: (string|null);
+
+            /** User subject */
+            subject?: (string|null);
+        }
+
+        /** Represents a User. */
+        class User implements IUser {
+
+            /**
+             * Constructs a new User.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IUser);
+
+            /** User firstName. */
+            public firstName: string;
+
+            /** User lastName. */
+            public lastName: string;
+
+            /** User email. */
+            public email: string;
+
+            /** User subject. */
+            public subject: string;
+
+            /**
+             * Creates a new User instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns User instance
+             */
+            public static create(properties?: flyteidl.admin.IUser): flyteidl.admin.User;
+
+            /**
+             * Encodes the specified User message. Does not implicitly {@link flyteidl.admin.User.verify|verify} messages.
+             * @param message User message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IUser, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a User message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns User
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.User;
+
+            /**
+             * Verifies a User message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Application. */
+        interface IApplication {
+
+            /** Application subject */
+            subject?: (string|null);
+        }
+
+        /** Represents an Application. */
+        class Application implements IApplication {
+
+            /**
+             * Constructs a new Application.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IApplication);
+
+            /** Application subject. */
+            public subject: string;
+
+            /**
+             * Creates a new Application instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Application instance
+             */
+            public static create(properties?: flyteidl.admin.IApplication): flyteidl.admin.Application;
+
+            /**
+             * Encodes the specified Application message. Does not implicitly {@link flyteidl.admin.Application.verify|verify} messages.
+             * @param message Application message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IApplication, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Application message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Application
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Application;
+
+            /**
+             * Verifies an Application message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an Identity. */
+        interface IIdentity {
+
+            /** Identity user */
+            user?: (flyteidl.admin.IUser|null);
+
+            /** Identity application */
+            application?: (flyteidl.admin.IApplication|null);
+        }
+
+        /** Represents an Identity. */
+        class Identity implements IIdentity {
+
+            /**
+             * Constructs a new Identity.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IIdentity);
+
+            /** Identity user. */
+            public user?: (flyteidl.admin.IUser|null);
+
+            /** Identity application. */
+            public application?: (flyteidl.admin.IApplication|null);
+
+            /** Identity principal. */
+            public principal?: ("user"|"application");
+
+            /**
+             * Creates a new Identity instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Identity instance
+             */
+            public static create(properties?: flyteidl.admin.IIdentity): flyteidl.admin.Identity;
+
+            /**
+             * Encodes the specified Identity message. Does not implicitly {@link flyteidl.admin.Identity.verify|verify} messages.
+             * @param message Identity message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IIdentity, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an Identity message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Identity
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.Identity;
+
+            /**
+             * Verifies an Identity message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */

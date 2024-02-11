@@ -913,6 +913,41 @@ pub struct TaskExecutionEventRequest {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionEventResponse {
 }
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct User {
+    #[prost(string, tag="1")]
+    pub first_name: ::prost::alloc::string::String,
+    #[prost(string, tag="2")]
+    pub last_name: ::prost::alloc::string::String,
+    #[prost(string, tag="3")]
+    pub email: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub subject: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Application {
+    #[prost(string, tag="1")]
+    pub subject: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Identity {
+    #[prost(oneof="identity::Principal", tags="1, 2")]
+    pub principal: ::core::option::Option<identity::Principal>,
+}
+/// Nested message and enum types in `Identity`.
+pub mod identity {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Principal {
+        #[prost(message, tag="1")]
+        User(super::User),
+        #[prost(message, tag="2")]
+        Application(super::Application),
+    }
+}
 /// Request to launch an execution with the given project, domain and optionally-assigned name.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -1051,9 +1086,13 @@ pub struct AbortMetadata {
     /// In the case of a user-specified abort, this will pass along the user-supplied cause.
     #[prost(string, tag="1")]
     pub cause: ::prost::alloc::string::String,
+    /// Deprecated, use Identity instead.
     /// Identifies the entity (if any) responsible for terminating the execution
+    #[deprecated]
     #[prost(string, tag="2")]
     pub principal: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="3")]
+    pub identity: ::core::option::Option<Identity>,
 }
 /// Encapsulates the results of the Execution
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -1139,9 +1178,11 @@ pub struct SystemMetadata {
 pub struct ExecutionMetadata {
     #[prost(enumeration="execution_metadata::ExecutionMode", tag="1")]
     pub mode: i32,
+    /// Deprecated, use Identity instead
     /// Identifier of the entity that triggered this execution.
     /// For systems using back-end authentication any value set here will be discarded in favor of the
     /// authenticated user context.
+    #[deprecated]
     #[prost(string, tag="2")]
     pub principal: ::prost::alloc::string::String,
     /// Indicates the nestedness of this execution.
@@ -1169,6 +1210,8 @@ pub struct ExecutionMetadata {
     /// since we don't have a structure to handle nested ones anyways.
     #[prost(message, repeated, tag="18")]
     pub artifact_ids: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    #[prost(message, optional, tag="19")]
+    pub identity: ::core::option::Option<Identity>,
 }
 /// Nested message and enum types in `ExecutionMetadata`.
 pub mod execution_metadata {
@@ -1371,9 +1414,12 @@ pub struct ExecutionStateChangeDetails {
     /// This timestamp represents when the state changed.
     #[prost(message, optional, tag="2")]
     pub occurred_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Deprecated, use Identity instead
     /// Identifies the entity (if any) responsible for causing the state change of the execution
     #[prost(string, tag="3")]
     pub principal: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="4")]
+    pub identity: ::core::option::Option<Identity>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

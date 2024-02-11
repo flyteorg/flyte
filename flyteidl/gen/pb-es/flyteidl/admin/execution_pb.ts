@@ -7,6 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { BoolValue, Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { LiteralMap } from "../core/literals_pb.js";
 import { Identifier, NodeExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
+import { Identity } from "./identity_pb.js";
 import { ExecutionError, QualityOfService, WorkflowExecution_Phase } from "../core/execution_pb.js";
 import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig, UrlBlob } from "./common_pb.js";
 import { ArtifactID } from "../core/artifact_id_pb.js";
@@ -511,11 +512,18 @@ export class AbortMetadata extends Message<AbortMetadata> {
   cause = "";
 
   /**
+   * Deprecated, use Identity instead.
    * Identifies the entity (if any) responsible for terminating the execution
    *
-   * @generated from field: string principal = 2;
+   * @generated from field: string principal = 2 [deprecated = true];
+   * @deprecated
    */
   principal = "";
+
+  /**
+   * @generated from field: flyteidl.admin.Identity identity = 3;
+   */
+  identity?: Identity;
 
   constructor(data?: PartialMessage<AbortMetadata>) {
     super();
@@ -527,6 +535,7 @@ export class AbortMetadata extends Message<AbortMetadata> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "cause", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "principal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "identity", kind: "message", T: Identity },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): AbortMetadata {
@@ -775,11 +784,13 @@ export class ExecutionMetadata extends Message<ExecutionMetadata> {
   mode = ExecutionMetadata_ExecutionMode.MANUAL;
 
   /**
+   * Deprecated, use Identity instead
    * Identifier of the entity that triggered this execution.
    * For systems using back-end authentication any value set here will be discarded in favor of the
    * authenticated user context.
    *
-   * @generated from field: string principal = 2;
+   * @generated from field: string principal = 2 [deprecated = true];
+   * @deprecated
    */
   principal = "";
 
@@ -832,6 +843,11 @@ export class ExecutionMetadata extends Message<ExecutionMetadata> {
    */
   artifactIds: ArtifactID[] = [];
 
+  /**
+   * @generated from field: flyteidl.admin.Identity identity = 19;
+   */
+  identity?: Identity;
+
   constructor(data?: PartialMessage<ExecutionMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -848,6 +864,7 @@ export class ExecutionMetadata extends Message<ExecutionMetadata> {
     { no: 16, name: "reference_execution", kind: "message", T: WorkflowExecutionIdentifier },
     { no: 17, name: "system_metadata", kind: "message", T: SystemMetadata },
     { no: 18, name: "artifact_ids", kind: "message", T: ArtifactID, repeated: true },
+    { no: 19, name: "identity", kind: "message", T: Identity },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionMetadata {
@@ -1414,11 +1431,17 @@ export class ExecutionStateChangeDetails extends Message<ExecutionStateChangeDet
   occurredAt?: Timestamp;
 
   /**
+   * Deprecated, use Identity instead
    * Identifies the entity (if any) responsible for causing the state change of the execution
    *
    * @generated from field: string principal = 3;
    */
   principal = "";
+
+  /**
+   * @generated from field: flyteidl.admin.Identity identity = 4;
+   */
+  identity?: Identity;
 
   constructor(data?: PartialMessage<ExecutionStateChangeDetails>) {
     super();
@@ -1431,6 +1454,7 @@ export class ExecutionStateChangeDetails extends Message<ExecutionStateChangeDet
     { no: 1, name: "state", kind: "enum", T: proto3.getEnumType(ExecutionState) },
     { no: 2, name: "occurred_at", kind: "message", T: Timestamp },
     { no: 3, name: "principal", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "identity", kind: "message", T: Identity },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionStateChangeDetails {

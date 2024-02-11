@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package flyteidl.admin;
+option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin";
+
+message User {
+  string first_name = 1;
+
+  string last_name = 2;
+
+  string email = 3;
+
+  string subject = 4;
+}
+
+message Application {
+  string subject = 1;
+}
+
+message Identity {
+  oneof principal {
+    User user = 1;
+
+    Application application = 2;
+  }
+}

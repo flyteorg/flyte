@@ -5,6 +5,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 
 import "flyteidl/admin/cluster_assignment.proto";
 import "flyteidl/admin/common.proto";
+import "flyteidl/admin/identity.proto";
 import "flyteidl/core/literals.proto";
 import "flyteidl/core/execution.proto";
 import "flyteidl/core/artifact_id.proto";
@@ -131,8 +132,11 @@ message AbortMetadata {
     // In the case of a user-specified abort, this will pass along the user-supplied cause.
     string cause = 1;
 
+    // Deprecated, use Identity instead.
     // Identifies the entity (if any) responsible for terminating the execution
-    string principal = 2;
+    string principal = 2 [deprecated = true];
+
+    Identity identity = 3;
 }
 
 // Encapsulates the results of the Execution
@@ -224,10 +228,11 @@ message ExecutionMetadata {
     }
     ExecutionMode mode = 1;
 
+    // Deprecated, use Identity instead
     // Identifier of the entity that triggered this execution.
     // For systems using back-end authentication any value set here will be discarded in favor of the
     // authenticated user context.
-    string principal = 2;
+    string principal = 2 [deprecated = true];
 
     // Indicates the nestedness of this execution.
     // If a user launches a workflow execution, the default nesting is 0.
@@ -253,6 +258,8 @@ message ExecutionMetadata {
     // Save a list of the artifacts used in this execution for now. This is a list only rather than a mapping
     // since we don't have a structure to handle nested ones anyways.
     repeated core.ArtifactID artifact_ids = 18;
+
+    Identity identity = 19;
 }
 
 message NotificationList {
@@ -394,8 +401,11 @@ message ExecutionStateChangeDetails {
     // This timestamp represents when the state changed.
     google.protobuf.Timestamp occurred_at = 2;
 
+    // Deprecated, use Identity instead
     // Identifies the entity (if any) responsible for causing the state change of the execution
     string principal = 3;
+
+    Identity identity = 4;
 }
 
 message ExecutionUpdateResponse {}

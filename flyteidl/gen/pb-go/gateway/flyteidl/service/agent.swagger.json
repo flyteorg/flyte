@@ -669,28 +669,6 @@
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
     },
-    "coreIdentity": {
-      "type": "object",
-      "properties": {
-        "iam_role": {
-          "type": "string",
-          "description": "iam_role references the fully qualified name of Identity \u0026 Access Management role to impersonate."
-        },
-        "k8s_service_account": {
-          "type": "string",
-          "description": "k8s_service_account references a kubernetes service account to impersonate."
-        },
-        "oauth2_client": {
-          "$ref": "#/definitions/coreOAuth2Client",
-          "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
-        },
-        "execution_identity": {
-          "type": "string",
-          "title": "execution_identity references the subject who makes the execution"
-        }
-      },
-      "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
-    },
     "coreInputBindingData": {
       "type": "object",
       "properties": {
@@ -1094,7 +1072,7 @@
       "type": "object",
       "properties": {
         "run_as": {
-          "$ref": "#/definitions/coreIdentity",
+          "$ref": "#/definitions/flyteidlcoreIdentity",
           "description": "run_as encapsulates the identity a pod should run as. If the task fills in multiple fields here, it'll be up to the\nbackend plugin to choose the appropriate identity for the execution engine the task will run on."
         },
         "secrets": {
@@ -1552,6 +1530,28 @@
         }
       },
       "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidlcoreIdentity": {
+      "type": "object",
+      "properties": {
+        "iam_role": {
+          "type": "string",
+          "description": "iam_role references the fully qualified name of Identity \u0026 Access Management role to impersonate."
+        },
+        "k8s_service_account": {
+          "type": "string",
+          "description": "k8s_service_account references a kubernetes service account to impersonate."
+        },
+        "oauth2_client": {
+          "$ref": "#/definitions/coreOAuth2Client",
+          "description": "oauth2_client references an oauth2 client. Backend plugins can use this information to impersonate the client when\nmaking external calls."
+        },
+        "execution_identity": {
+          "type": "string",
+          "title": "execution_identity references the subject who makes the execution"
+        }
+      },
+      "description": "Identity encapsulates the various security identities a task can run as. It's up to the underlying plugin to pick the\nright identity for the execution environment."
     },
     "flyteidlcoreKeyValuePair": {
       "type": "object",
