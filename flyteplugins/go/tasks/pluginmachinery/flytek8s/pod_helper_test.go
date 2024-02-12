@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	pluginsIOMock "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io/mocks"
+	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	config1 "github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/config/viper"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
@@ -1043,6 +1044,30 @@ func TestToK8sPod(t *testing.T) {
 				}
 				uniqueVariableNames[envVar.Name] = envVar.Value
 			}
+		}
+	})
+
+	t.Run("AcceleratedInputsEnabled", func(t *testing.T) {
+		cfg := propellerCfg.GetConfig()
+		cfg.AcceleratedInputs.Enabled = true
+		cfg.AcceleratedInputs.VolumePath = "/test/path"
+		cfg.AcceleratedInputs.LocalPathPrefix = "/test/local"
+		defer func() { cfg.AcceleratedInputs.Enabled = false }()
+		x := dummyExecContext(dummyTaskTemplate(), &v1.ResourceRequirements{}, nil)
+
+		p, _, _, err := ToK8sPodSpec(ctx, x)
+
+		assert.NoError(t, err)
+		if assert.Len(t, p.Volumes, 1) {
+			vol := p.Volumes[0]
+			assert.Equal(t, "union-persistent-data-volume", vol.Name)
+			assert.Equal(t, cfg.AcceleratedInputs.VolumePath, vol.HostPath.Path)
+		}
+		if assert.Len(t, p.Containers, 1) && assert.Len(t, p.Containers[0].VolumeMounts, 1) {
+			mount := p.Containers[0].VolumeMounts[0]
+			assert.Equal(t, "union-persistent-data-volume", mount.Name)
+			assert.Equal(t, cfg.AcceleratedInputs.LocalPathPrefix, mount.MountPath)
+			assert.True(t, mount.ReadOnly)
 		}
 	})
 }

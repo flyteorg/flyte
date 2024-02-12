@@ -110,5 +110,9 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "create-flyteworkflow-crd"), defaultConfig.CreateFlyteWorkflowCRD, "Enable creation of the FlyteWorkflow CRD on startup")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "array-node-event-version"), defaultConfig.ArrayNodeEventVersion, "ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask),  1 => new")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "node-execution-worker-count"), defaultConfig.NodeExecutionWorkerCount, "Number of workers to evaluate node executions,  currently only used for array nodes")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.enabled"), defaultConfig.AcceleratedInputs.Enabled, "Enabled accelerated inputs feature which overwrites remote artifacts path to local disk paths")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.remote-path-prefix"), defaultConfig.AcceleratedInputs.RemotePathPrefix, "Remote path prefix that should be replaced with local path prefix")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.local-path-prefix"), defaultConfig.AcceleratedInputs.LocalPathPrefix, "Path to locally mounted directory k8s pod")
+	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "accelerated-inputs.volume-path"), defaultConfig.AcceleratedInputs.VolumePath, "Path to locally mounted directory on k8s host node")
 	return cmdFlags
 }

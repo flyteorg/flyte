@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s/config"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/utils"
+	propellerCfg "github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -388,6 +389,10 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		return nil, nil, err
 	}
 
+	if propellerCfg.GetConfig().AcceleratedInputs.Enabled {
+		ApplyAcceleratedInputsSpec(podSpec, primaryContainerName)
+	}
+
 	// handling for extended resources
 	// Merge overrides with base extended resources
 	extendedResources := applyExtendedResourcesOverrides(
@@ -544,6 +549,29 @@ func mergePodSpecs(basePodSpec *v1.PodSpec, podSpec *v1.PodSpec, primaryContaine
 
 	mergedPodSpec.Containers = mergedContainers
 	return mergedPodSpec, nil
+}
+
+func ApplyAcceleratedInputsSpec(spec *v1.PodSpec, primaryName string) {
+	cfg := propellerCfg.GetConfig().AcceleratedInputs
+	hostPathType := v1.HostPathDirectory
+	spec.Volumes = append(spec.Volumes, v1.Volume{
+		Name: "union-persistent-data-volume",
+		VolumeSource: v1.VolumeSource{
+			HostPath: &v1.HostPathVolumeSource{
+				Path: cfg.VolumePath,
+				Type: &hostPathType,
+			},
+		},
+	})
+	for i, cont := range spec.Containers {
+		if cont.Name == primaryName {
+			spec.Containers[i].VolumeMounts = append(cont.VolumeMounts, v1.VolumeMount{
+				Name:      "union-persistent-data-volume",
+				ReadOnly:  true,
+				MountPath: cfg.LocalPathPrefix,
+			})
+		}
+	}
 }
 
 func BuildIdentityPod() *v1.Pod {

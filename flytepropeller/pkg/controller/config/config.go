@@ -117,8 +117,20 @@ var (
 		CreateFlyteWorkflowCRD:   false,
 		ArrayNodeEventVersion:    0,
 		NodeExecutionWorkerCount: 8,
+		AcceleratedInputs: AcceleratedInputs{
+			Enabled:         false,
+			LocalPathPrefix: "/union-persistent-data",
+			VolumePath:      "/mnt/k8s-disks/0/union-persistent-data",
+		},
 	}
 )
+
+type AcceleratedInputs struct {
+	Enabled          bool   `json:"enabled" pflag:",Enabled accelerated inputs feature which overwrites remote artifacts path to local disk paths"`
+	RemotePathPrefix string `json:"remote-path-prefix" pflag:",Remote path prefix that should be replaced with local path prefix"`
+	LocalPathPrefix  string `json:"local-path-prefix" pflag:",Path to locally mounted directory k8s pod"`
+	VolumePath       string `json:"volume-path" pflag:",Path to locally mounted directory on k8s host node"`
+}
 
 // Config that uses the flytestdlib Config module to generate commandline and load config files. This configuration is
 // the base configuration to start propeller
@@ -158,6 +170,7 @@ type Config struct {
 	CreateFlyteWorkflowCRD   bool                 `json:"create-flyteworkflow-crd" pflag:",Enable creation of the FlyteWorkflow CRD on startup"`
 	ArrayNodeEventVersion    int                  `json:"array-node-event-version" pflag:",ArrayNode eventing version. 0 => legacy (drop-in replacement for maptask), 1 => new"`
 	NodeExecutionWorkerCount int                  `json:"node-execution-worker-count" pflag:",Number of workers to evaluate node executions, currently only used for array nodes"`
+	AcceleratedInputs        AcceleratedInputs    `json:"accelerated-inputs" pflag:",Accelerated inputs config"`
 }
 
 // KubeClientConfig contains the configuration used by flytepropeller to configure its internal Kubernetes Client.

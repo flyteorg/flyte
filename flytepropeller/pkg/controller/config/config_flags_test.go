@@ -939,4 +939,60 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_accelerated-inputs.enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("accelerated-inputs.enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("accelerated-inputs.enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.AcceleratedInputs.Enabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_accelerated-inputs.remote-path-prefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("accelerated-inputs.remote-path-prefix", testValue)
+			if vString, err := cmdFlags.GetString("accelerated-inputs.remote-path-prefix"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AcceleratedInputs.RemotePathPrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_accelerated-inputs.local-path-prefix", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("accelerated-inputs.local-path-prefix", testValue)
+			if vString, err := cmdFlags.GetString("accelerated-inputs.local-path-prefix"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AcceleratedInputs.LocalPathPrefix)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_accelerated-inputs.volume-path", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("accelerated-inputs.volume-path", testValue)
+			if vString, err := cmdFlags.GetString("accelerated-inputs.volume-path"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.AcceleratedInputs.VolumePath)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 }

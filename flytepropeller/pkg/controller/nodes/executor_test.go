@@ -9,9 +9,11 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/proto"
+	_struct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/structpb"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
@@ -2816,4 +2818,289 @@ func TestNodeExecutor_IsEligibleForRetry(t *testing.T) {
 		})
 	}
 
+}
+
+func Test_replaceRemotePathsForMap(t *testing.T) {
+	cfg := config.GetConfig()
+	cfg.AcceleratedInputs.Enabled = true
+	cfg.AcceleratedInputs.RemotePathPrefix = "s3://path"
+	cfg.AcceleratedInputs.LocalPathPrefix = "/path"
+	defer func() { cfg.AcceleratedInputs.Enabled = false }()
+
+	ctx := context.Background()
+	input := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"primitive": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_StringValue{StringValue: "s3://path/untouched"},
+							},
+						},
+					},
+				},
+			},
+			"blob": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "s3://path/blob1"}},
+					},
+				},
+				Metadata: map[string]string{"foo": "bar"},
+			},
+			"binary": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Binary{Binary: &core.Binary{Value: []byte("s3://path/untouched")}},
+					},
+				},
+			},
+			"schema": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Schema{Schema: &core.Schema{Uri: "s3://path/schema"}},
+					},
+				},
+			},
+			"void": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_NoneType{NoneType: &core.Void{}},
+					},
+				},
+			},
+			"error": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Error{Error: &core.Error{Message: "s3://path/untouched"}},
+					},
+				},
+			},
+			"generic": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Generic{
+							Generic: &_struct.Struct{
+								Fields: map[string]*structpb.Value{
+									"a": {
+										Kind: &structpb.Value_StringValue{StringValue: "s3://path/untouched"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"structured_dataset": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_StructuredDataset{
+							StructuredDataset: &core.StructuredDataset{Uri: "s3://path/ds1"},
+						},
+					},
+				},
+			},
+			"union": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Union{
+							Union: &core.Union{
+								Value: &core.Literal{
+									Value: &core.Literal_Scalar{
+										Scalar: &core.Scalar{
+											Value: &core.Scalar_StructuredDataset{
+												StructuredDataset: &core.StructuredDataset{Uri: "s3://path/ds2"},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"map": {
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"blob": {
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "s3://path/blob2"}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"collection": {
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "s3://path/blob3"}},
+									},
+								},
+							},
+							{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "s3://path/blob4"}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	expected := &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"primitive": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_StringValue{StringValue: "s3://path/untouched"},
+							},
+						},
+					},
+				},
+			},
+			"blob": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "/path/blob1"}},
+					},
+				},
+				Metadata: map[string]string{
+					"foo":         "bar",
+					"initial_uri": "s3://path/blob1",
+				},
+			},
+			"binary": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Binary{Binary: &core.Binary{Value: []byte("s3://path/untouched")}},
+					},
+				},
+			},
+			"schema": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Schema{Schema: &core.Schema{Uri: "/path/schema"}},
+					},
+				},
+				Metadata: map[string]string{"initial_uri": "s3://path/schema"},
+			},
+			"void": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_NoneType{NoneType: &core.Void{}},
+					},
+				},
+			},
+			"error": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Error{Error: &core.Error{Message: "s3://path/untouched"}},
+					},
+				},
+			},
+			"generic": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Generic{
+							Generic: &_struct.Struct{
+								Fields: map[string]*structpb.Value{
+									"a": {
+										Kind: &structpb.Value_StringValue{StringValue: "s3://path/untouched"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			"structured_dataset": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_StructuredDataset{
+							StructuredDataset: &core.StructuredDataset{Uri: "/path/ds1"},
+						},
+					},
+				},
+				Metadata: map[string]string{"initial_uri": "s3://path/ds1"},
+			},
+			"union": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Union{
+							Union: &core.Union{
+								Value: &core.Literal{
+									Value: &core.Literal_Scalar{
+										Scalar: &core.Scalar{
+											Value: &core.Scalar_StructuredDataset{
+												StructuredDataset: &core.StructuredDataset{Uri: "/path/ds2"},
+											},
+										},
+									},
+									Metadata: map[string]string{"initial_uri": "s3://path/ds2"},
+								},
+							},
+						},
+					},
+				},
+			},
+			"map": {
+				Value: &core.Literal_Map{
+					Map: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"blob": {
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "/path/blob2"}},
+									},
+								},
+								Metadata: map[string]string{"initial_uri": "s3://path/blob2"},
+							},
+						},
+					},
+				},
+			},
+			"collection": {
+				Value: &core.Literal_Collection{
+					Collection: &core.LiteralCollection{
+						Literals: []*core.Literal{
+							{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "/path/blob3"}},
+									},
+								},
+								Metadata: map[string]string{"initial_uri": "s3://path/blob3"},
+							},
+							{
+								Value: &core.Literal_Scalar{
+									Scalar: &core.Scalar{
+										Value: &core.Scalar_Blob{Blob: &core.Blob{Uri: "/path/blob4"}},
+									},
+								},
+								Metadata: map[string]string{"initial_uri": "s3://path/blob4"},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	replaceRemotePathsForMap(ctx, input)
+
+	assert.Equal(t, expected, input)
 }

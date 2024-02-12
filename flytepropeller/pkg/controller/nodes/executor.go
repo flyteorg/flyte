@@ -19,6 +19,8 @@ package nodes
 import (
 	"context"
 	"fmt"
+	"path"
+	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -755,6 +757,9 @@ func (c *nodeExecutor) preExecute(ctx context.Context, dag executors.DAGStructur
 			}
 
 			if nodeInputs != nil {
+				if config.GetConfig().AcceleratedInputs.Enabled {
+					replaceRemotePathsForMap(ctx, nodeInputs)
+				}
 				inputsFile := v1alpha1.GetInputsFile(dataDir)
 				if err := c.store.WriteProtobuf(ctx, inputsFile, storage.Options{}, nodeInputs); err != nil {
 					c.metrics.InputsWriteFailure.Inc(ctx)
@@ -1386,6 +1391,55 @@ func (c *nodeExecutor) HandleNode(ctx context.Context, dag executors.DAGStructur
 	}
 
 	return c.handleQueuedOrRunningNode(ctx, nCtx, h)
+}
+
+func replaceRemotePathsForMap(ctx context.Context, inputs *core.LiteralMap) {
+	for _, value := range inputs.GetLiterals() {
+		replaceRemotePathsForLiteral(ctx, value)
+	}
+}
+
+func replaceRemotePathsForLiteral(ctx context.Context, literal *core.Literal) {
+	initialURI := ""
+	switch v := literal.GetValue().(type) {
+	case *core.Literal_Scalar:
+		switch s := v.Scalar.GetValue().(type) {
+		case *core.Scalar_Blob:
+			initialURI = s.Blob.GetUri()
+			s.Blob.Uri = replaceRemotePrefix(ctx, initialURI)
+		case *core.Scalar_Schema:
+			initialURI = s.Schema.GetUri()
+			s.Schema.Uri = replaceRemotePrefix(ctx, initialURI)
+		case *core.Scalar_StructuredDataset:
+			initialURI = s.StructuredDataset.GetUri()
+			s.StructuredDataset.Uri = replaceRemotePrefix(ctx, initialURI)
+		case *core.Scalar_Union:
+			replaceRemotePathsForLiteral(ctx, s.Union.GetValue())
+		}
+		if initialURI != "" {
+			if literal.Metadata == nil {
+				literal.Metadata = map[string]string{}
+			}
+			literal.Metadata["initial_uri"] = initialURI
+		}
+	case *core.Literal_Map:
+		replaceRemotePathsForMap(ctx, v.Map)
+	case *core.Literal_Collection:
+		for _, item := range v.Collection.GetLiterals() {
+			replaceRemotePathsForLiteral(ctx, item)
+		}
+	}
+}
+
+func replaceRemotePrefix(ctx context.Context, s string) string {
+	cfg := config.GetConfig().AcceleratedInputs
+	remotePrefix := cfg.RemotePathPrefix
+	localPrefix := cfg.LocalPathPrefix
+	if strings.HasPrefix(s, remotePrefix) {
+		logger.Debugf(ctx, "replacing remote input prefix in %s with local %s", s, localPrefix)
+		return path.Join(localPrefix, strings.TrimPrefix(s, remotePrefix))
+	}
+	return s
 }
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
