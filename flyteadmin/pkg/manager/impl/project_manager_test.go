@@ -46,10 +46,17 @@ func getMockApplicationConfigForProjectManagerTest() runtimeInterfaces.Applicati
 	return &mockApplicationConfig
 }
 
-func expectedOrgQueryExpr() *common.GormQueryExpr {
-	return &common.GormQueryExpr{
-		Query: "org = ?",
-		Args:  "",
+func expectedDefaultQueryExpr() []*common.GormQueryExpr {
+	return []*common.GormQueryExpr{
+		{
+			Query: "org = ?",
+			Args:  "",
+		},
+		{
+
+			Query: "state = ?",
+			Args:  "0",
+		},
 	}
 }
 
@@ -92,7 +99,7 @@ func TestListProjects_NoFilters_LimitOne(t *testing.T) {
 	testListProjects(admin.ProjectListRequest{
 		Token: "1",
 		Limit: 1,
-	}, "2", "identifier asc", []*common.GormQueryExpr{expectedOrgQueryExpr()}, t)
+	}, "2", "identifier asc", expectedDefaultQueryExpr(), t)
 }
 
 func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
@@ -105,16 +112,17 @@ func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
 			Direction: admin.Sort_DESCENDING,
 		},
 	}, "", "name desc", []*common.GormQueryExpr{
-		expectedOrgQueryExpr(),
-		{
+		expectedDefaultQueryExpr()[0],
+		&common.GormQueryExpr{
 			Query: "name = ?",
 			Args:  "foo",
 		},
+		expectedDefaultQueryExpr()[1],
 	}, t)
 }
 
 func TestListProjects_NoToken_NoLimit(t *testing.T) {
-	testListProjects(admin.ProjectListRequest{}, "", "identifier asc", []*common.GormQueryExpr{expectedOrgQueryExpr()}, t)
+	testListProjects(admin.ProjectListRequest{}, "", "identifier asc", expectedDefaultQueryExpr(), t)
 }
 
 func TestProjectManager_CreateProject(t *testing.T) {

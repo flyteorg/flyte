@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"strconv"
 
 	"google.golang.org/grpc/codes"
@@ -55,9 +56,14 @@ func (m *ProjectManager) getDomains() []*admin.Domain {
 }
 
 func (m *ProjectManager) ListProjects(ctx context.Context, request admin.ProjectListRequest) (*admin.Projects, error) {
+	var requestFilters = request.Filters
+	if len(requestFilters) == 0 {
+		// Add implicit active filters ordinarily added by database.
+		requestFilters = fmt.Sprintf("eq(state,%d)", admin.Project_ACTIVE)
+	}
 	spec := util.FilterSpec{
 		Org:            request.Org,
-		RequestFilters: request.Filters,
+		RequestFilters: requestFilters,
 	}
 	filters, err := util.GetDbFilters(spec, common.Project)
 	if err != nil {
