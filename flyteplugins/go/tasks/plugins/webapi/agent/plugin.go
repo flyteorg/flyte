@@ -149,24 +149,35 @@ func (p Plugin) ExecuteTaskSync(
 		}
 		header := in.GetHeader()
 		resource := header.GetResource()
-		var literals *flyteIdl.LiteralMap
+		mergedLiteralMap := &flyteIdl.LiteralMap{Literals: map[string]*flyteIdl.Literal{}}
 
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
 				// read done.
 				resourceChan <- resource
-				outputsChan <- literals
+				outputsChan <- mergedLiteralMap
 				close(waitChan)
 				return
 			}
 			if err != nil {
 				logger.Errorf(ctx, "Error reading from stream: %v", err)
 			}
-			literals = in.GetOutputs()
-			logger.Infof(ctx, "Got literals: %v", literals)
-			// TODO: how to combine the literals?
-			// log.Printf("Got message %s at point(%d, %d)", in.Message, in.Location.Latitude, in.Location.Longitude)
+			literalMap := in.GetOutputs()
+			for k, lt := range literalMap.Literals {
+				_, ok := mergedLiteralMap.Literals[k]
+				if !ok {
+					mergedLiteralMap.Literals[k] = &flyteIdl.Literal{
+						Value: &flyteIdl.Literal_Collection{
+							Collection: &flyteIdl.LiteralCollection{
+								Literals: []*flyteIdl.Literal{lt},
+							},
+						},
+					}
+				} else {
+					mergedLiteralMap.Literals[k].GetCollection().Literals = append(mergedLiteralMap.Literals[k].GetCollection().Literals, lt)
+				}
+			}
 		}
 	}()
 	headerProto := &admin.ExecuteTaskSyncRequest{

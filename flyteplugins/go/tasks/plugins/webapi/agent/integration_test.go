@@ -95,11 +95,16 @@ func TestEndToEnd(t *testing.T) {
 		template.Interface = &flyteIdlCore.TypedInterface{
 			Outputs: &flyteIdlCore.VariableMap{
 				Variables: map[string]*flyteIdlCore.Variable{
-					"x": {Type: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}}},
+					"x": {Type: &flyteIdlCore.LiteralType{
+						Type: &flyteIdlCore.LiteralType_Simple{
+							Simple: flyteIdlCore.SimpleType_INTEGER,
+						},
+					},
+					},
 				},
 			},
 		}
-		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": []interface{}{1, 2}})
 		assert.NoError(t, err)
 		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, expectedOutputs, nil, iter)
 		assert.Equal(t, true, phase.Phase().IsSuccess())
@@ -286,7 +291,8 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 func newMockSyncAgentPlugin() webapi.PluginEntry {
 	syncAgentClient := new(agentMocks.SyncAgentServiceClient)
 	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}
-	outputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	output1, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	output2, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 2})
 
 	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
 	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
@@ -299,7 +305,13 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 
 	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
 		Res: &admin.ExecuteTaskSyncResponse_Outputs{
-			Outputs: outputs,
+			Outputs: output1,
+		},
+	}, nil).Once()
+
+	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
+		Res: &admin.ExecuteTaskSyncResponse_Outputs{
+			Outputs: output2,
 		},
 	}, nil).Once()
 
