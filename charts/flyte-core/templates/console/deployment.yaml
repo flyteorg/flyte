@@ -22,9 +22,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      securityContext:
-        runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
+      {{- with .Values.flyteconsole.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flyteconsole.priorityClassName }}
       priorityClassName: {{ .Values.flyteconsole.priorityClassName }}
       {{- end }}

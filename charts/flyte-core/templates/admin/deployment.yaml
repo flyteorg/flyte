@@ -18,10 +18,9 @@ spec:
         {{- end }}
       labels: {{ include "flyteadmin.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+      {{- with .Values.flyteadmin.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flyteadmin.priorityClassName }}
       priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
       {{- end }}

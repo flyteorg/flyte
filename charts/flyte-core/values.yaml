@@ -111,6 +111,11 @@ flyteadmin:
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flyteadmin pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
 
   # -- Settings for flyteadmin service monitor
   serviceMonitor:
@@ -179,6 +184,11 @@ flytescheduler:
   additionalContainers: []
   # -- Sets priorityClassName for flyte scheduler pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flytescheduler pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
 
 #
 # DATACATALOG SETTINGS
@@ -242,6 +252,11 @@ datacatalog:
   extraArgs: {}
   # -- Sets priorityClassName for datacatalog pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for datacatalog pod(s).
+  securityContext:
+    fsGroup: 1001
+    runAsUser: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
 
 #
 # FLYTE_AGENT SETTINGS
@@ -320,6 +335,11 @@ flytepropeller:
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flytepropeller pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
 
   # -- Settings for flytepropeller service
   service:
@@ -382,6 +402,10 @@ flyteconsole:
   priorityClassName: ""
    # -- ImagePullSecrets to assign to the Flyteconsole deployment
   imagePullSecrets: []
+  # -- Sets securityContext for flyteconsole pod(s).
+  securityContext:
+    runAsUser: 1000
+    fsGroupChangePolicy: "OnRootMismatch"
 
 # It will enable the redoc route in ingress
 deployRedoc: false
