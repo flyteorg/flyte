@@ -137,6 +137,7 @@ helm install gateway bitnami/contour -n flyte
 | datacatalog.priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
 | datacatalog.replicaCount | int | `1` | Replicas count for Datacatalog deployment |
 | datacatalog.resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Datacatalog deployment |
+| datacatalog.securityContext | object | `{"fsGroup":1001,"runAsUser":1001,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context definition for Datacatalog pods |
 | datacatalog.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"NodePort"}` | Service settings for Datacatalog |
 | datacatalog.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Datacatalog |
 | datacatalog.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Datacatalog pods |
@@ -172,6 +173,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteadmin.replicaCount | int | `1` | Replicas count for Flyteadmin deployment |
 | flyteadmin.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flyteadmin deployment |
 | flyteadmin.secrets | object | `{}` |  |
+| flyteadmin.securityContext | object | `{"fsGroup":65534,"runAsUser":1001,"fsGroupChangePolicy":"Always"}` | Security context definition for Flyteadmin pods |
 | flyteadmin.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"loadBalancerSourceRanges":[],"type":"ClusterIP"}` | Service settings for Flyteadmin |
 | flyteadmin.serviceAccount | object | `{"alwaysCreate":false,"annotations":{},"clusterRole":{"apiGroups":["","flyte.lyft.com","rbac.authorization.k8s.io"],"resources":["configmaps","flyteworkflows","namespaces","pods","resourcequotas","roles","rolebindings","secrets","services","serviceaccounts","spark-role","limitranges"],"verbs":["*"]},"create":true,"createClusterRole":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlyteAdmin |
 | flyteadmin.serviceAccount.alwaysCreate | bool | `false` | Should a service account always be created for flyteadmin even without an actual flyteadmin deployment running (e.g. for multi-cluster setups) |
@@ -207,6 +209,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteconsole.priorityClassName | string | `""` | Sets priorityClassName for flyte console pod(s). |
 | flyteconsole.replicaCount | int | `1` | Replicas count for Flyteconsole deployment |
 | flyteconsole.resources | object | `{"limits":{"cpu":"500m","memory":"250Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Default resources requests and limits for Flyteconsole deployment |
+| flyteconsole.securityContext | object | `{"runAsUser":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context definition for Flyteconsole pods |
 | flyteconsole.service | object | `{"annotations":{},"type":"ClusterIP"}` | Service settings for Flyteconsole |
 | flyteconsole.tolerations | list | `[]` | tolerations for Flyteconsole deployment |
 | flytepropeller.additionalContainers | list | `[]` | Appends additional containers to the deployment spec. May include template values. |
@@ -230,6 +233,7 @@ helm install gateway bitnami/contour -n flyte
 | flytepropeller.priorityClassName | string | `""` | Sets priorityClassName for propeller pod(s). |
 | flytepropeller.replicaCount | int | `1` | Replicas count for Flytepropeller deployment |
 | flytepropeller.resources | object | `{"limits":{"cpu":"200m","ephemeral-storage":"100Mi","memory":"200Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"100Mi"}}` | Default resources requests and limits for Flytepropeller deployment |
+| flytepropeller.securityContext | object | `{"fsGroup":65534,"runAsUser":1001,"fsGroupChangePolicy":"Always"}` | Security context definition for Flytepropeller pods |
 | flytepropeller.service | object | `{"enabled":false}` | Settings for flytepropeller service |
 | flytepropeller.service.enabled | bool | `false` | If enabled create the flytepropeller service |
 | flytepropeller.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for FlytePropeller |
@@ -259,6 +263,7 @@ helm install gateway bitnami/contour -n flyte
 | flytescheduler.resources | object | `{"limits":{"cpu":"250m","ephemeral-storage":"100Mi","memory":"500Mi"},"requests":{"cpu":"10m","ephemeral-storage":"50Mi","memory":"50Mi"}}` | Default resources requests and limits for Flytescheduler deployment |
 | flytescheduler.runPrecheck | bool | `true` | Whether to inject an init container which waits on flyteadmin |
 | flytescheduler.secrets | object | `{}` |  |
+| flytescheduler.securityContext | object | `{"fsGroup":65534,"runAsUser":1001,"fsGroupChangePolicy":"Always"}` | Security context definition for Flytescheduler pods |
 | flytescheduler.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for Flytescheduler |
 | flytescheduler.serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to Flytescheduler pods |
 | flytescheduler.serviceAccount.create | bool | `true` | Should a service account be created for Flytescheduler |
@@ -280,6 +285,7 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3 | object | `{"accessKey":"","authType":"iam","region":"us-east-1","secretKey":""}` | settings for storage type s3 |
 | storage.s3.accessKey | string | `""` | AWS IAM user access key ID to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.s3.authType | string | `"iam"` | type of authentication to use for S3 buckets, can either be iam or accesskey |
+| storage.s3.endpoint | string | `nil` | endpoint to use for S3 buckets, if not AWS public |
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
