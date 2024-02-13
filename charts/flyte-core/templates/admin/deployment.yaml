@@ -19,9 +19,12 @@ spec:
       labels: {{ include "flyteadmin.podLabels" . | nindent 8 }}
     spec:
       securityContext:
+        runAsNonRoot: true
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       {{- if .Values.flyteadmin.priorityClassName }}
       priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
       {{- end }}
@@ -35,6 +38,10 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: run-migrations
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: base-config-volume
@@ -57,6 +64,10 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: seed-projects
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/config
             name: base-config-volume
@@ -77,6 +88,10 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
@@ -104,6 +119,10 @@ spec:
             [
                 "flyteadmin --config={{ .Values.flyteadmin.configPath }} secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /etc/flyte/config
               name: base-config-volume
@@ -149,6 +168,10 @@ spec:
           initialDelaySeconds: 20
           periodSeconds: 5
         resources: {{- toYaml .Values.flyteadmin.resources | nindent 10 }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /srv/flyte
           name: shared-data

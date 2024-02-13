@@ -1175,7 +1175,7 @@ spec:
         - -ec
         - |
           chown -R 1001:1001 /data
-        image: docker.io/bitnami/bitnami-shell:sandbox
+        image: docker.io/bitnami/os-shell:sandbox
         imagePullPolicy: Never
         name: volume-permissions
         resources:
@@ -1368,7 +1368,7 @@ spec:
           chmod 700 /bitnami/postgresql/data
           find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
             xargs -r chown -R 1001:1001
-        image: docker.io/bitnami/bitnami-shell:sandbox
+        image: docker.io/bitnami/os-shell:sandbox
         imagePullPolicy: Never
         name: init-chmod-data
         resources:
