@@ -11328,6 +11328,16 @@
       },
       "description": "Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.\nEach expression results in a boolean result."
     },
+    "coreCompiledLaunchPlan": {
+      "type": "object",
+      "properties": {
+        "template": {
+          "$ref": "#/definitions/coreLaunchPlanTemplate",
+          "title": "Completely contained LaunchPlan Template"
+        }
+      },
+      "title": "Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer"
+    },
     "coreCompiledTask": {
       "type": "object",
       "properties": {
@@ -11374,6 +11384,14 @@
             "$ref": "#/definitions/coreCompiledTask"
           },
           "title": "Guaranteed that there will only exist one and only one task with a given id, i.e., every task has a unique id\n+required (at least 1)"
+        },
+        "launch_plans": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreCompiledLaunchPlan"
+          },
+          "description": "A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan\nwith a given id, i.e., every launch plan has a unique id."
         }
       },
       "description": "A Compiled Workflow Closure contains all the information required to start a new execution, or to visualize a workflow\nand its details. The CompiledWorkflowClosure should always contain a primary workflow, that is the main workflow that\nwill being the execution. All subworkflows are denormalized. WorkflowNodes refer to the workflow identifiers of\ncompiled subworkflows."
@@ -11757,6 +11775,20 @@
         }
       }
     },
+    "coreLaunchPlanTemplate": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/coreIdentifier",
+          "description": "A globally unique identifier for the launch plan."
+        },
+        "interface": {
+          "$ref": "#/definitions/coreTypedInterface",
+          "title": "The input and output interface for the launch plan"
+        }
+      },
+      "description": "A structure that uniquely identifies a launch plan in the system."
+    },
     "coreLiteral": {
       "type": "object",
       "properties": {
@@ -11963,6 +11995,15 @@
           "description": "Number of retries per task."
         },
         "interruptible": {
+          "type": "boolean"
+        },
+        "cacheable": {
+          "type": "boolean"
+        },
+        "cache_version": {
+          "type": "string"
+        },
+        "cache_serializable": {
           "type": "boolean"
         }
       },
