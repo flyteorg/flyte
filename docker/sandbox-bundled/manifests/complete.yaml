@@ -457,7 +457,7 @@ data:
         stackdriver-enabled: false
       k8s:
         co-pilot:
-          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b4"
+          image: "cr.flyte.org/flyteorg/flytecopilot:v1.10.7"
       k8s-array:
         logs:
           config:
@@ -796,7 +796,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: YUZuVzcwNzBEZ1NQeldERA==
+  haSharedSecret: TmNxR2x6dVhWV0Q3eGllbA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1194,7 +1194,7 @@ spec:
     metadata:
       annotations:
         checksum/cluster-resource-templates: 6fd9b172465e3089fcc59f738b92b8dc4d8939360c19de8ee65f68b0e7422035
-        checksum/configuration: a67c0186a92e807ac104de4fe9ee168cb3c14cb173b55a6606a12357c240a9cd
+        checksum/configuration: ebc0c801b378ad16b6df2e54a8796fb57e71130935130b9f8e3201faf2fd09e2
         checksum/configuration-secret: 09216ffaa3d29e14f88b1f30af580d02a2a5e014de4d750b7f275cc07ed4e914
       labels:
         app.kubernetes.io/component: flyte-binary
@@ -1360,7 +1360,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e0744f578198b80af80004856744b2677195e1689f2a7652823af6235d0c9b50
+        checksum/secret: a37a516f51b7c405e40bf16e7bf7de4e7f20297873642b7f20e114c0016304bc
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1601,7 +1601,7 @@ spec:
         - -ec
         - |
           chown -R 1001:1001 /data
-        image: docker.io/bitnami/os-shell:sandbox
+        image: docker.io/bitnami/bitnami-shell:sandbox
         imagePullPolicy: Never
         name: volume-permissions
         resources:
@@ -1794,7 +1794,7 @@ spec:
           chmod 700 /bitnami/postgresql/data
           find /bitnami/postgresql -mindepth 1 -maxdepth 1 -not -name "conf" -not -name ".snapshot" -not -name "lost+found" | \
             xargs -r chown -R 1001:1001
-        image: docker.io/bitnami/os-shell:sandbox
+        image: docker.io/bitnami/bitnami-shell:sandbox
         imagePullPolicy: Never
         name: init-chmod-data
         resources:
