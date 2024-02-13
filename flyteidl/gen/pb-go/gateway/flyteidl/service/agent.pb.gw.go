@@ -505,10 +505,6 @@ func request_AsyncAgentService_GetTaskLogs_0(ctx context.Context, marshaler runt
 
 }
 
-var (
-	filter_AgentMetadataService_GetAgent_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_type": 0, "name": 1, "version": 2}, Base: []int{1, 4, 5, 6, 2, 0, 4, 0, 0, 0}, Check: []int{0, 1, 1, 1, 2, 5, 2, 7, 3, 4}}
-)
-
 func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AgentMetadataServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq extAdmin.GetAgentRequest
 	var metadata runtime.ServerMetadata
@@ -520,31 +516,14 @@ func request_AgentMetadataService_GetAgent_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	protoReq.Name, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
-	}
-
-	val, ok = pathParams["task_type.version"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AgentMetadataService_GetAgent_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
 
 	msg, err := client.GetAgent(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -563,31 +542,14 @@ func local_request_AgentMetadataService_GetAgent_0(ctx context.Context, marshale
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	protoReq.Name, err = runtime.String(val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
-	}
-
-	val, ok = pathParams["task_type.version"]
-	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
-	}
-
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
-	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AgentMetadataService_GetAgent_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
 
 	msg, err := server.GetAgent(ctx, &protoReq)
@@ -759,7 +721,7 @@ func RegisterAgentMetadataServiceHandlerServer(ctx context.Context, mux *runtime
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AgentMetadataService/GetAgent", runtime.WithHTTPPathPattern("/api/v1/agent/{task_type.name}/{task_type.version}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AgentMetadataService/GetAgent", runtime.WithHTTPPathPattern("/api/v1/agent/{name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1094,7 +1056,7 @@ func RegisterAgentMetadataServiceHandlerClient(ctx context.Context, mux *runtime
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AgentMetadataService/GetAgent", runtime.WithHTTPPathPattern("/api/v1/agent/{task_type.name}/{task_type.version}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AgentMetadataService/GetAgent", runtime.WithHTTPPathPattern("/api/v1/agent/{name}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1136,7 +1098,7 @@ func RegisterAgentMetadataServiceHandlerClient(ctx context.Context, mux *runtime
 }
 
 var (
-	pattern_AgentMetadataService_GetAgent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "agent", "task_type.name", "task_type.version"}, ""))
+	pattern_AgentMetadataService_GetAgent_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"api", "v1", "agent", "name"}, ""))
 
 	pattern_AgentMetadataService_ListAgents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "agents"}, ""))
 )

@@ -185,10 +185,10 @@ class TaskType(_message.Message):
     def __init__(self, name: _Optional[str] = ..., version: _Optional[int] = ...) -> None: ...
 
 class GetAgentRequest(_message.Message):
-    __slots__ = ["task_type"]
-    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    task_type: TaskType
-    def __init__(self, task_type: _Optional[_Union[TaskType, _Mapping]] = ...) -> None: ...
+    __slots__ = ["name"]
+    NAME_FIELD_NUMBER: _ClassVar[int]
+    name: str
+    def __init__(self, name: _Optional[str] = ...) -> None: ...
 
 class GetAgentResponse(_message.Message):
     __slots__ = ["agent"]

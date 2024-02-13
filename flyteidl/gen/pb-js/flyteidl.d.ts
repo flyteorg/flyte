@@ -9873,8 +9873,8 @@ export namespace flyteidl {
         /** Properties of a GetAgentRequest. */
         interface IGetAgentRequest {
 
-            /** GetAgentRequest taskType */
-            taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetAgentRequest name */
+            name?: (string|null);
         }
 
         /** Represents a GetAgentRequest. */
@@ -9886,8 +9886,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IGetAgentRequest);
 
-            /** GetAgentRequest taskType. */
-            public taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetAgentRequest name. */
+            public name: string;
 
             /**
              * Creates a new GetAgentRequest instance using the specified properties.

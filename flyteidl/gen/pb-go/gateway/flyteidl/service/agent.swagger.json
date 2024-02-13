@@ -350,7 +350,7 @@
         ]
       }
     },
-    "/api/v1/agent/{task_type.name}/{task_type.version}": {
+    "/api/v1/agent/{name}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Agent` definition.",
         "operationId": "AgentMetadataService_GetAgent",
@@ -370,19 +370,11 @@
         },
         "parameters": [
           {
-            "name": "task_type.name",
-            "description": "The name of the task type.",
+            "name": "name",
+            "description": "The name of the agent.",
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "task_type.version",
-            "description": "The version of the task type.",
-            "in": "path",
-            "required": true,
-            "type": "integer",
-            "format": "int32"
           }
         ],
         "tags": [
