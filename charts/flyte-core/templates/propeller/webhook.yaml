@@ -35,7 +35,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      {{- with .Values.flytepropeller.securityContext }}
+      {{- with .Values.webhook.securityContext }}
       securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
       {{- end }}
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}

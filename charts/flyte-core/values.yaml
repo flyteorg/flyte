@@ -113,9 +113,12 @@ flyteadmin:
   priorityClassName: ""
   # -- Sets securityContext for flyteadmin pod(s).
   securityContext:
+    runAsNonRoot: true
     fsGroup: 65534
     runAsUser: 1001
     fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
   # -- Settings for flyteadmin service monitor
   serviceMonitor:
@@ -186,9 +189,12 @@ flytescheduler:
   priorityClassName: ""
   # -- Sets securityContext for flytescheduler pod(s).
   securityContext:
+    runAsNonRoot: true
     fsGroup: 65534
     runAsUser: 1001
     fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # DATACATALOG SETTINGS
@@ -254,9 +260,12 @@ datacatalog:
   priorityClassName: ""
   # -- Sets securityContext for datacatalog pod(s).
   securityContext:
+    runAsNonRoot: true
     fsGroup: 1001
     runAsUser: 1001
     fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # FLYTE_AGENT SETTINGS
@@ -404,8 +413,11 @@ flyteconsole:
   imagePullSecrets: []
   # -- Sets securityContext for flyteconsole pod(s).
   securityContext:
+    runAsNonRoot: true
     runAsUser: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -443,6 +455,14 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Sets securityContext for webhook pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
 # ------------------------------------------------
 #
