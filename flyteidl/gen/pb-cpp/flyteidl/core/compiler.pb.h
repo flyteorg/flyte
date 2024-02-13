@@ -34,6 +34,8 @@
 #include <google/protobuf/map_entry.h>
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/unknown_field_set.h>
+#include "flyteidl/core/identifier.pb.h"
+#include "flyteidl/core/interface.pb.h"
 #include "flyteidl/core/workflow.pb.h"
 #include "flyteidl/core/tasks.pb.h"
 // @@protoc_insertion_point(includes)
@@ -46,7 +48,7 @@ struct TableStruct_flyteidl_2fcore_2fcompiler_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[7]
+  static const ::google::protobuf::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -55,6 +57,9 @@ struct TableStruct_flyteidl_2fcore_2fcompiler_2eproto {
 void AddDescriptors_flyteidl_2fcore_2fcompiler_2eproto();
 namespace flyteidl {
 namespace core {
+class CompiledLaunchPlan;
+class CompiledLaunchPlanDefaultTypeInternal;
+extern CompiledLaunchPlanDefaultTypeInternal _CompiledLaunchPlan_default_instance_;
 class CompiledTask;
 class CompiledTaskDefaultTypeInternal;
 extern CompiledTaskDefaultTypeInternal _CompiledTask_default_instance_;
@@ -80,6 +85,7 @@ extern ConnectionSet_UpstreamEntry_DoNotUseDefaultTypeInternal _ConnectionSet_Up
 }  // namespace flyteidl
 namespace google {
 namespace protobuf {
+template<> ::flyteidl::core::CompiledLaunchPlan* Arena::CreateMaybeMessage<::flyteidl::core::CompiledLaunchPlan>(Arena*);
 template<> ::flyteidl::core::CompiledTask* Arena::CreateMaybeMessage<::flyteidl::core::CompiledTask>(Arena*);
 template<> ::flyteidl::core::CompiledWorkflow* Arena::CreateMaybeMessage<::flyteidl::core::CompiledWorkflow>(Arena*);
 template<> ::flyteidl::core::CompiledWorkflowClosure* Arena::CreateMaybeMessage<::flyteidl::core::CompiledWorkflowClosure>(Arena*);
@@ -532,6 +538,121 @@ class CompiledWorkflow final :
 };
 // -------------------------------------------------------------------
 
+class CompiledLaunchPlan final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.CompiledLaunchPlan) */ {
+ public:
+  CompiledLaunchPlan();
+  virtual ~CompiledLaunchPlan();
+
+  CompiledLaunchPlan(const CompiledLaunchPlan& from);
+
+  inline CompiledLaunchPlan& operator=(const CompiledLaunchPlan& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  CompiledLaunchPlan(CompiledLaunchPlan&& from) noexcept
+    : CompiledLaunchPlan() {
+    *this = ::std::move(from);
+  }
+
+  inline CompiledLaunchPlan& operator=(CompiledLaunchPlan&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const CompiledLaunchPlan& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CompiledLaunchPlan* internal_default_instance() {
+    return reinterpret_cast<const CompiledLaunchPlan*>(
+               &_CompiledLaunchPlan_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  void Swap(CompiledLaunchPlan* other);
+  friend void swap(CompiledLaunchPlan& a, CompiledLaunchPlan& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CompiledLaunchPlan* New() const final {
+    return CreateMaybeMessage<CompiledLaunchPlan>(nullptr);
+  }
+
+  CompiledLaunchPlan* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<CompiledLaunchPlan>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const CompiledLaunchPlan& from);
+  void MergeFrom(const CompiledLaunchPlan& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CompiledLaunchPlan* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // .flyteidl.core.LaunchPlanTemplate template = 1;
+  bool has_template_() const;
+  void clear_template_();
+  static const int kTemplateFieldNumber = 1;
+  const ::flyteidl::core::LaunchPlanTemplate& template_() const;
+  ::flyteidl::core::LaunchPlanTemplate* release_template_();
+  ::flyteidl::core::LaunchPlanTemplate* mutable_template_();
+  void set_allocated_template_(::flyteidl::core::LaunchPlanTemplate* template_);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.core.CompiledLaunchPlan)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::flyteidl::core::LaunchPlanTemplate* template__;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fcore_2fcompiler_2eproto;
+};
+// -------------------------------------------------------------------
+
 class CompiledTask final :
     public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.core.CompiledTask) */ {
  public:
@@ -570,7 +691,7 @@ class CompiledTask final :
                &_CompiledTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(CompiledTask* other);
   friend void swap(CompiledTask& a, CompiledTask& b) {
@@ -685,7 +806,7 @@ class CompiledWorkflowClosure final :
                &_CompiledWorkflowClosure_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(CompiledWorkflowClosure* other);
   friend void swap(CompiledWorkflowClosure& a, CompiledWorkflowClosure& b) {
@@ -766,6 +887,18 @@ class CompiledWorkflowClosure final :
   const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledTask >&
       tasks() const;
 
+  // repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+  int launch_plans_size() const;
+  void clear_launch_plans();
+  static const int kLaunchPlansFieldNumber = 4;
+  ::flyteidl::core::CompiledLaunchPlan* mutable_launch_plans(int index);
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledLaunchPlan >*
+      mutable_launch_plans();
+  const ::flyteidl::core::CompiledLaunchPlan& launch_plans(int index) const;
+  ::flyteidl::core::CompiledLaunchPlan* add_launch_plans();
+  const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledLaunchPlan >&
+      launch_plans() const;
+
   // .flyteidl.core.CompiledWorkflow primary = 1;
   bool has_primary() const;
   void clear_primary();
@@ -782,6 +915,7 @@ class CompiledWorkflowClosure final :
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledWorkflow > sub_workflows_;
   ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledTask > tasks_;
+  ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledLaunchPlan > launch_plans_;
   ::flyteidl::core::CompiledWorkflow* primary_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fcore_2fcompiler_2eproto;
@@ -1012,6 +1146,55 @@ inline void CompiledWorkflow::set_allocated_connections(::flyteidl::core::Connec
 
 // -------------------------------------------------------------------
 
+// CompiledLaunchPlan
+
+// .flyteidl.core.LaunchPlanTemplate template = 1;
+inline bool CompiledLaunchPlan::has_template_() const {
+  return this != internal_default_instance() && template__ != nullptr;
+}
+inline const ::flyteidl::core::LaunchPlanTemplate& CompiledLaunchPlan::template_() const {
+  const ::flyteidl::core::LaunchPlanTemplate* p = template__;
+  // @@protoc_insertion_point(field_get:flyteidl.core.CompiledLaunchPlan.template)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::core::LaunchPlanTemplate*>(
+      &::flyteidl::core::_LaunchPlanTemplate_default_instance_);
+}
+inline ::flyteidl::core::LaunchPlanTemplate* CompiledLaunchPlan::release_template_() {
+  // @@protoc_insertion_point(field_release:flyteidl.core.CompiledLaunchPlan.template)
+  
+  ::flyteidl::core::LaunchPlanTemplate* temp = template__;
+  template__ = nullptr;
+  return temp;
+}
+inline ::flyteidl::core::LaunchPlanTemplate* CompiledLaunchPlan::mutable_template_() {
+  
+  if (template__ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::core::LaunchPlanTemplate>(GetArenaNoVirtual());
+    template__ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CompiledLaunchPlan.template)
+  return template__;
+}
+inline void CompiledLaunchPlan::set_allocated_template_(::flyteidl::core::LaunchPlanTemplate* template_) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(template__);
+  }
+  if (template_) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      template_ = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, template_, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  template__ = template_;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.core.CompiledLaunchPlan.template)
+}
+
+// -------------------------------------------------------------------
+
 // CompiledTask
 
 // .flyteidl.core.TaskTemplate template = 1;
@@ -1174,9 +1357,41 @@ CompiledWorkflowClosure::tasks() const {
   return tasks_;
 }
 
+// repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+inline int CompiledWorkflowClosure::launch_plans_size() const {
+  return launch_plans_.size();
+}
+inline void CompiledWorkflowClosure::clear_launch_plans() {
+  launch_plans_.Clear();
+}
+inline ::flyteidl::core::CompiledLaunchPlan* CompiledWorkflowClosure::mutable_launch_plans(int index) {
+  // @@protoc_insertion_point(field_mutable:flyteidl.core.CompiledWorkflowClosure.launch_plans)
+  return launch_plans_.Mutable(index);
+}
+inline ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledLaunchPlan >*
+CompiledWorkflowClosure::mutable_launch_plans() {
+  // @@protoc_insertion_point(field_mutable_list:flyteidl.core.CompiledWorkflowClosure.launch_plans)
+  return &launch_plans_;
+}
+inline const ::flyteidl::core::CompiledLaunchPlan& CompiledWorkflowClosure::launch_plans(int index) const {
+  // @@protoc_insertion_point(field_get:flyteidl.core.CompiledWorkflowClosure.launch_plans)
+  return launch_plans_.Get(index);
+}
+inline ::flyteidl::core::CompiledLaunchPlan* CompiledWorkflowClosure::add_launch_plans() {
+  // @@protoc_insertion_point(field_add:flyteidl.core.CompiledWorkflowClosure.launch_plans)
+  return launch_plans_.Add();
+}
+inline const ::google::protobuf::RepeatedPtrField< ::flyteidl::core::CompiledLaunchPlan >&
+CompiledWorkflowClosure::launch_plans() const {
+  // @@protoc_insertion_point(field_list:flyteidl.core.CompiledWorkflowClosure.launch_plans)
+  return launch_plans_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

@@ -17,12 +17,14 @@
 #include <google/protobuf/port_def.inc>
 
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<0> scc_info_ConnectionSet_IdList_flyteidl_2fcore_2fcompiler_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_CompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_CompiledTask_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ConnectionSet_DownstreamEntry_DoNotUse_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<1> scc_info_ConnectionSet_UpstreamEntry_DoNotUse_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_CompiledWorkflow_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fcompiler_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_ConnectionSet_flyteidl_2fcore_2fcompiler_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2ftasks_2eproto ::google::protobuf::internal::SCCInfo<10> scc_info_TaskTemplate_flyteidl_2fcore_2ftasks_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<2> scc_info_LaunchPlanTemplate_flyteidl_2fcore_2fworkflow_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_flyteidl_2fcore_2fworkflow_2eproto ::google::protobuf::internal::SCCInfo<6> scc_info_WorkflowTemplate_flyteidl_2fcore_2fworkflow_2eproto;
 namespace flyteidl {
 namespace core {
@@ -46,6 +48,10 @@ class CompiledWorkflowDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<CompiledWorkflow> _instance;
 } _CompiledWorkflow_default_instance_;
+class CompiledLaunchPlanDefaultTypeInternal {
+ public:
+  ::google::protobuf::internal::ExplicitlyConstructed<CompiledLaunchPlan> _instance;
+} _CompiledLaunchPlan_default_instance_;
 class CompiledTaskDefaultTypeInternal {
  public:
   ::google::protobuf::internal::ExplicitlyConstructed<CompiledTask> _instance;
@@ -130,6 +136,21 @@ static void InitDefaultsCompiledWorkflow_flyteidl_2fcore_2fcompiler_2eproto() {
       &scc_info_WorkflowTemplate_flyteidl_2fcore_2fworkflow_2eproto.base,
       &scc_info_ConnectionSet_flyteidl_2fcore_2fcompiler_2eproto.base,}};
 
+static void InitDefaultsCompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::flyteidl::core::_CompiledLaunchPlan_default_instance_;
+    new (ptr) ::flyteidl::core::CompiledLaunchPlan();
+    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::flyteidl::core::CompiledLaunchPlan::InitAsDefaultInstance();
+}
+
+::google::protobuf::internal::SCCInfo<1> scc_info_CompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 1, InitDefaultsCompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto}, {
+      &scc_info_LaunchPlanTemplate_flyteidl_2fcore_2fworkflow_2eproto.base,}};
+
 static void InitDefaultsCompiledTask_flyteidl_2fcore_2fcompiler_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -156,10 +177,11 @@ static void InitDefaultsCompiledWorkflowClosure_flyteidl_2fcore_2fcompiler_2epro
   ::flyteidl::core::CompiledWorkflowClosure::InitAsDefaultInstance();
 }
 
-::google::protobuf::internal::SCCInfo<2> scc_info_CompiledWorkflowClosure_flyteidl_2fcore_2fcompiler_2eproto =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 2, InitDefaultsCompiledWorkflowClosure_flyteidl_2fcore_2fcompiler_2eproto}, {
+::google::protobuf::internal::SCCInfo<3> scc_info_CompiledWorkflowClosure_flyteidl_2fcore_2fcompiler_2eproto =
+    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 3, InitDefaultsCompiledWorkflowClosure_flyteidl_2fcore_2fcompiler_2eproto}, {
       &scc_info_CompiledWorkflow_flyteidl_2fcore_2fcompiler_2eproto.base,
-      &scc_info_CompiledTask_flyteidl_2fcore_2fcompiler_2eproto.base,}};
+      &scc_info_CompiledTask_flyteidl_2fcore_2fcompiler_2eproto.base,
+      &scc_info_CompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto.base,}};
 
 void InitDefaults_flyteidl_2fcore_2fcompiler_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ConnectionSet_IdList_flyteidl_2fcore_2fcompiler_2eproto.base);
@@ -167,11 +189,12 @@ void InitDefaults_flyteidl_2fcore_2fcompiler_2eproto() {
   ::google::protobuf::internal::InitSCC(&scc_info_ConnectionSet_UpstreamEntry_DoNotUse_flyteidl_2fcore_2fcompiler_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_ConnectionSet_flyteidl_2fcore_2fcompiler_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CompiledWorkflow_flyteidl_2fcore_2fcompiler_2eproto.base);
+  ::google::protobuf::internal::InitSCC(&scc_info_CompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CompiledTask_flyteidl_2fcore_2fcompiler_2eproto.base);
   ::google::protobuf::internal::InitSCC(&scc_info_CompiledWorkflowClosure_flyteidl_2fcore_2fcompiler_2eproto.base);
 }
 
-::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fcompiler_2eproto[7];
+::google::protobuf::Metadata file_level_metadata_flyteidl_2fcore_2fcompiler_2eproto[8];
 constexpr ::google::protobuf::EnumDescriptor const** file_level_enum_descriptors_flyteidl_2fcore_2fcompiler_2eproto = nullptr;
 constexpr ::google::protobuf::ServiceDescriptor const** file_level_service_descriptors_flyteidl_2fcore_2fcompiler_2eproto = nullptr;
 
@@ -215,6 +238,12 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fcompiler_2eproto:
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledWorkflow, template__),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledWorkflow, connections_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledLaunchPlan, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledLaunchPlan, template__),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledTask, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -228,6 +257,7 @@ const ::google::protobuf::uint32 TableStruct_flyteidl_2fcore_2fcompiler_2eproto:
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledWorkflowClosure, primary_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledWorkflowClosure, sub_workflows_),
   PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledWorkflowClosure, tasks_),
+  PROTOBUF_FIELD_OFFSET(::flyteidl::core::CompiledWorkflowClosure, launch_plans_),
 };
 static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::flyteidl::core::ConnectionSet_IdList)},
@@ -235,8 +265,9 @@ static const ::google::protobuf::internal::MigrationSchema schemas[] PROTOBUF_SE
   { 15, 22, sizeof(::flyteidl::core::ConnectionSet_UpstreamEntry_DoNotUse)},
   { 24, -1, sizeof(::flyteidl::core::ConnectionSet)},
   { 31, -1, sizeof(::flyteidl::core::CompiledWorkflow)},
-  { 38, -1, sizeof(::flyteidl::core::CompiledTask)},
-  { 44, -1, sizeof(::flyteidl::core::CompiledWorkflowClosure)},
+  { 38, -1, sizeof(::flyteidl::core::CompiledLaunchPlan)},
+  { 44, -1, sizeof(::flyteidl::core::CompiledTask)},
+  { 50, -1, sizeof(::flyteidl::core::CompiledWorkflowClosure)},
 };
 
 static ::google::protobuf::Message const * const file_default_instances[] = {
@@ -245,6 +276,7 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_ConnectionSet_UpstreamEntry_DoNotUse_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_ConnectionSet_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_CompiledWorkflow_default_instance_),
+  reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_CompiledLaunchPlan_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_CompiledTask_default_instance_),
   reinterpret_cast<const ::google::protobuf::Message*>(&::flyteidl::core::_CompiledWorkflowClosure_default_instance_),
 };
@@ -252,46 +284,53 @@ static ::google::protobuf::Message const * const file_default_instances[] = {
 ::google::protobuf::internal::AssignDescriptorsTable assign_descriptors_table_flyteidl_2fcore_2fcompiler_2eproto = {
   {}, AddDescriptors_flyteidl_2fcore_2fcompiler_2eproto, "flyteidl/core/compiler.proto", schemas,
   file_default_instances, TableStruct_flyteidl_2fcore_2fcompiler_2eproto::offsets,
-  file_level_metadata_flyteidl_2fcore_2fcompiler_2eproto, 7, file_level_enum_descriptors_flyteidl_2fcore_2fcompiler_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fcompiler_2eproto,
+  file_level_metadata_flyteidl_2fcore_2fcompiler_2eproto, 8, file_level_enum_descriptors_flyteidl_2fcore_2fcompiler_2eproto, file_level_service_descriptors_flyteidl_2fcore_2fcompiler_2eproto,
 };
 
 const char descriptor_table_protodef_flyteidl_2fcore_2fcompiler_2eproto[] =
   "\n\034flyteidl/core/compiler.proto\022\rflyteidl"
-  ".core\032\034flyteidl/core/workflow.proto\032\031fly"
-  "teidl/core/tasks.proto\"\324\002\n\rConnectionSet"
-  "\022@\n\ndownstream\030\007 \003(\0132,.flyteidl.core.Con"
-  "nectionSet.DownstreamEntry\022<\n\010upstream\030\010"
-  " \003(\0132*.flyteidl.core.ConnectionSet.Upstr"
-  "eamEntry\032\025\n\006IdList\022\013\n\003ids\030\001 \003(\t\032V\n\017Downs"
-  "treamEntry\022\013\n\003key\030\001 \001(\t\0222\n\005value\030\002 \001(\0132#"
-  ".flyteidl.core.ConnectionSet.IdList:\0028\001\032"
-  "T\n\rUpstreamEntry\022\013\n\003key\030\001 \001(\t\0222\n\005value\030\002"
-  " \001(\0132#.flyteidl.core.ConnectionSet.IdLis"
-  "t:\0028\001\"x\n\020CompiledWorkflow\0221\n\010template\030\001 "
-  "\001(\0132\037.flyteidl.core.WorkflowTemplate\0221\n\013"
-  "connections\030\002 \001(\0132\034.flyteidl.core.Connec"
-  "tionSet\"=\n\014CompiledTask\022-\n\010template\030\001 \001("
-  "\0132\033.flyteidl.core.TaskTemplate\"\257\001\n\027Compi"
-  "ledWorkflowClosure\0220\n\007primary\030\001 \001(\0132\037.fl"
-  "yteidl.core.CompiledWorkflow\0226\n\rsub_work"
-  "flows\030\002 \003(\0132\037.flyteidl.core.CompiledWork"
-  "flow\022*\n\005tasks\030\003 \003(\0132\033.flyteidl.core.Comp"
-  "iledTaskB<Z:github.com/flyteorg/flyte/fl"
-  "yteidl/gen/pb-go/flyteidl/coreb\006proto3"
+  ".core\032\036flyteidl/core/identifier.proto\032\035f"
+  "lyteidl/core/interface.proto\032\034flyteidl/c"
+  "ore/workflow.proto\032\031flyteidl/core/tasks."
+  "proto\"\324\002\n\rConnectionSet\022@\n\ndownstream\030\007 "
+  "\003(\0132,.flyteidl.core.ConnectionSet.Downst"
+  "reamEntry\022<\n\010upstream\030\010 \003(\0132*.flyteidl.c"
+  "ore.ConnectionSet.UpstreamEntry\032\025\n\006IdLis"
+  "t\022\013\n\003ids\030\001 \003(\t\032V\n\017DownstreamEntry\022\013\n\003key"
+  "\030\001 \001(\t\0222\n\005value\030\002 \001(\0132#.flyteidl.core.Co"
+  "nnectionSet.IdList:\0028\001\032T\n\rUpstreamEntry\022"
+  "\013\n\003key\030\001 \001(\t\0222\n\005value\030\002 \001(\0132#.flyteidl.c"
+  "ore.ConnectionSet.IdList:\0028\001\"x\n\020Compiled"
+  "Workflow\0221\n\010template\030\001 \001(\0132\037.flyteidl.co"
+  "re.WorkflowTemplate\0221\n\013connections\030\002 \001(\013"
+  "2\034.flyteidl.core.ConnectionSet\"I\n\022Compil"
+  "edLaunchPlan\0223\n\010template\030\001 \001(\0132!.flyteid"
+  "l.core.LaunchPlanTemplate\"=\n\014CompiledTas"
+  "k\022-\n\010template\030\001 \001(\0132\033.flyteidl.core.Task"
+  "Template\"\350\001\n\027CompiledWorkflowClosure\0220\n\007"
+  "primary\030\001 \001(\0132\037.flyteidl.core.CompiledWo"
+  "rkflow\0226\n\rsub_workflows\030\002 \003(\0132\037.flyteidl"
+  ".core.CompiledWorkflow\022*\n\005tasks\030\003 \003(\0132\033."
+  "flyteidl.core.CompiledTask\0227\n\014launch_pla"
+  "ns\030\004 \003(\0132!.flyteidl.core.CompiledLaunchP"
+  "lanB<Z:github.com/flyteorg/flyte/flyteid"
+  "l/gen/pb-go/flyteidl/coreb\006proto3"
   ;
 ::google::protobuf::internal::DescriptorTable descriptor_table_flyteidl_2fcore_2fcompiler_2eproto = {
   false, InitDefaults_flyteidl_2fcore_2fcompiler_2eproto, 
   descriptor_table_protodef_flyteidl_2fcore_2fcompiler_2eproto,
-  "flyteidl/core/compiler.proto", &assign_descriptors_table_flyteidl_2fcore_2fcompiler_2eproto, 878,
+  "flyteidl/core/compiler.proto", &assign_descriptors_table_flyteidl_2fcore_2fcompiler_2eproto, 1073,
 };
 
 void AddDescriptors_flyteidl_2fcore_2fcompiler_2eproto() {
-  static constexpr ::google::protobuf::internal::InitFunc deps[2] =
+  static constexpr ::google::protobuf::internal::InitFunc deps[4] =
   {
+    ::AddDescriptors_flyteidl_2fcore_2fidentifier_2eproto,
+    ::AddDescriptors_flyteidl_2fcore_2finterface_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2fworkflow_2eproto,
     ::AddDescriptors_flyteidl_2fcore_2ftasks_2eproto,
   };
- ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fcompiler_2eproto, deps, 2);
+ ::google::protobuf::internal::AddDescriptors(&descriptor_table_flyteidl_2fcore_2fcompiler_2eproto, deps, 4);
 }
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -1548,6 +1587,299 @@ void CompiledWorkflow::InternalSwap(CompiledWorkflow* other) {
 
 // ===================================================================
 
+void CompiledLaunchPlan::InitAsDefaultInstance() {
+  ::flyteidl::core::_CompiledLaunchPlan_default_instance_._instance.get_mutable()->template__ = const_cast< ::flyteidl::core::LaunchPlanTemplate*>(
+      ::flyteidl::core::LaunchPlanTemplate::internal_default_instance());
+}
+class CompiledLaunchPlan::HasBitSetters {
+ public:
+  static const ::flyteidl::core::LaunchPlanTemplate& template_(const CompiledLaunchPlan* msg);
+};
+
+const ::flyteidl::core::LaunchPlanTemplate&
+CompiledLaunchPlan::HasBitSetters::template_(const CompiledLaunchPlan* msg) {
+  return *msg->template__;
+}
+void CompiledLaunchPlan::clear_template_() {
+  if (GetArenaNoVirtual() == nullptr && template__ != nullptr) {
+    delete template__;
+  }
+  template__ = nullptr;
+}
+#if !defined(_MSC_VER) || _MSC_VER >= 1900
+const int CompiledLaunchPlan::kTemplateFieldNumber;
+#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+
+CompiledLaunchPlan::CompiledLaunchPlan()
+  : ::google::protobuf::Message(), _internal_metadata_(nullptr) {
+  SharedCtor();
+  // @@protoc_insertion_point(constructor:flyteidl.core.CompiledLaunchPlan)
+}
+CompiledLaunchPlan::CompiledLaunchPlan(const CompiledLaunchPlan& from)
+  : ::google::protobuf::Message(),
+      _internal_metadata_(nullptr) {
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  if (from.has_template_()) {
+    template__ = new ::flyteidl::core::LaunchPlanTemplate(*from.template__);
+  } else {
+    template__ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:flyteidl.core.CompiledLaunchPlan)
+}
+
+void CompiledLaunchPlan::SharedCtor() {
+  ::google::protobuf::internal::InitSCC(
+      &scc_info_CompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto.base);
+  template__ = nullptr;
+}
+
+CompiledLaunchPlan::~CompiledLaunchPlan() {
+  // @@protoc_insertion_point(destructor:flyteidl.core.CompiledLaunchPlan)
+  SharedDtor();
+}
+
+void CompiledLaunchPlan::SharedDtor() {
+  if (this != internal_default_instance()) delete template__;
+}
+
+void CompiledLaunchPlan::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const CompiledLaunchPlan& CompiledLaunchPlan::default_instance() {
+  ::google::protobuf::internal::InitSCC(&::scc_info_CompiledLaunchPlan_flyteidl_2fcore_2fcompiler_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void CompiledLaunchPlan::Clear() {
+// @@protoc_insertion_point(message_clear_start:flyteidl.core.CompiledLaunchPlan)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  if (GetArenaNoVirtual() == nullptr && template__ != nullptr) {
+    delete template__;
+  }
+  template__ = nullptr;
+  _internal_metadata_.Clear();
+}
+
+#if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+const char* CompiledLaunchPlan::_InternalParse(const char* begin, const char* end, void* object,
+                  ::google::protobuf::internal::ParseContext* ctx) {
+  auto msg = static_cast<CompiledLaunchPlan*>(object);
+  ::google::protobuf::int32 size; (void)size;
+  int depth; (void)depth;
+  ::google::protobuf::uint32 tag;
+  ::google::protobuf::internal::ParseFunc parser_till_end; (void)parser_till_end;
+  auto ptr = begin;
+  while (ptr < end) {
+    ptr = ::google::protobuf::io::Parse32(ptr, &tag);
+    GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+    switch (tag >> 3) {
+      // .flyteidl.core.LaunchPlanTemplate template = 1;
+      case 1: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 10) goto handle_unusual;
+        ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+        parser_till_end = ::flyteidl::core::LaunchPlanTemplate::_InternalParse;
+        object = msg->mutable_template_();
+        if (size > end - ptr) goto len_delim_till_end;
+        ptr += size;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+            {parser_till_end, object}, ptr - size, ptr));
+        break;
+      }
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->EndGroup(tag);
+          return ptr;
+        }
+        auto res = UnknownFieldParse(tag, {_InternalParse, msg},
+          ptr, end, msg->_internal_metadata_.mutable_unknown_fields(), ctx);
+        ptr = res.first;
+        GOOGLE_PROTOBUF_PARSER_ASSERT(ptr != nullptr);
+        if (res.second) return ptr;
+      }
+    }  // switch
+  }  // while
+  return ptr;
+len_delim_till_end:
+  return ctx->StoreAndTailCall(ptr, end, {_InternalParse, msg},
+                               {parser_till_end, object}, size);
+}
+#else  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+bool CompiledLaunchPlan::MergePartialFromCodedStream(
+    ::google::protobuf::io::CodedInputStream* input) {
+#define DO_(EXPRESSION) if (!PROTOBUF_PREDICT_TRUE(EXPRESSION)) goto failure
+  ::google::protobuf::uint32 tag;
+  // @@protoc_insertion_point(parse_start:flyteidl.core.CompiledLaunchPlan)
+  for (;;) {
+    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
+    tag = p.first;
+    if (!p.second) goto handle_unusual;
+    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+      // .flyteidl.core.LaunchPlanTemplate template = 1;
+      case 1: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (10 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+               input, mutable_template_()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
+      default: {
+      handle_unusual:
+        if (tag == 0) {
+          goto success;
+        }
+        DO_(::google::protobuf::internal::WireFormat::SkipField(
+              input, tag, _internal_metadata_.mutable_unknown_fields()));
+        break;
+      }
+    }
+  }
+success:
+  // @@protoc_insertion_point(parse_success:flyteidl.core.CompiledLaunchPlan)
+  return true;
+failure:
+  // @@protoc_insertion_point(parse_failure:flyteidl.core.CompiledLaunchPlan)
+  return false;
+#undef DO_
+}
+#endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+
+void CompiledLaunchPlan::SerializeWithCachedSizes(
+    ::google::protobuf::io::CodedOutputStream* output) const {
+  // @@protoc_insertion_point(serialize_start:flyteidl.core.CompiledLaunchPlan)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.core.LaunchPlanTemplate template = 1;
+  if (this->has_template_()) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      1, HasBitSetters::template_(this), output);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
+        _internal_metadata_.unknown_fields(), output);
+  }
+  // @@protoc_insertion_point(serialize_end:flyteidl.core.CompiledLaunchPlan)
+}
+
+::google::protobuf::uint8* CompiledLaunchPlan::InternalSerializeWithCachedSizesToArray(
+    ::google::protobuf::uint8* target) const {
+  // @@protoc_insertion_point(serialize_to_array_start:flyteidl.core.CompiledLaunchPlan)
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .flyteidl.core.LaunchPlanTemplate template = 1;
+  if (this->has_template_()) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        1, HasBitSetters::template_(this), target);
+  }
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields(), target);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:flyteidl.core.CompiledLaunchPlan)
+  return target;
+}
+
+size_t CompiledLaunchPlan::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:flyteidl.core.CompiledLaunchPlan)
+  size_t total_size = 0;
+
+  if (_internal_metadata_.have_unknown_fields()) {
+    total_size +=
+      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
+        _internal_metadata_.unknown_fields());
+  }
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // .flyteidl.core.LaunchPlanTemplate template = 1;
+  if (this->has_template_()) {
+    total_size += 1 +
+      ::google::protobuf::internal::WireFormatLite::MessageSize(
+        *template__);
+  }
+
+  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void CompiledLaunchPlan::MergeFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:flyteidl.core.CompiledLaunchPlan)
+  GOOGLE_DCHECK_NE(&from, this);
+  const CompiledLaunchPlan* source =
+      ::google::protobuf::DynamicCastToGenerated<CompiledLaunchPlan>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:flyteidl.core.CompiledLaunchPlan)
+    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:flyteidl.core.CompiledLaunchPlan)
+    MergeFrom(*source);
+  }
+}
+
+void CompiledLaunchPlan::MergeFrom(const CompiledLaunchPlan& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:flyteidl.core.CompiledLaunchPlan)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  ::google::protobuf::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.has_template_()) {
+    mutable_template_()->::flyteidl::core::LaunchPlanTemplate::MergeFrom(from.template_());
+  }
+}
+
+void CompiledLaunchPlan::CopyFrom(const ::google::protobuf::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:flyteidl.core.CompiledLaunchPlan)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CompiledLaunchPlan::CopyFrom(const CompiledLaunchPlan& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:flyteidl.core.CompiledLaunchPlan)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CompiledLaunchPlan::IsInitialized() const {
+  return true;
+}
+
+void CompiledLaunchPlan::Swap(CompiledLaunchPlan* other) {
+  if (other == this) return;
+  InternalSwap(other);
+}
+void CompiledLaunchPlan::InternalSwap(CompiledLaunchPlan* other) {
+  using std::swap;
+  _internal_metadata_.Swap(&other->_internal_metadata_);
+  swap(template__, other->template__);
+}
+
+::google::protobuf::Metadata CompiledLaunchPlan::GetMetadata() const {
+  ::google::protobuf::internal::AssignDescriptors(&::assign_descriptors_table_flyteidl_2fcore_2fcompiler_2eproto);
+  return ::file_level_metadata_flyteidl_2fcore_2fcompiler_2eproto[kIndexInFileMessages];
+}
+
+
+// ===================================================================
+
 void CompiledTask::InitAsDefaultInstance() {
   ::flyteidl::core::_CompiledTask_default_instance_._instance.get_mutable()->template__ = const_cast< ::flyteidl::core::TaskTemplate*>(
       ::flyteidl::core::TaskTemplate::internal_default_instance());
@@ -1858,6 +2190,7 @@ CompiledWorkflowClosure::HasBitSetters::primary(const CompiledWorkflowClosure* m
 const int CompiledWorkflowClosure::kPrimaryFieldNumber;
 const int CompiledWorkflowClosure::kSubWorkflowsFieldNumber;
 const int CompiledWorkflowClosure::kTasksFieldNumber;
+const int CompiledWorkflowClosure::kLaunchPlansFieldNumber;
 #endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
 
 CompiledWorkflowClosure::CompiledWorkflowClosure()
@@ -1869,7 +2202,8 @@ CompiledWorkflowClosure::CompiledWorkflowClosure(const CompiledWorkflowClosure& 
   : ::google::protobuf::Message(),
       _internal_metadata_(nullptr),
       sub_workflows_(from.sub_workflows_),
-      tasks_(from.tasks_) {
+      tasks_(from.tasks_),
+      launch_plans_(from.launch_plans_) {
   _internal_metadata_.MergeFrom(from._internal_metadata_);
   if (from.has_primary()) {
     primary_ = new ::flyteidl::core::CompiledWorkflow(*from.primary_);
@@ -1911,6 +2245,7 @@ void CompiledWorkflowClosure::Clear() {
 
   sub_workflows_.Clear();
   tasks_.Clear();
+  launch_plans_.Clear();
   if (GetArenaNoVirtual() == nullptr && primary_ != nullptr) {
     delete primary_;
   }
@@ -1976,6 +2311,22 @@ const char* CompiledWorkflowClosure::_InternalParse(const char* begin, const cha
         } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 26 && (ptr += 1));
         break;
       }
+      // repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+      case 4: {
+        if (static_cast<::google::protobuf::uint8>(tag) != 34) goto handle_unusual;
+        do {
+          ptr = ::google::protobuf::io::ReadSize(ptr, &size);
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ptr);
+          parser_till_end = ::flyteidl::core::CompiledLaunchPlan::_InternalParse;
+          object = msg->add_launch_plans();
+          if (size > end - ptr) goto len_delim_till_end;
+          ptr += size;
+          GOOGLE_PROTOBUF_PARSER_ASSERT(ctx->ParseExactRange(
+              {parser_till_end, object}, ptr - size, ptr));
+          if (ptr >= end) break;
+        } while ((::google::protobuf::io::UnalignedLoad<::google::protobuf::uint64>(ptr) & 255) == 34 && (ptr += 1));
+        break;
+      }
       default: {
       handle_unusual:
         if ((tag & 7) == 4 || tag == 0) {
@@ -2039,6 +2390,17 @@ bool CompiledWorkflowClosure::MergePartialFromCodedStream(
         break;
       }
 
+      // repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+      case 4: {
+        if (static_cast< ::google::protobuf::uint8>(tag) == (34 & 0xFF)) {
+          DO_(::google::protobuf::internal::WireFormatLite::ReadMessage(
+                input, add_launch_plans()));
+        } else {
+          goto handle_unusual;
+        }
+        break;
+      }
+
       default: {
       handle_unusual:
         if (tag == 0) {
@@ -2090,6 +2452,15 @@ void CompiledWorkflowClosure::SerializeWithCachedSizes(
       output);
   }
 
+  // repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->launch_plans_size()); i < n; i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteMessageMaybeToArray(
+      4,
+      this->launch_plans(static_cast<int>(i)),
+      output);
+  }
+
   if (_internal_metadata_.have_unknown_fields()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         _internal_metadata_.unknown_fields(), output);
@@ -2124,6 +2495,14 @@ void CompiledWorkflowClosure::SerializeWithCachedSizes(
     target = ::google::protobuf::internal::WireFormatLite::
       InternalWriteMessageToArray(
         3, this->tasks(static_cast<int>(i)), target);
+  }
+
+  // repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->launch_plans_size()); i < n; i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      InternalWriteMessageToArray(
+        4, this->launch_plans(static_cast<int>(i)), target);
   }
 
   if (_internal_metadata_.have_unknown_fields()) {
@@ -2169,6 +2548,17 @@ size_t CompiledWorkflowClosure::ByteSizeLong() const {
     }
   }
 
+  // repeated .flyteidl.core.CompiledLaunchPlan launch_plans = 4;
+  {
+    unsigned int count = static_cast<unsigned int>(this->launch_plans_size());
+    total_size += 1UL * count;
+    for (unsigned int i = 0; i < count; i++) {
+      total_size +=
+        ::google::protobuf::internal::WireFormatLite::MessageSize(
+          this->launch_plans(static_cast<int>(i)));
+    }
+  }
+
   // .flyteidl.core.CompiledWorkflow primary = 1;
   if (this->has_primary()) {
     total_size += 1 +
@@ -2205,6 +2595,7 @@ void CompiledWorkflowClosure::MergeFrom(const CompiledWorkflowClosure& from) {
 
   sub_workflows_.MergeFrom(from.sub_workflows_);
   tasks_.MergeFrom(from.tasks_);
+  launch_plans_.MergeFrom(from.launch_plans_);
   if (from.has_primary()) {
     mutable_primary()->::flyteidl::core::CompiledWorkflow::MergeFrom(from.primary());
   }
@@ -2237,6 +2628,7 @@ void CompiledWorkflowClosure::InternalSwap(CompiledWorkflowClosure* other) {
   _internal_metadata_.Swap(&other->_internal_metadata_);
   CastToBase(&sub_workflows_)->InternalSwap(CastToBase(&other->sub_workflows_));
   CastToBase(&tasks_)->InternalSwap(CastToBase(&other->tasks_));
+  CastToBase(&launch_plans_)->InternalSwap(CastToBase(&other->launch_plans_));
   swap(primary_, other->primary_);
 }
 
@@ -2265,6 +2657,9 @@ template<> PROTOBUF_NOINLINE ::flyteidl::core::ConnectionSet* Arena::CreateMaybe
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::core::CompiledWorkflow* Arena::CreateMaybeMessage< ::flyteidl::core::CompiledWorkflow >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::CompiledWorkflow >(arena);
+}
+template<> PROTOBUF_NOINLINE ::flyteidl::core::CompiledLaunchPlan* Arena::CreateMaybeMessage< ::flyteidl::core::CompiledLaunchPlan >(Arena* arena) {
+  return Arena::CreateInternal< ::flyteidl::core::CompiledLaunchPlan >(arena);
 }
 template<> PROTOBUF_NOINLINE ::flyteidl::core::CompiledTask* Arena::CreateMaybeMessage< ::flyteidl::core::CompiledTask >(Arena* arena) {
   return Arena::CreateInternal< ::flyteidl::core::CompiledTask >(arena);
