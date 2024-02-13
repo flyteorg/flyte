@@ -11,7 +11,7 @@ About PodTemplate
 `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__
 is a K8s native resource used to define a K8s Pod. It contains all the fields in
 the PodSpec, in addition to ObjectMeta to control resource-specific metadata
-such as Labels or Annotations. PddTemplates are commonly applied in Deployments,
+such as Labels or Annotations. PodTemplates are commonly applied in Deployments,
 ReplicaSets, etc to define the managed Pod configuration of the resources.
 
 Within Flyte, you can use PodTemplates to configure Pods created as part
