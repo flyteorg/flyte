@@ -94,7 +94,7 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]map[int32]*Agent, error)
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
-		agentRegistry[taskType] = map[int32]*Agent{0: cfg.Agents[agentID]}
+		agentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: cfg.Agents[agentID]}
 	}
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
