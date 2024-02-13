@@ -18,13 +18,9 @@ spec:
         {{- end }}
       labels: {{ include "flyteadmin.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        runAsNonRoot: true
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
-        seLinuxOptions:
-          type: spc_t
+      {{- with .Values.flyteadmin.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flyteadmin.priorityClassName }}
       priorityClassName: {{ .Values.flyteadmin.priorityClassName }}
       {{- end }}
