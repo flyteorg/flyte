@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -72,8 +73,8 @@ func TestEndToEnd(t *testing.T) {
 	}
 	basePrefix := storage.DataReference("fake://bucket/prefix/")
 
-	t.Run("run a job", func(t *testing.T) {
-		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAgentPlugin())
+	t.Run("run an async task", func(t *testing.T) {
+		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAsyncAgentPlugin())
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test1"))
 		assert.NoError(t, err)
 
@@ -85,8 +86,18 @@ func TestEndToEnd(t *testing.T) {
 		assert.Equal(t, true, phase.Phase().IsSuccess())
 	})
 
+	t.Run("run a sync task", func(t *testing.T) {
+		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockSyncAgentPlugin())
+		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test1"))
+		assert.NoError(t, err)
+
+		template.Type = "openai"
+		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
+		assert.Equal(t, true, phase.Phase().IsSuccess())
+	})
+
 	t.Run("failed to create a job", func(t *testing.T) {
-		agentPlugin := newMockAgentPlugin()
+		agentPlugin := newMockAsyncAgentPlugin()
 		agentPlugin.PluginLoader = func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return Plugin{
 				metricScope: iCtx.MetricsScope(),
@@ -124,7 +135,7 @@ func TestEndToEnd(t *testing.T) {
 		tr.OnRead(context.Background()).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnTaskReader().Return(tr)
 
-		agentPlugin := newMockAgentPlugin()
+		agentPlugin := newMockAsyncAgentPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test3"))
 		assert.NoError(t, err)
@@ -145,7 +156,7 @@ func TestEndToEnd(t *testing.T) {
 		inputReader.OnGetMatch(mock.Anything).Return(nil, fmt.Errorf("read fail"))
 		tCtx.OnInputReader().Return(inputReader)
 
-		agentPlugin := newMockAgentPlugin()
+		agentPlugin := newMockAsyncAgentPlugin()
 		pluginEntry := pluginmachinery.CreateRemotePlugin(agentPlugin)
 		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test4"))
 		assert.NoError(t, err)
@@ -224,8 +235,7 @@ func getTaskContext(t *testing.T) *pluginCoreMocks.TaskExecutionContext {
 	return tCtx
 }
 
-func newMockAgentPlugin() webapi.PluginEntry {
-
+func newMockAsyncAgentPlugin() webapi.PluginEntry {
 	asyncAgentClient := new(agentMocks.AsyncAgentServiceClient)
 
 	mockCreateRequestMatcher := mock.MatchedBy(func(request *admin.CreateTaskRequest) bool {
@@ -239,7 +249,7 @@ func newMockAgentPlugin() webapi.PluginEntry {
 		return request.GetTaskType().GetName() == "spark"
 	})
 	asyncAgentClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
-		&admin.GetTaskResponse{Resource: &admin.Resource{State: admin.State_SUCCEEDED}}, nil)
+		&admin.GetTaskResponse{Resource: &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}}, nil)
 
 	asyncAgentClient.On("DeleteTask", mock.Anything, mock.Anything).Return(
 		&admin.DeleteTaskResponse{}, nil)
@@ -249,7 +259,7 @@ func newMockAgentPlugin() webapi.PluginEntry {
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
-		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark", "api_task"},
+		SupportedTaskTypes: []core.TaskType{"bigquery_query_job_task", "spark"},
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return Plugin{
 				metricScope: iCtx.MetricsScope(),
@@ -257,6 +267,53 @@ func newMockAgentPlugin() webapi.PluginEntry {
 				cs: &ClientSet{
 					asyncAgentClients: map[string]service.AsyncAgentServiceClient{
 						defaultAgentEndpoint: asyncAgentClient,
+					},
+				},
+			}, nil
+		},
+	}
+}
+
+func newMockSyncAgentPlugin() webapi.PluginEntry {
+	syncAgentClient := new(agentMocks.SyncAgentServiceClient)
+	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}
+	outputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+
+	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
+	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
+		Res: &admin.ExecuteTaskSyncResponse_Header{
+			Header: &admin.ExecuteTaskSyncResponseHeader{
+				Resource: resource,
+			},
+		},
+	}, nil).Once()
+
+	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
+		Res: &admin.ExecuteTaskSyncResponse_Outputs{
+			Outputs: outputs,
+		},
+	}, nil).Once()
+
+	stream.OnRecv().Return(nil, io.EOF).Once()
+	stream.OnSendMatch(mock.Anything).Return(nil)
+	stream.OnCloseSendMatch(mock.Anything).Return(nil)
+
+	syncAgentClient.OnExecuteTaskSyncMatch(mock.Anything).Return(stream, nil)
+
+	cfg := defaultConfig
+	cfg.DefaultAgent.Endpoint = defaultAgentEndpoint
+	cfg.DefaultAgent.IsSync = true
+
+	return webapi.PluginEntry{
+		ID:                 "agent-service",
+		SupportedTaskTypes: []core.TaskType{"openai"},
+		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
+			return Plugin{
+				metricScope: iCtx.MetricsScope(),
+				cfg:         &cfg,
+				cs: &ClientSet{
+					syncAgentClients: map[string]service.SyncAgentServiceClient{
+						defaultAgentEndpoint: syncAgentClient,
 					},
 				},
 			}, nil

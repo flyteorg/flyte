@@ -135,6 +135,7 @@ func (p Plugin) ExecuteTaskSync(
 	}
 	waitChan := make(chan struct{})
 	resourceChan := make(chan *admin.Resource)
+	outputsChan := make(chan *flyteIdl.LiteralMap)
 
 	go func() {
 		in, err := stream.Recv()
@@ -148,19 +149,21 @@ func (p Plugin) ExecuteTaskSync(
 		}
 		header := in.GetHeader()
 		resource := header.GetResource()
+		var literals *flyteIdl.LiteralMap
 
 		for {
 			in, err := stream.Recv()
 			if err == io.EOF {
 				// read done.
 				resourceChan <- resource
+				outputsChan <- literals
 				close(waitChan)
 				return
 			}
 			if err != nil {
 				logger.Errorf(ctx, "Error reading from stream: %v", err)
 			}
-			literals := in.GetOutputs().GetLiterals()
+			literals = in.GetOutputs()
 			logger.Infof(ctx, "Got literals: %v", literals)
 			// TODO: how to combine the literals?
 			// log.Printf("Got message %s at point(%d, %d)", in.Message, in.Location.Latitude, in.Location.Longitude)
@@ -182,11 +185,19 @@ func (p Plugin) ExecuteTaskSync(
 		err = stream.Send(inputsProto)
 	}
 
-	stream.CloseSend()
+	if err := stream.CloseSend(); err != nil {
+		return nil, nil, err
+	}
 	resource := <-resourceChan
+	outputs := <-outputsChan
 	<-waitChan
 
-	return nil, resource, err
+	return nil, ResourceWrapper{
+		Phase:    resource.Phase,
+		Outputs:  outputs,
+		Message:  resource.Message,
+		LogLinks: resource.LogLinks,
+	}, err
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
