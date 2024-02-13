@@ -911,9 +911,12 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
+        runAsNonRoot: true
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       initContainers:
         - command:
           - flyteadmin
@@ -924,6 +927,10 @@ spec:
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: run-migrations
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
           - mountPath: /etc/db
             name: db-pass
@@ -941,6 +948,10 @@ spec:
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: seed-projects
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
           - mountPath: /etc/db
             name: db-pass
@@ -955,6 +966,10 @@ spec:
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7-b4"
           imagePullPolicy: "IfNotPresent"
           name: sync-cluster-resources
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
           - mountPath: /etc/db
             name: db-pass
@@ -972,6 +987,10 @@ spec:
             [
                 "flyteadmin --config=/etc/flyte/config/*.yaml secrets init --localPath /etc/scratch/secrets && flyteadmin --config=/etc/flyte/config/*.yaml secrets create --name flyte-admin-secrets --fromPath /etc/scratch/secrets",
             ]
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - mountPath: /etc/flyte/config
               name: base-config-volume
@@ -1013,6 +1032,10 @@ spec:
             cpu: 500m
             ephemeral-storage: 2Gi
             memory: 1G
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
         - mountPath: /etc/db
           name: db-pass
@@ -1139,8 +1162,11 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
+        runAsNonRoot: true
         runAsUser: 1000
         fsGroupChangePolicy: "OnRootMismatch"
+        seLinuxOptions:
+          type: spc_t
       containers:
       - image: "cr.flyte.org/flyteorg/flyteconsole:v1.10.2"
         imagePullPolicy: "IfNotPresent"
@@ -1150,6 +1176,10 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources: 
           limits:
             cpu: 250m
@@ -1199,9 +1229,12 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
+        runAsNonRoot: true
         fsGroup: 1001
         runAsUser: 1001
         fsGroupChangePolicy: "OnRootMismatch"
+        seLinuxOptions:
+          type: spc_t
       initContainers:
       - command:
         - datacatalog
@@ -1217,6 +1250,10 @@ spec:
           name: db-pass
         - mountPath: /etc/datacatalog/config
           name: config-volume
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
       containers:
       - command:
         - datacatalog
@@ -1230,6 +1267,10 @@ spec:
         - containerPort: 8088
         - containerPort: 8089
         - containerPort: 10254
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources:
           limits:
             cpu: 500m
@@ -1290,9 +1331,12 @@ spec:
         app.kubernetes.io/managed-by: Helm
     spec:
       securityContext:
+        runAsNonRoot: true
         fsGroup: 65534
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       initContainers:
       - command:
         - flytescheduler
@@ -1302,6 +1346,10 @@ spec:
         image: "cr.flyte.org/flyteorg/flytescheduler:v1.10.7-b4"
         imagePullPolicy: "IfNotPresent"
         name: flytescheduler-check
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
         - mountPath: /etc/db
           name: db-pass
@@ -1320,6 +1368,10 @@ spec:
         name: flytescheduler
         ports:
           - containerPort: 10254
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources:
           limits:
             cpu: 250m
@@ -1455,8 +1507,11 @@ spec:
     spec:
       securityContext:
         fsGroup: 65534
+        runAsNonRoot: true
         runAsUser: 1001
         fsGroupChangePolicy: "Always"
+        seLinuxOptions:
+          type: spc_t
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
@@ -1478,6 +1533,10 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -1502,6 +1561,10 @@ spec:
                   fieldPath: metadata.namespace
           ports:
           - containerPort: 9443
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
