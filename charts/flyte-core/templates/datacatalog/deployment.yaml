@@ -43,6 +43,10 @@ spec:
           {{- toYaml . | nindent 8 }}
           {{- end }}
         {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
       containers:
       - command:
         - datacatalog
@@ -65,6 +69,10 @@ spec:
         - containerPort: 8088
         - containerPort: 8089
         - containerPort: {{ index .Values.configmap.datacatalogServer.datacatalog "profiler-port" }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources: {{- toYaml .Values.datacatalog.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/datacatalog/config

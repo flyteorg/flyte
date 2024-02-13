@@ -65,6 +65,10 @@ spec:
         {{- toYaml . | nindent 10 }}
         {{- end }}
         {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -95,6 +99,10 @@ spec:
         {{- end }}
           ports:
           - containerPort: 9443
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
