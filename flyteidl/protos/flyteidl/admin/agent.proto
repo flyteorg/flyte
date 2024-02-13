@@ -161,8 +161,8 @@ message TaskType {
 
 // A request to get an agent.
 message GetAgentRequest {
-  // The name of the agent.
-  string name = 1;
+  // A predefined yet extensible Task type identifier.
+  TaskType task_type = 1;
 }
 
 // A response containing an agent.

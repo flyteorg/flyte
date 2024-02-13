@@ -836,11 +836,11 @@ export class TaskType extends Message<TaskType> {
  */
 export class GetAgentRequest extends Message<GetAgentRequest> {
   /**
-   * The name of the agent.
+   * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: string name = 1;
+   * @generated from field: flyteidl.admin.TaskType task_type = 1;
    */
-  name = "";
+  taskType?: TaskType;
 
   constructor(data?: PartialMessage<GetAgentRequest>) {
     super();
@@ -850,7 +850,7 @@ export class GetAgentRequest extends Message<GetAgentRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.GetAgentRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "task_type", kind: "message", T: TaskType },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetAgentRequest {

@@ -208,9 +208,9 @@ pub struct TaskType {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct GetAgentRequest {
-    /// The name of the agent.
-    #[prost(string, tag="1")]
-    pub name: ::prost::alloc::string::String,
+    /// A predefined yet extensible Task type identifier.
+    #[prost(message, optional, tag="1")]
+    pub task_type: ::core::option::Option<TaskType>,
 }
 /// A response containing an agent.
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -23816,7 +23816,7 @@
                  * Properties of a GetAgentRequest.
                  * @memberof flyteidl.admin
                  * @interface IGetAgentRequest
-                 * @property {string|null} [name] GetAgentRequest name
+                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetAgentRequest taskType
                  */
     
                 /**
@@ -23835,12 +23835,12 @@
                 }
     
                 /**
-                 * GetAgentRequest name.
-                 * @member {string} name
+                 * GetAgentRequest taskType.
+                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
                  * @memberof flyteidl.admin.GetAgentRequest
                  * @instance
                  */
-                GetAgentRequest.prototype.name = "";
+                GetAgentRequest.prototype.taskType = null;
     
                 /**
                  * Creates a new GetAgentRequest instance using the specified properties.
@@ -23866,8 +23866,8 @@
                 GetAgentRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.name != null && message.hasOwnProperty("name"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     return writer;
                 };
     
@@ -23890,7 +23890,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.name = reader.string();
+                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23911,9 +23911,11 @@
                 GetAgentRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.name != null && message.hasOwnProperty("name"))
-                        if (!$util.isString(message.name))
-                            return "name: string expected";
+                    if (message.taskType != null && message.hasOwnProperty("taskType")) {
+                        var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
+                        if (error)
+                            return "taskType." + error;
+                    }
                     return null;
                 };
     
