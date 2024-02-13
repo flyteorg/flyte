@@ -205,7 +205,11 @@ flowchart LR
 
 Use the flow-chart above to point you to one of these examples:
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: extending_toc
+:hidden:
+
 custom_types
 prebuilt_container
 user_container

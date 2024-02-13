@@ -242,4 +242,4 @@ You will also need to update your `ImageSpec` instances to set `registry="localh
 
 ## What's next?
 
-Try out the examples in the {doc}`Basics <auto_examples/basics/index>` section.
+Try out the examples in the {doc}`Basics <basics/index>` section.

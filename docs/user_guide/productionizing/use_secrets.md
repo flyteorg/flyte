@@ -409,7 +409,7 @@ secret = Secret(
 
 The group parameter is used to specify the path to the secret in the Vault backend. For example, if you have a secret stored in Vault at `"secret/data/flyte/secret"` then the group parameter should be `"secret/data/flyte"`.
 When using either of the Key Vault engine versions, the secret key is the name of a specific secret entry to be retrieved from the group path.
-When using the database secrets engine, the secret key itself is arbitrary but is required by Flyte to name and identify the secret file. It is arbitray because the database secrets engine returns always two keys, `username` and `password` and we need to retrieve a matching pair in one request.
+When using the database secrets engine, the secret key itself is arbitrary but is required by Flyte to name and identify the secret file. It is arbitrary because the database secrets engine returns always two keys, `username` and `password` and we need to retrieve a matching pair in one request.
 
 **Configuration**
 

@@ -6,7 +6,11 @@ This section of the user guide introduces the advanced features of the Flytekit 
 These examples cover more complex aspects of Flyte, including conditions, subworkflows,
 dynamic workflows, map tasks, gate nodes and more.
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: advanced_composition_toc
+:hidden:
+
 conditional
 chain_entities
 subworkflow

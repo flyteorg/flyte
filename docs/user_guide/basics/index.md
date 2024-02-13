@@ -9,7 +9,11 @@ some advanced backend functionality like starting a distributed Spark cluster.
 Here, you will learn how to write Flyte tasks, assemble them into workflows,
 run bash scripts, and document workflows.
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: basics_toc
+:hidden:
+
 hello_world
 task
 workflow

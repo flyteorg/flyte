@@ -362,7 +362,7 @@ cluster to authenticate via a client key.
 
 When using a sandbox cluster started with `flytectl demo start`, however, the
 `client_secret_group` and `client_secret_key` are not required, since the
-default sandbox configration does not require key-based authentication.
+default sandbox configuration does not require key-based authentication.
 
 ```{code-cell}
 :lines_to_next_cell: 2

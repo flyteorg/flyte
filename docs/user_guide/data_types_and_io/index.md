@@ -136,7 +136,11 @@ Here's a breakdown of these mappings:
         **For instructions on building custom type transformers, please refer to :ref:`this section <advanced_custom_types>`**.
 ```
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: data_types_and_io_toc
+:hidden:
+
 file
 folder
 structured_dataset

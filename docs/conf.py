@@ -329,16 +329,16 @@ REPLACE_PATTERNS = {
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
     r"/protos/docs/service/index": r"/protos/docs/service/service",
     r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
-    r"<environment_setup>": r"</flytesnacks/environment_setup>",
 }
+
+# r"<environment_setup>": r"</flytesnacks/environment_setup>",
 
 import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
-        "flytesnacks/userguide",
-        "flytesnacks/tutorials",
+       "flytesnacks/tutorials",
         "flytesnacks/integrations",
     ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
@@ -372,6 +372,7 @@ import_projects = [
                 "flytesnacks/getting_started",
                 "flytesnacks/userguide.md",
                 "flytesnacks/environment_setup.md",
+                "flytesnacks/index.md",
                 "examples/advanced_composition",
                 "examples/basics",
                 "examples/customizing_dependencies",

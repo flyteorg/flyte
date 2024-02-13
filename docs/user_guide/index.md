@@ -11,7 +11,7 @@
 
 If this is your first time using Flyte, check out the {doc}`Getting Started <index>` guide.
 
-This _User Guide_, the {doc}`Tutorials <tutorials>` and the {doc}`Integrations <integrations>` examples cover all of
+This _User Guide_, the {ref}`Tutorials <tutorials>` and the {ref}`Integrations <integrations>` examples cover all of
 the key features of Flyte for data analytics, data science and machine learning practitioners, organized by topic. Each
 section below introduces a core feature of Flyte and how you can use it to address specific use cases. Code for all
 of the examples can be found in the [flytesnacks repo](https://github.com/flyteorg/flytesnacks).
@@ -26,7 +26,7 @@ To learn about how to spin up and manage a Flyte cluster in the cloud, see the
 ```
 
 ```{note}
-Want to contribute or update an example? Check out the {doc}`Contribution Guide <contribute>`.
+Want to contribute or update an example? Check out the {doc}`Contribution Guide <../flytesnacks/contribute>`.
 ```
 
 ## Table of Contents
@@ -53,4 +53,20 @@ Want to contribute or update an example? Check out the {doc}`Contribution Guide 
   - Ship and configure your machine learning pipelines on a production Flyte installation.
 * - {doc}`🏗 Extending <extending/index>`
   - Define custom plugins that aren't currently supported in the Flyte ecosystem.
+```
+
+```{toctree}
+:maxdepth: -1
+:name: user_guide_toc
+:hidden:
+
+environment_setup
+basics/index
+data_types_and_io/index
+advanced_composition/index
+customizing_dependencies/index
+development_lifecycle/index
+testing/index
+productionizing/index
+extending/index
 ```

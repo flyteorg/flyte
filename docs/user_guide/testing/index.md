@@ -7,6 +7,10 @@ your tasks and workflows in your test suite. For more details, you can also refe
 to the {py:mod}`~flytekit.testing` module in the API reference.
 
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: testing_toc
+:hidden:
+
 mocking
 ```

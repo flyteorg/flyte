@@ -36,7 +36,7 @@ To recap, here are a few examples of why you would want to implement a backend p
    - Use a new container orchestration engine like AWS Batch/ECS, Hashicorp' Nomad
    - Use a completely new runtime like AWS Lambda, KNative, etc.
 3. You want to retain the capability to update the plugin implementation and roll
-   out new changes and fixes without affecting the users code or requiring them to updat
+   out new changes and fixes without affecting the users code or requiring them to update
    versions of their plugins.
 4. You want the same plugin to be accessible across multiple language SDK's.
 

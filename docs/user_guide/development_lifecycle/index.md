@@ -3,7 +3,11 @@
 In this section, you will discover Flyte's features that aid in local workflow development.
 You will gain an understanding of concepts like caching, the Flyte remote API, Agents, Decks and more.
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: development_lifecycle_toc
+:hidden:
+
 agent_service
 private_images
 task_cache

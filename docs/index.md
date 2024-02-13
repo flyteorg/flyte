@@ -79,7 +79,7 @@ contribute its architecture and design. You can also access the
 * - {doc}`🔤 Introduction to Flyte <introduction>`
   - Get your first workflow running, learn about the Flyte development lifecycle
     and core use cases.
-* - {doc}`📖 User Guide <flytesnacks/userguide>`
+* - {doc}`📖 User Guide <user_guide/index>`
   - A comprehensive view of Flyte's functionality for data and ML practitioners.
 * - {doc}`📚 Tutorials <flytesnacks/tutorials>`
   - End-to-end examples of Flyte for data/feature engineering, machine learning,

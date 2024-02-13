@@ -6,7 +6,11 @@ You will explore how to execute a raw container with custom commands,
 indicate multiple container images within a single workflow,
 and get familiar with the ins and outs of `ImageSpec`!
 
-```{auto-examples-toc}
+```{toctree}
+:maxdepth: -1
+:name: customizing_dependencies_toc
+:hidden:
+
 image_spec
 raw_container
 multi_images
