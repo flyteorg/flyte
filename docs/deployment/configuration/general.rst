@@ -1,48 +1,35 @@
 .. _deployment-configuration-general:
 
-#################################
-Configuring Custom K8s Resources
-#################################
+###########################################
+Configuring task pods with K8s PodTemplates
+###########################################
 
-Configuring K8s Pods
-====================
-
-There are two approaches to applying the K8s Pod configuration. The **recommended**
-method is to use Flyte's Compile-time and Runtime PodTemplate schemes. You can do this by creating
-K8s PodTemplate resource/s that serves as the base configuration for all the
-task Pods that Flyte initializes. This solution ensures completeness regarding
-support configuration options and maintainability as new features are added to K8s. 
-
-The legacy technique is to set configuration options in Flyte's K8s plugin configuration. 
-
-.. note ::
-
-    These two approaches can be used simultaneously, where the K8s plugin configuration will override the default PodTemplate values.
-
-.. _using-k8s-podtemplates:
-
-*******************************
-Using K8s PodTemplates
-*******************************
+*****************
+About PodTemplate
+*****************
 
 `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__
 is a K8s native resource used to define a K8s Pod. It contains all the fields in
 the PodSpec, in addition to ObjectMeta to control resource-specific metadata
-such as Labels or Annotations. They are commonly applied in Deployments,
+such as Labels or Annotations. PddTemplates are commonly applied in Deployments,
 ReplicaSets, etc to define the managed Pod configuration of the resources.
 
-Within Flyte, you can leverage this resource to configure Pods created as part
-of Flyte's task execution. It ensures complete control over Pod configuration,
+Within Flyte, you can use PodTemplates to configure Pods created as part
+of Flyte's task execution. This ensures complete control over Pod configuration,
 supporting all options available through the resource and ensuring maintainability
 in future versions.
 
-Starting with the Flyte 1.4 release, we now have 2 ways of defining `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__:
+Starting with the Flyte 1.4 release, there are two ways of defining `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__:
 1. Compile-time PodTemplate defined at the task level
 2. Runtime PodTemplates
 
+.. note ::
 
+  The legacy technique is to set configuration options in Flyte's K8s plugin configuration. These two approaches can be used simultaneously, where the K8s plugin configuration will override the default PodTemplate values.
+
+*************************
 Compile-time PodTemplates
-=========================
+*************************
 
 We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task>`__, for example:
 
@@ -85,8 +72,9 @@ the name of the primary container, labels, and annotations.
 
 The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
 
+********************
 Runtime PodTemplates
-====================
+********************
 
 Runtime PodTemplates, as the name suggests, are applied during runtime, as part of building the resultant Pod. In terms of how
 they are applied, you have two choices: (1) you either elect one specific PodTemplate to be considered as default, or (2) you
