@@ -856,11 +856,11 @@ spec:
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
-        runAsNonRoot: true
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
         seLinuxOptions:
           type: spc_t
       initContainers:
@@ -1107,10 +1107,10 @@ spec:
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
+        fsGroupChangePolicy: OnRootMismatch
         runAsNonRoot: true
         runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
         seLinuxOptions:
           type: spc_t
       containers:
@@ -1174,11 +1174,11 @@ spec:
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
-        runAsNonRoot: true
+      securityContext: 
         fsGroup: 1001
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "OnRootMismatch"
         seLinuxOptions:
           type: spc_t
       initContainers:
@@ -1276,10 +1276,10 @@ spec:
         helm.sh/chart: flyte-core-v0.1.10
         app.kubernetes.io/managed-by: Helm
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
       priorityClassName: system-cluster-critical
       containers:
       - command:
@@ -1353,11 +1353,11 @@ spec:
       annotations:
         configChecksum: "799320510466012ad23a7380ea4ac9ff51fd8ed6e56d9c543179b6bb6a9bcf1"
     spec:
-      securityContext:
+      securityContext: 
         fsGroup: 65534
+        fsGroupChangePolicy: Always
         runAsNonRoot: true
         runAsUser: 1001
-        fsGroupChangePolicy: "Always"
         seLinuxOptions:
           type: spc_t
       serviceAccountName: flyte-pod-webhook
