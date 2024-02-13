@@ -41,6 +41,18 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
+     * Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+     * **Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.
+     *
+     * @generated from rpc flyteidl.service.AdminService.ListTasks
+     */
+    listTasks: {
+      name: "ListTasks",
+      I: ResourceListRequest,
+      O: TaskList,
+      kind: MethodKind.Unary,
+    },
+    /**
      * Fetch a :ref:`ref_flyteidl.admin.Task` definition.
      *
      * @generated from rpc flyteidl.service.AdminService.GetTask
@@ -63,17 +75,6 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
-     *
-     * @generated from rpc flyteidl.service.AdminService.ListTasks
-     */
-    listTasks: {
-      name: "ListTasks",
-      I: ResourceListRequest,
-      O: TaskList,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
      *
      * @generated from rpc flyteidl.service.AdminService.CreateWorkflow
@@ -82,6 +83,18 @@ export const AdminService = {
       name: "CreateWorkflow",
       I: WorkflowCreateRequest,
       O: WorkflowCreateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+     * **Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.
+     *
+     * @generated from rpc flyteidl.service.AdminService.ListWorkflows
+     */
+    listWorkflows: {
+      name: "ListWorkflows",
+      I: ResourceListRequest,
+      O: WorkflowList,
       kind: MethodKind.Unary,
     },
     /**
@@ -107,17 +120,6 @@ export const AdminService = {
       kind: MethodKind.Unary,
     },
     /**
-     * Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
-     *
-     * @generated from rpc flyteidl.service.AdminService.ListWorkflows
-     */
-    listWorkflows: {
-      name: "ListWorkflows",
-      I: ResourceListRequest,
-      O: WorkflowList,
-      kind: MethodKind.Unary,
-    },
-    /**
      * Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
      *
      * @generated from rpc flyteidl.service.AdminService.CreateLaunchPlan
@@ -126,6 +128,18 @@ export const AdminService = {
       name: "CreateLaunchPlan",
       I: LaunchPlanCreateRequest,
       O: LaunchPlanCreateResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+     * **Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.
+     *
+     * @generated from rpc flyteidl.service.AdminService.ListLaunchPlans
+     */
+    listLaunchPlans: {
+      name: "ListLaunchPlans",
+      I: ResourceListRequest,
+      O: LaunchPlanList,
       kind: MethodKind.Unary,
     },
     /**
@@ -170,17 +184,6 @@ export const AdminService = {
       name: "ListLaunchPlanIds",
       I: NamedEntityIdentifierListRequest,
       O: NamedEntityIdentifierList,
-      kind: MethodKind.Unary,
-    },
-    /**
-     * Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
-     *
-     * @generated from rpc flyteidl.service.AdminService.ListLaunchPlans
-     */
-    listLaunchPlans: {
-      name: "ListLaunchPlans",
-      I: ResourceListRequest,
-      O: LaunchPlanList,
       kind: MethodKind.Unary,
     },
     /**

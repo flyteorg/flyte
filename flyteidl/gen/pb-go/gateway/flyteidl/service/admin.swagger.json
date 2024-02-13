@@ -2888,7 +2888,7 @@
     },
     "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans4",
         "responses": {
@@ -2983,7 +2983,7 @@
     },
     "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans2",
         "responses": {
@@ -3240,7 +3240,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans3",
         "responses": {
@@ -3335,7 +3335,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans",
         "responses": {
@@ -6254,7 +6254,7 @@
     },
     "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks4",
         "responses": {
@@ -6349,7 +6349,7 @@
     },
     "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks2",
         "responses": {
@@ -6608,7 +6608,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks3",
         "responses": {
@@ -6703,7 +6703,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks",
         "responses": {
@@ -7449,7 +7449,7 @@
     },
     "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows4",
         "responses": {
@@ -7544,7 +7544,7 @@
     },
     "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows2",
         "responses": {
@@ -7802,7 +7802,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows3",
         "responses": {
@@ -7897,7 +7897,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows",
         "responses": {

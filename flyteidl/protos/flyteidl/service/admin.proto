@@ -52,6 +52,26 @@ service AdminService {
      };
   }
 
+  // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+  // **Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.
+  rpc ListTasks (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.TaskList) {
+    option (google.api.http) = {
+      get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}",
+      }
+      additional_bindings {
+        get: "/api/v1/tasks/{id.project}/{id.domain}",
+      }
+      additional_bindings {
+        get: "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}",
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Fetch existing task definitions matching input filters."
+    };
+  }
+
   // Fetch a :ref:`ref_flyteidl.admin.Task` definition.
   rpc GetTask (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Task) {
     option (google.api.http) = {
@@ -75,25 +95,6 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Fetch existing task definition identifiers matching input filters."
-    };
-  }
-
-  // Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
-  rpc ListTasks (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.TaskList) {
-    option (google.api.http) = {
-      get: "/api/v1/tasks/{id.project}/{id.domain}/{id.name}"
-      additional_bindings {
-        get: "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}",
-      }
-      additional_bindings {
-        get: "/api/v1/tasks/{id.project}/{id.domain}",
-      }
-      additional_bindings {
-        get: "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}",
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch existing task definitions matching input filters."
     };
   }
 
@@ -124,6 +125,26 @@ service AdminService {
     };
   }
 
+  // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+  // **Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.
+  rpc ListWorkflows (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.WorkflowList) {
+    option (google.api.http) = {
+      get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}",
+      }
+      additional_bindings {
+        get: "/api/v1/workflows/{id.project}/{id.domain}",
+      }
+      additional_bindings {
+        get: "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}",
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Fetch existing workflow definitions matching input filters."
+    };
+  }
+
   // Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
   rpc GetWorkflow (flyteidl.admin.ObjectGetRequest) returns (flyteidl.admin.Workflow) {
     option (google.api.http) = {
@@ -150,25 +171,6 @@ service AdminService {
     // };
   }
 
-  // Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
-  rpc ListWorkflows (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.WorkflowList) {
-    option (google.api.http) = {
-      get: "/api/v1/workflows/{id.project}/{id.domain}/{id.name}"
-      additional_bindings {
-        get: "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}",
-      }
-      additional_bindings {
-        get: "/api/v1/workflows/{id.project}/{id.domain}",
-      }
-      additional_bindings {
-        get: "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}",
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch existing workflow definitions matching input filters."
-    };
-  }
-
   // Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
   rpc CreateLaunchPlan (flyteidl.admin.LaunchPlanCreateRequest) returns (flyteidl.admin.LaunchPlanCreateResponse) {
     option (google.api.http) = {
@@ -193,6 +195,26 @@ service AdminService {
           description: "Returned for a request that references an identical entity that has already been registered."
         }
       }
+    };
+  }
+
+  // Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+  // **Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.
+  rpc ListLaunchPlans (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.LaunchPlanList) {
+    option (google.api.http) = {
+      get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}"
+      additional_bindings {
+        get: "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+      }
+      additional_bindings {
+        get: "/api/v1/launch_plans/{id.project}/{id.domain}"
+      }
+      additional_bindings {
+        get: "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}"
+      }
+    };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Fetch existing launch plan definitions matching input filters."
     };
   }
 
@@ -245,25 +267,6 @@ service AdminService {
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Fetch existing launch plan definition identifiers matching input filters."
-    };
-  }
-
-  // Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
-  rpc ListLaunchPlans (flyteidl.admin.ResourceListRequest) returns (flyteidl.admin.LaunchPlanList) {
-    option (google.api.http) = {
-      get: "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}"
-      additional_bindings {
-        get: "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}"
-      }
-      additional_bindings {
-        get: "/api/v1/launch_plans/{id.project}/{id.domain}"
-      }
-      additional_bindings {
-        get: "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}"
-      }
-    };
-    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch existing launch plan definitions matching input filters."
     };
   }
 

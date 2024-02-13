@@ -35,6 +35,11 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_task__pb2.TaskCreateRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_task__pb2.TaskCreateResponse.FromString,
                 )
+        self.ListTasks = channel.unary_unary(
+                '/flyteidl.service.AdminService/ListTasks',
+                request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_task__pb2.TaskList.FromString,
+                )
         self.GetTask = channel.unary_unary(
                 '/flyteidl.service.AdminService/GetTask',
                 request_serializer=flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.SerializeToString,
@@ -45,15 +50,15 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.FromString,
                 )
-        self.ListTasks = channel.unary_unary(
-                '/flyteidl.service.AdminService/ListTasks',
-                request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_task__pb2.TaskList.FromString,
-                )
         self.CreateWorkflow = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateWorkflow',
                 request_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowCreateRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowCreateResponse.FromString,
+                )
+        self.ListWorkflows = channel.unary_unary(
+                '/flyteidl.service.AdminService/ListWorkflows',
+                request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.FromString,
                 )
         self.GetWorkflow = channel.unary_unary(
                 '/flyteidl.service.AdminService/GetWorkflow',
@@ -65,15 +70,15 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.FromString,
                 )
-        self.ListWorkflows = channel.unary_unary(
-                '/flyteidl.service.AdminService/ListWorkflows',
-                request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.FromString,
-                )
         self.CreateLaunchPlan = channel.unary_unary(
                 '/flyteidl.service.AdminService/CreateLaunchPlan',
                 request_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateResponse.FromString,
+                )
+        self.ListLaunchPlans = channel.unary_unary(
+                '/flyteidl.service.AdminService/ListLaunchPlans',
+                request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.FromString,
                 )
         self.GetLaunchPlan = channel.unary_unary(
                 '/flyteidl.service.AdminService/GetLaunchPlan',
@@ -94,11 +99,6 @@ class AdminServiceStub(object):
                 '/flyteidl.service.AdminService/ListLaunchPlanIds',
                 request_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.FromString,
-                )
-        self.ListLaunchPlans = channel.unary_unary(
-                '/flyteidl.service.AdminService/ListLaunchPlans',
-                request_serializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
-                response_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.FromString,
                 )
         self.UpdateLaunchPlan = channel.unary_unary(
                 '/flyteidl.service.AdminService/UpdateLaunchPlan',
@@ -314,6 +314,14 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def ListTasks(self, request, context):
+        """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+        **Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def GetTask(self, request, context):
         """Fetch a :ref:`ref_flyteidl.admin.Task` definition.
         """
@@ -328,15 +336,16 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ListTasks(self, request, context):
-        """Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+    def CreateWorkflow(self, request, context):
+        """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CreateWorkflow(self, request, context):
-        """Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
+    def ListWorkflows(self, request, context):
+        """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+        **Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -356,15 +365,16 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ListWorkflows(self, request, context):
-        """Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+    def CreateLaunchPlan(self, request, context):
+        """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def CreateLaunchPlan(self, request, context):
-        """Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
+    def ListLaunchPlans(self, request, context):
+        """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+        **Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -393,13 +403,6 @@ class AdminServiceServicer(object):
 
     def ListLaunchPlanIds(self, request, context):
         """Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
-        """
-        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
-        context.set_details('Method not implemented!')
-        raise NotImplementedError('Method not implemented!')
-
-    def ListLaunchPlans(self, request, context):
-        """Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -698,6 +701,11 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_task__pb2.TaskCreateRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_task__pb2.TaskCreateResponse.SerializeToString,
             ),
+            'ListTasks': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListTasks,
+                    request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_task__pb2.TaskList.SerializeToString,
+            ),
             'GetTask': grpc.unary_unary_rpc_method_handler(
                     servicer.GetTask,
                     request_deserializer=flyteidl_dot_admin_dot_common__pb2.ObjectGetRequest.FromString,
@@ -708,15 +716,15 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.SerializeToString,
             ),
-            'ListTasks': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListTasks,
-                    request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_task__pb2.TaskList.SerializeToString,
-            ),
             'CreateWorkflow': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateWorkflow,
                     request_deserializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowCreateRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowCreateResponse.SerializeToString,
+            ),
+            'ListWorkflows': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListWorkflows,
+                    request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.SerializeToString,
             ),
             'GetWorkflow': grpc.unary_unary_rpc_method_handler(
                     servicer.GetWorkflow,
@@ -728,15 +736,15 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.SerializeToString,
             ),
-            'ListWorkflows': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListWorkflows,
-                    request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.SerializeToString,
-            ),
             'CreateLaunchPlan': grpc.unary_unary_rpc_method_handler(
                     servicer.CreateLaunchPlan,
                     request_deserializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateResponse.SerializeToString,
+            ),
+            'ListLaunchPlans': grpc.unary_unary_rpc_method_handler(
+                    servicer.ListLaunchPlans,
+                    request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
+                    response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.SerializeToString,
             ),
             'GetLaunchPlan': grpc.unary_unary_rpc_method_handler(
                     servicer.GetLaunchPlan,
@@ -757,11 +765,6 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     servicer.ListLaunchPlanIds,
                     request_deserializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.SerializeToString,
-            ),
-            'ListLaunchPlans': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListLaunchPlans,
-                    request_deserializer=flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.FromString,
-                    response_serializer=flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.SerializeToString,
             ),
             'UpdateLaunchPlan': grpc.unary_unary_rpc_method_handler(
                     servicer.UpdateLaunchPlan,
@@ -993,6 +996,23 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
+    def ListTasks(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListTasks',
+            flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
+            flyteidl_dot_admin_dot_task__pb2.TaskList.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
     def GetTask(request,
             target,
             options=(),
@@ -1027,23 +1047,6 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def ListTasks(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListTasks',
-            flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
-            flyteidl_dot_admin_dot_task__pb2.TaskList.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def CreateWorkflow(request,
             target,
             options=(),
@@ -1057,6 +1060,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/CreateWorkflow',
             flyteidl_dot_admin_dot_workflow__pb2.WorkflowCreateRequest.SerializeToString,
             flyteidl_dot_admin_dot_workflow__pb2.WorkflowCreateResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListWorkflows(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListWorkflows',
+            flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
+            flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -1095,23 +1115,6 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def ListWorkflows(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListWorkflows',
-            flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
-            flyteidl_dot_admin_dot_workflow__pb2.WorkflowList.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
     def CreateLaunchPlan(request,
             target,
             options=(),
@@ -1125,6 +1128,23 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/CreateLaunchPlan',
             flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateRequest.SerializeToString,
             flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanCreateResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ListLaunchPlans(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListLaunchPlans',
+            flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
+            flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
@@ -1193,23 +1213,6 @@ class AdminService(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListLaunchPlanIds',
             flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierListRequest.SerializeToString,
             flyteidl_dot_admin_dot_common__pb2.NamedEntityIdentifierList.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
-
-    @staticmethod
-    def ListLaunchPlans(request,
-            target,
-            options=(),
-            channel_credentials=None,
-            call_credentials=None,
-            insecure=False,
-            compression=None,
-            wait_for_ready=None,
-            timeout=None,
-            metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListLaunchPlans',
-            flyteidl_dot_admin_dot_common__pb2.ResourceListRequest.SerializeToString,
-            flyteidl_dot_admin_dot_launch__plan__pb2.LaunchPlanList.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

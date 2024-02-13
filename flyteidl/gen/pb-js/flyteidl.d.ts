@@ -20423,6 +20423,20 @@ export namespace flyteidl {
             public createTask(request: flyteidl.admin.ITaskCreateRequest): Promise<flyteidl.admin.TaskCreateResponse>;
 
             /**
+             * Calls ListTasks.
+             * @param request ResourceListRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and TaskList
+             */
+            public listTasks(request: flyteidl.admin.IResourceListRequest, callback: flyteidl.service.AdminService.ListTasksCallback): void;
+
+            /**
+             * Calls ListTasks.
+             * @param request ResourceListRequest message or plain object
+             * @returns Promise
+             */
+            public listTasks(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.TaskList>;
+
+            /**
              * Calls GetTask.
              * @param request ObjectGetRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and Task
@@ -20451,20 +20465,6 @@ export namespace flyteidl {
             public listTaskIds(request: flyteidl.admin.INamedEntityIdentifierListRequest): Promise<flyteidl.admin.NamedEntityIdentifierList>;
 
             /**
-             * Calls ListTasks.
-             * @param request ResourceListRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and TaskList
-             */
-            public listTasks(request: flyteidl.admin.IResourceListRequest, callback: flyteidl.service.AdminService.ListTasksCallback): void;
-
-            /**
-             * Calls ListTasks.
-             * @param request ResourceListRequest message or plain object
-             * @returns Promise
-             */
-            public listTasks(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.TaskList>;
-
-            /**
              * Calls CreateWorkflow.
              * @param request WorkflowCreateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and WorkflowCreateResponse
@@ -20477,6 +20477,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public createWorkflow(request: flyteidl.admin.IWorkflowCreateRequest): Promise<flyteidl.admin.WorkflowCreateResponse>;
+
+            /**
+             * Calls ListWorkflows.
+             * @param request ResourceListRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and WorkflowList
+             */
+            public listWorkflows(request: flyteidl.admin.IResourceListRequest, callback: flyteidl.service.AdminService.ListWorkflowsCallback): void;
+
+            /**
+             * Calls ListWorkflows.
+             * @param request ResourceListRequest message or plain object
+             * @returns Promise
+             */
+            public listWorkflows(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.WorkflowList>;
 
             /**
              * Calls GetWorkflow.
@@ -20507,20 +20521,6 @@ export namespace flyteidl {
             public listWorkflowIds(request: flyteidl.admin.INamedEntityIdentifierListRequest): Promise<flyteidl.admin.NamedEntityIdentifierList>;
 
             /**
-             * Calls ListWorkflows.
-             * @param request ResourceListRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and WorkflowList
-             */
-            public listWorkflows(request: flyteidl.admin.IResourceListRequest, callback: flyteidl.service.AdminService.ListWorkflowsCallback): void;
-
-            /**
-             * Calls ListWorkflows.
-             * @param request ResourceListRequest message or plain object
-             * @returns Promise
-             */
-            public listWorkflows(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.WorkflowList>;
-
-            /**
              * Calls CreateLaunchPlan.
              * @param request LaunchPlanCreateRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and LaunchPlanCreateResponse
@@ -20533,6 +20533,20 @@ export namespace flyteidl {
              * @returns Promise
              */
             public createLaunchPlan(request: flyteidl.admin.ILaunchPlanCreateRequest): Promise<flyteidl.admin.LaunchPlanCreateResponse>;
+
+            /**
+             * Calls ListLaunchPlans.
+             * @param request ResourceListRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and LaunchPlanList
+             */
+            public listLaunchPlans(request: flyteidl.admin.IResourceListRequest, callback: flyteidl.service.AdminService.ListLaunchPlansCallback): void;
+
+            /**
+             * Calls ListLaunchPlans.
+             * @param request ResourceListRequest message or plain object
+             * @returns Promise
+             */
+            public listLaunchPlans(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.LaunchPlanList>;
 
             /**
              * Calls GetLaunchPlan.
@@ -20589,20 +20603,6 @@ export namespace flyteidl {
              * @returns Promise
              */
             public listLaunchPlanIds(request: flyteidl.admin.INamedEntityIdentifierListRequest): Promise<flyteidl.admin.NamedEntityIdentifierList>;
-
-            /**
-             * Calls ListLaunchPlans.
-             * @param request ResourceListRequest message or plain object
-             * @param callback Node-style callback called with the error, if any, and LaunchPlanList
-             */
-            public listLaunchPlans(request: flyteidl.admin.IResourceListRequest, callback: flyteidl.service.AdminService.ListLaunchPlansCallback): void;
-
-            /**
-             * Calls ListLaunchPlans.
-             * @param request ResourceListRequest message or plain object
-             * @returns Promise
-             */
-            public listLaunchPlans(request: flyteidl.admin.IResourceListRequest): Promise<flyteidl.admin.LaunchPlanList>;
 
             /**
              * Calls UpdateLaunchPlan.
@@ -21175,6 +21175,13 @@ export namespace flyteidl {
             type CreateTaskCallback = (error: (Error|null), response?: flyteidl.admin.TaskCreateResponse) => void;
 
             /**
+             * Callback as used by {@link flyteidl.service.AdminService#listTasks}.
+             * @param error Error, if any
+             * @param [response] TaskList
+             */
+            type ListTasksCallback = (error: (Error|null), response?: flyteidl.admin.TaskList) => void;
+
+            /**
              * Callback as used by {@link flyteidl.service.AdminService#getTask}.
              * @param error Error, if any
              * @param [response] Task
@@ -21189,18 +21196,18 @@ export namespace flyteidl {
             type ListTaskIdsCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntityIdentifierList) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AdminService#listTasks}.
-             * @param error Error, if any
-             * @param [response] TaskList
-             */
-            type ListTasksCallback = (error: (Error|null), response?: flyteidl.admin.TaskList) => void;
-
-            /**
              * Callback as used by {@link flyteidl.service.AdminService#createWorkflow}.
              * @param error Error, if any
              * @param [response] WorkflowCreateResponse
              */
             type CreateWorkflowCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowCreateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#listWorkflows}.
+             * @param error Error, if any
+             * @param [response] WorkflowList
+             */
+            type ListWorkflowsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowList) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#getWorkflow}.
@@ -21217,18 +21224,18 @@ export namespace flyteidl {
             type ListWorkflowIdsCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntityIdentifierList) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AdminService#listWorkflows}.
-             * @param error Error, if any
-             * @param [response] WorkflowList
-             */
-            type ListWorkflowsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowList) => void;
-
-            /**
              * Callback as used by {@link flyteidl.service.AdminService#createLaunchPlan}.
              * @param error Error, if any
              * @param [response] LaunchPlanCreateResponse
              */
             type CreateLaunchPlanCallback = (error: (Error|null), response?: flyteidl.admin.LaunchPlanCreateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#listLaunchPlans}.
+             * @param error Error, if any
+             * @param [response] LaunchPlanList
+             */
+            type ListLaunchPlansCallback = (error: (Error|null), response?: flyteidl.admin.LaunchPlanList) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#getLaunchPlan}.
@@ -21257,13 +21264,6 @@ export namespace flyteidl {
              * @param [response] NamedEntityIdentifierList
              */
             type ListLaunchPlanIdsCallback = (error: (Error|null), response?: flyteidl.admin.NamedEntityIdentifierList) => void;
-
-            /**
-             * Callback as used by {@link flyteidl.service.AdminService#listLaunchPlans}.
-             * @param error Error, if any
-             * @param [response] LaunchPlanList
-             */
-            type ListLaunchPlansCallback = (error: (Error|null), response?: flyteidl.admin.LaunchPlanList) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#updateLaunchPlan}.

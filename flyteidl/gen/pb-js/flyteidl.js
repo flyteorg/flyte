@@ -48959,6 +48959,39 @@
                  */
     
                 /**
+                 * Callback as used by {@link flyteidl.service.AdminService#listTasks}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef ListTasksCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.TaskList} [response] TaskList
+                 */
+    
+                /**
+                 * Calls ListTasks.
+                 * @function listTasks
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
+                 * @param {flyteidl.service.AdminService.ListTasksCallback} callback Node-style callback called with the error, if any, and TaskList
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.listTasks = function listTasks(request, callback) {
+                    return this.rpcCall(listTasks, $root.flyteidl.admin.ResourceListRequest, $root.flyteidl.admin.TaskList, request, callback);
+                }, "name", { value: "ListTasks" });
+    
+                /**
+                 * Calls ListTasks.
+                 * @function listTasks
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.TaskList>} Promise
+                 * @variation 2
+                 */
+    
+                /**
                  * Callback as used by {@link flyteidl.service.AdminService#getTask}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef GetTaskCallback
@@ -49025,39 +49058,6 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AdminService#listTasks}.
-                 * @memberof flyteidl.service.AdminService
-                 * @typedef ListTasksCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.TaskList} [response] TaskList
-                 */
-    
-                /**
-                 * Calls ListTasks.
-                 * @function listTasks
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
-                 * @param {flyteidl.service.AdminService.ListTasksCallback} callback Node-style callback called with the error, if any, and TaskList
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(AdminService.prototype.listTasks = function listTasks(request, callback) {
-                    return this.rpcCall(listTasks, $root.flyteidl.admin.ResourceListRequest, $root.flyteidl.admin.TaskList, request, callback);
-                }, "name", { value: "ListTasks" });
-    
-                /**
-                 * Calls ListTasks.
-                 * @function listTasks
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.TaskList>} Promise
-                 * @variation 2
-                 */
-    
-                /**
                  * Callback as used by {@link flyteidl.service.AdminService#createWorkflow}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef CreateWorkflowCallback
@@ -49087,6 +49087,39 @@
                  * @instance
                  * @param {flyteidl.admin.IWorkflowCreateRequest} request WorkflowCreateRequest message or plain object
                  * @returns {Promise<flyteidl.admin.WorkflowCreateResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#listWorkflows}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef ListWorkflowsCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.WorkflowList} [response] WorkflowList
+                 */
+    
+                /**
+                 * Calls ListWorkflows.
+                 * @function listWorkflows
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
+                 * @param {flyteidl.service.AdminService.ListWorkflowsCallback} callback Node-style callback called with the error, if any, and WorkflowList
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.listWorkflows = function listWorkflows(request, callback) {
+                    return this.rpcCall(listWorkflows, $root.flyteidl.admin.ResourceListRequest, $root.flyteidl.admin.WorkflowList, request, callback);
+                }, "name", { value: "ListWorkflows" });
+    
+                /**
+                 * Calls ListWorkflows.
+                 * @function listWorkflows
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.WorkflowList>} Promise
                  * @variation 2
                  */
     
@@ -49157,39 +49190,6 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AdminService#listWorkflows}.
-                 * @memberof flyteidl.service.AdminService
-                 * @typedef ListWorkflowsCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.WorkflowList} [response] WorkflowList
-                 */
-    
-                /**
-                 * Calls ListWorkflows.
-                 * @function listWorkflows
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
-                 * @param {flyteidl.service.AdminService.ListWorkflowsCallback} callback Node-style callback called with the error, if any, and WorkflowList
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(AdminService.prototype.listWorkflows = function listWorkflows(request, callback) {
-                    return this.rpcCall(listWorkflows, $root.flyteidl.admin.ResourceListRequest, $root.flyteidl.admin.WorkflowList, request, callback);
-                }, "name", { value: "ListWorkflows" });
-    
-                /**
-                 * Calls ListWorkflows.
-                 * @function listWorkflows
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.WorkflowList>} Promise
-                 * @variation 2
-                 */
-    
-                /**
                  * Callback as used by {@link flyteidl.service.AdminService#createLaunchPlan}.
                  * @memberof flyteidl.service.AdminService
                  * @typedef CreateLaunchPlanCallback
@@ -49219,6 +49219,39 @@
                  * @instance
                  * @param {flyteidl.admin.ILaunchPlanCreateRequest} request LaunchPlanCreateRequest message or plain object
                  * @returns {Promise<flyteidl.admin.LaunchPlanCreateResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#listLaunchPlans}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef ListLaunchPlansCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.LaunchPlanList} [response] LaunchPlanList
+                 */
+    
+                /**
+                 * Calls ListLaunchPlans.
+                 * @function listLaunchPlans
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
+                 * @param {flyteidl.service.AdminService.ListLaunchPlansCallback} callback Node-style callback called with the error, if any, and LaunchPlanList
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.listLaunchPlans = function listLaunchPlans(request, callback) {
+                    return this.rpcCall(listLaunchPlans, $root.flyteidl.admin.ResourceListRequest, $root.flyteidl.admin.LaunchPlanList, request, callback);
+                }, "name", { value: "ListLaunchPlans" });
+    
+                /**
+                 * Calls ListLaunchPlans.
+                 * @function listLaunchPlans
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.LaunchPlanList>} Promise
                  * @variation 2
                  */
     
@@ -49351,39 +49384,6 @@
                  * @instance
                  * @param {flyteidl.admin.INamedEntityIdentifierListRequest} request NamedEntityIdentifierListRequest message or plain object
                  * @returns {Promise<flyteidl.admin.NamedEntityIdentifierList>} Promise
-                 * @variation 2
-                 */
-    
-                /**
-                 * Callback as used by {@link flyteidl.service.AdminService#listLaunchPlans}.
-                 * @memberof flyteidl.service.AdminService
-                 * @typedef ListLaunchPlansCallback
-                 * @type {function}
-                 * @param {Error|null} error Error, if any
-                 * @param {flyteidl.admin.LaunchPlanList} [response] LaunchPlanList
-                 */
-    
-                /**
-                 * Calls ListLaunchPlans.
-                 * @function listLaunchPlans
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
-                 * @param {flyteidl.service.AdminService.ListLaunchPlansCallback} callback Node-style callback called with the error, if any, and LaunchPlanList
-                 * @returns {undefined}
-                 * @variation 1
-                 */
-                Object.defineProperty(AdminService.prototype.listLaunchPlans = function listLaunchPlans(request, callback) {
-                    return this.rpcCall(listLaunchPlans, $root.flyteidl.admin.ResourceListRequest, $root.flyteidl.admin.LaunchPlanList, request, callback);
-                }, "name", { value: "ListLaunchPlans" });
-    
-                /**
-                 * Calls ListLaunchPlans.
-                 * @function listLaunchPlans
-                 * @memberof flyteidl.service.AdminService
-                 * @instance
-                 * @param {flyteidl.admin.IResourceListRequest} request ResourceListRequest message or plain object
-                 * @returns {Promise<flyteidl.admin.LaunchPlanList>} Promise
                  * @variation 2
                  */
     
