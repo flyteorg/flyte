@@ -12,6 +12,7 @@ require (
 	github.com/cloudevents/sdk-go/binding/format/protobuf/v2 v2.8.0
 	github.com/cloudevents/sdk-go/v2 v2.8.0
 	github.com/coreos/go-oidc/v3 v3.6.0
+	github.com/ddl-rliu/stow v0.0.2
 	github.com/evanphx/json-patch v5.6.0+incompatible
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000
