@@ -75,7 +75,7 @@ func TestEndToEnd(t *testing.T) {
 
 	t.Run("run an async task", func(t *testing.T) {
 		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockAsyncAgentPlugin())
-		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test1"))
+		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("async task"))
 		assert.NoError(t, err)
 
 		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
@@ -88,11 +88,20 @@ func TestEndToEnd(t *testing.T) {
 
 	t.Run("run a sync task", func(t *testing.T) {
 		pluginEntry := pluginmachinery.CreateRemotePlugin(newMockSyncAgentPlugin())
-		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("test1"))
+		plugin, err := pluginEntry.LoadPlugin(context.TODO(), newFakeSetupContext("sync task"))
 		assert.NoError(t, err)
 
 		template.Type = "openai"
-		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, nil, nil, iter)
+		template.Interface = &flyteIdlCore.TypedInterface{
+			Outputs: &flyteIdlCore.VariableMap{
+				Variables: map[string]*flyteIdlCore.Variable{
+					"x": {Type: &flyteIdlCore.LiteralType{Type: &flyteIdlCore.LiteralType_Simple{Simple: flyteIdlCore.SimpleType_INTEGER}}},
+				},
+			},
+		}
+		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+		assert.NoError(t, err)
+		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, expectedOutputs, nil, iter)
 		assert.Equal(t, true, phase.Phase().IsSuccess())
 	})
 
