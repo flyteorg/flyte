@@ -621,6 +621,7 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		taskExecutionID.On("GetGeneratedName").Return("per-retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+		taskMetadata.On("GetNamespace").Return("my-namespace")
 
 		params.TaskExecMetadata = taskMetadata
 		actual, err := Render(context.TODO(), []string{
@@ -644,6 +645,7 @@ func TestReplaceTemplateCommandArgsSpecialChars(t *testing.T) {
 		taskExecutionID.On("GetGeneratedName").Return("33 per retry-unique-key")
 		taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 		taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+		taskMetadata.On("GetNamespace").Return("my-namespace")
 
 		params.TaskExecMetadata = taskMetadata
 		testString := "doesn't start with a number"

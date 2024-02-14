@@ -385,6 +385,7 @@ func TestToK8sContainer(t *testing.T) {
 	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(map[string]string{
 		"foo": "bar",
 	})
+	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
 
 	tCtx := &mocks.TaskExecutionContext{}
 	tCtx.OnTaskExecutionMetadata().Return(&mockTaskExecMetadata)
