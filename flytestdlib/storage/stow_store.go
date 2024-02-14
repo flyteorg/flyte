@@ -475,9 +475,9 @@ func newStowRawStore(_ context.Context, cfg *Config, metrics *dataStoreMetrics) 
 func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {
 	// Non-nullable fields
 	stowConfig := stow.ConfigMap{
-		s3.ConfigAuthType: cfg.AuthType,
-		s3.ExtraArgs:      cfg.ExtraArgs,
-		s3.ConfigRegion:   cfg.Region,
+		s3.ConfigAuthType:  cfg.AuthType,
+		s3.ConfigExtraArgs: cfg.ExtraArgs,
+		s3.ConfigRegion:    cfg.Region,
 	}
 
 	// Fields that differ between minio and real S3
