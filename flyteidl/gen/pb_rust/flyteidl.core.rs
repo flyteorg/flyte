@@ -723,6 +723,8 @@ pub struct ArtifactKey {
     pub domain: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub name: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Only valid for triggers
 #[allow(clippy::derive_partial_eq_without_eq)]
