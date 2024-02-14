@@ -17,7 +17,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"k8s.io/apimachinery/pkg/util/rand"
 
-	"github.com/ddl-rliu/stow"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -28,6 +27,7 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/stow"
 )
 
 type Service struct {
