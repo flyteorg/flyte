@@ -25,7 +25,7 @@ service SignalService {
     option (google.api.http) = {
       get: "/api/v1/signals/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
       additional_bindings: {
-        get: "/api/v1/signals/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+        get: "/api/v1/org/signals/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
       }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
@@ -39,7 +39,7 @@ service SignalService {
       post: "/api/v1/signals"
       body: "*"
       additional_bindings: {
-        post: "/api/v1/signals/org/{id.execution_id.org}"
+        post: "/api/v1/org/signals/{id.execution_id.org}"
         body: "*"
       }
     };

@@ -16,49 +16,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/signals": {
-      "post": {
-        "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
-        "description": "Set a signal value.",
-        "operationId": "SignalService_SetSignal",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminSignalSetResponse"
-            }
-          },
-          "400": {
-            "description": "Returned for bad request that may have failed validation.",
-            "schema": {}
-          },
-          "409": {
-            "description": "Returned for a request that references an identical entity that has already been registered.",
-            "schema": {}
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminSignalSetRequest"
-            }
-          }
-        ],
-        "tags": [
-          "SignalService"
-        ]
-      }
-    },
-    "/api/v1/signals/org/{id.execution_id.org}": {
+    "/api/v1/org/signals/{id.execution_id.org}": {
       "post": {
         "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
         "description": "Set a signal value.",
@@ -107,7 +65,7 @@
         ]
       }
     },
-    "/api/v1/signals/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
+    "/api/v1/org/signals/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.",
         "description": "Fetch existing signal definitions matching the input signal id filters.",
@@ -195,6 +153,48 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "SignalService"
+        ]
+      }
+    },
+    "/api/v1/signals": {
+      "post": {
+        "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
+        "description": "Set a signal value.",
+        "operationId": "SignalService_SetSignal",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminSignalSetResponse"
+            }
+          },
+          "400": {
+            "description": "Returned for bad request that may have failed validation.",
+            "schema": {}
+          },
+          "409": {
+            "description": "Returned for a request that references an identical entity that has already been registered.",
+            "schema": {}
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminSignalSetRequest"
+            }
           }
         ],
         "tags": [
