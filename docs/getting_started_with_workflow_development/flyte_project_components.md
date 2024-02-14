@@ -52,7 +52,7 @@ The workflow directory also contains an `__init__.py` file to indicate that the 
 
 ### ImageSpec
 
-The workflow code file in the basic template includes an optional ImageSpec configuration. ImageSpec is a Flyte feature that enables you to build a custom container image without having to write a Dockerfile. To learn more, see the [ImageSpec documentation](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/customizing_dependencies/image_spec.html#image-spec-example)
+The workflow code file in the basic template includes an optional ImageSpec configuration. ImageSpec is a Flyte feature that enables you to build a custom container image without having to write a Dockerfile. To learn more, see the {ref}`ImageSpec documentation <image_spec_example>`.
 
 ```python
 # basic_image = ImageSpec(

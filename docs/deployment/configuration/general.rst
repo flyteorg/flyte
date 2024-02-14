@@ -31,7 +31,7 @@ Starting with the Flyte 1.4 release, there are two ways of defining `PodTemplate
 Compile-time PodTemplates
 *************************
 
-We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task>`__, for example:
+We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.task.html#flytekit-task>`__, for example:
 
 .. code-block:: python
 
@@ -70,7 +70,7 @@ Notice how in this example we are defining a new PodTemplate inline, which allow
 `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1PodSpec.md>`__ and also define
 the name of the primary container, labels, and annotations.
 
-The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
+The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
 
 ********************
 Runtime PodTemplates
@@ -92,7 +92,7 @@ initializes a K8s informer internally to track system PodTemplate updates
 `aware <https://docs.flyte.org/en/latest/deployment/cluster_config/flytepropeller_config.html#config-k8spluginconfig>`__
 of the latest PodTemplate definitions in the K8s environment. You can find this
 setting in `FlytePropeller <https://github.com/flyteorg/flyte/blob/e3e4978838f3caee0d156348ca966b7f940e3d45/deployment/eks/flyte_generated.yaml#L8239-L8244>`__
-config map, which is not set by default. 
+config map, which is not set by default.
 
 An example configuration is:
 
@@ -105,14 +105,14 @@ An example configuration is:
           image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.15"
           start-timeout: "30s"
         default-pod-template-name: <your_template_name>
- 
+
 Create a PodTemplate resource
 =============================
 
-Flyte recognizes PodTemplate definitions with the ``default-pod-template-name`` at two granularities. 
+Flyte recognizes PodTemplate definitions with the ``default-pod-template-name`` at two granularities.
 
 1. A system-wide configuration can be created in the same namespace that
-   FlytePropeller is running in (typically `flyte`). 
+   FlytePropeller is running in (typically `flyte`).
 2. PodTemplates can be applied from the same namespace that the Pod will be
    created in. FlytePropeller always favors the PodTemplate with the more
    specific namespace. For example, a Pod created in the ``flytesnacks-development``
@@ -197,7 +197,7 @@ where you start the Pod.
 An example PodTemplate is shown:
 
 .. code-block:: yaml
-    
+
     apiVersion: v1
     kind: PodTemplate
     metadata:
@@ -221,7 +221,7 @@ In addition, the K8s plugin configuration in FlytePropeller defines the default
 Pod Labels, Annotations, and enables the host networking.
 
 .. code-block:: yaml
-    
+
     plugins:
        k8s:
         default-labels:
@@ -234,7 +234,7 @@ Pod Labels, Annotations, and enables the host networking.
 To construct a Pod, FlytePropeller initializes a Pod definition using the default
 PodTemplate. This definition is applied to the K8s plugin configuration values,
 and any task-specific configuration is overlaid. During the process, when lists
-are merged, values are appended and when maps are merged, the values are overridden. 
+are merged, values are appended and when maps are merged, the values are overridden.
 The resultant Pod using the above default PodTemplate and K8s Plugin configuration is shown:
 
 .. code-block:: yaml

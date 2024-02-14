@@ -702,7 +702,7 @@ If your organization does any automated registration, then you'll need to authen
 
    .. group-tab:: flytectl
    
-      Flytectl's `config.yaml <https://docs.flyte.org/projects/flytectl/en/stable/#configure>`_ can be
+      Flytectl's `config.yaml <https://docs.flyte.org/en/latest/flytectl/overview.html#configuration>`_ can be
       configured to use either PKCE (`Proof key for code exchange <https://datatracker.ietf.org/doc/html/rfc7636>`_)
       or Client Credentials (`Client Credentials <https://datatracker.ietf.org/doc/html/rfc6749#section-4.4>`_) flows.
    
