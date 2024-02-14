@@ -15,34 +15,7 @@
     "application/json"
   ],
   "paths": {
-    "/api/v1/signals": {
-      "post": {
-        "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
-        "operationId": "SetSignal",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminSignalSetResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/adminSignalSetRequest"
-            }
-          }
-        ],
-        "tags": [
-          "SignalService"
-        ]
-      }
-    },
-    "/api/v1/signals/org/{id.execution_id.org}": {
+    "/api/v1/org/signals/{id.execution_id.org}": {
       "post": {
         "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
         "operationId": "SetSignal2",
@@ -76,7 +49,7 @@
         ]
       }
     },
-    "/api/v1/signals/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
+    "/api/v1/org/signals/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}": {
       "get": {
         "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.",
         "operationId": "ListSignals2",
@@ -157,6 +130,33 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "SignalService"
+        ]
+      }
+    },
+    "/api/v1/signals": {
+      "post": {
+        "summary": "Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition",
+        "operationId": "SetSignal",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminSignalSetResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/adminSignalSetRequest"
+            }
           }
         ],
         "tags": [

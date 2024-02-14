@@ -220,7 +220,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{org}', 'PUT',
+            '/api/v1/org/executions/{org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -422,7 +422,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/launch_plans/org/{id.org}', 'POST',
+            '/api/v1/org/launch_plans/{id.org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -624,7 +624,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/events/org/{event.id.execution_id.org}/nodes', 'POST',
+            '/api/v1/org/events/{event.id.execution_id.org}/nodes', 'POST',
             path_params,
             query_params,
             header_params,
@@ -826,7 +826,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/tasks/org/{id.org}', 'POST',
+            '/api/v1/org/tasks/{id.org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -1028,7 +1028,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks', 'POST',
+            '/api/v1/org/events/{event.parent_node_execution_id.execution_id.org}/tasks', 'POST',
             path_params,
             query_params,
             header_params,
@@ -1230,7 +1230,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflows/org/{id.org}', 'POST',
+            '/api/v1/org/workflows/{id.org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -1432,7 +1432,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/events/org/{event.execution_id.org}/workflows', 'POST',
+            '/api/v1/org/events/{event.execution_id.org}/workflows', 'POST',
             path_params,
             query_params,
             header_params,
@@ -1650,7 +1650,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/project_domain_attributes/org/{org}/{project}', 'DELETE',
+            '/api/v1/org/project_domain_attributes/{org}/{project}', 'DELETE',
             path_params,
             query_params,
             header_params,
@@ -1884,7 +1884,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/project_domain_attributes/org/{org}/{project}/{domain}', 'DELETE',
+            '/api/v1/org/project_domain_attributes/{org}/{project}/{domain}', 'DELETE',
             path_params,
             query_params,
             header_params,
@@ -2134,7 +2134,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}', 'DELETE',
+            '/api/v1/org/workflow_attributes/{org}/{project}/{domain}/{workflow}', 'DELETE',
             path_params,
             query_params,
             header_params,
@@ -2372,7 +2372,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/active_launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -2642,7 +2642,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
+            '/api/v1/org/description_entities/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -2896,7 +2896,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow', 'GET',
+            '/api/v1/org/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow', 'GET',
             path_params,
             query_params,
             header_params,
@@ -3134,7 +3134,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/executions/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -3372,7 +3372,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/data/org/{id.org}/executions/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/data/executions/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -3618,7 +3618,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/metrics/executions/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -3880,7 +3880,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
+            '/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -4134,7 +4134,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/named_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -4388,7 +4388,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}', 'GET',
+            '/api/v1/org/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -4642,7 +4642,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}', 'GET',
+            '/api/v1/org/data/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -4856,7 +4856,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/project_domain_attributes/org/{org}/{project}', 'GET',
+            '/api/v1/org/project_domain_attributes/{org}/{project}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -5086,7 +5086,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/project_domain_attributes/org/{org}/{project}/{domain}', 'GET',
+            '/api/v1/org/project_domain_attributes/{org}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -5348,7 +5348,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
+            '/api/v1/org/tasks/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -5698,7 +5698,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}', 'GET',
+            '/api/v1/org/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -6048,7 +6048,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}', 'GET',
+            '/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -6399,7 +6399,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
+            '/api/v1/org/workflows/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -6645,7 +6645,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}', 'GET',
+            '/api/v1/org/workflow_attributes/{org}/{project}/{domain}/{workflow}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -6899,7 +6899,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/active_launch_plans/org/{org}/{project}/{domain}', 'GET',
+            '/api/v1/org/active_launch_plans/{org}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -7193,7 +7193,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/description_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -7479,7 +7479,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}', 'GET',
+            '/api/v1/org/description_entities/{id.org}/{resource_type}/{id.project}/{id.domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -7749,7 +7749,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{id.org}/{id.project}/{id.domain}', 'GET',
+            '/api/v1/org/executions/{id.org}/{id.project}/{id.domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -8011,7 +8011,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/launch_plan_ids/org/{org}/{project}/{domain}', 'GET',
+            '/api/v1/org/launch_plan_ids/{org}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -8289,7 +8289,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -8559,7 +8559,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}', 'GET',
+            '/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -8757,7 +8757,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/matchable_attributes/org/{org}', 'GET',
+            '/api/v1/org/matchable_attributes/{org}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -9035,7 +9035,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}', 'GET',
+            '/api/v1/org/named_entities/{org}/{resource_type}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -9321,7 +9321,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}', 'GET',
+            '/api/v1/org/node_executions/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -9711,7 +9711,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}', 'GET',
+            '/api/v1/org/children/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -9941,7 +9941,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/projects/org/{org}', 'GET',
+            '/api/v1/org/projects/{org}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -10235,7 +10235,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}', 'GET',
+            '/api/v1/org/task_executions/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -10497,7 +10497,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/tasks/org/{org}/{project}/{domain}', 'GET',
+            '/api/v1/org/tasks/{org}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -10775,7 +10775,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/tasks/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -11045,7 +11045,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}', 'GET',
+            '/api/v1/org/tasks/{id.org}/{id.project}/{id.domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -11307,7 +11307,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflows/org/{org}/{project}/{domain}', 'GET',
+            '/api/v1/org/workflows/{org}/{project}/{domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -11585,7 +11585,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
+            '/api/v1/org/workflows/{id.org}/{id.project}/{id.domain}/{id.name}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -11855,7 +11855,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}', 'GET',
+            '/api/v1/org/workflows/{id.org}/{id.project}/{id.domain}', 'GET',
             path_params,
             query_params,
             header_params,
@@ -12057,7 +12057,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{id.org}/recover', 'POST',
+            '/api/v1/org/executions/{id.org}/recover', 'POST',
             path_params,
             query_params,
             header_params,
@@ -12259,7 +12259,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/projects/org/{project.org}', 'POST',
+            '/api/v1/org/projects/{project.org}', 'POST',
             path_params,
             query_params,
             header_params,
@@ -12461,7 +12461,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{id.org}/relaunch', 'POST',
+            '/api/v1/org/executions/{id.org}/relaunch', 'POST',
             path_params,
             query_params,
             header_params,
@@ -12711,7 +12711,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'DELETE',
+            '/api/v1/org/executions/{id.org}/{id.project}/{id.domain}/{id.name}', 'DELETE',
             path_params,
             query_params,
             header_params,
@@ -12961,7 +12961,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}', 'PUT',
+            '/api/v1/org/executions/{id.org}/{id.project}/{id.domain}/{id.name}', 'PUT',
             path_params,
             query_params,
             header_params,
@@ -13219,7 +13219,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'PUT',
+            '/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}', 'PUT',
             path_params,
             query_params,
             header_params,
@@ -13485,7 +13485,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'PUT',
+            '/api/v1/org/named_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}', 'PUT',
             path_params,
             query_params,
             header_params,
@@ -13703,7 +13703,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/projects/org/{org}/{id}', 'PUT',
+            '/api/v1/org/projects/{org}/{id}', 'PUT',
             path_params,
             query_params,
             header_params,
@@ -13921,7 +13921,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}', 'PUT',
+            '/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}', 'PUT',
             path_params,
             query_params,
             header_params,
@@ -14155,7 +14155,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}', 'PUT',
+            '/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}/{attributes.domain}', 'PUT',
             path_params,
             query_params,
             header_params,
@@ -14405,7 +14405,7 @@ class AdminServiceApi(object):
         auth_settings = []  # noqa: E501
 
         return self.api_client.call_api(
-            '/api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}', 'PUT',
+            '/api/v1/org/workflow_attributes/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}', 'PUT',
             path_params,
             query_params,
             header_params,

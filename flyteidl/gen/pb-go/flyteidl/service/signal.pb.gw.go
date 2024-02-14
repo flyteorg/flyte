@@ -336,11 +336,11 @@ func RegisterSignalServiceHandlerClient(ctx context.Context, mux *runtime.ServeM
 var (
 	pattern_SignalService_ListSignals_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5}, []string{"api", "v1", "signals", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
 
-	pattern_SignalService_ListSignals_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "signals", "org", "workflow_execution_id.org", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
+	pattern_SignalService_ListSignals_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "org", "signals", "workflow_execution_id.org", "workflow_execution_id.project", "workflow_execution_id.domain", "workflow_execution_id.name"}, ""))
 
 	pattern_SignalService_SetSignal_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "v1", "signals"}, ""))
 
-	pattern_SignalService_SetSignal_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "signals", "org", "id.execution_id.org"}, ""))
+	pattern_SignalService_SetSignal_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4}, []string{"api", "v1", "org", "signals", "id.execution_id.org"}, ""))
 )
 
 var (

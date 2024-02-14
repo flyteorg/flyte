@@ -125,7 +125,7 @@ AdminServiceApiService Triggers the creation of a :ref:&#x60;ref_flyteidl.admin.
 */
 func (a *AdminServiceApiService) CreateExecution2(ctx context.Context, org string, body AdminExecutionCreateRequest) (AdminExecutionCreateResponse, *http.Response, error) {
 	var (
-		localVarHttpMethod = strings.ToUpper("Put")
+		localVarHttpMethod = strings.ToUpper("Post")
 		localVarPostBody   interface{}
 		localVarFileName   string
 		localVarFileBytes  []byte
@@ -133,7 +133,7 @@ func (a *AdminServiceApiService) CreateExecution2(ctx context.Context, org strin
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -313,7 +313,7 @@ func (a *AdminServiceApiService) CreateLaunchPlan2(ctx context.Context, idOrg st
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/launch_plans/{id.org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -493,7 +493,7 @@ func (a *AdminServiceApiService) CreateNodeEvent2(ctx context.Context, eventIdEx
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.id.execution_id.org}/nodes"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/events/{event.id.execution_id.org}/nodes"
 	localVarPath = strings.Replace(localVarPath, "{"+"event.id.execution_id.org"+"}", fmt.Sprintf("%v", eventIdExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -673,7 +673,7 @@ func (a *AdminServiceApiService) CreateTask2(ctx context.Context, idOrg string, 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/tasks/{id.org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -853,7 +853,7 @@ func (a *AdminServiceApiService) CreateTaskEvent2(ctx context.Context, eventPare
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.parent_node_execution_id.execution_id.org}/tasks"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/events/{event.parent_node_execution_id.execution_id.org}/tasks"
 	localVarPath = strings.Replace(localVarPath, "{"+"event.parent_node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", eventParentNodeExecutionIdExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1033,7 +1033,7 @@ func (a *AdminServiceApiService) CreateWorkflow2(ctx context.Context, idOrg stri
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflows/{id.org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1213,7 +1213,7 @@ func (a *AdminServiceApiService) CreateWorkflowEvent2(ctx context.Context, event
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/events/org/{event.execution_id.org}/workflows"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/events/{event.execution_id.org}/workflows"
 	localVarPath = strings.Replace(localVarPath, "{"+"event.execution_id.org"+"}", fmt.Sprintf("%v", eventExecutionIdOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -1396,7 +1396,7 @@ func (a *AdminServiceApiService) DeleteProjectAttributes2(ctx context.Context, o
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/project_domain_attributes/{org}/{project}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 
@@ -1583,7 +1583,7 @@ func (a *AdminServiceApiService) DeleteProjectDomainAttributes2(ctx context.Cont
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/project_domain_attributes/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -1774,7 +1774,7 @@ func (a *AdminServiceApiService) DeleteWorkflowAttributes2(ctx context.Context, 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflow_attributes/{org}/{project}/{domain}/{workflow}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -1972,7 +1972,7 @@ func (a *AdminServiceApiService) GetActiveLaunchPlan2(ctx context.Context, idOrg
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/active_launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -2174,7 +2174,7 @@ func (a *AdminServiceApiService) GetDescriptionEntity2(ctx context.Context, idOr
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/org/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/description_entities/{id.org}/{id.resource_type}/{id.project}/{id.domain}/{id.name}/{id.version}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.resource_type"+"}", fmt.Sprintf("%v", idResourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
@@ -2375,7 +2375,7 @@ func (a *AdminServiceApiService) GetDynamicNodeWorkflow2(ctx context.Context, id
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}/dynamic_workflow"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
@@ -2572,7 +2572,7 @@ func (a *AdminServiceApiService) GetExecution2(ctx context.Context, idOrg string
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -2768,7 +2768,7 @@ func (a *AdminServiceApiService) GetExecutionData2(ctx context.Context, idOrg st
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/data/org/{id.org}/executions/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/data/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -2976,7 +2976,7 @@ func (a *AdminServiceApiService) GetExecutionMetrics2(ctx context.Context, idOrg
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/metrics/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/metrics/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -3190,7 +3190,7 @@ func (a *AdminServiceApiService) GetLaunchPlan2(ctx context.Context, idOrg strin
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -3393,7 +3393,7 @@ func (a *AdminServiceApiService) GetNamedEntity2(ctx context.Context, idOrg stri
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/named_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
@@ -3593,7 +3593,7 @@ func (a *AdminServiceApiService) GetNodeExecution2(ctx context.Context, idExecut
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
@@ -3793,7 +3793,7 @@ func (a *AdminServiceApiService) GetNodeExecutionData2(ctx context.Context, idEx
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/data/org/{id.execution_id.org}/node_executions/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/data/node_executions/{id.execution_id.org}/{id.execution_id.project}/{id.execution_id.domain}/{id.execution_id.name}/{id.node_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.org"+"}", fmt.Sprintf("%v", idExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.project"+"}", fmt.Sprintf("%v", idExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.execution_id.domain"+"}", fmt.Sprintf("%v", idExecutionIdDomain), -1)
@@ -3996,7 +3996,7 @@ func (a *AdminServiceApiService) GetProjectAttributes2(ctx context.Context, org 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/project_domain_attributes/{org}/{project}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 
@@ -4202,7 +4202,7 @@ func (a *AdminServiceApiService) GetProjectDomainAttributes2(ctx context.Context
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{org}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/project_domain_attributes/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -4415,7 +4415,7 @@ func (a *AdminServiceApiService) GetTask2(ctx context.Context, idOrg string, idP
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/tasks/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -4652,7 +4652,7 @@ func (a *AdminServiceApiService) GetTaskExecution2(ctx context.Context, idNodeEx
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/task_executions/org/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdDomain), -1)
@@ -4897,7 +4897,7 @@ func (a *AdminServiceApiService) GetTaskExecutionData2(ctx context.Context, idNo
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/data/org/{id.node_execution_id.execution_id.org}/task_executions/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/data/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", idNodeExecutionIdExecutionIdDomain), -1)
@@ -5206,7 +5206,7 @@ func (a *AdminServiceApiService) GetWorkflow2(ctx context.Context, idOrg string,
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflows/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -5418,7 +5418,7 @@ func (a *AdminServiceApiService) GetWorkflowAttributes2(ctx context.Context, org
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/org/{org}/{project}/{domain}/{workflow}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflow_attributes/{org}/{project}/{domain}/{workflow}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -5647,7 +5647,7 @@ func (a *AdminServiceApiService) ListActiveLaunchPlans2(ctx context.Context, org
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/active_launch_plans/org/{org}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/active_launch_plans/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -5897,7 +5897,7 @@ func (a *AdminServiceApiService) ListDescriptionEntities2(ctx context.Context, i
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/description_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
@@ -6156,7 +6156,7 @@ func (a *AdminServiceApiService) ListDescriptionEntities4(ctx context.Context, i
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/description_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/description_entities/{id.org}/{resource_type}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
@@ -6414,7 +6414,7 @@ func (a *AdminServiceApiService) ListExecutions2(ctx context.Context, idOrg stri
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{id.org}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -6664,7 +6664,7 @@ func (a *AdminServiceApiService) ListLaunchPlanIds2(ctx context.Context, org str
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plan_ids/org/{org}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/launch_plan_ids/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -6914,7 +6914,7 @@ func (a *AdminServiceApiService) ListLaunchPlans2(ctx context.Context, idOrg str
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -7169,7 +7169,7 @@ func (a *AdminServiceApiService) ListLaunchPlans4(ctx context.Context, idOrg str
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -7385,7 +7385,7 @@ func (a *AdminServiceApiService) ListMatchableAttributes2(ctx context.Context, o
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/matchable_attributes/org/{org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/matchable_attributes/{org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -7621,7 +7621,7 @@ func (a *AdminServiceApiService) ListNamedEntities2(ctx context.Context, org str
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/org/{org}/{resource_type}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/named_entities/{org}/{resource_type}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
@@ -7879,7 +7879,7 @@ func (a *AdminServiceApiService) ListNodeExecutions2(ctx context.Context, workfl
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/node_executions/org/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/node_executions/{workflow_execution_id.org}/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.org"+"}", fmt.Sprintf("%v", workflowExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.project"+"}", fmt.Sprintf("%v", workflowExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"workflow_execution_id.domain"+"}", fmt.Sprintf("%v", workflowExecutionIdDomain), -1)
@@ -8165,7 +8165,7 @@ func (a *AdminServiceApiService) ListNodeExecutionsForTask2(ctx context.Context,
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/children/org/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/children/{task_execution_id.node_execution_id.execution_id.org}/task_executions/{task_execution_id.node_execution_id.execution_id.project}/{task_execution_id.node_execution_id.execution_id.domain}/{task_execution_id.node_execution_id.execution_id.name}/{task_execution_id.node_execution_id.node_id}/{task_execution_id.task_id.project}/{task_execution_id.task_id.domain}/{task_execution_id.task_id.name}/{task_execution_id.task_id.version}/{task_execution_id.retry_attempt}"
 	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"task_execution_id.node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", taskExecutionIdNodeExecutionIdExecutionIdDomain), -1)
@@ -8419,7 +8419,7 @@ func (a *AdminServiceApiService) ListProjects2(ctx context.Context, org string, 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/projects/{org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -8670,7 +8670,7 @@ func (a *AdminServiceApiService) ListTaskExecutions2(ctx context.Context, nodeEx
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/task_executions/org/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/task_executions/{node_execution_id.execution_id.org}/{node_execution_id.execution_id.project}/{node_execution_id.execution_id.domain}/{node_execution_id.execution_id.name}/{node_execution_id.node_id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.org"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.project"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"node_execution_id.execution_id.domain"+"}", fmt.Sprintf("%v", nodeExecutionIdExecutionIdDomain), -1)
@@ -8919,7 +8919,7 @@ func (a *AdminServiceApiService) ListTaskIds2(ctx context.Context, org string, p
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{org}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/tasks/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -9169,7 +9169,7 @@ func (a *AdminServiceApiService) ListTasks2(ctx context.Context, idOrg string, i
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/tasks/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -9424,7 +9424,7 @@ func (a *AdminServiceApiService) ListTasks4(ctx context.Context, idOrg string, i
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/tasks/{id.org}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -9674,7 +9674,7 @@ func (a *AdminServiceApiService) ListWorkflowIds2(ctx context.Context, org strin
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{org}/{project}/{domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflows/{org}/{project}/{domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"project"+"}", fmt.Sprintf("%v", project), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"domain"+"}", fmt.Sprintf("%v", domain), -1)
@@ -9924,7 +9924,7 @@ func (a *AdminServiceApiService) ListWorkflows2(ctx context.Context, idOrg strin
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflows/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -10179,7 +10179,7 @@ func (a *AdminServiceApiService) ListWorkflows4(ctx context.Context, idOrg strin
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflows/{id.org}/{id.project}/{id.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -10377,7 +10377,7 @@ func (a *AdminServiceApiService) RecoverExecution2(ctx context.Context, idOrg st
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/recover"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{id.org}/recover"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -10557,7 +10557,7 @@ func (a *AdminServiceApiService) RegisterProject2(ctx context.Context, projectOr
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{project.org}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/projects/{project.org}"
 	localVarPath = strings.Replace(localVarPath, "{"+"project.org"+"}", fmt.Sprintf("%v", projectOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -10737,7 +10737,7 @@ func (a *AdminServiceApiService) RelaunchExecution2(ctx context.Context, idOrg s
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/relaunch"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{id.org}/relaunch"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 
 	localVarHeaderParams := make(map[string]string)
@@ -10926,7 +10926,7 @@ func (a *AdminServiceApiService) TerminateExecution2(ctx context.Context, idOrg 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -11118,7 +11118,7 @@ func (a *AdminServiceApiService) UpdateExecution2(ctx context.Context, idOrg str
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/executions/org/{id.org}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/executions/{id.org}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -11312,7 +11312,7 @@ func (a *AdminServiceApiService) UpdateLaunchPlan2(ctx context.Context, idOrg st
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/launch_plans/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.domain"+"}", fmt.Sprintf("%v", idDomain), -1)
@@ -11506,7 +11506,7 @@ func (a *AdminServiceApiService) UpdateNamedEntity2(ctx context.Context, idOrg s
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/named_entities/org/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/named_entities/{id.org}/{resource_type}/{id.project}/{id.domain}/{id.name}"
 	localVarPath = strings.Replace(localVarPath, "{"+"id.org"+"}", fmt.Sprintf("%v", idOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"resource_type"+"}", fmt.Sprintf("%v", resourceType), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id.project"+"}", fmt.Sprintf("%v", idProject), -1)
@@ -11693,7 +11693,7 @@ func (a *AdminServiceApiService) UpdateProject2(ctx context.Context, org string,
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/projects/org/{org}/{id}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/projects/{org}/{id}"
 	localVarPath = strings.Replace(localVarPath, "{"+"org"+"}", fmt.Sprintf("%v", org), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"id"+"}", fmt.Sprintf("%v", id), -1)
 
@@ -11877,7 +11877,7 @@ func (a *AdminServiceApiService) UpdateProjectAttributes2(ctx context.Context, a
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}"
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.org"+"}", fmt.Sprintf("%v", attributesOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
 
@@ -12064,7 +12064,7 @@ func (a *AdminServiceApiService) UpdateProjectDomainAttributes2(ctx context.Cont
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/project_domain_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/project_domain_attributes/{attributes.org}/{attributes.project}/{attributes.domain}"
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.org"+"}", fmt.Sprintf("%v", attributesOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.domain"+"}", fmt.Sprintf("%v", attributesDomain), -1)
@@ -12255,7 +12255,7 @@ func (a *AdminServiceApiService) UpdateWorkflowAttributes2(ctx context.Context, 
 	)
 
 	// create path and map variables
-	localVarPath := a.client.cfg.BasePath + "/api/v1/workflow_attributes/org/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}"
+	localVarPath := a.client.cfg.BasePath + "/api/v1/org/workflow_attributes/{attributes.org}/{attributes.project}/{attributes.domain}/{attributes.workflow}"
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.org"+"}", fmt.Sprintf("%v", attributesOrg), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.project"+"}", fmt.Sprintf("%v", attributesProject), -1)
 	localVarPath = strings.Replace(localVarPath, "{"+"attributes.domain"+"}", fmt.Sprintf("%v", attributesDomain), -1)
