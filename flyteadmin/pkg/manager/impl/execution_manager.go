@@ -13,8 +13,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+
 	"github.com/flyteorg/flyte/flyteadmin/auth"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
@@ -34,20 +43,9 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const childContainerQueueKey = "child_queue"
-const artifactTrackerKey = "_ua"
 
 // Map of [project] -> map of [domain] -> stop watch
 type projectDomainScopedStopWatchMap = map[string]map[string]*promutils.StopWatch
@@ -95,7 +93,6 @@ type ExecutionManager struct {
 	cloudEventPublisher       notificationInterfaces.Publisher
 	dbEventWriter             eventWriter.WorkflowExecutionEventWriter
 	pluginRegistry            *plugins.Registry
-	artifactRegistry          *artifacts.ArtifactRegistry
 }
 
 func getExecutionContext(ctx context.Context, id *core.WorkflowExecutionIdentifier) context.Context {
@@ -251,23 +248,6 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
 			Name:  core.Resources_EPHEMERAL_STORAGE,
 			Value: ephemeralStorage.Limit.String(),
-		})
-	}
-
-	// Only assign storage when it is either requested or limited in the task definition, or a platform
-	// default exists.
-	if !taskResourceRequirements.Defaults.Storage.IsZero() ||
-		!taskResourceRequirements.Limits.Storage.IsZero() ||
-		!platformTaskResources.Defaults.Storage.IsZero() {
-		storageResource := flytek8s.AdjustOrDefaultResource(taskResourceRequirements.Defaults.Storage, taskResourceRequirements.Limits.Storage,
-			platformTaskResources.Defaults.Storage, platformTaskResources.Limits.Storage)
-		finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Request.String(),
-		})
-		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Limit.String(),
 		})
 	}
 
@@ -704,28 +684,6 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 	}
 }
 
-// ExtractArtifactTrackers pulls out artifact tracker strings from Literals for lineage
-func (m *ExecutionManager) ExtractArtifactTrackers(artifactTrackers map[string]string, input *core.Literal) {
-
-	if input == nil {
-		return
-	}
-	if input.GetMetadata() != nil {
-		if tracker, ok := input.GetMetadata()[artifactTrackerKey]; ok {
-			artifactTrackers[tracker] = ""
-		}
-	}
-	if input.GetCollection() != nil {
-		for _, v := range input.GetCollection().Literals {
-			m.ExtractArtifactTrackers(artifactTrackers, v)
-		}
-	} else if input.GetMap() != nil {
-		for _, v := range input.GetMap().Literals {
-			m.ExtractArtifactTrackers(artifactTrackers, v)
-		}
-	}
-}
-
 // getStringFromInput should be called when a tag or partition value is a binding to an input. the input is looked up
 // from the input map and the binding, and an error is returned if the input key is not in the map.
 func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding core.InputBindingData, inputs map[string]*core.Literal) (string, error) {
@@ -938,8 +896,6 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
 
-	ctxPD := contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
-
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
@@ -963,55 +919,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		return nil, nil, err
 	}
 
-	// TODO: Artifact feature gate, remove when ready
 	var lpExpectedInputs *core.ParameterMap
-	var artifactTrackers = make(map[string]string)
 	var usedArtifactIDs []*core.ArtifactID
-	if m.artifactRegistry.GetClient() != nil {
-		// Literals may have an artifact key in the metadata field. This is something the artifact service should have
-		// added. Pull these back out so we can keep track of them for lineage purposes. Use a dummy wrapper object for
-		// easier recursion.
-		requestInputMap := &core.Literal{
-			Value: &core.Literal_Map{Map: request.Inputs},
-		}
-		fixedInputMap := &core.Literal{
-			Value: &core.Literal_Map{Map: launchPlan.Spec.FixedInputs},
-		}
-		m.ExtractArtifactTrackers(artifactTrackers, requestInputMap)
-		m.ExtractArtifactTrackers(artifactTrackers, fixedInputMap)
-
-		// Put together the inputs that we've already resolved so that the artifact querying bit can fill them in.
-		// This is to support artifact queries that depend on other inputs using the {{ .inputs.var }} construct.
-		var inputsForQueryTemplating = make(map[string]*core.Literal)
-		if request.Inputs != nil {
-			for k, v := range request.Inputs.Literals {
-				inputsForQueryTemplating[k] = v
-			}
-		}
-		for k, v := range launchPlan.Spec.FixedInputs.Literals {
-			inputsForQueryTemplating[k] = v
-		}
-		logger.Debugf(ctx, "Inputs for query templating: [%+v]", inputsForQueryTemplating)
-
-		// Resolve artifact queries
-		//   Within the launch plan, the artifact will be in the Parameter map, and can come in form of an ArtifactID,
-		//     or as an ArtifactQuery.
-		// Also send in the inputsForQueryTemplating for two reasons, so we don't run queries for things we don't need to
-		// and so we can fill in template args.
-		// ArtifactIDs are also returned for lineage purposes.
-		lpExpectedInputs, usedArtifactIDs, err = m.ResolveParameterMapArtifacts(ctxPD, launchPlan.Closure.ExpectedInputs, inputsForQueryTemplating)
-		if err != nil {
-			logger.Errorf(ctx, "Error looking up launch plan closure parameter map: %v", err)
-			return nil, nil, err
-		}
-
-		logger.Debugf(ctx, "Resolved launch plan closure expected inputs from [%+v] to [%+v]", launchPlan.Closure.ExpectedInputs, lpExpectedInputs)
-		logger.Debugf(ctx, "Found artifact trackers: %v", artifactTrackers)
-		logger.Debugf(ctx, "Found artifact IDs: %v", usedArtifactIDs)
-
-	} else {
-		lpExpectedInputs = launchPlan.Closure.ExpectedInputs
-	}
+	lpExpectedInputs = launchPlan.Closure.ExpectedInputs
 
 	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
 	// in the future, and also to make sure that relaunch and recover can use it if necessary.
@@ -1159,13 +1069,6 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	// Publish of event is also gated on the artifact client being available, even though it's not directly required.
-	// TODO: Artifact feature gate, remove when ready
-	if m.artifactRegistry.GetClient() != nil {
-		// TODO: Add principal
-		m.publishExecutionStart(ctx, workflowExecutionID, request.Spec.LaunchPlan, workflow.Id, artifactTrackers, usedArtifactIDs)
-	}
-
 	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
@@ -1213,36 +1116,6 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	return ctx, executionModel, nil
-}
-
-// publishExecutionStart is an event that Admin publishes for artifact lineage.
-func (m *ExecutionManager) publishExecutionStart(ctx context.Context, executionID core.WorkflowExecutionIdentifier,
-	launchPlanID *core.Identifier, workflowID *core.Identifier, artifactTrackers map[string]string, usedArtifactIDs []*core.ArtifactID) {
-
-	var artifactTrackerList []string
-	// Use a list instead of the fake set
-	for k := range artifactTrackers {
-		artifactTrackerList = append(artifactTrackerList, k)
-	}
-
-	if len(artifactTrackerList) > 0 || len(usedArtifactIDs) > 0 {
-		logger.Debugf(ctx, "Sending execution start event for execution [%+v] with trackers [%+v] and artifact ids [%+v]", executionID, artifactTrackerList, usedArtifactIDs)
-
-		request := event.CloudEventExecutionStart{
-			ExecutionId:      &executionID,
-			LaunchPlanId:     launchPlanID,
-			WorkflowId:       workflowID,
-			ArtifactIds:      usedArtifactIDs,
-			ArtifactTrackers: artifactTrackerList,
-		}
-		go func() {
-			ceCtx := context.TODO()
-			if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
-				m.systemMetrics.PublishEventError.Inc()
-				logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request, err)
-			}
-		}()
-	}
 }
 
 // Inserts an execution model into the database store and emits platform metrics.
@@ -1969,7 +1842,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.WorkflowExecutionEventWriter, artifactRegistry *artifacts.ArtifactRegistry) interfaces.ExecutionInterface {
+	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
 
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
@@ -2003,7 +1876,6 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		cloudEventPublisher:       cloudEventPublisher,
 		dbEventWriter:             eventWriter,
 		pluginRegistry:            pluginRegistry,
-		artifactRegistry:          artifactRegistry,
 	}
 }
 

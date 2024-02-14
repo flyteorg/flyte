@@ -23,7 +23,7 @@ func TestNewTokenSourceProvider(t *testing.T) {
 		audienceCfg              string
 		scopesCfg                []string
 		useAudienceFromAdmin     bool
-		clientConfigResponse     service.PublicClientAuthConfigResponse
+		clientConfigResponse     *service.PublicClientAuthConfigResponse
 		expectedAudience         string
 		expectedScopes           []string
 		expectedCallsPubEndpoint int
@@ -32,7 +32,7 @@ func TestNewTokenSourceProvider(t *testing.T) {
 			name:                     "audience from client config",
 			audienceCfg:              "clientConfiguredAud",
 			scopesCfg:                []string{"all"},
-			clientConfigResponse:     service.PublicClientAuthConfigResponse{},
+			clientConfigResponse:     &service.PublicClientAuthConfigResponse{},
 			expectedAudience:         "clientConfiguredAud",
 			expectedScopes:           []string{"all"},
 			expectedCallsPubEndpoint: 0,
@@ -42,7 +42,7 @@ func TestNewTokenSourceProvider(t *testing.T) {
 			audienceCfg:              "clientConfiguredAud",
 			useAudienceFromAdmin:     true,
 			scopesCfg:                []string{"all"},
-			clientConfigResponse:     service.PublicClientAuthConfigResponse{Audience: "AdminConfiguredAud", Scopes: []string{}},
+			clientConfigResponse:     &service.PublicClientAuthConfigResponse{Audience: "AdminConfiguredAud", Scopes: []string{}},
 			expectedAudience:         "AdminConfiguredAud",
 			expectedScopes:           []string{"all"},
 			expectedCallsPubEndpoint: 1,
@@ -53,7 +53,7 @@ func TestNewTokenSourceProvider(t *testing.T) {
 			audienceCfg:              "clientConfiguredAud",
 			useAudienceFromAdmin:     false,
 			scopesCfg:                []string{"all"},
-			clientConfigResponse:     service.PublicClientAuthConfigResponse{Audience: "AdminConfiguredAud", Scopes: []string{}},
+			clientConfigResponse:     &service.PublicClientAuthConfigResponse{Audience: "AdminConfiguredAud", Scopes: []string{}},
 			expectedAudience:         "clientConfiguredAud",
 			expectedScopes:           []string{"all"},
 			expectedCallsPubEndpoint: 0,
@@ -64,7 +64,7 @@ func TestNewTokenSourceProvider(t *testing.T) {
 		tokenCache := &tokenCacheMocks.TokenCache{}
 		metadataClient := &adminMocks.AuthMetadataServiceClient{}
 		metadataClient.OnGetOAuth2MetadataMatch(mock.Anything, mock.Anything).Return(&service.OAuth2MetadataResponse{}, nil)
-		metadataClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(&test.clientConfigResponse, nil)
+		metadataClient.OnGetPublicClientConfigMatch(mock.Anything, mock.Anything).Return(test.clientConfigResponse, nil)
 		cfg.AuthType = AuthTypeClientSecret
 		cfg.Audience = test.audienceCfg
 		cfg.Scopes = test.scopesCfg

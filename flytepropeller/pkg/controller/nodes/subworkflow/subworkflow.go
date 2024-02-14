@@ -88,6 +88,25 @@ func (s *subworkflowHandler) handleSubWorkflow(ctx context.Context, nCtx interfa
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
 	}
 
+	if state.HasTimedOut() {
+		workflowNodeState := handler.WorkflowNodeState{
+			Phase: v1alpha1.WorkflowNodePhaseFailing,
+			Error: &core.ExecutionError{
+				Kind:    core.ExecutionError_USER,
+				Code:    "Timeout",
+				Message: "Timeout in node",
+			},
+		}
+
+		err = nCtx.NodeStateWriter().PutWorkflowNodeState(workflowNodeState)
+		if err != nil {
+			logger.Warnf(ctx, "failed to store failing subworkflow state with err: [%v]", err)
+			return handler.UnknownTransition, err
+		}
+
+		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoRunning(nil)), nil
+	}
+
 	if state.IsComplete() {
 		// If the WF interface has outputs, validate that the outputs file was written.
 		var oInfo *handler.OutputInfo

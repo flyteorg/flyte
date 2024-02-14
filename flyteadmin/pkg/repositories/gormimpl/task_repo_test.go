@@ -7,12 +7,14 @@ import (
 	mocket "github.com/Selvatico/go-mocket"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
+
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 const pythonTestTaskType = "python-task"
@@ -58,7 +60,7 @@ func TestGetTask(t *testing.T) {
 		Org:     testOrg,
 	})
 	assert.Empty(t, output)
-	assert.EqualError(t, err, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" org:\"org\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type TASK with identifier project:\"project\" domain:\"domain\" name:\"name\" version:\"XYZ\" org:\"org\"", err.Error())
 
 	GlobalMock := mocket.Catcher.Reset()
 	GlobalMock.Logging = true

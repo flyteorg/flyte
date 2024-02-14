@@ -787,7 +787,7 @@ func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCo
 	for _, status := range append(
 		append(status.InitContainerStatuses, status.ContainerStatuses...), status.EphemeralContainerStatuses...) {
 		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
-			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
+			return pluginsCore.PhaseInfoRetryableFailure(OOMKilled,
 				"Pod reported success despite being OOMKilled", &info), nil
 		}
 	}
@@ -805,9 +805,14 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 			}
 
 			if s.State.Terminated != nil {
-				if s.State.Terminated.ExitCode != 0 {
+				if s.State.Terminated.ExitCode != 0 || strings.Contains(s.State.Terminated.Reason, OOMKilled) {
+					message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
+						s.Name,
+						s.State.Terminated.ExitCode,
+						s.State.Terminated.Reason,
+						s.State.Terminated.Message)
 					return pluginsCore.PhaseInfoRetryableFailure(
-						s.State.Terminated.Reason, s.State.Terminated.Message, info)
+						s.State.Terminated.Reason, message, info)
 				}
 				return pluginsCore.PhaseInfoSuccess(info)
 			}

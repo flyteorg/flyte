@@ -89,4 +89,3 @@ message ArtifactQuery {
     ArtifactBindingData binding = 4;
   }
 }
-

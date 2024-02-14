@@ -26,9 +26,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
       {{- if .Values.flytepropeller.manager }}
-      labels: {{ include "flytepropeller-manager.labels" . | nindent 8 }}
+      labels: {{ include "flytepropeller-manager.podLabels" . | nindent 8 }}
       {{- else }}
-      labels: {{ include "flytepropeller.labels" . | nindent 8 }}
+      labels: {{ include "flytepropeller.podLabels" . | nindent 8 }}
       {{- end }}
     spec:
       securityContext:
@@ -65,6 +65,11 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
+        {{- if .Values.flytepropeller.podEnv -}}
+        {{- with .Values.flytepropeller.podEnv -}}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- end }}
         image: "{{ .Values.flytepropeller.image.repository }}:{{ .Values.flytepropeller.image.tag }}"
         imagePullPolicy: "{{ .Values.flytepropeller.image.pullPolicy }}"
         {{- if .Values.flytepropeller.manager }}
