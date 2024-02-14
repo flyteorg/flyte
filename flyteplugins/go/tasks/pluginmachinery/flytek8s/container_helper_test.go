@@ -458,6 +458,7 @@ func getTemplateParametersForTest(resourceRequirements, platformResources *v1.Re
 	mockTaskExecMetadata.OnGetOverrides().Return(&mockOverrides)
 	mockTaskExecMetadata.OnGetPlatformResources().Return(platformResources)
 	mockTaskExecMetadata.OnGetEnvironmentVariables().Return(nil)
+	mockTaskExecMetadata.OnGetNamespace().Return("my-namespace")
 
 	mockInputReader := mocks2.InputReader{}
 	mockInputPath := storage.DataReference("s3://input/path")
