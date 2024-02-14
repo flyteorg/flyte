@@ -752,7 +752,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-proxy-config
   namespace: flyte
@@ -796,7 +796,7 @@ type: Opaque
 ---
 apiVersion: v1
 data:
-  haSharedSecret: SjFIazJlcWsxWGljTWNENA==
+  haSharedSecret: aGtXbUVsYnhhcVRRS0RwRA==
   proxyPassword: ""
   proxyUsername: ""
 kind: Secret
@@ -1052,7 +1052,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-proxy
   namespace: flyte
@@ -1097,7 +1097,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-db-storage
   namespace: flyte
@@ -1117,7 +1117,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-minio-storage
   namespace: flyte
@@ -1137,7 +1137,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-db-storage
   namespace: flyte
@@ -1157,7 +1157,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-minio-storage
   namespace: flyte
@@ -1287,7 +1287,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-buildkit
   namespace: flyte
@@ -1360,7 +1360,7 @@ spec:
     metadata:
       annotations:
         checksum/config: 8f50e768255a87f078ba8b9879a0c174c3e045ffb46ac8723d2eedbe293c8d81
-        checksum/secret: e88fbc90ab076d9b4f212621f01add7ad99d08e3be4049c88ed5ac091b081688
+        checksum/secret: 9f699df433a7f3227784261437025f01a0ddb97d1514041ab1d3a93533b70135
       labels:
         app: docker-registry
         release: flyte-sandbox
@@ -1627,7 +1627,7 @@ metadata:
     app.kubernetes.io/instance: flyte-sandbox
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: flyte-sandbox
-    app.kubernetes.io/version: 1.16.0
+    app.kubernetes.io/version: 1.16.1
     helm.sh/chart: flyte-sandbox-0.1.0
   name: flyte-sandbox-proxy
   namespace: flyte
