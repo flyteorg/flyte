@@ -77,6 +77,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 	taskExecutionID.On("GetGeneratedName").Return("per_retry_unique_key")
 	taskMetadata := &pluginsCoreMocks.TaskExecutionMetadata{}
 	taskMetadata.On("GetTaskExecutionID").Return(taskExecutionID)
+	taskMetadata.On("GetNamespace").Return("test-namespace")
 
 	t.Run("empty cmd", func(t *testing.T) {
 		actual, err := Render(context.TODO(), []string{}, Parameters{})
@@ -570,6 +571,38 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			"output/blah",
 			"--prev=s3://prev-checkpoint/prefix",
 			"--checkpoint=s3://new-checkpoint/prefix",
+		}, actual)
+	})
+
+	t.Run("namespace embedded replacement", func(t *testing.T) {
+		params := Parameters{
+			TaskExecMetadata: taskMetadata,
+			Inputs:           in,
+			OutputPath: dummyOutputPaths{
+				outputPath:          out.outputPath,
+				rawOutputDataPrefix: "s3://raw-data/prefix/{{ .Namespace }}",
+				prevCheckpointPath:  "s3://prev-checkpoint/prefix/{{ .Namespace}}",
+				checkpointPath:      "s3://new-checkpoint/prefix/{{.namespace}}",
+			},
+		}
+		actual, err := Render(context.TODO(), []string{
+			"hello",
+			"world",
+			"{{ .Input }}",
+			"{{ .OutputPrefix }}",
+			"--prev={{ .prevcheckpointprefix }}",
+			"--checkpoint={{ .checkpointoutputprefix }}",
+			"--raw-data-output={{ .rawoutputdataprefix }}",
+		}, params)
+		assert.NoError(t, err)
+		assert.Equal(t, []string{
+			"hello",
+			"world",
+			"input/blah",
+			"output/blah",
+			"--prev=s3://prev-checkpoint/prefix/test-namespace",
+			"--checkpoint=s3://new-checkpoint/prefix/test-namespace",
+			"--raw-data-output=s3://raw-data/prefix/test-namespace",
 		}, actual)
 	})
 }
