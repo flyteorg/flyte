@@ -35,7 +35,7 @@
 #include <google/protobuf/map_field_inl.h>
 #include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/unknown_field_set.h>
-#include <google/protobuf/any.pb.h>
+#include <google/protobuf/struct.pb.h>
 #include "google/api/annotations.pb.h"
 #include <google/protobuf/timestamp.pb.h>
 #include "flyteidl/admin/launch_plan.pb.h"
@@ -55,7 +55,7 @@ struct TableStruct_flyteidl_2fartifacts_2fartifacts_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::google::protobuf::internal::ParseTable schema[30]
+  static const ::google::protobuf::internal::ParseTable schema[31]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::google::protobuf::internal::FieldMetadata field_metadata[];
   static const ::google::protobuf::internal::SerializationTable serialization_table[];
@@ -76,6 +76,9 @@ extern ArtifactDefaultTypeInternal _Artifact_default_instance_;
 class ArtifactConsumer;
 class ArtifactConsumerDefaultTypeInternal;
 extern ArtifactConsumerDefaultTypeInternal _ArtifactConsumer_default_instance_;
+class ArtifactMetadata;
+class ArtifactMetadataDefaultTypeInternal;
+extern ArtifactMetadataDefaultTypeInternal _ArtifactMetadata_default_instance_;
 class ArtifactProducer;
 class ArtifactProducerDefaultTypeInternal;
 extern ArtifactProducerDefaultTypeInternal _ArtifactProducer_default_instance_;
@@ -162,6 +165,7 @@ template<> ::flyteidl::artifact::AddTagRequest* Arena::CreateMaybeMessage<::flyt
 template<> ::flyteidl::artifact::AddTagResponse* Arena::CreateMaybeMessage<::flyteidl::artifact::AddTagResponse>(Arena*);
 template<> ::flyteidl::artifact::Artifact* Arena::CreateMaybeMessage<::flyteidl::artifact::Artifact>(Arena*);
 template<> ::flyteidl::artifact::ArtifactConsumer* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactConsumer>(Arena*);
+template<> ::flyteidl::artifact::ArtifactMetadata* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactMetadata>(Arena*);
 template<> ::flyteidl::artifact::ArtifactProducer* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactProducer>(Arena*);
 template<> ::flyteidl::artifact::ArtifactSource* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactSource>(Arena*);
 template<> ::flyteidl::artifact::ArtifactSpec* Arena::CreateMaybeMessage<::flyteidl::artifact::ArtifactSpec>(Arena*);
@@ -360,6 +364,15 @@ class Artifact final :
   ::flyteidl::artifact::ArtifactSource* mutable_source();
   void set_allocated_source(::flyteidl::artifact::ArtifactSource* source);
 
+  // .flyteidl.artifact.ArtifactMetadata metadata = 5;
+  bool has_metadata() const;
+  void clear_metadata();
+  static const int kMetadataFieldNumber = 5;
+  const ::flyteidl::artifact::ArtifactMetadata& metadata() const;
+  ::flyteidl::artifact::ArtifactMetadata* release_metadata();
+  ::flyteidl::artifact::ArtifactMetadata* mutable_metadata();
+  void set_allocated_metadata(::flyteidl::artifact::ArtifactMetadata* metadata);
+
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.Artifact)
  private:
   class HasBitSetters;
@@ -369,6 +382,137 @@ class Artifact final :
   ::flyteidl::core::ArtifactID* artifact_id_;
   ::flyteidl::artifact::ArtifactSpec* spec_;
   ::flyteidl::artifact::ArtifactSource* source_;
+  ::flyteidl::artifact::ArtifactMetadata* metadata_;
+  mutable ::google::protobuf::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_flyteidl_2fartifacts_2fartifacts_2eproto;
+};
+// -------------------------------------------------------------------
+
+class ArtifactMetadata final :
+    public ::google::protobuf::Message /* @@protoc_insertion_point(class_definition:flyteidl.artifact.ArtifactMetadata) */ {
+ public:
+  ArtifactMetadata();
+  virtual ~ArtifactMetadata();
+
+  ArtifactMetadata(const ArtifactMetadata& from);
+
+  inline ArtifactMetadata& operator=(const ArtifactMetadata& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  #if LANG_CXX11
+  ArtifactMetadata(ArtifactMetadata&& from) noexcept
+    : ArtifactMetadata() {
+    *this = ::std::move(from);
+  }
+
+  inline ArtifactMetadata& operator=(ArtifactMetadata&& from) noexcept {
+    if (GetArenaNoVirtual() == from.GetArenaNoVirtual()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+  #endif
+  static const ::google::protobuf::Descriptor* descriptor() {
+    return default_instance().GetDescriptor();
+  }
+  static const ArtifactMetadata& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ArtifactMetadata* internal_default_instance() {
+    return reinterpret_cast<const ArtifactMetadata*>(
+               &_ArtifactMetadata_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    1;
+
+  void Swap(ArtifactMetadata* other);
+  friend void swap(ArtifactMetadata& a, ArtifactMetadata& b) {
+    a.Swap(&b);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ArtifactMetadata* New() const final {
+    return CreateMaybeMessage<ArtifactMetadata>(nullptr);
+  }
+
+  ArtifactMetadata* New(::google::protobuf::Arena* arena) const final {
+    return CreateMaybeMessage<ArtifactMetadata>(arena);
+  }
+  void CopyFrom(const ::google::protobuf::Message& from) final;
+  void MergeFrom(const ::google::protobuf::Message& from) final;
+  void CopyFrom(const ArtifactMetadata& from);
+  void MergeFrom(const ArtifactMetadata& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  #if GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  static const char* _InternalParse(const char* begin, const char* end, void* object, ::google::protobuf::internal::ParseContext* ctx);
+  ::google::protobuf::internal::ParseFunc _ParseFunc() const final { return _InternalParse; }
+  #else
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input) final;
+  #endif  // GOOGLE_PROTOBUF_ENABLE_EXPERIMENTAL_PARSER
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const final;
+  ::google::protobuf::uint8* InternalSerializeWithCachedSizesToArray(
+      ::google::protobuf::uint8* target) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ArtifactMetadata* other);
+  private:
+  inline ::google::protobuf::Arena* GetArenaNoVirtual() const {
+    return nullptr;
+  }
+  inline void* MaybeArenaPtr() const {
+    return nullptr;
+  }
+  public:
+
+  ::google::protobuf::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // string uri = 2;
+  void clear_uri();
+  static const int kUriFieldNumber = 2;
+  const ::std::string& uri() const;
+  void set_uri(const ::std::string& value);
+  #if LANG_CXX11
+  void set_uri(::std::string&& value);
+  #endif
+  void set_uri(const char* value);
+  void set_uri(const char* value, size_t size);
+  ::std::string* mutable_uri();
+  ::std::string* release_uri();
+  void set_allocated_uri(::std::string* uri);
+
+  // .google.protobuf.Timestamp created_at = 1;
+  bool has_created_at() const;
+  void clear_created_at();
+  static const int kCreatedAtFieldNumber = 1;
+  const ::google::protobuf::Timestamp& created_at() const;
+  ::google::protobuf::Timestamp* release_created_at();
+  ::google::protobuf::Timestamp* mutable_created_at();
+  void set_allocated_created_at(::google::protobuf::Timestamp* created_at);
+
+  // @@protoc_insertion_point(class_scope:flyteidl.artifact.ArtifactMetadata)
+ private:
+  class HasBitSetters;
+
+  ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
+  ::google::protobuf::internal::ArenaStringPtr uri_;
+  ::google::protobuf::Timestamp* created_at_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifacts_2fartifacts_2eproto;
 };
@@ -436,7 +580,7 @@ class CreateArtifactRequest final :
                &_CreateArtifactRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    2;
+    3;
 
   void Swap(CreateArtifactRequest* other);
   friend void swap(CreateArtifactRequest& a, CreateArtifactRequest& b) {
@@ -612,7 +756,7 @@ class ArtifactSource final :
                &_ArtifactSource_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    3;
+    4;
 
   void Swap(ArtifactSource* other);
   friend void swap(ArtifactSource& a, ArtifactSource& b) {
@@ -774,7 +918,7 @@ class ArtifactSpec final :
                &_ArtifactSpec_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    4;
+    5;
 
   void Swap(ArtifactSpec* other);
   friend void swap(ArtifactSpec& a, ArtifactSpec& b) {
@@ -845,34 +989,6 @@ class ArtifactSpec final :
   ::std::string* release_short_description();
   void set_allocated_short_description(::std::string* short_description);
 
-  // string metadata_type = 5;
-  void clear_metadata_type();
-  static const int kMetadataTypeFieldNumber = 5;
-  const ::std::string& metadata_type() const;
-  void set_metadata_type(const ::std::string& value);
-  #if LANG_CXX11
-  void set_metadata_type(::std::string&& value);
-  #endif
-  void set_metadata_type(const char* value);
-  void set_metadata_type(const char* value, size_t size);
-  ::std::string* mutable_metadata_type();
-  ::std::string* release_metadata_type();
-  void set_allocated_metadata_type(::std::string* metadata_type);
-
-  // string file_format = 7;
-  void clear_file_format();
-  static const int kFileFormatFieldNumber = 7;
-  const ::std::string& file_format() const;
-  void set_file_format(const ::std::string& value);
-  #if LANG_CXX11
-  void set_file_format(::std::string&& value);
-  #endif
-  void set_file_format(const char* value);
-  void set_file_format(const char* value, size_t size);
-  ::std::string* mutable_file_format();
-  ::std::string* release_file_format();
-  void set_allocated_file_format(::std::string* file_format);
-
   // .flyteidl.core.Literal value = 1;
   bool has_value() const;
   void clear_value();
@@ -891,23 +1007,14 @@ class ArtifactSpec final :
   ::flyteidl::core::LiteralType* mutable_type();
   void set_allocated_type(::flyteidl::core::LiteralType* type);
 
-  // .google.protobuf.Any user_metadata = 4;
+  // .google.protobuf.Struct user_metadata = 4;
   bool has_user_metadata() const;
   void clear_user_metadata();
   static const int kUserMetadataFieldNumber = 4;
-  const ::google::protobuf::Any& user_metadata() const;
-  ::google::protobuf::Any* release_user_metadata();
-  ::google::protobuf::Any* mutable_user_metadata();
-  void set_allocated_user_metadata(::google::protobuf::Any* user_metadata);
-
-  // .google.protobuf.Timestamp created_at = 6;
-  bool has_created_at() const;
-  void clear_created_at();
-  static const int kCreatedAtFieldNumber = 6;
-  const ::google::protobuf::Timestamp& created_at() const;
-  ::google::protobuf::Timestamp* release_created_at();
-  ::google::protobuf::Timestamp* mutable_created_at();
-  void set_allocated_created_at(::google::protobuf::Timestamp* created_at);
+  const ::google::protobuf::Struct& user_metadata() const;
+  ::google::protobuf::Struct* release_user_metadata();
+  ::google::protobuf::Struct* mutable_user_metadata();
+  void set_allocated_user_metadata(::google::protobuf::Struct* user_metadata);
 
   // @@protoc_insertion_point(class_scope:flyteidl.artifact.ArtifactSpec)
  private:
@@ -915,12 +1022,9 @@ class ArtifactSpec final :
 
   ::google::protobuf::internal::InternalMetadataWithArena _internal_metadata_;
   ::google::protobuf::internal::ArenaStringPtr short_description_;
-  ::google::protobuf::internal::ArenaStringPtr metadata_type_;
-  ::google::protobuf::internal::ArenaStringPtr file_format_;
   ::flyteidl::core::Literal* value_;
   ::flyteidl::core::LiteralType* type_;
-  ::google::protobuf::Any* user_metadata_;
-  ::google::protobuf::Timestamp* created_at_;
+  ::google::protobuf::Struct* user_metadata_;
   mutable ::google::protobuf::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_flyteidl_2fartifacts_2fartifacts_2eproto;
 };
@@ -964,7 +1068,7 @@ class Trigger final :
                &_Trigger_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    5;
+    6;
 
   void Swap(Trigger* other);
   friend void swap(Trigger& a, Trigger& b) {
@@ -1092,7 +1196,7 @@ class CreateArtifactResponse final :
                &_CreateArtifactResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    6;
+    7;
 
   void Swap(CreateArtifactResponse* other);
   friend void swap(CreateArtifactResponse& a, CreateArtifactResponse& b) {
@@ -1207,7 +1311,7 @@ class GetArtifactRequest final :
                &_GetArtifactRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    7;
+    8;
 
   void Swap(GetArtifactRequest* other);
   friend void swap(GetArtifactRequest& a, GetArtifactRequest& b) {
@@ -1329,7 +1433,7 @@ class GetArtifactResponse final :
                &_GetArtifactResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   void Swap(GetArtifactResponse* other);
   friend void swap(GetArtifactResponse& a, GetArtifactResponse& b) {
@@ -1444,7 +1548,7 @@ class SearchOptions final :
                &_SearchOptions_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   void Swap(SearchOptions* other);
   friend void swap(SearchOptions& a, SearchOptions& b) {
@@ -1563,7 +1667,7 @@ class SearchArtifactsRequest final :
                &_SearchArtifactsRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    10;
+    11;
 
   void Swap(SearchArtifactsRequest* other);
   friend void swap(SearchArtifactsRequest& a, SearchArtifactsRequest& b) {
@@ -1760,7 +1864,7 @@ class SearchArtifactsResponse final :
                &_SearchArtifactsResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    11;
+    12;
 
   void Swap(SearchArtifactsResponse* other);
   friend void swap(SearchArtifactsResponse& a, SearchArtifactsResponse& b) {
@@ -1893,7 +1997,7 @@ class FindByWorkflowExecRequest final :
                &_FindByWorkflowExecRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    12;
+    13;
 
   void Swap(FindByWorkflowExecRequest* other);
   friend void swap(FindByWorkflowExecRequest& a, FindByWorkflowExecRequest& b) {
@@ -2041,7 +2145,7 @@ class AddTagRequest final :
                &_AddTagRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    13;
+    14;
 
   void Swap(AddTagRequest* other);
   friend void swap(AddTagRequest& a, AddTagRequest& b) {
@@ -2178,7 +2282,7 @@ class AddTagResponse final :
                &_AddTagResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    14;
+    15;
 
   void Swap(AddTagResponse* other);
   friend void swap(AddTagResponse& a, AddTagResponse& b) {
@@ -2283,7 +2387,7 @@ class CreateTriggerRequest final :
                &_CreateTriggerRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    15;
+    16;
 
   void Swap(CreateTriggerRequest* other);
   friend void swap(CreateTriggerRequest& a, CreateTriggerRequest& b) {
@@ -2398,7 +2502,7 @@ class CreateTriggerResponse final :
                &_CreateTriggerResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    17;
 
   void Swap(CreateTriggerResponse* other);
   friend void swap(CreateTriggerResponse& a, CreateTriggerResponse& b) {
@@ -2503,7 +2607,7 @@ class DeactivateTriggerRequest final :
                &_DeactivateTriggerRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    18;
 
   void Swap(DeactivateTriggerRequest* other);
   friend void swap(DeactivateTriggerRequest& a, DeactivateTriggerRequest& b) {
@@ -2618,7 +2722,7 @@ class DeactivateTriggerResponse final :
                &_DeactivateTriggerResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    19;
 
   void Swap(DeactivateTriggerResponse* other);
   friend void swap(DeactivateTriggerResponse& a, DeactivateTriggerResponse& b) {
@@ -2723,7 +2827,7 @@ class DeactivateAllTriggersRequest final :
                &_DeactivateAllTriggersRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    20;
 
   void Swap(DeactivateAllTriggersRequest* other);
   friend void swap(DeactivateAllTriggersRequest& a, DeactivateAllTriggersRequest& b) {
@@ -2828,7 +2932,7 @@ class DeactivateAllTriggersResponse final :
                &_DeactivateAllTriggersResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    21;
 
   void Swap(DeactivateAllTriggersResponse* other);
   friend void swap(DeactivateAllTriggersResponse& a, DeactivateAllTriggersResponse& b) {
@@ -2940,7 +3044,7 @@ class ArtifactProducer final :
                &_ArtifactProducer_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    22;
 
   void Swap(ArtifactProducer* other);
   friend void swap(ArtifactProducer& a, ArtifactProducer& b) {
@@ -3065,7 +3169,7 @@ class RegisterProducerRequest final :
                &_RegisterProducerRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    23;
 
   void Swap(RegisterProducerRequest* other);
   friend void swap(RegisterProducerRequest& a, RegisterProducerRequest& b) {
@@ -3183,7 +3287,7 @@ class ArtifactConsumer final :
                &_ArtifactConsumer_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    24;
 
   void Swap(ArtifactConsumer* other);
   friend void swap(ArtifactConsumer& a, ArtifactConsumer& b) {
@@ -3308,7 +3412,7 @@ class RegisterConsumerRequest final :
                &_RegisterConsumerRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    25;
 
   void Swap(RegisterConsumerRequest* other);
   friend void swap(RegisterConsumerRequest& a, RegisterConsumerRequest& b) {
@@ -3426,7 +3530,7 @@ class RegisterResponse final :
                &_RegisterResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    26;
 
   void Swap(RegisterResponse* other);
   friend void swap(RegisterResponse& a, RegisterResponse& b) {
@@ -3531,7 +3635,7 @@ class ExecutionInputsRequest final :
                &_ExecutionInputsRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    26;
+    27;
 
   void Swap(ExecutionInputsRequest* other);
   friend void swap(ExecutionInputsRequest& a, ExecutionInputsRequest& b) {
@@ -3659,7 +3763,7 @@ class ExecutionInputsResponse final :
                &_ExecutionInputsResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    27;
+    28;
 
   void Swap(ExecutionInputsResponse* other);
   friend void swap(ExecutionInputsResponse& a, ExecutionInputsResponse& b) {
@@ -3764,7 +3868,7 @@ class ListUsageRequest final :
                &_ListUsageRequest_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    28;
+    29;
 
   void Swap(ListUsageRequest* other);
   friend void swap(ListUsageRequest& a, ListUsageRequest& b) {
@@ -3879,7 +3983,7 @@ class ListUsageResponse final :
                &_ListUsageResponse_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    29;
+    30;
 
   void Swap(ListUsageResponse* other);
   friend void swap(ListUsageResponse& a, ListUsageResponse& b) {
@@ -4182,6 +4286,160 @@ inline void Artifact::set_allocated_source(::flyteidl::artifact::ArtifactSource*
   }
   source_ = source;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.Artifact.source)
+}
+
+// .flyteidl.artifact.ArtifactMetadata metadata = 5;
+inline bool Artifact::has_metadata() const {
+  return this != internal_default_instance() && metadata_ != nullptr;
+}
+inline void Artifact::clear_metadata() {
+  if (GetArenaNoVirtual() == nullptr && metadata_ != nullptr) {
+    delete metadata_;
+  }
+  metadata_ = nullptr;
+}
+inline const ::flyteidl::artifact::ArtifactMetadata& Artifact::metadata() const {
+  const ::flyteidl::artifact::ArtifactMetadata* p = metadata_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.Artifact.metadata)
+  return p != nullptr ? *p : *reinterpret_cast<const ::flyteidl::artifact::ArtifactMetadata*>(
+      &::flyteidl::artifact::_ArtifactMetadata_default_instance_);
+}
+inline ::flyteidl::artifact::ArtifactMetadata* Artifact::release_metadata() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.Artifact.metadata)
+  
+  ::flyteidl::artifact::ArtifactMetadata* temp = metadata_;
+  metadata_ = nullptr;
+  return temp;
+}
+inline ::flyteidl::artifact::ArtifactMetadata* Artifact::mutable_metadata() {
+  
+  if (metadata_ == nullptr) {
+    auto* p = CreateMaybeMessage<::flyteidl::artifact::ArtifactMetadata>(GetArenaNoVirtual());
+    metadata_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.Artifact.metadata)
+  return metadata_;
+}
+inline void Artifact::set_allocated_metadata(::flyteidl::artifact::ArtifactMetadata* metadata) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete metadata_;
+  }
+  if (metadata) {
+    ::google::protobuf::Arena* submessage_arena = nullptr;
+    if (message_arena != submessage_arena) {
+      metadata = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, metadata, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  metadata_ = metadata;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.Artifact.metadata)
+}
+
+// -------------------------------------------------------------------
+
+// ArtifactMetadata
+
+// .google.protobuf.Timestamp created_at = 1;
+inline bool ArtifactMetadata::has_created_at() const {
+  return this != internal_default_instance() && created_at_ != nullptr;
+}
+inline const ::google::protobuf::Timestamp& ArtifactMetadata::created_at() const {
+  const ::google::protobuf::Timestamp* p = created_at_;
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactMetadata.created_at)
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
+      &::google::protobuf::_Timestamp_default_instance_);
+}
+inline ::google::protobuf::Timestamp* ArtifactMetadata::release_created_at() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactMetadata.created_at)
+  
+  ::google::protobuf::Timestamp* temp = created_at_;
+  created_at_ = nullptr;
+  return temp;
+}
+inline ::google::protobuf::Timestamp* ArtifactMetadata::mutable_created_at() {
+  
+  if (created_at_ == nullptr) {
+    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
+    created_at_ = p;
+  }
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactMetadata.created_at)
+  return created_at_;
+}
+inline void ArtifactMetadata::set_allocated_created_at(::google::protobuf::Timestamp* created_at) {
+  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
+  if (message_arena == nullptr) {
+    delete reinterpret_cast< ::google::protobuf::MessageLite*>(created_at_);
+  }
+  if (created_at) {
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(created_at)->GetArena();
+    if (message_arena != submessage_arena) {
+      created_at = ::google::protobuf::internal::GetOwnedMessage(
+          message_arena, created_at, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  created_at_ = created_at;
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactMetadata.created_at)
+}
+
+// string uri = 2;
+inline void ArtifactMetadata::clear_uri() {
+  uri_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline const ::std::string& ArtifactMetadata::uri() const {
+  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactMetadata.uri)
+  return uri_.GetNoArena();
+}
+inline void ArtifactMetadata::set_uri(const ::std::string& value) {
+  
+  uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
+  // @@protoc_insertion_point(field_set:flyteidl.artifact.ArtifactMetadata.uri)
+}
+#if LANG_CXX11
+inline void ArtifactMetadata::set_uri(::std::string&& value) {
+  
+  uri_.SetNoArena(
+    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
+  // @@protoc_insertion_point(field_set_rvalue:flyteidl.artifact.ArtifactMetadata.uri)
+}
+#endif
+inline void ArtifactMetadata::set_uri(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
+  // @@protoc_insertion_point(field_set_char:flyteidl.artifact.ArtifactMetadata.uri)
+}
+inline void ArtifactMetadata::set_uri(const char* value, size_t size) {
+  
+  uri_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
+      ::std::string(reinterpret_cast<const char*>(value), size));
+  // @@protoc_insertion_point(field_set_pointer:flyteidl.artifact.ArtifactMetadata.uri)
+}
+inline ::std::string* ArtifactMetadata::mutable_uri() {
+  
+  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactMetadata.uri)
+  return uri_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline ::std::string* ArtifactMetadata::release_uri() {
+  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactMetadata.uri)
+  
+  return uri_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+}
+inline void ArtifactMetadata::set_allocated_uri(::std::string* uri) {
+  if (uri != nullptr) {
+    
+  } else {
+    
+  }
+  uri_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), uri);
+  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactMetadata.uri)
 }
 
 // -------------------------------------------------------------------
@@ -4815,39 +5073,40 @@ inline void ArtifactSpec::set_allocated_short_description(::std::string* short_d
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.short_description)
 }
 
-// .google.protobuf.Any user_metadata = 4;
+// .google.protobuf.Struct user_metadata = 4;
 inline bool ArtifactSpec::has_user_metadata() const {
   return this != internal_default_instance() && user_metadata_ != nullptr;
 }
-inline const ::google::protobuf::Any& ArtifactSpec::user_metadata() const {
-  const ::google::protobuf::Any* p = user_metadata_;
+inline const ::google::protobuf::Struct& ArtifactSpec::user_metadata() const {
+  const ::google::protobuf::Struct* p = user_metadata_;
   // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSpec.user_metadata)
-  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Any*>(
-      &::google::protobuf::_Any_default_instance_);
+  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Struct*>(
+      &::google::protobuf::_Struct_default_instance_);
 }
-inline ::google::protobuf::Any* ArtifactSpec::release_user_metadata() {
+inline ::google::protobuf::Struct* ArtifactSpec::release_user_metadata() {
   // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSpec.user_metadata)
   
-  ::google::protobuf::Any* temp = user_metadata_;
+  ::google::protobuf::Struct* temp = user_metadata_;
   user_metadata_ = nullptr;
   return temp;
 }
-inline ::google::protobuf::Any* ArtifactSpec::mutable_user_metadata() {
+inline ::google::protobuf::Struct* ArtifactSpec::mutable_user_metadata() {
   
   if (user_metadata_ == nullptr) {
-    auto* p = CreateMaybeMessage<::google::protobuf::Any>(GetArenaNoVirtual());
+    auto* p = CreateMaybeMessage<::google::protobuf::Struct>(GetArenaNoVirtual());
     user_metadata_ = p;
   }
   // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSpec.user_metadata)
   return user_metadata_;
 }
-inline void ArtifactSpec::set_allocated_user_metadata(::google::protobuf::Any* user_metadata) {
+inline void ArtifactSpec::set_allocated_user_metadata(::google::protobuf::Struct* user_metadata) {
   ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
   if (message_arena == nullptr) {
     delete reinterpret_cast< ::google::protobuf::MessageLite*>(user_metadata_);
   }
   if (user_metadata) {
-    ::google::protobuf::Arena* submessage_arena = nullptr;
+    ::google::protobuf::Arena* submessage_arena =
+      reinterpret_cast<::google::protobuf::MessageLite*>(user_metadata)->GetArena();
     if (message_arena != submessage_arena) {
       user_metadata = ::google::protobuf::internal::GetOwnedMessage(
           message_arena, user_metadata, submessage_arena);
@@ -4858,158 +5117,6 @@ inline void ArtifactSpec::set_allocated_user_metadata(::google::protobuf::Any* u
   }
   user_metadata_ = user_metadata;
   // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.user_metadata)
-}
-
-// string metadata_type = 5;
-inline void ArtifactSpec::clear_metadata_type() {
-  metadata_type_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ArtifactSpec::metadata_type() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSpec.metadata_type)
-  return metadata_type_.GetNoArena();
-}
-inline void ArtifactSpec::set_metadata_type(const ::std::string& value) {
-  
-  metadata_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.artifact.ArtifactSpec.metadata_type)
-}
-#if LANG_CXX11
-inline void ArtifactSpec::set_metadata_type(::std::string&& value) {
-  
-  metadata_type_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.artifact.ArtifactSpec.metadata_type)
-}
-#endif
-inline void ArtifactSpec::set_metadata_type(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  metadata_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.artifact.ArtifactSpec.metadata_type)
-}
-inline void ArtifactSpec::set_metadata_type(const char* value, size_t size) {
-  
-  metadata_type_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.artifact.ArtifactSpec.metadata_type)
-}
-inline ::std::string* ArtifactSpec::mutable_metadata_type() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSpec.metadata_type)
-  return metadata_type_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ArtifactSpec::release_metadata_type() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSpec.metadata_type)
-  
-  return metadata_type_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ArtifactSpec::set_allocated_metadata_type(::std::string* metadata_type) {
-  if (metadata_type != nullptr) {
-    
-  } else {
-    
-  }
-  metadata_type_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), metadata_type);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.metadata_type)
-}
-
-// .google.protobuf.Timestamp created_at = 6;
-inline bool ArtifactSpec::has_created_at() const {
-  return this != internal_default_instance() && created_at_ != nullptr;
-}
-inline const ::google::protobuf::Timestamp& ArtifactSpec::created_at() const {
-  const ::google::protobuf::Timestamp* p = created_at_;
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSpec.created_at)
-  return p != nullptr ? *p : *reinterpret_cast<const ::google::protobuf::Timestamp*>(
-      &::google::protobuf::_Timestamp_default_instance_);
-}
-inline ::google::protobuf::Timestamp* ArtifactSpec::release_created_at() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSpec.created_at)
-  
-  ::google::protobuf::Timestamp* temp = created_at_;
-  created_at_ = nullptr;
-  return temp;
-}
-inline ::google::protobuf::Timestamp* ArtifactSpec::mutable_created_at() {
-  
-  if (created_at_ == nullptr) {
-    auto* p = CreateMaybeMessage<::google::protobuf::Timestamp>(GetArenaNoVirtual());
-    created_at_ = p;
-  }
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSpec.created_at)
-  return created_at_;
-}
-inline void ArtifactSpec::set_allocated_created_at(::google::protobuf::Timestamp* created_at) {
-  ::google::protobuf::Arena* message_arena = GetArenaNoVirtual();
-  if (message_arena == nullptr) {
-    delete reinterpret_cast< ::google::protobuf::MessageLite*>(created_at_);
-  }
-  if (created_at) {
-    ::google::protobuf::Arena* submessage_arena =
-      reinterpret_cast<::google::protobuf::MessageLite*>(created_at)->GetArena();
-    if (message_arena != submessage_arena) {
-      created_at = ::google::protobuf::internal::GetOwnedMessage(
-          message_arena, created_at, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  created_at_ = created_at;
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.created_at)
-}
-
-// string file_format = 7;
-inline void ArtifactSpec::clear_file_format() {
-  file_format_.ClearToEmptyNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline const ::std::string& ArtifactSpec::file_format() const {
-  // @@protoc_insertion_point(field_get:flyteidl.artifact.ArtifactSpec.file_format)
-  return file_format_.GetNoArena();
-}
-inline void ArtifactSpec::set_file_format(const ::std::string& value) {
-  
-  file_format_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), value);
-  // @@protoc_insertion_point(field_set:flyteidl.artifact.ArtifactSpec.file_format)
-}
-#if LANG_CXX11
-inline void ArtifactSpec::set_file_format(::std::string&& value) {
-  
-  file_format_.SetNoArena(
-    &::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::move(value));
-  // @@protoc_insertion_point(field_set_rvalue:flyteidl.artifact.ArtifactSpec.file_format)
-}
-#endif
-inline void ArtifactSpec::set_file_format(const char* value) {
-  GOOGLE_DCHECK(value != nullptr);
-  
-  file_format_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), ::std::string(value));
-  // @@protoc_insertion_point(field_set_char:flyteidl.artifact.ArtifactSpec.file_format)
-}
-inline void ArtifactSpec::set_file_format(const char* value, size_t size) {
-  
-  file_format_.SetNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(),
-      ::std::string(reinterpret_cast<const char*>(value), size));
-  // @@protoc_insertion_point(field_set_pointer:flyteidl.artifact.ArtifactSpec.file_format)
-}
-inline ::std::string* ArtifactSpec::mutable_file_format() {
-  
-  // @@protoc_insertion_point(field_mutable:flyteidl.artifact.ArtifactSpec.file_format)
-  return file_format_.MutableNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline ::std::string* ArtifactSpec::release_file_format() {
-  // @@protoc_insertion_point(field_release:flyteidl.artifact.ArtifactSpec.file_format)
-  
-  return file_format_.ReleaseNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-}
-inline void ArtifactSpec::set_allocated_file_format(::std::string* file_format) {
-  if (file_format != nullptr) {
-    
-  } else {
-    
-  }
-  file_format_.SetAllocatedNoArena(&::google::protobuf::internal::GetEmptyStringAlreadyInited(), file_format);
-  // @@protoc_insertion_point(field_set_allocated:flyteidl.artifact.ArtifactSpec.file_format)
 }
 
 // -------------------------------------------------------------------
@@ -6478,6 +6585,8 @@ ListUsageResponse::executions() const {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

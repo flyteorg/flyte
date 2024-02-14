@@ -55,6 +55,16 @@ public final class ArtifactId {
      */
     com.google.protobuf.ByteString
         getNameBytes();
+
+    /**
+     * <code>string org = 4;</code>
+     */
+    java.lang.String getOrg();
+    /**
+     * <code>string org = 4;</code>
+     */
+    com.google.protobuf.ByteString
+        getOrgBytes();
   }
   /**
    * Protobuf type {@code flyteidl.core.ArtifactKey}
@@ -72,6 +82,7 @@ public final class ArtifactId {
       project_ = "";
       domain_ = "";
       name_ = "";
+      org_ = "";
     }
 
     @java.lang.Override
@@ -114,6 +125,12 @@ public final class ArtifactId {
               java.lang.String s = input.readStringRequireUtf8();
 
               name_ = s;
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              org_ = s;
               break;
             }
             default: {
@@ -258,6 +275,40 @@ public final class ArtifactId {
       }
     }
 
+    public static final int ORG_FIELD_NUMBER = 4;
+    private volatile java.lang.Object org_;
+    /**
+     * <code>string org = 4;</code>
+     */
+    public java.lang.String getOrg() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        org_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string org = 4;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOrgBytes() {
+      java.lang.Object ref = org_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        org_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private byte memoizedIsInitialized = -1;
     @java.lang.Override
     public final boolean isInitialized() {
@@ -281,6 +332,9 @@ public final class ArtifactId {
       if (!getNameBytes().isEmpty()) {
         com.google.protobuf.GeneratedMessageV3.writeString(output, 3, name_);
       }
+      if (!getOrgBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, org_);
+      }
       unknownFields.writeTo(output);
     }
 
@@ -298,6 +352,9 @@ public final class ArtifactId {
       }
       if (!getNameBytes().isEmpty()) {
         size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, name_);
+      }
+      if (!getOrgBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, org_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -320,6 +377,8 @@ public final class ArtifactId {
           .equals(other.getDomain())) return false;
       if (!getName()
           .equals(other.getName())) return false;
+      if (!getOrg()
+          .equals(other.getOrg())) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
       return true;
     }
@@ -337,6 +396,8 @@ public final class ArtifactId {
       hash = (53 * hash) + getDomain().hashCode();
       hash = (37 * hash) + NAME_FIELD_NUMBER;
       hash = (53 * hash) + getName().hashCode();
+      hash = (37 * hash) + ORG_FIELD_NUMBER;
+      hash = (53 * hash) + getOrg().hashCode();
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -476,6 +537,8 @@ public final class ArtifactId {
 
         name_ = "";
 
+        org_ = "";
+
         return this;
       }
 
@@ -505,6 +568,7 @@ public final class ArtifactId {
         result.project_ = project_;
         result.domain_ = domain_;
         result.name_ = name_;
+        result.org_ = org_;
         onBuilt();
         return result;
       }
@@ -563,6 +627,10 @@ public final class ArtifactId {
         }
         if (!other.getName().isEmpty()) {
           name_ = other.name_;
+          onChanged();
+        }
+        if (!other.getOrg().isEmpty()) {
+          org_ = other.org_;
           onChanged();
         }
         this.mergeUnknownFields(other.unknownFields);
@@ -817,6 +885,75 @@ public final class ArtifactId {
   checkByteStringIsUtf8(value);
         
         name_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object org_ = "";
+      /**
+       * <code>string org = 4;</code>
+       */
+      public java.lang.String getOrg() {
+        java.lang.Object ref = org_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          org_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string org = 4;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOrgBytes() {
+        java.lang.Object ref = org_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          org_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string org = 4;</code>
+       */
+      public Builder setOrg(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        org_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string org = 4;</code>
+       */
+      public Builder clearOrg() {
+        
+        org_ = getDefaultInstance().getOrg();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string org = 4;</code>
+       */
+      public Builder setOrgBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        org_ = value;
         onChanged();
         return this;
       }
@@ -8618,38 +8755,38 @@ public final class ArtifactId {
     java.lang.String[] descriptorData = {
       "\n\037flyteidl/core/artifact_id.proto\022\rflyte" +
       "idl.core\032\037google/protobuf/timestamp.prot" +
-      "o\032\036flyteidl/core/identifier.proto\"<\n\013Art" +
+      "o\032\036flyteidl/core/identifier.proto\"I\n\013Art" +
       "ifactKey\022\017\n\007project\030\001 \001(\t\022\016\n\006domain\030\002 \001(" +
-      "\t\022\014\n\004name\030\003 \001(\t\"\204\001\n\023ArtifactBindingData\022" +
-      "\r\n\005index\030\001 \001(\r\022\027\n\rpartition_key\030\002 \001(\tH\000\022" +
-      " \n\026bind_to_time_partition\030\003 \001(\010H\000\022\021\n\ttra" +
-      "nsform\030\004 \001(\tB\020\n\016partition_data\"\037\n\020InputB" +
-      "indingData\022\013\n\003var\030\001 \001(\t\"\332\001\n\nLabelValue\022\026" +
-      "\n\014static_value\030\001 \001(\tH\000\0220\n\ntime_value\030\002 \001" +
-      "(\0132\032.google.protobuf.TimestampH\000\022?\n\021trig" +
-      "gered_binding\030\003 \001(\0132\".flyteidl.core.Arti" +
-      "factBindingDataH\000\0228\n\rinput_binding\030\004 \001(\013" +
-      "2\037.flyteidl.core.InputBindingDataH\000B\007\n\005v" +
-      "alue\"\212\001\n\nPartitions\0223\n\005value\030\001 \003(\0132$.fly" +
-      "teidl.core.Partitions.ValueEntry\032G\n\nValu" +
-      "eEntry\022\013\n\003key\030\001 \001(\t\022(\n\005value\030\002 \001(\0132\031.fly" +
-      "teidl.core.LabelValue:\0028\001\"9\n\rTimePartiti" +
-      "on\022(\n\005value\030\001 \001(\0132\031.flyteidl.core.LabelV" +
-      "alue\"\264\001\n\nArtifactID\0220\n\014artifact_key\030\001 \001(" +
-      "\0132\032.flyteidl.core.ArtifactKey\022\017\n\007version" +
-      "\030\002 \001(\t\022-\n\npartitions\030\003 \001(\0132\031.flyteidl.co" +
-      "re.Partitions\0224\n\016time_partition\030\004 \001(\0132\034." +
-      "flyteidl.core.TimePartition\"i\n\013ArtifactT" +
-      "ag\0220\n\014artifact_key\030\001 \001(\0132\032.flyteidl.core" +
-      ".ArtifactKey\022(\n\005value\030\002 \001(\0132\031.flyteidl.c" +
-      "ore.LabelValue\"\311\001\n\rArtifactQuery\0220\n\013arti" +
-      "fact_id\030\001 \001(\0132\031.flyteidl.core.ArtifactID" +
-      "H\000\0222\n\014artifact_tag\030\002 \001(\0132\032.flyteidl.core" +
-      ".ArtifactTagH\000\022\r\n\003uri\030\003 \001(\tH\000\0225\n\007binding" +
-      "\030\004 \001(\0132\".flyteidl.core.ArtifactBindingDa" +
-      "taH\000B\014\n\nidentifierB<Z:github.com/flyteor" +
-      "g/flyte/flyteidl/gen/pb-go/flyteidl/core" +
-      "b\006proto3"
+      "\t\022\014\n\004name\030\003 \001(\t\022\013\n\003org\030\004 \001(\t\"\204\001\n\023Artifac" +
+      "tBindingData\022\r\n\005index\030\001 \001(\r\022\027\n\rpartition" +
+      "_key\030\002 \001(\tH\000\022 \n\026bind_to_time_partition\030\003" +
+      " \001(\010H\000\022\021\n\ttransform\030\004 \001(\tB\020\n\016partition_d" +
+      "ata\"\037\n\020InputBindingData\022\013\n\003var\030\001 \001(\t\"\332\001\n" +
+      "\nLabelValue\022\026\n\014static_value\030\001 \001(\tH\000\0220\n\nt" +
+      "ime_value\030\002 \001(\0132\032.google.protobuf.Timest" +
+      "ampH\000\022?\n\021triggered_binding\030\003 \001(\0132\".flyte" +
+      "idl.core.ArtifactBindingDataH\000\0228\n\rinput_" +
+      "binding\030\004 \001(\0132\037.flyteidl.core.InputBindi" +
+      "ngDataH\000B\007\n\005value\"\212\001\n\nPartitions\0223\n\005valu" +
+      "e\030\001 \003(\0132$.flyteidl.core.Partitions.Value" +
+      "Entry\032G\n\nValueEntry\022\013\n\003key\030\001 \001(\t\022(\n\005valu" +
+      "e\030\002 \001(\0132\031.flyteidl.core.LabelValue:\0028\001\"9" +
+      "\n\rTimePartition\022(\n\005value\030\001 \001(\0132\031.flyteid" +
+      "l.core.LabelValue\"\264\001\n\nArtifactID\0220\n\014arti" +
+      "fact_key\030\001 \001(\0132\032.flyteidl.core.ArtifactK" +
+      "ey\022\017\n\007version\030\002 \001(\t\022-\n\npartitions\030\003 \001(\0132" +
+      "\031.flyteidl.core.Partitions\0224\n\016time_parti" +
+      "tion\030\004 \001(\0132\034.flyteidl.core.TimePartition" +
+      "\"i\n\013ArtifactTag\0220\n\014artifact_key\030\001 \001(\0132\032." +
+      "flyteidl.core.ArtifactKey\022(\n\005value\030\002 \001(\013" +
+      "2\031.flyteidl.core.LabelValue\"\311\001\n\rArtifact" +
+      "Query\0220\n\013artifact_id\030\001 \001(\0132\031.flyteidl.co" +
+      "re.ArtifactIDH\000\0222\n\014artifact_tag\030\002 \001(\0132\032." +
+      "flyteidl.core.ArtifactTagH\000\022\r\n\003uri\030\003 \001(\t" +
+      "H\000\0225\n\007binding\030\004 \001(\0132\".flyteidl.core.Arti" +
+      "factBindingDataH\000B\014\n\nidentifierB<Z:githu" +
+      "b.com/flyteorg/flyte/flyteidl/gen/pb-go/" +
+      "flyteidl/coreb\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -8670,7 +8807,7 @@ public final class ArtifactId {
     internal_static_flyteidl_core_ArtifactKey_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_flyteidl_core_ArtifactKey_descriptor,
-        new java.lang.String[] { "Project", "Domain", "Name", });
+        new java.lang.String[] { "Project", "Domain", "Name", "Org", });
     internal_static_flyteidl_core_ArtifactBindingData_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_flyteidl_core_ArtifactBindingData_fieldAccessorTable = new

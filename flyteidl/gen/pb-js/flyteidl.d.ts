@@ -16,6 +16,9 @@ export namespace flyteidl {
 
             /** ArtifactKey name */
             name?: (string|null);
+
+            /** ArtifactKey org */
+            org?: (string|null);
         }
 
         /** Represents an ArtifactKey. */
@@ -35,6 +38,9 @@ export namespace flyteidl {
 
             /** ArtifactKey name. */
             public name: string;
+
+            /** ArtifactKey org. */
+            public org: string;
 
             /**
              * Creates a new ArtifactKey instance using the specified properties.

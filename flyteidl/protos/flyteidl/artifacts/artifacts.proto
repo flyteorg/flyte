@@ -3,7 +3,7 @@ package flyteidl.artifact;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts";
 
-import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -24,6 +24,18 @@ message Artifact {
   repeated string tags = 3;
 
   ArtifactSource source = 4;
+
+  ArtifactMetadata metadata = 5;
+}
+
+message ArtifactMetadata {
+
+  google.protobuf.Timestamp created_at = 1;
+
+  // i.e. flyte://av0.1/org/project/domain/name
+  // for now return without org but we're going to need to detect if there is an org there
+  // this will support cross org serverless accounts (need to sanitize inputs, getting rid of any special characters)
+  string uri = 2;
 }
 
 message CreateArtifactRequest {
@@ -62,13 +74,7 @@ message ArtifactSpec {
   string short_description = 3;
 
   // Additional user metadata
-  google.protobuf.Any user_metadata = 4;
-
-  string metadata_type = 5;
-
-  google.protobuf.Timestamp created_at = 6;
-
-  string file_format = 7;
+  google.protobuf.Struct user_metadata = 4;
 }
 
 message Trigger {

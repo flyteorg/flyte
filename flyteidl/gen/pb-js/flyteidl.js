@@ -43,6 +43,7 @@
                  * @property {string|null} [project] ArtifactKey project
                  * @property {string|null} [domain] ArtifactKey domain
                  * @property {string|null} [name] ArtifactKey name
+                 * @property {string|null} [org] ArtifactKey org
                  */
     
                 /**
@@ -85,6 +86,14 @@
                 ArtifactKey.prototype.name = "";
     
                 /**
+                 * ArtifactKey org.
+                 * @member {string} org
+                 * @memberof flyteidl.core.ArtifactKey
+                 * @instance
+                 */
+                ArtifactKey.prototype.org = "";
+    
+                /**
                  * Creates a new ArtifactKey instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.ArtifactKey
@@ -114,6 +123,8 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
                     if (message.name != null && message.hasOwnProperty("name"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.name);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.org);
                     return writer;
                 };
     
@@ -144,6 +155,9 @@
                         case 3:
                             message.name = reader.string();
                             break;
+                        case 4:
+                            message.org = reader.string();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -172,6 +186,9 @@
                     if (message.name != null && message.hasOwnProperty("name"))
                         if (!$util.isString(message.name))
                             return "name: string expected";
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
                     return null;
                 };
     

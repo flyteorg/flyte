@@ -213,6 +213,12 @@
             "type": "string"
           },
           {
+            "name": "artifact_id.artifact_key.org",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "artifact_id.time_partition.value.static_value",
             "description": "The string static value is for use in the Partitions object.",
             "in": "query",
@@ -699,6 +705,9 @@
         },
         "source": {
           "$ref": "#/definitions/artifactArtifactSource"
+        },
+        "metadata": {
+          "$ref": "#/definitions/artifactArtifactMetadata"
         }
       }
     },
@@ -711,6 +720,19 @@
         },
         "inputs": {
           "$ref": "#/definitions/coreParameterMap"
+        }
+      }
+    },
+    "artifactArtifactMetadata": {
+      "type": "object",
+      "properties": {
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "uri": {
+          "type": "string",
+          "title": "i.e. flyte://av0.1/org/project/domain/name\nfor now return without org but we're going to need to detect if there is an org there\nthis will support cross org serverless accounts (need to sanitize inputs, getting rid of any special characters)"
         }
       }
     },
@@ -762,18 +784,8 @@
           "type": "string"
         },
         "user_metadata": {
-          "$ref": "#/definitions/protobufAny",
+          "$ref": "#/definitions/protobufStruct",
           "title": "Additional user metadata"
-        },
-        "metadata_type": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "file_format": {
-          "type": "string"
         }
       }
     },
@@ -970,6 +982,9 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        },
+        "org": {
           "type": "string"
         }
       }

@@ -215,6 +215,9 @@
         },
         "name": {
           "type": "string"
+        },
+        "org": {
+          "type": "string"
         }
       }
     },

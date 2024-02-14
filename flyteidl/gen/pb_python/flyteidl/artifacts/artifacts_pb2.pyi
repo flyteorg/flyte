@@ -1,4 +1,4 @@
-from google.protobuf import any_pb2 as _any_pb2
+from google.protobuf import struct_pb2 as _struct_pb2
 from google.api import annotations_pb2 as _annotations_pb2
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from flyteidl.admin import launch_plan_pb2 as _launch_plan_pb2
@@ -17,16 +17,26 @@ from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Map
 DESCRIPTOR: _descriptor.FileDescriptor
 
 class Artifact(_message.Message):
-    __slots__ = ["artifact_id", "spec", "tags", "source"]
+    __slots__ = ["artifact_id", "spec", "tags", "source", "metadata"]
     ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
     SPEC_FIELD_NUMBER: _ClassVar[int]
     TAGS_FIELD_NUMBER: _ClassVar[int]
     SOURCE_FIELD_NUMBER: _ClassVar[int]
+    METADATA_FIELD_NUMBER: _ClassVar[int]
     artifact_id: _artifact_id_pb2.ArtifactID
     spec: ArtifactSpec
     tags: _containers.RepeatedScalarFieldContainer[str]
     source: ArtifactSource
-    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ...) -> None: ...
+    metadata: ArtifactMetadata
+    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., spec: _Optional[_Union[ArtifactSpec, _Mapping]] = ..., tags: _Optional[_Iterable[str]] = ..., source: _Optional[_Union[ArtifactSource, _Mapping]] = ..., metadata: _Optional[_Union[ArtifactMetadata, _Mapping]] = ...) -> None: ...
+
+class ArtifactMetadata(_message.Message):
+    __slots__ = ["created_at", "uri"]
+    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
+    URI_FIELD_NUMBER: _ClassVar[int]
+    created_at: _timestamp_pb2.Timestamp
+    uri: str
+    def __init__(self, created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., uri: _Optional[str] = ...) -> None: ...
 
 class CreateArtifactRequest(_message.Message):
     __slots__ = ["artifact_key", "version", "spec", "partitions", "time_partition_value", "source"]
@@ -66,22 +76,16 @@ class ArtifactSource(_message.Message):
     def __init__(self, workflow_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., node_id: _Optional[str] = ..., task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., principal: _Optional[str] = ...) -> None: ...
 
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "short_description", "user_metadata", "metadata_type", "created_at", "file_format"]
+    __slots__ = ["value", "type", "short_description", "user_metadata"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SHORT_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     USER_METADATA_FIELD_NUMBER: _ClassVar[int]
-    METADATA_TYPE_FIELD_NUMBER: _ClassVar[int]
-    CREATED_AT_FIELD_NUMBER: _ClassVar[int]
-    FILE_FORMAT_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
     short_description: str
-    user_metadata: _any_pb2.Any
-    metadata_type: str
-    created_at: _timestamp_pb2.Timestamp
-    file_format: str
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_any_pb2.Any, _Mapping]] = ..., metadata_type: _Optional[str] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., file_format: _Optional[str] = ...) -> None: ...
+    user_metadata: _struct_pb2.Struct
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class Trigger(_message.Message):
     __slots__ = ["trigger_id", "triggers"]

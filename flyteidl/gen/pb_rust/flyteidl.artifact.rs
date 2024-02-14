@@ -11,6 +11,19 @@ pub struct Artifact {
     pub tags: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     #[prost(message, optional, tag="4")]
     pub source: ::core::option::Option<ArtifactSource>,
+    #[prost(message, optional, tag="5")]
+    pub metadata: ::core::option::Option<ArtifactMetadata>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ArtifactMetadata {
+    #[prost(message, optional, tag="1")]
+    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// i.e. flyte://av0.1/org/project/domain/name
+    /// for now return without org but we're going to need to detect if there is an org there
+    /// this will support cross org serverless accounts (need to sanitize inputs, getting rid of any special characters)
+    #[prost(string, tag="2")]
+    pub uri: ::prost::alloc::string::String,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -58,13 +71,7 @@ pub struct ArtifactSpec {
     pub short_description: ::prost::alloc::string::String,
     /// Additional user metadata
     #[prost(message, optional, tag="4")]
-    pub user_metadata: ::core::option::Option<::prost_types::Any>,
-    #[prost(string, tag="5")]
-    pub metadata_type: ::prost::alloc::string::String,
-    #[prost(message, optional, tag="6")]
-    pub created_at: ::core::option::Option<::prost_types::Timestamp>,
-    #[prost(string, tag="7")]
-    pub file_format: ::prost::alloc::string::String,
+    pub user_metadata: ::core::option::Option<::prost_types::Struct>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
