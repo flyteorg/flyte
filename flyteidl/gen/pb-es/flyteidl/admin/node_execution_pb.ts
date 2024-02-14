@@ -8,7 +8,7 @@ import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Identifier, NodeExecutionIdentifier, TaskExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { FlyteURLs, Sort, UrlBlob } from "./common_pb.js";
 import { ExecutionError, NodeExecution_Phase } from "../core/execution_pb.js";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap, OutputData } from "../core/literals_pb.js";
 import { CatalogCacheStatus, CatalogMetadata } from "../core/catalog_pb.js";
 import { CompiledWorkflowClosure } from "../core/compiler_pb.js";
 
@@ -457,6 +457,14 @@ export class NodeExecutionClosure extends Message<NodeExecutionClosure> {
      */
     value: LiteralMap;
     case: "outputData";
+  } | {
+    /**
+     * Raw output data produced by this node execution.
+     *
+     * @generated from field: flyteidl.core.OutputData full_outputs = 13;
+     */
+    value: OutputData;
+    case: "fullOutputs";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -541,6 +549,7 @@ export class NodeExecutionClosure extends Message<NodeExecutionClosure> {
     { no: 1, name: "output_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
     { no: 2, name: "error", kind: "message", T: ExecutionError, oneof: "output_result" },
     { no: 10, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 13, name: "full_outputs", kind: "message", T: OutputData, oneof: "output_result" },
     { no: 3, name: "phase", kind: "enum", T: proto3.getEnumType(NodeExecution_Phase) },
     { no: 4, name: "started_at", kind: "message", T: Timestamp },
     { no: 5, name: "duration", kind: "message", T: Duration },
@@ -793,17 +802,35 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
 
   /**
    * Full_inputs will only be populated if they are under a configured size threshold.
+   * Deprecated: Please use input_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap full_inputs = 3;
+   * @generated from field: flyteidl.core.LiteralMap full_inputs = 3 [deprecated = true];
+   * @deprecated
    */
   fullInputs?: LiteralMap;
 
   /**
-   * Full_outputs will only be populated if they are under a configured size threshold. 
+   * Full_outputs will only be populated if they are under a configured size threshold.
+   * Deprecated: Please use output_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap full_outputs = 4;
+   * @generated from field: flyteidl.core.LiteralMap full_outputs = 4 [deprecated = true];
+   * @deprecated
    */
   fullOutputs?: LiteralMap;
+
+  /**
+   * InputData will only be populated if they are under a configured size threshold.
+   *
+   * @generated from field: flyteidl.core.InputData input_data = 5;
+   */
+  inputData?: InputData;
+
+  /**
+   * OutputData will only be populated if they are under a configured size threshold.
+   *
+   * @generated from field: flyteidl.core.OutputData output_data = 6;
+   */
+  outputData?: OutputData;
 
   /**
    * Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
@@ -829,6 +856,8 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
     { no: 2, name: "outputs", kind: "message", T: UrlBlob },
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
+    { no: 5, name: "input_data", kind: "message", T: InputData },
+    { no: 6, name: "output_data", kind: "message", T: OutputData },
     { no: 16, name: "dynamic_workflow", kind: "message", T: DynamicWorkflowNodeMetadata },
     { no: 17, name: "flyte_urls", kind: "message", T: FlyteURLs },
   ]);

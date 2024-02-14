@@ -17,17 +17,20 @@ const ErrorCodeMalformedBranch = "MalformedBranchUserError"
 const ErrorCodeCompilerError = "CompilerError"
 const ErrorCodeFailedFetchOutputs = "FailedFetchOutputs"
 
-func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.LiteralMap) (bool, error) {
+func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.InputData) (bool, error) {
 	var lValue *core.Literal
 	var rValue *core.Literal
 	var lPrim *core.Primitive
 	var rPrim *core.Primitive
 
+	literals := nodeInputs.GetInputs().GetLiterals()
+
 	if expr.GetLeftValue().GetPrimitive() == nil {
 		if nodeInputs == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
-		lValue = nodeInputs.Literals[expr.GetLeftValue().GetVar()]
+
+		lValue = literals[expr.GetLeftValue().GetVar()]
 		if lValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
@@ -39,7 +42,8 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 		if nodeInputs == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetLeftValue().GetVar())
 		}
-		rValue = nodeInputs.Literals[expr.GetRightValue().GetVar()]
+
+		rValue = literals[expr.GetRightValue().GetVar()]
 		if rValue == nil {
 			return false, errors.Errorf(ErrorCodeMalformedBranch, "Failed to find Value for Variable [%v]", expr.GetRightValue().GetVar())
 		}
@@ -59,7 +63,7 @@ func EvaluateComparison(expr *core.ComparisonExpression, nodeInputs *core.Litera
 	return Evaluate(lPrim, rPrim, expr.GetOperator())
 }
 
-func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *core.LiteralMap) (bool, error) {
+func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *core.InputData) (bool, error) {
 	if expr.GetComparison() != nil {
 		return EvaluateComparison(expr.GetComparison(), nodeInputs)
 	}
@@ -80,7 +84,7 @@ func EvaluateBooleanExpression(expr *core.BooleanExpression, nodeInputs *core.Li
 	return lvalue && rvalue, nil
 }
 
-func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.LiteralMap, skippedNodeIds []*v1alpha1.NodeID) (*v1alpha1.NodeID, []*v1alpha1.NodeID, error) {
+func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.InputData, skippedNodeIds []*v1alpha1.NodeID) (*v1alpha1.NodeID, []*v1alpha1.NodeID, error) {
 	if ok, err := EvaluateBooleanExpression(block.GetCondition(), nodeInputs); err != nil {
 		return nil, skippedNodeIds, err
 	} else if ok {
@@ -91,10 +95,10 @@ func EvaluateIfBlock(block v1alpha1.ExecutableIfBlock, nodeInputs *core.LiteralM
 	return nil, append(skippedNodeIds, block.GetThenNode()), nil
 }
 
-// Decides the branch to be taken, returns the nodeId of the selected node or an error
+// DecideBranch decides the branch to be taken, returns the nodeId of the selected node or an error
 // The branchNode is marked as success. This is used by downstream node to determine if it can be executed
 // All downstream nodes are marked as skipped
-func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *core.LiteralMap) (*v1alpha1.NodeID, error) {
+func DecideBranch(ctx context.Context, nl executors.NodeLookup, nodeID v1alpha1.NodeID, node v1alpha1.ExecutableBranchNode, nodeInputs *core.InputData) (*v1alpha1.NodeID, error) {
 	var selectedNodeID *v1alpha1.NodeID
 	var skippedNodeIds []*v1alpha1.NodeID
 	var err error

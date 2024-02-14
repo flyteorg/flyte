@@ -15,7 +15,13 @@ type arrayJobInputReader struct {
 }
 
 // GetInputPath overrides the inputpath to return the prefix path for array jobs
-func (i arrayJobInputReader) GetInputPath() storage.DataReference {
+func (i arrayJobInputReader) GetInputPath(ctx context.Context) (storage.DataReference, error) {
+	// TODO (haytham): Does this need to copy the input data using the old format to the prefix path?
+	return i.GetInputPrefixPath(), nil
+}
+
+// GetInputDataPath overrides the inputpath to return the prefix path for array jobs
+func (i arrayJobInputReader) GetInputDataPath() storage.DataReference {
 	return i.GetInputPrefixPath()
 }
 
@@ -33,16 +39,16 @@ func GetInputReader(tCtx core.TaskExecutionContext, taskTemplate *idlCore.TaskTe
 // StaticInputReader complies with the io.InputReader interface but has the input already populated.
 type StaticInputReader struct {
 	io.InputFilePaths
-	input *idlCore.LiteralMap
+	input *idlCore.InputData
 }
 
-func NewStaticInputReader(inputPaths io.InputFilePaths, input *idlCore.LiteralMap) StaticInputReader {
+func NewStaticInputReader(inputPaths io.InputFilePaths, input *idlCore.InputData) StaticInputReader {
 	return StaticInputReader{
 		InputFilePaths: inputPaths,
 		input:          input,
 	}
 }
 
-func (i StaticInputReader) Get(_ context.Context) (*idlCore.LiteralMap, error) {
+func (i StaticInputReader) Get(_ context.Context) (*idlCore.InputData, error) {
 	return i.input, nil
 }

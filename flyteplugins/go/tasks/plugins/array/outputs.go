@@ -58,14 +58,16 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 		return workqueue.WorkStatusFailed, err
 	}
 
-	finalOutputs := &core.LiteralMap{
-		Literals: map[string]*core.Literal{},
+	finalOutputs := &core.OutputData{
+		Outputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{},
+		},
 	}
 
 	// Initialize the final output literal with empty output variable collections. Otherwise, if a
 	// task has no input values they will never be written.
 	for _, varName := range i.varNames {
-		finalOutputs.Literals[varName] = &core.Literal{
+		finalOutputs.GetOutputs().Literals[varName] = &core.Literal{
 			Value: &core.Literal_Collection{
 				Collection: &core.LiteralCollection{
 					Literals: make([]*core.Literal, 0),
@@ -87,7 +89,7 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 				if i.isAwsSingleJob {
 					// We will only have one output.pb when running aws single job, so we don't need
 					// to aggregate outputs here
-					finalOutputs.Literals = output.GetLiterals()
+					finalOutputs = output
 				} else {
 					appendSubTaskOutput(finalOutputs, output, int64(i.finalPhases.ItemsCount))
 					continue
@@ -109,8 +111,8 @@ func (w assembleOutputsWorker) Process(ctx context.Context, workItem workqueue.W
 	return workqueue.WorkStatusSucceeded, nil
 }
 
-func appendOneItem(outputs *core.LiteralMap, varName string, literal *core.Literal, expectedSize int64) {
-	existingVal, found := outputs.Literals[varName]
+func appendOneItem(outputs *core.OutputData, varName string, literal *core.Literal, expectedSize int64) {
+	existingVal, found := outputs.GetOutputs().GetLiterals()[varName]
 	var list *core.LiteralCollection
 	if found {
 		list = existingVal.GetCollection()
@@ -127,18 +129,18 @@ func appendOneItem(outputs *core.LiteralMap, varName string, literal *core.Liter
 	}
 
 	list.Literals = append(list.Literals, literal)
-	outputs.Literals[varName] = existingVal
+	outputs.GetOutputs().Literals[varName] = existingVal
 }
 
-func appendSubTaskOutput(outputs *core.LiteralMap, subTaskOutput *core.LiteralMap,
+func appendSubTaskOutput(outputs *core.OutputData, subTaskOutput *core.OutputData,
 	expectedSize int64) {
 
-	for key, val := range subTaskOutput.GetLiterals() {
+	for key, val := range subTaskOutput.GetOutputs().GetLiterals() {
 		appendOneItem(outputs, key, val, expectedSize)
 	}
 }
 
-func appendEmptyOutputs(outputs *core.LiteralMap, vars []string) {
+func appendEmptyOutputs(outputs *core.OutputData, vars []string) {
 	for _, varName := range vars {
 		appendOneItem(outputs, varName, nilLiteral, 1)
 	}

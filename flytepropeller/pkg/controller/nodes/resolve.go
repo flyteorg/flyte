@@ -101,6 +101,7 @@ func Resolve(ctx context.Context, outputResolver OutputResolver, nl executors.No
 
 		literalMap[varName] = l
 	}
+
 	return &core.LiteralMap{
 		Literals: literalMap,
 	}, nil

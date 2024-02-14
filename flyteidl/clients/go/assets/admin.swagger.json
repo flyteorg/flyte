@@ -8089,6 +8089,10 @@
         },
         "inputs": {
           "$ref": "#/definitions/coreLiteralMap",
+          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional\nDeprecated: Please use input_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
           "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         }
       },
@@ -8183,8 +8187,12 @@
             "input_uri": {
               "type": "string"
             },
-            "input_data": {
+            "deprecated_input_data": {
               "$ref": "#/definitions/coreLiteralMap",
+              "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
+            },
+            "input_data": {
+              "$ref": "#/definitions/coreInputData",
               "description": "Raw input data consumed by this node execution."
             },
             "output_uri": {
@@ -8195,9 +8203,13 @@
               "$ref": "#/definitions/coreExecutionError",
               "title": "Error information for the execution"
             },
-            "output_data": {
+            "deprecated_output_data": {
               "$ref": "#/definitions/coreLiteralMap",
-              "description": "Raw output data produced by this node execution."
+              "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+            },
+            "output_data": {
+              "$ref": "#/definitions/coreOutputData",
+              "description": "Raw output data produced by this workflow execution."
             },
             "workflow_node_metadata": {
               "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -8328,9 +8340,13 @@
               "type": "string",
               "description": "URI of the input file, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
             },
-            "input_data": {
+            "deprecated_input_data": {
               "$ref": "#/definitions/coreLiteralMap",
-              "description": "Raw input data consumed by this task execution."
+              "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
+            },
+            "input_data": {
+              "$ref": "#/definitions/coreInputData",
+              "description": "Raw input data consumed by this node execution."
             },
             "output_uri": {
               "type": "string",
@@ -8340,9 +8356,13 @@
               "$ref": "#/definitions/coreExecutionError",
               "title": "Error information for the execution"
             },
-            "output_data": {
+            "deprecated_output_data": {
               "$ref": "#/definitions/coreLiteralMap",
-              "description": "Raw output data produced by this task execution."
+              "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+            },
+            "output_data": {
+              "$ref": "#/definitions/coreOutputData",
+              "description": "Raw output data produced by this workflow execution."
             },
             "custom_info": {
               "type": "object",
@@ -8474,9 +8494,17 @@
               "$ref": "#/definitions/coreExecutionError",
               "title": "Error information for the execution"
             },
-            "output_data": {
+            "deprecated_output_data": {
               "$ref": "#/definitions/coreLiteralMap",
+              "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+            },
+            "output_data": {
+              "$ref": "#/definitions/coreOutputData",
               "description": "Raw output data produced by this workflow execution."
+            },
+            "event_version": {
+              "type": "integer",
+              "format": "int32"
             }
           },
           "description": "Details about the event that occurred.",
@@ -9289,6 +9317,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Raw output data produced by this execution.\nDEPRECATED. Use GetExecutionData to fetch output data instead."
         },
+        "full_outputs": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this execution.\nDEPRECATED. Use GetExecutionData to fetch output data instead."
+        },
         "computed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "title": "Inputs computed and passed for execution.\ncomputed_inputs depends on inputs in ExecutionSpec, fixed and default inputs in launch plan"
@@ -9365,11 +9397,15 @@
         },
         "inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
+          "description": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional\nDeprecated: Please use input_data instead."
         },
         "org": {
           "type": "string",
           "description": "Optional, org key applied to the resource."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "title": "The inputs required to start the execution. All required inputs must be\nincluded in this map. If not required and not provided, defaults apply.\n+optional"
         }
       },
       "description": "Request to launch an execution with the given project, domain and optionally-assigned name."
@@ -9784,6 +9820,10 @@
         },
         "fixed_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan.\nDeprecated: Please use fixec_input_data instead"
+        },
+        "fixed_input_data": {
+          "$ref": "#/definitions/coreInputData",
           "description": "Fixed, non-overridable inputs for the Launch Plan.\nThese can not be overridden when an execution is created with this launch plan."
         },
         "role": {
@@ -10065,6 +10105,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Raw output data produced by this node execution.\nDEPRECATED. Use GetNodeExecutionData to fetch output data instead."
         },
+        "full_outputs": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this node execution."
+        },
         "phase": {
           "$ref": "#/definitions/coreNodeExecutionPhase",
           "description": "The last recorded phase for this node execution."
@@ -10136,11 +10180,19 @@
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use input_data instead."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use output_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData will only be populated if they are under a configured size threshold."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData will only be populated if they are under a configured size threshold."
         },
         "dynamic_workflow": {
           "$ref": "#/definitions/flyteidladminDynamicWorkflowNodeMetadata",
@@ -10560,6 +10612,10 @@
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Raw output data produced by this task execution.\nDEPRECATED. Use GetTaskExecutionData to fetch output data instead."
         },
+        "full_outputs": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this task execution."
+        },
         "phase": {
           "$ref": "#/definitions/coreTaskExecutionPhase",
           "description": "The last recorded phase for this task execution."
@@ -10654,11 +10710,19 @@
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use input_data instead."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use output_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData will only be populated if they are under a configured size threshold."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData will only be populated if they are under a configured size threshold."
         },
         "flyte_urls": {
           "$ref": "#/definitions/adminFlyteURLs",
@@ -10930,11 +10994,19 @@
         },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_inputs will only be populated if they are under a configured size threshold."
+          "description": "Full_inputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use input_data instead."
         },
         "full_outputs": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Full_outputs will only be populated if they are under a configured size threshold."
+          "description": "Full_outputs will only be populated if they are under a configured size threshold.\nDeprecated: Please use output_data instead."
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "InputData will only be populated if they are under a configured size threshold."
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "OutputData will only be populated if they are under a configured size threshold."
         }
       },
       "description": "Response structure for WorkflowExecutionGetDataRequest which contains inputs and outputs for an execution."
@@ -11525,6 +11597,19 @@
       },
       "description": "This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.\nFlyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path\nAny outputs generated by the user container - within output_path are automatically uploaded."
     },
+    "coreEnumType": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
+        }
+      },
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
     "coreError": {
       "type": "object",
       "properties": {
@@ -11717,6 +11802,16 @@
         }
       }
     },
+    "coreInputData": {
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of input variables to their values."
+        }
+      },
+      "description": "InputData represents the inputs to a task or workflow. It's an envelope that contains a map of input variables to\ntheir values."
+    },
     "coreK8sObjectMetadata": {
       "type": "object",
       "properties": {
@@ -11867,7 +11962,7 @@
           "description": "A blob might have specialized implementation details depending on associated metadata."
         },
         "enum_type": {
-          "$ref": "#/definitions/flyteidlcoreEnumType",
+          "$ref": "#/definitions/coreEnumType",
           "description": "Defines an enum with pre-defined string values."
         },
         "structured_dataset_type": {
@@ -12074,6 +12169,16 @@
         }
       },
       "description": "Defines an operand to a comparison expression."
+    },
+    "coreOutputData": {
+      "type": "object",
+      "properties": {
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of output variables to their values."
+        }
+      },
+      "description": "OutputData represents the outputs of a task or workflow. It's an envelope that contains a map of output variables to\ntheir values."
     },
     "coreOutputReference": {
       "type": "object",
@@ -13015,8 +13120,12 @@
         "input_uri": {
           "type": "string"
         },
-        "input_data": {
+        "deprecated_input_data": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
           "description": "Raw input data consumed by this node execution."
         },
         "output_uri": {
@@ -13027,9 +13136,13 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
-        "output_data": {
+        "deprecated_output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this node execution."
+          "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this workflow execution."
         },
         "workflow_node_metadata": {
           "$ref": "#/definitions/flyteidleventWorkflowNodeMetadata"
@@ -13156,9 +13269,13 @@
           "type": "string",
           "description": "URI of the input file, it encodes all the information\nincluding Cloud source provider. ie., s3://..."
         },
-        "input_data": {
+        "deprecated_input_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw input data consumed by this task execution."
+          "title": "Raw input data consumed by this node execution.\nDeprecated: please use input_data instead"
+        },
+        "input_data": {
+          "$ref": "#/definitions/coreInputData",
+          "description": "Raw input data consumed by this node execution."
         },
         "output_uri": {
           "type": "string",
@@ -13168,9 +13285,13 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
-        "output_data": {
+        "deprecated_output_data": {
           "$ref": "#/definitions/coreLiteralMap",
-          "description": "Raw output data produced by this task execution."
+          "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
+          "description": "Raw output data produced by this workflow execution."
         },
         "custom_info": {
           "type": "object",
@@ -13241,9 +13362,17 @@
           "$ref": "#/definitions/coreExecutionError",
           "title": "Error information for the execution"
         },
-        "output_data": {
+        "deprecated_output_data": {
           "$ref": "#/definitions/coreLiteralMap",
+          "title": "Raw output data produced by this workflow execution.\nDeprecated: please use output_data instead"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreOutputData",
           "description": "Raw output data produced by this workflow execution."
+        },
+        "event_version": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
@@ -13369,19 +13498,6 @@
         }
       },
       "title": "Metadata for a WorkflowNode"
-    },
-    "flyteidlcoreEnumType": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Predefined set of enum values."
-        }
-      },
-      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
     "flyteidlcoreKeyValuePair": {
       "type": "object",
@@ -13518,11 +13634,11 @@
       "properties": {
         "@type": {
           "type": "string",
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
         }
       },
       "additionalProperties": {},
-      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\nExample 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\nExample 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufNullValue": {
       "type": "string",
@@ -13530,7 +13646,7 @@
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "serviceAdminServiceCreateTaskBody": {
       "type": "object",

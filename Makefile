@@ -115,3 +115,12 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+
+.PHONY: gen
+gen:
+	make -C flyteidl generate
+	make -C flyteadmin generate
+	make -C flytepropeller generate
+	make -C flyteplugins generate
+	make -C flytestdlib generate
+	make -C flytecopilot generate

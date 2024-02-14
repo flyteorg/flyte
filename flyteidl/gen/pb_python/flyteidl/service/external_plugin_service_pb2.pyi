@@ -21,14 +21,16 @@ RUNNING: State
 SUCCEEDED: State
 
 class TaskCreateRequest(_message.Message):
-    __slots__ = ["inputs", "template", "output_prefix"]
-    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["deprecated_inputs", "template", "output_prefix", "inputs"]
+    DEPRECATED_INPUTS_FIELD_NUMBER: _ClassVar[int]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_PREFIX_FIELD_NUMBER: _ClassVar[int]
-    inputs: _literals_pb2.LiteralMap
+    INPUTS_FIELD_NUMBER: _ClassVar[int]
+    deprecated_inputs: _literals_pb2.LiteralMap
     template: _tasks_pb2.TaskTemplate
     output_prefix: str
-    def __init__(self, inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ...) -> None: ...
+    inputs: _literals_pb2.InputData
+    def __init__(self, deprecated_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ..., output_prefix: _Optional[str] = ..., inputs: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ...) -> None: ...
 
 class TaskCreateResponse(_message.Message):
     __slots__ = ["job_id"]
@@ -45,12 +47,14 @@ class TaskGetRequest(_message.Message):
     def __init__(self, task_type: _Optional[str] = ..., job_id: _Optional[str] = ...) -> None: ...
 
 class TaskGetResponse(_message.Message):
-    __slots__ = ["state", "outputs"]
+    __slots__ = ["state", "deprecated_outputs", "outputs"]
     STATE_FIELD_NUMBER: _ClassVar[int]
+    DEPRECATED_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     state: State
-    outputs: _literals_pb2.LiteralMap
-    def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
+    deprecated_outputs: _literals_pb2.LiteralMap
+    outputs: _literals_pb2.OutputData
+    def __init__(self, state: _Optional[_Union[State, str]] = ..., deprecated_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ...) -> None: ...
 
 class TaskDeleteRequest(_message.Message):
     __slots__ = ["task_type", "job_id"]

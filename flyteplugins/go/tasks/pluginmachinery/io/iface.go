@@ -15,8 +15,12 @@ import (
 type InputFilePaths interface {
 	// GetInputPrefixPath returns the inputs file path, minus the protobuf file name.
 	GetInputPrefixPath() storage.DataReference
-	// GetInputPath returns a path for where the protobuf encoded inputs of type `core.LiteralMap` can be found. The returned value is an URN in the configured storage backend
-	GetInputPath() storage.DataReference
+	// GetInputPath returns a path for where the protobuf encoded inputs of type `core.LiteralMap` can be found.
+	// The returned value is a URN in the configured storage backend
+	GetInputPath(ctx context.Context) (storage.DataReference, error)
+	// GetInputDataPath returns a path for where the protobuf encoded inputs of type `core.InputData` can be found.
+	// The returned value is a URN in the configured storage backend
+	GetInputDataPath() storage.DataReference
 }
 
 // InputReader provides a method to access the inputs for a task execution within the plugin's Task Context
@@ -24,7 +28,7 @@ type InputReader interface {
 	InputFilePaths
 	// Get the inputs for this task as a literal map, an error is returned only in case of systemic errors.
 	// No outputs or void is indicated using *core.LiteralMap -> nil
-	Get(ctx context.Context) (*core.LiteralMap, error)
+	Get(ctx context.Context) (*core.InputData, error)
 }
 
 // OutputReader provides an abstracted OutputReader interface. The plugins are responsible to provide
@@ -40,7 +44,7 @@ type OutputReader interface {
 	// Exists returns true if the output exists false otherwise
 	Exists(ctx context.Context) (bool, error)
 	// Read returns the output -> *core.LiteralMap (nil if void), *ExecutionError if user error when reading the output and error to indicate system problems
-	Read(ctx context.Context) (*core.LiteralMap, *ExecutionError, error)
+	Read(ctx context.Context) (*core.OutputData, *ExecutionError, error)
 	// DeckExists checks if the deck file has been generated.
 	DeckExists(ctx context.Context) (bool, error)
 }

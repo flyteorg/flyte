@@ -10,6 +10,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -50,14 +51,30 @@ func (r *taskEventRecorder) RecordTaskEvent(ctx context.Context, ev *event.TaskE
 	var origEvent = ev
 	var rawOutputPolicy = eventConfig.RawOutputPolicy
 	if rawOutputPolicy == config.RawOutputPolicyInline && len(ev.GetOutputUri()) > 0 {
-		outputs := &core.LiteralMap{}
-		err := r.store.ReadProtobuf(ctx, storage.DataReference(ev.GetOutputUri()), outputs)
+		outputs := &core.OutputData{}
+		outputsLit := &core.LiteralMap{}
+		msgIndex, err := r.store.ReadProtobufAny(ctx, storage.DataReference(ev.GetOutputUri()), outputs, outputsLit)
 		if err != nil {
 			// Fall back to forwarding along outputs by reference when we can't fetch them.
 			logger.Warnf(ctx, "failed to fetch outputs by ref [%s] to send inline with err: %v", ev.GetOutputUri(), err)
 			rawOutputPolicy = config.RawOutputPolicyReference
+		} else if ev.EventVersion < int32(v1alpha1.EventVersion3) {
+			origEvent = proto.Clone(ev).(*event.TaskExecutionEvent)
+			if msgIndex == 0 { // OutputData
+				outputsLit = outputs.Outputs
+			}
+
+			ev.OutputResult = &event.TaskExecutionEvent_DeprecatedOutputData{
+				DeprecatedOutputData: outputsLit,
+			}
 		} else {
 			origEvent = proto.Clone(ev).(*event.TaskExecutionEvent)
+			if msgIndex == 1 { // LiteralMap
+				outputs = &core.OutputData{
+					Outputs: outputsLit,
+				}
+			}
+
 			ev.OutputResult = &event.TaskExecutionEvent_OutputData{
 				OutputData: outputs,
 			}

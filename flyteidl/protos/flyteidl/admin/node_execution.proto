@@ -144,6 +144,9 @@ message NodeExecutionClosure {
         // Raw output data produced by this node execution.
         // DEPRECATED. Use GetNodeExecutionData to fetch output data instead.
         core.LiteralMap output_data        = 10 [deprecated = true];
+
+        // Raw output data produced by this node execution.
+        core.OutputData full_outputs       = 13;
     }
 
     // The last recorded phase for this node execution.
@@ -224,10 +227,18 @@ message NodeExecutionGetDataResponse {
     UrlBlob outputs                            = 2  [deprecated = true];
 
     // Full_inputs will only be populated if they are under a configured size threshold.
-    core.LiteralMap full_inputs                = 3;
+    // Deprecated: Please use input_data instead.
+    core.LiteralMap full_inputs                = 3 [deprecated = true];
 
-    // Full_outputs will only be populated if they are under a configured size threshold. 
-    core.LiteralMap full_outputs               = 4;
+    // Full_outputs will only be populated if they are under a configured size threshold.
+    // Deprecated: Please use output_data instead.
+    core.LiteralMap full_outputs               = 4 [deprecated = true];
+
+    // InputData will only be populated if they are under a configured size threshold.
+    core.InputData input_data                  = 5;
+
+    // OutputData will only be populated if they are under a configured size threshold.
+    core.OutputData output_data                = 6;
 
     // Optional Workflow closure for a dynamically generated workflow, in the case this node yields a dynamic workflow we return its structure here.
     DynamicWorkflowNodeMetadata dynamic_workflow = 16;

@@ -169,7 +169,7 @@ type OutputReader_Read struct {
 	*mock.Call
 }
 
-func (_m OutputReader_Read) Return(_a0 *core.LiteralMap, _a1 *io.ExecutionError, _a2 error) *OutputReader_Read {
+func (_m OutputReader_Read) Return(_a0 *core.OutputData, _a1 *io.ExecutionError, _a2 error) *OutputReader_Read {
 	return &OutputReader_Read{Call: _m.Call.Return(_a0, _a1, _a2)}
 }
 
@@ -184,15 +184,15 @@ func (_m *OutputReader) OnReadMatch(matchers ...interface{}) *OutputReader_Read 
 }
 
 // Read provides a mock function with given fields: ctx
-func (_m *OutputReader) Read(ctx context.Context) (*core.LiteralMap, *io.ExecutionError, error) {
+func (_m *OutputReader) Read(ctx context.Context) (*core.OutputData, *io.ExecutionError, error) {
 	ret := _m.Called(ctx)
 
-	var r0 *core.LiteralMap
-	if rf, ok := ret.Get(0).(func(context.Context) *core.LiteralMap); ok {
+	var r0 *core.OutputData
+	if rf, ok := ret.Get(0).(func(context.Context) *core.OutputData); ok {
 		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*core.LiteralMap)
+			r0 = ret.Get(0).(*core.OutputData)
 		}
 	}
 

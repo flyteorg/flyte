@@ -80,11 +80,11 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(nil)
 
 		wfStatus := &mocks2.MutableWorkflowNodeStatus{}
-		mockNodeStatus.On("GetOrCreateWorkflowStatus").Return(wfStatus)
+		mockNodeStatus.OnGetOrCreateWorkflowStatus().Return(wfStatus)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
 		s, err := h.StartLaunchPlan(ctx, nCtx)
@@ -109,7 +109,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(errors.Wrapf(launchplan.RemoteErrorAlreadyExists, fmt.Errorf("blah"), "failed"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseUndefined, mockNode, mockNodeStatus)
@@ -135,7 +135,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("blah"), "failed"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
@@ -161,7 +161,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(errors.Wrapf(launchplan.RemoteErrorUser, fmt.Errorf("blah"), "failed"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
@@ -215,7 +215,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
-			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
+			mock.MatchedBy(func(o *core.InputData) bool { return o.GetInputs().GetLiterals() == nil }),
 		).Return(nil)
 
 		wfStatus := &mocks2.MutableWorkflowNodeStatus{}
@@ -224,7 +224,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 		nCtx := &mocks3.NodeExecutionContext{}
 
 		ir := &mocks4.InputReader{}
-		inputs := &core.LiteralMap{}
+		inputs := &core.InputData{}
 		ir.OnGetMatch(mock.Anything).Return(inputs, nil)
 		nCtx.OnInputReader().Return(ir)
 
@@ -305,14 +305,14 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		h := launchPlanHandler{
 			launchPlan: mockLPExec,
 		}
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_RUNNING,
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -328,7 +328,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		h := launchPlanHandler{
 			launchPlan: mockLPExec,
 		}
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
@@ -355,15 +355,17 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		op := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"x": coreutils.MustMakePrimitiveLiteral(1),
+		op := &core.OutputData{
+			Outputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"x": coreutils.MustMakePrimitiveLiteral(1),
+				},
 			},
 		}
 		err := mockStore.WriteProtobuf(ctx, uri, storage.Options{}, op)
 		assert.NoError(t, err)
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
@@ -384,9 +386,10 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, handler.EPhaseSuccess, s.Info().GetPhase())
-		final := &core.LiteralMap{}
-		assert.NoError(t, mockStore.ReadProtobuf(ctx, v1alpha1.GetOutputsFile(dataDir), final), mockStore)
-		v, ok := final.GetLiterals()["x"]
+		final := &core.OutputData{}
+		_, err = mockStore.ReadProtobufAny(ctx, v1alpha1.GetOutputsFile(dataDir), final)
+		assert.NoError(t, err, mockStore)
+		v, ok := final.GetOutputs().GetLiterals()["x"]
 		assert.True(t, ok)
 		assert.Equal(t, int64(1), v.GetScalar().GetPrimitive().GetInteger())
 	})
@@ -400,12 +403,14 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		op := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"x": coreutils.MustMakePrimitiveLiteral(1),
+		op := &core.OutputData{
+			Outputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"x": coreutils.MustMakePrimitiveLiteral(1),
+				},
 			},
 		}
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
@@ -415,7 +420,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			OutputResult: &admin.ExecutionClosure_Outputs{
 				Outputs: &admin.LiteralMapBlob{
 					Data: &admin.LiteralMapBlob_Values{
-						Values: op,
+						Values: op.GetOutputs(),
 					},
 				},
 			},
@@ -426,9 +431,10 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
 		assert.NoError(t, err)
 		assert.Equal(t, s.Info().GetPhase(), handler.EPhaseSuccess)
-		final := &core.LiteralMap{}
-		assert.NoError(t, mockStore.ReadProtobuf(ctx, v1alpha1.GetOutputsFile(dataDir), final))
-		v, ok := final.GetLiterals()["x"]
+		final := &core.OutputData{}
+		_, err = mockStore.ReadProtobufAny(ctx, v1alpha1.GetOutputsFile(dataDir), final)
+		assert.NoError(t, err, mockStore)
+		v, ok := final.GetOutputs().GetLiterals()["x"]
 		assert.True(t, ok)
 		assert.Equal(t, int64(1), v.GetScalar().GetPrimitive().GetInteger())
 	})
@@ -442,7 +448,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
@@ -455,7 +461,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					Code:    "code",
 				},
 			},
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -472,14 +478,14 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_FAILED,
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -496,14 +502,14 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
 		).Return(&admin.ExecutionClosure{
 			Phase: core.WorkflowExecution_ABORTED,
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -520,12 +526,12 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found"))
+		).Return(nil, &core.OutputData{}, errors.Wrapf(launchplan.RemoteErrorNotFound, fmt.Errorf("some error"), "not found"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -542,12 +548,12 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-		).Return(nil, &core.LiteralMap{}, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found"))
+		).Return(nil, &core.OutputData{}, errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("some error"), "not found"))
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		s, err := h.CheckLaunchPlanStatus(ctx, nCtx)
@@ -570,7 +576,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 				"x": coreutils.MustMakePrimitiveLiteral(1),
 			},
 		}
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
@@ -584,7 +590,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					},
 				},
 			},
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
@@ -604,7 +610,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 			eventConfig: eventConfig,
 		}
 
-		mockLPExec.On("GetStatus",
+		mockLPExec.OnGetStatusMatch(
 			ctx,
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
@@ -618,7 +624,7 @@ func TestSubWorkflowHandler_CheckLaunchPlanStatus(t *testing.T) {
 					},
 				},
 			},
-		}, &core.LiteralMap{}, nil)
+		}, &core.OutputData{}, nil)
 
 		nCtx := createNodeContext(v1alpha1.WorkflowNodePhaseExecuting, mockNode, mockNodeStatus)
 		nCtx.OnDataStore().Return(mockStore)
@@ -649,12 +655,12 @@ func TestLaunchPlanHandler_HandleAbort(t *testing.T) {
 	})
 
 	mockNode := &mocks2.ExecutableNode{}
-	mockNode.On("GetID").Return(nodeID)
-	mockNode.On("GetWorkflowNode").Return(mockWfNode)
+	mockNode.OnGetID().Return(nodeID)
+	mockNode.OnGetWorkflowNode().Return(mockWfNode)
 
 	mockNodeStatus := &mocks2.ExecutableNodeStatus{}
-	mockNodeStatus.On("GetAttempts").Return(attempts)
-	mockNodeStatus.On("GetDataDir").Return(dataDir)
+	mockNodeStatus.OnGetAttempts().Return(attempts)
+	mockNodeStatus.OnGetDataDir().Return(dataDir)
 
 	t.Run("abort-success", func(t *testing.T) {
 		mockLPExec := &mocks.Executor{}

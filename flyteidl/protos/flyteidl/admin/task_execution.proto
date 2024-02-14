@@ -86,6 +86,9 @@ message TaskExecutionClosure {
         // Raw output data produced by this task execution.
         // DEPRECATED. Use GetTaskExecutionData to fetch output data instead.
         core.LiteralMap output_data        = 12 [deprecated = true];
+
+        // Raw output data produced by this task execution.
+        core.OutputData full_outputs = 19;
     }
 
     // The last recorded phase for this task execution.
@@ -157,10 +160,18 @@ message TaskExecutionGetDataResponse {
     UrlBlob outputs                            = 2 [deprecated = true];
 
     // Full_inputs will only be populated if they are under a configured size threshold.
-    core.LiteralMap full_inputs                = 3;
+    // Deprecated: Please use input_data instead.
+    core.LiteralMap full_inputs                = 3 [deprecated = true];
 
     // Full_outputs will only be populated if they are under a configured size threshold.
-    core.LiteralMap full_outputs               = 4;
+    // Deprecated: Please use output_data instead.
+    core.LiteralMap full_outputs               = 4 [deprecated = true];
+
+    // InputData will only be populated if they are under a configured size threshold.
+    core.InputData input_data                  = 6;
+
+    // OutputData will only be populated if they are under a configured size threshold.
+    core.OutputData output_data                = 7;
 
     // flyte tiny url to fetch a core.LiteralMap of task execution's IO
     // Deck will be empty for task

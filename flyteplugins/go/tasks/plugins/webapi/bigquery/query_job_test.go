@@ -7,6 +7,7 @@ import (
 	"google.golang.org/api/bigquery/v2"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
 func TestGetQueryParameter(t *testing.T) {
@@ -68,7 +69,7 @@ func TestGetJobConfigurationQuery(t *testing.T) {
 			"integer": 42,
 		})
 
-		jobConfigurationQuery, err := getJobConfigurationQuery(&config, inputs)
+		jobConfigurationQuery, err := getJobConfigurationQuery(&config, &core.InputData{Inputs: inputs})
 		useLegacySQL := false
 
 		assert.NoError(t, err)

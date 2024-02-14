@@ -104,7 +104,7 @@ func TestOutputWriter(t *testing.T) {
 		literals, ee, err := or.Read(ctx)
 		assert.NoError(t, err)
 
-		sd := literals.GetLiterals()["results"].GetScalar().GetStructuredDataset()
+		sd := literals.GetOutputs().GetLiterals()["results"].GetScalar().GetStructuredDataset()
 		assert.Equal(t, sd.Uri, outputLocation)
 		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].Name, "col1")
 		assert.Equal(t, sd.Metadata.GetStructuredDatasetType().Columns[0].LiteralType.GetSimple(), flyteIdlCore.SimpleType_INTEGER)

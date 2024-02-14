@@ -103,6 +103,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 		Inputs:           taskCtx.InputReader(),
 		OutputPath:       taskCtx.OutputWriter(),
 		Task:             taskCtx.TaskReader(),
+		Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 	})
 	if err != nil {
 		return nil, nil, err

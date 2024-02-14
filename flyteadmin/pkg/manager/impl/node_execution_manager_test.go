@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"google.golang.org/grpc/status"
 	"testing"
 	"time"
 
@@ -12,11 +13,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
+	protoV2 "google.golang.org/protobuf/proto"
 
 	eventWriterMocks "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	dataMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -1282,16 +1284,13 @@ func TestGetNodeExecutionData(t *testing.T) {
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		if reference.String() == "input uri" {
 			marshalled, _ := proto.Marshal(fullInputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		} else if reference.String() == util.OutputsFile {
 			marshalled, _ := proto.Marshal(fullOutputs)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		} else if reference.String() == dynamicWorkflowClosureRef {
 			marshalled, _ := proto.Marshal(&dynamicWorkflowClosure)
-			_ = proto.Unmarshal(marshalled, msg)
-			return nil
+			return protoV2.UnmarshalOptions{DiscardUnknown: false, AllowPartial: false}.Unmarshal(marshalled, proto.MessageV2(msg))
 		}
 		return fmt.Errorf("unexpected call to find value in storage [%v]", reference.String())
 	}
@@ -1300,7 +1299,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 		Id: &nodeExecutionIdentifier,
 	})
 	assert.NoError(t, err)
-	assert.True(t, proto.Equal(&admin.NodeExecutionGetDataResponse{
+	commonTestUtils.AssertProtoEqual(t, &admin.NodeExecutionGetDataResponse{
 		Inputs: &admin.UrlBlob{
 			Url:   "inputs",
 			Bytes: 100,
@@ -1311,6 +1310,10 @@ func TestGetNodeExecutionData(t *testing.T) {
 		},
 		FullInputs:  fullInputs,
 		FullOutputs: fullOutputs,
+		InputData:   migrateInputData(nil, fullInputs),
+		OutputData: &core.OutputData{
+			Outputs: fullOutputs,
+		},
 		DynamicWorkflow: &admin.DynamicWorkflowNodeMetadata{
 			Id:               dynamicWorkflowClosure.Primary.Template.Id,
 			CompiledWorkflow: &dynamicWorkflowClosure,
@@ -1320,7 +1323,7 @@ func TestGetNodeExecutionData(t *testing.T) {
 			Outputs: "flyte://v1/project/domain/name/node id/o",
 			Deck:    "flyte://v1/project/domain/name/node id/d",
 		},
-	}, dataResponse))
+	}, dataResponse)
 }
 
 func Test_GetDynamicNodeWorkflow_Success(t *testing.T) {

@@ -88,10 +88,10 @@ func GetMockTaskExecutionContext() core.TaskExecutionContext {
 	dummyTaskMetadata := GetMockTaskExecutionMetadata()
 	taskCtx := &coreMock.TaskExecutionContext{}
 	inputReader := &ioMock.InputReader{}
-	inputReader.On("GetInputPath").Return(storage.DataReference("test-data-reference"))
-	inputReader.On("Get", mock.Anything).Return(&idlCore.LiteralMap{}, nil)
-	inputReader.On("GetInputPrefixPath").Return(storage.DataReference("/data"))
-	taskCtx.On("InputReader").Return(inputReader)
+	inputReader.OnGetInputDataPath().Return(storage.DataReference("test-data-reference"))
+	inputReader.OnGetMatch(mock.Anything).Return(&idlCore.InputData{}, nil)
+	inputReader.OnGetInputPrefixPath().Return(storage.DataReference("/data"))
+	taskCtx.OnInputReader().Return(inputReader)
 
 	outputReader := &ioMock.OutputWriter{}
 	outputReader.On("GetOutputPath").Return(storage.DataReference("/data/outputs.pb"))

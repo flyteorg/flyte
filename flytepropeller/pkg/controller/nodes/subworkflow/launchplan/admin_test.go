@@ -428,7 +428,7 @@ type test struct {
 	storageReadError      error
 	expectSuccess         bool
 	expectError           bool
-	expectedOutputs       *core.LiteralMap
+	expectedOutputs       *core.OutputData
 	expectedErrorContains string
 }
 
@@ -452,9 +452,11 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 			Phase: core.WorkflowExecution_SUCCEEDED,
 		},
 	}
-	outputLiteral := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+	outputLiteral := &core.OutputData{
+		Outputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo-1": coreutils.MustMakeLiteral("foo-value-1"),
+			},
 		},
 	}
 
@@ -490,7 +492,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 			cacheItem:       executionCacheItem{},
 			expectedOutputs: outputLiteral,
 			getExecutionDataResp: &admin.WorkflowExecutionGetDataResponse{
-				FullOutputs: outputLiteral,
+				FullOutputs: outputLiteral.GetOutputs(),
 			},
 			getExecutionDataError: nil,
 			getExecutionResp:      mockExecutionRespWithOutputs,
@@ -532,7 +534,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 				FullOutputs: &core.LiteralMap{},
 			},
 			getExecutionDataError: nil,
-			expectedOutputs:       &core.LiteralMap{},
+			expectedOutputs:       nil,
 			getExecutionResp:      mockExecutionRespWithOutputs,
 		},
 	}

@@ -113,6 +113,7 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflowTemplate(ctx context.Con
 			}
 		}
 	}
+
 	return &core.WorkflowTemplate{
 		Id: &core.Identifier{
 			Project:      nCtx.NodeExecutionMetadata().GetNodeExecutionID().GetExecutionId().Project,
@@ -256,7 +257,7 @@ func (d dynamicNodeTaskNodeHandler) buildDynamicWorkflow(ctx context.Context, nC
 		return nil, nil, errors.Wrapf(utils.ErrorCodeUser, err, "malformed dynamic workflow")
 	}
 
-	dynamicWf, err := k8s.BuildFlyteWorkflow(closure, &core.LiteralMap{}, nil, "")
+	dynamicWf, err := k8s.BuildFlyteWorkflow(closure, &core.InputData{Inputs: &core.LiteralMap{}}, nil, "")
 	if err != nil {
 		return nil, nil, errors.Wrapf(utils.ErrorCodeSystem, err, "failed to build workflow")
 	}

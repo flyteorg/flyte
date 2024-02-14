@@ -507,7 +507,7 @@ func TestAddCoPilotToPod(t *testing.T) {
 	inputPaths := &pluginsIOMock.InputFilePaths{}
 	inputs := "/base/inputs"
 	inputPaths.OnGetInputPrefixPath().Return(storage.DataReference(inputs))
-	inputPaths.OnGetInputPath().Return(storage.DataReference(inputs + "/inputs.pb"))
+	inputPaths.OnGetInputDataPath().Return(storage.DataReference(inputs + "/inputs.pb"))
 
 	opath := &pluginsIOMock.OutputFilePaths{}
 	opath.OnGetRawOutputPrefix().Return("/raw")

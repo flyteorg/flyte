@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
+	commonTestUtils "github.com/flyteorg/flyte/flyteadmin/pkg/common/testutils"
 	flyteAdminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	genModel "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/gen/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -52,9 +53,11 @@ const dynamicWorkflowClosureRef = "s3://bucket/admin/metadata/workflow"
 
 const testInputURI = "fake://bucket/inputs.pb"
 
-var testInputs = &core.LiteralMap{
-	Literals: map[string]*core.Literal{
-		"foo": coreutils.MustMakeLiteral("bar"),
+var testInputs = &core.InputData{
+	Inputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": coreutils.MustMakeLiteral("bar"),
+		},
 	},
 }
 
@@ -102,15 +105,17 @@ func TestAddTerminalState_OutputURI(t *testing.T) {
 }
 
 func TestAddTerminalState_OutputData(t *testing.T) {
-	outputData := &core.LiteralMap{
-		Literals: map[string]*core.Literal{
-			"foo": {
-				Value: &core.Literal_Scalar{
-					Scalar: &core.Scalar{
-						Value: &core.Scalar_Primitive{
-							Primitive: &core.Primitive{
-								Value: &core.Primitive_Integer{
-									Integer: 4,
+	outputData := &core.OutputData{
+		Outputs: &core.LiteralMap{
+			Literals: map[string]*core.Literal{
+				"foo": {
+					Value: &core.Literal_Scalar{
+						Scalar: &core.Scalar{
+							Value: &core.Scalar_Primitive{
+								Primitive: &core.Primitive{
+									Value: &core.Primitive_Integer{
+										Integer: 4,
+									},
 								},
 							},
 						},
@@ -119,6 +124,7 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 			},
 		},
 	}
+
 	request := admin.NodeExecutionEventRequest{
 		Event: &event.NodeExecutionEvent{
 			Id: &core.NodeExecutionIdentifier{
@@ -148,7 +154,7 @@ func TestAddTerminalState_OutputData(t *testing.T) {
 		err := addTerminalState(context.TODO(), &request, &nodeExecutionModel, &closure,
 			interfaces.InlineEventDataPolicyStoreInline, commonMocks.GetMockStorageClient())
 		assert.Nil(t, err)
-		assert.EqualValues(t, outputData, closure.GetOutputData())
+		commonTestUtils.AssertProtoEqual(t, outputData, closure.GetFullOutputs())
 		assert.Equal(t, time.Minute, nodeExecutionModel.Duration)
 	})
 	t.Run("output data stored offloaded", func(t *testing.T) {
@@ -670,10 +676,10 @@ func TestHandleNodeExecutionInputs(t *testing.T) {
 		assert.NoError(t, err)
 		expectedOffloadedInputsLocation := "/metadata/project/domain/name/node-id/offloaded_inputs"
 		assert.Equal(t, nodeExecutionModel.InputURI, expectedOffloadedInputsLocation)
-		actualInputs := &core.LiteralMap{}
+		actualInputs := &core.InputData{}
 		err = ds.ReadProtobuf(ctx, storage.DataReference(expectedOffloadedInputsLocation), actualInputs)
 		assert.NoError(t, err)
-		assert.True(t, proto.Equal(actualInputs, testInputs))
+		commonTestUtils.AssertProtoEqual(t, testInputs, actualInputs)
 	})
 	t.Run("read event input uri", func(t *testing.T) {
 		nodeExecutionModel := models.NodeExecution{}

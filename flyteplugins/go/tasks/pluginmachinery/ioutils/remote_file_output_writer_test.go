@@ -33,7 +33,7 @@ func TestRemoteFileOutputWriter(t *testing.T) {
 
 		assert.Equal(t, constructPath(memStore, rawOutputPrefix, CheckpointPrefix), checkpointPath.GetCheckpointPrefix())
 		assert.Equal(t, constructPath(memStore, outputPrefix, OutputsSuffix), checkpointPath.GetOutputPath())
-		assert.Equal(t, constructPath(memStore, outputPrefix, deckSuffix), checkpointPath.GetDeckPath())
+		assert.Equal(t, constructPath(memStore, outputPrefix, DeckSuffix), checkpointPath.GetDeckPath())
 		assert.Equal(t, constructPath(memStore, outputPrefix, ErrorsSuffix), checkpointPath.GetErrorPath())
 		assert.Equal(t, constructPath(memStore, outputPrefix, FuturesSuffix), checkpointPath.GetFuturesPath())
 	})
@@ -43,7 +43,7 @@ func TestRemoteFileOutputWriter(t *testing.T) {
 
 		assert.Equal(t, constructPath(memStore, rawOutputPrefix, CheckpointPrefix), p.GetCheckpointPrefix())
 		assert.Equal(t, constructPath(memStore, outputPrefix, OutputsSuffix), p.GetOutputPath())
-		assert.Equal(t, constructPath(memStore, outputPrefix, deckSuffix), p.GetDeckPath())
+		assert.Equal(t, constructPath(memStore, outputPrefix, DeckSuffix), p.GetDeckPath())
 		assert.Equal(t, constructPath(memStore, outputPrefix, ErrorsSuffix), p.GetErrorPath())
 	})
 }

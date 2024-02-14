@@ -26,15 +26,18 @@ func (d dummyInputReader) GetInputPrefixPath() storage.DataReference {
 	return d.inputPrefix
 }
 
-func (d dummyInputReader) GetInputPath() storage.DataReference {
+func (d dummyInputReader) GetInputPath(ctx context.Context) (storage.DataReference, error) {
+	return d.inputPath, nil
+}
+func (d dummyInputReader) GetInputDataPath() storage.DataReference {
 	return d.inputPath
 }
 
-func (d dummyInputReader) Get(ctx context.Context) (*core.LiteralMap, error) {
+func (d dummyInputReader) Get(ctx context.Context) (*core.InputData, error) {
 	if d.inputErr {
 		return nil, fmt.Errorf("expected input fetch error")
 	}
-	return d.inputs, nil
+	return &core.InputData{Inputs: d.inputs}, nil
 }
 
 type dummyOutputPaths struct {
@@ -95,6 +98,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 		Inputs:           in,
 		OutputPath:       out,
 		Task:             nil,
+		Runtime:          &core.RuntimeMetadata{},
 	}
 	t.Run("nothing to substitute", func(t *testing.T) {
 		actual, err := Render(context.TODO(), []string{
@@ -131,6 +135,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			Inputs:           in,
 			OutputPath:       out,
 			Task:             nil,
+			Runtime:          &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -211,6 +216,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 			Inputs:           in,
 			OutputPath:       out,
 			Task:             nil,
+			Runtime:          &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -467,6 +473,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
 				checkpointPath:      "s3://new-checkpoint/prefix",
 			},
+			Runtime: &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -493,6 +500,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				prevCheckpointPath:  "",
 				checkpointPath:      "s3://new-checkpoint/prefix",
 			},
+			Runtime: &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",
@@ -523,6 +531,7 @@ func TestReplaceTemplateCommandArgs(t *testing.T) {
 				prevCheckpointPath:  "s3://prev-checkpoint/prefix",
 				checkpointPath:      "s3://new-checkpoint/prefix",
 			},
+			Runtime: &core.RuntimeMetadata{},
 		}
 		actual, err := Render(context.TODO(), []string{
 			"hello",

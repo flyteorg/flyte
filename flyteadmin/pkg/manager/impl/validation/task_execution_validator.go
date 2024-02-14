@@ -14,7 +14,15 @@ func ValidateTaskExecutionRequest(request admin.TaskExecutionEventRequest, maxOu
 	if request.Event.OccurredAt == nil {
 		return shared.GetMissingArgumentError(shared.OccurredAt)
 	}
-	if err := ValidateOutputData(request.Event.GetOutputData(), maxOutputSizeInBytes); err != nil {
+
+	outputData := request.GetEvent().GetOutputData()
+	if outputData == nil {
+		outputData = &core.OutputData{
+			Outputs: request.GetEvent().GetDeprecatedOutputData(),
+		}
+	}
+
+	if err := ValidateOutputData(outputData, maxOutputSizeInBytes); err != nil {
 		return err
 	}
 

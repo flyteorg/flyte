@@ -535,8 +535,10 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 	response := &admin.NodeExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
-		FullInputs:  inputs,
-		FullOutputs: outputs,
+		FullInputs:  inputs.GetInputs(),
+		FullOutputs: outputs.GetOutputs(),
+		InputData:   inputs,
+		OutputData:  outputs,
 		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(*request.Id, nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
 	}
 

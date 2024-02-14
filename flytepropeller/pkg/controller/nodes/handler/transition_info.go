@@ -64,7 +64,7 @@ type ExecutionInfo struct {
 	DynamicNodeInfo  *DynamicNodeInfo
 	WorkflowNodeInfo *WorkflowNodeInfo
 	BranchNodeInfo   *BranchNodeInfo
-	Inputs           *core.LiteralMap
+	Inputs           *core.InputData
 	OutputInfo       *OutputInfo
 	TaskNodeInfo     *TaskNodeInfo
 	GateNodeInfo     *GateNodeInfo
@@ -135,7 +135,7 @@ func PhaseInfoNotReady(reason string) PhaseInfo {
 	return phaseInfo(EPhaseNotReady, nil, nil, reason)
 }
 
-func PhaseInfoQueued(reason string, inputs *core.LiteralMap) PhaseInfo {
+func PhaseInfoQueued(reason string, inputs *core.InputData) PhaseInfo {
 	return phaseInfo(EPhaseQueued, nil, &ExecutionInfo{
 		Inputs: inputs,
 	}, reason)

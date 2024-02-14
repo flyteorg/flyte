@@ -358,7 +358,7 @@ func TestWriteOutputs(t *testing.T) {
 		literals, err1, err2 := reader.Read(context.Background())
 		assert.Nil(t, err1)
 		assert.NoError(t, err2)
-		assert.NotNil(t, literals.Literals["results"].GetScalar().GetSchema())
+		assert.NotNil(t, literals.GetOutputs().GetLiterals()["results"].GetScalar().GetSchema())
 	})
 
 	state := ExecutionState{}

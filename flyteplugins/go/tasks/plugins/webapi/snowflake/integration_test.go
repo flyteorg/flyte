@@ -50,7 +50,7 @@ func TestEndToEnd(t *testing.T) {
 		config["schema"] = "my-schema"
 		config["warehouse"] = "my-warehouse"
 
-		inputs, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+		inputs := &flyteIdlCore.InputData{Inputs: coreutils.MustMakeLiteral(map[string]interface{}{"x": 1}).GetMap()}
 		template := flyteIdlCore.TaskTemplate{
 			Type:   "snowflake",
 			Config: config,

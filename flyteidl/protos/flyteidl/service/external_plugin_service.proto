@@ -31,11 +31,16 @@ message TaskCreateRequest {
   // The inputs required to start the execution. All required inputs must be
   // included in this map. If not required and not provided, defaults apply.
   // +optional
-  core.LiteralMap inputs = 1;
+  // Deprecated: please use inputs instead.
+  core.LiteralMap deprecated_inputs = 1 [deprecated = true];
   // Template of the task that encapsulates all the metadata of the task.
   core.TaskTemplate template = 2;
   // Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
   string output_prefix = 3;
+  // The inputs required to start the execution. All required inputs must be
+  // included in this map. If not required and not provided, defaults apply.
+  // +optional
+  core.InputData inputs = 4;
 }
 
 // Represents a create response structure.
@@ -61,7 +66,13 @@ message TaskGetResponse {
   // The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
   // Structured dataset pointing to the query result table.
   // +optional
-  core.LiteralMap outputs = 2;
+  // Deprecated: Please use outputs instead
+  core.LiteralMap deprecated_outputs = 2;
+
+  // The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a
+  // Structured dataset pointing to the query result table.
+  // +optional
+  core.OutputData outputs = 3;
 }
 
 // A message used to delete a task.

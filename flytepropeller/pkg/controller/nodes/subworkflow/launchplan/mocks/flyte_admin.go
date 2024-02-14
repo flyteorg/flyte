@@ -64,7 +64,7 @@ type FlyteAdmin_GetStatus struct {
 	*mock.Call
 }
 
-func (_m FlyteAdmin_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 *core.LiteralMap, _a2 error) *FlyteAdmin_GetStatus {
+func (_m FlyteAdmin_GetStatus) Return(_a0 *admin.ExecutionClosure, _a1 *core.OutputData, _a2 error) *FlyteAdmin_GetStatus {
 	return &FlyteAdmin_GetStatus{Call: _m.Call.Return(_a0, _a1, _a2)}
 }
 
@@ -79,7 +79,7 @@ func (_m *FlyteAdmin) OnGetStatusMatch(matchers ...interface{}) *FlyteAdmin_GetS
 }
 
 // GetStatus provides a mock function with given fields: ctx, executionID
-func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.LiteralMap, error) {
+func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowExecutionIdentifier) (*admin.ExecutionClosure, *core.OutputData, error) {
 	ret := _m.Called(ctx, executionID)
 
 	var r0 *admin.ExecutionClosure
@@ -91,12 +91,12 @@ func (_m *FlyteAdmin) GetStatus(ctx context.Context, executionID *core.WorkflowE
 		}
 	}
 
-	var r1 *core.LiteralMap
-	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier) *core.LiteralMap); ok {
+	var r1 *core.OutputData
+	if rf, ok := ret.Get(1).(func(context.Context, *core.WorkflowExecutionIdentifier) *core.OutputData); ok {
 		r1 = rf(ctx, executionID)
 	} else {
 		if ret.Get(1) != nil {
-			r1 = ret.Get(1).(*core.LiteralMap)
+			r1 = ret.Get(1).(*core.OutputData)
 		}
 	}
 
@@ -182,7 +182,7 @@ func (_m FlyteAdmin_Launch) Return(_a0 error) *FlyteAdmin_Launch {
 	return &FlyteAdmin_Launch{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *FlyteAdmin) OnLaunch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) *FlyteAdmin_Launch {
+func (_m *FlyteAdmin) OnLaunch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.InputData) *FlyteAdmin_Launch {
 	c_call := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs)
 	return &FlyteAdmin_Launch{Call: c_call}
 }
@@ -193,11 +193,11 @@ func (_m *FlyteAdmin) OnLaunchMatch(matchers ...interface{}) *FlyteAdmin_Launch 
 }
 
 // Launch provides a mock function with given fields: ctx, launchCtx, executionID, launchPlanRef, inputs
-func (_m *FlyteAdmin) Launch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
+func (_m *FlyteAdmin) Launch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.InputData) error {
 	ret := _m.Called(ctx, launchCtx, executionID, launchPlanRef, inputs)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, launchplan.LaunchContext, *core.WorkflowExecutionIdentifier, *core.Identifier, *core.LiteralMap) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, launchplan.LaunchContext, *core.WorkflowExecutionIdentifier, *core.Identifier, *core.InputData) error); ok {
 		r0 = rf(ctx, launchCtx, executionID, launchPlanRef, inputs)
 	} else {
 		r0 = ret.Error(0)

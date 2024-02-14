@@ -538,15 +538,17 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 		assert.EqualValues(t, expectedModel, executionModel)
 	})
 	t.Run("output data set", func(t *testing.T) {
-		outputData := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": {
-					Value: &core.Literal_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Primitive{
-								Primitive: &core.Primitive{
-									Value: &core.Primitive_Integer{
-										Integer: 4,
+		outputData := &core.OutputData{
+			Outputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{
+										Value: &core.Primitive_Integer{
+											Integer: 4,
+										},
 									},
 								},
 							},
@@ -555,6 +557,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 				},
 			},
 		}
+
 		err := UpdateExecutionModelState(context.TODO(), &executionModel, admin.WorkflowExecutionEventRequest{
 			Event: &event.WorkflowExecutionEvent{
 				Phase:      core.WorkflowExecution_SUCCEEDED,
@@ -576,8 +579,8 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 			StartedAt: startedAtProto,
 			UpdatedAt: occurredAtProto,
 			Duration:  durationProto,
-			OutputResult: &admin.ExecutionClosure_OutputData{
-				OutputData: outputData,
+			OutputResult: &admin.ExecutionClosure_FullOutputs{
+				FullOutputs: outputData,
 			},
 		}
 		closureBytes, _ := proto.Marshal(&expectedClosure)
@@ -585,15 +588,17 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 		assert.EqualValues(t, expectedModel, executionModel)
 	})
 	t.Run("output data offloaded", func(t *testing.T) {
-		outputData := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": {
-					Value: &core.Literal_Scalar{
-						Scalar: &core.Scalar{
-							Value: &core.Scalar_Primitive{
-								Primitive: &core.Primitive{
-									Value: &core.Primitive_Integer{
-										Integer: 4,
+		outputData := &core.OutputData{
+			Outputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": {
+						Value: &core.Literal_Scalar{
+							Scalar: &core.Scalar{
+								Value: &core.Scalar_Primitive{
+									Primitive: &core.Primitive{
+										Value: &core.Primitive_Integer{
+											Integer: 4,
+										},
 									},
 								},
 							},
@@ -602,6 +607,7 @@ func TestUpdateModelState_RunningToSuccess(t *testing.T) {
 				},
 			},
 		}
+
 		mockStorage := commonMocks.GetMockStorageClient()
 		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
 			assert.Equal(t, reference.String(), "s3://bucket/metadata/project/domain/name/offloaded_outputs")

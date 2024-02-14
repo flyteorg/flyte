@@ -92,9 +92,9 @@ func TestResolveKickoffTimeArg(t *testing.T) {
 	testExecutor := newWorkflowExecutorForTest(nil, nil, nil)
 	err := testExecutor.resolveKickoffTimeArg(scheduleRequest, launchPlan, &executionRequest)
 	assert.Nil(t, err)
-	assert.Contains(t, executionRequest.Inputs.Literals, testKickoffTime)
+	assert.Contains(t, executionRequest.GetInputData().GetInputs().GetLiterals(), testKickoffTime)
 	assert.Equal(t, testKickoffTimeProtoLiteral,
-		*executionRequest.Inputs.Literals[testKickoffTime])
+		*executionRequest.GetInputData().GetInputs().GetLiterals()[testKickoffTime])
 }
 
 func TestResolveKickoffTimeArg_NoKickoffTimeArg(t *testing.T) {
@@ -238,8 +238,8 @@ func TestRun(t *testing.T) {
 		assert.Equal(t, "domain", request.Domain)
 		assert.Equal(t, "ar8fphnlc5wh9dksjncj", request.Name)
 		if messagesSeen == 0 {
-			assert.Contains(t, request.Inputs.Literals, testKickoffTime)
-			assert.Equal(t, testKickoffTimeProtoLiteral, *request.Inputs.Literals[testKickoffTime])
+			assert.Contains(t, request.GetInputData().GetInputs().GetLiterals(), testKickoffTime)
+			assert.Equal(t, testKickoffTimeProtoLiteral, *request.GetInputData().GetInputs().GetLiterals()[testKickoffTime])
 		}
 		messagesSeen++
 		return &admin.ExecutionCreateResponse{}, nil

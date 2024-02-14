@@ -18,13 +18,13 @@ func (_m Sequencer_GetCur) Return(_a0 uint64) *Sequencer_GetCur {
 }
 
 func (_m *Sequencer) OnGetCur() *Sequencer_GetCur {
-	c := _m.On("GetCur")
-	return &Sequencer_GetCur{Call: c}
+	c_call := _m.On("GetCur")
+	return &Sequencer_GetCur{Call: c_call}
 }
 
 func (_m *Sequencer) OnGetCurMatch(matchers ...interface{}) *Sequencer_GetCur {
-	c := _m.On("GetCur", matchers...)
-	return &Sequencer_GetCur{Call: c}
+	c_call := _m.On("GetCur", matchers...)
+	return &Sequencer_GetCur{Call: c_call}
 }
 
 // GetCur provides a mock function with given fields:
@@ -50,13 +50,13 @@ func (_m Sequencer_GetNext) Return(_a0 uint64) *Sequencer_GetNext {
 }
 
 func (_m *Sequencer) OnGetNext() *Sequencer_GetNext {
-	c := _m.On("GetNext")
-	return &Sequencer_GetNext{Call: c}
+	c_call := _m.On("GetNext")
+	return &Sequencer_GetNext{Call: c_call}
 }
 
 func (_m *Sequencer) OnGetNextMatch(matchers ...interface{}) *Sequencer_GetNext {
-	c := _m.On("GetNext", matchers...)
-	return &Sequencer_GetNext{Call: c}
+	c_call := _m.On("GetNext", matchers...)
+	return &Sequencer_GetNext{Call: c_call}
 }
 
 // GetNext provides a mock function with given fields:

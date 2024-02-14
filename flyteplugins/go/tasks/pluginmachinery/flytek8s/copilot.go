@@ -229,7 +229,7 @@ func AddCoPilotToPod(ctx context.Context, cfg config.FlyteCoPilotConfig, coPilot
 			coPilotPod.Volumes = append(coPilotPod.Volumes, DataVolume(cfg.InputVolumeName, size))
 
 			// Lets add the Inputs init container
-			args, err := DownloadCommandArgs(inputPaths.GetInputPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
+			args, err := DownloadCommandArgs(inputPaths.GetInputDataPath(), outputPaths.GetOutputPrefixPath(), inPath, format, iFace.Inputs)
 			if err != nil {
 				return err
 			}

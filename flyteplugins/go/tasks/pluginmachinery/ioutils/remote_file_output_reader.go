@@ -88,15 +88,22 @@ func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
 	return false, nil
 }
 
-func (r RemoteFileOutputReader) Read(ctx context.Context) (*core.LiteralMap, *io.ExecutionError, error) {
+func (r RemoteFileOutputReader) Read(ctx context.Context) (*core.OutputData, *io.ExecutionError, error) {
 
-	d := &core.LiteralMap{}
+	d := &core.OutputData{}
 	if err := r.store.ReadProtobuf(ctx, r.outPath.GetOutputPath(), d); err != nil {
-		// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
-		return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %v", r.outPath.GetOutputPath(), err)
+		oldOutput := &core.LiteralMap{}
+		if err := r.store.ReadProtobuf(ctx, r.outPath.GetOutputPath(), d); err != nil {
+			// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
+			return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %v", r.outPath.GetOutputPath(), err)
+		}
+
+		d = &core.OutputData{
+			Outputs: oldOutput,
+		}
 	}
 
-	if d.Literals == nil {
+	if d.GetOutputs().GetLiterals() == nil {
 		return nil, &io.ExecutionError{
 			IsRecoverable: true,
 			ExecutionError: &core.ExecutionError{

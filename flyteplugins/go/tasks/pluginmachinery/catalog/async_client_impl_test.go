@@ -27,15 +27,17 @@ var exampleInterface = &core.TypedInterface{
 		},
 	},
 }
-var input1 = &core.LiteralMap{
-	Literals: map[string]*core.Literal{
-		"a": {
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_Integer{
-								Integer: 1,
+var input1 = &core.InputData{
+	Inputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"a": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 1,
+								},
 							},
 						},
 					},
@@ -44,15 +46,17 @@ var input1 = &core.LiteralMap{
 		},
 	},
 }
-var input2 = &core.LiteralMap{
-	Literals: map[string]*core.Literal{
-		"a": {
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_Integer{
-								Integer: 2,
+var input2 = &core.InputData{
+	Inputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"a": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 2,
+								},
 							},
 						},
 					},

@@ -9,7 +9,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 )
 
-func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs core.LiteralMap, errs errors.CompileErrors) (ok bool) {
+func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs core.InputData, errs errors.CompileErrors) (ok bool) {
 	if iface == nil {
 		errs.Collect(errors.NewValueRequiredErr(nodeID, "interface"))
 		return false
@@ -28,7 +28,7 @@ func validateInputs(nodeID common.NodeID, iface *core.TypedInterface, inputs cor
 	}
 
 	boundInputsSet := sets.String{}
-	for inputVar, inputVal := range inputs.Literals {
+	for inputVar, inputVal := range inputs.GetInputs().GetLiterals() {
 		v, exists := varMap[inputVar]
 		if !exists {
 			errs.Collect(errors.NewVariableNameNotFoundErr(nodeID, "", inputVar))

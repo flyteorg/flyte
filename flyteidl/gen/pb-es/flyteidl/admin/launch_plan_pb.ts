@@ -7,7 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Any, BoolValue, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Identifier } from "../core/identifier_pb.js";
 import { ParameterMap, VariableMap } from "../core/interface_pb.js";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap } from "../core/literals_pb.js";
 import { Annotations, AuthRole, Envs, Labels, NamedEntityIdentifier, Notification, RawOutputDataConfig, Sort } from "./common_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { QualityOfService } from "../core/execution_pb.js";
@@ -315,10 +315,20 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
   /**
    * Fixed, non-overridable inputs for the Launch Plan.
    * These can not be overridden when an execution is created with this launch plan.
+   * Deprecated: Please use fixec_input_data instead
    *
-   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 4;
+   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 4 [deprecated = true];
+   * @deprecated
    */
   fixedInputs?: LiteralMap;
+
+  /**
+   * Fixed, non-overridable inputs for the Launch Plan.
+   * These can not be overridden when an execution is created with this launch plan.
+   *
+   * @generated from field: flyteidl.core.InputData fixed_input_data = 22;
+   */
+  fixedInputData?: InputData;
 
   /**
    * String to indicate the role to use to execute the workflow underneath
@@ -424,6 +434,7 @@ export class LaunchPlanSpec extends Message<LaunchPlanSpec> {
     { no: 2, name: "entity_metadata", kind: "message", T: LaunchPlanMetadata },
     { no: 3, name: "default_inputs", kind: "message", T: ParameterMap },
     { no: 4, name: "fixed_inputs", kind: "message", T: LiteralMap },
+    { no: 22, name: "fixed_input_data", kind: "message", T: InputData },
     { no: 5, name: "role", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "labels", kind: "message", T: Labels },
     { no: 7, name: "annotations", kind: "message", T: Annotations },

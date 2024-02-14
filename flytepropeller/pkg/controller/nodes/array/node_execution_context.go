@@ -13,14 +13,14 @@ import (
 
 type staticInputReader struct {
 	io.InputFilePaths
-	input *core.LiteralMap
+	input *core.InputData
 }
 
-func (i staticInputReader) Get(_ context.Context) (*core.LiteralMap, error) {
+func (i staticInputReader) Get(_ context.Context) (*core.InputData, error) {
 	return i.input, nil
 }
 
-func newStaticInputReader(inputPaths io.InputFilePaths, input *core.LiteralMap) staticInputReader {
+func newStaticInputReader(inputPaths io.InputFilePaths, input *core.InputData) staticInputReader {
 	return staticInputReader{
 		InputFilePaths: inputPaths,
 		input:          input,

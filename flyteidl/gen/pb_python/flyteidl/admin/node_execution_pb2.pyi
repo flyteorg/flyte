@@ -84,10 +84,11 @@ class NodeExecutionList(_message.Message):
     def __init__(self, node_executions: _Optional[_Iterable[_Union[NodeExecution, _Mapping]]] = ..., token: _Optional[str] = ...) -> None: ...
 
 class NodeExecutionClosure(_message.Message):
-    __slots__ = ["output_uri", "error", "output_data", "phase", "started_at", "duration", "created_at", "updated_at", "workflow_node_metadata", "task_node_metadata", "deck_uri", "dynamic_job_spec_uri"]
+    __slots__ = ["output_uri", "error", "output_data", "full_outputs", "phase", "started_at", "duration", "created_at", "updated_at", "workflow_node_metadata", "task_node_metadata", "deck_uri", "dynamic_job_spec_uri"]
     OUTPUT_URI_FIELD_NUMBER: _ClassVar[int]
     ERROR_FIELD_NUMBER: _ClassVar[int]
     OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     PHASE_FIELD_NUMBER: _ClassVar[int]
     STARTED_AT_FIELD_NUMBER: _ClassVar[int]
     DURATION_FIELD_NUMBER: _ClassVar[int]
@@ -100,6 +101,7 @@ class NodeExecutionClosure(_message.Message):
     output_uri: str
     error: _execution_pb2.ExecutionError
     output_data: _literals_pb2.LiteralMap
+    full_outputs: _literals_pb2.OutputData
     phase: _execution_pb2.NodeExecution.Phase
     started_at: _timestamp_pb2.Timestamp
     duration: _duration_pb2.Duration
@@ -109,7 +111,7 @@ class NodeExecutionClosure(_message.Message):
     task_node_metadata: TaskNodeMetadata
     deck_uri: str
     dynamic_job_spec_uri: str
-    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., deck_uri: _Optional[str] = ..., dynamic_job_spec_uri: _Optional[str] = ...) -> None: ...
+    def __init__(self, output_uri: _Optional[str] = ..., error: _Optional[_Union[_execution_pb2.ExecutionError, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., phase: _Optional[_Union[_execution_pb2.NodeExecution.Phase, str]] = ..., started_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., duration: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., updated_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., workflow_node_metadata: _Optional[_Union[WorkflowNodeMetadata, _Mapping]] = ..., task_node_metadata: _Optional[_Union[TaskNodeMetadata, _Mapping]] = ..., deck_uri: _Optional[str] = ..., dynamic_job_spec_uri: _Optional[str] = ...) -> None: ...
 
 class WorkflowNodeMetadata(_message.Message):
     __slots__ = ["executionId"]
@@ -144,20 +146,24 @@ class NodeExecutionGetDataRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.NodeExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class NodeExecutionGetDataResponse(_message.Message):
-    __slots__ = ["inputs", "outputs", "full_inputs", "full_outputs", "dynamic_workflow", "flyte_urls"]
+    __slots__ = ["inputs", "outputs", "full_inputs", "full_outputs", "input_data", "output_data", "dynamic_workflow", "flyte_urls"]
     INPUTS_FIELD_NUMBER: _ClassVar[int]
     OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    INPUT_DATA_FIELD_NUMBER: _ClassVar[int]
+    OUTPUT_DATA_FIELD_NUMBER: _ClassVar[int]
     DYNAMIC_WORKFLOW_FIELD_NUMBER: _ClassVar[int]
     FLYTE_URLS_FIELD_NUMBER: _ClassVar[int]
     inputs: _common_pb2.UrlBlob
     outputs: _common_pb2.UrlBlob
     full_inputs: _literals_pb2.LiteralMap
     full_outputs: _literals_pb2.LiteralMap
+    input_data: _literals_pb2.InputData
+    output_data: _literals_pb2.OutputData
     dynamic_workflow: DynamicWorkflowNodeMetadata
     flyte_urls: _common_pb2.FlyteURLs
-    def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., dynamic_workflow: _Optional[_Union[DynamicWorkflowNodeMetadata, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...
+    def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., input_data: _Optional[_Union[_literals_pb2.InputData, _Mapping]] = ..., output_data: _Optional[_Union[_literals_pb2.OutputData, _Mapping]] = ..., dynamic_workflow: _Optional[_Union[DynamicWorkflowNodeMetadata, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...
 
 class GetDynamicNodeWorkflowRequest(_message.Message):
     __slots__ = ["id"]

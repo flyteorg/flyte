@@ -63,6 +63,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 			Inputs:           inputReader,
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 		})
 	if err != nil {
 		return nil, err
@@ -73,6 +74,7 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 			Inputs:           inputReader,
 			OutputPath:       tCtx.OutputWriter(),
 			Task:             tCtx.TaskReader(),
+			Runtime:          taskTemplate.GetMetadata().GetRuntime(),
 		})
 	taskTemplate.GetContainer().GetEnv()
 	if err != nil {

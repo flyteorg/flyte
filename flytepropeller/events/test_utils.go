@@ -21,15 +21,17 @@ var referenceEventConfig = &config.EventConfig{
 var referenceURI = "s3://foo/bar/outputs.pb"
 var deckURI = "s3://foo/bar/deck.html"
 
-var outputData = &core.LiteralMap{
-	Literals: map[string]*core.Literal{
-		"foo": {
-			Value: &core.Literal_Scalar{
-				Scalar: &core.Scalar{
-					Value: &core.Scalar_Primitive{
-						Primitive: &core.Primitive{
-							Value: &core.Primitive_Integer{
-								Integer: 4,
+var outputData = &core.OutputData{
+	Outputs: &core.LiteralMap{
+		Literals: map[string]*core.Literal{
+			"foo": {
+				Value: &core.Literal_Scalar{
+					Scalar: &core.Scalar{
+						Value: &core.Scalar_Primitive{
+							Primitive: &core.Primitive{
+								Value: &core.Primitive_Integer{
+									Integer: 4,
+								},
 							},
 						},
 					},

@@ -159,7 +159,7 @@ func TestCheckCatalogCache(t *testing.T) {
 		{
 			"CacheHitWithOutputs",
 			catalog.NewCatalogEntry(
-				ioutils.NewInMemoryOutputReader(&core.LiteralMap{}, nil, nil),
+				ioutils.NewInMemoryOutputReader(&core.OutputData{Outputs: &core.LiteralMap{}}, nil, nil),
 				catalog.NewStatus(core.CatalogCacheStatus_CACHE_HIT, nil),
 			),
 			nil,

@@ -23,7 +23,7 @@ func (_m FlyteWorkflowBuilder_Build) Return(_a0 *v1alpha1.FlyteWorkflow, _a1 err
 	return &FlyteWorkflowBuilder_Build{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *FlyteWorkflowBuilder) OnBuild(wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap, executionID *core.WorkflowExecutionIdentifier, namespace string) *FlyteWorkflowBuilder_Build {
+func (_m *FlyteWorkflowBuilder) OnBuild(wfClosure *core.CompiledWorkflowClosure, inputs *core.InputData, executionID *core.WorkflowExecutionIdentifier, namespace string) *FlyteWorkflowBuilder_Build {
 	c_call := _m.On("Build", wfClosure, inputs, executionID, namespace)
 	return &FlyteWorkflowBuilder_Build{Call: c_call}
 }
@@ -34,11 +34,11 @@ func (_m *FlyteWorkflowBuilder) OnBuildMatch(matchers ...interface{}) *FlyteWork
 }
 
 // Build provides a mock function with given fields: wfClosure, inputs, executionID, namespace
-func (_m *FlyteWorkflowBuilder) Build(wfClosure *core.CompiledWorkflowClosure, inputs *core.LiteralMap, executionID *core.WorkflowExecutionIdentifier, namespace string) (*v1alpha1.FlyteWorkflow, error) {
+func (_m *FlyteWorkflowBuilder) Build(wfClosure *core.CompiledWorkflowClosure, inputs *core.InputData, executionID *core.WorkflowExecutionIdentifier, namespace string) (*v1alpha1.FlyteWorkflow, error) {
 	ret := _m.Called(wfClosure, inputs, executionID, namespace)
 
 	var r0 *v1alpha1.FlyteWorkflow
-	if rf, ok := ret.Get(0).(func(*core.CompiledWorkflowClosure, *core.LiteralMap, *core.WorkflowExecutionIdentifier, string) *v1alpha1.FlyteWorkflow); ok {
+	if rf, ok := ret.Get(0).(func(*core.CompiledWorkflowClosure, *core.InputData, *core.WorkflowExecutionIdentifier, string) *v1alpha1.FlyteWorkflow); ok {
 		r0 = rf(wfClosure, inputs, executionID, namespace)
 	} else {
 		if ret.Get(0) != nil {
@@ -47,7 +47,7 @@ func (_m *FlyteWorkflowBuilder) Build(wfClosure *core.CompiledWorkflowClosure, i
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(*core.CompiledWorkflowClosure, *core.LiteralMap, *core.WorkflowExecutionIdentifier, string) error); ok {
+	if rf, ok := ret.Get(1).(func(*core.CompiledWorkflowClosure, *core.InputData, *core.WorkflowExecutionIdentifier, string) error); ok {
 		r1 = rf(wfClosure, inputs, executionID, namespace)
 	} else {
 		r1 = ret.Error(1)

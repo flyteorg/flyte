@@ -11,7 +11,7 @@ import (
 )
 
 func TestPhaseInfoQueued(t *testing.T) {
-	p := PhaseInfoQueued("Queued", &core.LiteralMap{})
+	p := PhaseInfoQueued("Queued", &core.InputData{})
 	assert.Equal(t, EPhaseQueued, p.p)
 }
 
@@ -62,9 +62,11 @@ func TestPhaseInfo(t *testing.T) {
 	})
 
 	t.Run("queued", func(t *testing.T) {
-		inputs := &core.LiteralMap{
-			Literals: map[string]*core.Literal{
-				"foo": coreutils.MustMakeLiteral("bar"),
+		inputs := &core.InputData{
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": coreutils.MustMakeLiteral("bar"),
+				},
 			},
 		}
 		p := PhaseInfoQueued("reason", inputs)

@@ -164,7 +164,7 @@ func (e *externalResourcesEventRecorder) finalize(ctx context.Context, nCtx inte
 		} else {
 			// pass inputs by reference
 			taskExecutionEvent.InputValue = &event.TaskExecutionEvent_InputUri{
-				InputUri: nCtx.InputReader().GetInputPath().String(),
+				InputUri: nCtx.InputReader().GetInputDataPath().String(),
 			}
 		}
 	}

@@ -1,5 +1,4 @@
 //go:build !console
-// +build !console
 
 package single
 

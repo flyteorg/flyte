@@ -77,7 +77,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		// identify and validate the size of the array job
 		size := -1
 		var literalCollection *idlCore.LiteralCollection
-		for _, literal := range inputs.Literals {
+		for _, literal := range inputs.GetInputs().GetLiterals() {
 			if literalCollection = literal.GetCollection(); literalCollection != nil {
 				// validate length of input list
 				if size != -1 && size != len(literalCollection.Literals) {
@@ -106,7 +106,7 @@ func DetermineDiscoverability(ctx context.Context, tCtx core.TaskExecutionContex
 		arrayJobSize = int64(size)
 
 		// build input readers
-		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs.Literals, size)
+		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs, size)
 	}
 
 	if arrayJobSize > maxArrayJobSize {
@@ -242,7 +242,7 @@ func WriteToDiscovery(ctx context.Context, tCtx core.TaskExecutionContext, state
 			return state, externalResources, errors.Errorf(errors.MetadataAccessFailed, "Could not read inputs and therefore failed to determine array job size")
 		}
 
-		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs.Literals, arrayJobSize)
+		inputReaders = ConstructStaticInputReaders(tCtx.InputReader(), inputs, arrayJobSize)
 	}
 
 	// output reader
@@ -462,8 +462,9 @@ func ConstructCatalogReaderWorkItems(ctx context.Context, taskReader core.TaskRe
 
 // ConstructStaticInputReaders constructs input readers that comply with the io.InputReader interface but have their
 // inputs already populated.
-func ConstructStaticInputReaders(inputPaths io.InputFilePaths, inputLiterals map[string]*idlCore.Literal, arrayJobSize int) []io.InputReader {
+func ConstructStaticInputReaders(inputPaths io.InputFilePaths, input *idlCore.InputData, arrayJobSize int) []io.InputReader {
 	var literalCollection *idlCore.LiteralCollection
+	inputLiterals := input.GetInputs().GetLiterals()
 
 	inputReaders := make([]io.InputReader, 0, arrayJobSize)
 	for i := 0; i < arrayJobSize; i++ {
@@ -477,7 +478,10 @@ func ConstructStaticInputReaders(inputPaths io.InputFilePaths, inputLiterals map
 			}
 		}
 
-		inputReaders = append(inputReaders, NewStaticInputReader(inputPaths, &idlCore.LiteralMap{Literals: literals}))
+		inputReaders = append(inputReaders, NewStaticInputReader(inputPaths,
+			&idlCore.InputData{
+				Inputs: &idlCore.LiteralMap{Literals: literals},
+			}))
 	}
 
 	return inputReaders

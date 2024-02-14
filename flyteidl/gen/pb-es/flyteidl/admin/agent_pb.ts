@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Duration, Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 import { TaskExecutionIdentifier } from "../core/identifier_pb.js";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap, OutputData } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
 import { TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
 import { ExecutionMetricResult } from "../core/metrics_pb.js";
@@ -142,10 +142,12 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
    * The inputs required to start the execution. All required inputs must be
    * included in this map. If not required and not provided, defaults apply.
    * +optional
+   * Deprecated: Use inputs instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap inputs = 1;
+   * @generated from field: flyteidl.core.LiteralMap deprecated_inputs = 1 [deprecated = true];
+   * @deprecated
    */
-  inputs?: LiteralMap;
+  deprecatedInputs?: LiteralMap;
 
   /**
    * Template of the task that encapsulates all the metadata of the task.
@@ -168,6 +170,15 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
    */
   taskExecutionMetadata?: TaskExecutionMetadata;
 
+  /**
+   * Inputs are the inputs required to start the execution. All required inputs must be
+   * included in this map. If not required and not provided, defaults apply.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.InputData inputs = 5;
+   */
+  inputs?: InputData;
+
   constructor(data?: PartialMessage<CreateTaskRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -176,10 +187,11 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.CreateTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "inputs", kind: "message", T: LiteralMap },
+    { no: 1, name: "deprecated_inputs", kind: "message", T: LiteralMap },
     { no: 2, name: "template", kind: "message", T: TaskTemplate },
     { no: 3, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "task_execution_metadata", kind: "message", T: TaskExecutionMetadata },
+    { no: 5, name: "inputs", kind: "message", T: InputData },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskRequest {
@@ -366,10 +378,21 @@ export class Resource extends Message<Resource> {
    * The outputs of the execution. It's typically used by sql task. Agent service will create a
    * Structured dataset pointing to the query result table.
    * +optional
+   * Deprecated: Use outputs instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap outputs = 2;
+   * @generated from field: flyteidl.core.LiteralMap deprecated_outputs = 2 [deprecated = true];
+   * @deprecated
    */
-  outputs?: LiteralMap;
+  deprecatedOutputs?: LiteralMap;
+
+  /**
+   * The outputs of the execution. It's typically used by sql task. Agent service will create a
+   * Structured dataset pointing to the query result table.
+   * +optional
+   *
+   * @generated from field: flyteidl.core.OutputData outputs = 6;
+   */
+  outputs?: OutputData;
 
   /**
    * A descriptive message for the current state. e.g. waiting for cluster.
@@ -401,7 +424,8 @@ export class Resource extends Message<Resource> {
   static readonly typeName = "flyteidl.admin.Resource";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "state", kind: "enum", T: proto3.getEnumType(State) },
-    { no: 2, name: "outputs", kind: "message", T: LiteralMap },
+    { no: 2, name: "deprecated_outputs", kind: "message", T: LiteralMap },
+    { no: 6, name: "outputs", kind: "message", T: OutputData },
     { no: 3, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "log_links", kind: "message", T: TaskLog, repeated: true },
     { no: 5, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },

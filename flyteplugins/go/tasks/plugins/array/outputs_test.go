@@ -90,12 +90,14 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
 
-		actualOutputs := &core.LiteralMap{}
+		actualOutputs := &core.OutputData{}
 		assert.NoError(t, memStore.ReadProtobuf(ctx, "/bucket/prefix/outputs.pb", actualOutputs))
-		expected := coreutils.MustMakeLiteral(map[string]interface{}{
-			"var1": []interface{}{},
-			"var2": []interface{}{},
-		}).GetMap()
+		expected := &core.OutputData{
+			Outputs: coreutils.MustMakeLiteral(map[string]interface{}{
+				"var1": []interface{}{},
+				"var2": []interface{}{},
+			}).GetMap(),
+		}
 
 		expectedBytes, err := json.Marshal(expected)
 		assert.NoError(t, err)
@@ -119,8 +121,8 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 			"var1": 5,
 			"var2": "hello world",
 		})
-		assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/0/outputs.pb", storage.Options{}, l.GetMap()))
-		assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/2/outputs.pb", storage.Options{}, l.GetMap()))
+		assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/0/outputs.pb", storage.Options{}, &core.OutputData{Outputs: l.GetMap()}))
+		assert.NoError(t, memStore.WriteProtobuf(ctx, "/bucket/prefix/2/outputs.pb", storage.Options{}, &core.OutputData{Outputs: l.GetMap()}))
 
 		// Setup the expected data to be written to outputWriter.
 		ow := &mocks2.OutputWriter{}
@@ -148,13 +150,15 @@ func Test_assembleOutputsWorker_Process(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, workqueue.WorkStatusSucceeded, actual)
 
-		actualOutputs := &core.LiteralMap{}
+		actualOutputs := &core.OutputData{}
 		assert.NoError(t, memStore.ReadProtobuf(ctx, "/bucket/prefix/outputs.pb", actualOutputs))
 		// Since 2nd and 4th tasks failed, there should be nil literals in their expected places.
-		expected := coreutils.MustMakeLiteral(map[string]interface{}{
-			"var1": []interface{}{5, nil, 5, nil},
-			"var2": []interface{}{"hello world", nil, "hello world", nil},
-		}).GetMap()
+		expected := &core.OutputData{
+			Outputs: coreutils.MustMakeLiteral(map[string]any{
+				"var1": []interface{}{5, nil, 5, nil},
+				"var2": []interface{}{"hello world", nil, "hello world", nil},
+			}).GetMap(),
+		}
 
 		expectedBytes, err := json.Marshal(expected)
 		assert.NoError(t, err)
@@ -173,7 +177,9 @@ func Test_appendSubTaskOutput(t *testing.T) {
 		"var1": 5,
 		"var2": "hello",
 	}
-	validOutputs := coreutils.MustMakeLiteral(nativeMap).GetMap()
+	validOutputs := &core.OutputData{
+		Outputs: coreutils.MustMakeLiteral(nativeMap).GetMap(),
+	}
 
 	t.Run("append to empty", func(t *testing.T) {
 		expected := map[string]interface{}{
@@ -181,11 +187,14 @@ func Test_appendSubTaskOutput(t *testing.T) {
 			"var2": []interface{}{coreutils.MustMakeLiteral("hello")},
 		}
 
-		actual := &core.LiteralMap{
-			Literals: map[string]*core.Literal{},
+		actual := &core.OutputData{
+			Outputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{},
+			},
 		}
+
 		appendSubTaskOutput(actual, validOutputs, 1)
-		assert.Equal(t, actual, coreutils.MustMakeLiteral(expected).GetMap())
+		assert.Equal(t, actual.GetOutputs(), coreutils.MustMakeLiteral(expected).GetMap())
 	})
 
 	t.Run("append to existing", func(t *testing.T) {
@@ -194,13 +203,15 @@ func Test_appendSubTaskOutput(t *testing.T) {
 			"var2": []interface{}{nilLiteral, coreutils.MustMakeLiteral("hello")},
 		}).GetMap()
 
-		actual := coreutils.MustMakeLiteral(map[string]interface{}{
-			"var1": []interface{}{nilLiteral},
-			"var2": []interface{}{nilLiteral},
-		}).GetMap()
+		actual := &core.OutputData{
+			Outputs: coreutils.MustMakeLiteral(map[string]interface{}{
+				"var1": []interface{}{nilLiteral},
+				"var2": []interface{}{nilLiteral},
+			}).GetMap(),
+		}
 
 		appendSubTaskOutput(actual, validOutputs, 1)
-		assert.Equal(t, actual, expected)
+		assert.Equal(t, actual.GetOutputs(), expected)
 	})
 }
 

@@ -160,6 +160,13 @@ func GetLaunchPlanRequest() admin.LaunchPlanCreateRequest {
 					"bar": coreutils.MustMakeLiteral("bar-value"),
 				},
 			},
+			FixedInputData: &core.InputData{
+				Inputs: &core.LiteralMap{
+					Literals: map[string]*core.Literal{
+						"bar": coreutils.MustMakeLiteral("bar-value"),
+					},
+				},
+			},
 		},
 	}
 }
@@ -241,6 +248,13 @@ func GetExecutionRequest() admin.ExecutionCreateRequest {
 		Inputs: &core.LiteralMap{
 			Literals: map[string]*core.Literal{
 				"foo": coreutils.MustMakeLiteral("foo-value-1"),
+			},
+		},
+		InputData: &core.InputData{
+			Inputs: &core.LiteralMap{
+				Literals: map[string]*core.Literal{
+					"foo": coreutils.MustMakeLiteral("foo-value-1"),
+				},
 			},
 		},
 	}

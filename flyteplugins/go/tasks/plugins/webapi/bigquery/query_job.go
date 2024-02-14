@@ -154,8 +154,8 @@ func unmarshalQueryJobConfig(structObj *structpb.Struct) (*QueryJobConfig, error
 	return &queryJobConfig, nil
 }
 
-func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.LiteralMap) (*bigquery.JobConfigurationQuery, error) {
-	queryParameters, err := getQueryParameters(inputs.Literals)
+func getJobConfigurationQuery(custom *QueryJobConfig, inputs *flyteIdlCore.InputData) (*bigquery.JobConfigurationQuery, error) {
+	queryParameters, err := getQueryParameters(inputs.GetInputs().GetLiterals())
 
 	if err != nil {
 		return nil, pluginErrors.Errorf(pluginErrors.BadTaskSpecification, "unable build query parameters [%v]", err.Error())

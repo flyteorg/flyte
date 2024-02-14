@@ -163,7 +163,7 @@ func TestArrayJobToBatchInput(t *testing.T) {
 	tMetadata.OnGetPlatformResources().Return(&v12.ResourceRequirements{})
 
 	ir := &mocks2.InputReader{}
-	ir.OnGetInputPath().Return("inputs.pb")
+	ir.OnGetInputDataPath().Return("inputs.pb")
 	ir.OnGetInputPrefixPath().Return("/inputs/prefix")
 	ir.OnGetMatch(mock.Anything).Return(nil, nil)
 

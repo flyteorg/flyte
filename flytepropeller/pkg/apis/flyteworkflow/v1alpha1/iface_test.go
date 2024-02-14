@@ -158,8 +158,8 @@ func TestGetInputsFile(t *testing.T) {
 		inputDir DataReference
 		expected DataReference
 	}{
-		{"dir1", "dir1/inputs.pb"},
-		{"dir2", "dir2/inputs.pb"},
+		{"dir1", "dir1/inputs_old.pb"},
+		{"dir2", "dir2/inputs_old.pb"},
 	}
 
 	for _, tt := range tests {

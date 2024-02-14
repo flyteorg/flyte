@@ -17,9 +17,11 @@ import (
 type AdvanceIteration func(ctx context.Context, tCtx core.TaskExecutionContext) error
 
 func RunArrayTestsEndToEnd(t *testing.T, executor core.Plugin, iter AdvanceIteration) {
-	inputs := coreutils.MustMakeLiteral(map[string]interface{}{
-		"x": 5,
-	}).GetMap()
+	inputs := &idlCore.InputData{
+		Inputs: coreutils.MustMakeLiteral(map[string]interface{}{
+			"x": 5,
+		}).GetMap(),
+	}
 
 	t.Run("Regular container task", func(t *testing.T) {
 		template := tests.BuildTaskTemplate()
@@ -54,9 +56,11 @@ func RunArrayTestsEndToEnd(t *testing.T, executor core.Plugin, iter AdvanceItera
 
 		assert.NoError(t, err)
 
-		expectedOutputs := coreutils.MustMakeLiteral(map[string]interface{}{
-			"x": []interface{}{5},
-		}).GetMap()
+		expectedOutputs := &idlCore.OutputData{
+			Outputs: coreutils.MustMakeLiteral(map[string]interface{}{
+				"x": []interface{}{5},
+			}).GetMap(),
+		}
 
 		tests.RunPluginEndToEndTest(t, executor, template, inputs, expectedOutputs, nil, iter)
 	})
@@ -89,9 +93,11 @@ func RunArrayTestsEndToEnd(t *testing.T, executor core.Plugin, iter AdvanceItera
 
 		assert.NoError(t, err)
 
-		expectedOutputs := coreutils.MustMakeLiteral(map[string]interface{}{
-			"x": []interface{}{5, 5},
-		}).GetMap()
+		expectedOutputs := &idlCore.OutputData{
+			Outputs: coreutils.MustMakeLiteral(map[string]interface{}{
+				"x": []interface{}{5, 5},
+			}).GetMap(),
+		}
 
 		tests.RunPluginEndToEndTest(t, executor, template, inputs, expectedOutputs, nil, iter)
 	})

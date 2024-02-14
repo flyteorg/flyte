@@ -8,7 +8,7 @@ import { Duration, Message, proto3, Struct, Timestamp } from "@bufbuild/protobuf
 import { NodeExecutionIdentifier, TaskExecutionIdentifier } from "../core/identifier_pb.js";
 import { FlyteURLs, Sort, UrlBlob } from "./common_pb.js";
 import { ExecutionError, TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
-import { LiteralMap } from "../core/literals_pb.js";
+import { InputData, LiteralMap, OutputData } from "../core/literals_pb.js";
 import { TaskExecutionMetadata } from "../event/event_pb.js";
 
 /**
@@ -288,6 +288,14 @@ export class TaskExecutionClosure extends Message<TaskExecutionClosure> {
      */
     value: LiteralMap;
     case: "outputData";
+  } | {
+    /**
+     * Raw output data produced by this task execution.
+     *
+     * @generated from field: flyteidl.core.OutputData full_outputs = 19;
+     */
+    value: OutputData;
+    case: "fullOutputs";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   /**
@@ -389,6 +397,7 @@ export class TaskExecutionClosure extends Message<TaskExecutionClosure> {
     { no: 1, name: "output_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
     { no: 2, name: "error", kind: "message", T: ExecutionError, oneof: "output_result" },
     { no: 12, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
+    { no: 19, name: "full_outputs", kind: "message", T: OutputData, oneof: "output_result" },
     { no: 3, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
     { no: 4, name: "logs", kind: "message", T: TaskLog, repeated: true },
     { no: 5, name: "started_at", kind: "message", T: Timestamp },
@@ -538,17 +547,35 @@ export class TaskExecutionGetDataResponse extends Message<TaskExecutionGetDataRe
 
   /**
    * Full_inputs will only be populated if they are under a configured size threshold.
+   * Deprecated: Please use input_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap full_inputs = 3;
+   * @generated from field: flyteidl.core.LiteralMap full_inputs = 3 [deprecated = true];
+   * @deprecated
    */
   fullInputs?: LiteralMap;
 
   /**
    * Full_outputs will only be populated if they are under a configured size threshold.
+   * Deprecated: Please use output_data instead.
    *
-   * @generated from field: flyteidl.core.LiteralMap full_outputs = 4;
+   * @generated from field: flyteidl.core.LiteralMap full_outputs = 4 [deprecated = true];
+   * @deprecated
    */
   fullOutputs?: LiteralMap;
+
+  /**
+   * InputData will only be populated if they are under a configured size threshold.
+   *
+   * @generated from field: flyteidl.core.InputData input_data = 6;
+   */
+  inputData?: InputData;
+
+  /**
+   * OutputData will only be populated if they are under a configured size threshold.
+   *
+   * @generated from field: flyteidl.core.OutputData output_data = 7;
+   */
+  outputData?: OutputData;
 
   /**
    * flyte tiny url to fetch a core.LiteralMap of task execution's IO
@@ -570,6 +597,8 @@ export class TaskExecutionGetDataResponse extends Message<TaskExecutionGetDataRe
     { no: 2, name: "outputs", kind: "message", T: UrlBlob },
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
+    { no: 6, name: "input_data", kind: "message", T: InputData },
+    { no: 7, name: "output_data", kind: "message", T: OutputData },
     { no: 5, name: "flyte_urls", kind: "message", T: FlyteURLs },
   ]);
 

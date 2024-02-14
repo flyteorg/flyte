@@ -18,7 +18,7 @@ type TaskResources struct {
 }
 
 type ExecutionParameters struct {
-	Inputs              *core.LiteralMap
+	InputData           *core.InputData
 	AcceptedAt          time.Time
 	Labels              map[string]string
 	Annotations         map[string]string
