@@ -16,7 +16,7 @@ spec:
         {{- with .Values.cluster_resource_manager.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      labels: {{ include "flyteclusterresourcesync.labels" . | nindent 8 }}
+      labels: {{ include "flyteclusterresourcesync.podLabels" . | nindent 8 }}
     spec:
       containers:
         - command:
@@ -25,6 +25,12 @@ spec:
             - {{ .Values.flyteadmin.configPath }}
             - clusterresource
             - run
+          {{- if .Values.cluster_resource_manager.podEnv }}
+          env:
+            {{- with .Values.cluster_resource_manager.podEnv }}
+            {{- toYaml . | nindent 10 }}
+            {{- end }}
+          {{- end }}
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
@@ -64,4 +70,7 @@ spec:
           secret:
             secretName: flyte-secret-auth
         {{- end }}
+      {{- with .Values.cluster_resource_manager.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
   {{- end }}

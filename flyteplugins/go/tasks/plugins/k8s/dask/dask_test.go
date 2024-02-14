@@ -179,6 +179,7 @@ func dummyDaskTaskContext(taskTemplate *core.TaskTemplate, resources *v1.Resourc
 		},
 	})
 	tID.On("GetGeneratedName").Return(testTaskID)
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	taskExecutionMetadata := &mocks.TaskExecutionMetadata{}
 	taskExecutionMetadata.OnGetTaskExecutionID().Return(tID)

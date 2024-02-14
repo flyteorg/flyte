@@ -84,6 +84,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 		},
 	})
 	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	taskMetadata.On("GetTaskExecutionID").Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
@@ -230,15 +231,15 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
@@ -340,15 +341,15 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
@@ -457,15 +458,15 @@ func TestBuildSidecarResource(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),

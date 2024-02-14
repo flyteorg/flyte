@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-const _PhaseName = "PhaseStartPhasePreLaunchPhaseLaunchPhaseWaitingForResourcesPhaseCheckingSubTaskExecutionsPhaseAssembleFinalOutputPhaseWriteToDiscoveryPhaseWriteToDiscoveryThenFailPhaseSuccessPhaseAssembleFinalErrorPhaseRetryableFailurePhasePermanentFailure"
+const _PhaseName = "PhaseStartPhasePreLaunchPhaseLaunchPhaseWaitingForResourcesPhaseCheckingSubTaskExecutionsPhaseAssembleFinalOutputPhaseWriteToDiscoveryPhaseWriteToDiscoveryThenFailPhaseSuccessPhaseAssembleFinalErrorPhaseRetryableFailurePhasePermanentFailurePhaseAbortSubTasks"
 
-var _PhaseIndex = [...]uint8{0, 10, 24, 35, 59, 89, 113, 134, 163, 175, 198, 219, 240}
+var _PhaseIndex = [...]uint16{0, 10, 24, 35, 59, 89, 113, 134, 163, 175, 198, 219, 240, 258}
 
 func (i Phase) String() string {
 	if i >= Phase(len(_PhaseIndex)-1) {
@@ -17,7 +17,7 @@ func (i Phase) String() string {
 	return _PhaseName[_PhaseIndex[i]:_PhaseIndex[i+1]]
 }
 
-var _PhaseValues = []Phase{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11}
+var _PhaseValues = []Phase{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
 var _PhaseNameToValueMap = map[string]Phase{
 	_PhaseName[0:10]:    0,
@@ -32,6 +32,7 @@ var _PhaseNameToValueMap = map[string]Phase{
 	_PhaseName[175:198]: 9,
 	_PhaseName[198:219]: 10,
 	_PhaseName[219:240]: 11,
+	_PhaseName[240:258]: 12,
 }
 
 // PhaseString retrieves an enum value from the enum constants string name.

@@ -67,6 +67,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 
 	tID := &mocks.TaskExecutionID{}
 	tID.OnGetGeneratedName().Return("notfound")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	tID.OnGetID().Return(core2.TaskExecutionIdentifier{
 		TaskId: &core2.Identifier{
 			ResourceType: core2.ResourceType_TASK,
@@ -299,7 +300,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		// validate results
 		assert.Nil(t, err)
 		p, _ := newState.GetPhase()
-		assert.Equal(t, arrayCore.PhaseWaitingForResources.String(), p.String())
+		assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), p.String())
 		resourceManager.AssertNumberOfCalls(t, "AllocateResource", subtaskCount)
 		for _, subtaskPhaseIndex := range newState.GetArrayStatus().Detailed.GetItems() {
 			assert.Equal(t, core.PhaseWaitingForResources, core.Phases[subtaskPhaseIndex])

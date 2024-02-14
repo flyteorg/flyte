@@ -306,7 +306,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 	}
 
 	_, version := currentState.GetPhase()
-	if phase == arrayCore.PhaseCheckingSubTaskExecutions {
+	if phase == arrayCore.PhaseCheckingSubTaskExecutions || phase == arrayCore.PhaseWaitingForResources {
 		newSubTaskPhaseHash, err := newState.GetArrayStatus().HashCode()
 		if err != nil {
 			return currentState, externalResources, err
@@ -316,7 +316,7 @@ func LaunchAndCheckSubTasksState(ctx context.Context, tCtx core.TaskExecutionCon
 			version++
 		}
 
-		newState = newState.SetPhase(phase, version).SetReason("Task is still running")
+		newState = newState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, version).SetReason("Task is still running")
 	} else {
 		newState = newState.SetPhase(phase, version+1)
 	}

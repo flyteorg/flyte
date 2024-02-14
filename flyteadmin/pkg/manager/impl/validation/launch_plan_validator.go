@@ -66,7 +66,7 @@ func ValidateLaunchPlan(ctx context.Context,
 
 func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
 	schedule := request.GetSpec().GetEntityMetadata().GetSchedule()
-	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil {
+	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil || schedule.GetCronSchedule() != nil {
 		for key, value := range expectedInputs.Parameters {
 			if value.GetRequired() && key != schedule.GetKickoffTimeInputArg() {
 				return errors.NewFlyteAdminErrorf(
