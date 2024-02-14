@@ -6,14 +6,16 @@ jupytext:
     format_name: myst
 ---
 
-(creating_agent)=
+(creating_an_agent)=
 # Creating an agent
 
 The Flyte agent framework enables rapid agent development, since agents are decoupled from the core FlytePropeller engine. Agents can be written in Python, easing development for data scientists. Agents can be tested independently and deployed privately, making maintenance easier and giving you more flexibility and control over development.
 
-TK - need to add content about async vs sync agents here (and possibly in index.md)
-
 If you need to create a new type of task, we recommend creating a new agent to run it rather than running the task in a pod. After testing the new agent, you can update your FlytePropeller configMap to specify the type of task that the agent should run.
+
+There are two types of agents: **async** and **sync**.
+* **Async agents** communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
+* **Sync agents** communicate with external services, such as the OpenAI API, that return an immediate response after a job is created.
 
 :::{note}
 
@@ -21,14 +23,12 @@ While agents can be written in any programming language, we currently only suppo
 
 :::
 
-## Flytekit interface specification
-
-### Async agent interface
+## Async agent interface specification
 
 To create a new async agent, extend the `AgentBase` class in the `flytekit.backend` module and implement `create`, `get`, and `delete` methods. All calls must be idempotent.
 
-- `create`: This method is used to initiate a new task. Users have the flexibility to use gRPC, REST, or an SDK to create a task.
-- `get`: This method allows retrieving the job Resource (jobID or output literal) associated with the task, such as a BigQuery Job ID or Databricks task ID.
+- `create`: This method is used to initiate a new job. Users have the flexibility to use gRPC, REST, or an SDK to create a job.
+- `get`: This method retrieves the job resource (jobID or output literal) associated with the task, such as a BigQuery job ID or Databricks task ID.
 - `delete`: Invoking this method will send a request to delete the corresponding job.
 
 ```python
@@ -92,10 +92,8 @@ AgentRegistry.register(CustomAgent())
 
 For an example implementation, see the [BigQuery Agent](https://github.com/flyteorg/flytekit/blob/9977aac26242ebbede8e00d476c2fbc59ac5487a/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L35).
 
-### Sync agent interface
+## Sync agent interface specification
 
-TK - just need to implement `execute()` method
+To create a new async agent, extend the `AgentBase` class in the `flytekit.backend` module and implement the `execute` method.
 
-To create a new async agent, extend the `AgentBase` class in the `flytekit.backend` module and implement the `execute` methods. All calls must be idempotent.
-
-- `execute`: TK
+- `execute`: This method is used to initiate a new job and return the response.
