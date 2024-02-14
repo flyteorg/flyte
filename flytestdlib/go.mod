@@ -154,5 +154,3 @@ replace (
 )
 
 replace github.com/flyteorg/stow => github.com/ddl-rliu/stow v0.0.13
-
-replace github.com/flyteorg/stow/s3 => github.com/ddl-rliu/stow/s3 v0.0.13
