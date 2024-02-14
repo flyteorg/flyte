@@ -164,6 +164,9 @@ func (p Plugin) ExecuteTaskSync(
 				logger.Errorf(ctx, "Error reading from stream: %v", err)
 			}
 			literalMap := in.GetOutputs()
+			if literalMap == nil {
+				continue
+			}
 			for k, lt := range literalMap.Literals {
 				_, ok := mergedLiteralMap.Literals[k]
 				if !ok {

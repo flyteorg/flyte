@@ -6,7 +6,7 @@ from flyteidl.admin import agent_pb2 as flyteidl_dot_admin_dot_agent__pb2
 
 
 class SyncAgentServiceStub(object):
-    """AgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+    """SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
     """
 
     def __init__(self, channel):
@@ -23,7 +23,7 @@ class SyncAgentServiceStub(object):
 
 
 class SyncAgentServiceServicer(object):
-    """AgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+    """SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
     """
 
     def ExecuteTaskSync(self, request_iterator, context):
@@ -49,7 +49,7 @@ def add_SyncAgentServiceServicer_to_server(servicer, server):
 
  # This class is part of an EXPERIMENTAL API.
 class SyncAgentService(object):
-    """AgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+    """SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
     """
 
     @staticmethod

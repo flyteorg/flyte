@@ -7,7 +7,7 @@ import { CreateTaskRequest, CreateTaskResponse, DeleteTaskRequest, DeleteTaskRes
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
- * AgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
+ * SyncAgentService defines an RPC Service that allows propeller to send the request to the agent server synchronously.
  *
  * @generated from service flyteidl.service.SyncAgentService
  */
