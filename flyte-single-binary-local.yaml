@@ -6,6 +6,9 @@ admin:
   # and _also_, admin to talk to artifacts
   endpoint: localhost:30080
   insecure: true
+flyteadmin:
+  featureGates:
+    enableArtifacts: true
 
 catalog-cache:
   endpoint: localhost:8081

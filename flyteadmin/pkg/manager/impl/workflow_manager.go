@@ -6,11 +6,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
@@ -40,12 +42,13 @@ type workflowMetrics struct {
 }
 
 type WorkflowManager struct {
-	db            repoInterfaces.Repository
-	config        runtimeInterfaces.Configuration
-	compiler      workflowengineInterfaces.Compiler
-	storageClient *storage.DataStore
-	storagePrefix []string
-	metrics       workflowMetrics
+	db               repoInterfaces.Repository
+	config           runtimeInterfaces.Configuration
+	compiler         workflowengineInterfaces.Compiler
+	storageClient    *storage.DataStore
+	storagePrefix    []string
+	metrics          workflowMetrics
+	artifactRegistry *artifacts.ArtifactRegistry
 }
 
 func getWorkflowContext(ctx context.Context, identifier *core.Identifier) context.Context {
@@ -222,6 +225,22 @@ func (w *WorkflowManager) CreateWorkflow(
 	}
 	w.metrics.TypedInterfaceSizeBytes.Observe(float64(len(workflowModel.TypedInterface)))
 
+	// Send the interface definition to Artifact service, this is so that it can statically pick up one dimension of
+	// lineage information
+	tIfaceCopy := proto.Clone(workflowClosure.CompiledWorkflow.Primary.Template.Interface).(*core.TypedInterface)
+	// TODO: Artifact feature gate, remove when ready
+	if w.artifactRegistry.GetClient() != nil {
+		go func() {
+			ceCtx := context.TODO()
+			if workflowClosure.CompiledWorkflow == nil || workflowClosure.CompiledWorkflow.Primary == nil {
+				logger.Debugf(ceCtx, "Insufficient fields to submit workflow interface %v", finalizedRequest.Id)
+				return
+			}
+
+			w.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
+		}()
+	}
+
 	return &admin.WorkflowCreateResponse{}, nil
 }
 
@@ -355,7 +374,8 @@ func NewWorkflowManager(
 	compiler workflowengineInterfaces.Compiler,
 	storageClient *storage.DataStore,
 	storagePrefix []string,
-	scope promutils.Scope) interfaces.WorkflowInterface {
+	scope promutils.Scope,
+	artifactRegistry *artifacts.ArtifactRegistry) interfaces.WorkflowInterface {
 
 	metrics := workflowMetrics{
 		Scope: scope,
@@ -365,11 +385,12 @@ func NewWorkflowManager(
 			"size in bytes of serialized workflow TypedInterface"),
 	}
 	return &WorkflowManager{
-		db:            db,
-		config:        config,
-		compiler:      compiler,
-		storageClient: storageClient,
-		storagePrefix: storagePrefix,
-		metrics:       metrics,
+		db:               db,
+		config:           config,
+		compiler:         compiler,
+		storageClient:    storageClient,
+		storagePrefix:    storagePrefix,
+		metrics:          metrics,
+		artifactRegistry: artifactRegistry,
 	}
 }
