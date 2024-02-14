@@ -37,3 +37,8 @@ plugins:
   - plugin: buf.build/connectrpc/es:v1.3.0
     out: gen/pb-es
     opt: target=ts
+  - plugin: buf.build/connectrpc/go
+    out: gen/pb-go
+    opt:
+      - paths=import
+      - module=github.com/flyteorg/flyte/flyteidl/gen/pb-go
