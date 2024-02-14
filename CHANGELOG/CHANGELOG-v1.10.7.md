@@ -20,6 +20,8 @@ Our sincere gratitude goes to all contributors for their invaluable efforts towa
 - Introduced support for failure nodes, allowing workflows to handle failures more gracefully. [[PR #4308]](https://github.com/flyteorg/flyte/pull/4308)
 - Made various updates to Go versions, plugin integrations, and GitHub workflows to enhance performance and developer experience. [[PR #4534]](https://github.com/flyteorg/flyte/pull/4534), [[PR #4582]](https://github.com/flyteorg/flyte/pull/4582), [[PR #4589]](https://github.com/flyteorg/flyte/pull/4589)
 - Addressed several bugs and made improvements in caching, metadata handling, and task execution, further stabilizing the Flyte platform. [[PR #4594]](https://github.com/flyteorg/flyte/pull/4594), [[PR #4590]](https://github.com/flyteorg/flyte/pull/4590), [[PR #4607]](https://github.com/flyteorg/flyte/pull/4607)
+- Streamlined development workflow with the transition to buf for generating protobuf stubs, ceasing the automatic generation of Java and C++ stubs.
+- Upgraded to grpc-gateway v2, optimizing API performance and compatibility.
 
 ## Plugin and Integration Enhancements
 
@@ -166,6 +168,16 @@ Our sincere gratitude goes to all contributors for their invaluable efforts towa
 - Fix npm publish of flyteidl package by @eapolinario in https://github.com/flyteorg/flyte/pull/4861
 - Remove protoc_gen_swagger by @eapolinario in https://github.com/flyteorg/flyte/pull/4860
 - Create CODEOWNERS file and add docs team by @neverett in https://github.com/flyteorg/flyte/pull/4857
+- [Docs] update outdated link to on-prem tutorial by @ALMerrill in https://github.com/flyteorg/flyte/pull/4868
+- Re-add link to hosted sandbox by @neverett in https://github.com/flyteorg/flyte/pull/4856
+- Fix asterisk in cron table being rendered as list item by @neverett in https://github.com/flyteorg/flyte/pull/4836
+- Add notes to selfAuth with Azure docs by @davidmirror-ops in https://github.com/flyteorg/flyte/pull/4835
+- Add protos to support cache overrides by @hamersaw in https://github.com/flyteorg/flyte/pull/4820
+- Flyte-core add support for ingressClassName in ingress by @ddl-ebrown in https://github.com/flyteorg/flyte/pull/4805
+- Update flyte docs build directions by @ppiegaze in https://github.com/flyteorg/flyte/pull/4862
+- Replaced deprecated bitnami/bitnami-shell image with bitnami/os-shell by @kamaleybov in https://github.com/flyteorg/flyte/pull/4882
+- Flyte-core define pod and container securityContext by @ddl-ebrown in https://github.com/flyteorg/flyte/pull/4809
+- Leverage KubeRay v1 instead of v1alpha1 for resources by @peterghaddad in https://github.com/flyteorg/flyte/pull/4818
 
 ## New Contributors
 
