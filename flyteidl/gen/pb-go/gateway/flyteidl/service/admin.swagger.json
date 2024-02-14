@@ -2886,196 +2886,6 @@
         ]
       }
     },
-    "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
-        "description": "Fetch existing launch plan definitions matching input filters.",
-        "operationId": "AdminService_ListLaunchPlans4",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminLaunchPlanList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
-        "description": "Fetch existing launch plan definitions matching input filters.",
-        "operationId": "AdminService_ListLaunchPlans2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminLaunchPlanList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.",
@@ -3240,7 +3050,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans3",
         "responses": {
@@ -3335,7 +3145,7 @@
     },
     "/api/v1/launch_plans/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.\n**Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
         "description": "Fetch existing launch plan definitions matching input filters.",
         "operationId": "AdminService_ListLaunchPlans",
         "responses": {
@@ -3557,6 +3367,576 @@
             "schema": {
               "$ref": "#/definitions/AdminServiceUpdateLaunchPlanBody"
             }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/list_launch_plans/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "description": "Fetch existing launch plan definitions matching input filters.",
+        "operationId": "AdminService_ListLaunchPlans4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/list_launch_plans/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.",
+        "description": "Fetch existing launch plan definitions matching input filters.",
+        "operationId": "AdminService_ListLaunchPlans2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminLaunchPlanList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/list_tasks/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "description": "Fetch existing task definitions matching input filters.",
+        "operationId": "AdminService_ListTasks4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/list_tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
+        "description": "Fetch existing task definitions matching input filters.",
+        "operationId": "AdminService_ListTasks2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminTaskList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/list_workflows/org/{id.org}/{id.project}/{id.domain}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "description": "Fetch existing workflow definitions matching input filters.",
+        "operationId": "AdminService_ListWorkflows4",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/list_workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
+      "get": {
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
+        "description": "Fetch existing workflow definitions matching input filters.",
+        "operationId": "AdminService_ListWorkflows2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminWorkflowList"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id.org",
+            "description": "Optional, org key applied to the resource.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.project",
+            "description": "Name of the project the resource belongs to.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.domain",
+            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "id.name",
+            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "description": "Indicates the number of resources to be returned.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "token",
+            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.key",
+            "description": "Indicates an attribute to sort the response values.\n+required",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sort_by.direction",
+            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "DESCENDING",
+              "ASCENDING"
+            ],
+            "default": "DESCENDING"
           }
         ],
         "tags": [
@@ -6252,196 +6632,6 @@
         ]
       }
     },
-    "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
-        "description": "Fetch existing task definitions matching input filters.",
-        "operationId": "AdminService_ListTasks4",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminTaskList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
-        "description": "Fetch existing task definitions matching input filters.",
-        "operationId": "AdminService_ListTasks2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminTaskList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/tasks/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Task` definition.",
@@ -6608,7 +6798,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks3",
         "responses": {
@@ -6703,7 +6893,7 @@
     },
     "/api/v1/tasks/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.\n**Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.",
         "description": "Fetch existing task definitions matching input filters.",
         "operationId": "AdminService_ListTasks",
         "responses": {
@@ -7447,196 +7637,6 @@
         ]
       }
     },
-    "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
-        "description": "Fetch existing workflow definitions matching input filters.",
-        "operationId": "AdminService_ListWorkflows4",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminWorkflowList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}": {
-      "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
-        "description": "Fetch existing workflow definitions matching input filters.",
-        "operationId": "AdminService_ListWorkflows2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminWorkflowList"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id.org",
-            "description": "Optional, org key applied to the resource.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.project",
-            "description": "Name of the project the resource belongs to.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.domain",
-            "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id.name",
-            "description": "User provided value for the resource.\nThe combination of project + domain + name uniquely identifies the resource.\n+optional - in certain contexts - like 'List API', 'Launch plans'",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "limit",
-            "description": "Indicates the number of resources to be returned.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "name": "token",
-            "description": "In the case of multiple pages of results, this server-provided token can be used to fetch the next page\nin a query.\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\nMore info on constructing filters : \u003cLink\u003e\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.key",
-            "description": "Indicates an attribute to sort the response values.\n+required",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "sort_by.direction",
-            "description": "Indicates the direction to apply sort key for response values.\n+optional\n\n - DESCENDING: By default, fields are sorted in descending order.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "DESCENDING",
-              "ASCENDING"
-            ],
-            "default": "DESCENDING"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/workflows/org/{id.org}/{id.project}/{id.domain}/{id.name}/{id.version}": {
       "get": {
         "summary": "Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.",
@@ -7802,7 +7802,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows3",
         "responses": {
@@ -7897,7 +7897,7 @@
     },
     "/api/v1/workflows/{id.project}/{id.domain}/{id.name}": {
       "get": {
-        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.\n**Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.",
+        "summary": "Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.",
         "description": "Fetch existing workflow definitions matching input filters.",
         "operationId": "AdminService_ListWorkflows",
         "responses": {

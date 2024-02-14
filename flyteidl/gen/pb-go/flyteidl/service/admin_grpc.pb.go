@@ -21,19 +21,19 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	AdminService_CreateTask_FullMethodName                    = "/flyteidl.service.AdminService/CreateTask"
-	AdminService_ListTasks_FullMethodName                     = "/flyteidl.service.AdminService/ListTasks"
 	AdminService_GetTask_FullMethodName                       = "/flyteidl.service.AdminService/GetTask"
 	AdminService_ListTaskIds_FullMethodName                   = "/flyteidl.service.AdminService/ListTaskIds"
+	AdminService_ListTasks_FullMethodName                     = "/flyteidl.service.AdminService/ListTasks"
 	AdminService_CreateWorkflow_FullMethodName                = "/flyteidl.service.AdminService/CreateWorkflow"
-	AdminService_ListWorkflows_FullMethodName                 = "/flyteidl.service.AdminService/ListWorkflows"
 	AdminService_GetWorkflow_FullMethodName                   = "/flyteidl.service.AdminService/GetWorkflow"
 	AdminService_ListWorkflowIds_FullMethodName               = "/flyteidl.service.AdminService/ListWorkflowIds"
+	AdminService_ListWorkflows_FullMethodName                 = "/flyteidl.service.AdminService/ListWorkflows"
 	AdminService_CreateLaunchPlan_FullMethodName              = "/flyteidl.service.AdminService/CreateLaunchPlan"
-	AdminService_ListLaunchPlans_FullMethodName               = "/flyteidl.service.AdminService/ListLaunchPlans"
 	AdminService_GetLaunchPlan_FullMethodName                 = "/flyteidl.service.AdminService/GetLaunchPlan"
 	AdminService_GetActiveLaunchPlan_FullMethodName           = "/flyteidl.service.AdminService/GetActiveLaunchPlan"
 	AdminService_ListActiveLaunchPlans_FullMethodName         = "/flyteidl.service.AdminService/ListActiveLaunchPlans"
 	AdminService_ListLaunchPlanIds_FullMethodName             = "/flyteidl.service.AdminService/ListLaunchPlanIds"
+	AdminService_ListLaunchPlans_FullMethodName               = "/flyteidl.service.AdminService/ListLaunchPlans"
 	AdminService_UpdateLaunchPlan_FullMethodName              = "/flyteidl.service.AdminService/UpdateLaunchPlan"
 	AdminService_CreateExecution_FullMethodName               = "/flyteidl.service.AdminService/CreateExecution"
 	AdminService_RelaunchExecution_FullMethodName             = "/flyteidl.service.AdminService/RelaunchExecution"
@@ -82,27 +82,22 @@ const (
 type AdminServiceClient interface {
 	// Create and upload a :ref:`ref_flyteidl.admin.Task` definition
 	CreateTask(ctx context.Context, in *admin.TaskCreateRequest, opts ...grpc.CallOption) (*admin.TaskCreateResponse, error)
-	// Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
-	// **Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.
-	ListTasks(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.TaskList, error)
 	// Fetch a :ref:`ref_flyteidl.admin.Task` definition.
 	GetTask(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.Task, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
 	ListTaskIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+	ListTasks(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.TaskList, error)
 	// Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
 	CreateWorkflow(ctx context.Context, in *admin.WorkflowCreateRequest, opts ...grpc.CallOption) (*admin.WorkflowCreateResponse, error)
-	// Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
-	// **Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.
-	ListWorkflows(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.WorkflowList, error)
 	// Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
 	GetWorkflow(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.Workflow, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
 	ListWorkflowIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+	ListWorkflows(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.WorkflowList, error)
 	// Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
 	CreateLaunchPlan(ctx context.Context, in *admin.LaunchPlanCreateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanCreateResponse, error)
-	// Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
-	// **Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.
-	ListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
 	// Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
 	GetLaunchPlan(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.LaunchPlan, error)
 	// Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
@@ -111,6 +106,8 @@ type AdminServiceClient interface {
 	ListActiveLaunchPlans(ctx context.Context, in *admin.ActiveLaunchPlanListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
 	ListLaunchPlanIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+	ListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error)
 	// Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
 	UpdateLaunchPlan(ctx context.Context, in *admin.LaunchPlanUpdateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanUpdateResponse, error)
 	// Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
@@ -215,15 +212,6 @@ func (c *adminServiceClient) CreateTask(ctx context.Context, in *admin.TaskCreat
 	return out, nil
 }
 
-func (c *adminServiceClient) ListTasks(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.TaskList, error) {
-	out := new(admin.TaskList)
-	err := c.cc.Invoke(ctx, AdminService_ListTasks_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *adminServiceClient) GetTask(ctx context.Context, in *admin.ObjectGetRequest, opts ...grpc.CallOption) (*admin.Task, error) {
 	out := new(admin.Task)
 	err := c.cc.Invoke(ctx, AdminService_GetTask_FullMethodName, in, out, opts...)
@@ -242,18 +230,18 @@ func (c *adminServiceClient) ListTaskIds(ctx context.Context, in *admin.NamedEnt
 	return out, nil
 }
 
-func (c *adminServiceClient) CreateWorkflow(ctx context.Context, in *admin.WorkflowCreateRequest, opts ...grpc.CallOption) (*admin.WorkflowCreateResponse, error) {
-	out := new(admin.WorkflowCreateResponse)
-	err := c.cc.Invoke(ctx, AdminService_CreateWorkflow_FullMethodName, in, out, opts...)
+func (c *adminServiceClient) ListTasks(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.TaskList, error) {
+	out := new(admin.TaskList)
+	err := c.cc.Invoke(ctx, AdminService_ListTasks_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *adminServiceClient) ListWorkflows(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.WorkflowList, error) {
-	out := new(admin.WorkflowList)
-	err := c.cc.Invoke(ctx, AdminService_ListWorkflows_FullMethodName, in, out, opts...)
+func (c *adminServiceClient) CreateWorkflow(ctx context.Context, in *admin.WorkflowCreateRequest, opts ...grpc.CallOption) (*admin.WorkflowCreateResponse, error) {
+	out := new(admin.WorkflowCreateResponse)
+	err := c.cc.Invoke(ctx, AdminService_CreateWorkflow_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -278,18 +266,18 @@ func (c *adminServiceClient) ListWorkflowIds(ctx context.Context, in *admin.Name
 	return out, nil
 }
 
-func (c *adminServiceClient) CreateLaunchPlan(ctx context.Context, in *admin.LaunchPlanCreateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanCreateResponse, error) {
-	out := new(admin.LaunchPlanCreateResponse)
-	err := c.cc.Invoke(ctx, AdminService_CreateLaunchPlan_FullMethodName, in, out, opts...)
+func (c *adminServiceClient) ListWorkflows(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.WorkflowList, error) {
+	out := new(admin.WorkflowList)
+	err := c.cc.Invoke(ctx, AdminService_ListWorkflows_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *adminServiceClient) ListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error) {
-	out := new(admin.LaunchPlanList)
-	err := c.cc.Invoke(ctx, AdminService_ListLaunchPlans_FullMethodName, in, out, opts...)
+func (c *adminServiceClient) CreateLaunchPlan(ctx context.Context, in *admin.LaunchPlanCreateRequest, opts ...grpc.CallOption) (*admin.LaunchPlanCreateResponse, error) {
+	out := new(admin.LaunchPlanCreateResponse)
+	err := c.cc.Invoke(ctx, AdminService_CreateLaunchPlan_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -326,6 +314,15 @@ func (c *adminServiceClient) ListActiveLaunchPlans(ctx context.Context, in *admi
 func (c *adminServiceClient) ListLaunchPlanIds(ctx context.Context, in *admin.NamedEntityIdentifierListRequest, opts ...grpc.CallOption) (*admin.NamedEntityIdentifierList, error) {
 	out := new(admin.NamedEntityIdentifierList)
 	err := c.cc.Invoke(ctx, AdminService_ListLaunchPlanIds_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *adminServiceClient) ListLaunchPlans(ctx context.Context, in *admin.ResourceListRequest, opts ...grpc.CallOption) (*admin.LaunchPlanList, error) {
+	out := new(admin.LaunchPlanList)
+	err := c.cc.Invoke(ctx, AdminService_ListLaunchPlans_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -698,27 +695,22 @@ func (c *adminServiceClient) GetExecutionMetrics(ctx context.Context, in *admin.
 type AdminServiceServer interface {
 	// Create and upload a :ref:`ref_flyteidl.admin.Task` definition
 	CreateTask(context.Context, *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error)
-	// Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
-	// **Important** due to conflicts in GetTask with the additional path bindings, this definition must come first.
-	ListTasks(context.Context, *admin.ResourceListRequest) (*admin.TaskList, error)
 	// Fetch a :ref:`ref_flyteidl.admin.Task` definition.
 	GetTask(context.Context, *admin.ObjectGetRequest) (*admin.Task, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of task objects.
 	ListTaskIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Task` definitions.
+	ListTasks(context.Context, *admin.ResourceListRequest) (*admin.TaskList, error)
 	// Create and upload a :ref:`ref_flyteidl.admin.Workflow` definition
 	CreateWorkflow(context.Context, *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error)
-	// Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
-	// **Important** due to conflicts in GetWorkflow with the additional path bindings, this definition must come first.
-	ListWorkflows(context.Context, *admin.ResourceListRequest) (*admin.WorkflowList, error)
 	// Fetch a :ref:`ref_flyteidl.admin.Workflow` definition.
 	GetWorkflow(context.Context, *admin.ObjectGetRequest) (*admin.Workflow, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of workflow objects.
 	ListWorkflowIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.Workflow` definitions.
+	ListWorkflows(context.Context, *admin.ResourceListRequest) (*admin.WorkflowList, error)
 	// Create and upload a :ref:`ref_flyteidl.admin.LaunchPlan` definition
 	CreateLaunchPlan(context.Context, *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error)
-	// Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
-	// **Important** due to conflicts in GetLaunchPlan with the additional path bindings, this definition must come first.
-	ListLaunchPlans(context.Context, *admin.ResourceListRequest) (*admin.LaunchPlanList, error)
 	// Fetch a :ref:`ref_flyteidl.admin.LaunchPlan` definition.
 	GetLaunchPlan(context.Context, *admin.ObjectGetRequest) (*admin.LaunchPlan, error)
 	// Fetch the active version of a :ref:`ref_flyteidl.admin.LaunchPlan`.
@@ -727,6 +719,8 @@ type AdminServiceServer interface {
 	ListActiveLaunchPlans(context.Context, *admin.ActiveLaunchPlanListRequest) (*admin.LaunchPlanList, error)
 	// Fetch a list of :ref:`ref_flyteidl.admin.NamedEntityIdentifier` of launch plan objects.
 	ListLaunchPlanIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error)
+	// Fetch a list of :ref:`ref_flyteidl.admin.LaunchPlan` definitions.
+	ListLaunchPlans(context.Context, *admin.ResourceListRequest) (*admin.LaunchPlanList, error)
 	// Updates the status of a registered :ref:`ref_flyteidl.admin.LaunchPlan`.
 	UpdateLaunchPlan(context.Context, *admin.LaunchPlanUpdateRequest) (*admin.LaunchPlanUpdateResponse, error)
 	// Triggers the creation of a :ref:`ref_flyteidl.admin.Execution`
@@ -821,20 +815,17 @@ type UnimplementedAdminServiceServer struct {
 func (UnimplementedAdminServiceServer) CreateTask(context.Context, *admin.TaskCreateRequest) (*admin.TaskCreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTask not implemented")
 }
-func (UnimplementedAdminServiceServer) ListTasks(context.Context, *admin.ResourceListRequest) (*admin.TaskList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListTasks not implemented")
-}
 func (UnimplementedAdminServiceServer) GetTask(context.Context, *admin.ObjectGetRequest) (*admin.Task, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTask not implemented")
 }
 func (UnimplementedAdminServiceServer) ListTaskIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTaskIds not implemented")
 }
+func (UnimplementedAdminServiceServer) ListTasks(context.Context, *admin.ResourceListRequest) (*admin.TaskList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTasks not implemented")
+}
 func (UnimplementedAdminServiceServer) CreateWorkflow(context.Context, *admin.WorkflowCreateRequest) (*admin.WorkflowCreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWorkflow not implemented")
-}
-func (UnimplementedAdminServiceServer) ListWorkflows(context.Context, *admin.ResourceListRequest) (*admin.WorkflowList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListWorkflows not implemented")
 }
 func (UnimplementedAdminServiceServer) GetWorkflow(context.Context, *admin.ObjectGetRequest) (*admin.Workflow, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflow not implemented")
@@ -842,11 +833,11 @@ func (UnimplementedAdminServiceServer) GetWorkflow(context.Context, *admin.Objec
 func (UnimplementedAdminServiceServer) ListWorkflowIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListWorkflowIds not implemented")
 }
+func (UnimplementedAdminServiceServer) ListWorkflows(context.Context, *admin.ResourceListRequest) (*admin.WorkflowList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListWorkflows not implemented")
+}
 func (UnimplementedAdminServiceServer) CreateLaunchPlan(context.Context, *admin.LaunchPlanCreateRequest) (*admin.LaunchPlanCreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateLaunchPlan not implemented")
-}
-func (UnimplementedAdminServiceServer) ListLaunchPlans(context.Context, *admin.ResourceListRequest) (*admin.LaunchPlanList, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListLaunchPlans not implemented")
 }
 func (UnimplementedAdminServiceServer) GetLaunchPlan(context.Context, *admin.ObjectGetRequest) (*admin.LaunchPlan, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetLaunchPlan not implemented")
@@ -859,6 +850,9 @@ func (UnimplementedAdminServiceServer) ListActiveLaunchPlans(context.Context, *a
 }
 func (UnimplementedAdminServiceServer) ListLaunchPlanIds(context.Context, *admin.NamedEntityIdentifierListRequest) (*admin.NamedEntityIdentifierList, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListLaunchPlanIds not implemented")
+}
+func (UnimplementedAdminServiceServer) ListLaunchPlans(context.Context, *admin.ResourceListRequest) (*admin.LaunchPlanList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListLaunchPlans not implemented")
 }
 func (UnimplementedAdminServiceServer) UpdateLaunchPlan(context.Context, *admin.LaunchPlanUpdateRequest) (*admin.LaunchPlanUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateLaunchPlan not implemented")
@@ -1010,24 +1004,6 @@ func _AdminService_CreateTask_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_ListTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.ResourceListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AdminServiceServer).ListTasks(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AdminService_ListTasks_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).ListTasks(ctx, req.(*admin.ResourceListRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AdminService_GetTask_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(admin.ObjectGetRequest)
 	if err := dec(in); err != nil {
@@ -1064,6 +1040,24 @@ func _AdminService_ListTaskIds_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_ListTasks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ResourceListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).ListTasks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_ListTasks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).ListTasks(ctx, req.(*admin.ResourceListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AdminService_CreateWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(admin.WorkflowCreateRequest)
 	if err := dec(in); err != nil {
@@ -1078,24 +1072,6 @@ func _AdminService_CreateWorkflow_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).CreateWorkflow(ctx, req.(*admin.WorkflowCreateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AdminService_ListWorkflows_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.ResourceListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AdminServiceServer).ListWorkflows(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AdminService_ListWorkflows_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).ListWorkflows(ctx, req.(*admin.ResourceListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1136,6 +1112,24 @@ func _AdminService_ListWorkflowIds_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AdminService_ListWorkflows_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ResourceListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).ListWorkflows(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_ListWorkflows_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).ListWorkflows(ctx, req.(*admin.ResourceListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AdminService_CreateLaunchPlan_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(admin.LaunchPlanCreateRequest)
 	if err := dec(in); err != nil {
@@ -1150,24 +1144,6 @@ func _AdminService_CreateLaunchPlan_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).CreateLaunchPlan(ctx, req.(*admin.LaunchPlanCreateRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _AdminService_ListLaunchPlans_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.ResourceListRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AdminServiceServer).ListLaunchPlans(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: AdminService_ListLaunchPlans_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).ListLaunchPlans(ctx, req.(*admin.ResourceListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1240,6 +1216,24 @@ func _AdminService_ListLaunchPlanIds_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AdminServiceServer).ListLaunchPlanIds(ctx, req.(*admin.NamedEntityIdentifierListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AdminService_ListLaunchPlans_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(admin.ResourceListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AdminServiceServer).ListLaunchPlans(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AdminService_ListLaunchPlans_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AdminServiceServer).ListLaunchPlans(ctx, req.(*admin.ResourceListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1976,10 +1970,6 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_CreateTask_Handler,
 		},
 		{
-			MethodName: "ListTasks",
-			Handler:    _AdminService_ListTasks_Handler,
-		},
-		{
 			MethodName: "GetTask",
 			Handler:    _AdminService_GetTask_Handler,
 		},
@@ -1988,12 +1978,12 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_ListTaskIds_Handler,
 		},
 		{
-			MethodName: "CreateWorkflow",
-			Handler:    _AdminService_CreateWorkflow_Handler,
+			MethodName: "ListTasks",
+			Handler:    _AdminService_ListTasks_Handler,
 		},
 		{
-			MethodName: "ListWorkflows",
-			Handler:    _AdminService_ListWorkflows_Handler,
+			MethodName: "CreateWorkflow",
+			Handler:    _AdminService_CreateWorkflow_Handler,
 		},
 		{
 			MethodName: "GetWorkflow",
@@ -2004,12 +1994,12 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_ListWorkflowIds_Handler,
 		},
 		{
-			MethodName: "CreateLaunchPlan",
-			Handler:    _AdminService_CreateLaunchPlan_Handler,
+			MethodName: "ListWorkflows",
+			Handler:    _AdminService_ListWorkflows_Handler,
 		},
 		{
-			MethodName: "ListLaunchPlans",
-			Handler:    _AdminService_ListLaunchPlans_Handler,
+			MethodName: "CreateLaunchPlan",
+			Handler:    _AdminService_CreateLaunchPlan_Handler,
 		},
 		{
 			MethodName: "GetLaunchPlan",
@@ -2026,6 +2016,10 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListLaunchPlanIds",
 			Handler:    _AdminService_ListLaunchPlanIds_Handler,
+		},
+		{
+			MethodName: "ListLaunchPlans",
+			Handler:    _AdminService_ListLaunchPlans_Handler,
 		},
 		{
 			MethodName: "UpdateLaunchPlan",
