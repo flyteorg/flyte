@@ -186,8 +186,8 @@ github.com/cucumber/godog v0.8.1/go.mod h1:vSh3r/lM+psC1BPXvdkSEuNjmXfpVqrMGYAEl
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/ddl-rliu/stow v0.0.5 h1:WiApXJFIX8gLuE6qYYY6XGNDgFI3ts3+aroeX7CEDlw=
-github.com/ddl-rliu/stow v0.0.5/go.mod h1:9C2Oded8S32cXePf0FaDsWgA5YiqlZ/9vZRfK2CXgbY=
+github.com/ddl-rliu/stow v0.0.6-0.20240214205431-897714158730 h1:JDaZtd5pfyutR09nbdgtykkguz+/82ncPuHmf4RmPh4=
+github.com/ddl-rliu/stow v0.0.6-0.20240214205431-897714158730/go.mod h1:FkvkEc4Ie3kv2fU7h/seqDxcburMSKgsUPsE3q6TENs=
 github.com/decred/dcrd/chaincfg/chainhash v1.0.2/go.mod h1:BpbrGgrPTr3YJYRN3Bm+D9NuaFd+zGyNeIKgrhCXK60=
 github.com/decred/dcrd/crypto/blake256 v1.0.0/go.mod h1:sQl2p6Y26YV+ZOcSTP6thNdn47hh8kt6rqSlvmrXFAc=
 github.com/decred/dcrd/dcrec/secp256k1/v3 v3.0.0 h1:sgNeV1VRMDzs6rzyPpxyM0jp317hnwiq58Filgag2xw=
