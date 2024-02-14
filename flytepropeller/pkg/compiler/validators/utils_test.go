@@ -1,6 +1,7 @@
 package validators
 
 import (
+	"github.com/golang/protobuf/proto"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -159,7 +160,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, expectedLt, lt)
+		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
 	t.Run("nested lists with empty list", func(t *testing.T) {
@@ -214,7 +215,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, expectedLt, lt)
+		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
 	t.Run("nested Lists with different types", func(t *testing.T) {
@@ -298,7 +299,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 
 		lt := LiteralTypeForLiteral(literals)
 
-		assert.Equal(t, expectedLt, lt)
+		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
 	t.Run("empty nested listed", func(t *testing.T) {
@@ -332,7 +333,7 @@ func TestLiteralTypeForLiterals(t *testing.T) {
 
 		lt := LiteralTypeForLiteral(literals)
 
-		assert.Equal(t, expectedLt, lt)
+		assert.True(t, proto.Equal(expectedLt, lt))
 	})
 
 }
