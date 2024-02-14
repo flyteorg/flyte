@@ -4987,6 +4987,9 @@ export namespace flyteidl {
 
             /** LaunchPlanTemplate interface */
             "interface"?: (flyteidl.core.ITypedInterface|null);
+
+            /** LaunchPlanTemplate fixedInputs */
+            fixedInputs?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents a LaunchPlanTemplate. */
@@ -5003,6 +5006,9 @@ export namespace flyteidl {
 
             /** LaunchPlanTemplate interface. */
             public interface?: (flyteidl.core.ITypedInterface|null);
+
+            /** LaunchPlanTemplate fixedInputs. */
+            public fixedInputs?: (flyteidl.core.ILiteralMap|null);
 
             /**
              * Creates a new LaunchPlanTemplate instance using the specified properties.

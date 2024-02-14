@@ -12083,6 +12083,7 @@
                  * @interface ILaunchPlanTemplate
                  * @property {flyteidl.core.IIdentifier|null} [id] LaunchPlanTemplate id
                  * @property {flyteidl.core.ITypedInterface|null} ["interface"] LaunchPlanTemplate interface
+                 * @property {flyteidl.core.ILiteralMap|null} [fixedInputs] LaunchPlanTemplate fixedInputs
                  */
     
                 /**
@@ -12117,6 +12118,14 @@
                 LaunchPlanTemplate.prototype["interface"] = null;
     
                 /**
+                 * LaunchPlanTemplate fixedInputs.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} fixedInputs
+                 * @memberof flyteidl.core.LaunchPlanTemplate
+                 * @instance
+                 */
+                LaunchPlanTemplate.prototype.fixedInputs = null;
+    
+                /**
                  * Creates a new LaunchPlanTemplate instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.LaunchPlanTemplate
@@ -12144,6 +12153,8 @@
                         $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message["interface"] != null && message.hasOwnProperty("interface"))
                         $root.flyteidl.core.TypedInterface.encode(message["interface"], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.fixedInputs != null && message.hasOwnProperty("fixedInputs"))
+                        $root.flyteidl.core.LiteralMap.encode(message.fixedInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -12170,6 +12181,9 @@
                             break;
                         case 2:
                             message["interface"] = $root.flyteidl.core.TypedInterface.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.fixedInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12199,6 +12213,11 @@
                         var error = $root.flyteidl.core.TypedInterface.verify(message["interface"]);
                         if (error)
                             return "interface." + error;
+                    }
+                    if (message.fixedInputs != null && message.hasOwnProperty("fixedInputs")) {
+                        var error = $root.flyteidl.core.LiteralMap.verify(message.fixedInputs);
+                        if (error)
+                            return "fixedInputs." + error;
                     }
                     return null;
                 };

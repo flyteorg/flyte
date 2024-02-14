@@ -8,7 +8,7 @@ import { Duration, Message, proto3 } from "@bufbuild/protobuf";
 import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
-import { Binding, RetryStrategy } from "./literals_pb.js";
+import { Binding, LiteralMap, RetryStrategy } from "./literals_pb.js";
 import { QualityOfService } from "./execution_pb.js";
 import { TypedInterface } from "./interface_pb.js";
 import { ExtendedResources, Resources } from "./tasks_pb.js";
@@ -1170,6 +1170,13 @@ export class LaunchPlanTemplate extends Message<LaunchPlanTemplate> {
    */
   interface?: TypedInterface;
 
+  /**
+   * A collection of input literals that are fixed for the launch plan
+   *
+   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 3;
+   */
+  fixedInputs?: LiteralMap;
+
   constructor(data?: PartialMessage<LaunchPlanTemplate>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1180,6 +1187,7 @@ export class LaunchPlanTemplate extends Message<LaunchPlanTemplate> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: Identifier },
     { no: 2, name: "interface", kind: "message", T: TypedInterface },
+    { no: 3, name: "fixed_inputs", kind: "message", T: LiteralMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanTemplate {
