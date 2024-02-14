@@ -476,6 +476,7 @@ func legacyS3ConfigMap(cfg ConnectionConfig) stow.ConfigMap {
 	// Non-nullable fields
 	stowConfig := stow.ConfigMap{
 		s3.ConfigAuthType: cfg.AuthType,
+		s3.ExtraArgs:      cfg.ExtraArgs,
 		s3.ConfigRegion:   cfg.Region,
 	}
 

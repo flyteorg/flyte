@@ -84,6 +84,7 @@ type ConnectionConfig struct {
 	SecretKey  string     `json:"secret-key" pflag:",Secret to use when accesskey is set."`
 	Region     string     `json:"region" pflag:",Region to connect to."`
 	DisableSSL bool       `json:"disable-ssl" pflag:",Disables SSL connection. Should only be used for development."`
+	ExtraArgs  string     `json:"extra-args" pflag:",Extra arguments, as a JSON object of key/value pairs, passed to S3 upload."`
 }
 
 // StowConfig defines configs for stow as defined in github.com/flyteorg/stow
