@@ -578,6 +578,64 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a Trigger. */
+        interface ITrigger {
+
+            /** Trigger triggerId */
+            triggerId?: (flyteidl.core.IIdentifier|null);
+
+            /** Trigger triggers */
+            triggers?: (flyteidl.core.IArtifactID[]|null);
+        }
+
+        /** Represents a Trigger. */
+        class Trigger implements ITrigger {
+
+            /**
+             * Constructs a new Trigger.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITrigger);
+
+            /** Trigger triggerId. */
+            public triggerId?: (flyteidl.core.IIdentifier|null);
+
+            /** Trigger triggers. */
+            public triggers: flyteidl.core.IArtifactID[];
+
+            /**
+             * Creates a new Trigger instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns Trigger instance
+             */
+            public static create(properties?: flyteidl.core.ITrigger): flyteidl.core.Trigger;
+
+            /**
+             * Encodes the specified Trigger message. Does not implicitly {@link flyteidl.core.Trigger.verify|verify} messages.
+             * @param message Trigger message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITrigger, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a Trigger message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns Trigger
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.Trigger;
+
+            /**
+             * Verifies a Trigger message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** ResourceType enum. */
         enum ResourceType {
             UNSPECIFIED = 0,
@@ -9329,6 +9387,9 @@ export namespace flyteidl {
 
             /** Resource logLinks */
             logLinks?: (flyteidl.core.ITaskLog[]|null);
+
+            /** Resource phase */
+            phase?: (flyteidl.core.TaskExecution.Phase|null);
         }
 
         /** Represents a Resource. */
@@ -9351,6 +9412,9 @@ export namespace flyteidl {
 
             /** Resource logLinks. */
             public logLinks: flyteidl.core.ITaskLog[];
+
+            /** Resource phase. */
+            public phase: flyteidl.core.TaskExecution.Phase;
 
             /**
              * Creates a new Resource instance using the specified properties.

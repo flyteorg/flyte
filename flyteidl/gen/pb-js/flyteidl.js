@@ -1421,6 +1421,145 @@
                 return ArtifactQuery;
             })();
     
+            core.Trigger = (function() {
+    
+                /**
+                 * Properties of a Trigger.
+                 * @memberof flyteidl.core
+                 * @interface ITrigger
+                 * @property {flyteidl.core.IIdentifier|null} [triggerId] Trigger triggerId
+                 * @property {Array.<flyteidl.core.IArtifactID>|null} [triggers] Trigger triggers
+                 */
+    
+                /**
+                 * Constructs a new Trigger.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a Trigger.
+                 * @implements ITrigger
+                 * @constructor
+                 * @param {flyteidl.core.ITrigger=} [properties] Properties to set
+                 */
+                function Trigger(properties) {
+                    this.triggers = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Trigger triggerId.
+                 * @member {flyteidl.core.IIdentifier|null|undefined} triggerId
+                 * @memberof flyteidl.core.Trigger
+                 * @instance
+                 */
+                Trigger.prototype.triggerId = null;
+    
+                /**
+                 * Trigger triggers.
+                 * @member {Array.<flyteidl.core.IArtifactID>} triggers
+                 * @memberof flyteidl.core.Trigger
+                 * @instance
+                 */
+                Trigger.prototype.triggers = $util.emptyArray;
+    
+                /**
+                 * Creates a new Trigger instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.Trigger
+                 * @static
+                 * @param {flyteidl.core.ITrigger=} [properties] Properties to set
+                 * @returns {flyteidl.core.Trigger} Trigger instance
+                 */
+                Trigger.create = function create(properties) {
+                    return new Trigger(properties);
+                };
+    
+                /**
+                 * Encodes the specified Trigger message. Does not implicitly {@link flyteidl.core.Trigger.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.Trigger
+                 * @static
+                 * @param {flyteidl.core.ITrigger} message Trigger message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                Trigger.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.triggerId != null && message.hasOwnProperty("triggerId"))
+                        $root.flyteidl.core.Identifier.encode(message.triggerId, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.triggers != null && message.triggers.length)
+                        for (var i = 0; i < message.triggers.length; ++i)
+                            $root.flyteidl.core.ArtifactID.encode(message.triggers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a Trigger message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.Trigger
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.Trigger} Trigger
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                Trigger.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.Trigger();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.triggerId = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            if (!(message.triggers && message.triggers.length))
+                                message.triggers = [];
+                            message.triggers.push($root.flyteidl.core.ArtifactID.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a Trigger message.
+                 * @function verify
+                 * @memberof flyteidl.core.Trigger
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                Trigger.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.triggerId != null && message.hasOwnProperty("triggerId")) {
+                        var error = $root.flyteidl.core.Identifier.verify(message.triggerId);
+                        if (error)
+                            return "triggerId." + error;
+                    }
+                    if (message.triggers != null && message.hasOwnProperty("triggers")) {
+                        if (!Array.isArray(message.triggers))
+                            return "triggers: array expected";
+                        for (var i = 0; i < message.triggers.length; ++i) {
+                            var error = $root.flyteidl.core.ArtifactID.verify(message.triggers[i]);
+                            if (error)
+                                return "triggers." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return Trigger;
+            })();
+    
             /**
              * ResourceType enum.
              * @name flyteidl.core.ResourceType
@@ -22869,6 +23008,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [outputs] Resource outputs
                  * @property {string|null} [message] Resource message
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] Resource logLinks
+                 * @property {flyteidl.core.TaskExecution.Phase|null} [phase] Resource phase
                  */
     
                 /**
@@ -22920,6 +23060,14 @@
                 Resource.prototype.logLinks = $util.emptyArray;
     
                 /**
+                 * Resource phase.
+                 * @member {flyteidl.core.TaskExecution.Phase} phase
+                 * @memberof flyteidl.admin.Resource
+                 * @instance
+                 */
+                Resource.prototype.phase = 0;
+    
+                /**
                  * Creates a new Resource instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.Resource
@@ -22952,6 +23100,8 @@
                     if (message.logLinks != null && message.logLinks.length)
                         for (var i = 0; i < message.logLinks.length; ++i)
                             $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        writer.uint32(/* id 5, wireType 0 =*/40).int32(message.phase);
                     return writer;
                 };
     
@@ -22986,6 +23136,9 @@
                             if (!(message.logLinks && message.logLinks.length))
                                 message.logLinks = [];
                             message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
+                            break;
+                        case 5:
+                            message.phase = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23034,6 +23187,20 @@
                                 return "logLinks." + error;
                         }
                     }
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        switch (message.phase) {
+                        default:
+                            return "phase: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                            break;
+                        }
                     return null;
                 };
     

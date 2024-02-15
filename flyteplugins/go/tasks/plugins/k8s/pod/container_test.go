@@ -24,8 +24,7 @@ import (
 
 var containerResourceRequirements = &v1.ResourceRequirements{
 	Limits: v1.ResourceList{
-		v1.ResourceCPU:     resource.MustParse("1024m"),
-		v1.ResourceStorage: resource.MustParse("100M"),
+		v1.ResourceCPU: resource.MustParse("1024m"),
 	},
 }
 
@@ -206,9 +205,8 @@ func TestContainerTaskExecutor_BuildResource(t *testing.T) {
 			assert.NotEmpty(t, j.Spec.Containers)
 			assert.Equal(t, containerResourceRequirements.Limits[v1.ResourceCPU], j.Spec.Containers[0].Resources.Limits[v1.ResourceCPU])
 
-			// TODO: Once configurable, test when setting storage is supported on the cluster vs not.
-			storageRes := j.Spec.Containers[0].Resources.Limits[v1.ResourceStorage]
-			assert.Equal(t, int64(0), (&storageRes).Value())
+			ephemeralStorageRes := j.Spec.Containers[0].Resources.Limits[v1.ResourceEphemeralStorage]
+			assert.Equal(t, int64(0), (&ephemeralStorageRes).Value())
 
 			assert.Equal(t, command, j.Spec.Containers[0].Command)
 			assert.Equal(t, []string{"test-data-reference"}, j.Spec.Containers[0].Args)

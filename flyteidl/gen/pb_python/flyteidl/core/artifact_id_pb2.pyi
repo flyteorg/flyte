@@ -3,7 +3,7 @@ from flyteidl.core import identifier_pb2 as _identifier_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -99,3 +99,11 @@ class ArtifactQuery(_message.Message):
     uri: str
     binding: ArtifactBindingData
     def __init__(self, artifact_id: _Optional[_Union[ArtifactID, _Mapping]] = ..., artifact_tag: _Optional[_Union[ArtifactTag, _Mapping]] = ..., uri: _Optional[str] = ..., binding: _Optional[_Union[ArtifactBindingData, _Mapping]] = ...) -> None: ...
+
+class Trigger(_message.Message):
+    __slots__ = ["trigger_id", "triggers"]
+    TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
+    TRIGGERS_FIELD_NUMBER: _ClassVar[int]
+    trigger_id: _identifier_pb2.Identifier
+    triggers: _containers.RepeatedCompositeFieldContainer[ArtifactID]
+    def __init__(self, trigger_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., triggers: _Optional[_Iterable[_Union[ArtifactID, _Mapping]]] = ...) -> None: ...

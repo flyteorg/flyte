@@ -307,7 +307,7 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 		assert.Equal(t, domain, launchPlan.Id.Domain)
 		assert.Equal(t, name, launchPlan.Id.Name)
 		assert.Equal(t, version, launchPlan.Id.Version)
-		assert.EqualValues(t, testutils.GetLaunchPlanRequest().Spec, launchPlan.Spec)
+		assert.True(t, proto.Equal(testutils.GetLaunchPlanRequest().Spec, launchPlan.Spec))
 		expectedInputs := &core.ParameterMap{
 			Parameters: map[string]*core.Parameter{
 				"foo": {
@@ -320,10 +320,9 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualValues(t, expectedInputs, launchPlan.Closure.ExpectedInputs)
-		assert.EqualValues(
-			t, testutils.GetSampleWorkflowSpecForTest().Template.Interface.Outputs,
-			launchPlan.Closure.ExpectedOutputs)
+		assert.True(t, proto.Equal(expectedInputs, launchPlan.Closure.ExpectedInputs))
+		assert.True(t, proto.Equal(testutils.GetSampleWorkflowSpecForTest().Template.Interface.Outputs,
+			launchPlan.Closure.ExpectedOutputs))
 		return nil
 	}
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetCreateCallback(lpCreateFunc)
@@ -334,7 +333,7 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 	assert.Nil(t, err)
 
 	expectedResponse := &admin.LaunchPlanCreateResponse{}
-	assert.Equal(t, expectedResponse, response)
+	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
 func TestCreateLaunchPlanNoWorkflowInterface(t *testing.T) {

@@ -23,7 +23,7 @@ image:
   # -- Docker image for flyteagent deployment
   repository: ghcr.io/flyteorg/flyteagent
   # -- Docker image tag
-  tag: 1.10.2 # FLYTEAGENT_TAG
+  tag: 1.10.3 # FLYTEAGENT_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
@@ -54,8 +54,17 @@ serviceAccount:
   annotations: {}
   # -- ImagePullSecrets to automatically assign to the service account
   imagePullSecrets: []
+# -- Security context for pod
+podSecurityContext: {}
+# -- Security context for container
+securityContext:
+  allowPrivilegeEscalation: false
 # -- Annotations for flyteagent pods
 podAnnotations: {}
+# -- Additional flyteagent pod container environment variables
+podEnv: {}
+# -- Labels for flyteagent pods
+podLabels: {}
 # -- nodeSelector for flyteagent deployment
 nodeSelector: {}
 # -- tolerations for flyteagent deployment

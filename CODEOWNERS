@@ -1,2 +1,5 @@
+# Automatically request docs team for docs PR review
+/docs/          @neverett @ppiegaze
+
 # Default owner for all files, unless otherwise overridden below
 * @unionai/cloud-eng

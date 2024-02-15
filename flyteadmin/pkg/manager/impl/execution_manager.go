@@ -13,6 +13,16 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
+	"github.com/flyteorg/flyte/flytestdlib/contextutils"
+	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
+	"github.com/flyteorg/flyte/flytestdlib/storage"
+
 	"github.com/flyteorg/flyte/flyteadmin/auth"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -34,16 +44,7 @@ import (
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
-	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/flytek8s"
-	"github.com/flyteorg/flyte/flytestdlib/contextutils"
-	"github.com/flyteorg/flyte/flytestdlib/logger"
-	"github.com/flyteorg/flyte/flytestdlib/promutils"
-	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
-	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
 const childContainerQueueKey = "child_queue"
@@ -251,23 +252,6 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
 			Name:  core.Resources_EPHEMERAL_STORAGE,
 			Value: ephemeralStorage.Limit.String(),
-		})
-	}
-
-	// Only assign storage when it is either requested or limited in the task definition, or a platform
-	// default exists.
-	if !taskResourceRequirements.Defaults.Storage.IsZero() ||
-		!taskResourceRequirements.Limits.Storage.IsZero() ||
-		!platformTaskResources.Defaults.Storage.IsZero() {
-		storageResource := flytek8s.AdjustOrDefaultResource(taskResourceRequirements.Defaults.Storage, taskResourceRequirements.Limits.Storage,
-			platformTaskResources.Defaults.Storage, platformTaskResources.Limits.Storage)
-		finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Request.String(),
-		})
-		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Limit.String(),
 		})
 	}
 
