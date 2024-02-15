@@ -205,8 +205,8 @@ class TaskNodeOverrides(_message.Message):
     CONTAINER_IMAGE_FIELD_NUMBER: _ClassVar[int]
     resources: _tasks_pb2.Resources
     extended_resources: _tasks_pb2.ExtendedResources
-<<<<<<< HEAD
-    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...
+    container_image: str
+    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ...) -> None: ...
 
 class LaunchPlanTemplate(_message.Message):
     __slots__ = ["id", "interface", "fixed_inputs"]
@@ -220,8 +220,11 @@ class LaunchPlanTemplate(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., fixed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
 =======
     def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ...) -> None: ...
+<<<<<<< HEAD
 =======
     container_image: str
     def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ...) -> None: ...
 >>>>>>> b88b170a7 (Add container image to TaskNodeOverrides proto)
 >>>>>>> 3f38dddcf (Add container image to TaskNodeOverrides proto)
+=======
+>>>>>>> faf3d3e38 (Re-generate flyteidl)
