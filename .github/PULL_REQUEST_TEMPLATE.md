@@ -5,7 +5,11 @@
 *TODO: Summarize tests added, integration tests run, or other steps you took to validate this change. Include (or link to) relevant test output or screenshots.*
 
 ## Rollout Plan (if applicable)
-*TODO: Describe any deployment or compatibility considerations for rolling out this change.
+*TODO: Describe any deployment or compatibility considerations for rolling out this change.*
+
+## Upstream Changes
+Should this change be upstreamed to OSS (flyteorg/flyte)? If so, please check this box for auditing. Note, this is the responsibility of each developer. See [this guide](https://unionai.atlassian.net/wiki/spaces/ENG/pages/447610883/Flyte+-+Union+Cloud+Development+Runbook/#When-are-versions-updated%3F).
+- [ ] To be upstreamed
 
 ## Jira Issue
 https://unionai.atlassian.net/browse/<project-number>
