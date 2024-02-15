@@ -306,4 +306,7 @@ message LaunchPlanTemplate {
 
     // The input and output interface for the launch plan
     TypedInterface interface = 2;
+
+    // A collection of input literals that are fixed for the launch plan
+    LiteralMap fixed_inputs = 3;
 }
