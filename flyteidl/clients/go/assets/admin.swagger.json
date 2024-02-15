@@ -7221,6 +7221,10 @@
         "interface": {
           "$ref": "#/definitions/coreTypedInterface",
           "title": "The input and output interface for the launch plan"
+        },
+        "fixed_inputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "title": "A collection of input literals that are fixed for the launch plan"
         }
       },
       "description": "A structure that uniquely identifies a launch plan in the system."
