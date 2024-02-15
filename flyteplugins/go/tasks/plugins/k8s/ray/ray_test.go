@@ -241,7 +241,7 @@ func TestBuildResourceRayContainerImage(t *testing.T) {
 
 	for _, f := range fixtures {
 		t.Run(f.name, func(t *testing.T) {
-			taskTemplate := dummyRayTaskTemplate("ray-id", dummyRayCustomObj())
+			taskTemplate := dummyRayTaskTemplate("id", dummyRayCustomObj())
 			taskContext := dummyRayTaskContext(taskTemplate, f.resources, nil, f.containerImageOverride)
 			rayJobResourceHandler := rayJobResourceHandler{}
 			r, err := rayJobResourceHandler.BuildResource(context.TODO(), taskContext)
