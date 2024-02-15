@@ -1122,6 +1122,8 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
   extendedResources?: ExtendedResources;
 
   /**
+   * Override for the image used by task pods.
+   *
    * @generated from field: string container_image = 3;
    */
   containerImage = "";

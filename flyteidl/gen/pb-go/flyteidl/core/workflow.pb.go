@@ -1498,7 +1498,8 @@ type TaskNodeOverrides struct {
 	// Overrides for all non-standard resources, not captured by
 	// v1.ResourceRequirements, to allocate to a task.
 	ExtendedResources *ExtendedResources `protobuf:"bytes,2,opt,name=extended_resources,json=extendedResources,proto3" json:"extended_resources,omitempty"`
-	ContainerImage    string             `protobuf:"bytes,3,opt,name=container_image,json=containerImage,proto3" json:"container_image,omitempty"`
+	// Override for the image used by task pods.
+	ContainerImage string `protobuf:"bytes,3,opt,name=container_image,json=containerImage,proto3" json:"container_image,omitempty"`
 }
 
 func (x *TaskNodeOverrides) Reset() {

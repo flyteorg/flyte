@@ -2634,6 +2634,7 @@ pub struct TaskNodeOverrides {
     /// v1.ResourceRequirements, to allocate to a task.
     #[prost(message, optional, tag="2")]
     pub extended_resources: ::core::option::Option<ExtendedResources>,
+    /// Override for the image used by task pods.
     #[prost(string, tag="3")]
     pub container_image: ::prost::alloc::string::String,
 }
