@@ -368,10 +368,6 @@
     "coreArtifactBindingData": {
       "type": "object",
       "properties": {
-        "index": {
-          "type": "integer",
-          "format": "int64"
-        },
         "partition_key": {
           "type": "string"
         },

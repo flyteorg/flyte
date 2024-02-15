@@ -259,9 +259,9 @@ pub struct OutputReference {
 // @workflow
 // def wf():
 //      o = t1()
-//      t2(o.a\["b"][0\])
+//      t2(o.a["b"][0])
 // ```
-// the output reference t2 binds to has a list of PromiseAttribute ["a", "b", 0]
+// the output reference t2 binds to has a list of PromiseAttribute \["a", "b", 0\]
 
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -728,8 +728,6 @@ pub struct ArtifactKey {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactBindingData {
-    #[prost(uint32, tag="1")]
-    pub index: u32,
     /// This is only relevant in the time partition case
     #[prost(string, tag="4")]
     pub transform: ::prost::alloc::string::String,

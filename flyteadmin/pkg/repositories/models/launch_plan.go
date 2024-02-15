@@ -22,7 +22,7 @@ const (
 type LaunchConditionType string
 
 const (
-	// LaunchConditionTypeCRON is the const representing the launch plan has a CRON type of schedule
+	// LaunchConditionTypeSCHED is the const representing the launch plan has a CRON type of schedule
 	LaunchConditionTypeSCHED LaunchConditionType = "SCHED"
 )
 
