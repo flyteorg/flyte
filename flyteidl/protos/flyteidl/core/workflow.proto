@@ -298,6 +298,7 @@ message TaskNodeOverrides {
     // v1.ResourceRequirements, to allocate to a task.
     ExtendedResources extended_resources = 2;
 
+    // Override for the image used by task pods.
     string container_image = 3;
 }
 
