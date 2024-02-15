@@ -19,7 +19,14 @@ const (
 	LaunchPlanScheduleTypeRATE LaunchPlanScheduleType = "RATE"
 )
 
-// Database model to encapsulate a launch plan.
+type LaunchConditionType string
+
+const (
+	// LaunchConditionTypeCRON is the const representing the launch plan has a CRON type of schedule
+	LaunchConditionTypeSCHED LaunchConditionType = "SCHED"
+)
+
+// LaunchPlan Database model to encapsulate a launch plan.
 type LaunchPlan struct {
 	BaseModel
 	LaunchPlanKey
@@ -29,8 +36,9 @@ type LaunchPlan struct {
 	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
 	State *int32 `gorm:"default:0"`
 	// Hash of the launch plan
-	Digest       []byte
-	ScheduleType LaunchPlanScheduleType
+	Digest              []byte
+	ScheduleType        LaunchPlanScheduleType
+	LaunchConditionType *LaunchConditionType
 }
 
 var LaunchPlanColumns = modelColumns(LaunchPlan{})

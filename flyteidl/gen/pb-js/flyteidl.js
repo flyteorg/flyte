@@ -31973,6 +31973,7 @@
                         case 3:
                         case 4:
                         case 5:
+                        case 6:
                             break;
                         }
                     if (message.principal != null && message.hasOwnProperty("principal"))
@@ -32023,6 +32024,7 @@
                  * @property {number} RELAUNCH=3 RELAUNCH value
                  * @property {number} CHILD_WORKFLOW=4 CHILD_WORKFLOW value
                  * @property {number} RECOVERED=5 RECOVERED value
+                 * @property {number} TRIGGER=6 TRIGGER value
                  */
                 ExecutionMetadata.ExecutionMode = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -32032,6 +32034,7 @@
                     values[valuesById[3] = "RELAUNCH"] = 3;
                     values[valuesById[4] = "CHILD_WORKFLOW"] = 4;
                     values[valuesById[5] = "RECOVERED"] = 5;
+                    values[valuesById[6] = "TRIGGER"] = 6;
                     return values;
                 })();
     

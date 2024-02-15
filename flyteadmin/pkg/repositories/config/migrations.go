@@ -1182,7 +1182,55 @@ var NoopMigrations = []*gormigrate.Migration{
 	},
 }
 
-var Migrations = append(LegacyMigrations, NoopMigrations...)
+var ContinuedMigrations = []*gormigrate.Migration{
+	{
+		ID: "pg-continue-2024-02-launchplan",
+		Migrate: func(tx *gorm.DB) error {
+			type LaunchPlanScheduleType string
+
+			type LaunchPlan struct {
+				ID         uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt  time.Time  `gorm:"type:time"`
+				UpdatedAt  time.Time  `gorm:"type:time"`
+				DeletedAt  *time.Time `gorm:"index"`
+				Project    string     `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
+				Domain     string     `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
+				Name       string     `gorm:"primary_key;index:lp_project_domain_name_idx" valid:"length(0|255)"`
+				Version    string     `gorm:"primary_key" valid:"length(0|255)"`
+				Spec       []byte     `gorm:"not null"`
+				WorkflowID uint       `gorm:"index"`
+				Closure    []byte     `gorm:"not null"`
+				// GORM doesn't save the zero value for ints, so we use a pointer for the State field
+				State *int32 `gorm:"default:0"`
+				// Hash of the launch plan
+				Digest       []byte
+				ScheduleType LaunchPlanScheduleType
+				// store the type of event that this launch plan is triggered by, can be empty, or SCHED
+				LaunchConditionType string `gorm:"null"`
+			}
+			return tx.AutoMigrate(&LaunchPlan{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
+		},
+	},
+	{
+		ID: "pg-continue-2024-02-launch-index",
+		Migrate: func(tx *gorm.DB) error {
+			sql := `CREATE INDEX idx_launch_plans_launch_conditions ON launch_plans (launch_condition_type) WHERE launch_condition_type IS NOT NULL;`
+			return tx.Exec(sql).Error
+		},
+		Rollback: func(tx *gorm.DB) error {
+			if err := tx.Exec("DROP INDEX IF EXISTS idx_launch_plans_launch_conditions;").Error; err != nil {
+				return err
+			}
+			return nil
+		},
+	},
+}
+
+var m = append(LegacyMigrations, NoopMigrations...)
+var Migrations = append(m, ContinuedMigrations...)
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
 	var err error

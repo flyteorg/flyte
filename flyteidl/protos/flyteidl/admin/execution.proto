@@ -221,6 +221,9 @@ message ExecutionMetadata {
 
         // This execution was recovered from another execution.
         RECOVERED = 5;
+
+        // Execution was kicked off by the artifact trigger system
+        TRIGGER = 6;
     }
     ExecutionMode mode = 1;
 

@@ -13215,7 +13215,8 @@ export namespace flyteidl {
                 SYSTEM = 2,
                 RELAUNCH = 3,
                 CHILD_WORKFLOW = 4,
-                RECOVERED = 5
+                RECOVERED = 5,
+                TRIGGER = 6
             }
         }
 

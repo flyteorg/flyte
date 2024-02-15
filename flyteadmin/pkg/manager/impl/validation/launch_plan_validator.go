@@ -54,6 +54,12 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := validateSchedule(request, expectedInputs); err != nil {
 		return err
 	}
+	if request.Spec.EntityMetadata.LaunchConditions != nil {
+		return errors.NewFlyteAdminErrorf(
+			codes.InvalidArgument,
+			"Launch condition must be empty, found %v", request.Spec.EntityMetadata.LaunchConditions)
+	}
+
 	// Augment default inputs with the unbound workflow inputs.
 	request.Spec.DefaultInputs = expectedInputs
 	if request.Spec.EntityMetadata != nil {
