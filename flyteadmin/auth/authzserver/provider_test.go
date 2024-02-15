@@ -7,6 +7,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"testing"
 	"time"
 
@@ -42,6 +43,123 @@ func newMockProvider(t testing.TB) (Provider, auth.SecretsSet) {
 
 func TestNewProvider(t *testing.T) {
 	newMockProvider(t)
+}
+
+func newInvalidMockProvider(t *testing.T, ctx context.Context, secrets auth.SecretsSet, sm *mocks.SecretManager, invalidFunc func() *mocks.SecretManager_Get, errorContains string) {
+
+	sm.OnGet(ctx, config.SecretNameClaimSymmetricKey).Return(base64.RawStdEncoding.EncodeToString(secrets.TokenHashKey), nil)
+	sm.OnGet(ctx, config.SecretNameCookieBlockKey).Return(base64.RawStdEncoding.EncodeToString(secrets.CookieBlockKey), nil)
+	sm.OnGet(ctx, config.SecretNameCookieHashKey).Return(base64.RawStdEncoding.EncodeToString(secrets.CookieHashKey), nil)
+
+	privBytes := x509.MarshalPKCS1PrivateKey(secrets.TokenSigningRSAPrivateKey)
+	var buf bytes.Buffer
+	assert.NoError(t, pem.Encode(&buf, &pem.Block{Type: "RSA PRIVATE KEY", Bytes: privBytes}))
+	sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return(buf.String(), nil)
+	sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return(buf.String(), nil)
+
+	invalidFunc()
+	p, err := NewProvider(ctx, config.DefaultConfig.AppAuth.SelfAuthServer, sm)
+	assert.Error(t, err)
+	assert.ErrorContains(t, err, errorContains)
+	assert.Equal(t, Provider{}, p)
+}
+
+func TestNewInvalidProviderSecretTokenHashBad(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameClaimSymmetricKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameClaimSymmetricKey).Return("", fmt.Errorf("test error"))
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to read secretTokenHash file. Error: test error")
+}
+
+func TestNewInvalidProviderSecretTokenHashEmpty(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameClaimSymmetricKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameClaimSymmetricKey).Return("", nil)
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to read secretTokenHash. Error: empty value")
+}
+
+func TestNewInvalidProviderTokenSigningRSAKeyBad(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return("", fmt.Errorf("test error"))
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to read token signing RSA Key. Error: test error")
+}
+
+func TestNewInvalidProviderTokenSigningRSAKeyEmpty(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return("", nil)
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to read token signing RSA Key. Error: empty value")
+}
+
+func TestNewInvalidProviderTokenSigningRSAKeyNoPEMData(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameTokenSigningRSAKey).Return("this is no PEM data", nil)
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to decode token signing RSA Key. Error: no PEM data found")
+}
+
+func TestNewInvalidProviderOldTokenSigningRSAKeyEmpty(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return("", nil)
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to read PKCS1PrivateKey. Error: empty value")
+}
+
+func TestNewInvalidProviderOldTokenSigningRSAKeyNoPEMData(t *testing.T) {
+	secrets, err := auth.NewSecrets()
+	assert.NoError(t, err)
+
+	ctx := context.Background()
+	sm := &mocks.SecretManager{}
+
+	invalidFunc := func() *mocks.SecretManager_Get {
+		sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Unset()
+		return sm.OnGet(ctx, config.SecretNameOldTokenSigningRSAKey).Return("this is no PEM data", nil)
+	}
+	newInvalidMockProvider(t, ctx, secrets, sm, invalidFunc, "failed to decode PKCS1PrivateKey. Error: no PEM data found")
 }
 
 func TestProvider_KeySet(t *testing.T) {
