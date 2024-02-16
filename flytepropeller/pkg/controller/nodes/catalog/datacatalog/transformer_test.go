@@ -19,10 +19,11 @@ import (
 func TestNilParamTask(t *testing.T) {
 	key := catalog.Key{
 		Identifier: core.Identifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-			Version: "1.0.0",
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "1.0.0",
+			ResourceType: core.ResourceType_TASK,
 		},
 		CacheVersion: "1.0.0",
 		TypedInterface: core.TypedInterface{
@@ -30,7 +31,7 @@ func TestNilParamTask(t *testing.T) {
 			Outputs: nil,
 		},
 	}
-	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
+	datasetID, err := GenerateDatasetID(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, datasetID.Version)
 	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.Version)
@@ -40,10 +41,11 @@ func TestNilParamTask(t *testing.T) {
 func TestEmptyParamTask(t *testing.T) {
 	key := catalog.Key{
 		Identifier: core.Identifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-			Version: "1.0.0",
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "1.0.0",
+			ResourceType: core.ResourceType_TASK,
 		},
 		CacheVersion: "1.0.0",
 		TypedInterface: core.TypedInterface{
@@ -51,14 +53,14 @@ func TestEmptyParamTask(t *testing.T) {
 			Outputs: &core.VariableMap{},
 		},
 	}
-	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
+	datasetID, err := GenerateDatasetID(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, datasetID.Version)
 	assert.Equal(t, "1.0.0-GKw-c0Pw-GKw-c0Pw", datasetID.Version)
 
 	key.TypedInterface.Inputs = nil
 	key.TypedInterface.Outputs = nil
-	datasetIDDupe, err := GenerateDatasetIDForTask(context.TODO(), key)
+	datasetIDDupe, err := GenerateDatasetID(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.Equal(t, datasetIDDupe.String(), datasetID.String())
 }
@@ -67,10 +69,11 @@ func TestEmptyParamTask(t *testing.T) {
 func TestVariableMapOrder(t *testing.T) {
 	key := catalog.Key{
 		Identifier: core.Identifier{
-			Project: "project",
-			Domain:  "domain",
-			Name:    "name",
-			Version: "1.0.0",
+			Project:      "project",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "1.0.0",
+			ResourceType: core.ResourceType_TASK,
 		},
 		CacheVersion: "1.0.0",
 		TypedInterface: core.TypedInterface{
@@ -82,7 +85,7 @@ func TestVariableMapOrder(t *testing.T) {
 			},
 		},
 	}
-	datasetID, err := GenerateDatasetIDForTask(context.TODO(), key)
+	datasetID, err := GenerateDatasetID(context.TODO(), key)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, datasetID.Version)
 	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetID.Version)
@@ -93,7 +96,7 @@ func TestVariableMapOrder(t *testing.T) {
 			"1": {Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_INTEGER}}},
 		},
 	}
-	datasetIDDupe, err := GenerateDatasetIDForTask(context.TODO(), key)
+	datasetIDDupe, err := GenerateDatasetID(context.TODO(), key)
 	assert.NoError(t, err)
 
 	assert.Equal(t, "1.0.0-UxVtPm0k-GKw-c0Pw", datasetIDDupe.Version)
