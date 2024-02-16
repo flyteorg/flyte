@@ -9,6 +9,7 @@ This guide provides an overview of how to set up the Snowflake agent in your Fly
 2. Create a secret with the group "snowflake" and the key "private_key". For more details, see `"Using Secrets in a Task" <https://https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/use_secrets.html>`__.
 
 .. code-block:: bash
+
    kubectl create secret generic snowflake-private-key --namespace=flytesnacks-development --from-file=your_private_key_above
 
 Specify agent configuration

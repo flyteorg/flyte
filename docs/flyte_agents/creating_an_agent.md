@@ -82,4 +82,4 @@ class CustomAsyncAgent(AsyncAgentBase):
 AgentRegistry.register(CustomAsyncAgent())
 ```
 
-For an example implementation, see the [BigQuery Agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
+For an example implementation, see the [BigQuery agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).

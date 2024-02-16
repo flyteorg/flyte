@@ -14,17 +14,23 @@ In Flyte, an agent is a long-running, stateless service powered by a gRPC server
 :class: with-shadow
 :::
 
+## Using agents in tasks
+
+If you need to connect to an external service in your workflow, we recommend using the corresponding agent rather than a web API plugin. Agents are designed to be scalable and can handle large workloads efficiently, and decrease load on FlytePropeller, since they run outside of it. You can also test agents locally without having to change the Flyte backend configuration, streamlining development.
+
+For a list of agents you can use in your tasks and example usage for each, see the [Integrations](https://docs.flyte.org/en/latest/flytesnacks/integrations.html#agents) documentation.
+
+## Table of contents
+
 ```{list-table}
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Using agents in tasks <using_agents_in_tasks>`
-  - Learn how to use agents to efficiently communicate with external services in your tasks.
 * - {doc}`Creating an agent <creating_an_agent>`
   - If the agent you need doesn't exist, follow these steps to create it.
 * - {doc}`Testing agents locally <testing_agents_locally>`
   - Whether using an existing agent or creating a new one, you can test it locally without needing to configure or run the backend server.
-* - {doc}`Configuring your Flyte deployment for agents <running_a_workflow_locally>`
+* - {doc}`Configuring your Flyte deployment for agents <configuring_your_flyte_deployment_for_agents>`
   - Once you have tested an agent locally and want to use it in production, you must configure your Flyte deployment for the agent.
 ```
 
@@ -32,7 +38,6 @@ In Flyte, an agent is a long-running, stateless service powered by a gRPC server
 :maxdepth: -1
 :hidden:
 
-using_agents_in_tasks
 creating_an_agent
 testing_agents_locally
 configuring_your_flyte_deployment_for_agents
