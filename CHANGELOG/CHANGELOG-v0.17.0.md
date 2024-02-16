@@ -7,10 +7,10 @@
 
 
 ## Flytekit
-1. Great Expectations Integration ([docs](https://docs.flyte.org/en/latest/flytesnacks/auto/integrations/flytekit_plugins/greatexpectations/index.html#great-expectations)).
+1. Great Expectations Integration ([docs](https://docs.flyte.org/en/latest/flytesnacks/examples/greatexpectations_plugin/index.html)).
 1. Access to durable blob stores (AWS/GCS/etc) are now pluggable.
 1. Local task execution has been updated to also trigger the type engine.
-1. Tasks that have `cache=True` should now be cached when running locally as well ([docs](https://docs.flyte.org/en/latest/flytesnacks/auto/core/flyte_basics/task_cache.html#how-local-caching-works)).
+1. Tasks that have `cache=True` should now be cached when running locally as well ([docs](https://docs.flyte.org/en/latest/flytesnacks/examples/development_lifecycle/task_cache.html#how-does-local-caching-work)).
 
 Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/tag/v0.22.0) for the full list and more details.
 
@@ -20,7 +20,7 @@ Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/
    <img src="https://i.imgur.com/HTfuios.png" alt="New Graph UX" width="800"/>
 1. JSON Validation for json-based types in the UI.
 
-   
+
 
 | Before | After |
 | -------- | -------- |
