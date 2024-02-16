@@ -13,6 +13,12 @@ Agents can be tested locally without configuring or running the backend server, 
 
 The task inherited from `AsyncAgentExecutorMixin` can be executed locally, allowing flytekit to mimic FlytePropeller's behavior to call the agent.
 
+```python
+class BigQueryTask(AsyncAgentExecutorMixin, SQLTask[BigQueryConfig]):
+    def __init__(self, name: str, **kwargs):
+        ...
+```
+
 :::{note}
 
 In some cases, you will need to store credentials in your local environment when testing locally.
