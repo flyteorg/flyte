@@ -4,10 +4,10 @@ prev-page: getting_started/extending_flyte
 prev-page-title: Extending Flyte
 ---
 
-(flyte_agents)=
+(flyte_agents_guide)=
 # Flyte agents
 
-In Flyte, an agent is a long-running, stateless service powered by a gRPC server. Each agent service is a Kubernetes deployment that receives gRPC requests from FlytePropeller when users trigger a particular type of task (for example, the BigQuery agent handles BigQuery tasks). The agent service then initiates a job with the appropriate external service. You can create different agent services that host different agents, e.g., a production and a development agent service.
+In Flyte, an agent is a long-running, stateless service powered by a gRPC server that communicates with an external service. Each agent service is a Kubernetes deployment that receives gRPC requests from FlytePropeller when users trigger a particular type of task (for example, the BigQuery agent handles BigQuery tasks). The agent service then initiates a job with the appropriate external service. You can create different agent services that host different agents, e.g., a production and a development agent service.
 
 :::{figure} https://i.ibb.co/vXhBDjP/Screen-Shot-2023-05-29-at-2-54-14-PM.png
 :alt: Agent Service

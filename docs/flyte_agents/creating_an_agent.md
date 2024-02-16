@@ -17,11 +17,11 @@ There are two types of agents: **async** and **sync**.
 * **Async agents** communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
 * **Sync agents** communicate with external services, such as the OpenAI API, that return an immediate response after a job is created.
 
-:::{note}
+```{note}
 
 While agents can be written in any programming language, we currently only support Python agents. We may support other languages in the future.
 
-:::
+```
 
 ## Async agent interface specification
 
@@ -82,4 +82,4 @@ class CustomAsyncAgent(AsyncAgentBase):
 AgentRegistry.register(CustomAsyncAgent())
 ```
 
-For an example implementation, see the [BigQuery Agent](https://github.com/flyteorg/flytekit/blob/9977aac26242ebbede8e00d476c2fbc59ac5487a/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L35).
+For an example implementation, see the [BigQuery Agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
