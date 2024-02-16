@@ -146,7 +146,7 @@ func (w *WorkflowManager) CreateWorkflow(
 	workflowClosure, err := w.getCompiledWorkflow(ctx, finalizedRequest)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to compile workflow with err: %v", err)
-		return nil, errors.NewFlyteAdminErrorf(codes.Internal,
+		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"failed to compile workflow for [%+v] with err %v", request.Id, err)
 	}
 	err = validation.ValidateCompiledWorkflow(
@@ -234,7 +234,7 @@ func (w *WorkflowManager) GetWorkflow(ctx context.Context, request admin.ObjectG
 	return workflow, nil
 }
 
-// Returns workflows *without* a populated workflow closure.
+// ListWorkflows returns workflows *without* a populated workflow closure.
 func (w *WorkflowManager) ListWorkflows(
 	ctx context.Context, request admin.ResourceListRequest) (*admin.WorkflowList, error) {
 	// Check required fields
@@ -349,6 +349,7 @@ func NewWorkflowManager(
 	storageClient *storage.DataStore,
 	storagePrefix []string,
 	scope promutils.Scope) interfaces.WorkflowInterface {
+
 	metrics := workflowMetrics{
 		Scope: scope,
 		CompilationFailures: scope.MustNewCounter(

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -15,7 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/runtime/protoiface"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -50,7 +51,7 @@ func (e *PreRedirectHookError) Error() string {
 type PreRedirectHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) *PreRedirectHookError
 type LogoutHookFunc func(ctx context.Context, authCtx interfaces.AuthenticationContext, request *http.Request, w http.ResponseWriter) error
 type HTTPRequestToMetadataAnnotator func(ctx context.Context, request *http.Request) metadata.MD
-type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error
+type UserInfoForwardResponseHandler func(ctx context.Context, w http.ResponseWriter, m proto.Message) error
 
 type AuthenticatedClientMeta struct {
 	ClientIds     []string
@@ -139,8 +140,13 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 
 		state := HashCsrfState(csrfToken)
 		logger.Debugf(ctx, "Setting CSRF state cookie to %s and state to %s\n", csrfToken, state)
-		url := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
+		urlString := authCtx.OAuth2ClientConfig(GetPublicURL(ctx, request, authCtx.Options())).AuthCodeURL(state)
 		queryParams := request.URL.Query()
+		if !GetRedirectURLAllowed(ctx, queryParams.Get(RedirectURLParameter), authCtx.Options()) {
+			logger.Infof(ctx, "unauthorized redirect URI")
+			writer.WriteHeader(http.StatusForbidden)
+			return
+		}
 		if flowEndRedirectURL := queryParams.Get(RedirectURLParameter); flowEndRedirectURL != "" {
 			redirectCookie := NewRedirectCookie(ctx, flowEndRedirectURL)
 			if redirectCookie != nil {
@@ -149,7 +155,23 @@ func GetLoginHandler(ctx context.Context, authCtx interfaces.AuthenticationConte
 				logger.Errorf(ctx, "Was not able to create a redirect cookie")
 			}
 		}
-		http.Redirect(writer, request, url, http.StatusTemporaryRedirect)
+
+		idpURL, err := url.Parse(urlString)
+		if err != nil {
+			logger.Errorf(ctx, "failed to parse url %q: %v", urlString, err)
+			writer.WriteHeader(http.StatusInternalServerError)
+		}
+
+		// Add the IDPQueryParameter to the URL if it is present in the request
+		idpQueryParam := authCtx.Options().UserAuth.IDPQueryParameter
+		if len(idpQueryParam) > 0 && queryParams.Get(idpQueryParam) != "" {
+			logger.Infof(ctx, "Adding IDP Query Parameter to the URL")
+			query := idpURL.Query() // Gets a copy of query parameters
+			query.Add(idpQueryParam, queryParams.Get(idpQueryParam))
+			// Updates the rawquery with the new query parameters
+			idpURL.RawQuery = query.Encode()
+		}
+		http.Redirect(writer, request, idpURL.String(), http.StatusTemporaryRedirect)
 	}
 }
 
@@ -491,7 +513,7 @@ func GetLogoutEndpointHandler(ctx context.Context, authCtx interfaces.Authentica
 }
 
 func GetUserInfoForwardResponseHandler() UserInfoForwardResponseHandler {
-	return func(ctx context.Context, w http.ResponseWriter, m protoiface.MessageV1) error {
+	return func(ctx context.Context, w http.ResponseWriter, m proto.Message) error {
 		info, ok := m.(*service.UserInfoResponse)
 		if ok {
 			if info.AdditionalClaims != nil {

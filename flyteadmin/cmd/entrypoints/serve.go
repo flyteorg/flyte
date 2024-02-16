@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/server"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
+	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
 )
 
@@ -31,6 +32,14 @@ var serveCmd = &cobra.Command{
 			}
 		}()
 		server.SetMetricKeys(cfg.ApplicationConfiguration().GetTopLevelConfig())
+
+		// register otel tracer providers
+		for _, serviceName := range []string{otelutils.AdminGormTracer, otelutils.AdminServerTracer, otelutils.BlobstoreClientTracer} {
+			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
+				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
+				return err
+			}
+		}
 
 		return server.Serve(ctx, pluginRegistryStore.Load(), nil)
 	},

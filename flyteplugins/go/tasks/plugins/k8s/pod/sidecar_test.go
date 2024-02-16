@@ -84,6 +84,7 @@ func dummySidecarTaskMetadata(resources *v1.ResourceRequirements, extendedResour
 		},
 	})
 	tID.On("GetGeneratedName").Return("my_project:my_domain:my_name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 	taskMetadata.On("GetTaskExecutionID").Return(tID)
 
 	to := &pluginsCoreMock.TaskOverrides{}
@@ -230,15 +231,15 @@ func TestBuildSidecarResource_TaskType2(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
@@ -340,15 +341,15 @@ func TestBuildSidecarResource_TaskType1(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
@@ -457,15 +458,15 @@ func TestBuildSidecarResource(t *testing.T) {
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 
-	tolStorage := v1.Toleration{
-		Key:      "storage",
+	tolEphemeralStorage := v1.Toleration{
+		Key:      "ephemeral-storage",
 		Value:    "dedicated",
 		Operator: v1.TolerationOpExists,
 		Effect:   v1.TaintEffectNoSchedule,
 	}
 	assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
 		ResourceTolerations: map[v1.ResourceName][]v1.Toleration{
-			v1.ResourceStorage: {tolStorage},
+			v1.ResourceStorage: {tolEphemeralStorage},
 			ResourceNvidiaGPU:  {tolGPU},
 		},
 		DefaultCPURequest:    resource.MustParse("1024m"),
@@ -844,6 +845,13 @@ func TestDemystifiedSidecarStatus_PrimaryRunning(t *testing.T) {
 
 func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
 		Status: v1.PodStatus{
 			Phase: v1.PodRunning,
 			ContainerStatuses: []v1.ContainerStatus{
@@ -860,6 +868,33 @@ func TestDemystifiedSidecarStatus_PrimaryMissing(t *testing.T) {
 	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
 	assert.Nil(t, err)
 	assert.Equal(t, pluginsCore.PhasePermanentFailure, phaseInfo.Phase())
+}
+
+func TestDemystifiedSidecarStatus_PrimaryNotExistsYet(t *testing.T) {
+	res := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "Primary",
+				},
+			},
+		},
+		Status: v1.PodStatus{
+			Phase: v1.PodRunning,
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					Name: "Secondary",
+				},
+			},
+		},
+	}
+	res.SetAnnotations(map[string]string{
+		flytek8s.PrimaryContainerKey: "Primary",
+	})
+	taskCtx := getDummySidecarTaskContext(&core.TaskTemplate{}, sidecarResourceRequirements, nil)
+	phaseInfo, err := DefaultPodPlugin.GetTaskPhase(context.TODO(), taskCtx, res)
+	assert.Nil(t, err)
+	assert.Equal(t, pluginsCore.PhaseRunning, phaseInfo.Phase())
 }
 
 func TestGetProperties(t *testing.T) {

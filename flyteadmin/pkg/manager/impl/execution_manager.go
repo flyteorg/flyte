@@ -164,11 +164,8 @@ func (m *ExecutionManager) addPluginOverrides(ctx context.Context, executionID *
 		LaunchPlan:   launchPlanName,
 		ResourceType: admin.MatchableResource_PLUGIN_OVERRIDE,
 	})
-	if err != nil {
-		ec, ok := err.(errors.FlyteAdminError)
-		if !ok || ec.Code() != codes.NotFound {
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		return nil, err
 	}
 	if override != nil && override.Attributes != nil && override.Attributes.GetPluginOverrides() != nil {
 		return override.Attributes.GetPluginOverrides().Overrides, nil
@@ -249,23 +246,6 @@ func (m *ExecutionManager) setCompiledTaskDefaults(ctx context.Context, task *co
 		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
 			Name:  core.Resources_EPHEMERAL_STORAGE,
 			Value: ephemeralStorage.Limit.String(),
-		})
-	}
-
-	// Only assign storage when it is either requested or limited in the task definition, or a platform
-	// default exists.
-	if !taskResourceRequirements.Defaults.Storage.IsZero() ||
-		!taskResourceRequirements.Limits.Storage.IsZero() ||
-		!platformTaskResources.Defaults.Storage.IsZero() {
-		storageResource := flytek8s.AdjustOrDefaultResource(taskResourceRequirements.Defaults.Storage, taskResourceRequirements.Limits.Storage,
-			platformTaskResources.Defaults.Storage, platformTaskResources.Limits.Storage)
-		finalizedResourceRequests = append(finalizedResourceRequests, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Request.String(),
-		})
-		finalizedResourceLimits = append(finalizedResourceLimits, &core.Resources_ResourceEntry{
-			Name:  core.Resources_STORAGE,
-			Value: storageResource.Limit.String(),
 		})
 	}
 
@@ -427,11 +407,9 @@ func (m *ExecutionManager) getClusterAssignment(ctx context.Context, request *ad
 		Domain:       request.Domain,
 		ResourceType: admin.MatchableResource_CLUSTER_ASSIGNMENT,
 	})
-	if err != nil {
-		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
-			logger.Errorf(ctx, "Failed to get cluster assignment overrides with error: %v", err)
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		logger.Errorf(ctx, "Failed to get cluster assignment overrides with error: %v", err)
+		return nil, err
 	}
 	if resource != nil && resource.Attributes.GetClusterAssignment() != nil {
 		return resource.Attributes.GetClusterAssignment(), nil
@@ -701,9 +679,144 @@ func resolveSecurityCtx(ctx context.Context, executionConfigSecurityCtx *core.Se
 	}
 }
 
+// getStringFromInput should be called when a tag or partition value is a binding to an input. the input is looked up
+// from the input map and the binding, and an error is returned if the input key is not in the map.
+func (m *ExecutionManager) getStringFromInput(ctx context.Context, inputBinding core.InputBindingData, inputs map[string]*core.Literal) (string, error) {
+
+	inputName := inputBinding.GetVar()
+	if inputName == "" {
+		return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input binding var is empty")
+	}
+	if inputVal, ok := inputs[inputName]; ok {
+		if inputVal.GetScalar() == nil || inputVal.GetScalar().GetPrimitive() == nil {
+			return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "invalid input value [%+v]", inputVal)
+		}
+		var strVal string
+		p := inputVal.GetScalar().GetPrimitive()
+		switch p.GetValue().(type) {
+		case *core.Primitive_Integer:
+			strVal = p.GetStringValue()
+		case *core.Primitive_Datetime:
+			t := time.Unix(p.GetDatetime().Seconds, int64(p.GetDatetime().Nanos))
+			t = t.In(time.UTC)
+			strVal = t.Format("2006-01-02")
+		case *core.Primitive_StringValue:
+			strVal = p.GetStringValue()
+		case *core.Primitive_FloatValue:
+			strVal = fmt.Sprintf("%.2f", p.GetFloatValue())
+		case *core.Primitive_Boolean:
+			strVal = fmt.Sprintf("%t", p.GetBoolean())
+		default:
+			strVal = fmt.Sprintf("%s", p.GetValue())
+		}
+
+		logger.Debugf(ctx, "String templating returning [%s] for [%+v]", strVal, inputVal)
+		return strVal, nil
+	}
+	return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "input binding var [%s] not found", inputName)
+}
+
+func (m *ExecutionManager) getLabelValue(ctx context.Context, l *core.LabelValue, inputs map[string]*core.Literal) (string, error) {
+	if l == nil {
+		return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "label value is nil")
+	}
+	if l.GetInputBinding() != nil {
+		return m.getStringFromInput(ctx, *l.GetInputBinding(), inputs)
+	}
+	if l.GetStaticValue() != "" {
+		return l.GetStaticValue(), nil
+	}
+	return "", errors.NewFlyteAdminErrorf(codes.InvalidArgument, "label value is empty")
+}
+
+func (m *ExecutionManager) fillInTemplateArgs(ctx context.Context, query core.ArtifactQuery, inputs map[string]*core.Literal) (core.ArtifactQuery, error) {
+	if query.GetUri() != "" {
+		// If a query string, then just pass it through, nothing to fill in.
+		return query, nil
+	} else if query.GetArtifactId() != nil {
+		artifactID := query.GetArtifactId()
+		ak := artifactID.GetArtifactKey()
+		if ak == nil {
+			return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "id doesn't have key")
+		}
+		var project, domain string
+		if ak.GetProject() == "" {
+			project = contextutils.Value(ctx, contextutils.ProjectKey)
+		} else {
+			project = ak.GetProject()
+		}
+		if ak.GetDomain() == "" {
+			domain = contextutils.Value(ctx, contextutils.DomainKey)
+		} else {
+			domain = ak.GetDomain()
+		}
+
+		var partitions map[string]*core.LabelValue
+
+		if artifactID.GetPartitions().GetValue() != nil {
+			partitions = make(map[string]*core.LabelValue, len(artifactID.GetPartitions().Value))
+			for k, v := range artifactID.GetPartitions().GetValue() {
+				newValue, err := m.getLabelValue(ctx, v, inputs)
+				if err != nil {
+					logger.Errorf(ctx, "Failed to resolve partition input string [%s] [%+v] [%v]", k, v, err)
+					return query, err
+				}
+				partitions[k] = &core.LabelValue{Value: &core.LabelValue_StaticValue{StaticValue: newValue}}
+			}
+		}
+
+		var timePartition *core.TimePartition
+		if artifactID.GetTimePartition().GetValue() != nil {
+			if artifactID.GetTimePartition().Value.GetTimeValue() != nil {
+				// If the time value is set, then just pass it through, nothing to fill in.
+				timePartition = artifactID.GetTimePartition()
+			} else if artifactID.GetTimePartition().Value.GetInputBinding() != nil {
+				// Evaluate the time partition input binding
+				lit, ok := inputs[artifactID.GetTimePartition().Value.GetInputBinding().GetVar()]
+				if !ok {
+					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "time partition input binding var [%s] not found in inputs %v", artifactID.GetTimePartition().Value.GetInputBinding().GetVar(), inputs)
+				}
+
+				if lit.GetScalar().GetPrimitive().GetDatetime() == nil {
+					return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
+						"time partition binding to input var [%s] failing because %v is not a datetime",
+						artifactID.GetTimePartition().Value.GetInputBinding().GetVar(), lit)
+				}
+				timePartition = &core.TimePartition{
+					Value: &core.LabelValue{
+						Value: &core.LabelValue_TimeValue{
+							TimeValue: lit.GetScalar().GetPrimitive().GetDatetime(),
+						},
+					},
+				}
+			} else {
+				return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "time partition value cannot be empty when evaluating query: %v", query)
+			}
+		}
+
+		return core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: &core.ArtifactID{
+					ArtifactKey: &core.ArtifactKey{
+						Project: project,
+						Domain:  domain,
+						Name:    ak.GetName(),
+					},
+					Partitions: &core.Partitions{
+						Value: partitions,
+					},
+					TimePartition: timePartition,
+				},
+			},
+		}, nil
+	}
+	return query, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "query doesn't have uri, tag, or id")
+}
+
 func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	context.Context, *models.Execution, error) {
+
 	err := validation.ValidateExecutionRequest(ctx, request, m.db, m.config.ApplicationConfiguration())
 	if err != nil {
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
@@ -711,7 +824,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
-		return m.launchSingleTaskExecution(ctx, request, requestedAt)
+		// When tasks can have defaults this will need to handle Artifacts as well.
+		ctx, model, err := m.launchSingleTaskExecution(ctx, request, requestedAt)
+		return ctx, model, err
 	}
 
 	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Spec.LaunchPlan)
@@ -724,16 +839,23 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
 		return nil, nil, err
 	}
+
+	var lpExpectedInputs *core.ParameterMap
+	var usedArtifactIDs []*core.ArtifactID
+	lpExpectedInputs = launchPlan.Closure.ExpectedInputs
+
+	// Artifacts retrieved will need to be stored somewhere to ensure that we can re-emit events if necessary
+	// in the future, and also to make sure that relaunch and recover can use it if necessary.
 	executionInputs, err := validation.CheckAndFetchInputsForExecution(
 		request.Inputs,
 		launchPlan.Spec.FixedInputs,
-		launchPlan.Closure.ExpectedInputs,
+		lpExpectedInputs,
 	)
 
 	if err != nil {
 		logger.Debugf(ctx, "Failed to CheckAndFetchInputsForExecution with request.Inputs: %+v"+
 			"fixed inputs: %+v and expected inputs: %+v with err %v",
-			request.Inputs, launchPlan.Spec.FixedInputs, launchPlan.Closure.ExpectedInputs, err)
+			request.Inputs, launchPlan.Spec.FixedInputs, lpExpectedInputs, err)
 		return nil, nil, err
 	}
 
@@ -767,6 +889,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		requestSpec.Metadata = &admin.ExecutionMetadata{}
 	}
 	requestSpec.Metadata.Principal = getUser(ctx)
+	requestSpec.Metadata.ArtifactIds = usedArtifactIDs
 
 	// Get the node and parent execution (if any) that launched this execution
 	var parentNodeExecutionID uint
@@ -850,26 +973,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
 	}
 
-	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
-	execInfo, err := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
-		Namespace:                namespace,
-		ExecutionID:              &workflowExecutionID,
-		ReferenceWorkflowName:    workflow.Id.Name,
-		ReferenceLaunchPlanName:  launchPlan.Id.Name,
-		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
-		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
-		ExecutionParameters:      executionParameters,
-	})
-
-	if err != nil {
-		m.systemMetrics.PropellerFailures.Inc()
-		logger.Infof(ctx, "Failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
-			request, workflowExecutionID, executionInputs, err)
-		return nil, nil, err
-	}
 	executionCreatedAt := time.Now()
 	acceptanceDelay := executionCreatedAt.Sub(requestedAt)
-	m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
 
 	// Request notification settings takes precedence over the launch plan settings.
 	// If there is no notification in the request and DisableAll is not true, use the settings from the launch plan.
@@ -884,7 +989,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
+	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
 		LaunchPlanID:        launchPlanModel.ID,
@@ -896,13 +1001,34 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		WorkflowIdentifier:    workflow.Id,
 		ParentNodeExecutionID: parentNodeExecutionID,
 		SourceExecutionID:     sourceExecutionID,
-		Cluster:               execInfo.Cluster,
 		InputsURI:             inputsURI,
 		UserInputsURI:         userInputsURI,
 		SecurityContext:       executionConfig.SecurityContext,
 		LaunchEntity:          launchPlan.Id.ResourceType,
 		Namespace:             namespace,
+	}
+
+	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
+	execInfo, execErr := workflowExecutor.Execute(ctx, workflowengineInterfaces.ExecutionData{
+		Namespace:                namespace,
+		ExecutionID:              &workflowExecutionID,
+		ReferenceWorkflowName:    workflow.Id.Name,
+		ReferenceLaunchPlanName:  launchPlan.Id.Name,
+		WorkflowClosure:          workflow.Closure.CompiledWorkflow,
+		WorkflowClosureReference: storage.DataReference(workflowModel.RemoteClosureIdentifier),
+		ExecutionParameters:      executionParameters,
 	})
+	if execErr != nil {
+		createExecModelInput.Error = execErr
+		m.systemMetrics.PropellerFailures.Inc()
+		logger.Infof(ctx, "failed to execute workflow %+v with execution id %+v and inputs %+v with err %v",
+			request, workflowExecutionID, executionInputs, execErr)
+	} else {
+		m.systemMetrics.AcceptanceDelay.Observe(acceptanceDelay.Seconds())
+		createExecModelInput.Cluster = execInfo.Cluster
+	}
+
+	executionModel, err := transformers.CreateExecutionModel(createExecModelInput)
 	if err != nil {
 		logger.Infof(ctx, "Failed to create execution model in transformer for id: [%+v] with err: %v",
 			workflowExecutionID, err)
@@ -936,7 +1062,8 @@ func (m *ExecutionManager) createExecutionModel(
 func (m *ExecutionManager) CreateExecution(
 	ctx context.Context, request admin.ExecutionCreateRequest, requestedAt time.Time) (
 	*admin.ExecutionCreateResponse, error) {
-	// Prior to  flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
+
+	// Prior to flyteidl v0.15.0, Inputs was held in ExecutionSpec. Ensure older clients continue to work.
 	if request.Inputs == nil || len(request.Inputs.Literals) == 0 {
 		request.Inputs = request.GetSpec().GetInputs()
 	}
@@ -1293,7 +1420,8 @@ func (m *ExecutionManager) CreateWorkflowEvent(ctx context.Context, request admi
 	}
 
 	go func() {
-		if err := m.cloudEventPublisher.Publish(ctx, proto.MessageName(&request), &request); err != nil {
+		ceCtx := context.TODO()
+		if err := m.cloudEventPublisher.Publish(ceCtx, proto.MessageName(&request), &request); err != nil {
 			m.systemMetrics.PublishEventError.Inc()
 			logger.Infof(ctx, "error publishing cloud event [%+v] with err: [%v]", request.RequestId, err)
 		}
@@ -1630,6 +1758,7 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
+
 	queueAllocator := executions.NewQueueAllocator(config, db)
 	systemMetrics := newExecutionSystemMetrics(systemScope)
 

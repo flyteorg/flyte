@@ -9,6 +9,7 @@ import (
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -28,6 +29,7 @@ import (
 	engine "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 const remoteClosureIdentifier = "s3://flyte/metadata/admin/remote closure id"
@@ -223,9 +225,9 @@ func TestCreateWorkflow_CompilerGetRequirementsError(t *testing.T) {
 		getMockWorkflowConfigProvider(), mockCompiler, getMockStorage(), storagePrefix, mockScope.NewTestScope())
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, fmt.Sprintf(
+	utils.AssertEqualWithSanitizedRegex(t, fmt.Sprintf(
 		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
-			"name:\"name\" version:\"version\" ] with err %v", expectedErr.Error()))
+			"name:\"name\" version:\"version\" ] with err %v", expectedErr.Error()), err.Error())
 	assert.Nil(t, response)
 }
 
@@ -243,10 +245,13 @@ func TestCreateWorkflow_CompileWorkflowError(t *testing.T) {
 		getMockWorkflowConfigProvider(), mockCompiler, getMockStorage(), storagePrefix, mockScope.NewTestScope())
 	request := testutils.GetWorkflowRequest()
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
-	assert.EqualError(t, err, fmt.Sprintf(
-		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
-			"name:\"name\" version:\"version\" ] with err %v", expectedErr.Error()))
 	assert.Nil(t, response)
+	s, ok := status.FromError(err)
+	assert.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, s.Code())
+	utils.AssertEqualWithSanitizedRegex(t, fmt.Sprintf(
+		"failed to compile workflow for [resource_type:WORKFLOW project:\"project\" domain:\"domain\" "+
+			"name:\"name\" version:\"version\" ] with err %v", expectedErr.Error()), err.Error())
 }
 
 func TestCreateWorkflow_DatabaseError(t *testing.T) {

@@ -64,7 +64,11 @@ func GetEmailer(config runtimeInterfaces.NotificationsConfig, scope promutils.Sc
 
 	switch config.Type {
 	case common.AWS:
-		awsConfig := aws.NewConfig().WithRegion(config.Region).WithMaxRetries(maxRetries)
+		region := config.AWSConfig.Region
+		if region == "" {
+			region = config.Region
+		}
+		awsConfig := aws.NewConfig().WithRegion(region).WithMaxRetries(maxRetries)
 		awsSession, err := session.NewSession(awsConfig)
 		if err != nil {
 			panic(err)
@@ -98,7 +102,11 @@ func NewNotificationsProcessor(config runtimeInterfaces.NotificationsConfig, sco
 			// However, the message body of SQS is the SNS message format which isn't Base64 encoded.
 			ConsumeBase64: &enable64decoding,
 		}
-		sqsConfig.Region = config.Region
+		if config.AWSConfig.Region != "" {
+			sqsConfig.Region = config.AWSConfig.Region
+		} else {
+			sqsConfig.Region = config.Region
+		}
 		var err error
 		err = async.Retry(reconnectAttempts, reconnectDelay, func() error {
 			sub, err = gizmoAWS.NewSubscriber(sqsConfig)

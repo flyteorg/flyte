@@ -200,6 +200,7 @@ func getMockTaskExecutionMetadata() pluginsCore.TaskExecutionMetadata {
 	taskExecutionMetadata.On("GetAnnotations").Return(map[string]string{"aKey": "aVal"})
 	taskExecutionMetadata.On("GetLabels").Return(map[string]string{"lKey": "lVal"})
 	taskExecutionMetadata.On("GetOwnerReference").Return(metav1.OwnerReference{Name: "x"})
+	taskExecutionMetadata.On("GetSecurityContext").Return(core.SecurityContext{RunAs: &core.Identity{}})
 
 	id := &pluginsCoreMock.TaskExecutionID{}
 	id.On("GetGeneratedName").Return("test")

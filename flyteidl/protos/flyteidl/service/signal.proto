@@ -5,7 +5,7 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/servi
 
 import "google/api/annotations.proto";
 import "flyteidl/admin/signal.proto";
-// import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 // SignalService defines an RPC Service that may create, update, and retrieve signal(s).
 service SignalService {
@@ -15,9 +15,9 @@ service SignalService {
     // a signal, meaning the first call will create the signal and all subsequent calls will
     // fetch the existing signal. This is only useful during Flyte Workflow execution and therefore
     // is not exposed to mitigate unintended behavior.
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Retrieve a signal, creating it if it does not exist."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Retrieve a signal, creating it if it does not exist."
+    };
   }
 
   // Fetch a list of :ref:`ref_flyteidl.admin.Signal` definitions.
@@ -25,9 +25,9 @@ service SignalService {
     option (google.api.http) = {
       get: "/api/v1/signals/{workflow_execution_id.project}/{workflow_execution_id.domain}/{workflow_execution_id.name}"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Fetch existing signal definitions matching the input signal id filters."
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Fetch existing signal definitions matching the input signal id filters."
+    };
   }
 
   // Sets the value on a :ref:`ref_flyteidl.admin.Signal` definition
@@ -36,20 +36,20 @@ service SignalService {
       post: "/api/v1/signals"
       body: "*"
     };
-    // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-    //   description: "Set a signal value."
-    //   responses: {
-    //     key: "400"
-    //     value: {
-    //       description: "Returned for bad request that may have failed validation."
-    //     }
-    //   }
-    //   responses: {
-    //     key: "409"
-    //     value: {
-    //       description: "Returned for a request that references an identical entity that has already been registered."
-    //     }
-    //   }
-    // };
+    option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+      description: "Set a signal value."
+      responses: {
+        key: "400"
+        value: {
+          description: "Returned for bad request that may have failed validation."
+        }
+      }
+      responses: {
+        key: "409"
+        value: {
+          description: "Returned for a request that references an identical entity that has already been registered."
+        }
+      }
+    };
   }
 }

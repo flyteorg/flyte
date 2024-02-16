@@ -33,12 +33,17 @@ var (
 const IDMaxLength = 50
 
 type taskExecutionID struct {
-	execName string
-	id       *core.TaskExecutionIdentifier
+	execName     string
+	id           *core.TaskExecutionIdentifier
+	uniqueNodeID string
 }
 
 func (te taskExecutionID) GetID() core.TaskExecutionIdentifier {
 	return *te.id
+}
+
+func (te taskExecutionID) GetUniqueNodeID() string {
+	return te.uniqueNodeID
 }
 
 func (te taskExecutionID) GetGeneratedName() string {
@@ -192,14 +197,12 @@ func convertTaskResourcesToRequirements(taskResources v1alpha1.TaskResources) *v
 			v1.ResourceCPU:              taskResources.Requests.CPU,
 			v1.ResourceMemory:           taskResources.Requests.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Requests.EphemeralStorage,
-			v1.ResourceStorage:          taskResources.Requests.Storage,
 			utils.ResourceNvidiaGPU:     taskResources.Requests.GPU,
 		},
 		Limits: v1.ResourceList{
 			v1.ResourceCPU:              taskResources.Limits.CPU,
 			v1.ResourceMemory:           taskResources.Limits.Memory,
 			v1.ResourceEphemeralStorage: taskResources.Limits.EphemeralStorage,
-			v1.ResourceStorage:          taskResources.Limits.Storage,
 			utils.ResourceNvidiaGPU:     taskResources.Limits.GPU,
 		},
 	}
@@ -291,11 +294,15 @@ func (t *Handler) newTaskExecutionContext(ctx context.Context, nCtx interfaces.N
 		NodeExecutionContext: nCtx,
 		tm: taskExecutionMetadata{
 			NodeExecutionMetadata: nCtx.NodeExecutionMetadata(),
-			taskExecID:            taskExecutionID{execName: uniqueID, id: id},
-			o:                     nCtx.Node(),
-			maxAttempts:           maxAttempts,
-			platformResources:     convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
-			environmentVariables:  nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
+			taskExecID: taskExecutionID{
+				execName:     uniqueID,
+				id:           id,
+				uniqueNodeID: currentNodeUniqueID,
+			},
+			o:                    nCtx.Node(),
+			maxAttempts:          maxAttempts,
+			platformResources:    convertTaskResourcesToRequirements(nCtx.ExecutionContext().GetExecutionConfig().TaskResources),
+			environmentVariables: nCtx.ExecutionContext().GetExecutionConfig().EnvironmentVariables,
 		},
 		rm: resourcemanager.GetTaskResourceManager(
 			t.resourceManager, resourceNamespacePrefix, id),

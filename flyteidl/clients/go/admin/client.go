@@ -203,16 +203,6 @@ func initializeClients(ctx context.Context, cfg *Config, tokenCache cache.TokenC
 	return &cs, nil
 }
 
-// Deprecated: Please use NewClientsetBuilder() instead.
-func InitializeAdminClientFromConfig(ctx context.Context, tokenCache cache.TokenCache, opts ...grpc.DialOption) (service.AdminServiceClient, error) {
-	clientSet, err := initializeClients(ctx, GetConfig(ctx), tokenCache, opts...)
-	if err != nil {
-		return nil, err
-	}
-
-	return clientSet.AdminClient(), nil
-}
-
 func InitializeMockAdminClient() service.AdminServiceClient {
 	logger.Infof(context.TODO(), "Initialized Mock Admin client")
 	return &mocks.AdminServiceClient{}

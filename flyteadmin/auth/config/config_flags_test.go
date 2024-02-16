@@ -323,6 +323,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_userAuth.idpQueryParameter", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("userAuth.idpQueryParameter", testValue)
+			if vString, err := cmdFlags.GetString("userAuth.idpQueryParameter"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.UserAuth.IDPQueryParameter)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_appAuth.selfAuthServer.issuer", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {

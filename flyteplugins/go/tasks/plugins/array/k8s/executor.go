@@ -103,9 +103,6 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 	case arrayCore.PhasePreLaunch:
 		nextState = pluginState.SetPhase(arrayCore.PhaseLaunch, version+1).SetReason("Nothing to do in PreLaunch phase.")
 
-	case arrayCore.PhaseWaitingForResources:
-		fallthrough
-
 	case arrayCore.PhaseLaunch:
 		// In order to maintain backwards compatibility with the state transitions
 		// in the aws batch plugin. Forward to PhaseCheckingSubTasksExecutions where the launching
@@ -113,9 +110,15 @@ func (e Executor) Handle(ctx context.Context, tCtx core.TaskExecutionContext) (c
 		nextState = pluginState.SetPhase(arrayCore.PhaseCheckingSubTaskExecutions, version+1).SetReason("Nothing to do in Launch phase.")
 		err = nil
 
+	case arrayCore.PhaseWaitingForResources:
+		fallthrough
+
 	case arrayCore.PhaseCheckingSubTaskExecutions:
 		nextState, externalResources, err = LaunchAndCheckSubTasksState(ctx, tCtx, e.kubeClient, pluginConfig,
 			tCtx.DataStore(), tCtx.OutputWriter().GetOutputPrefixPath(), tCtx.OutputWriter().GetRawOutputPrefix(), pluginState)
+
+	case arrayCore.PhaseAbortSubTasks:
+		nextState, externalResources, err = TerminateSubTasks(ctx, tCtx, e.kubeClient, GetConfig(), abortSubtask, pluginState)
 
 	case arrayCore.PhaseAssembleFinalOutput:
 		nextState, err = array.AssembleFinalOutputs(ctx, e.outputsAssembler, tCtx, arrayCore.PhaseSuccess, version+1, pluginState)
@@ -156,7 +159,7 @@ func (e Executor) Abort(ctx context.Context, tCtx core.TaskExecutionContext) err
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
 	}
 
-	return TerminateSubTasks(ctx, tCtx, e.kubeClient, GetConfig(), abortSubtask, pluginState)
+	return TerminateSubTasksOnAbort(ctx, tCtx, e.kubeClient, GetConfig(), abortSubtask, pluginState)
 }
 
 func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) error {
@@ -165,7 +168,8 @@ func (e Executor) Finalize(ctx context.Context, tCtx core.TaskExecutionContext) 
 		return errors.Wrapf(errors.CorruptedPluginState, err, "Failed to read unmarshal custom state")
 	}
 
-	return TerminateSubTasks(ctx, tCtx, e.kubeClient, GetConfig(), finalizeSubtask, pluginState)
+	_, _, err := TerminateSubTasks(ctx, tCtx, e.kubeClient, GetConfig(), finalizeSubtask, pluginState)
+	return err
 }
 
 func (e Executor) Start(ctx context.Context) error {

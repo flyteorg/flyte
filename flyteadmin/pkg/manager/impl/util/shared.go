@@ -275,12 +275,10 @@ func GetMatchableResource(ctx context.Context, resourceManager interfaces.Resour
 		Workflow:     workflowName,
 		ResourceType: resourceType,
 	})
-	if err != nil {
-		if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
-			logger.Errorf(ctx, "Failed to get %v overrides in %s project %s domain %s workflow with error: %v", resourceType,
-				project, domain, workflowName, err)
-			return nil, err
-		}
+	if err != nil && !errors.IsDoesNotExistError(err) {
+		logger.Errorf(ctx, "Failed to get %v overrides in %s project %s domain %s workflow with error: %v", resourceType,
+			project, domain, workflowName, err)
+		return nil, err
 	}
 	return matchableResource, nil
 }

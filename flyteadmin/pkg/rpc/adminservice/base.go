@@ -96,7 +96,6 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	publisher := notifications.NewNotificationsPublisher(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	processor := notifications.NewNotificationsProcessor(*configuration.ApplicationConfiguration().GetNotificationsConfig(), adminScope)
 	eventPublisher := notifications.NewEventsPublisher(*configuration.ApplicationConfiguration().GetExternalEventsConfig(), adminScope)
-	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), adminScope)
 	go func() {
 		logger.Info(ctx, "Started processing notifications.")
 		processor.StartProcessing()
@@ -111,6 +110,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	})
 
 	eventScheduler := workflowScheduler.GetEventScheduler()
+
 	launchPlanManager := manager.NewLaunchPlanManager(
 		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
 
@@ -124,6 +124,8 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 		Retries:                  defaultRetries,
 		RemoteDataStoreClient:    dataStorageClient,
 	}).GetRemoteURLInterface()
+
+	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, repo, dataStorageClient, urlData, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), *configuration.ApplicationConfiguration().GetRemoteDataConfig(), adminScope)
 
 	workflowManager := manager.NewWorkflowManager(
 		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),

@@ -24,6 +24,7 @@ import (
 const PodKind = "pod"
 const OOMKilled = "OOMKilled"
 const Interrupted = "Interrupted"
+const PrimaryContainerNotFound = "PrimaryContainerNotFound"
 const SIGKILL = 137
 
 const defaultContainerTemplateName = "default"
@@ -571,14 +572,38 @@ func BuildIdentityPod() *v1.Pod {
 //	and hence input gates. We should not allow bad requests that Request for large number of resource through.
 //	In the case it makes through, we will fail after timeout
 func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
+	phaseInfo, t := demystifyPendingHelper(status)
+
+	if phaseInfo.Phase().IsTerminal() {
+		return phaseInfo, nil
+	}
+
+	podPendingTimeout := config.GetK8sPluginConfig().PodPendingTimeout.Duration
+	if podPendingTimeout > 0 && time.Since(t) >= podPendingTimeout {
+		return pluginsCore.PhaseInfoRetryableFailureWithCleanup("PodPendingTimeout", phaseInfo.Reason(), &pluginsCore.TaskInfo{
+			OccurredAt: &t,
+		}), nil
+	}
+
+	if phaseInfo.Phase() != pluginsCore.PhaseUndefined {
+		return phaseInfo, nil
+	}
+
+	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+}
+
+func demystifyPendingHelper(status v1.PodStatus) (pluginsCore.PhaseInfo, time.Time) {
 	// Search over the difference conditions in the status object.  Note that the 'Pending' this function is
 	// demystifying is the 'phase' of the pod status. This is different than the PodReady condition type also used below
+	phaseInfo := pluginsCore.PhaseInfoUndefined
+	t := time.Now()
 	for _, c := range status.Conditions {
+		t = c.LastTransitionTime.Time
 		switch c.Type {
 		case v1.PodScheduled:
 			if c.Status == v1.ConditionFalse {
 				// Waiting to be scheduled. This usually refers to inability to acquire resources.
-				return pluginsCore.PhaseInfoQueued(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), nil
+				return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
 			}
 
 		case v1.PodReasonUnschedulable:
@@ -591,7 +616,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 			//  reason: Unschedulable
 			// 	status: "False"
 			// 	type: PodScheduled
-			return pluginsCore.PhaseInfoQueued(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), nil
+			return pluginsCore.PhaseInfoQueued(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("%s:%s", c.Reason, c.Message)), t
 
 		case v1.PodReady:
 			if c.Status == v1.ConditionFalse {
@@ -636,7 +661,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// ErrImagePull -> Transitionary phase to ImagePullBackOff
 								// ContainerCreating -> Image is being downloaded
 								// PodInitializing -> Init containers are running
-								return pluginsCore.PhaseInfoInitializing(c.LastTransitionTime.Time, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &c.LastTransitionTime.Time}), nil
+								return pluginsCore.PhaseInfoInitializing(t, pluginsCore.DefaultPhaseVersion, fmt.Sprintf("[%s]: %s", finalReason, finalMessage), &pluginsCore.TaskInfo{OccurredAt: &t}), t
 
 							case "CreateContainerError":
 								// This may consist of:
@@ -658,31 +683,45 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// synced, and therefore, only provides an
 								// approximation of the elapsed time since the last
 								// transition.
-								t := c.LastTransitionTime.Time
-								if time.Since(t) >= config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration {
-									return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), nil
+									}), t
 								}
 								return pluginsCore.PhaseInfoInitializing(
 									t,
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), nil
+								), t
 
-							case "CreateContainerConfigError", "InvalidImageName":
-								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+							case "CreateContainerConfigError":
+								gracePeriod := config.GetK8sPluginConfig().CreateContainerConfigErrorGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
+										OccurredAt: &t,
+									}), t
+								}
+								return pluginsCore.PhaseInfoInitializing(
+									t,
+									pluginsCore.DefaultPhaseVersion,
+									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
+									&pluginsCore.TaskInfo{OccurredAt: &t},
+								), t
+
+							case "InvalidImageName":
+								return pluginsCore.PhaseInfoFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
-								}), nil
+								}), t
 
 							case "ImagePullBackOff":
-								t := c.LastTransitionTime.Time
-								if time.Since(t) >= config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration {
-									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								gracePeriod := config.GetK8sPluginConfig().ImagePullBackoffGracePeriod.Duration
+								if time.Since(t) >= gracePeriod {
+									return pluginsCore.PhaseInfoRetryableFailureWithCleanup(finalReason, GetMessageAfterGracePeriod(finalMessage, gracePeriod), &pluginsCore.TaskInfo{
 										OccurredAt: &t,
-									}), nil
+									}), t
 								}
 
 								return pluginsCore.PhaseInfoInitializing(
@@ -690,7 +729,7 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 									pluginsCore.DefaultPhaseVersion,
 									fmt.Sprintf("[%s]: %s", finalReason, finalMessage),
 									&pluginsCore.TaskInfo{OccurredAt: &t},
-								), nil
+								), t
 
 							default:
 								// Since we are not checking for all error states, we may end up perpetually
@@ -698,12 +737,10 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 								// by K8s and we get elusive 'pod not found' errors
 								// So be default if the container is not waiting with the PodInitializing/ContainerCreating
 								// reasons, then we will assume a failure reason, and fail instantly
-								t := c.LastTransitionTime.Time
-								return pluginsCore.PhaseInfoSystemRetryableFailure(finalReason, finalMessage, &pluginsCore.TaskInfo{
+								return pluginsCore.PhaseInfoSystemRetryableFailureWithCleanup(finalReason, finalMessage, &pluginsCore.TaskInfo{
 									OccurredAt: &t,
-								}), nil
+								}), t
 							}
-
 						}
 					}
 				}
@@ -711,14 +748,18 @@ func DemystifyPending(status v1.PodStatus) (pluginsCore.PhaseInfo, error) {
 		}
 	}
 
-	return pluginsCore.PhaseInfoQueued(time.Now(), pluginsCore.DefaultPhaseVersion, "Scheduling"), nil
+	return phaseInfo, t
+}
+
+func GetMessageAfterGracePeriod(message string, gracePeriod time.Duration) string {
+	return fmt.Sprintf("Grace period [%s] exceeded|%s", gracePeriod, message)
 }
 
 func DemystifySuccess(status v1.PodStatus, info pluginsCore.TaskInfo) (pluginsCore.PhaseInfo, error) {
 	for _, status := range append(
 		append(status.InitContainerStatuses, status.ContainerStatuses...), status.EphemeralContainerStatuses...) {
 		if status.State.Terminated != nil && strings.Contains(status.State.Terminated.Reason, OOMKilled) {
-			return pluginsCore.PhaseInfoRetryableFailure("OOMKilled",
+			return pluginsCore.PhaseInfoRetryableFailure(OOMKilled,
 				"Pod reported success despite being OOMKilled", &info), nil
 		}
 	}
@@ -736,9 +777,14 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 			}
 
 			if s.State.Terminated != nil {
-				if s.State.Terminated.ExitCode != 0 {
+				if s.State.Terminated.ExitCode != 0 || strings.Contains(s.State.Terminated.Reason, OOMKilled) {
+					message := fmt.Sprintf("\r\n[%v] terminated with exit code (%v). Reason [%v]. Message: \n%v.",
+						s.Name,
+						s.State.Terminated.ExitCode,
+						s.State.Terminated.Reason,
+						s.State.Terminated.Message)
 					return pluginsCore.PhaseInfoRetryableFailure(
-						s.State.Terminated.Reason, s.State.Terminated.Message, info)
+						s.State.Terminated.Reason, message, info)
 				}
 				return pluginsCore.PhaseInfoSuccess(info)
 			}
@@ -746,7 +792,7 @@ func DeterminePrimaryContainerPhase(primaryContainerName string, statuses []v1.C
 	}
 
 	// If for some reason we can't find the primary container, always just return a permanent failure
-	return pluginsCore.PhaseInfoFailure("PrimaryContainerMissing",
+	return pluginsCore.PhaseInfoFailure(PrimaryContainerNotFound,
 		fmt.Sprintf("Primary container [%s] not found in pod's container statuses", primaryContainerName), info)
 }
 

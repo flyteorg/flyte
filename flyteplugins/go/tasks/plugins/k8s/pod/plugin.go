@@ -126,7 +126,9 @@ func (p plugin) BuildResource(ctx context.Context, taskCtx pluginsCore.TaskExecu
 		objectMeta.Annotations[flytek8s.PrimaryContainerKey] = primaryContainerName
 	}
 
-	podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	if len(podSpec.ServiceAccountName) == 0 {
+		podSpec.ServiceAccountName = flytek8s.GetServiceAccountNameFromTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
+	}
 
 	pod := flytek8s.BuildIdentityPod()
 	pod.ObjectMeta = *objectMeta
@@ -144,9 +146,14 @@ func (p plugin) GetTaskPhase(ctx context.Context, pluginContext k8s.PluginContex
 	return p.GetTaskPhaseWithLogs(ctx, pluginContext, r, logPlugin, " (User)", nil)
 }
 
-func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme *tasklog.TemplateVarsByScheme) (pluginsCore.PhaseInfo, error) {
+func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.PluginContext, r client.Object, logPlugin tasklog.Plugin, logSuffix string, extraLogTemplateVarsByScheme []tasklog.TemplateVar) (pluginsCore.PhaseInfo, error) {
 	pluginState := k8s.PluginState{}
 	_, err := pluginContext.PluginStateReader().Get(&pluginState)
+	if err != nil {
+		return pluginsCore.PhaseInfoUndefined, err
+	}
+
+	taskTemplate, err := pluginContext.TaskReader().Read(ctx)
 	if err != nil {
 		return pluginsCore.PhaseInfoUndefined, err
 	}
@@ -164,9 +171,9 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		ReportedAt: &reportedAt,
 	}
 
-	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID().GetID()
+	taskExecID := pluginContext.TaskExecutionMetadata().GetTaskExecutionID()
 	if pod.Status.Phase != v1.PodPending && pod.Status.Phase != v1.PodUnknown {
-		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, &taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme)
+		taskLogs, err := logs.GetLogsForContainerInPod(ctx, logPlugin, taskExecID, pod, 0, logSuffix, extraLogTemplateVarsByScheme, taskTemplate)
 		if err != nil {
 			return pluginsCore.PhaseInfoUndefined, err
 		}
@@ -211,7 +218,17 @@ func (plugin) GetTaskPhaseWithLogs(ctx context.Context, pluginContext k8s.Plugin
 		} else {
 			// if the primary container annotation exists, we use the status of the specified container
 			phaseInfo = flytek8s.DeterminePrimaryContainerPhase(primaryContainerName, pod.Status.ContainerStatuses, &info)
-			if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
+			if phaseInfo.Phase() == pluginsCore.PhasePermanentFailure && phaseInfo.Err() != nil &&
+				phaseInfo.Err().GetCode() == flytek8s.PrimaryContainerNotFound {
+				// if the primary container status is not found ensure that the primary container exists.
+				// note: it should be impossible for the primary container to not exist at this point.
+				for _, container := range pod.Spec.Containers {
+					if container.Name == primaryContainerName {
+						phaseInfo = pluginsCore.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, &info)
+						break
+					}
+				}
+			} else if phaseInfo.Phase() == pluginsCore.PhaseRunning && len(info.Logs) > 0 {
 				phaseInfo = phaseInfo.WithVersion(pluginsCore.DefaultPhaseVersion + 1)
 			}
 		}

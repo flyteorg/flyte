@@ -14,7 +14,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
-const MaxErrorMessageLength = 104857600 //100KB
+const MaxErrorMessageLength = 102400 //100KB
 const truncationIndicator = "... <Message Truncated> ..."
 
 type recordingMetrics struct {

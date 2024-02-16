@@ -189,6 +189,9 @@ message UpdateArtifactRequest {
     // List of data to overwrite stored artifact data with. Must contain ALL data for updated Artifact as any missing
     // ArtifactData entries will be removed from the underlying blob storage and database.
     repeated ArtifactData data = 4;
+
+    // Update execution metadata(including execution domain, name, node, project data) when overwriting cache
+    Metadata metadata = 5;
 }
 
 /*
@@ -286,6 +289,9 @@ message DatasetID {
     string domain = 3;   // The domain (eg. environment)
     string version = 4;  // Version of the data schema
     string UUID = 5;     // UUID for the dataset (if set the above fields are optional)
+
+    // Optional, org key applied to the resource.
+    string org = 6;
 }
 
 /*
@@ -383,6 +389,8 @@ message DatasetPropertyFilter {
         string name = 2;
         string domain = 3;
         string version = 4;
+        // Optional, org key applied to the dataset.
+        string org = 5;
     }
 }
 

@@ -154,6 +154,7 @@ func dummyPytorchTaskContext(taskTemplate *core.TaskTemplate, resources *corev1.
 		},
 	})
 	tID.OnGetGeneratedName().Return("some-acceptable-name")
+	tID.On("GetUniqueNodeID").Return("an-unique-id")
 
 	overrides := &mocks.TaskOverrides{}
 	overrides.OnGetResources().Return(resources)
@@ -663,9 +664,11 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "250Mi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "500Mi"},
 				},
 			},
 			RestartPolicy: kfplugins.RestartPolicy_RESTART_POLICY_ALWAYS,
@@ -675,9 +678,11 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 				},
 			},
 		},
@@ -685,19 +690,23 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 
 	masterResourceRequirements := &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("250m"),
+			corev1.ResourceCPU:    resource.MustParse("250m"),
+			corev1.ResourceMemory: resource.MustParse("250Mi"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("500m"),
+			corev1.ResourceCPU:    resource.MustParse("500m"),
+			corev1.ResourceMemory: resource.MustParse("500Mi"),
 		},
 	}
 
 	workerResourceRequirements := &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("1024m"),
+			corev1.ResourceCPU:    resource.MustParse("1024m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("2048m"),
+			corev1.ResourceCPU:    resource.MustParse("2048m"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
 	}
 
@@ -714,7 +723,7 @@ func TestBuildResourcePytorchV1(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas)
-	assert.Nil(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Replicas)
+	assert.Equal(t, int32(1), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Replicas)
 
 	assert.Equal(t, testImageMaster, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Template.Spec.Containers[0].Image)
 	assert.Equal(t, testImage, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Containers[0].Image)
@@ -757,7 +766,7 @@ func TestBuildResourcePytorchV1WithRunPolicy(t *testing.T) {
 	pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
 	assert.True(t, ok)
 	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas)
-	assert.Nil(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Replicas)
+	assert.Equal(t, int32(1), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Replicas)
 	assert.Equal(t, commonOp.CleanPodPolicyAll, *pytorchJob.Spec.RunPolicy.CleanPodPolicy)
 	assert.Equal(t, int32(100), *pytorchJob.Spec.RunPolicy.BackoffLimit)
 	assert.Equal(t, int64(1000), *pytorchJob.Spec.RunPolicy.ActiveDeadlineSeconds)
@@ -771,9 +780,11 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 			Resources: &core.Resources{
 				Requests: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
 				},
 				Limits: []*core.Resources_ResourceEntry{
 					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
 				},
 			},
 		},
@@ -794,10 +805,12 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 
 	workerResourceRequirements := &corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("1024m"),
+			corev1.ResourceCPU:    resource.MustParse("1024m"),
+			corev1.ResourceMemory: resource.MustParse("1Gi"),
 		},
 		Limits: corev1.ResourceList{
-			corev1.ResourceCPU: resource.MustParse("2048m"),
+			corev1.ResourceCPU:    resource.MustParse("2048m"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
 	}
 
@@ -814,7 +827,7 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 	assert.True(t, ok)
 
 	assert.Equal(t, int32(100), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Replicas)
-	assert.Nil(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Replicas)
+	assert.Equal(t, int32(1), *pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Replicas)
 
 	assert.Equal(t, testImage, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Template.Spec.Containers[0].Image)
 	assert.Equal(t, testImage, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Containers[0].Image)
@@ -826,6 +839,66 @@ func TestBuildResourcePytorchV1WithOnlyWorkerSpec(t *testing.T) {
 	assert.Equal(t, commonOp.RestartPolicyNever, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].RestartPolicy)
 
 	assert.Nil(t, pytorchJob.Spec.ElasticPolicy)
+}
+
+func TestBuildResourcePytorchV1ResourceTolerations(t *testing.T) {
+	gpuToleration := corev1.Toleration{
+		Key:      "nvidia.com/gpu",
+		Value:    "present",
+		Operator: corev1.TolerationOpEqual,
+		Effect:   corev1.TaintEffectNoSchedule,
+	}
+	assert.NoError(t, flytek8sConfig.SetK8sPluginConfig(&flytek8sConfig.K8sPluginConfig{
+		GpuResourceName: flytek8s.ResourceNvidiaGPU,
+		ResourceTolerations: map[corev1.ResourceName][]corev1.Toleration{
+			flytek8s.ResourceNvidiaGPU: {gpuToleration},
+		},
+	}))
+
+	taskConfig := &kfplugins.DistributedPyTorchTrainingTask{
+		MasterReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "250m"},
+					{Name: core.Resources_MEMORY, Value: "250Mi"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "500m"},
+					{Name: core.Resources_MEMORY, Value: "500Mi"},
+				},
+			},
+		},
+		WorkerReplicas: &kfplugins.DistributedPyTorchTrainingReplicaSpec{
+			Replicas: 100,
+			Resources: &core.Resources{
+				Requests: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "1024m"},
+					{Name: core.Resources_MEMORY, Value: "1Gi"},
+					{Name: core.Resources_GPU, Value: "1"},
+				},
+				Limits: []*core.Resources_ResourceEntry{
+					{Name: core.Resources_CPU, Value: "2048m"},
+					{Name: core.Resources_MEMORY, Value: "2Gi"},
+					{Name: core.Resources_GPU, Value: "1"},
+				},
+			},
+		},
+	}
+
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+
+	taskTemplate := dummyPytorchTaskTemplate("job4", taskConfig)
+	taskTemplate.TaskTypeVersion = 1
+
+	res, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, res)
+
+	pytorchJob, ok := res.(*kubeflowv1.PyTorchJob)
+	assert.True(t, ok)
+
+	assert.NotContains(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeMaster].Template.Spec.Tolerations, gpuToleration)
+	assert.Contains(t, pytorchJob.Spec.PyTorchReplicaSpecs[kubeflowv1.PyTorchJobReplicaTypeWorker].Template.Spec.Tolerations, gpuToleration)
 }
 
 func TestBuildResourcePytorchV1WithElastic(t *testing.T) {
@@ -886,4 +959,17 @@ func TestParseElasticConfig(t *testing.T) {
 	assert.Equal(t, int32(2), *elasticPolicy.MaxReplicas)
 	assert.Equal(t, int32(4), *elasticPolicy.NProcPerNode)
 	assert.Equal(t, kubeflowv1.RDZVBackend("c10d"), *elasticPolicy.RDZVBackend)
+}
+
+func TestGetReplicaCount(t *testing.T) {
+	pytorchResourceHandler := pytorchOperatorResourceHandler{}
+	tfObj := dummyPytorchCustomObj(1)
+	taskTemplate := dummyPytorchTaskTemplate("the job", tfObj)
+	resource, err := pytorchResourceHandler.BuildResource(context.TODO(), dummyPytorchTaskContext(taskTemplate, resourceRequirements, nil))
+	assert.NoError(t, err)
+	assert.NotNil(t, resource)
+	PytorchJob, ok := resource.(*kubeflowv1.PyTorchJob)
+	assert.True(t, ok)
+
+	assert.NotNil(t, common.GetReplicaCount(PytorchJob.Spec.PyTorchReplicaSpecs, kubeflowv1.PyTorchJobReplicaTypeWorker))
 }

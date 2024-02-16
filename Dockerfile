@@ -2,7 +2,7 @@ ARG FLYTECONSOLE_VERSION=latest
 FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
 
 
-FROM --platform=${BUILDPLATFORM} golang:1.19.1-bullseye AS flytebuilder
+FROM --platform=${BUILDPLATFORM} golang:1.21.5-bookworm AS flytebuilder
 
 ARG TARGETARCH
 ENV GOARCH "${TARGETARCH}"
@@ -26,7 +26,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/r
     go build -tags console -v -o dist/flyte cmd/main.go
 
 
-FROM debian:bullseye-slim
+FROM debian:bookworm-slim
 
 ARG FLYTE_VERSION
 ENV FLYTE_VERSION "${FLYTE_VERSION}"
