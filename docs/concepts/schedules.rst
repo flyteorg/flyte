@@ -24,37 +24,116 @@ Let's now look at how schedules can be defined through cron_expression_ or rate_
 
 Cron Expression
 ---------------
-Cron expression strings use :ref:`this <cron_expression_table>` syntax. They are validated at launch plan registration time.
-
-.. _rate_unit:
+Cron expression strings use the syntax shown below. They are validated at launch plan registration time.
 
 Format
 ------
 
 A cron expression represents a set of times, with the help of 5 space-separated fields.
 
-.. _cron_expression_table:
+.. raw:: html
 
-+--------------+------------+-----------------+----------------------------+
-| Field name   | Mandatory? | Allowed values  | Allowed special characters |
-+==============+============+=================+============================+
-| Minutes      | Yes        | 0-59            | * / , -                    |
-+--------------+------------+-----------------+----------------------------+
-| Hours        | Yes        | 0-23            | * / , -                    |
-+--------------+------------+-----------------+----------------------------+
-| Day of month | Yes        | 1-31            | * / , - ?                  |
-+--------------+------------+-----------------+----------------------------+
-| Month        | Yes        | 1-12 or JAN-DEC | * / , -                    |
-+--------------+------------+-----------------+----------------------------+
-| Day of week  | Yes        | 0-6 or SUN-SAT  | * / , - ?                  |
-+--------------+------------+-----------------+----------------------------+
+    <table id="cron_expression_table" class="docutils align-default">
+        <colgroup>
+            <col style="width: 20%">
+            <col style="width: 17%">
+            <col style="width: 24%">
+            <col style="width: 39%">
+        </colgroup>
+        <thead>
+            <tr class="row-odd">
+                <th class="head">
+                    <p>Field name</p>
+                </th>
+                <th class="head">
+                    <p>Required</p>
+                </th>
+                <th class="head">
+                    <p>Allowed values</p>
+                </th>
+                <th class="head">
+                    <p>Allowed special characters</p>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="row-even">
+                <td>
+                    <p>Minutes</p>
+                </td>
+                <td>
+                    <p>Yes</p>
+                </td>
+                <td>
+                    <p>0-59</p>
+                </td>
+                <td>
+                    <p>* / , -</p>
+                </td>
+            </tr>
+            <tr class="row-odd">
+            <td><p>Hours</p></td>
+                <td>
+                    <p>Yes</p>
+                </td>
+                <td>
+                    <p>0-23</p>
+                </td>
+                <td>
+                    <p>* / , -</p>
+                </td>
+            </tr>
+            <tr class="row-even">
+                <td>
+                    <p>Day of month</p>
+                </td>
+                <td>
+                    <p>Yes</p>
+                </td>
+                <td>
+                    <p>1-31</p><
+                </td>
+                <td>
+                    <p>/ , - ?</p>
+                </td>
+            </tr>
+            <tr class="row-odd">
+                <td>
+                    <p>Month</p>
+                </td>
+                <td>
+                    <p>Yes</p>
+                </td>
+                <td>
+                    <p>1-12 or JAN-DEC</p>
+                </td>
+                <td>
+                    <p>* / , -</p>
+                </td>
+            </tr>
+            <tr class="row-even">
+                <td>
+                    <p>Day of week</p>
+                </td>
+                <td>
+                    <p>Yes</p>
+                </td>
+                <td>
+                    <p>0-6 or SUN-SAT</p>
+                </td>
+                <td>
+                    <p>* / , - ?</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 
 **Note**: The 'Month' and 'Day of week' fields are case insensitive.
 
 
 Cron schedules
 --------------
-An incorrect cron schedule expression leads to a failure in triggering the schedule. :ref:`Here <cron_expression_table>` is a table that shows the format of a cron expression.
+An incorrect cron schedule expression leads to a failure in triggering the schedule. :ref:`Here <cron_expression>` is a table that shows the format of a cron expression.
 
 Below is another example:
 
@@ -72,6 +151,8 @@ Below is another example:
 
 	)
 
+
+.. _fixed_rate:
 
 Fixed rate schedules
 ----------------------
@@ -95,6 +176,7 @@ Below is an example with duration in `days`.
 
 )
 
+.. _rate_unit:
 
 Rate Unit
 ---------

@@ -1,0 +1,908 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "flyteidl/datacatalog/datacatalog.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "DataCatalog"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {},
+  "definitions": {
+    "BlobTypeBlobDimensionality": {
+      "type": "string",
+      "enum": [
+        "SINGLE",
+        "MULTIPART"
+      ],
+      "default": "SINGLE"
+    },
+    "PaginationOptionsSortKey": {
+      "type": "string",
+      "enum": [
+        "CREATION_TIME"
+      ],
+      "default": "CREATION_TIME"
+    },
+    "PaginationOptionsSortOrder": {
+      "type": "string",
+      "enum": [
+        "DESCENDING",
+        "ASCENDING"
+      ],
+      "default": "DESCENDING"
+    },
+    "SchemaColumnSchemaColumnType": {
+      "type": "string",
+      "enum": [
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION"
+      ],
+      "default": "INTEGER"
+    },
+    "SchemaTypeSchemaColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "A unique name -within the schema type- for the column"
+        },
+        "type": {
+          "$ref": "#/definitions/SchemaColumnSchemaColumnType",
+          "description": "The column type. This allows a limited set of types currently."
+        }
+      }
+    },
+    "SinglePropertyFilterComparisonOperator": {
+      "type": "string",
+      "enum": [
+        "EQUALS"
+      ],
+      "default": "EQUALS",
+      "description": "as use-cases come up we can add more operators, ex: gte, like, not eq etc."
+    },
+    "StructuredDatasetTypeDatasetColumn": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "A unique name within the schema type for the column."
+        },
+        "literal_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "The column type."
+        }
+      }
+    },
+    "coreBinary": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "format": "byte"
+        },
+        "tag": {
+          "type": "string"
+        }
+      },
+      "description": "A simple byte array with a tag to help different parts of the system communicate about what is in the byte array.\nIt's strongly advisable that consumers of this type define a unique tag and validate the tag before parsing the data."
+    },
+    "coreBlob": {
+      "type": "object",
+      "properties": {
+        "metadata": {
+          "$ref": "#/definitions/coreBlobMetadata"
+        },
+        "uri": {
+          "type": "string"
+        }
+      },
+      "description": "Refers to an offloaded set of files. It encapsulates the type of the store and a unique uri for where the data is.\nThere are no restrictions on how the uri is formatted since it will depend on how to interact with the store."
+    },
+    "coreBlobMetadata": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/definitions/coreBlobType"
+        }
+      }
+    },
+    "coreBlobType": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "title": "Format can be a free form string understood by SDK/UI etc like\ncsv, parquet etc"
+        },
+        "dimensionality": {
+          "$ref": "#/definitions/BlobTypeBlobDimensionality"
+        }
+      },
+      "title": "Defines type behavior for blob objects"
+    },
+    "coreError": {
+      "type": "object",
+      "properties": {
+        "failed_node_id": {
+          "type": "string",
+          "description": "The node id that threw the error."
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message thrown."
+        }
+      },
+      "description": "Represents an error thrown from a node."
+    },
+    "coreLiteral": {
+      "type": "object",
+      "properties": {
+        "scalar": {
+          "$ref": "#/definitions/coreScalar",
+          "description": "A simple value."
+        },
+        "collection": {
+          "$ref": "#/definitions/coreLiteralCollection",
+          "description": "A collection of literals to allow nesting."
+        },
+        "map": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "A map of strings to literals."
+        },
+        "hash": {
+          "type": "string",
+          "title": "A hash representing this literal.\nThis is used for caching purposes. For more details refer to RFC 1893\n(https://github.com/flyteorg/flyte/blob/master/rfc/system/1893-caching-of-offloaded-objects.md)"
+        },
+        "metadata": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Additional metadata for literals."
+        }
+      },
+      "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."
+    },
+    "coreLiteralCollection": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralMap": {
+      "type": "object",
+      "properties": {
+        "literals": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteral"
+          }
+        }
+      },
+      "description": "A map of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field."
+    },
+    "coreLiteralType": {
+      "type": "object",
+      "properties": {
+        "simple": {
+          "$ref": "#/definitions/coreSimpleType",
+          "description": "A simple type that can be compared one-to-one with another."
+        },
+        "schema": {
+          "$ref": "#/definitions/coreSchemaType",
+          "description": "A complex type that requires matching of inner fields."
+        },
+        "collection_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a collection. Only homogeneous collections are allowed."
+        },
+        "map_value_type": {
+          "$ref": "#/definitions/coreLiteralType",
+          "description": "Defines the type of the value of a map type. The type of the key is always a string."
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlobType",
+          "description": "A blob might have specialized implementation details depending on associated metadata."
+        },
+        "enum_type": {
+          "$ref": "#/definitions/flyteidlcoreEnumType",
+          "description": "Defines an enum with pre-defined string values."
+        },
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "title": "Generalized schema support"
+        },
+        "union_type": {
+          "$ref": "#/definitions/coreUnionType",
+          "description": "Defines an union type with pre-defined LiteralTypes."
+        },
+        "metadata": {
+          "type": "object",
+          "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
+        },
+        "annotation": {
+          "$ref": "#/definitions/coreTypeAnnotation",
+          "description": "This field contains arbitrary data that might have special semantic\nmeaning for the client but does not effect internal flyte behavior."
+        },
+        "structure": {
+          "$ref": "#/definitions/coreTypeStructure",
+          "description": "Hints to improve type matching."
+        }
+      },
+      "description": "Defines a strong type to allow type checking between interfaces."
+    },
+    "corePrimitive": {
+      "type": "object",
+      "properties": {
+        "integer": {
+          "type": "string",
+          "format": "int64"
+        },
+        "float_value": {
+          "type": "number",
+          "format": "double"
+        },
+        "string_value": {
+          "type": "string"
+        },
+        "boolean": {
+          "type": "boolean"
+        },
+        "datetime": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "duration": {
+          "type": "string"
+        }
+      },
+      "title": "Primitive Types"
+    },
+    "coreScalar": {
+      "type": "object",
+      "properties": {
+        "primitive": {
+          "$ref": "#/definitions/corePrimitive"
+        },
+        "blob": {
+          "$ref": "#/definitions/coreBlob"
+        },
+        "binary": {
+          "$ref": "#/definitions/coreBinary"
+        },
+        "schema": {
+          "$ref": "#/definitions/flyteidlcoreSchema"
+        },
+        "none_type": {
+          "$ref": "#/definitions/coreVoid"
+        },
+        "error": {
+          "$ref": "#/definitions/coreError"
+        },
+        "generic": {
+          "type": "object"
+        },
+        "structured_dataset": {
+          "$ref": "#/definitions/coreStructuredDataset"
+        },
+        "union": {
+          "$ref": "#/definitions/coreUnion"
+        }
+      }
+    },
+    "coreSchemaType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SchemaTypeSchemaColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        }
+      },
+      "description": "Defines schema columns and types to strongly type-validate schemas interoperability."
+    },
+    "coreSimpleType": {
+      "type": "string",
+      "enum": [
+        "NONE",
+        "INTEGER",
+        "FLOAT",
+        "STRING",
+        "BOOLEAN",
+        "DATETIME",
+        "DURATION",
+        "BINARY",
+        "ERROR",
+        "STRUCT"
+      ],
+      "default": "NONE",
+      "description": "Define a set of simple types."
+    },
+    "coreStructuredDataset": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string",
+          "title": "String location uniquely identifying where the data is.\nShould start with the storage location (e.g. s3://, gs://, bq://, etc.)"
+        },
+        "metadata": {
+          "$ref": "#/definitions/coreStructuredDatasetMetadata"
+        }
+      }
+    },
+    "coreStructuredDatasetMetadata": {
+      "type": "object",
+      "properties": {
+        "structured_dataset_type": {
+          "$ref": "#/definitions/coreStructuredDatasetType",
+          "description": "Bundle the type information along with the literal.\nThis is here because StructuredDatasets can often be more defined at run time than at compile time.\nThat is, at compile time you might only declare a task to return a pandas dataframe or a StructuredDataset,\nwithout any column information, but at run time, you might have that column information.\nflytekit python will copy this type information into the literal, from the type information, if not provided by\nthe various plugins (encoders).\nSince this field is run time generated, it's not used for any type checking."
+        }
+      }
+    },
+    "coreStructuredDatasetType": {
+      "type": "object",
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/StructuredDatasetTypeDatasetColumn"
+          },
+          "description": "A list of ordered columns this schema comprises of."
+        },
+        "format": {
+          "type": "string",
+          "description": "This is the storage format, the format of the bits at rest\nparquet, feather, csv, etc.\nFor two types to be compatible, the format will need to be an exact match."
+        },
+        "external_schema_type": {
+          "type": "string",
+          "description": "This is a string representing the type that the bytes in external_schema_bytes are formatted in.\nThis is an optional field that will not be used for type checking."
+        },
+        "external_schema_bytes": {
+          "type": "string",
+          "format": "byte",
+          "description": "The serialized bytes of a third-party schema library like Arrow.\nThis is an optional field that will not be used for type checking."
+        }
+      }
+    },
+    "coreTypeAnnotation": {
+      "type": "object",
+      "properties": {
+        "annotations": {
+          "type": "object",
+          "description": "A arbitrary JSON payload to describe a type."
+        }
+      },
+      "description": "TypeAnnotation encapsulates registration time information about a type. This can be used for various control-plane operations. TypeAnnotation will not be available at runtime when a task runs."
+    },
+    "coreTypeStructure": {
+      "type": "object",
+      "properties": {
+        "tag": {
+          "type": "string",
+          "title": "Must exactly match for types to be castable"
+        },
+        "dataclass_type": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "title": "dataclass_type only exists for dataclasses.\nThis is used to resolve the type of the fields of dataclass\nThe key is the field name, and the value is the literal type of the field\ne.g. For dataclass Foo, with fields a, and a is a string\nFoo.a will be resolved as a literal type of string from dataclass_type"
+        }
+      },
+      "description": "Hints to improve type matching\ne.g. allows distinguishing output from custom type transformers\neven if the underlying IDL serialization matches."
+    },
+    "coreUnion": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLiteral"
+        },
+        "type": {
+          "$ref": "#/definitions/coreLiteralType"
+        }
+      },
+      "description": "The runtime representation of a tagged union value. See `UnionType` for more details."
+    },
+    "coreUnionType": {
+      "type": "object",
+      "properties": {
+        "variants": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/coreLiteralType"
+          },
+          "description": "Predefined set of variants in union."
+        }
+      },
+      "description": "Defines a tagged union type, also known as a variant (and formally as the sum type).\n\nA sum type S is defined by a sequence of types (A, B, C, ...), each tagged by a string tag\nA value of type S is constructed from a value of any of the variant types. The specific choice of type is recorded by\nstoring the varaint's tag with the literal value and can be examined in runtime.\n\nType S is typically written as\nS := Apple A | Banana B | Cantaloupe C | ...\n\nNotably, a nullable (optional) type is a sum type between some type X and the singleton type representing a null-value:\nOptional X := X | Null\n\nSee also: https://en.wikipedia.org/wiki/Tagged_union"
+    },
+    "coreVoid": {
+      "type": "object",
+      "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
+    },
+    "datacatalogAddTagResponse": {
+      "type": "object",
+      "description": "Response message for tagging an Artifact."
+    },
+    "datacatalogArtifact": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "The unique ID of the artifact"
+        },
+        "dataset": {
+          "$ref": "#/definitions/datacatalogDatasetID",
+          "title": "The Dataset that the artifact belongs to"
+        },
+        "data": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datacatalogArtifactData"
+          },
+          "title": "A list of data that is associated with the artifact"
+        },
+        "metadata": {
+          "$ref": "#/definitions/datacatalogMetadata",
+          "title": "Free-form metadata associated with the artifact"
+        },
+        "partitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datacatalogPartition"
+          }
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datacatalogTag"
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "creation timestamp of artifact, autogenerated by service"
+        }
+      },
+      "description": "Artifact message. It is composed of several string fields."
+    },
+    "datacatalogArtifactData": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "value": {
+          "$ref": "#/definitions/coreLiteral"
+        }
+      },
+      "title": "ArtifactData that belongs to an artifact"
+    },
+    "datacatalogArtifactPropertyFilter": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string"
+        }
+      },
+      "title": "Artifact properties we can filter by"
+    },
+    "datacatalogCreateArtifactResponse": {
+      "type": "object",
+      "description": "Response message for creating an Artifact."
+    },
+    "datacatalogCreateDatasetResponse": {
+      "type": "object",
+      "title": "Response message for creating a Dataset"
+    },
+    "datacatalogDataset": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "$ref": "#/definitions/datacatalogDatasetID"
+        },
+        "metadata": {
+          "$ref": "#/definitions/datacatalogMetadata"
+        },
+        "partitionKeys": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Dataset message. It is uniquely identified by DatasetID."
+    },
+    "datacatalogDatasetID": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string",
+          "title": "The name of the project"
+        },
+        "name": {
+          "type": "string",
+          "title": "The name of the dataset"
+        },
+        "domain": {
+          "type": "string",
+          "title": "The domain (eg. environment)"
+        },
+        "version": {
+          "type": "string",
+          "title": "Version of the data schema"
+        },
+        "UUID": {
+          "type": "string",
+          "title": "UUID for the dataset (if set the above fields are optional)"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
+        }
+      },
+      "description": "DatasetID message that is composed of several string fields."
+    },
+    "datacatalogDatasetPropertyFilter": {
+      "type": "object",
+      "properties": {
+        "project": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "domain": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the dataset."
+        }
+      },
+      "title": "Dataset properties we can filter by"
+    },
+    "datacatalogFilterExpression": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datacatalogSinglePropertyFilter"
+          }
+        }
+      },
+      "title": "Filter expression that is composed of a combination of single filters"
+    },
+    "datacatalogGetArtifactResponse": {
+      "type": "object",
+      "properties": {
+        "artifact": {
+          "$ref": "#/definitions/datacatalogArtifact"
+        }
+      },
+      "description": "Response message for retrieving an Artifact. The result returned will include the artifact data\nand metadata associated with the artifact."
+    },
+    "datacatalogGetDatasetResponse": {
+      "type": "object",
+      "properties": {
+        "dataset": {
+          "$ref": "#/definitions/datacatalogDataset"
+        }
+      },
+      "description": "Response message for retrieving a Dataset. The response will include the metadata for the\nDataset."
+    },
+    "datacatalogGetOrExtendReservationResponse": {
+      "type": "object",
+      "properties": {
+        "reservation": {
+          "$ref": "#/definitions/datacatalogReservation",
+          "title": "The reservation to be acquired or extended"
+        }
+      },
+      "title": "Response including either a newly minted reservation or the existing reservation"
+    },
+    "datacatalogKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      }
+    },
+    "datacatalogListArtifactsResponse": {
+      "type": "object",
+      "properties": {
+        "artifacts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datacatalogArtifact"
+          },
+          "title": "The list of artifacts"
+        },
+        "next_token": {
+          "type": "string",
+          "title": "Token to use to request the next page, pass this into the next requests PaginationOptions"
+        }
+      },
+      "title": "Response to list artifacts"
+    },
+    "datacatalogListDatasetsResponse": {
+      "type": "object",
+      "properties": {
+        "datasets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/datacatalogDataset"
+          },
+          "title": "The list of datasets"
+        },
+        "next_token": {
+          "type": "string",
+          "title": "Token to use to request the next page, pass this into the next requests PaginationOptions"
+        }
+      },
+      "title": "List the datasets response with token for next pagination"
+    },
+    "datacatalogMetadata": {
+      "type": "object",
+      "properties": {
+        "key_map": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "key map is a dictionary of key/val strings that represent metadata"
+        }
+      },
+      "title": "Metadata representation for artifacts and datasets"
+    },
+    "datacatalogPaginationOptions": {
+      "type": "object",
+      "properties": {
+        "limit": {
+          "type": "integer",
+          "format": "int64",
+          "title": "the max number of results to return"
+        },
+        "token": {
+          "type": "string",
+          "title": "the token to pass to fetch the next page"
+        },
+        "sortKey": {
+          "$ref": "#/definitions/PaginationOptionsSortKey",
+          "title": "the property that we want to sort the results by"
+        },
+        "sortOrder": {
+          "$ref": "#/definitions/PaginationOptionsSortOrder",
+          "title": "the sort order of the results"
+        }
+      },
+      "title": "Pagination options for making list requests"
+    },
+    "datacatalogPartition": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": "An artifact could have multiple partitions and each partition can have an arbitrary string key/value pair"
+    },
+    "datacatalogPartitionPropertyFilter": {
+      "type": "object",
+      "properties": {
+        "key_val": {
+          "$ref": "#/definitions/datacatalogKeyValuePair"
+        }
+      },
+      "title": "Partition properties we can filter by"
+    },
+    "datacatalogReleaseReservationResponse": {
+      "type": "object",
+      "title": "Response to release reservation"
+    },
+    "datacatalogReservation": {
+      "type": "object",
+      "properties": {
+        "reservation_id": {
+          "$ref": "#/definitions/datacatalogReservationID",
+          "title": "The unique ID for the reservation"
+        },
+        "owner_id": {
+          "type": "string",
+          "title": "The unique ID of the owner for the reservation"
+        },
+        "heartbeat_interval": {
+          "type": "string",
+          "title": "Recommended heartbeat interval to extend reservation"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "title": "Expiration timestamp of this reservation"
+        },
+        "metadata": {
+          "$ref": "#/definitions/datacatalogMetadata",
+          "title": "Free-form metadata associated with the artifact"
+        }
+      },
+      "description": "A reservation including owner, heartbeat interval, expiration timestamp, and various metadata."
+    },
+    "datacatalogReservationID": {
+      "type": "object",
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/definitions/datacatalogDatasetID",
+          "title": "The unique ID for the reserved dataset"
+        },
+        "tag_name": {
+          "type": "string",
+          "title": "The specific artifact tag for the reservation"
+        }
+      },
+      "description": "ReservationID message that is composed of several string fields."
+    },
+    "datacatalogSinglePropertyFilter": {
+      "type": "object",
+      "properties": {
+        "tag_filter": {
+          "$ref": "#/definitions/datacatalogTagPropertyFilter"
+        },
+        "partition_filter": {
+          "$ref": "#/definitions/datacatalogPartitionPropertyFilter"
+        },
+        "artifact_filter": {
+          "$ref": "#/definitions/datacatalogArtifactPropertyFilter"
+        },
+        "dataset_filter": {
+          "$ref": "#/definitions/datacatalogDatasetPropertyFilter"
+        },
+        "operator": {
+          "$ref": "#/definitions/SinglePropertyFilterComparisonOperator",
+          "title": "field 10 in case we add more entities to query"
+        }
+      },
+      "description": "A single property to filter on."
+    },
+    "datacatalogTag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Name of tag"
+        },
+        "artifact_id": {
+          "type": "string",
+          "title": "The tagged artifact"
+        },
+        "dataset": {
+          "$ref": "#/definitions/datacatalogDatasetID",
+          "title": "The Dataset that this tag belongs to"
+        }
+      },
+      "description": "Tag message that is unique to a Dataset. It is associated to a single artifact and\ncan be retrieved by name later."
+    },
+    "datacatalogTagPropertyFilter": {
+      "type": "object",
+      "properties": {
+        "tag_name": {
+          "type": "string"
+        }
+      },
+      "title": "Tag properties we can filter by"
+    },
+    "datacatalogUpdateArtifactResponse": {
+      "type": "object",
+      "properties": {
+        "artifact_id": {
+          "type": "string",
+          "title": "The unique ID of the artifact updated"
+        }
+      },
+      "description": "Response message for updating an Artifact."
+    },
+    "flyteidlcoreEnumType": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
+        }
+      },
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
+    },
+    "flyteidlcoreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "googlerpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
+        }
+      },
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    }
+  }
+}

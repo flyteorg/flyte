@@ -53,10 +53,6 @@ deploy_sandbox:
 install-piptools: ## Install pip-tools
 	pip install -U pip-tools
 
-.PHONY: doc-requirements.txt
-doc-requirements.txt: doc-requirements.in install-piptools
-	$(call PIP_COMPILE,doc-requirements.in)
-
 .PHONY: install-conda-lock
 install-conda-lock:
 	pip install conda-lock

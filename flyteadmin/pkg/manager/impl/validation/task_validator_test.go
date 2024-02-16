@@ -439,7 +439,7 @@ func TestValidateTaskResources_GPULimitNotEqualToRequested(t *testing.T) {
 			},
 		})
 	assert.EqualError(t, err,
-		"For extended resource 'gpu' the default value must equal the limit value for task [name:\"name\" ]")
+		"For extended resource 'gpu' the default value must equal the limit value for task [name:\"name\"]")
 }
 
 func TestValidateTaskResources_GPULimitGreaterThanConfig(t *testing.T) {

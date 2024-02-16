@@ -217,7 +217,7 @@ Workflow Execution Config
 =========================
 
 This helps with overriding the config used for workflows execution which includes
-`security context <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/core/core.html#securitycontext>`__, `annotations or labels <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/containerization/workflow_labels_annotations.html#sphx-glr-auto-core-containerization-workflow-labels-annotations-py>`__ 
+`security context <https://docs.flyte.org/en/latest/protos/docs/core/core.html#securitycontext>`__, `annotations or labels <https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/workflow_labels_annotations.html#adding-workflow-labels-and-annotations>`__ 
 etc. in the `Workflow execution config <https://github.com/flyteorg/flyteidl/blob/master/gen/pb-go/flyteidl/service/flyteadmin/model_admin_workflow_execution_config.go#L14-L23>`__.
 These can be defined at two levels of project-domain or project-domain-workflow:
 
@@ -315,7 +315,7 @@ Starting with the Flyte 1.4 release, we now have 2 ways of defining `PodTemplate
 Compile-time PodTemplates
 =========================
 
-We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task>`__, for example:
+We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.task.html#flytekit-task>`__, for example:
 
 .. code-block:: python
 
@@ -354,7 +354,7 @@ Notice how in this example we are defining a new PodTemplate inline, which allow
 `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1PodSpec.md>`__ and also define
 the name of the primary container, labels, and annotations.
 
-The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
+The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
 
 Runtime PodTemplates
 ====================

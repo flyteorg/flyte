@@ -27,6 +27,6 @@
      - More use case driven examples in flytesnacks
 
 ## flytectl
- - flytectl is ready for BETA. check it out - https://docs.flyte.org/projects/flytectl/en/latest/
+ - flytectl is ready for BETA. check it out - https://docs.flyte.org/en/latest/flytectl/
 
 Please see the [flytekit release](https://github.com/flyteorg/flytekit/releases/tag/v0.18.0) for the full list and more details.

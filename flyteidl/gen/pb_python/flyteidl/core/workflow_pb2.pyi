@@ -102,16 +102,22 @@ class ArrayNode(_message.Message):
     def __init__(self, node: _Optional[_Union[Node, _Mapping]] = ..., parallelism: _Optional[int] = ..., min_successes: _Optional[int] = ..., min_success_ratio: _Optional[float] = ...) -> None: ...
 
 class NodeMetadata(_message.Message):
-    __slots__ = ["name", "timeout", "retries", "interruptible"]
+    __slots__ = ["name", "timeout", "retries", "interruptible", "cacheable", "cache_version", "cache_serializable"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     TIMEOUT_FIELD_NUMBER: _ClassVar[int]
     RETRIES_FIELD_NUMBER: _ClassVar[int]
     INTERRUPTIBLE_FIELD_NUMBER: _ClassVar[int]
+    CACHEABLE_FIELD_NUMBER: _ClassVar[int]
+    CACHE_VERSION_FIELD_NUMBER: _ClassVar[int]
+    CACHE_SERIALIZABLE_FIELD_NUMBER: _ClassVar[int]
     name: str
     timeout: _duration_pb2.Duration
     retries: _literals_pb2.RetryStrategy
     interruptible: bool
-    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ...) -> None: ...
+    cacheable: bool
+    cache_version: str
+    cache_serializable: bool
+    def __init__(self, name: _Optional[str] = ..., timeout: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., retries: _Optional[_Union[_literals_pb2.RetryStrategy, _Mapping]] = ..., interruptible: bool = ..., cacheable: bool = ..., cache_version: _Optional[str] = ..., cache_serializable: bool = ...) -> None: ...
 
 class Alias(_message.Message):
     __slots__ = ["var", "alias"]
@@ -199,3 +205,13 @@ class TaskNodeOverrides(_message.Message):
     resources: _tasks_pb2.Resources
     extended_resources: _tasks_pb2.ExtendedResources
     def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...
+
+class LaunchPlanTemplate(_message.Message):
+    __slots__ = ["id", "interface", "fixed_inputs"]
+    ID_FIELD_NUMBER: _ClassVar[int]
+    INTERFACE_FIELD_NUMBER: _ClassVar[int]
+    FIXED_INPUTS_FIELD_NUMBER: _ClassVar[int]
+    id: _identifier_pb2.Identifier
+    interface: _interface_pb2.TypedInterface
+    fixed_inputs: _literals_pb2.LiteralMap
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., fixed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...

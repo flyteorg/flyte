@@ -13,6 +13,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestValidateSignalGetOrCreateRequest(t *testing.T) {
@@ -279,7 +280,7 @@ func TestValidateSignalUpdateRequest(t *testing.T) {
 				},
 			},
 		}
-		assert.EqualError(t, ValidateSignalSetRequest(ctx, repo, request),
-			"requested signal value [scalar:<primitive:<boolean:false > > ] is not castable to existing signal type [[8 1]]")
+		utils.AssertEqualWithSanitizedRegex(t,
+			"requested signal value [scalar:{ primitive:{ boolean:false } } ] is not castable to existing signal type [[8 1]]", ValidateSignalSetRequest(ctx, repo, request).Error())
 	})
 }

@@ -35,4 +35,6 @@ linters-settings:
       - default
       - prefix(github.com/flyteorg)
     skip-generated: true
-
+issues:
+  exclude:
+    - copylocks

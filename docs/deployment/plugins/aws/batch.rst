@@ -146,7 +146,7 @@ These configurations reside within FlytePropeller's configMap. Modify the config
 .. note::
 
   To register the `map task 
-  <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/map_task.html>`__ on Flyte,
+  <https://docs.flyte.org/en/latest/flytesnacks/examples/advanced_composition/map_task.html#map-task>`__ on Flyte,
   use the command ``pyflyte register <name-of-the-python-file>``.
   Launch the execution through the FlyteConsole by selecting the appropriate ``IAM Role`` and entering the full 
   ``AWS Arn`` of an IAM Role configured according to the above guide.

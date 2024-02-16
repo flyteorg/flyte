@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 var workflowIdentifier = core.Identifier{
@@ -59,6 +60,6 @@ func TestCreateWorkflowError(t *testing.T) {
 		Id: &workflowIdentifier,
 	})
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "missing entity of type WORKFLOW with "+
-		"identifier resource_type:WORKFLOW project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type WORKFLOW with "+
+		"identifier resource_type:WORKFLOW project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\"", err.Error())
 }

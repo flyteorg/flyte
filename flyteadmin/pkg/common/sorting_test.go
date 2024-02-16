@@ -1,6 +1,7 @@
 package common
 
 import (
+	"regexp"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,9 @@ func TestSortParameter_InvalidSortDirection(t *testing.T) {
 		Key:       "name",
 	}, sets.NewString("name"))
 
-	assert.EqualError(t, err, `invalid sort order specified: key:"name" direction:2 `)
+	regex := regexp.MustCompile(`\s+`)
+	expected := `invalid sort order specified: key:"name" direction:2`
+	assert.Equal(t, regex.ReplaceAllString(err.Error(), " "), regex.ReplaceAllString(expected, " "))
 }
 
 func TestSortParameter_Ascending(t *testing.T) {

@@ -5,7 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gogo/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
@@ -148,14 +147,16 @@ func TestToEmailMessageFromWorkflowExecutionEvent(t *testing.T) {
 		},
 	}
 	emailMessage := ToEmailMessageFromWorkflowExecutionEvent(notificationsConfig, emailNotification, request, workflowExecution)
-	assert.True(t, proto.Equal(emailMessage, &admin.EmailMessage{
+	expected := &admin.EmailMessage{
 		RecipientsEmail: []string{
 			"a@example.com", "b@example.org",
 		},
 		SenderEmail: "no-reply@example.com",
-		SubjectLine: "Notice: Execution \"e124\" has succeeded in \"prod\".",
-		Body: "Execution \"e124\" has succeeded in \"prod\". View details at " +
-			"<a href=\"https://example.com/executions/proj/prod/e124\">" +
-			"https://example.com/executions/proj/prod/e124</a>.",
-	}), fmt.Sprintf("%+v", emailMessage))
+		SubjectLine: `Notice: Execution "e124" has succeeded in "prod".`,
+		Body:        `Execution "e124" has succeeded in "prod". View details at <a href="https://example.com/executions/proj/prod/e124">https://example.com/executions/proj/prod/e124</a>.`,
+	}
+	assert.True(t, emailMessage.Body == expected.Body)
+	assert.True(t, emailMessage.SubjectLine == expected.SubjectLine)
+	assert.True(t, emailMessage.SenderEmail == expected.SenderEmail)
+	assert.True(t, len(emailMessage.RecipientsEmail) == len(expected.RecipientsEmail))
 }

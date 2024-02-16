@@ -11,6 +11,7 @@ build:
   jobs:
     post_install:
       - conda-lock install --name $READTHEDOCS_VERSION monodocs-environment.lock.yaml
+      - pip install ./flyteidl
       - conda info
       - conda env list
       - conda list

@@ -5,9 +5,9 @@ import (
 	stdErrors "errors"
 	"fmt"
 	"os"
+	"reflect"
 	"testing"
 	"time"
-	"reflect"
 
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
@@ -15,12 +15,13 @@ import (
 	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
+
 	"github.com/flyteorg/flyte/datacatalog/pkg/common"
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
 	repoErrors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/mocks"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/models"
+	"github.com/flyteorg/flyte/datacatalog/pkg/repositories/transformers"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/datacatalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -237,7 +238,7 @@ func TestCreateArtifact(t *testing.T) {
 		var value core.Literal
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestArtifact().Data[0].Value)
+		assert.True(t, proto.Equal(&value, getTestArtifact().Data[0].Value))
 	})
 
 	t.Run("Dataset does not exist", func(t *testing.T) {
@@ -657,7 +658,6 @@ func TestUpdateArtifact(t *testing.T) {
 					reflect.DeepEqual(artifact.SerializedMetadata, serializedMetadata)
 			})).Return(nil)
 
-
 		request := &datacatalog.UpdateArtifactRequest{
 			Dataset: expectedDataset.Id,
 			QueryHandle: &datacatalog.UpdateArtifactRequest_ArtifactId{
@@ -692,7 +692,7 @@ func TestUpdateArtifact(t *testing.T) {
 		var value core.Literal
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value11"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value11")))
 
 		// data2 was not included in update payload, should be removed
 		dataRef, err = getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data2")
@@ -706,7 +706,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value3"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value3")))
 	})
 
 	t.Run("Update by artifact tag", func(t *testing.T) {
@@ -786,7 +786,7 @@ func TestUpdateArtifact(t *testing.T) {
 		var value core.Literal
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value11"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value11")))
 
 		// data2 was not included in update payload, should be removed
 		dataRef, err = getExpectedDatastoreLocationFromName(ctx, datastore, testStoragePrefix, expectedArtifact, "data2")
@@ -800,7 +800,7 @@ func TestUpdateArtifact(t *testing.T) {
 		assert.NoError(t, err)
 		err = datastore.ReadProtobuf(ctx, dataRef, &value)
 		assert.NoError(t, err)
-		assert.Equal(t, value, *getTestStringLiteralWithValue("value3"))
+		assert.True(t, proto.Equal(&value, getTestStringLiteralWithValue("value3")))
 	})
 
 	t.Run("Artifact not found", func(t *testing.T) {

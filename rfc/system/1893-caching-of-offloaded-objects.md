@@ -6,7 +6,7 @@
 
 ## 1 Executive Summary
 
-We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/task_cache.html), enabling cache-by-value semantics for certain categories of objects.
+We propose a way to override the default behavior of [caching task executions](https://docs.flyte.org/en/latest/flytesnacks/auto/core/flyte_basics/task_cache.html), enabling cache-by-value semantics for certain categories of objects.
 
 ## 2 Motivation
 

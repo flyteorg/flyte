@@ -1,3 +1,5 @@
+from flyteidl.core import identifier_pb2 as _identifier_pb2
+from flyteidl.core import interface_pb2 as _interface_pb2
 from flyteidl.core import workflow_pb2 as _workflow_pb2
 from flyteidl.core import tasks_pb2 as _tasks_pb2
 from google.protobuf.internal import containers as _containers
@@ -42,6 +44,12 @@ class CompiledWorkflow(_message.Message):
     connections: ConnectionSet
     def __init__(self, template: _Optional[_Union[_workflow_pb2.WorkflowTemplate, _Mapping]] = ..., connections: _Optional[_Union[ConnectionSet, _Mapping]] = ...) -> None: ...
 
+class CompiledLaunchPlan(_message.Message):
+    __slots__ = ["template"]
+    TEMPLATE_FIELD_NUMBER: _ClassVar[int]
+    template: _workflow_pb2.LaunchPlanTemplate
+    def __init__(self, template: _Optional[_Union[_workflow_pb2.LaunchPlanTemplate, _Mapping]] = ...) -> None: ...
+
 class CompiledTask(_message.Message):
     __slots__ = ["template"]
     TEMPLATE_FIELD_NUMBER: _ClassVar[int]
@@ -49,11 +57,13 @@ class CompiledTask(_message.Message):
     def __init__(self, template: _Optional[_Union[_tasks_pb2.TaskTemplate, _Mapping]] = ...) -> None: ...
 
 class CompiledWorkflowClosure(_message.Message):
-    __slots__ = ["primary", "sub_workflows", "tasks"]
+    __slots__ = ["primary", "sub_workflows", "tasks", "launch_plans"]
     PRIMARY_FIELD_NUMBER: _ClassVar[int]
     SUB_WORKFLOWS_FIELD_NUMBER: _ClassVar[int]
     TASKS_FIELD_NUMBER: _ClassVar[int]
+    LAUNCH_PLANS_FIELD_NUMBER: _ClassVar[int]
     primary: CompiledWorkflow
     sub_workflows: _containers.RepeatedCompositeFieldContainer[CompiledWorkflow]
     tasks: _containers.RepeatedCompositeFieldContainer[CompiledTask]
-    def __init__(self, primary: _Optional[_Union[CompiledWorkflow, _Mapping]] = ..., sub_workflows: _Optional[_Iterable[_Union[CompiledWorkflow, _Mapping]]] = ..., tasks: _Optional[_Iterable[_Union[CompiledTask, _Mapping]]] = ...) -> None: ...
+    launch_plans: _containers.RepeatedCompositeFieldContainer[CompiledLaunchPlan]
+    def __init__(self, primary: _Optional[_Union[CompiledWorkflow, _Mapping]] = ..., sub_workflows: _Optional[_Iterable[_Union[CompiledWorkflow, _Mapping]]] = ..., tasks: _Optional[_Iterable[_Union[CompiledTask, _Mapping]]] = ..., launch_plans: _Optional[_Iterable[_Union[CompiledLaunchPlan, _Mapping]]] = ...) -> None: ...

@@ -26,11 +26,13 @@ A Helm chart for Flyte agent
 | podAnnotations | object | `{}` | Annotations for flyteagent pods |
 | podEnv | object | `{}` | Additional flyteagent pod container environment variables |
 | podLabels | object | `{}` | Labels for flyteagent pods |
+| podSecurityContext | object | `{}` | Security context for pod |
 | ports.containerPort | int | `8000` |  |
 | ports.name | string | `"agent-grpc"` |  |
 | priorityClassName | string | `""` | Sets priorityClassName for datacatalog pod(s). |
 | replicaCount | int | `1` | Replicas count for flyteagent deployment |
 | resources | object | `{"limits":{"cpu":"500m","ephemeral-storage":"200Mi","memory":"200Mi"},"requests":{"cpu":"500m","ephemeral-storage":"200Mi","memory":"200Mi"}}` | Default resources requests and limits for flyteagent deployment |
+| securityContext | object | `{"allowPrivilegeEscalation":false}` | Security context for container |
 | service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for flyteagent |
 | serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for flyteagent |
 | serviceAccount.annotations | object | `{}` | Annotations for ServiceAccount attached to flyteagent pods |

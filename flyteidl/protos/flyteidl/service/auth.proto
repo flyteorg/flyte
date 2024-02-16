@@ -4,7 +4,7 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
-// import "protoc-gen-swagger/options/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 message OAuth2MetadataRequest {}
 
@@ -76,9 +76,9 @@ service AuthMetadataService {
         option (google.api.http) = {
             get: "/.well-known/oauth-authorization-server"
         };
-        // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-        //     description: "Retrieves OAuth2 authorization server metadata. This endpoint is anonymously accessible."
-        // };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Retrieves OAuth2 authorization server metadata. This endpoint is anonymously accessible."
+        };
     }
 
     // Anonymously accessible. Retrieves the client information clients should use when initiating OAuth2 authorization
@@ -87,8 +87,8 @@ service AuthMetadataService {
         option (google.api.http) = {
             get: "/config/v1/flyte_client"
         };
-        // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-        //     description: "Retrieves public flyte client info. This endpoint is anonymously accessible."
-        // };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Retrieves public flyte client info. This endpoint is anonymously accessible."
+        };
     }
 }

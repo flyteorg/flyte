@@ -18,9 +18,13 @@ spec:
         {{- end }}
       labels: {{ include "flyteconsole.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        runAsUser: 1000
-        fsGroupChangePolicy: "OnRootMismatch"
+    {{- with .Values.flyteconsole.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      {{- with .Values.flyteconsole.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flyteconsole.priorityClassName }}
       priorityClassName: {{ .Values.flyteconsole.priorityClassName }}
       {{- end }}
@@ -33,7 +37,9 @@ spec:
             name: flyte-console-config
         ports:
         - containerPort: 8080
+        {{- if or .Values.flyteconsole.ga.enabled .Values.flyteconsole.podEnv }}
         env:
+        {{- end }}
         {{- if .Values.flyteconsole.ga.enabled }}
         - name: ENABLE_GA
           value: "{{ .Values.flyteconsole.ga.enabled }}"
@@ -45,6 +51,10 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources: {{ toYaml .Values.flyteconsole.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /srv/flyte

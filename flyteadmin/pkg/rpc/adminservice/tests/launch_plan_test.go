@@ -10,6 +10,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/errors"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestCreateLaunchPlanHappyCase(t *testing.T) {
@@ -63,8 +64,8 @@ func TestCreateLaunchPlanError(t *testing.T) {
 		},
 	})
 	assert.Nil(t, resp)
-	assert.EqualError(t, err, "missing entity of type LAUNCH_PLAN with "+
-		"identifier resource_type:LAUNCH_PLAN project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\" ")
+	utils.AssertEqualWithSanitizedRegex(t, "missing entity of type LAUNCH_PLAN with "+
+		"identifier resource_type:LAUNCH_PLAN project:\"Project\" domain:\"Domain\" name:\"Name\" version:\"Version\"", err.Error())
 }
 
 func TestGetActiveLaunchPlan(t *testing.T) {

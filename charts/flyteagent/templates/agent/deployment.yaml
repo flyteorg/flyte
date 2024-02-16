@@ -19,6 +19,8 @@ spec:
       {{- if .Values.priorityClassName }}
       priorityClassName: {{ .Values.priorityClassName }}
       {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
       - command:
         - pyflyte
@@ -37,6 +39,8 @@ spec:
         ports:
         - containerPort: {{ .Values.ports.containerPort }}
           name: {{ .Values.ports.name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
         resources: {{- toYaml .Values.resources | nindent 10 }}
         {{- with .Values.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}

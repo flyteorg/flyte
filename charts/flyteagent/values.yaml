@@ -54,6 +54,11 @@ serviceAccount:
   annotations: {}
   # -- ImagePullSecrets to automatically assign to the service account
   imagePullSecrets: []
+# -- Security context for pod
+podSecurityContext: {}
+# -- Security context for container
+securityContext:
+  allowPrivilegeEscalation: false
 # -- Annotations for flyteagent pods
 podAnnotations: {}
 # -- Additional flyteagent pod container environment variables

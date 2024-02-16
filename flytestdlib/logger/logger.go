@@ -41,7 +41,8 @@ func onConfigUpdated(cfg Config) {
 	default:
 		if _, isJSON := logrus.StandardLogger().Formatter.(*logrus.JSONFormatter); !isJSON {
 			logrus.SetFormatter(&logrus.JSONFormatter{
-				DataKey: jsonDataKey,
+				DataKey:           jsonDataKey,
+				DisableHTMLEscape: true,
 				FieldMap: logrus.FieldMap{
 					logrus.FieldKeyTime: "ts",
 				},

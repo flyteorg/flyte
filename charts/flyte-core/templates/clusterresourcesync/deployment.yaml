@@ -70,4 +70,7 @@ spec:
           secret:
             secretName: flyte-secret-auth
         {{- end }}
+      {{- with .Values.cluster_resource_manager.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
   {{- end }}

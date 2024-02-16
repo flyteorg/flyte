@@ -15,10 +15,9 @@ template:
     labels: {{ include "flytepropeller.labels" . | nindent 6 }}
       app: {{ index .Values.configmap.core.manager "pod-application" }}
   spec:
-    securityContext:
-      fsGroup: 65534
-      runAsUser: 1001
-      fsGroupChangePolicy: "Always"
+    {{- with .Values.flytepropeller.securityContext }}
+    securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+    {{- end }}
     {{- if .Values.flytepropeller.priorityClassName }}
     priorityClassName: {{ .Values.flytepropeller.priorityClassName }}
     {{- end }}

@@ -659,6 +659,7 @@ Defines Auth options for users.
     domain: ""
     sameSitePolicy: DefaultMode
   httpProxyURL: ""
+  idpQueryParameter: ""
   openId:
     baseUrl: ""
     clientId: ""
@@ -1242,6 +1243,18 @@ settings used by cookies created for user auth
 
   domain: ""
   sameSitePolicy: DefaultMode
+  
+
+idpQueryParameter (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+idp query parameter used for selecting a particular IDP for doing user authentication. Eg: for Okta passing idp=<IDP-ID> forces the authentication to happen with IDP-ID
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 config.CookieSettings
@@ -5337,7 +5350,6 @@ defaults (`interfaces.TaskResourceSet`_)
   ephemeralStorage: "0"
   gpu: "0"
   memory: 200Mi
-  storage: "0"
   
 
 limits (`interfaces.TaskResourceSet`_)
@@ -5351,7 +5363,6 @@ limits (`interfaces.TaskResourceSet`_)
   ephemeralStorage: "0"
   gpu: "1"
   memory: 1Gi
-  storage: "0"
   
 
 interfaces.TaskResourceSet
@@ -5385,16 +5396,6 @@ memory (`resource.Quantity`_)
 .. code-block:: yaml
 
   200Mi
-  
-
-storage (`resource.Quantity`_)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  "0"
   
 
 ephemeralStorage (`resource.Quantity`_)

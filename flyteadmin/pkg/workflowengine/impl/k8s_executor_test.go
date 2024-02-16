@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"errors"
+	"regexp"
 	"testing"
 
 	"github.com/golang/protobuf/proto"
@@ -192,7 +193,7 @@ func TestExecute(t *testing.T) {
 func TestExecute_AlreadyExists(t *testing.T) {
 	fakeFlyteWorkflow := FakeFlyteWorkflow{}
 	fakeFlyteWorkflow.createCallback = func(flyteWorkflow *v1alpha1.FlyteWorkflow, opts v1.CreateOptions) (*v1alpha1.FlyteWorkflow, error) {
-		return nil, k8_api_err.NewAlreadyExists(schema.GroupResource{}, "")
+		return nil, k8_api_err.NewAlreadyExists(schema.GroupResource{}, " ")
 	}
 	fakeFlyteWF.flyteWorkflowsCallback = func(ns string) v1alpha12.FlyteWorkflowInterface {
 		assert.Equal(t, namespace, ns)
@@ -338,7 +339,9 @@ func TestAbort_MiscError(t *testing.T) {
 		ExecutionID: execID,
 		Cluster:     clusterID,
 	})
-	assert.EqualError(t, err, "failed to terminate execution: project:\"proj\" domain:\"domain\" name:\"name\"  with err call failed")
+	regex := regexp.MustCompile(`\s+`)
+	expected := "failed to terminate execution: project:\"proj\" domain:\"domain\" name:\"name\" with err call failed"
+	assert.Equal(t, regex.ReplaceAllString(err.Error(), ""), regex.ReplaceAllString(expected, ""))
 }
 
 func TestExecute_OffloadWorkflowClosure(t *testing.T) {

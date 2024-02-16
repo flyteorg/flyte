@@ -567,7 +567,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 
 			if tc.expectSuccess {
 				assert.Nil(t, item.SyncError)
-				assert.Equal(t, tc.expectedOutputs, item.ExecutionOutputs)
+				assert.True(t, proto.Equal(tc.expectedOutputs, item.ExecutionOutputs))
 			}
 			if tc.expectError {
 				assert.NotNil(t, item.SyncError)

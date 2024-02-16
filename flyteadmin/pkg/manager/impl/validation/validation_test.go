@@ -15,6 +15,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestGetMissingArgumentError(t *testing.T) {
@@ -67,8 +68,8 @@ func TestValidateIdentifier(t *testing.T) {
 		Project:      "project",
 		Domain:       "domain",
 	}, common.Task)
-	assert.EqualError(t, err, "unexpected resource type workflow for identifier "+
-		"[resource_type:WORKFLOW project:\"project\" domain:\"domain\" ], expected task instead")
+	utils.AssertEqualWithSanitizedRegex(t, "unexpected resource type workflow for identifier "+
+		"[resource_type:WORKFLOW project:\"project\" domain:\"domain\" ], expected task instead", err.Error())
 }
 
 func TestValidateNamedEntityIdentifierListRequest(t *testing.T) {

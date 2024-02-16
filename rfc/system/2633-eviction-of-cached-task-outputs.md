@@ -70,7 +70,7 @@ Similar to the `interruptible` override currently available, we propose to add a
 
 #### `flytekit`
 
-We should extend the [`flytekit.remote`](https://docs.flyte.org/projects/flytekit/en/latest/remote.html#remote-access) functionality to support setting the `skip_cache` flag for a single execution.
+We should extend the [`flytekit.remote`](https://docs.flyte.org/en/latest/api/flytekit/remote.html#remote-access) functionality to support setting the `skip_cache` flag for a single execution.
 
 #### `flytectl`
 
@@ -112,7 +112,7 @@ Whilst our main intent for this `AdminService` extension is for automated/script
 
 #### `flytekit`
 
-[`flytekit.remote`](https://docs.flyte.org/projects/flytekit/en/latest/remote.html#remote-access) could be extended to support eviction of a task/workflow's cached results remotely.
+[`flytekit.remote`](https://docs.flyte.org/en/latest/api/flytekit/remote.html#remote-access) could be extended to support eviction of a task/workflow's cached results remotely.
 
 #### `flytectl`
 
@@ -158,7 +158,7 @@ The potential for malicious exploitation is deemed non-existent as no access to 
 3. Which Flyte tools (`flyteconsole`/`flytectl`) should support the proposed `AdminService` API extension for `flyteadmin`, if any?
     - **RESOLVED**: `flytectl`, `flytekit.remote`, `flyteconsole`
 4. Should we support automatic eviction of cached results on workflow archival (opt-out via `flyteconsole`)?
-5. Should we evict [Infratask Checkpoints](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/checkpoint.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
+5. Should we evict [Infratask Checkpoints](https://docs.flyte.org/en/latest/flytesnacks/auto/core/control_flow/checkpoint.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
     - **RESOLVED**: not for the initial implementation. Infratask checkpoints are only relevant for consecutive retries of a task - their results would not be considered when launching another execution with a `cache_override` flag set. 
 
 ## 9 Conclusion

@@ -1066,8 +1066,7 @@ k8s-array (`k8s.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
-      flyin-enabled: false
-      flyin-template-uri: ""
+      dynamic-log-links: null
       gcp-project: ""
       kubernetes-enabled: true
       kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -1117,8 +1116,7 @@ logs (`logs.LogConfig`_)
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: true
   kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -1174,13 +1172,13 @@ ray (`ray.Config`_)
         disable-usage-stats: "true"
   enableUsageStats: false
   includeDashboard: true
+  kubeRayCrdVersion: v1alpha1
   logs:
     cloudwatch-enabled: false
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
-    flyin-enabled: false
-    flyin-template-uri: ""
+    dynamic-log-links: null
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -1247,8 +1245,7 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
-      flyin-enabled: false
-      flyin-template-uri: ""
+      dynamic-log-links: null
       gcp-project: ""
       kubernetes-enabled: false
       kubernetes-template-uri: ""
@@ -1262,8 +1259,7 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
-      flyin-enabled: false
-      flyin-template-uri: ""
+      dynamic-log-links: null
       gcp-project: ""
       kubernetes-enabled: true
       kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -1278,8 +1274,7 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
-      flyin-enabled: false
-      flyin-template-uri: ""
+      dynamic-log-links: null
       gcp-project: ""
       kubernetes-enabled: false
       kubernetes-template-uri: ""
@@ -1293,8 +1288,7 @@ spark (`spark.Config`_)
       cloudwatch-log-group: ""
       cloudwatch-region: ""
       cloudwatch-template-uri: ""
-      flyin-enabled: false
-      flyin-template-uri: ""
+      dynamic-log-links: null
       gcp-project: ""
       kubernetes-enabled: false
       kubernetes-template-uri: ""
@@ -2941,8 +2935,7 @@ Config for log links for k8s array jobs.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
-    flyin-enabled: false
-    flyin-template-uri: ""
+    dynamic-log-links: null
     gcp-project: ""
     kubernetes-enabled: true
     kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3060,8 +3053,7 @@ Defines the log config for k8s logs.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: true
   kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3209,28 +3201,14 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-flyin-enabled (bool)
+dynamic-log-links (map[string]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Log-links to flyin logs
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "false"
-  
-
-flyin-template-uri (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Template Uri to use when building flyin log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
+  null
   
 
 templates ([]tasklog.TemplateLogPlugin)
@@ -3406,28 +3384,14 @@ Template Uri to use when building stackdriver log links
   ""
   
 
-flyin-enabled (bool)
+dynamic-log-links (map[string]tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Enable Log-links to flyin logs
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "false"
-  
-
-flyin-template-uri (string)
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Template Uri to use when building flyin log links
-
-**Default Value**: 
-
-.. code-block:: yaml
-
-  ""
+  null
   
 
 templates ([]tasklog.TemplateLogPlugin)
@@ -3531,8 +3495,7 @@ logs (`logs.LogConfig`_)
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3555,8 +3518,6 @@ logsSidecar (v1.Container)
 
 dashboardURLTemplate (tasklog.TemplateLogPlugin)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-Template for URL of Ray dashboard running on a head node.
 
 **Default Value**: 
 
@@ -3592,6 +3553,18 @@ Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io
 .. code-block:: yaml
 
   "false"
+  
+
+kubeRayCrdVersion (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+Version of the Ray CRD to use when creating RayClusters or RayJobs.
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  v1alpha1
   
 
 ray.DefaultConfig
@@ -3768,8 +3741,7 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
-    flyin-enabled: false
-    flyin-template-uri: ""
+    dynamic-log-links: null
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -3783,8 +3755,7 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
-    flyin-enabled: false
-    flyin-template-uri: ""
+    dynamic-log-links: null
     gcp-project: ""
     kubernetes-enabled: true
     kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3799,8 +3770,7 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
-    flyin-enabled: false
-    flyin-template-uri: ""
+    dynamic-log-links: null
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -3814,8 +3784,7 @@ Config for log links for spark applications.
     cloudwatch-log-group: ""
     cloudwatch-region: ""
     cloudwatch-template-uri: ""
-    flyin-enabled: false
-    flyin-template-uri: ""
+    dynamic-log-links: null
     gcp-project: ""
     kubernetes-enabled: false
     kubernetes-template-uri: ""
@@ -3842,8 +3811,7 @@ Defines the log config that's not split into user/system.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: true
   kubernetes-template-uri: http://localhost:30082/#!/log/{{ .namespace }}/{{ .podName
@@ -3868,8 +3836,7 @@ Defines the log config for user logs.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3893,8 +3860,7 @@ Defines the log config for system logs.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""
@@ -3918,8 +3884,7 @@ All user logs across driver and executors.
   cloudwatch-log-group: ""
   cloudwatch-region: ""
   cloudwatch-template-uri: ""
-  flyin-enabled: false
-  flyin-template-uri: ""
+  dynamic-log-links: null
   gcp-project: ""
   kubernetes-enabled: false
   kubernetes-template-uri: ""

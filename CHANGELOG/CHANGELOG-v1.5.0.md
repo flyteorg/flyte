@@ -63,7 +63,7 @@ def wf(a: int) -> str:
 
 Notice how calls to `t1_fixed_b` do not need to specify the `b` parameter.
 
-This also works for [MapTasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html#sphx-glr-auto-core-control-flow-map-task-py) in a limited capacity. For example:
+This also works for [MapTasks](https://docs.flyte.org/en/latest/flytesnacks/auto/core/control_flow/map_task.html#sphx-glr-auto-core-control-flow-map-task-py) in a limited capacity. For example:
 
 ```
 from flytekit import task, workflow, partial, map_task
@@ -107,5 +107,5 @@ Map tasks do not support partial tasks with lists as inputs.
 
 ## Flyteconsole
 
-Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/waiting_for_external_inputs.html#waiting-for-external-inputs). 
+Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/en/latest/flytesnacks/auto/core/control_flow/waiting_for_external_inputs.html#waiting-for-external-inputs). 
 Better support for dataclasses in the launch form.
