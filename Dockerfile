@@ -1,5 +1,6 @@
 ARG FLYTECONSOLE_VERSION=latest
-FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
+# FROM ghcr.io/flyteorg/flyteconsole:${FLYTECONSOLE_VERSION} AS flyteconsole
+FROM ghcr.io/jsonporter/console-update:test_3 AS flyteconsole
 
 
 FROM --platform=${BUILDPLATFORM} golang:1.21.5-bookworm AS flytebuilder
