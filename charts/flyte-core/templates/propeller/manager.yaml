@@ -53,9 +53,11 @@ template:
     - configMap:
         name: flyte-propeller-config
       name: config-volume
+    {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
     - name: auth
       secret:
         secretName: flyte-secret-auth
+    {{- end }}
     {{- with .Values.flytepropeller.nodeSelector }}
     nodeSelector: {{ tpl (toYaml .) $ | nindent 6 }}
     {{- end }}

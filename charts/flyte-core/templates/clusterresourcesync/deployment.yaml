@@ -66,9 +66,11 @@ spec:
             secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           secret:
             secretName: flyte-secret-auth
+        {{- end }}
         {{- end }}
       {{- with .Values.cluster_resource_manager.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
