@@ -98,9 +98,11 @@ spec:
       - configMap:
           name: flyte-propeller-config
         name: config-volume
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
           secretName: flyte-secret-auth
+      {{- end }}
       {{- with .Values.flytepropeller.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}
       {{- end }}
