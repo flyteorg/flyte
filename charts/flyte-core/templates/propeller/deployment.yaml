@@ -82,8 +82,10 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
+        {{- end }}
         {{- with .Values.flytepropeller.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
