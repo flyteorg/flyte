@@ -659,6 +659,7 @@ Defines Auth options for users.
     domain: ""
     sameSitePolicy: DefaultMode
   httpProxyURL: ""
+  idpQueryParameter: ""
   openId:
     baseUrl: ""
     clientId: ""
@@ -1242,6 +1243,18 @@ settings used by cookies created for user auth
 
   domain: ""
   sameSitePolicy: DefaultMode
+  
+
+idpQueryParameter (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+idp query parameter used for selecting a particular IDP for doing user authentication. Eg: for Okta passing idp=<IDP-ID> forces the authentication to happen with IDP-ID
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  ""
   
 
 config.CookieSettings

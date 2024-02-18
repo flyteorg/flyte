@@ -19,10 +19,9 @@ spec:
         {{- end }}
       labels: {{ include "flytescheduler.podLabels" . | nindent 8 }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+      {{- with .Values.flytescheduler.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flytescheduler.priorityClassName }}
       priorityClassName: {{ .Values.flytescheduler.priorityClassName }}
       {{- end }}
@@ -42,6 +41,10 @@ spec:
         image: "{{ .Values.flytescheduler.image.repository }}:{{ .Values.flytescheduler.image.tag }}"
         imagePullPolicy: "{{ .Values.flytescheduler.image.pullPolicy }}"
         name: flytescheduler-check
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config
           name: config-volume
@@ -65,6 +68,10 @@ spec:
         name: flytescheduler
         ports:
           - containerPort: {{ .Values.configmap.schedulerConfig.scheduler.profilerPort }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         resources: {{- toYaml .Values.flytescheduler.resources | nindent 10 }}
         volumeMounts: {{- include "databaseSecret.volumeMount" . | nindent 8 }}
         - mountPath: /etc/flyte/config

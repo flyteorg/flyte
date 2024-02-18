@@ -23,8 +23,7 @@ If you have custom Python dependencies, update the `requirements.txt` file that
 ships with the {ref}`project template <getting_started_python_dependencies>`
 and those changes will be incorporated into the Docker image.
 
-You can also update the Dockerfile (if using a Dockerfile) or the [ImageSpec configuration](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/customizing_dependencies/image_spec.html#image-spec-example) if you
-want to use a different base image or if the additional Python dependencies
+You can also update the Dockerfile (if using a Dockerfile) or the {ref}`ImageSpec configuration <image_spec_example>` if you want to use a different base image or if the additional Python dependencies
 require installing binaries or packages from other languages.
 
 ## Registration patterns

@@ -153,7 +153,7 @@ Example
 ^^^^^^^^
 Let's take an example to understand resource allocation and deallocation when a plugin requests resources. 
 
-Flyte has a built-in `Qubole <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/plugins/plugins.html#qubolehivejob>`__ plugin. This plugin allows Flyte tasks to send Hive commands to Qubole. In the plugin, a single Qubole cluster is considered a resource, and sending a single Hive command to a Qubole cluster consumes a token of the corresponding resource. 
+Flyte has a built-in `Qubole <https://docs.flyte.org/en/latest/protos/docs/plugins/plugins.html#qubolehivejob>`__ plugin. This plugin allows Flyte tasks to send Hive commands to Qubole. In the plugin, a single Qubole cluster is considered a resource, and sending a single Hive command to a Qubole cluster consumes a token of the corresponding resource. 
 The resource is allocated when the status is **“AllocationGranted”**. Qubole plugin calls:
 
 .. code-block:: go

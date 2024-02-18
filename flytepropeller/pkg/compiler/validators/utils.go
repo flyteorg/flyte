@@ -162,17 +162,61 @@ func UnionDistinctVariableMaps(m1, m2 map[string]*core.Variable) (map[string]*co
 	return res, nil
 }
 
+func buildMultipleTypeUnion(innerType []*core.LiteralType) *core.LiteralType {
+	var variants []*core.LiteralType
+	isNested := false
+
+	for _, x := range innerType {
+		unionType := x.GetCollectionType().GetUnionType()
+		if unionType != nil {
+			isNested = true
+			variants = append(variants, unionType.Variants...)
+		} else {
+			variants = append(variants, x)
+		}
+	}
+	unionLiteralType := &core.LiteralType{
+		Type: &core.LiteralType_UnionType{
+			UnionType: &core.UnionType{
+				Variants: variants,
+			},
+		},
+	}
+
+	if isNested {
+		return &core.LiteralType{
+			Type: &core.LiteralType_CollectionType{
+				CollectionType: unionLiteralType,
+			},
+		}
+	}
+
+	return unionLiteralType
+}
+
 func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 	innerType := make([]*core.LiteralType, 0, 1)
 	innerTypeSet := sets.NewString()
+	var noneType *core.LiteralType
 	for _, x := range literals {
 		otherType := LiteralTypeForLiteral(x)
 		otherTypeKey := otherType.String()
+		if _, ok := x.GetValue().(*core.Literal_Collection); ok {
+			if x.GetCollection().GetLiterals() == nil {
+				noneType = otherType
+				continue
+			}
+		}
 
 		if !innerTypeSet.Has(otherTypeKey) {
 			innerType = append(innerType, otherType)
 			innerTypeSet.Insert(otherTypeKey)
 		}
+	}
+
+	// only add none type if there aren't other types
+	if len(innerType) == 0 && noneType != nil {
+		innerType = append(innerType, noneType)
 	}
 
 	if len(innerType) == 0 {
@@ -195,14 +239,7 @@ func literalTypeForLiterals(literals []*core.Literal) *core.LiteralType {
 
 		return 0
 	})
-
-	return &core.LiteralType{
-		Type: &core.LiteralType_UnionType{
-			UnionType: &core.UnionType{
-				Variants: innerType,
-			},
-		},
-	}
+	return buildMultipleTypeUnion(innerType)
 }
 
 // LiteralTypeForLiteral gets LiteralType for literal, nil if the value of literal is unknown, or type collection/map of
