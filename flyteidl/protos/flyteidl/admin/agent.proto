@@ -105,9 +105,6 @@ message GetTaskRequest {
 // Response to get an individual task resource.
 message GetTaskResponse {
   Resource resource = 1;
-
-  // log information for the task execution
-  repeated core.TaskLog log_links = 2;
 }
 
 message Resource {

@@ -529,13 +529,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
    */
   resource?: Resource;
 
-  /**
-   * log information for the task execution
-   *
-   * @generated from field: repeated flyteidl.core.TaskLog log_links = 2;
-   */
-  logLinks: TaskLog[] = [];
-
   constructor(data?: PartialMessage<GetTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -545,7 +538,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
   static readonly typeName = "flyteidl.admin.GetTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "resource", kind: "message", T: Resource },
-    { no: 2, name: "log_links", kind: "message", T: TaskLog, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskResponse {

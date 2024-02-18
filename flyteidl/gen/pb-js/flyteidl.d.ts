@@ -9515,9 +9515,6 @@ export namespace flyteidl {
 
             /** GetTaskResponse resource */
             resource?: (flyteidl.admin.IResource|null);
-
-            /** GetTaskResponse logLinks */
-            logLinks?: (flyteidl.core.ITaskLog[]|null);
         }
 
         /** Represents a GetTaskResponse. */
@@ -9531,9 +9528,6 @@ export namespace flyteidl {
 
             /** GetTaskResponse resource. */
             public resource?: (flyteidl.admin.IResource|null);
-
-            /** GetTaskResponse logLinks. */
-            public logLinks: flyteidl.core.ITaskLog[];
 
             /**
              * Creates a new GetTaskResponse instance using the specified properties.

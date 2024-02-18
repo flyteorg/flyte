@@ -735,14 +735,6 @@
       "properties": {
         "resource": {
           "$ref": "#/definitions/adminResource"
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "title": "log information for the task execution"
         }
       },
       "description": "Response to get an individual task resource."

@@ -23326,7 +23326,6 @@
                  * @memberof flyteidl.admin
                  * @interface IGetTaskResponse
                  * @property {flyteidl.admin.IResource|null} [resource] GetTaskResponse resource
-                 * @property {Array.<flyteidl.core.ITaskLog>|null} [logLinks] GetTaskResponse logLinks
                  */
     
                 /**
@@ -23338,7 +23337,6 @@
                  * @param {flyteidl.admin.IGetTaskResponse=} [properties] Properties to set
                  */
                 function GetTaskResponse(properties) {
-                    this.logLinks = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -23352,14 +23350,6 @@
                  * @instance
                  */
                 GetTaskResponse.prototype.resource = null;
-    
-                /**
-                 * GetTaskResponse logLinks.
-                 * @member {Array.<flyteidl.core.ITaskLog>} logLinks
-                 * @memberof flyteidl.admin.GetTaskResponse
-                 * @instance
-                 */
-                GetTaskResponse.prototype.logLinks = $util.emptyArray;
     
                 /**
                  * Creates a new GetTaskResponse instance using the specified properties.
@@ -23387,9 +23377,6 @@
                         writer = $Writer.create();
                     if (message.resource != null && message.hasOwnProperty("resource"))
                         $root.flyteidl.admin.Resource.encode(message.resource, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.logLinks != null && message.logLinks.length)
-                        for (var i = 0; i < message.logLinks.length; ++i)
-                            $root.flyteidl.core.TaskLog.encode(message.logLinks[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     return writer;
                 };
     
@@ -23414,11 +23401,6 @@
                         case 1:
                             message.resource = $root.flyteidl.admin.Resource.decode(reader, reader.uint32());
                             break;
-                        case 2:
-                            if (!(message.logLinks && message.logLinks.length))
-                                message.logLinks = [];
-                            message.logLinks.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
-                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -23442,15 +23424,6 @@
                         var error = $root.flyteidl.admin.Resource.verify(message.resource);
                         if (error)
                             return "resource." + error;
-                    }
-                    if (message.logLinks != null && message.hasOwnProperty("logLinks")) {
-                        if (!Array.isArray(message.logLinks))
-                            return "logLinks: array expected";
-                        for (var i = 0; i < message.logLinks.length; ++i) {
-                            var error = $root.flyteidl.core.TaskLog.verify(message.logLinks[i]);
-                            if (error)
-                                return "logLinks." + error;
-                        }
                     }
                     return null;
                 };
