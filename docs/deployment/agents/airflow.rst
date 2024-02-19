@@ -94,4 +94,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For Airflow plugin on the Flyte cluster, see `Airflow Plugin Example <TODO: Add airflow plugin example>`_
+For Airflow agent on the Flyte cluster, see `Airflow agent <https://docs.flyte.org/en/latest/flytesnacks/examples/airflow_agent/index.html>`_.

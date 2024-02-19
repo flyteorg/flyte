@@ -3,7 +3,7 @@
 Sensor agent
 =================
 
-The sensor agent enables users to continuously check for a file or a condition to be met periodically.
+The `sensor agent <https://docs.flyte.org/en/latest/flytesnacks/examples/sensor/index.html>`_ enables users to continuously check for a file or a condition to be met periodically.
 
 When the condition is met, the sensor will complete.
 
