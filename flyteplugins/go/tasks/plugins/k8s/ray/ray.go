@@ -114,6 +114,8 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 		headNodeRayStartParams[DisableUsageStatsStartParameter] = DisableUsageStatsStartParameterVal
 	}
 
+	podSpec.ServiceAccountName = cfg.ServiceAccount
+
 	headPodSpec := podSpec.DeepCopy()
 
 	if cfg.KubeRayCrdVersion == "v1" {
