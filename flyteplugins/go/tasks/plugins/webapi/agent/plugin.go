@@ -23,7 +23,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => AgentDeployment
+type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 
 type Plugin struct {
 	metricScope   promutils.Scope
@@ -151,7 +151,7 @@ func (p Plugin) ExecuteTaskSync(
 		}
 		err = stream.Send(inputsProto)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
 		}
 	}
 
