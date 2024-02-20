@@ -30,10 +30,10 @@ For a list of agents you can use in your tasks and example usage for each, see t
 :header-rows: 0
 :widths: 20 30
 
-* - {doc}`Creating an agent <creating_an_agent>`
+* - {doc}`Developing agents <developing_agents>`
   - If the agent you need doesn't exist, follow these steps to create it.
 * - {doc}`Testing agents locally <testing_agents_locally>`
-  - Whether using an existing agent or creating a new one, you can test it locally without needing to configure or run the backend server.
+  - Whether using an existing agent or developing a new one, you can test the agent locally without needing to configure your Flyte deployment.
 * - {doc}`Enabling agents in your Flyte deployment <enabling_agents_in_your_flyte_deployment>`
   - Once you have tested an agent locally and want to use it in production, you must configure your Flyte deployment for the agent.
 ```
@@ -42,7 +42,7 @@ For a list of agents you can use in your tasks and example usage for each, see t
 :maxdepth: -1
 :hidden:
 
-creating_an_agent
+developing_agents
 testing_agents_locally
 enabling_agents_in_your_flyte_deployment
 ```
