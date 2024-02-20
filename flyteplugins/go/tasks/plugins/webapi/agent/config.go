@@ -63,10 +63,10 @@ type Config struct {
 	// The default agent if there does not exist a more specific matching against task types
 	DefaultAgent AgentDeployment `json:"defaultAgent" pflag:",The default agent."`
 
-	// The agents used to match against specific task types. {AgentDeploymentId: AgentDeployment}
+	// The agents used to match against specific task types. {agentDeploymentID: AgentDeployment}
 	AgentDeployments map[string]*AgentDeployment `json:"agents" pflag:",The agents."`
 
-	// Maps task types to their agents. {TaskType: AgentDeploymentId}
+	// Maps task types to their agents. {TaskType: agentDeploymentID}
 	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
 
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.

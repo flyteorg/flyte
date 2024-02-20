@@ -104,8 +104,8 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 	var agentDeployments []*AgentDeployment
 
 	// Ensure that the old configuration is backward compatible
-	for taskType, agentDeploymentId := range cfg.AgentForTaskTypes {
-		agent := Agent{AgentDeployment: cfg.AgentDeployments[agentDeploymentId], IsSync: false}
+	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
+		agent := Agent{AgentDeployment: cfg.AgentDeployments[agentDeploymentID], IsSync: false}
 		agentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: &agent}
 	}
 
