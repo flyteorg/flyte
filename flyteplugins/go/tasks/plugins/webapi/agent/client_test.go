@@ -15,7 +15,6 @@ func TestInitializeClients(t *testing.T) {
 		},
 		"y": {
 			Endpoint: "y",
-			IsSync:   true,
 		},
 	}
 	ctx := context.Background()

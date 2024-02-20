@@ -113,10 +113,10 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
-	for i := 0; i < len(agentDeployments); i++ {
-		client := cs.agentMetadataClients[agentDeployments[i].Endpoint]
+	for _, agentDeployment := range agentDeployments {
+		client := cs.agentMetadataClients[agentDeployment.Endpoint]
 
-		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployments[i])
+		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployment)
 		defer cancel()
 
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
@@ -124,30 +124,27 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
 				// we should not panic here, as we want to continue to support old agent settings
-				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployments[i])
+				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
 				continue
 			}
 
 			if !ok {
-				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployments[i], err)
+				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment, err)
 			}
 
-			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployments[i], err)
+			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployment, err)
 		}
 
-		agents := res.GetAgents()
-		for j := 0; j < len(agents); j++ {
-			supportedTaskTypes := agents[j].SupportedTaskTypes
+		for _, agent := range res.GetAgents() {
+			supportedTaskTypes := agent.SupportedTaskTypes
 			for _, supportedTaskType := range supportedTaskTypes {
-				agent := &Agent{AgentDeployment: agentDeployments[i], IsSync: agents[j].IsSync}
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
 				agentRegistry[supportedTaskType.GetName()] = map[int32]*Agent{supportedTaskType.GetVersion(): agent}
 			}
-			logger.Infof(context.Background(), "[%v] AgentDeployment is a sync agent: [%v]", agents[j].Name, agents[j].IsSync)
-			logger.Infof(context.Background(), "[%v] AgentDeployment supports task types: [%v]", agents[j].Name, supportedTaskTypes)
+			logger.Infof(context.Background(), "[%v] is a sync agent: [%v]", agent.Name, agent.IsSync)
+			logger.Infof(context.Background(), "[%v] supports task types: [%v]", agent.Name, supportedTaskTypes)
 		}
 	}
-
-	logger.Infof(context.Background(), "AgentDeployment registry initialized: [%v]", agentRegistry["mock_openai"][0])
 
 	return agentRegistry, nil
 }

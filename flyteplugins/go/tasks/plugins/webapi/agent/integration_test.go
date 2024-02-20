@@ -104,7 +104,7 @@ func TestEndToEnd(t *testing.T) {
 				},
 			},
 		}
-		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": []interface{}{1, 2}})
+		expectedOutputs, err := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
 		assert.NoError(t, err)
 		phase := tests.RunPluginEndToEndTest(t, plugin, &template, inputs, expectedOutputs, nil, iter)
 		assert.Equal(t, true, phase.Phase().IsSuccess())
@@ -290,9 +290,8 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 
 func newMockSyncAgentPlugin() webapi.PluginEntry {
 	syncAgentClient := new(agentMocks.SyncAgentServiceClient)
-	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}
-	output1, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
-	output2, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 2})
+	output, _ := coreutils.MakeLiteralMap(map[string]interface{}{"x": 1})
+	resource := &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED, Outputs: output}
 
 	stream := new(agentMocks.SyncAgentService_ExecuteTaskSyncClient)
 	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
@@ -300,18 +299,6 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 			Header: &admin.ExecuteTaskSyncResponseHeader{
 				Resource: resource,
 			},
-		},
-	}, nil).Once()
-
-	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
-		Res: &admin.ExecuteTaskSyncResponse_Outputs{
-			Outputs: output1,
-		},
-	}, nil).Once()
-
-	stream.OnRecv().Return(&admin.ExecuteTaskSyncResponse{
-		Res: &admin.ExecuteTaskSyncResponse_Outputs{
-			Outputs: output2,
 		},
 	}, nil).Once()
 
@@ -323,7 +310,6 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 
 	cfg := defaultConfig
 	cfg.DefaultAgent.Endpoint = defaultAgentEndpoint
-	cfg.DefaultAgent.IsSync = true
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
@@ -337,6 +323,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: syncAgentClient,
 					},
 				},
+				agentRegistry: Registry{"openai": {defaultTaskTypeVersion: {AgentDeployment: &AgentDeployment{Endpoint: defaultAgentEndpoint}, IsSync: true}}},
 			}, nil
 		},
 	}
