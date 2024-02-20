@@ -169,7 +169,7 @@ func DatasetIDToIdentifier(id *datacatalog.DatasetID) *core.Identifier {
 	if id == nil {
 		return nil
 	}
-	return &core.Identifier{ResourceType: core.ResourceType_DATASET, Name: id.Name, Project: id.Project, Domain: id.Domain, Version: id.Version}
+	return &core.Identifier{ResourceType: core.ResourceType_DATASET, Name: id.Name, Project: id.Project, Domain: id.Domain, Version: id.Version, Org: id.Org}
 }
 
 // With Node-Node relationship this is bound to change. So lets keep it extensible

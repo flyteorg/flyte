@@ -328,10 +328,11 @@ func TestEventCatalogMetadata(t *testing.T) {
 }
 
 func TestDatasetIDToIdentifier(t *testing.T) {
-	id := DatasetIDToIdentifier(&datacatalog.DatasetID{Project: "p", Domain: "d", Name: "n", Version: "v"})
+	id := DatasetIDToIdentifier(&datacatalog.DatasetID{Project: "p", Domain: "d", Name: "n", Version: "v", Org: "o"})
 	assert.Equal(t, core.ResourceType_DATASET, id.ResourceType)
 	assert.Equal(t, "n", id.Name)
 	assert.Equal(t, "p", id.Project)
 	assert.Equal(t, "d", id.Domain)
 	assert.Equal(t, "v", id.Version)
+	assert.Equal(t, "o", id.Org)
 }
