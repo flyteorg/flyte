@@ -150,6 +150,9 @@ func (p Plugin) ExecuteTaskSync(
 			},
 		}
 		err = stream.Send(inputsProto)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	in, err := stream.Recv()
