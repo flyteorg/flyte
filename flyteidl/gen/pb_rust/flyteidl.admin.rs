@@ -190,8 +190,8 @@ pub struct Agent {
     pub name: ::prost::alloc::string::String,
     /// SupportedTaskTypes are the types of the tasks that the agent can handle.
     #[deprecated]
-    #[prost(message, repeated, tag="2")]
-    pub deprecated_supported_task_types: ::prost::alloc::vec::Vec<TaskType>,
+    #[prost(string, repeated, tag="2")]
+    pub deprecated_supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
     /// results synchronously when called by propeller. Given that sync agents can affect the performance
     /// of the system, it's important to enforce strict timeout policies.

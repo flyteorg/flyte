@@ -175,10 +175,10 @@ class Agent(_message.Message):
     IS_SYNC_FIELD_NUMBER: _ClassVar[int]
     SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
     name: str
-    deprecated_supported_task_types: _containers.RepeatedCompositeFieldContainer[TaskType]
+    deprecated_supported_task_types: _containers.RepeatedScalarFieldContainer[str]
     is_sync: bool
     supported_task_types: _containers.RepeatedCompositeFieldContainer[TaskType]
-    def __init__(self, name: _Optional[str] = ..., deprecated_supported_task_types: _Optional[_Iterable[_Union[TaskType, _Mapping]]] = ..., is_sync: bool = ..., supported_task_types: _Optional[_Iterable[_Union[TaskType, _Mapping]]] = ...) -> None: ...
+    def __init__(self, name: _Optional[str] = ..., deprecated_supported_task_types: _Optional[_Iterable[str]] = ..., is_sync: bool = ..., supported_task_types: _Optional[_Iterable[_Union[TaskType, _Mapping]]] = ...) -> None: ...
 
 class TaskType(_message.Message):
     __slots__ = ["name", "version"]

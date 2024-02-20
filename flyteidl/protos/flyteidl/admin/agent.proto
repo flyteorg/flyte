@@ -143,7 +143,7 @@ message Agent {
   string name = 1;
   
   // SupportedTaskTypes are the types of the tasks that the agent can handle.
-  repeated TaskType deprecated_supported_task_types = 2 [deprecated = true];
+  repeated string deprecated_supported_task_types = 2 [deprecated = true];
 
   // IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
   // results synchronously when called by propeller. Given that sync agents can affect the performance

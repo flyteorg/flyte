@@ -9773,7 +9773,7 @@ export namespace flyteidl {
             name?: (string|null);
 
             /** Agent deprecatedSupportedTaskTypes */
-            deprecatedSupportedTaskTypes?: (flyteidl.admin.ITaskType[]|null);
+            deprecatedSupportedTaskTypes?: (string[]|null);
 
             /** Agent isSync */
             isSync?: (boolean|null);
@@ -9795,7 +9795,7 @@ export namespace flyteidl {
             public name: string;
 
             /** Agent deprecatedSupportedTaskTypes. */
-            public deprecatedSupportedTaskTypes: flyteidl.admin.ITaskType[];
+            public deprecatedSupportedTaskTypes: string[];
 
             /** Agent isSync. */
             public isSync: boolean;

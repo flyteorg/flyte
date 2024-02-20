@@ -747,10 +747,10 @@ export class Agent extends Message<Agent> {
   /**
    * SupportedTaskTypes are the types of the tasks that the agent can handle.
    *
-   * @generated from field: repeated flyteidl.admin.TaskType deprecated_supported_task_types = 2 [deprecated = true];
+   * @generated from field: repeated string deprecated_supported_task_types = 2 [deprecated = true];
    * @deprecated
    */
-  deprecatedSupportedTaskTypes: TaskType[] = [];
+  deprecatedSupportedTaskTypes: string[] = [];
 
   /**
    * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
@@ -779,7 +779,7 @@ export class Agent extends Message<Agent> {
   static readonly typeName = "flyteidl.admin.Agent";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "deprecated_supported_task_types", kind: "message", T: TaskType, repeated: true },
+    { no: 2, name: "deprecated_supported_task_types", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 3, name: "is_sync", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 4, name: "supported_task_types", kind: "message", T: TaskType, repeated: true },
   ]);

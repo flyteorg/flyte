@@ -601,8 +601,7 @@
         "deprecated_supported_task_types": {
           "type": "array",
           "items": {
-            "type": "object",
-            "$ref": "#/definitions/adminTaskType"
+            "type": "string"
           },
           "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
         },

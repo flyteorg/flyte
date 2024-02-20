@@ -23939,7 +23939,7 @@
                  * @memberof flyteidl.admin
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
-                 * @property {Array.<flyteidl.admin.ITaskType>|null} [deprecatedSupportedTaskTypes] Agent deprecatedSupportedTaskTypes
+                 * @property {Array.<string>|null} [deprecatedSupportedTaskTypes] Agent deprecatedSupportedTaskTypes
                  * @property {boolean|null} [isSync] Agent isSync
                  * @property {Array.<flyteidl.admin.ITaskType>|null} [supportedTaskTypes] Agent supportedTaskTypes
                  */
@@ -23971,7 +23971,7 @@
     
                 /**
                  * Agent deprecatedSupportedTaskTypes.
-                 * @member {Array.<flyteidl.admin.ITaskType>} deprecatedSupportedTaskTypes
+                 * @member {Array.<string>} deprecatedSupportedTaskTypes
                  * @memberof flyteidl.admin.Agent
                  * @instance
                  */
@@ -24021,7 +24021,7 @@
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
                     if (message.deprecatedSupportedTaskTypes != null && message.deprecatedSupportedTaskTypes.length)
                         for (var i = 0; i < message.deprecatedSupportedTaskTypes.length; ++i)
-                            $root.flyteidl.admin.TaskType.encode(message.deprecatedSupportedTaskTypes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                            writer.uint32(/* id 2, wireType 2 =*/18).string(message.deprecatedSupportedTaskTypes[i]);
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
                     if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
@@ -24054,7 +24054,7 @@
                         case 2:
                             if (!(message.deprecatedSupportedTaskTypes && message.deprecatedSupportedTaskTypes.length))
                                 message.deprecatedSupportedTaskTypes = [];
-                            message.deprecatedSupportedTaskTypes.push($root.flyteidl.admin.TaskType.decode(reader, reader.uint32()));
+                            message.deprecatedSupportedTaskTypes.push(reader.string());
                             break;
                         case 3:
                             message.isSync = reader.bool();
@@ -24089,11 +24089,9 @@
                     if (message.deprecatedSupportedTaskTypes != null && message.hasOwnProperty("deprecatedSupportedTaskTypes")) {
                         if (!Array.isArray(message.deprecatedSupportedTaskTypes))
                             return "deprecatedSupportedTaskTypes: array expected";
-                        for (var i = 0; i < message.deprecatedSupportedTaskTypes.length; ++i) {
-                            var error = $root.flyteidl.admin.TaskType.verify(message.deprecatedSupportedTaskTypes[i]);
-                            if (error)
-                                return "deprecatedSupportedTaskTypes." + error;
-                        }
+                        for (var i = 0; i < message.deprecatedSupportedTaskTypes.length; ++i)
+                            if (!$util.isString(message.deprecatedSupportedTaskTypes[i]))
+                                return "deprecatedSupportedTaskTypes: string[] expected";
                     }
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         if (typeof message.isSync !== "boolean")
