@@ -38,8 +38,10 @@ spec:
           {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
           {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           {{- else }}
+          {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
           - name: auth
             mountPath: /etc/secrets/
+          {{- end }}
           {{- end }}
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
@@ -66,9 +68,11 @@ spec:
             secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           secret:
             secretName: flyte-secret-auth
+        {{- end }}
         {{- end }}
       {{- with .Values.cluster_resource_manager.nodeSelector }}
       nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
