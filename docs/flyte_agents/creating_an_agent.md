@@ -9,13 +9,13 @@ jupytext:
 (creating_an_agent)=
 # Creating an agent
 
-The Flyte agent framework enables rapid agent development, since agents are decoupled from the core FlytePropeller engine. Agents can be written in Python, easing development for data scientists. Agents can be tested independently and deployed privately, making maintenance easier and giving you more flexibility and control over development.
+The Flyte agent framework enables rapid agent development, since agents are decoupled from the core FlytePropeller engine. Rather than building a complete gRPC service from scratch, you can implement an agent as a Python class, easing development. Agents can be tested independently and deployed privately, making maintenance easier and giving you more flexibility and control over development.
 
 If you need to create a new type of task, we recommend creating a new agent to run it rather than running the task in a pod. After testing the new agent, you can update your FlytePropeller configMap to specify the type of task that the agent should run.
 
 There are two types of agents: **async** and **sync**.
-* **Async agents** communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
-* **Sync agents** communicate with external services, such as the OpenAI API, that return an immediate response after a job is created.
+* **Async agents** enable long-running jobs that execute on an external platform over time. They communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
+* **Sync agents** enable request/response services that return immediate outputs (e.g. calling an internal API to fetch data or communicating with the OpenAI API).
 
 ```{note}
 
