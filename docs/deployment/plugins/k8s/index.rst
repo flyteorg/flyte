@@ -440,14 +440,14 @@ Install the Kubernetes operator
     3. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
        to use the new gang scheduler for your tasks.
       
-       See the :ref:`using-k8s-podtemplates` section for more information on pod templates in Flyte.
+       See :ref:`deployment-configuration-general` for more information on pod templates in Flyte.
        You can set the scheduler name in the pod template passed to the ``@task`` decorator. However, to prevent the
        two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
        in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
        gang scheduler as well.
 
 
-       For more information on pod templates in Flyte, refer to the :ref:`using-k8s-podtemplates` section.
+       For more information on pod templates in Flyte, see :ref:`deployment-configuration-general`.
        You can set the scheduler name in the pod template passed to the ``@task`` decorator.
        However, to avoid resource competition between the two different schedulers,
        it is recommended to set the scheduler name in the pod template in the ``flyte`` namespace,
