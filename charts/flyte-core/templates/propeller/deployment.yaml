@@ -31,10 +31,9 @@ spec:
       labels: {{ include "flytepropeller.podLabels" . | nindent 8 }}
       {{- end }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+      {{- with .Values.flytepropeller.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flytepropeller.priorityClassName }}
       priorityClassName: {{ .Values.flytepropeller.priorityClassName }}
       {{- end }}

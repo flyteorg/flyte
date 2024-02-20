@@ -8,7 +8,7 @@ import { Duration, Message, proto3 } from "@bufbuild/protobuf";
 import { BooleanExpression } from "./condition_pb.js";
 import { Error, LiteralType } from "./types_pb.js";
 import { Identifier } from "./identifier_pb.js";
-import { Binding, RetryStrategy } from "./literals_pb.js";
+import { Binding, LiteralMap, RetryStrategy } from "./literals_pb.js";
 import { QualityOfService } from "./execution_pb.js";
 import { TypedInterface } from "./interface_pb.js";
 import { ExtendedResources, Resources } from "./tasks_pb.js";
@@ -612,6 +612,45 @@ export class NodeMetadata extends Message<NodeMetadata> {
     case: "interruptible";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
+  /**
+   * Identify whether a node should have it's outputs cached.
+   *
+   * @generated from oneof flyteidl.core.NodeMetadata.cacheable_value
+   */
+  cacheableValue: {
+    /**
+     * @generated from field: bool cacheable = 7;
+     */
+    value: boolean;
+    case: "cacheable";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  /**
+   * The version of the cache to use.
+   *
+   * @generated from oneof flyteidl.core.NodeMetadata.cache_version_value
+   */
+  cacheVersionValue: {
+    /**
+     * @generated from field: string cache_version = 8;
+     */
+    value: string;
+    case: "cacheVersion";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  /**
+   * Identify whether caching operations involving this node should be serialized.
+   *
+   * @generated from oneof flyteidl.core.NodeMetadata.cache_serializable_value
+   */
+  cacheSerializableValue: {
+    /**
+     * @generated from field: bool cache_serializable = 9;
+     */
+    value: boolean;
+    case: "cacheSerializable";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
   constructor(data?: PartialMessage<NodeMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -624,6 +663,9 @@ export class NodeMetadata extends Message<NodeMetadata> {
     { no: 4, name: "timeout", kind: "message", T: Duration },
     { no: 5, name: "retries", kind: "message", T: RetryStrategy },
     { no: 6, name: "interruptible", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "interruptible_value" },
+    { no: 7, name: "cacheable", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "cacheable_value" },
+    { no: 8, name: "cache_version", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "cache_version_value" },
+    { no: 9, name: "cache_serializable", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "cache_serializable_value" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): NodeMetadata {
@@ -1105,6 +1147,63 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
 
   static equals(a: TaskNodeOverrides | PlainMessage<TaskNodeOverrides> | undefined, b: TaskNodeOverrides | PlainMessage<TaskNodeOverrides> | undefined): boolean {
     return proto3.util.equals(TaskNodeOverrides, a, b);
+  }
+}
+
+/**
+ * A structure that uniquely identifies a launch plan in the system.
+ *
+ * @generated from message flyteidl.core.LaunchPlanTemplate
+ */
+export class LaunchPlanTemplate extends Message<LaunchPlanTemplate> {
+  /**
+   * A globally unique identifier for the launch plan.
+   *
+   * @generated from field: flyteidl.core.Identifier id = 1;
+   */
+  id?: Identifier;
+
+  /**
+   * The input and output interface for the launch plan
+   *
+   * @generated from field: flyteidl.core.TypedInterface interface = 2;
+   */
+  interface?: TypedInterface;
+
+  /**
+   * A collection of input literals that are fixed for the launch plan
+   *
+   * @generated from field: flyteidl.core.LiteralMap fixed_inputs = 3;
+   */
+  fixedInputs?: LiteralMap;
+
+  constructor(data?: PartialMessage<LaunchPlanTemplate>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.LaunchPlanTemplate";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "message", T: Identifier },
+    { no: 2, name: "interface", kind: "message", T: TypedInterface },
+    { no: 3, name: "fixed_inputs", kind: "message", T: LiteralMap },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LaunchPlanTemplate {
+    return new LaunchPlanTemplate().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): LaunchPlanTemplate {
+    return new LaunchPlanTemplate().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): LaunchPlanTemplate {
+    return new LaunchPlanTemplate().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: LaunchPlanTemplate | PlainMessage<LaunchPlanTemplate> | undefined, b: LaunchPlanTemplate | PlainMessage<LaunchPlanTemplate> | undefined): boolean {
+    return proto3.util.equals(LaunchPlanTemplate, a, b);
   }
 }
 

@@ -259,9 +259,9 @@ pub struct OutputReference {
 // @workflow
 // def wf():
 //      o = t1()
-//      t2(o.a\["b"][0\])
+//      t2(o.a["b"][0])
 // ```
-// the output reference t2 binds to has a list of PromiseAttribute ["a", "b", 0]
+// the output reference t2 binds to has a list of PromiseAttribute \["a", "b", 0\]
 
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -723,6 +723,8 @@ pub struct ArtifactKey {
     pub domain: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub name: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Only valid for triggers
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2415,6 +2417,15 @@ pub struct NodeMetadata {
     /// Identify whether node is interruptible
     #[prost(oneof="node_metadata::InterruptibleValue", tags="6")]
     pub interruptible_value: ::core::option::Option<node_metadata::InterruptibleValue>,
+    /// Identify whether a node should have it's outputs cached.
+    #[prost(oneof="node_metadata::CacheableValue", tags="7")]
+    pub cacheable_value: ::core::option::Option<node_metadata::CacheableValue>,
+    /// The version of the cache to use.
+    #[prost(oneof="node_metadata::CacheVersionValue", tags="8")]
+    pub cache_version_value: ::core::option::Option<node_metadata::CacheVersionValue>,
+    /// Identify whether caching operations involving this node should be serialized.
+    #[prost(oneof="node_metadata::CacheSerializableValue", tags="9")]
+    pub cache_serializable_value: ::core::option::Option<node_metadata::CacheSerializableValue>,
 }
 /// Nested message and enum types in `NodeMetadata`.
 pub mod node_metadata {
@@ -2424,6 +2435,27 @@ pub mod node_metadata {
     pub enum InterruptibleValue {
         #[prost(bool, tag="6")]
         Interruptible(bool),
+    }
+    /// Identify whether a node should have it's outputs cached.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CacheableValue {
+        #[prost(bool, tag="7")]
+        Cacheable(bool),
+    }
+    /// The version of the cache to use.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CacheVersionValue {
+        #[prost(string, tag="8")]
+        CacheVersion(::prost::alloc::string::String),
+    }
+    /// Identify whether caching operations involving this node should be serialized.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CacheSerializableValue {
+        #[prost(bool, tag="9")]
+        CacheSerializable(bool),
     }
 }
 /// Links a variable to an alias.
@@ -2603,6 +2635,20 @@ pub struct TaskNodeOverrides {
     #[prost(message, optional, tag="2")]
     pub extended_resources: ::core::option::Option<ExtendedResources>,
 }
+/// A structure that uniquely identifies a launch plan in the system.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanTemplate {
+    /// A globally unique identifier for the launch plan.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<Identifier>,
+    /// The input and output interface for the launch plan
+    #[prost(message, optional, tag="2")]
+    pub interface: ::core::option::Option<TypedInterface>,
+    /// A collection of input literals that are fixed for the launch plan
+    #[prost(message, optional, tag="3")]
+    pub fixed_inputs: ::core::option::Option<LiteralMap>,
+}
 /// Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
 /// step uses this created ConnectionSet
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -2635,6 +2681,14 @@ pub struct CompiledWorkflow {
     #[prost(message, optional, tag="2")]
     pub connections: ::core::option::Option<ConnectionSet>,
 }
+/// Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CompiledLaunchPlan {
+    /// Completely contained LaunchPlan Template
+    #[prost(message, optional, tag="1")]
+    pub template: ::core::option::Option<LaunchPlanTemplate>,
+}
 /// Output of the Compilation step. This object represent one Task. We store more metadata at this layer
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2663,6 +2717,10 @@ pub struct CompiledWorkflowClosure {
     /// +required (at least 1)
     #[prost(message, repeated, tag="3")]
     pub tasks: ::prost::alloc::vec::Vec<CompiledTask>,
+    /// A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+    /// with a given id, i.e., every launch plan has a unique id.
+    #[prost(message, repeated, tag="4")]
+    pub launch_plans: ::prost::alloc::vec::Vec<CompiledLaunchPlan>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

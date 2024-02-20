@@ -44,7 +44,7 @@ API Reference
    
    ---
 
-   .. link-button:: https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html
+   .. link-button:: https://docs.flyte.org/en/latest/protos/docs/service/service.html
       :type: url
       :text: FlyteAdmin
       :classes: btn-block stretched-link
@@ -71,5 +71,5 @@ API Reference
    FlyteIDL <https://flyteidl.readthedocs.io>
    Flytekit Python <https://flytekit.readthedocs.io>
    Flytekit Java <https://github.com/spotify/flytekit-java>
-   FlyteAdmin <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/service/service.html>
+   FlyteAdmin <https://docs.flyte.org/en/latest/protos/docs/service/service.html>
    swagger

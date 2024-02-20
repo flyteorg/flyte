@@ -4,10 +4,6 @@
 Configuring task pods with K8s PodTemplates
 ###########################################
 
-*****************
-About PodTemplate
-*****************
-
 `PodTemplate <https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates>`__
 is a K8s native resource used to define a K8s Pod. It contains all the fields in
 the PodSpec, in addition to ObjectMeta to control resource-specific metadata
@@ -31,7 +27,7 @@ Starting with the Flyte 1.4 release, there are two ways of defining `PodTemplate
 Compile-time PodTemplates
 *************************
 
-We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.task.html#flytekit-task>`__, for example:
+We can define a compile-time pod template, as part of the definition of a `Task <https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.task.html#flytekit-task>`__, for example:
 
 .. code-block:: python
 
@@ -70,7 +66,7 @@ Notice how in this example we are defining a new PodTemplate inline, which allow
 `V1PodSpec <https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/V1PodSpec.md>`__ and also define
 the name of the primary container, labels, and annotations.
 
-The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
+The term compile-time here refers to the fact that the pod template definition is part of the `TaskSpec <https://docs.flyte.org/en/latest/protos/docs/admin/admin.html#ref-flyteidl-admin-taskclosure>`__.
 
 ********************
 Runtime PodTemplates

@@ -149,6 +149,20 @@ message NodeMetadata {
         bool interruptible = 6;
     };
 
+    // Identify whether a node should have it's outputs cached.
+    oneof cacheable_value {
+        bool cacheable = 7;
+    }
+
+    // The version of the cache to use.
+    oneof cache_version_value {
+        string cache_version = 8;
+    }
+
+    // Identify whether caching operations involving this node should be serialized.
+    oneof cache_serializable_value {
+        bool cache_serializable = 9;
+    }
 }
 
 // Links a variable to an alias.
@@ -283,4 +297,16 @@ message TaskNodeOverrides {
     // Overrides for all non-standard resources, not captured by
     // v1.ResourceRequirements, to allocate to a task.
     ExtendedResources extended_resources = 2;
+}
+
+// A structure that uniquely identifies a launch plan in the system.
+message LaunchPlanTemplate {
+    // A globally unique identifier for the launch plan.
+    Identifier id = 1;
+
+    // The input and output interface for the launch plan
+    TypedInterface interface = 2;
+
+    // A collection of input literals that are fixed for the launch plan
+    LiteralMap fixed_inputs = 3;
 }

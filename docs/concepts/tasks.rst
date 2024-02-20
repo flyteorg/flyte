@@ -99,7 +99,7 @@ System retry can be of two types:
 
   - Or update `max-workflow-retries <https://github.com/flyteorg/flyte/blob/33f179b807093dcad2f37bde832869103bdf5182/charts/flyte/values-sandbox.yaml#L143>`__ in helm.
 
-2. User retry: If a task fails to execute, it is retried for a specific number of times, and this number is set by the user in `TaskMetadata <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__. The number of retries must be less than or equal to 10.
+2. User retry: If a task fails to execute, it is retried for a specific number of times, and this number is set by the user in `TaskMetadata <https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__. The number of retries must be less than or equal to 10.
 
 .. note::
   
@@ -113,7 +113,7 @@ System retry can be of two types:
 
 **Timeouts**
   
-To ensure that the system is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is possible for task authors to define a timeout period, after which the task is marked as ``failure``. Note that a timed-out task will be retried if it has a retry strategy defined. The timeout can be handled in the `TaskMetadata <https://docs.flyte.org/projects/flytekit/en/latest/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__.
+To ensure that the system is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is possible for task authors to define a timeout period, after which the task is marked as ``failure``. Note that a timed-out task will be retried if it has a retry strategy defined. The timeout can be handled in the `TaskMetadata <https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__.
 
 
 Caching/Memoization
