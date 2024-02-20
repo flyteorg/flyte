@@ -194,6 +194,7 @@ helm install gateway bitnami/contour -n flyte
 | flyteagent.enabled | bool | `false` |  |
 | flyteagent.plugin_config.plugins.agentService.defaultAgent.endpoint | string | `"dns:///flyteagent.flyte.svc.cluster.local:8000"` |  |
 | flyteagent.plugin_config.plugins.agentService.defaultAgent.insecure | bool | `true` |  |
+| flyteagent.podLabels | object | `{}` | Labels for flyteagent pods |
 | flyteconsole.affinity | object | `{}` | affinity for Flyteconsole deployment |
 | flyteconsole.enabled | bool | `true` |  |
 | flyteconsole.ga.enabled | bool | `false` |  |

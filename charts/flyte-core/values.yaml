@@ -279,6 +279,8 @@ flyteagent:
         defaultAgent:
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
           insecure: true
+  # -- Labels for flyteagent pods
+  podLabels: {}
 
 #
 # FLYTEPROPELLER SETTINGS
