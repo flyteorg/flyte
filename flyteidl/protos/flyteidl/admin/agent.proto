@@ -11,6 +11,7 @@ import "flyteidl/core/execution.proto";
 import "flyteidl/core/metrics.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 // The state of the execution is used to control its visibility in the UI/CLI.
 enum State {
