@@ -27,7 +27,7 @@ func TestGetAndSetConfig(t *testing.T) {
 		},
 	}
 	cfg.DefaultAgent.DefaultTimeout = config.Duration{Duration: 10 * time.Second}
-	cfg.AgentDeployments = map[string]*AgentDeployment{
+	cfg.AgentDeployments = map[string]*Deployment{
 		"agent_1": {
 			Insecure:             cfg.DefaultAgent.Insecure,
 			DefaultServiceConfig: cfg.DefaultAgent.DefaultServiceConfig,

@@ -29,7 +29,7 @@ type Agent struct {
 	// identifier and query for job statuses as jobs progress.
 	IsSync bool
 	// AgentDeployment is the agent deployment where this agent is running.
-	AgentDeployment *AgentDeployment
+	AgentDeployment *Deployment
 }
 
 // ClientSet contains the clients exposed to communicate with various agent services.
@@ -39,7 +39,7 @@ type ClientSet struct {
 	agentMetadataClients map[string]service.AgentMetadataServiceClient // map[endpoint] => AgentMetadataServiceClient
 }
 
-func getGrpcConnection(ctx context.Context, agent *AgentDeployment) (*grpc.ClientConn, error) {
+func getGrpcConnection(ctx context.Context, agent *Deployment) (*grpc.ClientConn, error) {
 	var opts []grpc.DialOption
 
 	if agent.Insecure {
@@ -81,7 +81,7 @@ func getGrpcConnection(ctx context.Context, agent *AgentDeployment) (*grpc.Clien
 	return conn, nil
 }
 
-func getFinalTimeout(operation string, agent *AgentDeployment) config.Duration {
+func getFinalTimeout(operation string, agent *Deployment) config.Duration {
 	if t, exists := agent.Timeouts[operation]; exists {
 		return t
 	}
@@ -89,7 +89,7 @@ func getFinalTimeout(operation string, agent *AgentDeployment) config.Duration {
 	return agent.DefaultTimeout
 }
 
-func getFinalContext(ctx context.Context, operation string, agent *AgentDeployment) (context.Context, context.CancelFunc) {
+func getFinalContext(ctx context.Context, operation string, agent *Deployment) (context.Context, context.CancelFunc) {
 	timeout := getFinalTimeout(operation, agent).Duration
 	if timeout == 0 {
 		return ctx, func() {}
@@ -101,7 +101,7 @@ func getFinalContext(ctx context.Context, operation string, agent *AgentDeployme
 func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 	agentRegistry := make(Registry)
 	cfg := GetConfig()
-	var agentDeployments []*AgentDeployment
+	var agentDeployments []*Deployment
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
@@ -160,7 +160,7 @@ func initializeClients(ctx context.Context) (*ClientSet, error) {
 	syncAgentClients := make(map[string]service.SyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
 
-	var agentDeployments []*AgentDeployment
+	var agentDeployments []*Deployment
 	cfg := GetConfig()
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {

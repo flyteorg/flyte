@@ -9,7 +9,7 @@ import (
 
 func TestInitializeClients(t *testing.T) {
 	cfg := defaultConfig
-	cfg.AgentDeployments = map[string]*AgentDeployment{
+	cfg.AgentDeployments = map[string]*Deployment{
 		"x": {
 			Endpoint: "x",
 		},

@@ -122,6 +122,8 @@ message Resource {
   repeated core.TaskLog log_links = 4;
   // The phase of the execution is used to determine the phase of the plugin's execution.
   core.TaskExecution.Phase phase = 5;
+  // Custom data specific to the agent.
+  google.protobuf.Struct custom_info = 6;
 }
 
 // A message used to delete a task.

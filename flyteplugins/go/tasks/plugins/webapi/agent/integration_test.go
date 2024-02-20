@@ -323,7 +323,7 @@ func newMockSyncAgentPlugin() webapi.PluginEntry {
 						defaultAgentEndpoint: syncAgentClient,
 					},
 				},
-				agentRegistry: Registry{"openai": {defaultTaskTypeVersion: {AgentDeployment: &AgentDeployment{Endpoint: defaultAgentEndpoint}, IsSync: true}}},
+				agentRegistry: Registry{"openai": {defaultTaskTypeVersion: {AgentDeployment: &Deployment{Endpoint: defaultAgentEndpoint}, IsSync: true}}},
 			}, nil
 		},
 	}

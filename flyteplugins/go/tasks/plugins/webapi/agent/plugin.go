@@ -285,7 +285,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p Plugin) getSyncAgentClient(ctx context.Context, agent *AgentDeployment) (service.SyncAgentServiceClient, error) {
+func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
 	client, ok := p.cs.syncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -298,7 +298,7 @@ func (p Plugin) getSyncAgentClient(ctx context.Context, agent *AgentDeployment) 
 	return client, nil
 }
 
-func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *AgentDeployment) (service.AsyncAgentServiceClient, error) {
+func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
 	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -333,7 +333,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType *admin.TaskType, cfg *Config, agentRegistry Registry) (*AgentDeployment, bool) {
+func getFinalAgent(taskType *admin.TaskType, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
 	if agent, exists := agentRegistry[taskType.Name][taskType.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
