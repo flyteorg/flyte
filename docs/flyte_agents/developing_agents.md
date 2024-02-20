@@ -6,8 +6,8 @@ jupytext:
     format_name: myst
 ---
 
-(creating_an_agent)=
-# Creating an agent
+(developing_agents)=
+# Developing agents
 
 The Flyte agent framework enables rapid agent development, since agents are decoupled from the core FlytePropeller engine. Rather than building a complete gRPC service from scratch, you can implement an agent as a Python class, easing development. Agents can be tested independently and deployed privately, making maintenance easier and giving you more flexibility and control over development.
 
