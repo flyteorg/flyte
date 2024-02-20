@@ -23,11 +23,13 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => AgentDeployment
+
 type Plugin struct {
 	metricScope   promutils.Scope
 	cfg           *Config
 	cs            *ClientSet
-	agentRegistry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+	agentRegistry Registry
 }
 
 type ResourceWrapper struct {
@@ -89,15 +91,14 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskType := admin.TaskType{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent := getFinalAgent(&taskType, p.cfg, p.agentRegistry)
+	agent, isSync := getFinalAgent(&taskType, p.cfg, p.agentRegistry)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
-	logger.Infof(ctx, "hello [%v] is a sync agent: [%v]", agent.Endpoint, agent.IsSync)
-	if agent.IsSync {
+	if isSync {
 		client, err := p.getSyncAgentClient(ctx, agent)
 		if err != nil {
 			return nil, nil, err
@@ -178,7 +179,7 @@ func (p Plugin) ExecuteTaskSync(
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -211,7 +212,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -281,7 +282,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Agent) (service.SyncAgentServiceClient, error) {
+func (p Plugin) getSyncAgentClient(ctx context.Context, agent *AgentDeployment) (service.SyncAgentServiceClient, error) {
 	client, ok := p.cs.syncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -294,7 +295,7 @@ func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Agent) (service.S
 	return client, nil
 }
 
-func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Agent) (service.AsyncAgentServiceClient, error) {
+func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *AgentDeployment) (service.AsyncAgentServiceClient, error) {
 	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
 	if !ok {
 		conn, err := getGrpcConnection(ctx, agent)
@@ -320,21 +321,21 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 
 	var opReader flyteIO.OutputReader
 	if outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output.")
+		logger.Debugf(ctx, "AgentDeployment returned an output.")
 		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
-		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
+		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType *admin.TaskType, cfg *Config, agentRegistry map[string]map[int32]*Agent) *Agent {
+func getFinalAgent(taskType *admin.TaskType, cfg *Config, agentRegistry Registry) (*AgentDeployment, bool) {
 	if agent, exists := agentRegistry[taskType.Name][taskType.Version]; exists {
-		return agent
+		return agent.AgentDeployment, agent.IsSync
 	}
 
-	return &cfg.DefaultAgent
+	return &cfg.DefaultAgent, false
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
@@ -363,7 +364,7 @@ func newAgentPlugin() webapi.PluginEntry {
 
 	cfg := GetConfig()
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "Agent service supports task types: %v", supportedTaskTypes)
+	logger.Infof(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",

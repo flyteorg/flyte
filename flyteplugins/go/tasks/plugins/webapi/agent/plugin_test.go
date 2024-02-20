@@ -31,8 +31,8 @@ func TestPlugin(t *testing.T) {
 	cfg := defaultConfig
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
-	cfg.DefaultAgent = Agent{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
-	cfg.Agents = map[string]*Agent{"spark_agent": {Endpoint: "localhost:80"}}
+	cfg.DefaultAgent = AgentDeployment{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
+	cfg.AgentDeployments = map[string]*AgentDeployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
 	plugin := Plugin{
@@ -59,30 +59,31 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agentRegistry := map[string]map[int32]*Agent{"spark": {defaultTaskTypeVersion: &Agent{Endpoint: "localhost:80"}}}
+		agent := &Agent{AgentDeployment: &AgentDeployment{Endpoint: "localhost:80"}}
+		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
 		spark := &admin.TaskType{Name: "spark", Version: defaultTaskTypeVersion}
 		foo := &admin.TaskType{Name: "foo", Version: defaultTaskTypeVersion}
 		bar := &admin.TaskType{Name: "bar", Version: defaultTaskTypeVersion}
-		agent := getFinalAgent(spark, &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, "localhost:80")
-		agent = getFinalAgent(foo, &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
-		agent = getFinalAgent(bar, &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
+		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
+		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
+		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
+		agentDeployment, _ = getFinalAgent(bar, &cfg, agentRegistry)
+		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
-		timeout := getFinalTimeout("CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		timeout := getFinalTimeout("CreateTask", &AgentDeployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
-		timeout = getFinalTimeout("DeleteTask", &Agent{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
+		timeout = getFinalTimeout("DeleteTask", &AgentDeployment{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
 		assert.Equal(t, 10*time.Second, timeout.Duration)
 	})
 
 	t.Run("test getFinalContext", func(t *testing.T) {
-		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &Agent{})
+		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &AgentDeployment{})
 		assert.Equal(t, context.TODO(), ctx)
 
-		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &AgentDeployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
 
@@ -302,7 +303,7 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	}
 
 	cfg := defaultConfig
-	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: defaultAgentEndpoint}}
+	cfg.AgentDeployments = map[string]*AgentDeployment{"custom_agent": {Endpoint: defaultAgentEndpoint}}
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
