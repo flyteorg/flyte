@@ -302,12 +302,15 @@ func constructV1Job(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ray
 		ttlSecondsAfterFinished = &rayJob.TtlSecondsAfterFinished
 	}
 
+	submitterPodTemplate := buildSubmitterPodTemplate(headPodSpec, objectMeta, taskCtx)
+
 	jobSpec := rayv1.RayJobSpec{
 		RayClusterSpec:           &rayClusterSpec,
 		Entrypoint:               strings.Join(primaryContainer.Args, " "),
 		ShutdownAfterJobFinishes: shutdownAfterJobFinishes,
 		TTLSecondsAfterFinished:  ttlSecondsAfterFinished,
 		RuntimeEnv:               rayJob.RuntimeEnv,
+		SubmitterPodTemplate:     &submitterPodTemplate,
 	}
 
 	return &rayv1.RayJob{
@@ -417,6 +420,17 @@ func buildHeadPodTemplate(primaryContainer *v1.Container, podSpec *v1.PodSpec, o
 	// Inject a sidecar for capturing and exposing Ray job logs
 	injectLogsSidecar(primaryContainer, podSpec)
 
+	podTemplateSpec := v1.PodTemplateSpec{
+		Spec:       *podSpec,
+		ObjectMeta: *objectMeta,
+	}
+	cfg := config.GetK8sPluginConfig()
+	podTemplateSpec.SetLabels(utils.UnionMaps(cfg.DefaultLabels, podTemplateSpec.GetLabels(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetLabels())))
+	podTemplateSpec.SetAnnotations(utils.UnionMaps(cfg.DefaultAnnotations, podTemplateSpec.GetAnnotations(), utils.CopyMap(taskCtx.TaskExecutionMetadata().GetAnnotations())))
+	return podTemplateSpec
+}
+
+func buildSubmitterPodTemplate(podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, taskCtx pluginsCore.TaskExecutionContext) v1.PodTemplateSpec {
 	podTemplateSpec := v1.PodTemplateSpec{
 		Spec:       *podSpec,
 		ObjectMeta: *objectMeta,
