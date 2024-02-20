@@ -97,9 +97,11 @@ message ExecuteTaskSyncResponse {
 // A message used to fetch a job resource from flyte agent server.
 message GetTaskRequest {
   // A predefined yet extensible Task type identifier.
-  TaskType task_type = 1;
+  string deprecated_task_type = 1 [deprecated = true];
   // Metadata about the resource to be pass to the agent.
   bytes resource_meta = 2;
+  // A predefined yet extensible Task type identifier.
+  TaskType task_type = 3;
 }
 
 // Response to get an individual task resource.
@@ -125,9 +127,11 @@ message Resource {
 // A message used to delete a task.
 message DeleteTaskRequest {
   // A predefined yet extensible Task type identifier.
-  TaskType task_type = 1;
+  string deprecated_task_type = 1 [deprecated = true];
   // Metadata about the resource to be pass to the agent.
   bytes resource_meta = 2;
+  // A predefined yet extensible Task type identifier.
+  TaskType task_type = 3;
 }
 
 // Response to delete a task.
@@ -139,7 +143,7 @@ message Agent {
   string name = 1;
   
   // SupportedTaskTypes are the types of the tasks that the agent can handle.
-  repeated TaskType supported_task_types = 2;
+  repeated TaskType deprecated_supported_task_types = 2 [deprecated = true];
 
   // IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
   // results synchronously when called by propeller. Given that sync agents can affect the performance
@@ -147,6 +151,9 @@ message Agent {
   // An Async agent, on the other hand, is required to be able to identify jobs by an
   // identifier and query for job statuses as jobs progress.
   bool is_sync = 3;
+
+  // SupportedTaskTypes are the types of the tasks that the agent can handle.
+  repeated TaskType supported_task_types = 4;
 }
 
 message TaskType {
@@ -178,7 +185,7 @@ message ListAgentsResponse {
 // A request to get the metrics from a task execution.
 message GetTaskMetricsRequest {
   // A predefined yet extensible Task type identifier.
-  TaskType task_type = 1;
+  string deprecated_task_type = 1 [deprecated = true];
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 2;
   // The metrics to query. If empty, will return a default set of metrics.
@@ -190,6 +197,8 @@ message GetTaskMetricsRequest {
   google.protobuf.Timestamp end_time = 5;
   // Query resolution step width in duration format or float number of seconds.
   google.protobuf.Duration step = 6;
+  // A predefined yet extensible Task type identifier.
+  TaskType task_type = 7;
 }
 
 // A response containing a list of metrics for a task execution.
@@ -201,7 +210,7 @@ message GetTaskMetricsResponse {
 // A request to get the log from a task execution.
 message GetTaskLogsRequest {
   // A predefined yet extensible Task type identifier.
-  TaskType task_type = 1;
+  string deprecated_task_type = 1 [deprecated = true];
   // Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
   bytes resource_meta = 2;
   // Number of lines to return.
@@ -209,6 +218,8 @@ message GetTaskLogsRequest {
   // In the case of multiple pages of results, the server-provided token can be used to fetch the next page
   // in a query. If there are no more results, this value will be empty.
   string token = 4;
+  // A predefined yet extensible Task type identifier.
+  TaskType task_type = 5;
 }
 
 message GetTaskLogsResponseHeader {

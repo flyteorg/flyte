@@ -9467,11 +9467,14 @@ export namespace flyteidl {
         /** Properties of a GetTaskRequest. */
         interface IGetTaskRequest {
 
-            /** GetTaskRequest taskType */
-            taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetTaskRequest deprecatedTaskType */
+            deprecatedTaskType?: (string|null);
 
             /** GetTaskRequest resourceMeta */
             resourceMeta?: (Uint8Array|null);
+
+            /** GetTaskRequest taskType */
+            taskType?: (flyteidl.admin.ITaskType|null);
         }
 
         /** Represents a GetTaskRequest. */
@@ -9483,11 +9486,14 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IGetTaskRequest);
 
-            /** GetTaskRequest taskType. */
-            public taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetTaskRequest deprecatedTaskType. */
+            public deprecatedTaskType: string;
 
             /** GetTaskRequest resourceMeta. */
             public resourceMeta: Uint8Array;
+
+            /** GetTaskRequest taskType. */
+            public taskType?: (flyteidl.admin.ITaskType|null);
 
             /**
              * Creates a new GetTaskRequest instance using the specified properties.
@@ -9653,11 +9659,14 @@ export namespace flyteidl {
         /** Properties of a DeleteTaskRequest. */
         interface IDeleteTaskRequest {
 
-            /** DeleteTaskRequest taskType */
-            taskType?: (flyteidl.admin.ITaskType|null);
+            /** DeleteTaskRequest deprecatedTaskType */
+            deprecatedTaskType?: (string|null);
 
             /** DeleteTaskRequest resourceMeta */
             resourceMeta?: (Uint8Array|null);
+
+            /** DeleteTaskRequest taskType */
+            taskType?: (flyteidl.admin.ITaskType|null);
         }
 
         /** Represents a DeleteTaskRequest. */
@@ -9669,11 +9678,14 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IDeleteTaskRequest);
 
-            /** DeleteTaskRequest taskType. */
-            public taskType?: (flyteidl.admin.ITaskType|null);
+            /** DeleteTaskRequest deprecatedTaskType. */
+            public deprecatedTaskType: string;
 
             /** DeleteTaskRequest resourceMeta. */
             public resourceMeta: Uint8Array;
+
+            /** DeleteTaskRequest taskType. */
+            public taskType?: (flyteidl.admin.ITaskType|null);
 
             /**
              * Creates a new DeleteTaskRequest instance using the specified properties.
@@ -9760,11 +9772,14 @@ export namespace flyteidl {
             /** Agent name */
             name?: (string|null);
 
-            /** Agent supportedTaskTypes */
-            supportedTaskTypes?: (flyteidl.admin.ITaskType[]|null);
+            /** Agent deprecatedSupportedTaskTypes */
+            deprecatedSupportedTaskTypes?: (flyteidl.admin.ITaskType[]|null);
 
             /** Agent isSync */
             isSync?: (boolean|null);
+
+            /** Agent supportedTaskTypes */
+            supportedTaskTypes?: (flyteidl.admin.ITaskType[]|null);
         }
 
         /** Represents an Agent. */
@@ -9779,11 +9794,14 @@ export namespace flyteidl {
             /** Agent name. */
             public name: string;
 
-            /** Agent supportedTaskTypes. */
-            public supportedTaskTypes: flyteidl.admin.ITaskType[];
+            /** Agent deprecatedSupportedTaskTypes. */
+            public deprecatedSupportedTaskTypes: flyteidl.admin.ITaskType[];
 
             /** Agent isSync. */
             public isSync: boolean;
+
+            /** Agent supportedTaskTypes. */
+            public supportedTaskTypes: flyteidl.admin.ITaskType[];
 
             /**
              * Creates a new Agent instance using the specified properties.
@@ -10081,8 +10099,8 @@ export namespace flyteidl {
         /** Properties of a GetTaskMetricsRequest. */
         interface IGetTaskMetricsRequest {
 
-            /** GetTaskMetricsRequest taskType */
-            taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetTaskMetricsRequest deprecatedTaskType */
+            deprecatedTaskType?: (string|null);
 
             /** GetTaskMetricsRequest resourceMeta */
             resourceMeta?: (Uint8Array|null);
@@ -10098,6 +10116,9 @@ export namespace flyteidl {
 
             /** GetTaskMetricsRequest step */
             step?: (google.protobuf.IDuration|null);
+
+            /** GetTaskMetricsRequest taskType */
+            taskType?: (flyteidl.admin.ITaskType|null);
         }
 
         /** Represents a GetTaskMetricsRequest. */
@@ -10109,8 +10130,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IGetTaskMetricsRequest);
 
-            /** GetTaskMetricsRequest taskType. */
-            public taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetTaskMetricsRequest deprecatedTaskType. */
+            public deprecatedTaskType: string;
 
             /** GetTaskMetricsRequest resourceMeta. */
             public resourceMeta: Uint8Array;
@@ -10126,6 +10147,9 @@ export namespace flyteidl {
 
             /** GetTaskMetricsRequest step. */
             public step?: (google.protobuf.IDuration|null);
+
+            /** GetTaskMetricsRequest taskType. */
+            public taskType?: (flyteidl.admin.ITaskType|null);
 
             /**
              * Creates a new GetTaskMetricsRequest instance using the specified properties.
@@ -10215,8 +10239,8 @@ export namespace flyteidl {
         /** Properties of a GetTaskLogsRequest. */
         interface IGetTaskLogsRequest {
 
-            /** GetTaskLogsRequest taskType */
-            taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetTaskLogsRequest deprecatedTaskType */
+            deprecatedTaskType?: (string|null);
 
             /** GetTaskLogsRequest resourceMeta */
             resourceMeta?: (Uint8Array|null);
@@ -10226,6 +10250,9 @@ export namespace flyteidl {
 
             /** GetTaskLogsRequest token */
             token?: (string|null);
+
+            /** GetTaskLogsRequest taskType */
+            taskType?: (flyteidl.admin.ITaskType|null);
         }
 
         /** Represents a GetTaskLogsRequest. */
@@ -10237,8 +10264,8 @@ export namespace flyteidl {
              */
             constructor(properties?: flyteidl.admin.IGetTaskLogsRequest);
 
-            /** GetTaskLogsRequest taskType. */
-            public taskType?: (flyteidl.admin.ITaskType|null);
+            /** GetTaskLogsRequest deprecatedTaskType. */
+            public deprecatedTaskType: string;
 
             /** GetTaskLogsRequest resourceMeta. */
             public resourceMeta: Uint8Array;
@@ -10248,6 +10275,9 @@ export namespace flyteidl {
 
             /** GetTaskLogsRequest token. */
             public token: string;
+
+            /** GetTaskLogsRequest taskType. */
+            public taskType?: (flyteidl.admin.ITaskType|null);
 
             /**
              * Creates a new GetTaskLogsRequest instance using the specified properties.

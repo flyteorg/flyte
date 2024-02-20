@@ -21,7 +21,7 @@ from google.protobuf import duration_pb2 as google_dot_protobuf_dot_duration__pb
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66lyteidl/admin/agent.proto\x12\x0e\x66lyteidl.admin\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x19\x66lyteidl/core/tasks.proto\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1b\x66lyteidl/core/metrics.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe9\x06\n\x15TaskExecutionMetadata\x12R\n\x11task_execution_id\x18\x01 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifierR\x0ftaskExecutionId\x12\x1c\n\tnamespace\x18\x02 \x01(\tR\tnamespace\x12I\n\x06labels\x18\x03 \x03(\x0b\x32\x31.flyteidl.admin.TaskExecutionMetadata.LabelsEntryR\x06labels\x12X\n\x0b\x61nnotations\x18\x04 \x03(\x0b\x32\x36.flyteidl.admin.TaskExecutionMetadata.AnnotationsEntryR\x0b\x61nnotations\x12.\n\x13k8s_service_account\x18\x05 \x01(\tR\x11k8sServiceAccount\x12t\n\x15\x65nvironment_variables\x18\x06 \x03(\x0b\x32?.flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntryR\x14\x65nvironmentVariables\x12!\n\x0cmax_attempts\x18\x07 \x01(\x05R\x0bmaxAttempts\x12$\n\rinterruptible\x18\x08 \x01(\x08R\rinterruptible\x12\x46\n\x1finterruptible_failure_threshold\x18\t \x01(\x05R\x1dinterruptibleFailureThreshold\x12>\n\toverrides\x18\n \x01(\x0b\x32 .flyteidl.core.TaskNodeOverridesR\toverrides\x1a\x39\n\x0bLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1a>\n\x10\x41nnotationsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1aG\n\x19\x45nvironmentVariablesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x83\x02\n\x11\x43reateTaskRequest\x12\x31\n\x06inputs\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x06inputs\x12\x37\n\x08template\x18\x02 \x01(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x08template\x12#\n\routput_prefix\x18\x03 \x01(\tR\x0coutputPrefix\x12]\n\x17task_execution_metadata\x18\x04 \x01(\x0b\x32%.flyteidl.admin.TaskExecutionMetadataR\x15taskExecutionMetadata\"9\n\x12\x43reateTaskResponse\x12#\n\rresource_meta\x18\x01 \x01(\x0cR\x0cresourceMeta\"\x87\x02\n\x13\x43reateRequestHeader\x12\x37\n\x08template\x18\x01 \x01(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x08template\x12#\n\routput_prefix\x18\x02 \x01(\tR\x0coutputPrefix\x12]\n\x17task_execution_metadata\x18\x03 \x01(\x0b\x32%.flyteidl.admin.TaskExecutionMetadataR\x15taskExecutionMetadata\x12\x33\n\x16max_dataset_size_bytes\x18\x04 \x01(\x03R\x13maxDatasetSizeBytes\"\x94\x01\n\x16\x45xecuteTaskSyncRequest\x12=\n\x06header\x18\x01 \x01(\x0b\x32#.flyteidl.admin.CreateRequestHeaderH\x00R\x06header\x12\x33\n\x06inputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapH\x00R\x06inputsB\x06\n\x04part\"U\n\x1d\x45xecuteTaskSyncResponseHeader\x12\x34\n\x08resource\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.ResourceR\x08resource\"\xa0\x01\n\x17\x45xecuteTaskSyncResponse\x12G\n\x06header\x18\x01 \x01(\x0b\x32-.flyteidl.admin.ExecuteTaskSyncResponseHeaderH\x00R\x06header\x12\x35\n\x07outputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapH\x00R\x07outputsB\x05\n\x03res\"l\n\x0eGetTaskRequest\x12\x35\n\ttask_type\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\"G\n\x0fGetTaskResponse\x12\x34\n\x08resource\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.ResourceR\x08resource\"\xf9\x01\n\x08Resource\x12/\n\x05state\x18\x01 \x01(\x0e\x32\x15.flyteidl.admin.StateB\x02\x18\x01R\x05state\x12\x33\n\x07outputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x07outputs\x12\x18\n\x07message\x18\x03 \x01(\tR\x07message\x12\x33\n\tlog_links\x18\x04 \x03(\x0b\x32\x16.flyteidl.core.TaskLogR\x08logLinks\x12\x38\n\x05phase\x18\x05 \x01(\x0e\x32\".flyteidl.core.TaskExecution.PhaseR\x05phase\"o\n\x11\x44\x65leteTaskRequest\x12\x35\n\ttask_type\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\"\x14\n\x12\x44\x65leteTaskResponse\"\x80\x01\n\x05\x41gent\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12J\n\x14supported_task_types\x18\x02 \x03(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x12supportedTaskTypes\x12\x17\n\x07is_sync\x18\x03 \x01(\x08R\x06isSync\"8\n\x08TaskType\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n\x07version\x18\x02 \x01(\x05R\x07version\"%\n\x0fGetAgentRequest\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\"?\n\x10GetAgentResponse\x12+\n\x05\x61gent\x18\x01 \x01(\x0b\x32\x15.flyteidl.admin.AgentR\x05\x61gent\"\x13\n\x11ListAgentsRequest\"C\n\x12ListAgentsResponse\x12-\n\x06\x61gents\x18\x01 \x03(\x0b\x32\x15.flyteidl.admin.AgentR\x06\x61gents\"\xae\x02\n\x15GetTaskMetricsRequest\x12\x35\n\ttask_type\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\x12\x18\n\x07queries\x18\x03 \x03(\tR\x07queries\x12\x39\n\nstart_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12\x35\n\x08\x65nd_time\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x07\x65ndTime\x12-\n\x04step\x18\x06 \x01(\x0b\x32\x19.google.protobuf.DurationR\x04step\"X\n\x16GetTaskMetricsResponse\x12>\n\x07results\x18\x01 \x03(\x0b\x32$.flyteidl.core.ExecutionMetricResultR\x07results\"\x9c\x01\n\x12GetTaskLogsRequest\x12\x35\n\ttask_type\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\x12\x14\n\x05lines\x18\x03 \x01(\x04R\x05lines\x12\x14\n\x05token\x18\x04 \x01(\tR\x05token\"1\n\x19GetTaskLogsResponseHeader\x12\x14\n\x05token\x18\x01 \x01(\tR\x05token\"3\n\x17GetTaskLogsResponseBody\x12\x18\n\x07results\x18\x01 \x03(\tR\x07results\"\xa1\x01\n\x13GetTaskLogsResponse\x12\x43\n\x06header\x18\x01 \x01(\x0b\x32).flyteidl.admin.GetTaskLogsResponseHeaderH\x00R\x06header\x12=\n\x04\x62ody\x18\x02 \x01(\x0b\x32\'.flyteidl.admin.GetTaskLogsResponseBodyH\x00R\x04\x62odyB\x06\n\x04part*b\n\x05State\x12\x15\n\x11RETRYABLE_FAILURE\x10\x00\x12\x15\n\x11PERMANENT_FAILURE\x10\x01\x12\x0b\n\x07PENDING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tSUCCEEDED\x10\x04\x1a\x02\x18\x01\x42\xb6\x01\n\x12\x63om.flyteidl.adminB\nAgentProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x1a\x66lyteidl/admin/agent.proto\x12\x0e\x66lyteidl.admin\x1a\x1c\x66lyteidl/core/literals.proto\x1a\x19\x66lyteidl/core/tasks.proto\x1a\x1c\x66lyteidl/core/workflow.proto\x1a\x1e\x66lyteidl/core/identifier.proto\x1a\x1d\x66lyteidl/core/execution.proto\x1a\x1b\x66lyteidl/core/metrics.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe9\x06\n\x15TaskExecutionMetadata\x12R\n\x11task_execution_id\x18\x01 \x01(\x0b\x32&.flyteidl.core.TaskExecutionIdentifierR\x0ftaskExecutionId\x12\x1c\n\tnamespace\x18\x02 \x01(\tR\tnamespace\x12I\n\x06labels\x18\x03 \x03(\x0b\x32\x31.flyteidl.admin.TaskExecutionMetadata.LabelsEntryR\x06labels\x12X\n\x0b\x61nnotations\x18\x04 \x03(\x0b\x32\x36.flyteidl.admin.TaskExecutionMetadata.AnnotationsEntryR\x0b\x61nnotations\x12.\n\x13k8s_service_account\x18\x05 \x01(\tR\x11k8sServiceAccount\x12t\n\x15\x65nvironment_variables\x18\x06 \x03(\x0b\x32?.flyteidl.admin.TaskExecutionMetadata.EnvironmentVariablesEntryR\x14\x65nvironmentVariables\x12!\n\x0cmax_attempts\x18\x07 \x01(\x05R\x0bmaxAttempts\x12$\n\rinterruptible\x18\x08 \x01(\x08R\rinterruptible\x12\x46\n\x1finterruptible_failure_threshold\x18\t \x01(\x05R\x1dinterruptibleFailureThreshold\x12>\n\toverrides\x18\n \x01(\x0b\x32 .flyteidl.core.TaskNodeOverridesR\toverrides\x1a\x39\n\x0bLabelsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1a>\n\x10\x41nnotationsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1aG\n\x19\x45nvironmentVariablesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"\x83\x02\n\x11\x43reateTaskRequest\x12\x31\n\x06inputs\x18\x01 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x06inputs\x12\x37\n\x08template\x18\x02 \x01(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x08template\x12#\n\routput_prefix\x18\x03 \x01(\tR\x0coutputPrefix\x12]\n\x17task_execution_metadata\x18\x04 \x01(\x0b\x32%.flyteidl.admin.TaskExecutionMetadataR\x15taskExecutionMetadata\"9\n\x12\x43reateTaskResponse\x12#\n\rresource_meta\x18\x01 \x01(\x0cR\x0cresourceMeta\"\x87\x02\n\x13\x43reateRequestHeader\x12\x37\n\x08template\x18\x01 \x01(\x0b\x32\x1b.flyteidl.core.TaskTemplateR\x08template\x12#\n\routput_prefix\x18\x02 \x01(\tR\x0coutputPrefix\x12]\n\x17task_execution_metadata\x18\x03 \x01(\x0b\x32%.flyteidl.admin.TaskExecutionMetadataR\x15taskExecutionMetadata\x12\x33\n\x16max_dataset_size_bytes\x18\x04 \x01(\x03R\x13maxDatasetSizeBytes\"\x94\x01\n\x16\x45xecuteTaskSyncRequest\x12=\n\x06header\x18\x01 \x01(\x0b\x32#.flyteidl.admin.CreateRequestHeaderH\x00R\x06header\x12\x33\n\x06inputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapH\x00R\x06inputsB\x06\n\x04part\"U\n\x1d\x45xecuteTaskSyncResponseHeader\x12\x34\n\x08resource\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.ResourceR\x08resource\"\xa0\x01\n\x17\x45xecuteTaskSyncResponse\x12G\n\x06header\x18\x01 \x01(\x0b\x32-.flyteidl.admin.ExecuteTaskSyncResponseHeaderH\x00R\x06header\x12\x35\n\x07outputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapH\x00R\x07outputsB\x05\n\x03res\"\xa2\x01\n\x0eGetTaskRequest\x12\x34\n\x14\x64\x65precated_task_type\x18\x01 \x01(\tB\x02\x18\x01R\x12\x64\x65precatedTaskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\x12\x35\n\ttask_type\x18\x03 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\"G\n\x0fGetTaskResponse\x12\x34\n\x08resource\x18\x01 \x01(\x0b\x32\x18.flyteidl.admin.ResourceR\x08resource\"\xf9\x01\n\x08Resource\x12/\n\x05state\x18\x01 \x01(\x0e\x32\x15.flyteidl.admin.StateB\x02\x18\x01R\x05state\x12\x33\n\x07outputs\x18\x02 \x01(\x0b\x32\x19.flyteidl.core.LiteralMapR\x07outputs\x12\x18\n\x07message\x18\x03 \x01(\tR\x07message\x12\x33\n\tlog_links\x18\x04 \x03(\x0b\x32\x16.flyteidl.core.TaskLogR\x08logLinks\x12\x38\n\x05phase\x18\x05 \x01(\x0e\x32\".flyteidl.core.TaskExecution.PhaseR\x05phase\"\xa5\x01\n\x11\x44\x65leteTaskRequest\x12\x34\n\x14\x64\x65precated_task_type\x18\x01 \x01(\tB\x02\x18\x01R\x12\x64\x65precatedTaskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\x12\x35\n\ttask_type\x18\x03 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\"\x14\n\x12\x44\x65leteTaskResponse\"\xe5\x01\n\x05\x41gent\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x63\n\x1f\x64\x65precated_supported_task_types\x18\x02 \x03(\x0b\x32\x18.flyteidl.admin.TaskTypeB\x02\x18\x01R\x1c\x64\x65precatedSupportedTaskTypes\x12\x17\n\x07is_sync\x18\x03 \x01(\x08R\x06isSync\x12J\n\x14supported_task_types\x18\x04 \x03(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x12supportedTaskTypes\"8\n\x08TaskType\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n\x07version\x18\x02 \x01(\x05R\x07version\"%\n\x0fGetAgentRequest\x12\x12\n\x04name\x18\x01 \x01(\tR\x04name\"?\n\x10GetAgentResponse\x12+\n\x05\x61gent\x18\x01 \x01(\x0b\x32\x15.flyteidl.admin.AgentR\x05\x61gent\"\x13\n\x11ListAgentsRequest\"C\n\x12ListAgentsResponse\x12-\n\x06\x61gents\x18\x01 \x03(\x0b\x32\x15.flyteidl.admin.AgentR\x06\x61gents\"\xe4\x02\n\x15GetTaskMetricsRequest\x12\x34\n\x14\x64\x65precated_task_type\x18\x01 \x01(\tB\x02\x18\x01R\x12\x64\x65precatedTaskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\x12\x18\n\x07queries\x18\x03 \x03(\tR\x07queries\x12\x39\n\nstart_time\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tstartTime\x12\x35\n\x08\x65nd_time\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\x07\x65ndTime\x12-\n\x04step\x18\x06 \x01(\x0b\x32\x19.google.protobuf.DurationR\x04step\x12\x35\n\ttask_type\x18\x07 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\"X\n\x16GetTaskMetricsResponse\x12>\n\x07results\x18\x01 \x03(\x0b\x32$.flyteidl.core.ExecutionMetricResultR\x07results\"\xd2\x01\n\x12GetTaskLogsRequest\x12\x34\n\x14\x64\x65precated_task_type\x18\x01 \x01(\tB\x02\x18\x01R\x12\x64\x65precatedTaskType\x12#\n\rresource_meta\x18\x02 \x01(\x0cR\x0cresourceMeta\x12\x14\n\x05lines\x18\x03 \x01(\x04R\x05lines\x12\x14\n\x05token\x18\x04 \x01(\tR\x05token\x12\x35\n\ttask_type\x18\x05 \x01(\x0b\x32\x18.flyteidl.admin.TaskTypeR\x08taskType\"1\n\x19GetTaskLogsResponseHeader\x12\x14\n\x05token\x18\x01 \x01(\tR\x05token\"3\n\x17GetTaskLogsResponseBody\x12\x18\n\x07results\x18\x01 \x03(\tR\x07results\"\xa1\x01\n\x13GetTaskLogsResponse\x12\x43\n\x06header\x18\x01 \x01(\x0b\x32).flyteidl.admin.GetTaskLogsResponseHeaderH\x00R\x06header\x12=\n\x04\x62ody\x18\x02 \x01(\x0b\x32\'.flyteidl.admin.GetTaskLogsResponseBodyH\x00R\x04\x62odyB\x06\n\x04part*b\n\x05State\x12\x15\n\x11RETRYABLE_FAILURE\x10\x00\x12\x15\n\x11PERMANENT_FAILURE\x10\x01\x12\x0b\n\x07PENDING\x10\x02\x12\x0b\n\x07RUNNING\x10\x03\x12\r\n\tSUCCEEDED\x10\x04\x1a\x02\x18\x01\x42\xb6\x01\n\x12\x63om.flyteidl.adminB\nAgentProtoP\x01Z;github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin\xa2\x02\x03\x46\x41X\xaa\x02\x0e\x46lyteidl.Admin\xca\x02\x0e\x46lyteidl\\Admin\xe2\x02\x1a\x46lyteidl\\Admin\\GPBMetadata\xea\x02\x0f\x46lyteidl::Adminb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,10 +38,20 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _TASKEXECUTIONMETADATA_ANNOTATIONSENTRY._serialized_options = b'8\001'
   _TASKEXECUTIONMETADATA_ENVIRONMENTVARIABLESENTRY._options = None
   _TASKEXECUTIONMETADATA_ENVIRONMENTVARIABLESENTRY._serialized_options = b'8\001'
+  _GETTASKREQUEST.fields_by_name['deprecated_task_type']._options = None
+  _GETTASKREQUEST.fields_by_name['deprecated_task_type']._serialized_options = b'\030\001'
   _RESOURCE.fields_by_name['state']._options = None
   _RESOURCE.fields_by_name['state']._serialized_options = b'\030\001'
-  _globals['_STATE']._serialized_start=3929
-  _globals['_STATE']._serialized_end=4027
+  _DELETETASKREQUEST.fields_by_name['deprecated_task_type']._options = None
+  _DELETETASKREQUEST.fields_by_name['deprecated_task_type']._serialized_options = b'\030\001'
+  _AGENT.fields_by_name['deprecated_supported_task_types']._options = None
+  _AGENT.fields_by_name['deprecated_supported_task_types']._serialized_options = b'\030\001'
+  _GETTASKMETRICSREQUEST.fields_by_name['deprecated_task_type']._options = None
+  _GETTASKMETRICSREQUEST.fields_by_name['deprecated_task_type']._serialized_options = b'\030\001'
+  _GETTASKLOGSREQUEST.fields_by_name['deprecated_task_type']._options = None
+  _GETTASKLOGSREQUEST.fields_by_name['deprecated_task_type']._serialized_options = b'\030\001'
+  _globals['_STATE']._serialized_start=4248
+  _globals['_STATE']._serialized_end=4346
   _globals['_TASKEXECUTIONMETADATA']._serialized_start=291
   _globals['_TASKEXECUTIONMETADATA']._serialized_end=1164
   _globals['_TASKEXECUTIONMETADATA_LABELSENTRY']._serialized_start=970
@@ -62,38 +72,38 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_EXECUTETASKSYNCRESPONSEHEADER']._serialized_end=1989
   _globals['_EXECUTETASKSYNCRESPONSE']._serialized_start=1992
   _globals['_EXECUTETASKSYNCRESPONSE']._serialized_end=2152
-  _globals['_GETTASKREQUEST']._serialized_start=2154
-  _globals['_GETTASKREQUEST']._serialized_end=2262
-  _globals['_GETTASKRESPONSE']._serialized_start=2264
-  _globals['_GETTASKRESPONSE']._serialized_end=2335
-  _globals['_RESOURCE']._serialized_start=2338
-  _globals['_RESOURCE']._serialized_end=2587
-  _globals['_DELETETASKREQUEST']._serialized_start=2589
-  _globals['_DELETETASKREQUEST']._serialized_end=2700
-  _globals['_DELETETASKRESPONSE']._serialized_start=2702
-  _globals['_DELETETASKRESPONSE']._serialized_end=2722
-  _globals['_AGENT']._serialized_start=2725
-  _globals['_AGENT']._serialized_end=2853
-  _globals['_TASKTYPE']._serialized_start=2855
-  _globals['_TASKTYPE']._serialized_end=2911
-  _globals['_GETAGENTREQUEST']._serialized_start=2913
-  _globals['_GETAGENTREQUEST']._serialized_end=2950
-  _globals['_GETAGENTRESPONSE']._serialized_start=2952
-  _globals['_GETAGENTRESPONSE']._serialized_end=3015
-  _globals['_LISTAGENTSREQUEST']._serialized_start=3017
-  _globals['_LISTAGENTSREQUEST']._serialized_end=3036
-  _globals['_LISTAGENTSRESPONSE']._serialized_start=3038
-  _globals['_LISTAGENTSRESPONSE']._serialized_end=3105
-  _globals['_GETTASKMETRICSREQUEST']._serialized_start=3108
-  _globals['_GETTASKMETRICSREQUEST']._serialized_end=3410
-  _globals['_GETTASKMETRICSRESPONSE']._serialized_start=3412
-  _globals['_GETTASKMETRICSRESPONSE']._serialized_end=3500
-  _globals['_GETTASKLOGSREQUEST']._serialized_start=3503
-  _globals['_GETTASKLOGSREQUEST']._serialized_end=3659
-  _globals['_GETTASKLOGSRESPONSEHEADER']._serialized_start=3661
-  _globals['_GETTASKLOGSRESPONSEHEADER']._serialized_end=3710
-  _globals['_GETTASKLOGSRESPONSEBODY']._serialized_start=3712
-  _globals['_GETTASKLOGSRESPONSEBODY']._serialized_end=3763
-  _globals['_GETTASKLOGSRESPONSE']._serialized_start=3766
-  _globals['_GETTASKLOGSRESPONSE']._serialized_end=3927
+  _globals['_GETTASKREQUEST']._serialized_start=2155
+  _globals['_GETTASKREQUEST']._serialized_end=2317
+  _globals['_GETTASKRESPONSE']._serialized_start=2319
+  _globals['_GETTASKRESPONSE']._serialized_end=2390
+  _globals['_RESOURCE']._serialized_start=2393
+  _globals['_RESOURCE']._serialized_end=2642
+  _globals['_DELETETASKREQUEST']._serialized_start=2645
+  _globals['_DELETETASKREQUEST']._serialized_end=2810
+  _globals['_DELETETASKRESPONSE']._serialized_start=2812
+  _globals['_DELETETASKRESPONSE']._serialized_end=2832
+  _globals['_AGENT']._serialized_start=2835
+  _globals['_AGENT']._serialized_end=3064
+  _globals['_TASKTYPE']._serialized_start=3066
+  _globals['_TASKTYPE']._serialized_end=3122
+  _globals['_GETAGENTREQUEST']._serialized_start=3124
+  _globals['_GETAGENTREQUEST']._serialized_end=3161
+  _globals['_GETAGENTRESPONSE']._serialized_start=3163
+  _globals['_GETAGENTRESPONSE']._serialized_end=3226
+  _globals['_LISTAGENTSREQUEST']._serialized_start=3228
+  _globals['_LISTAGENTSREQUEST']._serialized_end=3247
+  _globals['_LISTAGENTSRESPONSE']._serialized_start=3249
+  _globals['_LISTAGENTSRESPONSE']._serialized_end=3316
+  _globals['_GETTASKMETRICSREQUEST']._serialized_start=3319
+  _globals['_GETTASKMETRICSREQUEST']._serialized_end=3675
+  _globals['_GETTASKMETRICSRESPONSE']._serialized_start=3677
+  _globals['_GETTASKMETRICSRESPONSE']._serialized_end=3765
+  _globals['_GETTASKLOGSREQUEST']._serialized_start=3768
+  _globals['_GETTASKLOGSREQUEST']._serialized_end=3978
+  _globals['_GETTASKLOGSRESPONSEHEADER']._serialized_start=3980
+  _globals['_GETTASKLOGSRESPONSEHEADER']._serialized_end=4029
+  _globals['_GETTASKLOGSRESPONSEBODY']._serialized_start=4031
+  _globals['_GETTASKLOGSRESPONSEBODY']._serialized_end=4082
+  _globals['_GETTASKLOGSRESPONSE']._serialized_start=4085
+  _globals['_GETTASKLOGSRESPONSE']._serialized_end=4246
 # @@protoc_insertion_point(module_scope)

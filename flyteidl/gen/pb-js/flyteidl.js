@@ -23232,8 +23232,9 @@
                  * Properties of a GetTaskRequest.
                  * @memberof flyteidl.admin
                  * @interface IGetTaskRequest
-                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetTaskRequest taskType
+                 * @property {string|null} [deprecatedTaskType] GetTaskRequest deprecatedTaskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskRequest resourceMeta
+                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetTaskRequest taskType
                  */
     
                 /**
@@ -23252,12 +23253,12 @@
                 }
     
                 /**
-                 * GetTaskRequest taskType.
-                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * GetTaskRequest deprecatedTaskType.
+                 * @member {string} deprecatedTaskType
                  * @memberof flyteidl.admin.GetTaskRequest
                  * @instance
                  */
-                GetTaskRequest.prototype.taskType = null;
+                GetTaskRequest.prototype.deprecatedTaskType = "";
     
                 /**
                  * GetTaskRequest resourceMeta.
@@ -23266,6 +23267,14 @@
                  * @instance
                  */
                 GetTaskRequest.prototype.resourceMeta = $util.newBuffer([]);
+    
+                /**
+                 * GetTaskRequest taskType.
+                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * @memberof flyteidl.admin.GetTaskRequest
+                 * @instance
+                 */
+                GetTaskRequest.prototype.taskType = null;
     
                 /**
                  * Creates a new GetTaskRequest instance using the specified properties.
@@ -23291,10 +23300,12 @@
                 GetTaskRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.deprecatedTaskType);
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -23317,10 +23328,13 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
+                            message.deprecatedTaskType = reader.string();
                             break;
                         case 2:
                             message.resourceMeta = reader.bytes();
+                            break;
+                        case 3:
+                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23341,14 +23355,17 @@
                 GetTaskRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        if (!$util.isString(message.deprecatedTaskType))
+                            return "deprecatedTaskType: string expected";
+                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
+                        if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
+                            return "resourceMeta: buffer expected";
                     if (message.taskType != null && message.hasOwnProperty("taskType")) {
                         var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
                         if (error)
                             return "taskType." + error;
                     }
-                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
-                        if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
-                            return "resourceMeta: buffer expected";
                     return null;
                 };
     
@@ -23682,8 +23699,9 @@
                  * Properties of a DeleteTaskRequest.
                  * @memberof flyteidl.admin
                  * @interface IDeleteTaskRequest
-                 * @property {flyteidl.admin.ITaskType|null} [taskType] DeleteTaskRequest taskType
+                 * @property {string|null} [deprecatedTaskType] DeleteTaskRequest deprecatedTaskType
                  * @property {Uint8Array|null} [resourceMeta] DeleteTaskRequest resourceMeta
+                 * @property {flyteidl.admin.ITaskType|null} [taskType] DeleteTaskRequest taskType
                  */
     
                 /**
@@ -23702,12 +23720,12 @@
                 }
     
                 /**
-                 * DeleteTaskRequest taskType.
-                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * DeleteTaskRequest deprecatedTaskType.
+                 * @member {string} deprecatedTaskType
                  * @memberof flyteidl.admin.DeleteTaskRequest
                  * @instance
                  */
-                DeleteTaskRequest.prototype.taskType = null;
+                DeleteTaskRequest.prototype.deprecatedTaskType = "";
     
                 /**
                  * DeleteTaskRequest resourceMeta.
@@ -23716,6 +23734,14 @@
                  * @instance
                  */
                 DeleteTaskRequest.prototype.resourceMeta = $util.newBuffer([]);
+    
+                /**
+                 * DeleteTaskRequest taskType.
+                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * @memberof flyteidl.admin.DeleteTaskRequest
+                 * @instance
+                 */
+                DeleteTaskRequest.prototype.taskType = null;
     
                 /**
                  * Creates a new DeleteTaskRequest instance using the specified properties.
@@ -23741,10 +23767,12 @@
                 DeleteTaskRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.deprecatedTaskType);
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -23767,10 +23795,13 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
+                            message.deprecatedTaskType = reader.string();
                             break;
                         case 2:
                             message.resourceMeta = reader.bytes();
+                            break;
+                        case 3:
+                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -23791,14 +23822,17 @@
                 DeleteTaskRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        if (!$util.isString(message.deprecatedTaskType))
+                            return "deprecatedTaskType: string expected";
+                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
+                        if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
+                            return "resourceMeta: buffer expected";
                     if (message.taskType != null && message.hasOwnProperty("taskType")) {
                         var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
                         if (error)
                             return "taskType." + error;
                     }
-                    if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
-                        if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
-                            return "resourceMeta: buffer expected";
                     return null;
                 };
     
@@ -23905,8 +23939,9 @@
                  * @memberof flyteidl.admin
                  * @interface IAgent
                  * @property {string|null} [name] Agent name
-                 * @property {Array.<flyteidl.admin.ITaskType>|null} [supportedTaskTypes] Agent supportedTaskTypes
+                 * @property {Array.<flyteidl.admin.ITaskType>|null} [deprecatedSupportedTaskTypes] Agent deprecatedSupportedTaskTypes
                  * @property {boolean|null} [isSync] Agent isSync
+                 * @property {Array.<flyteidl.admin.ITaskType>|null} [supportedTaskTypes] Agent supportedTaskTypes
                  */
     
                 /**
@@ -23918,6 +23953,7 @@
                  * @param {flyteidl.admin.IAgent=} [properties] Properties to set
                  */
                 function Agent(properties) {
+                    this.deprecatedSupportedTaskTypes = [];
                     this.supportedTaskTypes = [];
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
@@ -23934,12 +23970,12 @@
                 Agent.prototype.name = "";
     
                 /**
-                 * Agent supportedTaskTypes.
-                 * @member {Array.<flyteidl.admin.ITaskType>} supportedTaskTypes
+                 * Agent deprecatedSupportedTaskTypes.
+                 * @member {Array.<flyteidl.admin.ITaskType>} deprecatedSupportedTaskTypes
                  * @memberof flyteidl.admin.Agent
                  * @instance
                  */
-                Agent.prototype.supportedTaskTypes = $util.emptyArray;
+                Agent.prototype.deprecatedSupportedTaskTypes = $util.emptyArray;
     
                 /**
                  * Agent isSync.
@@ -23948,6 +23984,14 @@
                  * @instance
                  */
                 Agent.prototype.isSync = false;
+    
+                /**
+                 * Agent supportedTaskTypes.
+                 * @member {Array.<flyteidl.admin.ITaskType>} supportedTaskTypes
+                 * @memberof flyteidl.admin.Agent
+                 * @instance
+                 */
+                Agent.prototype.supportedTaskTypes = $util.emptyArray;
     
                 /**
                  * Creates a new Agent instance using the specified properties.
@@ -23975,11 +24019,14 @@
                         writer = $Writer.create();
                     if (message.name != null && message.hasOwnProperty("name"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                    if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
-                        for (var i = 0; i < message.supportedTaskTypes.length; ++i)
-                            $root.flyteidl.admin.TaskType.encode(message.supportedTaskTypes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.deprecatedSupportedTaskTypes != null && message.deprecatedSupportedTaskTypes.length)
+                        for (var i = 0; i < message.deprecatedSupportedTaskTypes.length; ++i)
+                            $root.flyteidl.admin.TaskType.encode(message.deprecatedSupportedTaskTypes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.isSync != null && message.hasOwnProperty("isSync"))
                         writer.uint32(/* id 3, wireType 0 =*/24).bool(message.isSync);
+                    if (message.supportedTaskTypes != null && message.supportedTaskTypes.length)
+                        for (var i = 0; i < message.supportedTaskTypes.length; ++i)
+                            $root.flyteidl.admin.TaskType.encode(message.supportedTaskTypes[i], writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     return writer;
                 };
     
@@ -24005,12 +24052,17 @@
                             message.name = reader.string();
                             break;
                         case 2:
-                            if (!(message.supportedTaskTypes && message.supportedTaskTypes.length))
-                                message.supportedTaskTypes = [];
-                            message.supportedTaskTypes.push($root.flyteidl.admin.TaskType.decode(reader, reader.uint32()));
+                            if (!(message.deprecatedSupportedTaskTypes && message.deprecatedSupportedTaskTypes.length))
+                                message.deprecatedSupportedTaskTypes = [];
+                            message.deprecatedSupportedTaskTypes.push($root.flyteidl.admin.TaskType.decode(reader, reader.uint32()));
                             break;
                         case 3:
                             message.isSync = reader.bool();
+                            break;
+                        case 4:
+                            if (!(message.supportedTaskTypes && message.supportedTaskTypes.length))
+                                message.supportedTaskTypes = [];
+                            message.supportedTaskTypes.push($root.flyteidl.admin.TaskType.decode(reader, reader.uint32()));
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24034,6 +24086,18 @@
                     if (message.name != null && message.hasOwnProperty("name"))
                         if (!$util.isString(message.name))
                             return "name: string expected";
+                    if (message.deprecatedSupportedTaskTypes != null && message.hasOwnProperty("deprecatedSupportedTaskTypes")) {
+                        if (!Array.isArray(message.deprecatedSupportedTaskTypes))
+                            return "deprecatedSupportedTaskTypes: array expected";
+                        for (var i = 0; i < message.deprecatedSupportedTaskTypes.length; ++i) {
+                            var error = $root.flyteidl.admin.TaskType.verify(message.deprecatedSupportedTaskTypes[i]);
+                            if (error)
+                                return "deprecatedSupportedTaskTypes." + error;
+                        }
+                    }
+                    if (message.isSync != null && message.hasOwnProperty("isSync"))
+                        if (typeof message.isSync !== "boolean")
+                            return "isSync: boolean expected";
                     if (message.supportedTaskTypes != null && message.hasOwnProperty("supportedTaskTypes")) {
                         if (!Array.isArray(message.supportedTaskTypes))
                             return "supportedTaskTypes: array expected";
@@ -24043,9 +24107,6 @@
                                 return "supportedTaskTypes." + error;
                         }
                     }
-                    if (message.isSync != null && message.hasOwnProperty("isSync"))
-                        if (typeof message.isSync !== "boolean")
-                            return "isSync: boolean expected";
                     return null;
                 };
     
@@ -24620,12 +24681,13 @@
                  * Properties of a GetTaskMetricsRequest.
                  * @memberof flyteidl.admin
                  * @interface IGetTaskMetricsRequest
-                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetTaskMetricsRequest taskType
+                 * @property {string|null} [deprecatedTaskType] GetTaskMetricsRequest deprecatedTaskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskMetricsRequest resourceMeta
                  * @property {Array.<string>|null} [queries] GetTaskMetricsRequest queries
                  * @property {google.protobuf.ITimestamp|null} [startTime] GetTaskMetricsRequest startTime
                  * @property {google.protobuf.ITimestamp|null} [endTime] GetTaskMetricsRequest endTime
                  * @property {google.protobuf.IDuration|null} [step] GetTaskMetricsRequest step
+                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetTaskMetricsRequest taskType
                  */
     
                 /**
@@ -24645,12 +24707,12 @@
                 }
     
                 /**
-                 * GetTaskMetricsRequest taskType.
-                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * GetTaskMetricsRequest deprecatedTaskType.
+                 * @member {string} deprecatedTaskType
                  * @memberof flyteidl.admin.GetTaskMetricsRequest
                  * @instance
                  */
-                GetTaskMetricsRequest.prototype.taskType = null;
+                GetTaskMetricsRequest.prototype.deprecatedTaskType = "";
     
                 /**
                  * GetTaskMetricsRequest resourceMeta.
@@ -24693,6 +24755,14 @@
                 GetTaskMetricsRequest.prototype.step = null;
     
                 /**
+                 * GetTaskMetricsRequest taskType.
+                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * @memberof flyteidl.admin.GetTaskMetricsRequest
+                 * @instance
+                 */
+                GetTaskMetricsRequest.prototype.taskType = null;
+    
+                /**
                  * Creates a new GetTaskMetricsRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskMetricsRequest
@@ -24716,8 +24786,8 @@
                 GetTaskMetricsRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.deprecatedTaskType);
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.queries != null && message.queries.length)
@@ -24729,6 +24799,8 @@
                         $root.google.protobuf.Timestamp.encode(message.endTime, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     if (message.step != null && message.hasOwnProperty("step"))
                         $root.google.protobuf.Duration.encode(message.step, writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -24751,7 +24823,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
+                            message.deprecatedTaskType = reader.string();
                             break;
                         case 2:
                             message.resourceMeta = reader.bytes();
@@ -24769,6 +24841,9 @@
                             break;
                         case 6:
                             message.step = $root.google.protobuf.Duration.decode(reader, reader.uint32());
+                            break;
+                        case 7:
+                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -24789,11 +24864,9 @@
                 GetTaskMetricsRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.taskType != null && message.hasOwnProperty("taskType")) {
-                        var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
-                        if (error)
-                            return "taskType." + error;
-                    }
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        if (!$util.isString(message.deprecatedTaskType))
+                            return "deprecatedTaskType: string expected";
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
                             return "resourceMeta: buffer expected";
@@ -24818,6 +24891,11 @@
                         var error = $root.google.protobuf.Duration.verify(message.step);
                         if (error)
                             return "step." + error;
+                    }
+                    if (message.taskType != null && message.hasOwnProperty("taskType")) {
+                        var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
+                        if (error)
+                            return "taskType." + error;
                     }
                     return null;
                 };
@@ -24951,10 +25029,11 @@
                  * Properties of a GetTaskLogsRequest.
                  * @memberof flyteidl.admin
                  * @interface IGetTaskLogsRequest
-                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetTaskLogsRequest taskType
+                 * @property {string|null} [deprecatedTaskType] GetTaskLogsRequest deprecatedTaskType
                  * @property {Uint8Array|null} [resourceMeta] GetTaskLogsRequest resourceMeta
                  * @property {Long|null} [lines] GetTaskLogsRequest lines
                  * @property {string|null} [token] GetTaskLogsRequest token
+                 * @property {flyteidl.admin.ITaskType|null} [taskType] GetTaskLogsRequest taskType
                  */
     
                 /**
@@ -24973,12 +25052,12 @@
                 }
     
                 /**
-                 * GetTaskLogsRequest taskType.
-                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * GetTaskLogsRequest deprecatedTaskType.
+                 * @member {string} deprecatedTaskType
                  * @memberof flyteidl.admin.GetTaskLogsRequest
                  * @instance
                  */
-                GetTaskLogsRequest.prototype.taskType = null;
+                GetTaskLogsRequest.prototype.deprecatedTaskType = "";
     
                 /**
                  * GetTaskLogsRequest resourceMeta.
@@ -25005,6 +25084,14 @@
                 GetTaskLogsRequest.prototype.token = "";
     
                 /**
+                 * GetTaskLogsRequest taskType.
+                 * @member {flyteidl.admin.ITaskType|null|undefined} taskType
+                 * @memberof flyteidl.admin.GetTaskLogsRequest
+                 * @instance
+                 */
+                GetTaskLogsRequest.prototype.taskType = null;
+    
+                /**
                  * Creates a new GetTaskLogsRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.admin.GetTaskLogsRequest
@@ -25028,14 +25115,16 @@
                 GetTaskLogsRequest.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.taskType != null && message.hasOwnProperty("taskType"))
-                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.deprecatedTaskType);
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.resourceMeta);
                     if (message.lines != null && message.hasOwnProperty("lines"))
                         writer.uint32(/* id 3, wireType 0 =*/24).uint64(message.lines);
                     if (message.token != null && message.hasOwnProperty("token"))
                         writer.uint32(/* id 4, wireType 2 =*/34).string(message.token);
+                    if (message.taskType != null && message.hasOwnProperty("taskType"))
+                        $root.flyteidl.admin.TaskType.encode(message.taskType, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -25058,7 +25147,7 @@
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
                         case 1:
-                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
+                            message.deprecatedTaskType = reader.string();
                             break;
                         case 2:
                             message.resourceMeta = reader.bytes();
@@ -25068,6 +25157,9 @@
                             break;
                         case 4:
                             message.token = reader.string();
+                            break;
+                        case 5:
+                            message.taskType = $root.flyteidl.admin.TaskType.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -25088,11 +25180,9 @@
                 GetTaskLogsRequest.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.taskType != null && message.hasOwnProperty("taskType")) {
-                        var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
-                        if (error)
-                            return "taskType." + error;
-                    }
+                    if (message.deprecatedTaskType != null && message.hasOwnProperty("deprecatedTaskType"))
+                        if (!$util.isString(message.deprecatedTaskType))
+                            return "deprecatedTaskType: string expected";
                     if (message.resourceMeta != null && message.hasOwnProperty("resourceMeta"))
                         if (!(message.resourceMeta && typeof message.resourceMeta.length === "number" || $util.isString(message.resourceMeta)))
                             return "resourceMeta: buffer expected";
@@ -25102,6 +25192,11 @@
                     if (message.token != null && message.hasOwnProperty("token"))
                         if (!$util.isString(message.token))
                             return "token: string expected";
+                    if (message.taskType != null && message.hasOwnProperty("taskType")) {
+                        var error = $root.flyteidl.admin.TaskType.verify(message.taskType);
+                        if (error)
+                            return "taskType." + error;
+                    }
                     return null;
                 };
     

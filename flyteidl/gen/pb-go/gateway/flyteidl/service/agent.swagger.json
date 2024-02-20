@@ -108,6 +108,13 @@
             "format": "byte"
           },
           {
+            "name": "deprecated_task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "lines",
             "description": "Number of lines to return.",
             "in": "query",
@@ -170,6 +177,13 @@
             "required": true,
             "type": "string",
             "format": "byte"
+          },
+          {
+            "name": "deprecated_task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           },
           {
             "name": "queries",
@@ -295,6 +309,13 @@
             "required": true,
             "type": "string",
             "format": "byte"
+          },
+          {
+            "name": "deprecated_task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -343,6 +364,13 @@
             "required": true,
             "type": "string",
             "format": "byte"
+          },
+          {
+            "name": "deprecated_task_type",
+            "description": "A predefined yet extensible Task type identifier.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -570,7 +598,7 @@
           "type": "string",
           "description": "Name is the developer-assigned name of the agent."
         },
-        "supported_task_types": {
+        "deprecated_supported_task_types": {
           "type": "array",
           "items": {
             "type": "object",
@@ -581,6 +609,14 @@
         "is_sync": {
           "type": "boolean",
           "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their\nresults synchronously when called by propeller. Given that sync agents can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async agent, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
+        },
+        "supported_task_types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminTaskType"
+          },
+          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
         }
       },
       "description": "A message containing the agent metadata."

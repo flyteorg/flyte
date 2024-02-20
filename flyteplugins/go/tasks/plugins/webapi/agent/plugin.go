@@ -96,6 +96,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
 
+	logger.Infof(ctx, "hello [%v] is a sync agent: [%v]", agent.Endpoint, agent.IsSync)
 	if agent.IsSync {
 		client, err := p.getSyncAgentClient(ctx, agent)
 		if err != nil {
@@ -133,56 +134,7 @@ func (p Plugin) ExecuteTaskSync(
 	if err != nil {
 		return nil, nil, err
 	}
-	waitChan := make(chan struct{})
-	resourceChan := make(chan *admin.Resource)
-	outputsChan := make(chan *flyteIdl.LiteralMap)
 
-	go func() {
-		in, err := stream.Recv()
-		if err == io.EOF {
-			// read done.
-			close(waitChan)
-			return
-		}
-		if err != nil {
-			logger.Errorf(ctx, "Error reading from stream: %v", err)
-		}
-		header := in.GetHeader()
-		resource := header.GetResource()
-		mergedLiteralMap := &flyteIdl.LiteralMap{Literals: map[string]*flyteIdl.Literal{}}
-
-		for {
-			in, err := stream.Recv()
-			if err == io.EOF {
-				// read done.
-				resourceChan <- resource
-				outputsChan <- mergedLiteralMap
-				close(waitChan)
-				return
-			}
-			if err != nil {
-				logger.Errorf(ctx, "Error reading from stream: %v", err)
-			}
-			literalMap := in.GetOutputs()
-			if literalMap == nil {
-				continue
-			}
-			for k, lt := range literalMap.Literals {
-				_, ok := mergedLiteralMap.Literals[k]
-				if !ok {
-					mergedLiteralMap.Literals[k] = &flyteIdl.Literal{
-						Value: &flyteIdl.Literal_Collection{
-							Collection: &flyteIdl.LiteralCollection{
-								Literals: []*flyteIdl.Literal{lt},
-							},
-						},
-					}
-				} else {
-					mergedLiteralMap.Literals[k].GetCollection().Literals = append(mergedLiteralMap.Literals[k].GetCollection().Literals, lt)
-				}
-			}
-		}
-	}()
 	headerProto := &admin.ExecuteTaskSyncRequest{
 		Part: &admin.ExecuteTaskSyncRequest_Header{
 			Header: header,
@@ -199,16 +151,26 @@ func (p Plugin) ExecuteTaskSync(
 		err = stream.Send(inputsProto)
 	}
 
+	in, err := stream.Recv()
+	if err != nil && err != io.EOF {
+		return nil, nil, err
+	}
+	// TODO: Read the streaming output from the agent, and merge it into the final output.
+	// For now, Propeller assumes that the output is always in the header.
+	resource := in.GetHeader().GetResource()
+
 	if err := stream.CloseSend(); err != nil {
 		return nil, nil, err
 	}
-	resource := <-resourceChan
-	outputs := <-outputsChan
-	<-waitChan
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+		return nil, nil, err
+	}
 
 	return nil, ResourceWrapper{
 		Phase:    resource.Phase,
-		Outputs:  outputs,
+		Outputs:  resource.Outputs,
 		Message:  resource.Message,
 		LogLinks: resource.LogLinks,
 	}, err
@@ -225,7 +187,12 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: &metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	request := &admin.GetTaskRequest{
+		DeprecatedTaskType: metadata.TaskType.Name,
+		TaskType:           &metadata.TaskType,
+		ResourceMeta:       metadata.AgentResourceMeta,
+	}
+	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +202,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		State:    res.Resource.State,
 		Outputs:  res.Resource.Outputs,
 		Message:  res.Resource.Message,
-		LogLinks: res.LogLinks,
+		LogLinks: res.Resource.LogLinks,
 	}, nil
 }
 
@@ -253,7 +220,12 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	_, err = client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: &metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	request := &admin.DeleteTaskRequest{
+		DeprecatedTaskType: metadata.TaskType.Name,
+		TaskType:           &metadata.TaskType,
+		ResourceMeta:       metadata.AgentResourceMeta,
+	}
+	_, err = client.DeleteTask(finalCtx, request)
 	return err
 }
 
@@ -271,7 +243,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource)
+		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
@@ -299,7 +271,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_RETRYABLE_FAILURE:
 		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
 	case admin.State_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource)
+		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
@@ -335,7 +307,7 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Agent) (service.
 	return client, nil
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err
@@ -347,9 +319,9 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 	}
 
 	var opReader flyteIO.OutputReader
-	if resource.Outputs != nil {
+	if outputs != nil {
 		logger.Debugf(ctx, "Agent returned an output.")
-		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
+		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
 		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
@@ -391,7 +363,7 @@ func newAgentPlugin() webapi.PluginEntry {
 
 	cfg := GetConfig()
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "Agent supports task types: %v", supportedTaskTypes)
+	logger.Infof(context.Background(), "Agent service supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",

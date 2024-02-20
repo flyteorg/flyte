@@ -90,7 +90,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Agent) (conte
 func initializeAgentRegistry(cs *ClientSet) (map[string]map[int32]*Agent, error) {
 	agentRegistry := make(map[string]map[int32]*Agent)
 	cfg := GetConfig()
-	var agentDeployments []*Agent
+	var agentServices []*Agent
 
 	// Ensure that the old configuration is backward compatible
 	for taskType, agentID := range cfg.AgentForTaskTypes {
@@ -98,13 +98,13 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]map[int32]*Agent, error)
 	}
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
-		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
+		agentServices = append(agentServices, &cfg.DefaultAgent)
 	}
-	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
-	for _, agentDeployment := range agentDeployments {
-		client := cs.agentMetadataClients[agentDeployment.Endpoint]
+	agentServices = append(agentServices, maps.Values(cfg.Agents)...)
+	for i := 0; i < len(agentServices); i++ {
+		client := cs.agentMetadataClients[agentServices[i].Endpoint]
 
-		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployment)
+		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentServices[i])
 		defer cancel()
 
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
@@ -112,25 +112,31 @@ func initializeAgentRegistry(cs *ClientSet) (map[string]map[int32]*Agent, error)
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
 				// we should not panic here, as we want to continue to support old agent settings
-				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
+				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentServices[i])
 				continue
 			}
 
 			if !ok {
-				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment, err)
+				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentServices[i], err)
 			}
 
-			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployment, err)
+			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentServices[i], err)
 		}
 
 		agents := res.GetAgents()
-		for _, agent := range agents {
-			supportedTaskTypes := agent.SupportedTaskTypes
+		for j := 0; j < len(agents); j++ {
+			supportedTaskTypes := agents[j].SupportedTaskTypes
 			for _, supportedTaskType := range supportedTaskTypes {
-				agentRegistry[supportedTaskType.GetName()] = map[int32]*Agent{supportedTaskType.Version: agentDeployment}
+				finalAgent := agentServices[i]
+				finalAgent.IsSync = true
+				agentRegistry[supportedTaskType.GetName()] = map[int32]*Agent{supportedTaskType.Version: finalAgent}
 			}
+			logger.Infof(context.Background(), "[%v] Agent is a sync agent: [%v]", agents[j].Name, agents[j].IsSync)
+			logger.Infof(context.Background(), "[%v] Agent supports task types: [%v]", agents[j].Name, supportedTaskTypes)
 		}
 	}
+
+	logger.Infof(context.Background(), "Agent registry initialized: [%v]", agentRegistry["mock_openai"][0])
 
 	return agentRegistry, nil
 }
@@ -140,24 +146,21 @@ func initializeClients(ctx context.Context) (*ClientSet, error) {
 	syncAgentClients := make(map[string]service.SyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
 
-	var agentDeployments []*Agent
+	var agentServices []*Agent
 	cfg := GetConfig()
 
 	if len(cfg.DefaultAgent.Endpoint) != 0 {
-		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
+		agentServices = append(agentServices, &cfg.DefaultAgent)
 	}
-	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
-	for _, agentDeployment := range agentDeployments {
-		conn, err := getGrpcConnection(ctx, agentDeployment)
+	agentServices = append(agentServices, maps.Values(cfg.Agents)...)
+	for _, agentService := range agentServices {
+		conn, err := getGrpcConnection(ctx, agentService)
 		if err != nil {
 			return nil, err
 		}
-		if agentDeployment.IsSync {
-			syncAgentClients[agentDeployment.Endpoint] = service.NewSyncAgentServiceClient(conn)
-		} else {
-			asyncAgentClients[agentDeployment.Endpoint] = service.NewAsyncAgentServiceClient(conn)
-		}
-		agentMetadataClients[agentDeployment.Endpoint] = service.NewAgentMetadataServiceClient(conn)
+		syncAgentClients[agentService.Endpoint] = service.NewSyncAgentServiceClient(conn)
+		asyncAgentClients[agentService.Endpoint] = service.NewAsyncAgentServiceClient(conn)
+		agentMetadataClients[agentService.Endpoint] = service.NewAgentMetadataServiceClient(conn)
 	}
 
 	return &ClientSet{

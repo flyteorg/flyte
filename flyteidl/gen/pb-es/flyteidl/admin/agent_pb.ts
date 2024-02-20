@@ -478,9 +478,10 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl.admin.TaskType task_type = 1;
+   * @generated from field: string deprecated_task_type = 1 [deprecated = true];
+   * @deprecated
    */
-  taskType?: TaskType;
+  deprecatedTaskType = "";
 
   /**
    * Metadata about the resource to be pass to the agent.
@@ -488,6 +489,13 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
    * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta = new Uint8Array(0);
+
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskType task_type = 3;
+   */
+  taskType?: TaskType;
 
   constructor(data?: PartialMessage<GetTaskRequest>) {
     super();
@@ -497,8 +505,9 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.GetTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "task_type", kind: "message", T: TaskType },
+    { no: 1, name: "deprecated_task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 3, name: "task_type", kind: "message", T: TaskType },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskRequest {
@@ -640,9 +649,10 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl.admin.TaskType task_type = 1;
+   * @generated from field: string deprecated_task_type = 1 [deprecated = true];
+   * @deprecated
    */
-  taskType?: TaskType;
+  deprecatedTaskType = "";
 
   /**
    * Metadata about the resource to be pass to the agent.
@@ -650,6 +660,13 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
    * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta = new Uint8Array(0);
+
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskType task_type = 3;
+   */
+  taskType?: TaskType;
 
   constructor(data?: PartialMessage<DeleteTaskRequest>) {
     super();
@@ -659,8 +676,9 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.DeleteTaskRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "task_type", kind: "message", T: TaskType },
+    { no: 1, name: "deprecated_task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 3, name: "task_type", kind: "message", T: TaskType },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteTaskRequest {
@@ -729,9 +747,10 @@ export class Agent extends Message<Agent> {
   /**
    * SupportedTaskTypes are the types of the tasks that the agent can handle.
    *
-   * @generated from field: repeated flyteidl.admin.TaskType supported_task_types = 2;
+   * @generated from field: repeated flyteidl.admin.TaskType deprecated_supported_task_types = 2 [deprecated = true];
+   * @deprecated
    */
-  supportedTaskTypes: TaskType[] = [];
+  deprecatedSupportedTaskTypes: TaskType[] = [];
 
   /**
    * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
@@ -744,6 +763,13 @@ export class Agent extends Message<Agent> {
    */
   isSync = false;
 
+  /**
+   * SupportedTaskTypes are the types of the tasks that the agent can handle.
+   *
+   * @generated from field: repeated flyteidl.admin.TaskType supported_task_types = 4;
+   */
+  supportedTaskTypes: TaskType[] = [];
+
   constructor(data?: PartialMessage<Agent>) {
     super();
     proto3.util.initPartial(data, this);
@@ -753,8 +779,9 @@ export class Agent extends Message<Agent> {
   static readonly typeName = "flyteidl.admin.Agent";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "supported_task_types", kind: "message", T: TaskType, repeated: true },
+    { no: 2, name: "deprecated_supported_task_types", kind: "message", T: TaskType, repeated: true },
     { no: 3, name: "is_sync", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "supported_task_types", kind: "message", T: TaskType, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Agent {
@@ -982,9 +1009,10 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl.admin.TaskType task_type = 1;
+   * @generated from field: string deprecated_task_type = 1 [deprecated = true];
+   * @deprecated
    */
-  taskType?: TaskType;
+  deprecatedTaskType = "";
 
   /**
    * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
@@ -1022,6 +1050,13 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
    */
   step?: Duration;
 
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskType task_type = 7;
+   */
+  taskType?: TaskType;
+
   constructor(data?: PartialMessage<GetTaskMetricsRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1030,12 +1065,13 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.GetTaskMetricsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "task_type", kind: "message", T: TaskType },
+    { no: 1, name: "deprecated_task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "queries", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
     { no: 4, name: "start_time", kind: "message", T: Timestamp },
     { no: 5, name: "end_time", kind: "message", T: Timestamp },
     { no: 6, name: "step", kind: "message", T: Duration },
+    { no: 7, name: "task_type", kind: "message", T: TaskType },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskMetricsRequest {
@@ -1105,9 +1141,10 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: flyteidl.admin.TaskType task_type = 1;
+   * @generated from field: string deprecated_task_type = 1 [deprecated = true];
+   * @deprecated
    */
-  taskType?: TaskType;
+  deprecatedTaskType = "";
 
   /**
    * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
@@ -1131,6 +1168,13 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
    */
   token = "";
 
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskType task_type = 5;
+   */
+  taskType?: TaskType;
+
   constructor(data?: PartialMessage<GetTaskLogsRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1139,10 +1183,11 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.GetTaskLogsRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "task_type", kind: "message", T: TaskType },
+    { no: 1, name: "deprecated_task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "lines", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 4, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "task_type", kind: "message", T: TaskType },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskLogsRequest {
