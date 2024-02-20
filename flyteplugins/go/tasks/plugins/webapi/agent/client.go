@@ -136,6 +136,12 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 		}
 
 		for _, agent := range res.GetAgents() {
+			deprecatedSupportedTaskTypes := agent.DeprecatedSupportedTaskTypes
+			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
+				agentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+			}
+
 			supportedTaskTypes := agent.SupportedTaskTypes
 			for _, supportedTaskType := range supportedTaskTypes {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
