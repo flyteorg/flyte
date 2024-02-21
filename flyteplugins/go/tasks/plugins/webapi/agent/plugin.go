@@ -5,7 +5,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
-	"io"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -158,8 +157,11 @@ func (p Plugin) ExecuteTaskSync(
 	}
 
 	in, err := stream.Recv()
-	if err != nil && err != io.EOF {
+	if err != nil {
 		return nil, nil, err
+	}
+	if in.GetHeader() == nil {
+		return nil, nil, fmt.Errorf("expected header in the response, but got none")
 	}
 	// TODO: Read the streaming output from the agent, and merge it into the final output.
 	// For now, Propeller assumes that the output is always in the header.
