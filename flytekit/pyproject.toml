@@ -77,6 +77,7 @@ flyte-cli = "flytekit.clis.flyte_cli.main:_flyte_cli"
 [tool.setuptools_scm]
 write_to = "flytekit/_version.py"
 search_parent_directories = true
+tag_regex = '^(?:[\w-]+/)?(?P<version>[vV]?\d+(?:\.\d+){0,2}[^\+]*)(?:\+.*)?$'
 
 [tool.setuptools]
 include-package-data = true
