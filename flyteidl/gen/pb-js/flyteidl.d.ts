@@ -19372,6 +19372,183 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a TaskErrorExistsDifferentStructure. */
+        interface ITaskErrorExistsDifferentStructure {
+
+            /** TaskErrorExistsDifferentStructure id */
+            id?: (flyteidl.core.IIdentifier|null);
+
+            /** TaskErrorExistsDifferentStructure oldSpec */
+            oldSpec?: (flyteidl.core.ITaskTemplate|null);
+
+            /** TaskErrorExistsDifferentStructure newSpec */
+            newSpec?: (flyteidl.core.ITaskTemplate|null);
+        }
+
+        /** Represents a TaskErrorExistsDifferentStructure. */
+        class TaskErrorExistsDifferentStructure implements ITaskErrorExistsDifferentStructure {
+
+            /**
+             * Constructs a new TaskErrorExistsDifferentStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskErrorExistsDifferentStructure);
+
+            /** TaskErrorExistsDifferentStructure id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /** TaskErrorExistsDifferentStructure oldSpec. */
+            public oldSpec?: (flyteidl.core.ITaskTemplate|null);
+
+            /** TaskErrorExistsDifferentStructure newSpec. */
+            public newSpec?: (flyteidl.core.ITaskTemplate|null);
+
+            /**
+             * Creates a new TaskErrorExistsDifferentStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskErrorExistsDifferentStructure instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskErrorExistsDifferentStructure): flyteidl.admin.TaskErrorExistsDifferentStructure;
+
+            /**
+             * Encodes the specified TaskErrorExistsDifferentStructure message. Does not implicitly {@link flyteidl.admin.TaskErrorExistsDifferentStructure.verify|verify} messages.
+             * @param message TaskErrorExistsDifferentStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskErrorExistsDifferentStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskErrorExistsDifferentStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskErrorExistsDifferentStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskErrorExistsDifferentStructure;
+
+            /**
+             * Verifies a TaskErrorExistsDifferentStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a TaskErrorExistsIdenticalStructure. */
+        interface ITaskErrorExistsIdenticalStructure {
+
+            /** TaskErrorExistsIdenticalStructure id */
+            id?: (flyteidl.core.IIdentifier|null);
+        }
+
+        /** Represents a TaskErrorExistsIdenticalStructure. */
+        class TaskErrorExistsIdenticalStructure implements ITaskErrorExistsIdenticalStructure {
+
+            /**
+             * Constructs a new TaskErrorExistsIdenticalStructure.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ITaskErrorExistsIdenticalStructure);
+
+            /** TaskErrorExistsIdenticalStructure id. */
+            public id?: (flyteidl.core.IIdentifier|null);
+
+            /**
+             * Creates a new TaskErrorExistsIdenticalStructure instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TaskErrorExistsIdenticalStructure instance
+             */
+            public static create(properties?: flyteidl.admin.ITaskErrorExistsIdenticalStructure): flyteidl.admin.TaskErrorExistsIdenticalStructure;
+
+            /**
+             * Encodes the specified TaskErrorExistsIdenticalStructure message. Does not implicitly {@link flyteidl.admin.TaskErrorExistsIdenticalStructure.verify|verify} messages.
+             * @param message TaskErrorExistsIdenticalStructure message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ITaskErrorExistsIdenticalStructure, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TaskErrorExistsIdenticalStructure message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TaskErrorExistsIdenticalStructure
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.TaskErrorExistsIdenticalStructure;
+
+            /**
+             * Verifies a TaskErrorExistsIdenticalStructure message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a CreateTaskFailureReason. */
+        interface ICreateTaskFailureReason {
+
+            /** CreateTaskFailureReason existsDifferentStructure */
+            existsDifferentStructure?: (flyteidl.admin.ITaskErrorExistsDifferentStructure|null);
+
+            /** CreateTaskFailureReason existsIdenticalStructure */
+            existsIdenticalStructure?: (flyteidl.admin.ITaskErrorExistsIdenticalStructure|null);
+        }
+
+        /** Represents a CreateTaskFailureReason. */
+        class CreateTaskFailureReason implements ICreateTaskFailureReason {
+
+            /**
+             * Constructs a new CreateTaskFailureReason.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.ICreateTaskFailureReason);
+
+            /** CreateTaskFailureReason existsDifferentStructure. */
+            public existsDifferentStructure?: (flyteidl.admin.ITaskErrorExistsDifferentStructure|null);
+
+            /** CreateTaskFailureReason existsIdenticalStructure. */
+            public existsIdenticalStructure?: (flyteidl.admin.ITaskErrorExistsIdenticalStructure|null);
+
+            /** CreateTaskFailureReason reason. */
+            public reason?: ("existsDifferentStructure"|"existsIdenticalStructure");
+
+            /**
+             * Creates a new CreateTaskFailureReason instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns CreateTaskFailureReason instance
+             */
+            public static create(properties?: flyteidl.admin.ICreateTaskFailureReason): flyteidl.admin.CreateTaskFailureReason;
+
+            /**
+             * Encodes the specified CreateTaskFailureReason message. Does not implicitly {@link flyteidl.admin.CreateTaskFailureReason.verify|verify} messages.
+             * @param message CreateTaskFailureReason message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.ICreateTaskFailureReason, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a CreateTaskFailureReason message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns CreateTaskFailureReason
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.CreateTaskFailureReason;
+
+            /**
+             * Verifies a CreateTaskFailureReason message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a TaskExecutionGetRequest. */
         interface ITaskExecutionGetRequest {
 
