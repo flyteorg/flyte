@@ -102,21 +102,34 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
   environmentVariables: { [key: string]: string } = {};
 
   /**
+   * Represents the maximum number of attempts allowed for a task.
+   * If a task fails, it can be retried up to this maximum number of attempts.
+   *
    * @generated from field: int32 max_attempts = 7;
    */
   maxAttempts = 0;
 
   /**
+   * Indicates whether the task execution can be interrupted.
+   * If set to true, the task can be stopped before completion.
+   *
    * @generated from field: bool interruptible = 8;
    */
   interruptible = false;
 
   /**
+   * Specifies the threshold for failure count at which the interruptible property
+   * will take effect. If the number of consecutive task failures exceeds this threshold,
+   * interruptible behavior will be activated.
+   *
    * @generated from field: int32 interruptible_failure_threshold = 9;
    */
   interruptibleFailureThreshold = 0;
 
   /**
+   * Overrides for specific properties of the task node.
+   * These overrides can be used to customize the behavior of the task node.
+   *
    * @generated from field: flyteidl.core.TaskNodeOverrides overrides = 10;
    */
   overrides?: TaskNodeOverrides;

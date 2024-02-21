@@ -21,12 +21,21 @@ pub struct TaskExecutionMetadata {
     /// Environment variables attached to the task execution
     #[prost(map="string, string", tag="6")]
     pub environment_variables: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Represents the maximum number of attempts allowed for a task.
+    /// If a task fails, it can be retried up to this maximum number of attempts.
     #[prost(int32, tag="7")]
     pub max_attempts: i32,
+    /// Indicates whether the task execution can be interrupted.
+    /// If set to true, the task can be stopped before completion.
     #[prost(bool, tag="8")]
     pub interruptible: bool,
+    /// Specifies the threshold for failure count at which the interruptible property
+    /// will take effect. If the number of consecutive task failures exceeds this threshold,
+    /// interruptible behavior will be activated.
     #[prost(int32, tag="9")]
     pub interruptible_failure_threshold: i32,
+    /// Overrides for specific properties of the task node.
+    /// These overrides can be used to customize the behavior of the task node.
     #[prost(message, optional, tag="10")]
     pub overrides: ::core::option::Option<super::core::TaskNodeOverrides>,
 }

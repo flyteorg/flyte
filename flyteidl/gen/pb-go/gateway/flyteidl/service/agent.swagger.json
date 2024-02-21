@@ -2025,17 +2025,21 @@
         },
         "max_attempts": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Represents the maximum number of attempts allowed for a task.\nIf a task fails, it can be retried up to this maximum number of attempts."
         },
         "interruptible": {
-          "type": "boolean"
+          "type": "boolean",
+          "description": "Indicates whether the task execution can be interrupted.\nIf set to true, the task can be stopped before completion."
         },
         "interruptible_failure_threshold": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Specifies the threshold for failure count at which the interruptible property\nwill take effect. If the number of consecutive task failures exceeds this threshold,\ninterruptible behavior will be activated."
         },
         "overrides": {
-          "$ref": "#/definitions/coreTaskNodeOverrides"
+          "$ref": "#/definitions/coreTaskNodeOverrides",
+          "description": "Overrides for specific properties of the task node.\nThese overrides can be used to customize the behavior of the task node."
         }
       },
       "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."

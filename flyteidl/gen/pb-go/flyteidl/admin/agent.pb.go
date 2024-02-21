@@ -99,11 +99,20 @@ type TaskExecutionMetadata struct {
 	// k8s service account associated with the task execution
 	K8SServiceAccount string `protobuf:"bytes,5,opt,name=k8s_service_account,json=k8sServiceAccount,proto3" json:"k8s_service_account,omitempty"`
 	// Environment variables attached to the task execution
-	EnvironmentVariables          map[string]string       `protobuf:"bytes,6,rep,name=environment_variables,json=environmentVariables,proto3" json:"environment_variables,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
-	MaxAttempts                   int32                   `protobuf:"varint,7,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`
-	Interruptible                 bool                    `protobuf:"varint,8,opt,name=interruptible,proto3" json:"interruptible,omitempty"`
-	InterruptibleFailureThreshold int32                   `protobuf:"varint,9,opt,name=interruptible_failure_threshold,json=interruptibleFailureThreshold,proto3" json:"interruptible_failure_threshold,omitempty"`
-	Overrides                     *core.TaskNodeOverrides `protobuf:"bytes,10,opt,name=overrides,proto3" json:"overrides,omitempty"`
+	EnvironmentVariables map[string]string `protobuf:"bytes,6,rep,name=environment_variables,json=environmentVariables,proto3" json:"environment_variables,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
+	// Represents the maximum number of attempts allowed for a task.
+	// If a task fails, it can be retried up to this maximum number of attempts.
+	MaxAttempts int32 `protobuf:"varint,7,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`
+	// Indicates whether the task execution can be interrupted.
+	// If set to true, the task can be stopped before completion.
+	Interruptible bool `protobuf:"varint,8,opt,name=interruptible,proto3" json:"interruptible,omitempty"`
+	// Specifies the threshold for failure count at which the interruptible property
+	// will take effect. If the number of consecutive task failures exceeds this threshold,
+	// interruptible behavior will be activated.
+	InterruptibleFailureThreshold int32 `protobuf:"varint,9,opt,name=interruptible_failure_threshold,json=interruptibleFailureThreshold,proto3" json:"interruptible_failure_threshold,omitempty"`
+	// Overrides for specific properties of the task node.
+	// These overrides can be used to customize the behavior of the task node.
+	Overrides *core.TaskNodeOverrides `protobuf:"bytes,10,opt,name=overrides,proto3" json:"overrides,omitempty"`
 }
 
 func (x *TaskExecutionMetadata) Reset() {
