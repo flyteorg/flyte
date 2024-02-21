@@ -21,7 +21,6 @@ dependencies = [
     "diskcache>=5.2.1",
     "docker>=4.0.0,<7.0.0",
     "docstring-parser>=0.9.0",
-    "flyteidl>=1.10.7",
     "fsspec>=2023.3.0",
     "gcsfs>=2023.3.0",
     "googleapis-common-protos>=1.57",
@@ -36,6 +35,7 @@ dependencies = [
     "marshmallow-jsonschema>=0.12.0",
     "mashumaro>=3.9.1",
     "protobuf!=4.25.0",
+    "protoc-gen-openapiv2",
     "pyarrow",
     "python-json-logger>=2.0.0",
     "pytimeparse>=1.1.8,<2.0.0",
@@ -76,6 +76,7 @@ flyte-cli = "flytekit.clis.flyte_cli.main:_flyte_cli"
 
 [tool.setuptools_scm]
 write_to = "flytekit/_version.py"
+search_parent_directories = true
 
 [tool.setuptools]
 include-package-data = true
@@ -86,7 +87,7 @@ script-files = [
 ]
 
 [tool.setuptools.packages.find]
-include = ["flytekit*", "flytekit_scripts"]
+include = ["flytekit*", "flytekit_scripts", "flyteidl*"]
 exclude = ["boilerplate", "docs", "plugins", "tests*"]
 
 [tool.pytest.ini_options]
