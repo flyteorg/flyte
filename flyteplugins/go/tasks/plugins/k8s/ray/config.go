@@ -24,7 +24,7 @@ var (
 		EnableUsageStats:         false,
 		KubeRayCrdVersion:        "v1alpha1",
 		ServiceAccount:           "default",
-		Labels: 				  map[string]string{},
+		Labels: map[string]string{},
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
