@@ -274,15 +274,15 @@ func TestPlugin(t *testing.T) {
 func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
 	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
 	mockRequest := &admin.ListAgentsRequest{}
-	suppoertedTaskTypes := make([]*admin.TaskCategory, 3)
-	suppoertedTaskTypes[0] = &admin.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
-	suppoertedTaskTypes[1] = &admin.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
-	suppoertedTaskTypes[2] = &admin.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
+	supportedTaskCategories := make([]*admin.TaskCategory, 3)
+	supportedTaskCategories[0] = &admin.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[1] = &admin.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[2] = &admin.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
 	mockResponse := &admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
 				Name:                    "test-agent",
-				SupportedTaskCategories: suppoertedTaskTypes,
+				SupportedTaskCategories: supportedTaskCategories,
 			},
 		},
 	}

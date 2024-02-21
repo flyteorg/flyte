@@ -143,16 +143,18 @@ func (p Plugin) ExecuteTaskSync(
 	}
 
 	err = stream.Send(headerProto)
-	if err == nil {
-		inputsProto := &admin.ExecuteTaskSyncRequest{
-			Part: &admin.ExecuteTaskSyncRequest_Inputs{
-				Inputs: inputs,
-			},
-		}
-		err = stream.Send(inputsProto)
-		if err != nil {
-			return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
-		}
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to send headerProto with error: %w", err)
+	}
+	inputsProto := &admin.ExecuteTaskSyncRequest{
+		Part: &admin.ExecuteTaskSyncRequest_Inputs{
+			Inputs: inputs,
+		},
+	}
+	err = stream.Send(inputsProto)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
 	}
 
 	in, err := stream.Recv()
