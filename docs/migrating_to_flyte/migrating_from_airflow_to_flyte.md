@@ -3,19 +3,16 @@
 # Migrating from Airflow to Flyte
 
 Flyte can compile Airflow tasks into Flyte tasks without changing code, which allows you 
-to migrate your Airflow DAGs to Flyte with minimal effort. To migrate to Flyte:
-
-1. [Complete the prerequisites](#prerequisites)
-2. [Define your Airflow tasks in a Flyte workflow](#define-your-airflow-tasks-in-a-flyte-workflow)
-3. [Test your workflow locally](#test-your-workflow-locally)
-4. [Move your workflow to production](#move-your-workflow-to-production)
+to migrate your Airflow DAGs to Flyte with minimal effort.
 
 ## Prerequisites
 
 - Install `flytekitplugins-airflow` in your Python environment.
-- Enable an {ref}`Airflow agent<eployment-agent-setup-airflow>` in your Flyte cluster.
+- Enable an {ref}`Airflow agent<deployment-agent-setup-airflow>` in your Flyte cluster.
 
-## Define your Airflow tasks in a Flyte workflow
+## Steps
+
+### 1. Define your Airflow tasks in a Flyte workflow
 
 Flytekit compiles Airflow tasks into Flyte tasks, so you can use
 any Airflow sensor or operator in a Flyte workflow.
@@ -39,7 +36,7 @@ if __name__ == "__main__":
     print(f"Running airflow_wf() {airflow_wf()}")
 ```
 
-## Test your workflow locally
+### 2. Test your workflow locally
 
 :::{note}
 Before running your workflow locally, you must configure the [Airflow connection](https://airflow.apache.org/docs/apache-airflow/stable/howto/connection.html) by setting the `AIRFLOW_CONN_{CONN_ID}` environment variable.
@@ -60,7 +57,7 @@ Some Airflow operators may require certain permissions to execute. For instance,
 When running Airflow tasks locally, you may need to set the necessary permissions locally for the task to execute successfully.
 :::
 
-## Move your workflow to production
+### 3. Move your workflow to production
 
 :::{note}
 In production, we recommend storing connections in a [secrets backend](https://airflow.apache.org/docs/apache-airflow/stable/security/secrets/secrets-backend/index.html).
