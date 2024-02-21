@@ -3,14 +3,17 @@ package errors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"github.com/golang/protobuf/proto"
+	"github.com/wI2L/jsondiff"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
@@ -105,6 +108,50 @@ func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster strin
 	if transformationErr != nil {
 		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
 		return NewFlyteAdminErrorf(codes.FailedPrecondition, errorMsg)
+	}
+	return statusErr
+}
+
+func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.TaskTemplate, newSpec *core.TaskTemplate) FlyteAdminError {
+	errorMsg := "task with different structure already exists "
+	diff, err := jsondiff.Compare(oldSpec, newSpec)
+	if err != nil {
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg+"diff computation on two different structures failed")
+	}
+	diffString, err := json.Marshal(diff)
+	if err != nil {
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg+"marshal diff computation output failed")
+	}
+	errorMsg += string(diffString)
+
+	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateTaskFailureReason{
+		Reason: &admin.CreateTaskFailureReason_ExistsDifferentStructure{
+			ExistsDifferentStructure: &admin.TaskErrorExistsDifferentStructure{
+				Id:      request.Id,
+				OldSpec: oldSpec,
+				NewSpec: newSpec,
+			},
+		},
+	})
+	if transformationErr != nil {
+		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+	}
+	return statusErr
+}
+
+func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.TaskCreateRequest) FlyteAdminError {
+	errorMsg := "task with identical structure already exists"
+	statusErr, transformationErr := NewFlyteAdminError(codes.AlreadyExists, errorMsg).WithDetails(&admin.CreateTaskFailureReason{
+		Reason: &admin.CreateTaskFailureReason_ExistsIdenticalStructure{
+			ExistsIdenticalStructure: &admin.TaskErrorExistsIdenticalStructure{
+				Id: request.Id,
+			},
+		},
+	})
+	if transformationErr != nil {
+		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
 	}
 	return statusErr
 }

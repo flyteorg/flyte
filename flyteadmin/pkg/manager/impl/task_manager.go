@@ -92,11 +92,13 @@ func (t *TaskManager) CreateTask(
 	existingTask, err := util.GetTaskModel(ctx, t.db, request.Spec.Template.Id)
 	if err == nil {
 		if bytes.Equal(taskDigest, existingTask.Digest) {
-			return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists,
-				"identical task already exists with id %s", request.Id)
+			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, &request)
 		}
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
-			"task with different structure already exists with id %v", request.Id)
+		t2, err2 := util.GetTask(ctx, t.db, *request.Id)
+		if err2 != nil {
+			return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, t2.Closure.CompiledTask.Template, compiledTask.Template)
+		}
+		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, t2.Closure.CompiledTask.Template, compiledTask.Template)
 	}
 	taskModel, err := transformers.CreateTaskModel(finalizedRequest, admin.TaskClosure{
 		CompiledTask: compiledTask,
