@@ -6882,7 +6882,7 @@ spec:
             - run
           image: "cr.flyte.org/flyteorg/flyteadmin:v1.10.7"
           imagePullPolicy: "IfNotPresent"
-          name: sync-cluster-resources
+          name: sync-cluster-resources}
           volumeMounts:
           
           - mountPath: /etc/flyte/clusterresource/templates
