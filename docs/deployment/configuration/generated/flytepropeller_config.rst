@@ -1195,6 +1195,7 @@ ray (`ray.Config`_)
     enabled: false
     endpoint: ""
     name: ""
+  serviceAccount: default
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
@@ -3565,6 +3566,18 @@ Version of the Ray CRD to use when creating RayClusters or RayJobs.
 .. code-block:: yaml
 
   v1alpha1
+  
+
+serviceAccount (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The k8s service account to run as
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default
   
 
 ray.DefaultConfig

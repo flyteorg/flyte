@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.8
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -435,7 +435,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "74e9568d4bf785885a1103d7c39c1b2ede648fc59f8f714c28ba6578e5d5ca1"
+        configChecksum: "2e32043fe27a6b059f48bfd95576d20a0bdcbe5922c2abaeb15c5d48fdb39f6"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -460,7 +460,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.8"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -514,9 +514,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.10.7
+        app.kubernetes.io/version: v1.10.8
       annotations:
-        configChecksum: "74e9568d4bf785885a1103d7c39c1b2ede648fc59f8f714c28ba6578e5d5ca1"
+        configChecksum: "2e32043fe27a6b059f48bfd95576d20a0bdcbe5922c2abaeb15c5d48fdb39f6"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -528,7 +528,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.8"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -555,7 +555,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.7"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.10.8"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
