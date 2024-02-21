@@ -233,7 +233,9 @@ configmap:
         cpu: 1000m
         memory: 1000Mi
         storage: 1000Mi
+        ephemeralStorage: null
       limits:
+        ephemeralStorage: null
         storage: 2000Mi
 
   core:
