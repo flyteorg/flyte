@@ -1,0 +1,143 @@
+[build-system]
+requires = ["setuptools", "setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flytekit"
+dynamic = ["version"]
+authors = [{ name = "Flyte Contributors", email = "admin@flyte.org" }]
+description = "Flyte SDK for Python"
+license = { text = "Apache-2.0" }
+readme = { file = "README.md", content-type = "text/markdown" }
+requires-python = ">=3.8,<3.13"
+dependencies = [
+    # Please maintain an alphabetical order in the following list
+    "adlfs>=2023.3.0",
+    "click>=6.6,<9.0",
+    "cloudpickle>=2.0.0",
+    "cookiecutter>=1.7.3",
+    "croniter>=0.3.20,<4.0.0",
+    "dataclasses-json>=0.5.2,<0.5.12", # TODO: remove upper-bound after fixing change in contract
+    "diskcache>=5.2.1",
+    "docker>=4.0.0,<7.0.0",
+    "docstring-parser>=0.9.0",
+    "flyteidl>=1.10.7",
+    "fsspec>=2023.3.0",
+    "gcsfs>=2023.3.0",
+    "googleapis-common-protos>=1.57",
+    "grpcio",
+    "grpcio-status",
+    "importlib-metadata",
+    "isodate",
+    "joblib",
+    "jsonpickle",
+    "keyring>=18.0.1",
+    "marshmallow-enum",
+    "marshmallow-jsonschema>=0.12.0",
+    "mashumaro>=3.9.1",
+    "protobuf!=4.25.0",
+    "pyarrow",
+    "python-json-logger>=2.0.0",
+    "pytimeparse>=1.1.8,<2.0.0",
+    "pyyaml!=6.0.0,!=5.4.0,!=5.4.1", # pyyaml is broken with cython 3: https://github.com/yaml/pyyaml/issues/601
+    "requests>=2.18.4,<3.0.0",
+    "rich",
+    "rich_click",
+    "s3fs>=2023.3.0",
+    "statsd>=3.0.0,<4.0.0",
+    "typing_extensions",
+    "urllib3>=1.22,<2.0.0",
+]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/flyteorg/flytekit"
+
+[project.scripts]
+pyflyte-execute = "flytekit.bin.entrypoint:execute_task_cmd"
+pyflyte-fast-execute = "flytekit.bin.entrypoint:fast_execute_task_cmd"
+pyflyte-map-execute = "flytekit.bin.entrypoint:map_execute_task_cmd"
+pyflyte = "flytekit.clis.sdk_in_container.pyflyte:main"
+flyte-cli = "flytekit.clis.flyte_cli.main:_flyte_cli"
+
+[tool.setuptools_scm]
+write_to = "flytekit/_version.py"
+
+[tool.setuptools]
+include-package-data = true
+script-files = [
+    "flytekit_scripts/flytekit_build_image.sh",
+    "flytekit_scripts/flytekit_venv",
+    "flytekit/bin/entrypoint.py",
+]
+
+[tool.setuptools.packages.find]
+include = ["flytekit*", "flytekit_scripts"]
+exclude = ["boilerplate", "docs", "plugins", "tests*"]
+
+[tool.pytest.ini_options]
+norecursedirs = ["common", "workflows", "spark", "fsspec"]
+log_cli = true
+log_cli_level = 20
+markers = [
+    # unit tests that are really integration tests that run on a sandbox environment
+    "sandbox_test: fake integration tests",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "def __repr__",
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "if (typing\\.)?TYPE_CHECKING:",
+    "@(typing\\.)?overload",
+    "@(abc\\.)?abstractmethod",
+    "raise NotImplementedError",
+]
+
+[tool.coverage.run]
+branch = true
+
+[tool.ruff]
+line-length = 120
+select = ["E", "W", "F", "I"]
+ignore = [
+    # Whitespace before '{symbol}'
+    "E203",
+    # Too many leading # before block comment
+    "E266",
+    # Line too long ({width} > {limit})
+    "E501",
+    # Ambiguous variable name: {name}
+    "E741",
+    # Undefined name {name}
+    "F821",
+    # Do not compare types, use isinstance()
+    "E721",
+    # Do not assign a lambda expression, use a def
+    "E731",
+]
+
+[tool.ruff.extend-per-file-ignores]
+"*/__init__.py" = [
+    # unused-import
+    "F401",
+]
+
+[tool.codespell]
+ignore-words-list="ot,te,raison,fo,lits"
+skip="./docs/build,./.git,*.txt"

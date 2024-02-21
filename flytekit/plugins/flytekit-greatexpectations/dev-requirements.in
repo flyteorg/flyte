@@ -1,0 +1,1 @@
+-e file:../../.#egg=flytekitplugins-spark&subdirectory=plugins/flytekit-spark

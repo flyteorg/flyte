@@ -1,0 +1,313 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  FLYTE_SDK_LOGGING_LEVEL: 10 # debug
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.8", "3.11", "3.12"]
+    steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements files
+          key: ${{ format('{0}-pip-{1}', runner.os, hashFiles('dev-requirements.in', 'requirements.in')) }}
+      - name: Install dependencies
+        run: |
+          make setup
+          pip uninstall -y pandas
+          pip freeze
+      - name: Run extras unit tests with coverage
+        # Skip this step if running on python 3.12 due to https://github.com/tensorflow/tensorflow/issues/62003
+        # and https://github.com/pytorch/pytorch/issues/110436
+        if: ${{ matrix.python-version != '3.12' }}
+        run: |
+          make unit_test_extras_codecov
+      - name: Test with coverage
+        run: |
+          make unit_test_codecov
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          fail_ci_if_error: false
+          files: coverage.xml
+
+  build-with-pandas:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        python-version: [ "3.11" ]
+        pandas: [ "pandas<2.0.0", "pandas>=2.0.0" ]
+    steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements files
+          key: ${{ format('{0}-pip-{1}', runner.os, hashFiles('dev-requirements.in', 'requirements.in')) }}
+      - name: Install dependencies
+        run: |
+          make setup
+          pip install --force-reinstall "${{ matrix.pandas }}"
+          pip freeze
+      - name: Test with coverage
+        run: |
+          make unit_test_codecov
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          fail_ci_if_error: false
+          files: coverage.xml
+
+  test-serialization:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python-version: ["3.8", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements files
+          key: ${{ format('{0}-pip-{1}', runner.os, hashFiles('dev-requirements.in', 'requirements.in')) }}
+      - name: Install dependencies
+        run: make setup && pip freeze
+      - name: Test with coverage
+        run: |
+          make test_serialization_codecov
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.4
+        with:
+          fail_ci_if_error: false
+          files: coverage.xml
+
+  integration:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        # python 3.11 has intermittent issues with the docker build + push step
+        # https://github.com/flyteorg/flytekit/actions/runs/5800978835/job/15724237979?pr=1579
+        python-version: ["3.8", "3.11", "3.12"]
+    steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
+      # As described in https://github.com/pypa/setuptools_scm/issues/414, SCM needs git history
+      # and tags to work.
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements files
+          key: ${{ format('{0}-pip-{1}', runner.os, hashFiles('dev-requirements.in', 'requirements.in')) }}
+      - name: Install dependencies
+        run: make setup && pip freeze
+      - name: Install FlyteCTL
+        uses: unionai-oss/flytectl-setup-action@master
+      - name: Setup Flyte Sandbox
+        run: |
+          flytectl demo start
+      - name: Build and push to local registry
+        run: |
+          docker build --push . -f Dockerfile.dev -t localhost:30000/flytekit:dev --build-arg PYTHON_VERSION=${{ matrix.python-version }}
+      - name: Integration Test with coverage
+        env:
+          FLYTEKIT_IMAGE: localhost:30000/flytekit:dev
+          FLYTEKIT_CI: 1
+          PYTEST_OPTS: -n2
+        run: make integration_test_codecov
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          fail_ci_if_error: false
+
+  build-plugins:
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.8", "3.11"]
+        plugin-names:
+          # Please maintain an alphabetical order in the following list
+          - flytekit-airflow
+          - flytekit-async-fsspec
+          - flytekit-aws-athena
+          - flytekit-aws-batch
+          # TODO: uncomment this when the sagemaker agent is implemented: https://github.com/flyteorg/flyte/issues/4079
+          # - flytekit-aws-sagemaker
+          - flytekit-bigquery
+          - flytekit-dask
+          - flytekit-data-fsspec
+          - flytekit-dbt
+          - flytekit-deck-standard
+          - flytekit-dolt
+          - flytekit-duckdb
+          - flytekit-envd
+          - flytekit-greatexpectations
+          - flytekit-hive
+          - flytekit-huggingface
+          - flytekit-k8s-pod
+          - flytekit-kf-mpi
+          - flytekit-kf-pytorch
+          - flytekit-kf-tensorflow
+          - flytekit-mlflow
+          - flytekit-modin
+          - flytekit-onnx-pytorch
+          - flytekit-onnx-scikitlearn
+          # onnx-tensorflow needs a version of tensorflow that does not work with protobuf>4.
+          # The issue is being tracked on the tensorflow side in https://github.com/tensorflow/tensorflow/issues/53234#issuecomment-1330111693
+          # flytekit-onnx-tensorflow
+          - flytekit-pandera
+          - flytekit-papermill
+          - flytekit-polars
+          - flytekit-ray
+          - flytekit-snowflake
+          - flytekit-spark
+          - flytekit-sqlalchemy
+          - flytekit-vaex
+          - flytekit-flyteinteractive
+          - flytekit-whylogs
+        exclude:
+          # flytekit-modin depends on ray which does not have a 3.11 wheel yet.
+          # Issue tracked in https://github.com/ray-project/ray/issues/27881
+          - python-version: 3.11
+            plugin-names: "flytekit-modin"
+          - python-version: 3.11
+            plugin-names: "flytekit-ray"
+          # Great-expectations does not support python 3.11 due to sqlachemy>=2.0.0
+          # not being supported yet:
+          # https://github.com/great-expectations/great_expectations/issues/7020
+          - python-version: 3.11
+            plugin-names: "flytekit-greatexpectations"
+          # onnxruntime does not support python 3.10 yet
+          # https://github.com/microsoft/onnxruntime/issues/9782
+          - python-version: 3.11
+            plugin-names: "flytekit-onnx-pytorch"
+          - python-version: 3.11
+            plugin-names: "flytekit-onnx-scikitlearn"
+          - python-version: 3.11
+            plugin-names: "flytekit-onnx-tensorflow"
+          # numba, a dependency of mlflow, doesn't support python 3.11
+          # https://github.com/numba/numba/issues/8304
+          - python-version: 3.11
+            plugin-names: "flytekit-mlflow"
+          # vaex currently doesn't support python 3.11
+          - python-version: 3.11
+            plugin-names: "flytekit-vaex"
+          # whylogs does support python 3.11 dataclass restrictions
+          # See: https://github.com/flyteorg/flytekit/actions/runs/4493746408/jobs/7905368664
+          - python-version: 3.11
+            plugin-names: "flytekit-whylogs"
+    steps:
+      - uses: insightsengineering/disk-space-reclaimer@v1
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          # This path is specific to Ubuntu
+          path: ~/.cache/pip
+          # Look to see if there is a cache hit for the corresponding requirements files
+          key: ${{ format('{0}-pip-{1}', runner.os, hashFiles('dev-requirements.txt', format('plugins/{0}/requirements.txt', matrix.plugin-names ))) }}
+      - name: Install dependencies
+        run: |
+          make setup
+          cd plugins/${{ matrix.plugin-names }}
+          pip install --pre .
+          if [ -f dev-requirements.txt ]; then pip install -r dev-requirements.txt; fi
+          pip install --pre -U $GITHUB_WORKSPACE
+          pip freeze
+      - name: Test with coverage
+        run: |
+          cd plugins/${{ matrix.plugin-names }}
+          # onnx plugins does not support protobuf>4 yet (in fact it is tensorflow that
+          # does not support that yet). More details in https://github.com/onnx/onnx/issues/4239.
+          if [[ ${{ matrix.plugin-names }} == *"onnx"* || ${{ matrix.plugin-names }} == "flytekit-whylogs" || ${{ matrix.plugin-names }} == "flytekit-mlflow" ]]; then
+             PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python coverage run -m pytest tests --cov=./ --cov-report=xml --cov-append
+          else
+             coverage run -m pytest tests --cov=./ --cov-report=xml --cov-append
+          fi
+      - name: Codecov
+        uses: codecov/codecov-action@v3.1.0
+        with:
+          fail_ci_if_error: false
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch the code
+        uses: actions/checkout@v4
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+      - uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/dev-requirements.in') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          make setup
+          pip freeze
+      - name: Lint
+        run: |
+          make lint
+      - name: ShellCheck
+        uses: ludeeus/action-shellcheck@master
+        with:
+          ignore_paths: boilerplate

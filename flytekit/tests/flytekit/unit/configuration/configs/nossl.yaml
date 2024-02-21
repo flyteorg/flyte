@@ -1,0 +1,4 @@
+admin:
+  endpoint: dns:///flyte.mycorp.io
+  authType: Pkce
+  insecure: false

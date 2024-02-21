@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <title>User Content</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://fonts.googleapis.com/css?family=Lato:300,400,700%7COpen+Sans:400,700" rel="stylesheet">
+    <style>
+        ol, ul {
+            list-style: none;
+        }
+
+        table {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        #flyte-frame-nav {
+            display: flex;
+            width: 100%;
+        }
+
+        #flyte-frame-tabs {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            margin-block: 0;
+            padding-inline-start: 0;
+        }
+
+        #flyte-frame-tabs li {
+            cursor: pointer;
+            padding: 8px;
+            margin: 0;
+            margin-right: 12px;
+            font-size: 14px;
+            line-height: 20px;
+            font-weight: 700;
+            font-style: normal;
+            font-family: Open Sans, helvetica, arial, sans-serif;
+            color: #666666;
+            width: 126px;
+            text-align: center;
+        }
+
+        #flyte-frame-tabs li:last-child {
+            margin-right: 0;
+        }
+
+        #flyte-frame-tabs li.active {
+            border-bottom: 4px solid rgb(163, 26, 255);
+            color: #333333;
+        }
+
+        #flyte-frame-container {
+            width: auto;
+        }
+
+        #flyte-frame-container > div {
+            display: None;
+        }
+
+        #flyte-frame-container > div.active {
+            display: Block;
+            padding: 2rem 4rem;
+            width: 100%;
+        }
+
+    </style>
+
+</head>
+<body>
+    <!---{#% autoescape true %#}--->
+    <nav id="flyte-frame-nav">
+        <ul id="flyte-frame-tabs">
+            {% for key, value in metadata.items() %}
+                <li onclick="handleLinkClick(this)">{{ key | safe }}</li>
+            {% endfor %}
+        </ul>
+    </nav>
+    <div id="flyte-frame-container">
+        {% for key, value in metadata.items() %}
+            <div>{{ value | safe }}</div>
+        {% endfor %}
+    </div>
+    <!---{#% autoescape %#}--->
+</body>
+<script>
+    const setTabs = index => {
+        const container = document.getElementById('flyte-frame-tabs')
+        for (let i = 0; i < container.children.length; i++) {
+            const tabIndex = container.children[i].getAttribute('link_index')
+            if (tabIndex === index) {
+                container.children[i].classList.add('active')
+            } else {
+                container.children[i].className = ''
+            }
+        }
+    }
+    const setContent = index => {
+        const container = document.getElementById('flyte-frame-container')
+        for (let i = 0; i < container.children.length; i++) {
+            const tabIndex = container.children[i].getAttribute('link_index')
+            if (tabIndex === index) {
+                container.children[i].classList.add('active')
+            } else {
+                container.children[i].className = ''
+            }
+        }
+    }
+    const setLinkIndex = index => {
+        setTabs(index)
+        setContent(index)
+    }
+    const handleLinkClick = e => {
+        const linkIndex = e.getAttribute('link_index');
+        setLinkIndex(linkIndex)
+    }
+
+    const tabs = document.getElementById('flyte-frame-tabs');
+    const containers = document.getElementById('flyte-frame-container');
+    for(var i = 0; i < tabs.children.length; i++) {
+        if (i === 0) {
+            tabs.children[i].classList.add('active')
+            containers.children[i].classList.add('active')
+        }
+        tabs.children[i].setAttribute("link_index", i+1)
+        containers.children[i].setAttribute("link_index", i+1)
+    }
+</script>
+</html>

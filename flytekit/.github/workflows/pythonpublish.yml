@@ -1,0 +1,275 @@
+name: Publish Python Package
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: "3.x"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine setuptools wheel
+      - name: Put version in environment
+        id: bump
+        run: |
+          # from refs/tags/v1.2.3 get 1.2.3
+          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
+          echo "::set-output name=version::$VERSION"
+        shell: bash
+      - name: Build and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          python -m build
+          twine upload dist/*
+      - name: Autobump plugin version
+        run: |
+          # from refs/tags/v1.2.3 get 1.2.3
+          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
+          VERSION=$VERSION make -C plugins update_all_versions
+        shell: bash
+      - name: Build all Plugins and publish
+        env:
+          TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+          TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+        run: |
+          make -C plugins build_all_plugins
+          make -C plugins publish_all_plugins
+      - name: Sleep until pypi is available
+        id: pypiwait
+        run: |
+          # from refs/tags/v1.2.3 get 1.2.3 and make sure it's not an empty string
+          VERSION=$(echo $GITHUB_REF | sed 's#.*/v##')
+          if [ -z "$VERSION" ]
+          then
+            echo "No tagged version found, exiting"
+            exit 1
+          fi
+          sleep 300
+          LINK="https://pypi.org/project/flytekitplugins-pod/${VERSION}/"
+          for i in {1..60}; do
+            result=$(curl -L -I -s -f ${LINK})
+            if [ $? -eq 0 ]; then
+              echo "Found pypi for $LINK"
+              exit 0
+            else
+              echo "Did not find - Retrying in 10 seconds..."
+              sleep 10
+            fi
+          done
+          exit 1
+        shell: bash
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+
+  build-and-push-docker-images:
+    runs-on: ubuntu-latest
+    needs: deploy
+    strategy:
+      matrix:
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Flytekit Image Names
+        id: flytekit-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flytekit
+          tags: |
+            py${{ matrix.python-version }}-latest
+            py${{ matrix.python-version }}-${{ github.sha }}
+            py${{ matrix.python-version }}-${{ needs.deploy.outputs.version }}
+      - name: Build & Push Flytekit Python${{ matrix.python-version }} Docker Image to Github Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.flytekit-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ needs.deploy.outputs.version }}
+            DOCKER_IMAGE=ghcr.io/${{ github.repository_owner }}/flytekit:py${{ matrix.python-version }}-${{ needs.deploy.outputs.version }}
+            PYTHON_VERSION=${{ matrix.python-version }}
+          file: Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Prepare SQLAlchemy Image Names
+        id: sqlalchemy-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flytekit
+          tags: |
+            py${{ matrix.python-version }}-sqlalchemy-latest
+            py${{ matrix.python-version }}-sqlalchemy-${{ github.sha }}
+            py${{ matrix.python-version }}-sqlalchemy-${{ needs.deploy.outputs.version }}
+      - name: Push SQLAlchemy Image to GitHub Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: "./plugins/flytekit-sqlalchemy/"
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.sqlalchemy-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ needs.deploy.outputs.version }}
+            PYTHON_VERSION=${{ matrix.python-version }}
+          file: ./plugins/flytekit-sqlalchemy/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push-flyteagent-images:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Flyte Agent Image Names
+        id: flyteagent-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flyteagent
+          tags: |
+            latest
+            ${{ github.sha }}
+            ${{ needs.deploy.outputs.version }}
+      - name: Push External Plugin Service Image to GitHub Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: "."
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.flyteagent-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ needs.deploy.outputs.version }}
+          file: ./Dockerfile.agent
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push-spark-images:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare Spark Image Names
+        id: spark-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flytekit
+          tags: |
+            spark-latest
+            spark-${{ github.sha }}
+            spark-${{ needs.deploy.outputs.version }}
+      - name: Push Spark Image to GitHub Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: "./plugins/flytekit-spark/"
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.spark-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ needs.deploy.outputs.version }}
+          file: ./plugins/flytekit-spark/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  build-and-push-flyteinteractive-images:
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: "0"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Login to GitHub Container Registry
+        if: ${{ github.event_name == 'release' }}
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: "${{ secrets.FLYTE_BOT_USERNAME }}"
+          password: "${{ secrets.FLYTE_BOT_PAT }}"
+      - name: Prepare flyteinteractive Image Names
+        id: flyteinteractive-names
+        uses: docker/metadata-action@v3
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/flytekit
+          tags: |
+            flyteinteractive-latest
+            flyteinteractive-${{ github.sha }}
+            flyteinteractive-${{ needs.deploy.outputs.version }}
+      - name: Push Flyin Image to GitHub Registry
+        uses: docker/build-push-action@v2
+        with:
+          context: "./plugins/flytekit-flyteinteractive/"
+          platforms: linux/arm64, linux/amd64
+          push: ${{ github.event_name == 'release' }}
+          tags: ${{ steps.flyteinteractive-names.outputs.tags }}
+          build-args: |
+            VERSION=${{ needs.deploy.outputs.version }}
+          file: ./plugins/flytekit-flyteinteractive/Dockerfile
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
