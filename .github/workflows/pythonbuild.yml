@@ -27,6 +27,8 @@ jobs:
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
+        with:
+          filter: tree:0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -72,6 +74,8 @@ jobs:
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
+        with:
+          filter: tree:0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -109,6 +113,8 @@ jobs:
         working-directory: flytekit
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: tree:0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -148,6 +154,8 @@ jobs:
       # As described in https://github.com/pypa/setuptools_scm/issues/414, SCM needs git history
       # and tags to work.
       - uses: actions/checkout@v4
+        with:
+          filter: tree:0
         with:
           fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
@@ -266,6 +274,8 @@ jobs:
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
+        with:
+          filter: tree:0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -307,6 +317,8 @@ jobs:
     steps:
       - name: Fetch the code
         uses: actions/checkout@v4
+        with:
+          filter: tree:0
       - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
