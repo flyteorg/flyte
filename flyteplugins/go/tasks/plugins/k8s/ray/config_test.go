@@ -35,3 +35,13 @@ func TestLoadDefaultServiceAccountConfig(t *testing.T) {
 		assert.Equal(t, config.ServiceAccount, "default")
 	})
 }
+
+func TestLoadDefaultLabels(t *testing.T) {
+	rayConfig := GetConfig()
+	assert.Assert(t, rayConfig != nil)
+
+	t.Run("labels", func(t *testing.T) {
+		config := GetConfig()
+		assert.Equal(t, config.Labels, map[string]string{})
+	})
+}
