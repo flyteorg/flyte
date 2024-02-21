@@ -37,7 +37,7 @@ spec:
           {{- with .Values.cluster_resource_manager.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
-          {{- end }}}
+          {{- end }}
           volumeMounts:
           {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
           {{- include "databaseSecret.volumeMount" . | nindent 10 }}
