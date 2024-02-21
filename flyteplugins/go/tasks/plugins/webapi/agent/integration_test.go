@@ -260,7 +260,7 @@ func newMockAsyncAgentPlugin() webapi.PluginEntry {
 		ResourceMeta: []byte{1, 2, 3, 4}}, nil)
 
 	mockGetRequestMatcher := mock.MatchedBy(func(request *admin.GetTaskRequest) bool {
-		return request.GetTaskType().GetName() == "spark"
+		return request.GetTaskCategory().GetName() == "spark"
 	})
 	asyncAgentClient.On("GetTask", mock.Anything, mockGetRequestMatcher).Return(
 		&admin.GetTaskResponse{Resource: &admin.Resource{Phase: flyteIdlCore.TaskExecution_SUCCEEDED}}, nil)

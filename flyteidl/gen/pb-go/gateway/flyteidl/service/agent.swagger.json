@@ -56,7 +56,7 @@
         ]
       }
     },
-    "/api/v1/agent/task/logs/{task_type.name}/{task_type.version}/{resource_meta}": {
+    "/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}": {
       "get": {
         "summary": "GetTaskLogs returns task execution logs, if available.",
         "operationId": "AsyncAgentService_GetTaskLogs",
@@ -85,14 +85,14 @@
         },
         "parameters": [
           {
-            "name": "task_type.name",
+            "name": "task_category.name",
             "description": "The name of the task type.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "task_type.version",
+            "name": "task_category.version",
             "description": "The version of the task type.",
             "in": "path",
             "required": true,
@@ -108,7 +108,7 @@
             "format": "byte"
           },
           {
-            "name": "deprecated_task_type",
+            "name": "task_type",
             "description": "A predefined yet extensible Task type identifier.",
             "in": "query",
             "required": false,
@@ -135,7 +135,7 @@
         ]
       }
     },
-    "/api/v1/agent/task/metrics/{task_type.name}/{task_type.version}/{resource_meta}": {
+    "/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}": {
       "get": {
         "summary": "GetTaskMetrics returns one or more task execution metrics, if available.",
         "description": "Errors include\n * OutOfRange if metrics are not available for the specified task time range\n * various other errors",
@@ -156,14 +156,14 @@
         },
         "parameters": [
           {
-            "name": "task_type.name",
+            "name": "task_category.name",
             "description": "The name of the task type.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "task_type.version",
+            "name": "task_category.version",
             "description": "The version of the task type.",
             "in": "path",
             "required": true,
@@ -179,7 +179,7 @@
             "format": "byte"
           },
           {
-            "name": "deprecated_task_type",
+            "name": "task_type",
             "description": "A predefined yet extensible Task type identifier.",
             "in": "query",
             "required": false,
@@ -268,7 +268,7 @@
         ]
       }
     },
-    "/api/v1/agent/task/{task_type.name}/{task_type.version}/{resource_meta}": {
+    "/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}": {
       "get": {
         "summary": "Get job status.",
         "operationId": "AsyncAgentService_GetTask",
@@ -288,14 +288,14 @@
         },
         "parameters": [
           {
-            "name": "task_type.name",
+            "name": "task_category.name",
             "description": "The name of the task type.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "task_type.version",
+            "name": "task_category.version",
             "description": "The version of the task type.",
             "in": "path",
             "required": true,
@@ -311,7 +311,7 @@
             "format": "byte"
           },
           {
-            "name": "deprecated_task_type",
+            "name": "task_type",
             "description": "A predefined yet extensible Task type identifier.",
             "in": "query",
             "required": false,
@@ -323,7 +323,7 @@
         ]
       }
     },
-    "/api/v1/agent/task_executions/{task_type.name}/{task_type.version}/{resource_meta}": {
+    "/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}": {
       "delete": {
         "summary": "Delete the task resource.",
         "operationId": "AsyncAgentService_DeleteTask",
@@ -343,14 +343,14 @@
         },
         "parameters": [
           {
-            "name": "task_type.name",
+            "name": "task_category.name",
             "description": "The name of the task type.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "task_type.version",
+            "name": "task_category.version",
             "description": "The version of the task type.",
             "in": "path",
             "required": true,
@@ -366,7 +366,7 @@
             "format": "byte"
           },
           {
-            "name": "deprecated_task_type",
+            "name": "task_type",
             "description": "A predefined yet extensible Task type identifier.",
             "in": "query",
             "required": false,
@@ -598,7 +598,7 @@
           "type": "string",
           "description": "Name is the developer-assigned name of the agent."
         },
-        "deprecated_supported_task_types": {
+        "supported_task_types": {
           "type": "array",
           "items": {
             "type": "string"
@@ -609,13 +609,13 @@
           "type": "boolean",
           "description": "IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their\nresults synchronously when called by propeller. Given that sync agents can affect the performance\nof the system, it's important to enforce strict timeout policies.\nAn Async agent, on the other hand, is required to be able to identify jobs by an\nidentifier and query for job statuses as jobs progress."
         },
-        "supported_task_types": {
+        "supported_task_categories": {
           "type": "array",
           "items": {
             "type": "object",
-            "$ref": "#/definitions/adminTaskType"
+            "$ref": "#/definitions/adminTaskCategory"
           },
-          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
+          "description": "Supported_task_categories are the categories of the tasks that the agent can handle."
         }
       },
       "description": "A message containing the agent metadata."
@@ -820,7 +820,7 @@
         }
       }
     },
-    "adminTaskType": {
+    "adminTaskCategory": {
       "type": "object",
       "properties": {
         "name": {

@@ -44,7 +44,7 @@ type ResourceWrapper struct {
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
 	AgentResourceMeta []byte
-	TaskType          admin.TaskType
+	TaskCategory      admin.TaskCategory
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -90,8 +90,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	taskType := admin.TaskType{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent, isSync := getFinalAgent(&taskType, p.cfg, p.agentRegistry)
+	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
+	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
@@ -121,7 +121,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
-		TaskType:          taskType,
+		TaskCategory:      taskCategory,
 	}, nil, nil
 }
 
@@ -182,7 +182,7 @@ func (p Plugin) ExecuteTaskSync(
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -192,9 +192,9 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 	defer cancel()
 
 	request := &admin.GetTaskRequest{
-		DeprecatedTaskType: metadata.TaskType.Name,
-		TaskType:           &metadata.TaskType,
-		ResourceMeta:       metadata.AgentResourceMeta,
+		TaskType:     metadata.TaskCategory.Name,
+		TaskCategory: &metadata.TaskCategory,
+		ResourceMeta: metadata.AgentResourceMeta,
 	}
 	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
@@ -215,7 +215,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskType, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -225,9 +225,9 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 	defer cancel()
 
 	request := &admin.DeleteTaskRequest{
-		DeprecatedTaskType: metadata.TaskType.Name,
-		TaskType:           &metadata.TaskType,
-		ResourceMeta:       metadata.AgentResourceMeta,
+		TaskType:     metadata.TaskCategory.Name,
+		TaskCategory: &metadata.TaskCategory,
+		ResourceMeta: metadata.AgentResourceMeta,
 	}
 	_, err = client.DeleteTask(finalCtx, request)
 	return err
@@ -333,8 +333,8 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType *admin.TaskType, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
-	if agent, exists := agentRegistry[taskType.Name][taskType.Version]; exists {
+func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
+	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
 

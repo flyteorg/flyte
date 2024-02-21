@@ -30,14 +30,14 @@ service AsyncAgentService {
   // Get job status.
   rpc GetTask (flyteidl.admin.GetTaskRequest) returns (flyteidl.admin.GetTaskResponse){
     option (google.api.http) = {
-      get: "/api/v1/agent/task/{task_type.name}/{task_type.version}/{resource_meta}"
+      get: "/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}"
     };
   };
 
   // Delete the task resource.
   rpc DeleteTask (flyteidl.admin.DeleteTaskRequest) returns (flyteidl.admin.DeleteTaskResponse){
     option (google.api.http) = {
-      delete: "/api/v1/agent/task_executions/{task_type.name}/{task_type.version}/{resource_meta}"
+      delete: "/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}"
     };
   };
 
@@ -48,14 +48,14 @@ service AsyncAgentService {
   //  * various other errors
   rpc GetTaskMetrics(flyteidl.admin.GetTaskMetricsRequest) returns (flyteidl.admin.GetTaskMetricsResponse){
     option (google.api.http) = {
-      get: "/api/v1/agent/task/metrics/{task_type.name}/{task_type.version}/{resource_meta}"
+      get: "/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}"
     };
   };
 
   // GetTaskLogs returns task execution logs, if available.
   rpc GetTaskLogs(flyteidl.admin.GetTaskLogsRequest) returns (stream flyteidl.admin.GetTaskLogsResponse){
     option (google.api.http) = {
-      get: "/api/v1/agent/task/logs/{task_type.name}/{task_type.version}/{resource_meta}"
+      get: "/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}"
     };
   };
 }

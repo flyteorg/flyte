@@ -136,19 +136,19 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 		}
 
 		for _, agent := range res.GetAgents() {
-			deprecatedSupportedTaskTypes := agent.DeprecatedSupportedTaskTypes
+			deprecatedSupportedTaskTypes := agent.SupportedTaskTypes
 			for _, supportedTaskType := range deprecatedSupportedTaskTypes {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
 				agentRegistry[supportedTaskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
 			}
 
-			supportedTaskTypes := agent.SupportedTaskTypes
-			for _, supportedTaskType := range supportedTaskTypes {
+			supportedTaskCategories := agent.SupportedTaskCategories
+			for _, supportedCategory := range supportedTaskCategories {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
-				agentRegistry[supportedTaskType.GetName()] = map[int32]*Agent{supportedTaskType.GetVersion(): agent}
+				agentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 			}
 			logger.Infof(context.Background(), "[%v] is a sync agent: [%v]", agent.Name, agent.IsSync)
-			logger.Infof(context.Background(), "[%v] supports task types: [%v]", agent.Name, supportedTaskTypes)
+			logger.Infof(context.Background(), "[%v] supports task types: [%v]", agent.Name, supportedTaskCategories)
 		}
 	}
 

@@ -111,7 +111,7 @@ func local_request_AsyncAgentService_CreateTask_0(ctx context.Context, marshaler
 }
 
 var (
-	filter_AsyncAgentService_GetTask_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_type": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
+	filter_AsyncAgentService_GetTask_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_category": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
 )
 
 func request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -125,24 +125,24 @@ func request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler runtime.
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -178,24 +178,24 @@ func local_request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler ru
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -221,7 +221,7 @@ func local_request_AsyncAgentService_GetTask_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_AsyncAgentService_DeleteTask_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_type": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
+	filter_AsyncAgentService_DeleteTask_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_category": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
 )
 
 func request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -235,24 +235,24 @@ func request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -288,24 +288,24 @@ func local_request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -331,7 +331,7 @@ func local_request_AsyncAgentService_DeleteTask_0(ctx context.Context, marshaler
 }
 
 var (
-	filter_AsyncAgentService_GetTaskMetrics_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_type": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
+	filter_AsyncAgentService_GetTaskMetrics_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_category": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
 )
 
 func request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -345,24 +345,24 @@ func request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marshaler r
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -398,24 +398,24 @@ func local_request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marsh
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -441,7 +441,7 @@ func local_request_AsyncAgentService_GetTaskMetrics_0(ctx context.Context, marsh
 }
 
 var (
-	filter_AsyncAgentService_GetTaskLogs_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_type": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
+	filter_AsyncAgentService_GetTaskLogs_0 = &utilities.DoubleArray{Encoding: map[string]int{"task_category": 0, "name": 1, "version": 2, "resource_meta": 3, "resourceMeta": 4}, Base: []int{1, 6, 5, 6, 7, 8, 2, 0, 4, 0, 0, 0, 0, 0}, Check: []int{0, 1, 1, 1, 1, 1, 2, 7, 2, 9, 3, 4, 5, 6}}
 )
 
 func request_AsyncAgentService_GetTaskLogs_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AsyncAgentServiceClient, req *http.Request, pathParams map[string]string) (extService.AsyncAgentService_GetTaskLogsClient, runtime.ServerMetadata, error) {
@@ -455,24 +455,24 @@ func request_AsyncAgentService_GetTaskLogs_0(ctx context.Context, marshaler runt
 		_   = err
 	)
 
-	val, ok = pathParams["task_type.name"]
+	val, ok = pathParams["task_category.name"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.name")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.name")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.name", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.name", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.name", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.name", err)
 	}
 
-	val, ok = pathParams["task_type.version"]
+	val, ok = pathParams["task_category.version"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_type.version")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "task_category.version")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "task_type.version", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "task_category.version", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_type.version", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "task_category.version", err)
 	}
 
 	val, ok = pathParams["resource_meta"]
@@ -630,7 +630,7 @@ func RegisterAsyncAgentServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/agent/task/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -655,7 +655,7 @@ func RegisterAsyncAgentServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/DeleteTask", runtime.WithHTTPPathPattern("/api/v1/agent/task_executions/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/DeleteTask", runtime.WithHTTPPathPattern("/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -680,7 +680,7 @@ func RegisterAsyncAgentServiceHandlerServer(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTaskMetrics", runtime.WithHTTPPathPattern("/api/v1/agent/task/metrics/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTaskMetrics", runtime.WithHTTPPathPattern("/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -903,7 +903,7 @@ func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/agent/task/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTask", runtime.WithHTTPPathPattern("/api/v1/agent/task/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -925,7 +925,7 @@ func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/DeleteTask", runtime.WithHTTPPathPattern("/api/v1/agent/task_executions/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/DeleteTask", runtime.WithHTTPPathPattern("/api/v1/agent/task_executions/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -947,7 +947,7 @@ func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTaskMetrics", runtime.WithHTTPPathPattern("/api/v1/agent/task/metrics/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTaskMetrics", runtime.WithHTTPPathPattern("/api/v1/agent/task/metrics/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -969,7 +969,7 @@ func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.Se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTaskLogs", runtime.WithHTTPPathPattern("/api/v1/agent/task/logs/{task_type.name}/{task_type.version}/{resource_meta}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/flyteidl.service.AsyncAgentService/GetTaskLogs", runtime.WithHTTPPathPattern("/api/v1/agent/task/logs/{task_category.name}/{task_category.version}/{resource_meta}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -991,13 +991,13 @@ func RegisterAsyncAgentServiceHandlerClient(ctx context.Context, mux *runtime.Se
 var (
 	pattern_AsyncAgentService_CreateTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "v1", "agent", "task"}, ""))
 
-	pattern_AsyncAgentService_GetTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "agent", "task", "task_type.name", "task_type.version", "resource_meta"}, ""))
+	pattern_AsyncAgentService_GetTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "agent", "task", "task_category.name", "task_category.version", "resource_meta"}, ""))
 
-	pattern_AsyncAgentService_DeleteTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "agent", "task_executions", "task_type.name", "task_type.version", "resource_meta"}, ""))
+	pattern_AsyncAgentService_DeleteTask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 1, 0, 4, 1, 5, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6}, []string{"api", "v1", "agent", "task_executions", "task_category.name", "task_category.version", "resource_meta"}, ""))
 
-	pattern_AsyncAgentService_GetTaskMetrics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "agent", "task", "metrics", "task_type.name", "task_type.version", "resource_meta"}, ""))
+	pattern_AsyncAgentService_GetTaskMetrics_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "agent", "task", "metrics", "task_category.name", "task_category.version", "resource_meta"}, ""))
 
-	pattern_AsyncAgentService_GetTaskLogs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "agent", "task", "logs", "task_type.name", "task_type.version", "resource_meta"}, ""))
+	pattern_AsyncAgentService_GetTaskLogs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4, 1, 0, 4, 1, 5, 5, 1, 0, 4, 1, 5, 6, 1, 0, 4, 1, 5, 7}, []string{"api", "v1", "agent", "task", "logs", "task_category.name", "task_category.version", "resource_meta"}, ""))
 )
 
 var (

@@ -61,9 +61,9 @@ func TestPlugin(t *testing.T) {
 	t.Run("test getFinalAgent", func(t *testing.T) {
 		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
 		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
-		spark := &admin.TaskType{Name: "spark", Version: defaultTaskTypeVersion}
-		foo := &admin.TaskType{Name: "foo", Version: defaultTaskTypeVersion}
-		bar := &admin.TaskType{Name: "bar", Version: defaultTaskTypeVersion}
+		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
+		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
+		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
 		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
 		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
 		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
@@ -274,15 +274,15 @@ func TestPlugin(t *testing.T) {
 func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
 	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
 	mockRequest := &admin.ListAgentsRequest{}
-	suppoertedTaskTypes := make([]*admin.TaskType, 3)
-	suppoertedTaskTypes[0] = &admin.TaskType{Name: "task1", Version: defaultTaskTypeVersion}
-	suppoertedTaskTypes[1] = &admin.TaskType{Name: "task2", Version: defaultTaskTypeVersion}
-	suppoertedTaskTypes[2] = &admin.TaskType{Name: "task3", Version: defaultTaskTypeVersion}
+	suppoertedTaskTypes := make([]*admin.TaskCategory, 3)
+	suppoertedTaskTypes[0] = &admin.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
+	suppoertedTaskTypes[1] = &admin.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
+	suppoertedTaskTypes[2] = &admin.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
 	mockResponse := &admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
-				Name:               "test-agent",
-				SupportedTaskTypes: suppoertedTaskTypes,
+				Name:                    "test-agent",
+				SupportedTaskCategories: suppoertedTaskTypes,
 			},
 		},
 	}

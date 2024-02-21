@@ -126,14 +126,14 @@ class ExecuteTaskSyncResponse(_message.Message):
     def __init__(self, header: _Optional[_Union[ExecuteTaskSyncResponseHeader, _Mapping]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
 
 class GetTaskRequest(_message.Message):
-    __slots__ = ["deprecated_task_type", "resource_meta", "task_type"]
-    DEPRECATED_TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["task_type", "resource_meta", "task_category"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    deprecated_task_type: str
+    RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
     resource_meta: bytes
-    task_type: TaskType
-    def __init__(self, deprecated_task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_type: _Optional[_Union[TaskType, _Mapping]] = ...) -> None: ...
+    task_category: TaskCategory
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
 
 class GetTaskResponse(_message.Message):
     __slots__ = ["resource"]
@@ -158,32 +158,32 @@ class Resource(_message.Message):
     def __init__(self, state: _Optional[_Union[State, str]] = ..., outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., message: _Optional[str] = ..., log_links: _Optional[_Iterable[_Union[_execution_pb2.TaskLog, _Mapping]]] = ..., phase: _Optional[_Union[_execution_pb2.TaskExecution.Phase, str]] = ..., custom_info: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskRequest(_message.Message):
-    __slots__ = ["deprecated_task_type", "resource_meta", "task_type"]
-    DEPRECATED_TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["task_type", "resource_meta", "task_category"]
     TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    deprecated_task_type: str
+    RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
+    TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
     resource_meta: bytes
-    task_type: TaskType
-    def __init__(self, deprecated_task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_type: _Optional[_Union[TaskType, _Mapping]] = ...) -> None: ...
+    task_category: TaskCategory
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
 
 class DeleteTaskResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 
 class Agent(_message.Message):
-    __slots__ = ["name", "deprecated_supported_task_types", "is_sync", "supported_task_types"]
+    __slots__ = ["name", "supported_task_types", "is_sync", "supported_task_categories"]
     NAME_FIELD_NUMBER: _ClassVar[int]
-    DEPRECATED_SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
-    IS_SYNC_FIELD_NUMBER: _ClassVar[int]
     SUPPORTED_TASK_TYPES_FIELD_NUMBER: _ClassVar[int]
+    IS_SYNC_FIELD_NUMBER: _ClassVar[int]
+    SUPPORTED_TASK_CATEGORIES_FIELD_NUMBER: _ClassVar[int]
     name: str
-    deprecated_supported_task_types: _containers.RepeatedScalarFieldContainer[str]
+    supported_task_types: _containers.RepeatedScalarFieldContainer[str]
     is_sync: bool
-    supported_task_types: _containers.RepeatedCompositeFieldContainer[TaskType]
-    def __init__(self, name: _Optional[str] = ..., deprecated_supported_task_types: _Optional[_Iterable[str]] = ..., is_sync: bool = ..., supported_task_types: _Optional[_Iterable[_Union[TaskType, _Mapping]]] = ...) -> None: ...
+    supported_task_categories: _containers.RepeatedCompositeFieldContainer[TaskCategory]
+    def __init__(self, name: _Optional[str] = ..., supported_task_types: _Optional[_Iterable[str]] = ..., is_sync: bool = ..., supported_task_categories: _Optional[_Iterable[_Union[TaskCategory, _Mapping]]] = ...) -> None: ...
 
-class TaskType(_message.Message):
+class TaskCategory(_message.Message):
     __slots__ = ["name", "version"]
     NAME_FIELD_NUMBER: _ClassVar[int]
     VERSION_FIELD_NUMBER: _ClassVar[int]
@@ -214,22 +214,22 @@ class ListAgentsResponse(_message.Message):
     def __init__(self, agents: _Optional[_Iterable[_Union[Agent, _Mapping]]] = ...) -> None: ...
 
 class GetTaskMetricsRequest(_message.Message):
-    __slots__ = ["deprecated_task_type", "resource_meta", "queries", "start_time", "end_time", "step", "task_type"]
-    DEPRECATED_TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["task_type", "resource_meta", "queries", "start_time", "end_time", "step", "task_category"]
+    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
     QUERIES_FIELD_NUMBER: _ClassVar[int]
     START_TIME_FIELD_NUMBER: _ClassVar[int]
     END_TIME_FIELD_NUMBER: _ClassVar[int]
     STEP_FIELD_NUMBER: _ClassVar[int]
-    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    deprecated_task_type: str
+    TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
     resource_meta: bytes
     queries: _containers.RepeatedScalarFieldContainer[str]
     start_time: _timestamp_pb2.Timestamp
     end_time: _timestamp_pb2.Timestamp
     step: _duration_pb2.Duration
-    task_type: TaskType
-    def __init__(self, deprecated_task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., queries: _Optional[_Iterable[str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., step: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., task_type: _Optional[_Union[TaskType, _Mapping]] = ...) -> None: ...
+    task_category: TaskCategory
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., queries: _Optional[_Iterable[str]] = ..., start_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., end_time: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., step: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
 
 class GetTaskMetricsResponse(_message.Message):
     __slots__ = ["results"]
@@ -238,18 +238,18 @@ class GetTaskMetricsResponse(_message.Message):
     def __init__(self, results: _Optional[_Iterable[_Union[_metrics_pb2.ExecutionMetricResult, _Mapping]]] = ...) -> None: ...
 
 class GetTaskLogsRequest(_message.Message):
-    __slots__ = ["deprecated_task_type", "resource_meta", "lines", "token", "task_type"]
-    DEPRECATED_TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["task_type", "resource_meta", "lines", "token", "task_category"]
+    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
     RESOURCE_META_FIELD_NUMBER: _ClassVar[int]
     LINES_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
-    TASK_TYPE_FIELD_NUMBER: _ClassVar[int]
-    deprecated_task_type: str
+    TASK_CATEGORY_FIELD_NUMBER: _ClassVar[int]
+    task_type: str
     resource_meta: bytes
     lines: int
     token: str
-    task_type: TaskType
-    def __init__(self, deprecated_task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., lines: _Optional[int] = ..., token: _Optional[str] = ..., task_type: _Optional[_Union[TaskType, _Mapping]] = ...) -> None: ...
+    task_category: TaskCategory
+    def __init__(self, task_type: _Optional[str] = ..., resource_meta: _Optional[bytes] = ..., lines: _Optional[int] = ..., token: _Optional[str] = ..., task_category: _Optional[_Union[TaskCategory, _Mapping]] = ...) -> None: ...
 
 class GetTaskLogsResponseHeader(_message.Message):
     __slots__ = ["token"]

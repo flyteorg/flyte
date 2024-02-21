@@ -124,13 +124,13 @@ pub struct GetTaskRequest {
     /// A predefined yet extensible Task type identifier.
     #[deprecated]
     #[prost(string, tag="1")]
-    pub deprecated_task_type: ::prost::alloc::string::String,
+    pub task_type: ::prost::alloc::string::String,
     /// Metadata about the resource to be pass to the agent.
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="3")]
-    pub task_type: ::core::option::Option<TaskType>,
+    pub task_category: ::core::option::Option<TaskCategory>,
 }
 /// Response to get an individual task resource.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -171,13 +171,13 @@ pub struct DeleteTaskRequest {
     /// A predefined yet extensible Task type identifier.
     #[deprecated]
     #[prost(string, tag="1")]
-    pub deprecated_task_type: ::prost::alloc::string::String,
+    pub task_type: ::prost::alloc::string::String,
     /// Metadata about the resource to be pass to the agent.
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="3")]
-    pub task_type: ::core::option::Option<TaskType>,
+    pub task_category: ::core::option::Option<TaskCategory>,
 }
 /// Response to delete a task.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -194,7 +194,7 @@ pub struct Agent {
     /// SupportedTaskTypes are the types of the tasks that the agent can handle.
     #[deprecated]
     #[prost(string, repeated, tag="2")]
-    pub deprecated_supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
+    pub supported_task_types: ::prost::alloc::vec::Vec<::prost::alloc::string::String>,
     /// IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
     /// results synchronously when called by propeller. Given that sync agents can affect the performance
     /// of the system, it's important to enforce strict timeout policies.
@@ -202,13 +202,13 @@ pub struct Agent {
     /// identifier and query for job statuses as jobs progress.
     #[prost(bool, tag="3")]
     pub is_sync: bool,
-    /// SupportedTaskTypes are the types of the tasks that the agent can handle.
+    /// Supported_task_categories are the categories of the tasks that the agent can handle.
     #[prost(message, repeated, tag="4")]
-    pub supported_task_types: ::prost::alloc::vec::Vec<TaskType>,
+    pub supported_task_categories: ::prost::alloc::vec::Vec<TaskCategory>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskType {
+pub struct TaskCategory {
     /// The name of the task type.
     #[prost(string, tag="1")]
     pub name: ::prost::alloc::string::String,
@@ -250,7 +250,7 @@ pub struct GetTaskMetricsRequest {
     /// A predefined yet extensible Task type identifier.
     #[deprecated]
     #[prost(string, tag="1")]
-    pub deprecated_task_type: ::prost::alloc::string::String,
+    pub task_type: ::prost::alloc::string::String,
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
@@ -269,7 +269,7 @@ pub struct GetTaskMetricsRequest {
     pub step: ::core::option::Option<::prost_types::Duration>,
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="7")]
-    pub task_type: ::core::option::Option<TaskType>,
+    pub task_category: ::core::option::Option<TaskCategory>,
 }
 /// A response containing a list of metrics for a task execution.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -286,7 +286,7 @@ pub struct GetTaskLogsRequest {
     /// A predefined yet extensible Task type identifier.
     #[deprecated]
     #[prost(string, tag="1")]
-    pub deprecated_task_type: ::prost::alloc::string::String,
+    pub task_type: ::prost::alloc::string::String,
     /// Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
     #[prost(bytes="vec", tag="2")]
     pub resource_meta: ::prost::alloc::vec::Vec<u8>,
@@ -299,7 +299,7 @@ pub struct GetTaskLogsRequest {
     pub token: ::prost::alloc::string::String,
     /// A predefined yet extensible Task type identifier.
     #[prost(message, optional, tag="5")]
-    pub task_type: ::core::option::Option<TaskType>,
+    pub task_category: ::core::option::Option<TaskCategory>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
