@@ -21,6 +21,9 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.8", "3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: flytekit
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
@@ -63,6 +66,9 @@ jobs:
         os: [ ubuntu-latest ]
         python-version: [ "3.11" ]
         pandas: [ "pandas<2.0.0", "pandas>=2.0.0" ]
+    defaults:
+      run:
+        working-directory: flytekit
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
@@ -98,6 +104,9 @@ jobs:
       matrix:
         os: [ubuntu-latest]
         python-version: ["3.8", "3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: flytekit
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
@@ -131,6 +140,9 @@ jobs:
         # python 3.11 has intermittent issues with the docker build + push step
         # https://github.com/flyteorg/flytekit/actions/runs/5800978835/job/15724237979?pr=1579
         python-version: ["3.8", "3.11", "3.12"]
+    defaults:
+      run:
+        working-directory: flytekit
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       # As described in https://github.com/pypa/setuptools_scm/issues/414, SCM needs git history
@@ -248,6 +260,9 @@ jobs:
           # See: https://github.com/flyteorg/flytekit/actions/runs/4493746408/jobs/7905368664
           - python-version: 3.11
             plugin-names: "flytekit-whylogs"
+    defaults:
+      run:
+        working-directory: flytekit
     steps:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
@@ -286,6 +301,9 @@ jobs:
           fail_ci_if_error: false
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: flytekit
     steps:
       - name: Fetch the code
         uses: actions/checkout@v4
