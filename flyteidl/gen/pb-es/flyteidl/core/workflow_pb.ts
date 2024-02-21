@@ -1121,6 +1121,13 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
    */
   extendedResources?: ExtendedResources;
 
+  /**
+   * Override for the image used by task pods.
+   *
+   * @generated from field: string container_image = 3;
+   */
+  containerImage = "";
+
   constructor(data?: PartialMessage<TaskNodeOverrides>) {
     super();
     proto3.util.initPartial(data, this);
@@ -1131,6 +1138,7 @@ export class TaskNodeOverrides extends Message<TaskNodeOverrides> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "resources", kind: "message", T: Resources },
     { no: 2, name: "extended_resources", kind: "message", T: ExtendedResources },
+    { no: 3, name: "container_image", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskNodeOverrides {

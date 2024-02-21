@@ -11969,6 +11969,7 @@
                  * @interface ITaskNodeOverrides
                  * @property {flyteidl.core.IResources|null} [resources] TaskNodeOverrides resources
                  * @property {flyteidl.core.IExtendedResources|null} [extendedResources] TaskNodeOverrides extendedResources
+                 * @property {string|null} [containerImage] TaskNodeOverrides containerImage
                  */
     
                 /**
@@ -12003,6 +12004,14 @@
                 TaskNodeOverrides.prototype.extendedResources = null;
     
                 /**
+                 * TaskNodeOverrides containerImage.
+                 * @member {string} containerImage
+                 * @memberof flyteidl.core.TaskNodeOverrides
+                 * @instance
+                 */
+                TaskNodeOverrides.prototype.containerImage = "";
+    
+                /**
                  * Creates a new TaskNodeOverrides instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskNodeOverrides
@@ -12030,6 +12039,8 @@
                         $root.flyteidl.core.Resources.encode(message.resources, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
                     if (message.extendedResources != null && message.hasOwnProperty("extendedResources"))
                         $root.flyteidl.core.ExtendedResources.encode(message.extendedResources, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
+                    if (message.containerImage != null && message.hasOwnProperty("containerImage"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.containerImage);
                     return writer;
                 };
     
@@ -12056,6 +12067,9 @@
                             break;
                         case 2:
                             message.extendedResources = $root.flyteidl.core.ExtendedResources.decode(reader, reader.uint32());
+                            break;
+                        case 3:
+                            message.containerImage = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -12086,6 +12100,9 @@
                         if (error)
                             return "extendedResources." + error;
                     }
+                    if (message.containerImage != null && message.hasOwnProperty("containerImage"))
+                        if (!$util.isString(message.containerImage))
+                            return "containerImage: string expected";
                     return null;
                 };
     

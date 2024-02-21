@@ -4935,6 +4935,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides extendedResources */
             extendedResources?: (flyteidl.core.IExtendedResources|null);
+
+            /** TaskNodeOverrides containerImage */
+            containerImage?: (string|null);
         }
 
         /** Represents a TaskNodeOverrides. */
@@ -4951,6 +4954,9 @@ export namespace flyteidl {
 
             /** TaskNodeOverrides extendedResources. */
             public extendedResources?: (flyteidl.core.IExtendedResources|null);
+
+            /** TaskNodeOverrides containerImage. */
+            public containerImage: string;
 
             /**
              * Creates a new TaskNodeOverrides instance using the specified properties.

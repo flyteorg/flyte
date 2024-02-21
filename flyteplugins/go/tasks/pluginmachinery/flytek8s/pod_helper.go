@@ -317,7 +317,7 @@ func BuildRawPod(ctx context.Context, tCtx pluginsCore.TaskExecutionContext) (*v
 }
 
 // ApplyFlytePodConfiguration updates the PodSpec and ObjectMeta with various Flyte configuration. This includes
-// applying default k8s configuration, resource requests, injecting copilot containers, and merging with the
+// applying default k8s configuration, applying overrides (resources etc.), injecting copilot containers, and merging with the
 // configuration PodTemplate (if exists).
 func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecutionContext, podSpec *v1.PodSpec, objectMeta *metav1.ObjectMeta, primaryContainerName string) (*v1.PodSpec, *metav1.ObjectMeta, error) {
 	taskTemplate, err := tCtx.TaskReader().Read(ctx)
@@ -400,7 +400,21 @@ func ApplyFlytePodConfiguration(ctx context.Context, tCtx pluginsCore.TaskExecut
 		ApplyGPUNodeSelectors(podSpec, extendedResources.GetGpuAccelerator())
 	}
 
+	// Override container image if necessary
+	if len(tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage()) > 0 {
+		ApplyContainerImageOverride(podSpec, tCtx.TaskExecutionMetadata().GetOverrides().GetContainerImage(), primaryContainerName)
+	}
+
 	return podSpec, objectMeta, nil
+}
+
+func ApplyContainerImageOverride(podSpec *v1.PodSpec, containerImage string, primaryContainerName string) {
+	for i, c := range podSpec.Containers {
+		if c.Name == primaryContainerName {
+			podSpec.Containers[i].Image = containerImage
+			return
+		}
+	}
 }
 
 // ToK8sPodSpec builds a PodSpec and ObjectMeta based on the definition passed by the TaskExecutionContext. This
