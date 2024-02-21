@@ -73,7 +73,7 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	if err != nil {
 		return nil, flyteerr.Errorf(flyteerr.BadTaskSpecification, "Unable to create pod spec: [%v]", err.Error())
 	}
-
+	
 	var primaryContainer *v1.Container
 	var primaryContainerIdx int
 	for idx, c := range podSpec.Containers {
@@ -90,6 +90,10 @@ func (rayJobResourceHandler) BuildResource(ctx context.Context, taskCtx pluginsC
 	}
 
 	cfg := GetConfig()
+	for k, v := range cfg.Labels {
+		objectMeta.Labels[k] = v
+	}
+	
 	headReplicas := int32(1)
 	headNodeRayStartParams := make(map[string]string)
 	if rayJob.RayCluster.HeadGroupSpec != nil && rayJob.RayCluster.HeadGroupSpec.RayStartParams != nil {

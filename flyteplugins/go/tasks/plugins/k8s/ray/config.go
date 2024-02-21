@@ -24,6 +24,7 @@ var (
 		EnableUsageStats:         false,
 		KubeRayCrdVersion:        "v1alpha1",
 		ServiceAccount:           "default",
+		Labels: 				  map[string]string{},
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
@@ -79,6 +80,9 @@ type Config struct {
 
 	// DeprecatedNodeIPAddress the IP address of the head node. By default, this is pod ip address.
 	DeprecatedNodeIPAddress string `json:"nodeIPAddress,omitempty" pflag:"-,DEPRECATED. Please use DefaultConfig.[HeadNode|WorkerNode].IPAddress"`
+
+	// Labels is the list of labels associated with the rayJob
+	Labels map[string]string `json:"labels,omitempty"`
 
 	// Remote Ray Cluster Config
 	RemoteClusterConfig  pluginmachinery.ClusterConfig `json:"remoteClusterConfig" pflag:"Configuration of remote K8s cluster for ray jobs"`
