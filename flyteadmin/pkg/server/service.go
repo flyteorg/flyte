@@ -148,7 +148,7 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	grpcService.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
 
-	service.RegisterCacheServiceServer(grpcServer, cacheservice.NewCacheServer(ctx, configuration, dataStorageClient, scope.NewSubScope("cache")))
+	grpcService.RegisterCacheServiceServer(grpcServer, cacheservice.NewCacheServer(ctx, configuration, dataStorageClient, scope.NewSubScope("cache")))
 
 	additionalService := plugins.Get[common.RegisterAdditionalGRPCService](pluginRegistry, plugins.PluginIDAdditionalGRPCService)
 	if additionalService != nil {

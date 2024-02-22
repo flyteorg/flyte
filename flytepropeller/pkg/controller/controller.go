@@ -5,7 +5,6 @@ package controller
 import (
 	"context"
 	"fmt"
-	"github.com/flyteorg/flyte/flytestdlib/catalog"
 	"os"
 	"runtime/pprof"
 	"time"
@@ -50,6 +49,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/controller/workflowstore"
 	leader "github.com/flyteorg/flyte/flytepropeller/pkg/leaderelection"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/utils"
+	"github.com/flyteorg/flyte/flytestdlib/catalog"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	stdErrs "github.com/flyteorg/flyte/flytestdlib/errors"
 	"github.com/flyteorg/flyte/flytestdlib/logger"

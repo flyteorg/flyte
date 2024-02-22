@@ -4,7 +4,6 @@ package flyteidl.service;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service";
 
 import "google/api/annotations.proto";
-// import "protoc-gen-swagger/options/annotations.proto";
 
 import "flyteidl/core/errors.proto";
 import "flyteidl/core/identifier.proto";
