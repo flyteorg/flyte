@@ -148,7 +148,7 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 				agentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 			}
 			logger.Infof(context.Background(), "[%v] is a sync agent: [%v]", agent.Name, agent.IsSync)
-			logger.Infof(context.Background(), "[%v] supports task types: [%v]", agent.Name, supportedTaskCategories)
+			logger.Infof(context.Background(), "[%v] supports task category: [%v]", agent.Name, supportedTaskCategories)
 		}
 	}
 
