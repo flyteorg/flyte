@@ -90,7 +90,7 @@ cron schedule into the `kickoff_time` argument of the `date_formatter_wf` workfl
 
 +++
 
-## Fixed rate schedules
+## Fixed rate intervals
 
 If you prefer to use an interval rather than a cron scheduler to schedule your workflows, you can use the fixed-rate scheduler.
 A fixed-rate scheduler runs at the specified interval.

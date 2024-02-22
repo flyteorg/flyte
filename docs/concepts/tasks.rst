@@ -108,11 +108,11 @@ System retry can be of two types:
 
 .. note::
 
-   `RFC 3902 <https://github.com/flyteorg/flyte/pull/3902>`_ implements an alternative, simplified retry behaviour with which both system and user retries are counted towards a single retry budget defined in the task decorator (thus, without a second retry budget defined in the platform configuration). The last retries are always performed on non-spot instances to guarantee completion. To activate this behaviour, set ``configmap.core.propeller.node-config.ignore-retry-cause`` to ``true`` in the helm values.
+   `RFC 3902 <https://github.com/flyteorg/flyte/pull/3902>`_ implements an alternative, simplified retry behavior with which both system and user retries are counted towards a single retry budget defined in the task decorator (thus, without a second retry budget defined in the platform configuration). The last retries are always performed on non-spot instances to guarantee completion. To activate this behaviour, set ``configmap.core.propeller.node-config.ignore-retry-cause`` to ``true`` in the helm values.
 
 
 **Timeouts**
-  
+
 To ensure that the system is always making progress, tasks must be guaranteed to end gracefully/successfully. The system defines a default timeout period for the tasks. It is possible for task authors to define a timeout period, after which the task is marked as ``failure``. Note that a timed-out task will be retried if it has a retry strategy defined. The timeout can be handled in the `TaskMetadata <https://docs.flyte.org/en/latest/api/flytekit/generated/flytekit.TaskMetadata.html?highlight=retries#flytekit.TaskMetadata>`__.
 
 
@@ -120,4 +120,4 @@ Caching/Memoization
 ^^^^^^^^^^^^^^^^^^^
 
 Flyte supports memoization of task outputs to ensure that identical invocations of a task are not executed repeatedly, thereby saving compute resources and execution time. For example, if you wish to run the same piece of code multiple times, you can reuse the output instead of re-computing it.
-For more information on memoization, refer to the :std:doc:`Caching Example </user_guide/development_lifecycle/task_cache>`.
+For more information on memoization, refer to the :std:doc:`/user_guide/development_lifecycle/caching`.
