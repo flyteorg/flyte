@@ -13,5 +13,5 @@ and get familiar with the ins and outs of `ImageSpec`!
 
 imagespec
 raw_container
-multi_images_in_a_workflow
+multiple_images_in_a_workflow
 ```
