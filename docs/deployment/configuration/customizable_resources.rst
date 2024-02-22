@@ -187,7 +187,7 @@ etc. in the `Workflow execution config <https://github.com/flyteorg/flyteidl/blo
 - `max_parallelism`: Limits maximum number of nodes that can be evaluated for an individual workflow in parallel
 - `security context <https://docs.flyte.org/projects/flyteidl/en/latest/protos/docs/core/core.html#securitycontext>`__: configures the pod identity and auth credentials for task pods at execution time
 - `raw_output_data_config`: where offloaded user data is stored
-- `interruptible`: whether to use [spot instances](https://docs.flyte.org/en/latest/flytesnacks/examples/productionizing/spot_instances.html#using-spot-preemptible-instances)
+- `interruptible`: whether to use [spot instances](https://docs.flyte.org/en/user_guide/productionizing/spot_instances.html)
 - `overwrite_cache`: Allows for all cached values of a workflow and its tasks to be overwritten for a single execution.
 - `envs`: Custom environment variables to apply for task pods brought up during execution
 

@@ -313,6 +313,7 @@ PROTO_REF_REPLACE = r"\1/protos/docs"
 # These patterns are used to replace values in source files that are imported
 # from other repos.
 REPLACE_PATTERNS = {
+
     r"<flyte:deployment/index>": r"</deployment/index>",
     r"<flytectl:index>": r"</flytectl/overview>",
     INTERSPHINX_REFS_PATTERN: INTERSPHINX_REFS_REPLACE,
@@ -328,16 +329,16 @@ REPLACE_PATTERNS = {
     PROTO_REF_PATTERN: PROTO_REF_REPLACE,
     r"/protos/docs/service/index": r"/protos/docs/service/service",
     r"<weather_forecasting>": r"</flytesnacks/weather_forecasting>",
-    r"<environment_setup>": r"</flytesnacks/environment_setup>"
 }
+
+# r"<environment_setup>": r"</flytesnacks/environment_setup>",
 
 import_projects_config = {
     "clone_dir": "_projects",
     "flytekit_api_dir": "_src/flytekit/",
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
-        "flytesnacks/userguide",
-        "flytesnacks/tutorials",
+       "flytesnacks/tutorials",
         "flytesnacks/integrations",
     ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
@@ -369,6 +370,25 @@ import_projects = [
                 "flytesnacks/_build",
                 "flytesnacks/_tags",
                 "flytesnacks/getting_started",
+                "flytesnacks/userguide.md",
+                "flytesnacks/environment_setup.md",
+                "flytesnacks/index.md",
+                "examples/advanced_composition",
+                "examples/basics",
+                "examples/customizing_dependencies",
+                "examples/data_types_and_io",
+                "examples/development_lifecycle",
+                "examples/extending",
+                "examples/productionizing",
+                "examples/testing",
+                "flytesnacks/examples/advanced_composition",
+                "flytesnacks/examples/basics",
+                "flytesnacks/examples/customizing_dependencies",
+                "flytesnacks/examples/data_types_and_io",
+                "flytesnacks/examples/development_lifecycle",
+                "flytesnacks/examples/extending",
+                "flytesnacks/examples/productionizing",
+                "flytesnacks/examples/testing",
             ]
         ],
         "local": flytesnacks_local_path is not None,

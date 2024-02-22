@@ -63,7 +63,7 @@ def wf(a: int) -> str:
 
 Notice how calls to `t1_fixed_b` do not need to specify the `b` parameter.
 
-This also works for [Map Tasks](https://docs.flyte.org/en/latest/flytesnacks/examples/advanced_composition/map_task.html) in a limited capacity. For example:
+This also works for [Map Tasks](https://docs.flyte.org/en/latest/user_guide/advanced_composition/map_tasks.html) in a limited capacity. For example:
 
 ```
 from flytekit import task, workflow, partial, map_task
@@ -107,5 +107,5 @@ Map tasks do not support partial tasks with lists as inputs.
 
 ## Flyteconsole
 
-Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/en/latest/flytesnacks/examples/advanced_composition/waiting_for_external_inputs.html#waiting-for-external-inputs).
+Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/en/latest/user_guide/advanced_composition/waiting_for_external_inputs.html).
 Better support for dataclasses in the launch form.
