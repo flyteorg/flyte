@@ -99,7 +99,7 @@ Users can now configure workflow execution to overwrite the cache. Each task in 
 
 
 ### Support for Dask
-Users will be able to spawn [Dask](https://www.dask.org/) ephemeral clusters as part of their workflows, similar to the support for [Ray](https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/kubernetes/ray_example/ray_example.html#sphx-glr-auto-integrations-kubernetes-ray-example-ray-example-py) and [Spark](https://docs.flyte.org/projects/cookbook/en/stable/auto/integrations/kubernetes/k8s_spark/pyspark_pi.html).
+Users will be able to spawn [Dask](https://www.dask.org/) ephemeral clusters as part of their workflows, similar to the support for [Ray](https://docs.flyte.org/en/latest/flytesnacks/examples/ray_plugin/index.html) and [Spark](https://docs.flyte.org/en/latest/flytesnacks/examples/k8s_spark_plugin/index.html).
 
 
 ## Looking Ahead

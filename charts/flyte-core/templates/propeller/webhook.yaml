@@ -35,10 +35,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+      {{- with .Values.webhook.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       serviceAccountName: {{ template "flyte-pod-webhook.name" . }}
 {{- if .Values.webhook.enabled }}
       initContainers:
@@ -61,6 +60,15 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.namespace
+        {{- if .Values.flytepropeller.podEnv -}}
+        {{- with .Values.flytepropeller.podEnv -}}
+        {{- toYaml . | nindent 10 }}
+        {{- end }}
+        {{- end }}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: ["ALL"]
         volumeMounts:
           - name: config-volume
             mountPath: /etc/flyte/config
@@ -89,6 +97,12 @@ spec:
         {{- toYaml . | nindent 12 }}
         {{- end }}
         {{- end }}
+          ports:
+          - containerPort: 9443
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
@@ -103,6 +117,9 @@ spec:
         - name: webhook-certs
           secret:
             secretName: flyte-pod-webhook
+      {{- with .Values.flytepropeller.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
 ---
 # Service
 apiVersion: v1
@@ -154,6 +171,9 @@ metadata:
   annotations: {{ tpl (toYaml .) $ | nindent 4 }}
   {{- end}}
 {{- end }}
+  {{- with .Values.webhook.serviceAccount.imagePullSecrets }}
+imagePullSecrets: {{ tpl (toYaml .) $ | nindent 2 }}
+  {{- end }}
 ---
 # Create a binding from Role -> ServiceAccount
 kind: ClusterRoleBinding

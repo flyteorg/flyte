@@ -420,7 +420,7 @@ func TestCatalog_Put(t *testing.T) {
 				assert.NoError(t, parseErr)
 				assert.EqualValues(t, 1, len(o.Artifact.Data))
 				assert.EqualValues(t, "out1", o.Artifact.Data[0].Name)
-				assert.EqualValues(t, newStringLiteral("output1-stringval"), o.Artifact.Data[0].Value)
+				assert.True(t, proto.Equal(newStringLiteral("output1-stringval"), o.Artifact.Data[0].Value))
 				return true
 			}),
 		).Return(&datacatalog.CreateArtifactResponse{}, nil)
@@ -508,7 +508,7 @@ func TestCatalog_Put(t *testing.T) {
 				assert.NoError(t, parseErr)
 				assert.EqualValues(t, 1, len(o.Artifact.Data))
 				assert.EqualValues(t, "out1", o.Artifact.Data[0].Name)
-				assert.EqualValues(t, newStringLiteral("output1-stringval"), o.Artifact.Data[0].Value)
+				assert.True(t, proto.Equal(newStringLiteral("output1-stringval"), o.Artifact.Data[0].Value))
 				createArtifactCalled = true
 				return true
 			}),

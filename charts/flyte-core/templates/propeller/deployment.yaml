@@ -31,10 +31,9 @@ spec:
       labels: {{ include "flytepropeller.podLabels" . | nindent 8 }}
       {{- end }}
     spec:
-      securityContext:
-        fsGroup: 65534
-        runAsUser: 1001
-        fsGroupChangePolicy: "Always"
+      {{- with .Values.flytepropeller.securityContext }}
+      securityContext: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
       {{- if .Values.flytepropeller.priorityClassName }}
       priorityClassName: {{ .Values.flytepropeller.priorityClassName }}
       {{- end }}
@@ -83,8 +82,10 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
+        {{- end }}
         {{- with .Values.flytepropeller.additionalVolumeMounts -}}
         {{ tpl (toYaml .) $ | nindent 8 }}
         {{- end }}
@@ -99,9 +100,11 @@ spec:
       - configMap:
           name: flyte-propeller-config
         name: config-volume
+      {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
       - name: auth
         secret:
           secretName: flyte-secret-auth
+      {{- end }}
       {{- with .Values.flytepropeller.additionalVolumes -}}
       {{ tpl (toYaml .) $ | nindent 6 }}
       {{- end }}

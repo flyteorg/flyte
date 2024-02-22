@@ -7,7 +7,7 @@
 </h1>
 
 <p align="center">
-  :building_construction: :rocket: :chart_with_upwards_trend: 
+  :building_construction: :rocket: :chart_with_upwards_trend:
 </p>
 
 
@@ -24,7 +24,7 @@
     <img src="https://img.shields.io/badge/openssf%20best%20practices-passing-green?style=for-the-badge" alt="OpenSSF Best Practices label" /></a>
   <a href="https://artifacthub.io/packages/search?repo=flyte">
     <img src="https://img.shields.io/endpoint?style=for-the-badge&url=https://artifacthub.io/badge/repository/flyte" alt="Flyte Helm Chart label" /></a>
-  <a href="https://twitter.com/flyteorg"> 
+  <a href="https://twitter.com/flyteorg">
     <img src="https://img.shields.io/badge/X-000000.svg?style=for-the-badge&logo=X&logoColor=white" height=30px/></a>
   <a href="https://slack.flyte.org" alt="Twitter, formerly X logo label">
     <img src="https://img.shields.io/badge/Slack-Chat-pink?style=for-the-badge&logo=slack" alt="Flyte Slack label" /></a>
@@ -36,7 +36,7 @@ Flyte is an open-source orchestrator that facilitates building production-grade 
   Build
 </h2>
 <p>
-Write code in Python or any other language and leverage a robust type engine. 
+Write code in Python or any other language and leverage a robust type engine.
 </p>
 
 <img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadmebuildv2.gif" style="width: 60%; height: auto;" />
@@ -48,7 +48,7 @@ Write code in Python or any other language and leverage a robust type engine.
 Either locally or on a remote cluster, execute your models with ease.
 </p>
 <img alt="Getting started with Flyte" src="https://raw.githubusercontent.com/flyteorg/static-resources/main/common/flytereadme-deploy.gif" style="width: 60%; height: auto;" />
- 
+
 
 <h3 align="center">
   <a href="#quick-start">Get Started</a>
@@ -99,32 +99,32 @@ Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deploym
 
 ## Tutorials
 - [Fine-tune Code Llama on the Flyte codebase](https://github.com/unionai-oss/llm-fine-tuning/tree/main/flyte_llama#readme)
-- [Forecast sales with Horovod and Spark](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/forecasting_sales/index.html)
-- [Nucleotide Sequence Querying with BLASTX](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/blast/index.html)
+- [Forecast sales with Horovod and Spark](https://docs.flyte.org/en/latest/flytesnacks/examples/forecasting_sales/index.html)
+- [Nucleotide Sequence Querying with BLASTX](https://docs.flyte.org/en/latest/flytesnacks/examples/blast/index.html)
 
 ## Features
 🚀 **Strongly typed interfaces**: Validate your data at every step of the workflow by defining data guardrails using Flyte types.<br>
 🌐 **Any language**: Write code in any language using raw containers, or choose [Python](https://github.com/flyteorg/flytekit), [Java](https://github.com/flyteorg/flytekit-java), [Scala](https://github.com/flyteorg/flytekit-java) or [JavaScript](https://github.com/NotMatthewGriffin/pterodactyl) SDKs to develop your Flyte workflows. <br />
 🔒 **Immutability**: Immutable executions help ensure reproducibility by preventing any changes to the state of an execution. <br />
 🧬 **Data lineage**: Track the movement and transformation of data throughout the lifecycle of your data and ML workflows. <br />
-📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/map_task.html). <br />
+📊 **Map tasks**: Achieve parallel code execution with minimal configuration using [map tasks](https://docs.flyte.org/en/latest/user_guide/advanced_composition/map_tasks.html). <br />
 🌎 **Multi-tenancy**: Multiple users can share the same platform while maintaining their own distinct data and configurations. <br />
-🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/dynamics.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
-⏯️ [Wait](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
-🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/conditions.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
+🌟 **Dynamic workflows**: [Build flexible and adaptable workflows](https://docs.flyte.org/en/latest/user_guide/advanced_composition/dynamic_workflows.html) that can change and evolve as needed, making it easier to respond to changing requirements. <br />
+⏯️ [Wait](https://docs.flyte.org/en/latest/user_guide/advanced_composition/waiting_for_external_inputs.html) for **external inputs** before proceeding with the execution. <br />
+🌳 **Branching**: [Selectively execute branches](https://docs.flyte.org/en/latest/user_guide/advanced_composition/conditionals.html) of your workflow based on static or dynamic data produced by other tasks or input data. <br />
 📈 **Data visualization**: Visualize data, monitor models and view training history through plots. <br />
-📂 **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/files.html) and [directories](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/folders.html) between local and cloud storage. <br />
-🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/data_types_and_io/structured_dataset.html). <br />
+📂 **FlyteFile & FlyteDirectory**: Transfer [files](https://docs.flyte.org/en/latest/user_guide/data_types_and_io/flytefile.html) and [directories](https://docs.flyte.org/en/latest/user_guide/data_types_and_io/flytedirectory.html) between local and cloud storage. <br />
+🗃️ **Structured dataset**: Convert dataframes between types and enforce column-level type checking using the abstract 2D representation provided by [Structured Dataset](https://docs.flyte.org/en/latest/user_guide/data_types_and_io/structureddataset.html). <br />
 🛡️ **Recover from failures**: Recover only the failed tasks. <br />
 🔁 **Rerun a single task**: Rerun workflows at the most granular level without modifying the previous state of a data/ML workflow. <br />
 🔍 **Cache outputs**: Cache task outputs by passing `cache=True` to the task decorator. <br />
-🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/advanced_composition/checkpoint.html) within a task execution. <br />
+🚩 **Intra-task checkpointing**: [Checkpoint progress](https://docs.flyte.org/en/latest/user_guide/advanced_composition/intratask_checkpoints.html) within a task execution. <br />
 ⏰ **Timeout**: Define a timeout period, after which the task is marked as failure. <br />
 🏭 **Dev to prod**: As simple as changing your [domain](https://docs.flyte.org/en/latest/concepts/domains.html) from development or staging to production. <br />
 💸 **Spot or preemptible instances**: Schedule your workflows on spot instances by setting `interruptible` to `True` in the task decorator. <br />
 ☁️ **Cloud-native deployment**: Deploy Flyte on AWS, GCP, Azure and other cloud services. <br />
-📅 **Scheduling**: [Schedule](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/lp_schedules.html) your data and ML workflows to run at a specific time. <br />
-📢 **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/productionizing/lp_notifications.html) through Slack, PagerDuty or email. <br />
+📅 **Scheduling**: [Schedule](https://docs.flyte.org/en/latest/user_guide/productionizing/schedules.html) your data and ML workflows to run at a specific time. <br />
+📢 **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/en/latest/user_guide/productionizing/notifications.html) through Slack, PagerDuty or email. <br />
 ⌛️ **Timeline view**: Evaluate the duration of each of your Flyte tasks and identify potential bottlenecks. <br />
 💨 **GPU acceleration**: Enable and control your tasks’ GPU demands by requesting resources in the task decorator. <br />
 🐳 **Dependency isolation via containers**: Maintain separate sets of dependencies for your tasks so no dependency conflicts arise. <br />
