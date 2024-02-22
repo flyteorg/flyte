@@ -19,7 +19,7 @@ kernelspec:
 
 (folder)=
 
-# `FlyteDirectory`
+# FlyteDirectory
 
 ```{eval-rst}
 .. tags:: Data, Basic

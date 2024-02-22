@@ -158,7 +158,7 @@ The potential for malicious exploitation is deemed non-existent as no access to 
 3. Which Flyte tools (`flyteconsole`/`flytectl`) should support the proposed `AdminService` API extension for `flyteadmin`, if any?
     - **RESOLVED**: `flytectl`, `flytekit.remote`, `flyteconsole`
 4. Should we support automatic eviction of cached results on workflow archival (opt-out via `flyteconsole`)?
-5. Should we evict [Intratask Checkpoints](https://docs.flyte.org/en/latest/flytesnacks/examples/advanced_composition/checkpoint.html#intratask-checkpoints) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
+5. Should we evict [Intratask Checkpoints](https://docs.flyte.org/en/latest/user_guide/advanced_composition/intratask_checkpoints.html) from the cache as well since they might return cached results? If so, should we evict them from the backend side or pass the `cache_override` flag along to `flytekit`/its `Checkpointer` to skip any available entries?
     - **RESOLVED**: not for the initial implementation. Intratask checkpoints are only relevant for consecutive retries of a task - their results would not be considered when launching another execution with a `cache_override` flag set.
 
 ## 9 Conclusion

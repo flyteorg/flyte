@@ -282,7 +282,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
     * - **Purpose**: Examples, Tips, and Tricks to use Flytekit SDKs
     * - **Language**: Python (In the future, Java examples will be added)
     * - **Guidelines**: Refer to the `Flytesnacks Contribution Guide <https://docs.flyte.org/en/latest/flytesnacks/contribute.html>`__
- 
+
 ``flytectl``
 ************
 
@@ -291,7 +291,7 @@ The resulting ``html`` files will be in ``docs/_build/html``. You can view them 
     * - `Repo <https://github.com/flyteorg/flytectl>`__
     * - **Purpose**: A standalone Flyte CLI
     * - **Language**: Go
-    * - **Guidelines**: Refer to the `FlyteCTL Contribution Guide <https://docs.flyte.org/en/latest/flytectl/contribute.html>`__    
+    * - **Guidelines**: Refer to the `FlyteCTL Contribution Guide <https://docs.flyte.org/en/latest/flytectl/contribute.html>`__
 
 
 🔮 Development Environment Setup Guide
@@ -677,7 +677,7 @@ You can access it via http://localhost:30080/console.
 
 
 Core Flyte components, such as admin, propeller, and datacatalog, as well as user runtime containers rely on an object store (in this case, minio) to hold files.
-During development, you might need to examine files such as `input.pb/output.pb <https://docs.flyte.org/en/latest/concepts/data_management.html#serialization-time>`__, or `deck.html <https://docs.flyte.org/en/latest/flytesnacks/examples/development_lifecycle/decks.html#id1>`__ stored in minio.
+During development, you might need to examine files such as `input.pb/output.pb <https://docs.flyte.org/en/latest/concepts/data_management.html#serialization-time>`__, or `deck.html <https://docs.flyte.org/en/latest/user_guide/development_lifecycle/decks.html#id1>`__ stored in minio.
 
 Access the minio console at: http://localhost:30080/minio/login. The default credentials are:
 

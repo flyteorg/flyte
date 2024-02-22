@@ -19,7 +19,7 @@ kernelspec:
 
 (file)=
 
-# `FlyteFile`
+# FlyteFile
 
 ```{eval-rst}
 .. tags:: Data, Basic

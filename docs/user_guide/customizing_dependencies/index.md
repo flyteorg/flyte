@@ -12,6 +12,6 @@ and get familiar with the ins and outs of `ImageSpec`!
 :hidden:
 
 imagespec
-raw_container
+raw_containers
 multiple_images_in_a_workflow
 ```

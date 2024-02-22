@@ -19,7 +19,7 @@ kernelspec:
 
 (structured_dataset)=
 
-# `StructuredDataset`
+# StructuredDataset
 
 ```{eval-rst}
 .. tags:: Basic, DataFrame

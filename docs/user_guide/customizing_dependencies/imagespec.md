@@ -19,7 +19,7 @@ kernelspec:
 
 (image_spec_example)=
 
-# `ImageSpec`
+# ImageSpec
 
 ```{eval-rst}
 .. tags:: Containerization, Intermediate
