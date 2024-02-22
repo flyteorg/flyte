@@ -123,7 +123,7 @@ Go to the [Deployment guide](https://docs.flyte.org/en/latest/deployment/deploym
 🏭 **Dev to prod**: As simple as changing your [domain](https://docs.flyte.org/en/latest/concepts/domains.html) from development or staging to production. <br />
 💸 **Spot or preemptible instances**: Schedule your workflows on spot instances by setting `interruptible` to `True` in the task decorator. <br />
 ☁️ **Cloud-native deployment**: Deploy Flyte on AWS, GCP, Azure and other cloud services. <br />
-📅 **Scheduling**: [Schedule](https://docs.flyte.org/en/latest/userr/productionizing/lp_schedules.html) your data and ML workflows to run at a specific time. <br />
+📅 **Scheduling**: [Schedule](https://docs.flyte.org/en/latest/user_guide/productionizing/schedules.html) your data and ML workflows to run at a specific time. <br />
 📢 **Notifications**: Stay informed about changes to your workflow's state by configuring [notifications](https://docs.flyte.org/en/latest/user_guide/productionizing/notifications.html) through Slack, PagerDuty or email. <br />
 ⌛️ **Timeline view**: Evaluate the duration of each of your Flyte tasks and identify potential bottlenecks. <br />
 💨 **GPU acceleration**: Enable and control your tasks’ GPU demands by requesting resources in the task decorator. <br />
