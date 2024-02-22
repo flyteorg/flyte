@@ -442,9 +442,6 @@ type ExecutableNode interface {
 	GetActiveDeadline() *time.Duration
 	IsInterruptible() *bool
 	GetName() string
-	IsCacheable() *bool
-	GetCacheVersion() *string
-	IsCacheSerializable() *bool
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow
@@ -494,15 +491,6 @@ type ExecutableSubWorkflow interface {
 	GetConnections() *Connections
 	GetOutputs() *OutputVarMap
 	GetOnFailurePolicy() WorkflowOnFailurePolicy
-	GetIdentifier() *core.Identifier
-	GetInterface() *core.TypedInterface
-}
-
-// ExecutableLaunchPlan interface captures the methods available on any launch plan.
-type ExecutableLaunchPlan interface {
-	GetId() *core.Identifier
-	GetInterface() *core.TypedInterface
-	GetFixedInputs() *core.LiteralMap
 }
 
 // Meta provides an interface to retrieve labels, annotations and other concepts that are declared only once
@@ -530,7 +518,6 @@ type TaskDetailsGetter interface {
 
 type SubWorkflowGetter interface {
 	FindSubWorkflow(subID WorkflowID) ExecutableSubWorkflow
-	FindLaunchPlan(id LaunchPlanRefID) ExecutableLaunchPlan
 }
 
 type MetaExtended interface {

@@ -18,43 +18,32 @@ import (
 type InterfaceProvider = common.InterfaceProvider
 
 type LaunchPlanInterfaceProvider struct {
-	identifier      *core.Identifier
 	expectedInputs  core.ParameterMap
-	fixedInputs     core.LiteralMap
 	expectedOutputs core.VariableMap
+	identifier      *core.Identifier
 }
 
 func (p *LaunchPlanInterfaceProvider) GetID() *core.Identifier {
 	return p.identifier
 }
-
 func (p *LaunchPlanInterfaceProvider) GetExpectedInputs() *core.ParameterMap {
 	return &p.expectedInputs
-}
 
-func (p *LaunchPlanInterfaceProvider) GetFixedInputs() *core.LiteralMap {
-	return &p.fixedInputs
 }
-
 func (p *LaunchPlanInterfaceProvider) GetExpectedOutputs() *core.VariableMap {
 	return &p.expectedOutputs
 }
 
 func NewLaunchPlanInterfaceProvider(launchPlan models.LaunchPlan, identifier core.Identifier) (common.InterfaceProvider, error) {
 	var closure admin.LaunchPlanClosure
-	if err := proto.Unmarshal(launchPlan.Closure, &closure); err != nil {
-		logger.Errorf(context.TODO(), "Failed to transform launch plan: %v", err)
-		return &LaunchPlanInterfaceProvider{}, err
-	}
-	var spec admin.LaunchPlanSpec
-	if err := proto.Unmarshal(launchPlan.Spec, &spec); err != nil {
+	err := proto.Unmarshal(launchPlan.Closure, &closure)
+	if err != nil {
 		logger.Errorf(context.TODO(), "Failed to transform launch plan: %v", err)
 		return &LaunchPlanInterfaceProvider{}, err
 	}
 	return &LaunchPlanInterfaceProvider{
-		identifier:      &identifier,
 		expectedInputs:  *closure.ExpectedInputs,
-		fixedInputs:     *spec.FixedInputs,
 		expectedOutputs: *closure.ExpectedOutputs,
+		identifier:      &identifier,
 	}, nil
 }

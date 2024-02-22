@@ -16,8 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 )
 
-const notExistsErrMsg = "workflow wfNode does not have a subworkflow or child workflow reference"
-
 type workflowNodeHandler struct {
 	lpHandler    launchPlanHandler
 	subWfHandler subworkflowHandler
@@ -46,8 +44,9 @@ func (w *workflowNodeHandler) Handle(ctx context.Context, nCtx interfaces.NodeEx
 
 	logger.Debug(ctx, "Starting workflow Node")
 	invalidWFNodeError := func() (handler.Transition, error) {
+		errMsg := "workflow wfNode does not have a subworkflow or child workflow reference"
 		return handler.DoTransition(handler.TransitionTypeEphemeral, handler.PhaseInfoFailure(core.ExecutionError_SYSTEM,
-			errors.BadSpecificationError, notExistsErrMsg, nil)), nil
+			errors.BadSpecificationError, errMsg, nil)), nil
 	}
 
 	updateNodeStateFn := func(transition handler.Transition, workflowNodeState handler.WorkflowNodeState, err error) (handler.Transition, error) {

@@ -73,7 +73,7 @@ var sampleKey = catalog.Key{
 }
 
 var noInputOutputKey = catalog.Key{
-	Identifier:   core.Identifier{Project: "project", Domain: "domain", Name: "name", ResourceType: core.ResourceType_TASK},
+	Identifier:   core.Identifier{Project: "project", Domain: "domain", Name: "name"},
 	CacheVersion: "1.0.0",
 }
 

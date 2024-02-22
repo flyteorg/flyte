@@ -948,7 +948,7 @@ func (c *nodeExecutor) handleNotYetStartedNode(ctx context.Context, dag executor
 
 	var cacheStatus *catalog.Status
 	if cacheHandler, ok := h.(interfaces.CacheableNodeHandler); p.GetPhase() != handler.EPhaseSkip && ok {
-		cacheable, _, err := isCacheableWithOverrides(ctx, nCtx, cacheHandler)
+		cacheable, _, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
 			return interfaces.NodeStatusUndefined, err
@@ -1042,7 +1042,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 	if cacheHandlerOk {
 		// if node is cacheable we attempt to check the cache if in queued phase or get / extend a
 		// catalog reservation
-		_, cacheSerializable, err := isCacheableWithOverrides(ctx, nCtx, cacheHandler)
+		_, cacheSerializable, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
 			return interfaces.NodeStatusUndefined, err
@@ -1128,7 +1128,7 @@ func (c *nodeExecutor) handleQueuedOrRunningNode(ctx context.Context, nCtx inter
 
 	if p.GetPhase() == handler.EPhaseSuccess && cacheHandlerOk {
 		// if node is cacheable we attempt to write outputs to the cache and release catalog reservation
-		cacheable, cacheSerializable, err := isCacheableWithOverrides(ctx, nCtx, cacheHandler)
+		cacheable, cacheSerializable, err := cacheHandler.IsCacheable(ctx, nCtx)
 		if err != nil {
 			logger.Errorf(ctx, "failed to determine if node is cacheable with err '%s'", err.Error())
 			return interfaces.NodeStatusUndefined, err

@@ -39,7 +39,7 @@ type CatalogClient struct {
 
 // GetDataset retrieves a dataset that is associated with the task represented by the provided catalog.Key.
 func (m *CatalogClient) GetDataset(ctx context.Context, key catalog.Key) (*datacatalog.Dataset, error) {
-	datasetID, err := GenerateDatasetID(ctx, key)
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (m *CatalogClient) Get(ctx context.Context, key catalog.Key) (catalog.Entry
 
 // CreateDataset creates a Dataset in datacatalog including the associated metadata.
 func (m *CatalogClient) CreateDataset(ctx context.Context, key catalog.Key, metadata *datacatalog.Metadata) (*datacatalog.DatasetID, error) {
-	datasetID, err := GenerateDatasetID(ctx, key)
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
 		logger.Errorf(ctx, "DataCatalog failed to generate dataset for ID: %s, err: %s", key.Identifier, err)
 		return nil, err
@@ -368,7 +368,7 @@ func (m *CatalogClient) Update(ctx context.Context, key catalog.Key, reader io.O
 // previously acquired a reservation it will be extended. If another entity holds the reservation
 // that is returned.
 func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.Key, ownerID string, heartbeatInterval time.Duration) (*datacatalog.Reservation, error) {
-	datasetID, err := GenerateDatasetID(ctx, key)
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
 		return nil, err
 	}
@@ -408,7 +408,7 @@ func (m *CatalogClient) GetOrExtendReservation(ctx context.Context, key catalog.
 // does not exist (e.x. it never existed or has been acquired by another owner) then this call
 // still succeeds.
 func (m *CatalogClient) ReleaseReservation(ctx context.Context, key catalog.Key, ownerID string) error {
-	datasetID, err := GenerateDatasetID(ctx, key)
+	datasetID, err := GenerateDatasetIDForTask(ctx, key)
 	if err != nil {
 		return err
 	}

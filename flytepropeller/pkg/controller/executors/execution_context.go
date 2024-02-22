@@ -4,7 +4,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/apis/flyteworkflow/v1alpha1"
 )
 
-//go:generate mockery -all -case=underscore
+// go:generate mockery -case=underscore
 
 type TaskDetailsGetter interface {
 	GetTask(id v1alpha1.TaskID) (v1alpha1.ExecutableTask, error)
@@ -12,7 +12,6 @@ type TaskDetailsGetter interface {
 
 type SubWorkflowGetter interface {
 	FindSubWorkflow(subID v1alpha1.WorkflowID) v1alpha1.ExecutableSubWorkflow
-	FindLaunchPlan(id v1alpha1.LaunchPlanRefID) v1alpha1.ExecutableLaunchPlan
 }
 
 type ImmutableExecutionContext interface {

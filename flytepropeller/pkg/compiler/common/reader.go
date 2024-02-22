@@ -54,6 +54,5 @@ type Task interface {
 type InterfaceProvider interface {
 	GetID() *core.Identifier
 	GetExpectedInputs() *core.ParameterMap
-	GetFixedInputs() *core.LiteralMap
 	GetExpectedOutputs() *core.VariableMap
 }

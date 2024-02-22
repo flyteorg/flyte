@@ -51,9 +51,6 @@ func (t mockTaskReader) GetTaskID() *core.Identifier    { return nil }
 func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTemplate *core.TaskTemplate) *nodeExecContext {
 	mockNode := &mocks.ExecutableNode{}
 	mockNode.OnGetIDMatch(mock.Anything).Return(nodeID)
-	mockNode.OnIsCacheableMatch().Return(nil)
-	mockNode.OnGetCacheVersionMatch().Return(nil)
-	mockNode.OnIsCacheSerializableMatch().Return(nil)
 
 	mockNodeStatus := &mocks.ExecutableNodeStatus{}
 	mockNodeStatus.OnGetAttemptsMatch().Return(currentAttempt)
@@ -79,9 +76,6 @@ func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTempla
 		},
 	)
 
-	mockNodeLookup := &executorsmocks.NodeLookup{}
-	mockNodeLookup.OnGetNodeMatch(mock.Anything).Return(nil, false)
-
 	var taskReader interfaces.TaskReader
 	if taskTemplate != nil {
 		taskReader = mockTaskReader{
@@ -92,7 +86,6 @@ func setupCacheableNodeExecutionContext(dataStore *storage.DataStore, taskTempla
 	return &nodeExecContext{
 		ic:         mockExecutionContext,
 		md:         mockNodeExecutionMetadata,
-		nl:         mockNodeLookup,
 		node:       mockNode,
 		nodeStatus: mockNodeStatus,
 		store:      dataStore,
@@ -249,54 +242,6 @@ func TestCheckCatalogCache(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestIsCacheableWithOverrides(t *testing.T) {
-	cacheable := true
-	cacheSerializable := true
-
-	// initialize mocks
-	cacheableHandler := &interfacesmocks.CacheableNodeHandler{}
-	cacheableHandler.OnIsCacheableMatch(mock.Anything, mock.Anything, mock.Anything).Return(false, false, nil)
-
-	nCtx := &interfacesmocks.NodeExecutionContext{}
-
-	mockNode := &mocks.ExecutableNode{}
-	mockNode.OnIsCacheableMatch().Return(&cacheable)
-	mockNode.OnIsCacheSerializableMatch().Return(&cacheSerializable)
-	nCtx.OnNode().Return(mockNode)
-
-	// evaluate isCacheableWithOverrides to override the cacheable and cacheSerializable values
-	cacheableResult, cacheSerializableResult, err := isCacheableWithOverrides(context.TODO(), nCtx, cacheableHandler)
-	assert.NoError(t, err)
-
-	// validate the result
-	assert.Equal(t, cacheable, cacheableResult)
-	assert.Equal(t, cacheSerializable, cacheSerializableResult)
-}
-
-func TestGetCatalogKeyWithOverrides(t *testing.T) {
-	cacheVersion := "1"
-	catalogKey := catalog.Key{
-		CacheVersion: "0",
-	}
-
-	// initialize mocks
-	cacheableHandler := &interfacesmocks.CacheableNodeHandler{}
-	cacheableHandler.OnGetCatalogKeyMatch(mock.Anything, mock.Anything, mock.Anything).Return(catalogKey, nil)
-
-	nCtx := &interfacesmocks.NodeExecutionContext{}
-
-	mockNode := &mocks.ExecutableNode{}
-	mockNode.OnGetCacheVersionMatch().Return(&cacheVersion)
-	nCtx.OnNode().Return(mockNode)
-
-	// evaluate getCatalogKey to override the CacheVersion value
-	catalogKeyResult, err := getCatalogKeyWithOverrides(context.TODO(), nCtx, cacheableHandler)
-	assert.NoError(t, err)
-
-	// validate the result
-	assert.Equal(t, cacheVersion, catalogKeyResult.CacheVersion)
 }
 
 func TestGetOrExtendCatalogReservation(t *testing.T) {
