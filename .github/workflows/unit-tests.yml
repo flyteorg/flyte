@@ -9,9 +9,6 @@ on:
       go-version:
         required: true
         type: string
-    secrets:
-      FLYTE_BOT_PAT:
-        required: true
 jobs:
   tests:
     name: Run Unit Test

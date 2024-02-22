@@ -60,8 +60,6 @@ jobs:
     with:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
   docker-build:
     strategy:
       fail-fast: false
@@ -118,14 +116,9 @@ jobs:
     with:
       component: ${{ matrix.component }}
       go-version: ${{ needs.unpack-envvars.outputs.go-version }}
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
 
   build_docker_images:
     name: Build Images
     uses: ./.github/workflows/publish-images.yml
     with:
       push: false
-    secrets:
-      FLYTE_BOT_PAT: ${{ secrets.FLYTE_BOT_PAT }}
-      FLYTE_BOT_USERNAME: ${{ secrets.FLYTE_BOT_USERNAME }}

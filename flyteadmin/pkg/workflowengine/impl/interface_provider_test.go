@@ -46,10 +46,15 @@ func getProviderForTest(t *testing.T) common.InterfaceProvider {
 		ExpectedInputs:  &inputs,
 		ExpectedOutputs: &outputs,
 	}
-	bytes, _ := proto.Marshal(&launchPlanStatus)
+	spec := admin.LaunchPlanSpec{
+		FixedInputs: &core.LiteralMap{},
+	}
+	launchPlanStatusBytes, _ := proto.Marshal(&launchPlanStatus)
+	specBytes, _ := proto.Marshal(&spec)
 	provider, err := NewLaunchPlanInterfaceProvider(
 		models.LaunchPlan{
-			Closure: bytes,
+			Closure: launchPlanStatusBytes,
+			Spec:    specBytes,
 		}, launchPlanIdentifier)
 	if err != nil {
 		t.Fatalf("Failed to initialize LaunchPlanInterfaceProvider for test with err %v", err)

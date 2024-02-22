@@ -28,6 +28,7 @@ import (
 )
 
 // Static values for test
+const orgValue = ""
 const projectValue = "foo"
 const domainValue = "bar"
 const nameValue = "baz"
@@ -353,11 +354,14 @@ func TestListUniqueTaskIdentifiers(t *testing.T) {
 	listFunc := func(input interfaces.ListResourceInput) (interfaces.TaskCollectionOutput, error) {
 		// Test that parameters are being passed in
 		assert.Equal(t, 100, input.Limit)
-		assert.Len(t, input.InlineFilters, 2)
+		assert.Len(t, input.InlineFilters, 3)
 		for idx, filter := range input.InlineFilters {
 			assert.Equal(t, common.Task, filter.GetEntity())
 			query, _ := filter.GetGormQueryExpr()
 			if idx == 0 {
+				assert.Equal(t, testutils.OrgQueryPattern, query.Query)
+				assert.Equal(t, "", query.Args)
+			} else if idx == 1 {
 				assert.Equal(t, testutils.ProjectQueryPattern, query.Query)
 				assert.Equal(t, "foo", query.Args)
 			} else {

@@ -375,11 +375,14 @@ func TestGetWorkflow_TransformerError(t *testing.T) {
 func TestListWorkflows(t *testing.T) {
 	repository := repositoryMocks.NewMockRepository()
 	workflowListFunc := func(input interfaces.ListResourceInput) (interfaces.WorkflowCollectionOutput, error) {
-		var projectFilter, domainFilter, nameFilter bool
-		assert.Len(t, input.InlineFilters, 3)
+		var orgFilter, projectFilter, domainFilter, nameFilter bool
+		assert.Len(t, input.InlineFilters, 4)
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Workflow, filter.GetEntity())
 			queryExpr, _ := filter.GetGormQueryExpr()
+			if queryExpr.Args == orgValue && queryExpr.Query == testutils.OrgQueryPattern {
+				orgFilter = true
+			}
 			if queryExpr.Args == projectValue && queryExpr.Query == testutils.ProjectQueryPattern {
 				projectFilter = true
 			}
@@ -390,6 +393,7 @@ func TestListWorkflows(t *testing.T) {
 				nameFilter = true
 			}
 		}
+		assert.True(t, orgFilter, "Missing org equality filter")
 		assert.True(t, projectFilter, "Missing project equality filter")
 		assert.True(t, domainFilter, "Missing domain equality filter")
 		assert.True(t, nameFilter, "Missing name equality filter")
