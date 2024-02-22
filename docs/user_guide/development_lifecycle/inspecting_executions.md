@@ -15,7 +15,7 @@ kernelspec:
   name: python3
 ---
 
-# Inspecting Workflow and Task Executions
+# Inspecting executions
 
 ## Flytectl
 

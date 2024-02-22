@@ -1,6 +1,6 @@
 (testing)=
 
-# Testing Flyte Tasks and Workflows
+# Testing Flyte tasks and workflows
 
 The `flytekit` python SDK provides a few utilities for making it easier to test
 your tasks and workflows in your test suite. For more details, you can also refer

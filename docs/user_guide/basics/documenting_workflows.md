@@ -17,7 +17,7 @@ kernelspec:
 
 +++ {"lines_to_next_cell": 0}
 
-# Documenting Workflows
+# Documenting workflows
 
 ```{eval-rst}
 .. tags:: Basic

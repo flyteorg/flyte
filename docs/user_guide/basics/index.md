@@ -15,11 +15,11 @@ run bash scripts, and document workflows.
 :hidden:
 
 hello_world
-task
-workflow
-launch_plan
-imperative_workflow
+tasks
+workflows
+launch_plans
+imperative_workflows
 documenting_workflows
-shell_task
+shell_tasks
 named_outputs
 ```

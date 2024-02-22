@@ -17,7 +17,7 @@ kernelspec:
 
 +++ {"lines_to_next_cell": 0}
 
-# Using Spot/Preemptible Instances
+# Spot instances
 
 ```{eval-rst}
 .. tags:: AWS, GCP, Intermediate
@@ -26,7 +26,7 @@ kernelspec:
 
 +++
 
-## What Are Spot/Preemptible Instances?
+## What are spot instances?
 
 Spot instances are unused EC2 capacity in AWS. [Spot instances](https://aws.amazon.com/ec2/spot/?cards.sort-by=item.additionalFields.startDateTime&cards.sort-order=asc) can result in up to 90% savings on on-demand prices. The caveat is that these instances can be preempted at any point and no longer be available for use. This can happen due to:
 
@@ -40,7 +40,7 @@ Generally, most spot instances are obtained for around 2 hours (median), with th
 Spot Instances are called `Preemptible Instances` in the GCP terminology.
 :::
 
-### Setting up Spot Instances
+### Setting up spot instances
 
 - AWS: <https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/spot-requests.html>
 - GCP: <https://cloud.google.com/compute/docs/instances/create-start-preemptible-instance>
@@ -54,11 +54,11 @@ When your spot/preemptible instance is terminated, ASG attempts to launch a repl
 
 +++
 
-## What Are Interruptible Tasks?
+## What are interruptible tasks?
 
 If specified, the `interruptible flag` is added to the task definition and signals to the Flyte engine that it may be scheduled on machines that may be preempted, such as AWS spot instances. This is low-hanging fruit for any cost-savings initiative.
 
-### Setting Interruptible
+### Setting interruptible tasks
 
 To run your workload on a spot/preemptible instance, you can set interruptible to `True`. In case you would like to automatically retry in case the node gets preemted, please also make sure to set at least one retry. For example:
 
@@ -76,7 +76,7 @@ By setting this value, Flyte will schedule your task on an auto-scaling group (A
 If you set `retries=n`, for instance, and the task gets preempted repeatedly, Flyte will retry on a preemptible/spot instance `n-1` times and for the last attempt will retry your task on a non-spot (regular) instance. Please note that tasks will only be retried if at least one retry is allowed using the `retries` parameter in the `task` decorator.
 :::
 
-### Which Tasks Should Be Set To Interruptible?
+### Which tasks should be set to interruptible?
 
 Most Flyte workloads should be good candidates for spot instances.
 If your task does NOT exhibit the following properties, you can set `interruptible` to true.

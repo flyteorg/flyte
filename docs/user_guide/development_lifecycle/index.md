@@ -1,4 +1,4 @@
-# Development Lifecycle
+# Development lifecycle
 
 In this section, you will discover Flyte's features that aid in local workflow development.
 You will gain an understanding of concepts like caching, the Flyte remote API, Agents, Decks and more.
@@ -8,15 +8,15 @@ You will gain an understanding of concepts like caching, the Flyte remote API, A
 :name: development_lifecycle_toc
 :hidden:
 
-agent_service
+agents
 private_images
-task_cache
-task_cache_serialize
+caching
+cache_serializing
 decks
-register_project
-remote_task
-remote_workflow
-remote_launchplan
+creating_a_new_project
+running_tasks
+running_workflows
+running_launch_plans
 inspecting_executions
-debugging_workflows_tasks
+debugging_executions
 ```

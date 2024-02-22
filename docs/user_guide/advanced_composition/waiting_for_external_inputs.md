@@ -17,7 +17,7 @@ kernelspec:
 
 +++ {"lines_to_next_cell": 0}
 
-# Waiting for External Inputs
+# Waiting for external inputs
 
 *New in Flyte 1.3.0*
 

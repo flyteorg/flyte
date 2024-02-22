@@ -141,11 +141,11 @@ Here's a breakdown of these mappings:
 :name: data_types_and_io_toc
 :hidden:
 
-file
-folder
-structured_dataset
+flytefile
+flytedirectory
+structureddataset
 dataclass
-attribute_access
+accessing_attributes
 pytorch_type
 enum_type
 pickle_type

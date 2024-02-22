@@ -19,7 +19,7 @@ kernelspec:
 
 (dataclass)=
 
-# Data Class
+# `dataclass`
 
 ```{eval-rst}
 .. tags:: Basic

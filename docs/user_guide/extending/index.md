@@ -211,8 +211,8 @@ Use the flow-chart above to point you to one of these examples:
 :hidden:
 
 custom_types
-prebuilt_container
-user_container
+prebuilt_container_task_plugins
+user_container_task_plugins
 backend_plugins
 container_interface
 ```

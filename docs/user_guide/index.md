@@ -7,11 +7,11 @@
 
 (userguide)=
 
-# User Guide
+# User guide
 
 If this is your first time using Flyte, check out the {doc}`Getting Started <index>` guide.
 
-This _User Guide_, the {ref}`Tutorials <tutorials>` and the {ref}`Integrations <integrations>` examples cover all of
+This _User guide_, the {ref}`Tutorials <tutorials>` and the {ref}`Integrations <integrations>` examples cover all of
 the key features of Flyte for data analytics, data science and machine learning practitioners, organized by topic. Each
 section below introduces a core feature of Flyte and how you can use it to address specific use cases. Code for all
 of the examples can be found in the [flytesnacks repo](https://github.com/flyteorg/flytesnacks).
@@ -29,7 +29,7 @@ To learn about how to spin up and manage a Flyte cluster in the cloud, see the
 Want to contribute or update an example? Check out the {doc}`Contribution Guide <../flytesnacks/contribute>`.
 ```
 
-## Table of Contents
+## Table of contents
 
 ```{list-table}
 :header-rows: 0

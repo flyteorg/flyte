@@ -17,7 +17,7 @@ kernelspec:
 
 +++ {"lines_to_next_cell": 0}
 
-# Enum Type
+# Enum type
 
 ```{eval-rst}
 .. tags:: Basic

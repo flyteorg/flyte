@@ -1,4 +1,4 @@
-# Customizing Dependencies
+# Customizing dependencies
 
 In this section, you will uncover how Flyte utilizes Docker images to construct containers under the hood,
 and you'll learn how to craft your own images to encompass all the necessary dependencies for your tasks or workflows.
@@ -11,7 +11,7 @@ and get familiar with the ins and outs of `ImageSpec`!
 :name: customizing_dependencies_toc
 :hidden:
 
-image_spec
+imagespec
 raw_container
 multi_images
 ```

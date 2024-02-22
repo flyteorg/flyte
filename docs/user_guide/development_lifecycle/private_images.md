@@ -17,7 +17,7 @@ kernelspec:
 
 (private_images)=
 
-# Pulling Private Images
+# Private images
 
 As we learned in the {ref}`Flyte Fundamentals <containerizing_your_project>` guide,
 Flyte uses OCI-compatible containers to package up your code and third-party
@@ -33,7 +33,7 @@ and [GitHub Container Registry](https://docs.github.com/en/packages/working-with
 To pull private images, ensure that you have the command line tools and login
 information associated with the registry.
 
-## Create a Secret
+## Create a secret
 
 First [create a secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/)
 that contains all the credentials needed to log into the registry.

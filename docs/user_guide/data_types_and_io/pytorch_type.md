@@ -19,7 +19,7 @@ kernelspec:
 
 (pytorch_type)=
 
-# PyTorch Type
+# PyTorch type
 
 ```{eval-rst}
 .. tags:: MachineLearning, Basic

@@ -19,7 +19,7 @@ kernelspec:
 
 (decorating_workflows)=
 
-# Decorating Workflows
+# Decorating workflows
 
 ```{eval-rst}
 .. tags:: Intermediate

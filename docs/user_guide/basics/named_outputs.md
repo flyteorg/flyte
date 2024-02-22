@@ -19,7 +19,7 @@ kernelspec:
 
 (named_outputs)=
 
-# Named Outputs
+# Named outputs
 
 ```{eval-rst}
 .. tags:: Basic

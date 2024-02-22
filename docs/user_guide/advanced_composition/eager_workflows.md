@@ -19,7 +19,7 @@ kernelspec:
 
 (eager_workflows)=
 
-# Eager Workflows
+# Eager workflows
 
 ```{eval-rst}
 .. tags:: Intermediate

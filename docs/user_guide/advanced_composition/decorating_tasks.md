@@ -19,7 +19,7 @@ kernelspec:
 
 (decorating_tasks)=
 
-# Decorating Tasks
+# Decorating tasks
 
 ```{eval-rst}
 .. tags:: Intermediate

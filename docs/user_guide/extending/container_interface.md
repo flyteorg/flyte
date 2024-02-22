@@ -17,7 +17,7 @@ kernelspec:
 
 (core-extend-flyte-container-interface)=
 
-# Container Interface
+# Container interface
 
 ```{eval-rst}
 .. tags:: Extensibility, Contribute, Intermediate
@@ -41,7 +41,7 @@ tasks). This is what that process looks like:
    writes the output to the raw output location. Or a query that uses the unique retry key as a temp table name, etc.
    :::
 
-## Command Templating
+## Command templating
 
 The templating of container arguments at run-time is one of the more advanced constructs of Flyte, but one that
 authors of new task types should be aware of. For example, when looking at the hello world task in the UI,

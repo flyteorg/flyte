@@ -19,7 +19,7 @@ kernelspec:
 
 (pickle_type)=
 
-# Pickle Type
+# Pickle type
 
 ```{eval-rst}
 .. tags:: Basic

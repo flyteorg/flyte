@@ -19,7 +19,7 @@ kernelspec:
 
 (raw_container)=
 
-# Using Raw Containers
+# Raw containers
 
 ```{eval-rst}
 .. tags:: Containerization, Advanced
@@ -42,7 +42,7 @@ logger = logging.getLogger(__file__)
 
 +++ {"lines_to_next_cell": 0}
 
-## Container Tasks
+## Container tasks
 
 A {py:class}`flytekit.ContainerTask` denotes an arbitrary container. In the following example, the name of the task
 is `calculate_ellipse_area_shell`. This name has to be unique in the entire project. Users can specify:

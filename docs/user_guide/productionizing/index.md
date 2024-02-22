@@ -11,14 +11,14 @@ GPU configuration, secrets, spot instances and more.
 :name: productionizing_toc
 :hidden:
 
-customizing_resources
-reference_task
-reference_launch_plan
-lp_notifications
-lp_schedules
-configure_logging_links
-configure_use_gpus
+customizing_task_resources
+reference_tasks
+reference_launch_plans
+notifications
+schedules
+configuring_logging_links_in_the_ui
+configure_access_to_gpus
 spot_instances
-use_secrets
-workflow_labels_annotations
+secrets
+workflow_labels_and_annotations
 ```

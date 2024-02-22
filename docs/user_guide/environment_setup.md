@@ -1,6 +1,6 @@
 (env_setup)=
 
-# Environment Setup
+# Environment setup
 
 ## Prerequisites
 
@@ -159,7 +159,7 @@ Replace `<version>` with the version obtained from the console UI,
 which might resemble something like `BLrGKJaYsW2ME1PaoirK1g==`.
 
 :::{tip}
-Running most of the examples in the **User Guide** only requires the default Docker image that ships with Flyte.
+Running most of the examples in the **User guide** only requires the default Docker image that ships with Flyte.
 Many examples in the {ref}`tutorials` and {ref}`integrations` section depend on additional libraries such as
 `sklearn`, `pytorch` or `tensorflow`, which will not work with the default docker image used by `pyflyte run`.
 

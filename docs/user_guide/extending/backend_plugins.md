@@ -18,7 +18,7 @@ kernelspec:
 %% [markdown]
 (extend-plugin-flyte-backend)=
 
-# Writing Backend Extensions
+# Backend plugins
 
 ```{eval-rst}
 .. tags:: Extensibility, Contribute, Intermediate
@@ -66,7 +66,7 @@ It is highly recommended to use an interface definition language like Protobuf, 
 For Spark we decided to use Protobuf to specify the plugin as can be seen [here](https://github.com/flyteorg/flyteidl/blob/master/protos/flyteidl/plugins/spark.proto). Note it isn't necessary to have the Plugin structure specified in `flyteidl`, but we do it for simplicity, ease of maintenance alongside the core platform, and convenience leveraging existing tooling to generate code for protobuf.
 ```
 
-### Flytekit Plugin implementation
+### Flytekit plugin implementation
 
 Now that you have a specification, we have to implement a method to generate this new TaskTemplate, with the special custom field. Also, this is where the UX design comes into play. You want to write the best possible interface in the SDK that users are delighted to use. The end goal is to create the TaskTemplate with the Custom field populated with the actual JSON structure.
 
@@ -78,7 +78,7 @@ In the case of Spark, we extend the {py:class}`flytekit.PythonFunctionTask`, as 
 
 The `SparkTask` is implemented as a regular flytekit plugin, with one exception: the `custom` field is now actually the `SparkJob` protocol buffer. When serializing a task, `flytekit` base classes will automatically invoke the [`get_custom` method](https://github.com/flyteorg/flytekit/blob/c02075d472b5587d199630bcfc7f9937673c6a0e/flytekit/core/base_task.py#L255).
 
-### FlytePropeller backend Plugin
+### FlytePropeller backend plugin
 
 The backend plugin is where the actual logic of the execution is implemented. The backend plugin uses the **Flyte PluginMachinery** interface to implement a plugin which can be one of the following supported types:
 

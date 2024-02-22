@@ -17,7 +17,7 @@ kernelspec:
 
 (advanced_custom_types)=
 
-# Writing Custom Flyte Types
+# Custom types
 
 ```{eval-rst}
 .. tags:: Extensibility, Contribute, Intermediate
