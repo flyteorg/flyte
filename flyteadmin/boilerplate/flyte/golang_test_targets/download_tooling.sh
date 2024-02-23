@@ -24,6 +24,11 @@ tools=(
 	"github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
 )
 
+# Produce an up-to-date pflags binary
+REPO_ROOT=$(pwd)/..
+make -C $REPO_ROOT/flytestdlib compile
+cp $REPO_ROOT/flytestdlib/bin/pflags $(go env GOPATH)/bin
+
 tmp_dir=$(mktemp -d -t gotooling-XXX)
 echo "Using temp directory ${tmp_dir}"
 cp -R boilerplate/flyte/golang_support_tools/* $tmp_dir
