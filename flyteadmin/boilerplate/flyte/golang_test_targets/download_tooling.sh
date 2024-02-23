@@ -16,6 +16,7 @@ set -e
 # List of tools to go get
 # In the format of "<cli>:<package>" or ":<package>" if no cli
 tools=(
+	"github.com/EngHabu/mockery/cmd/mockery"
 	"github.com/vektra/mockery/v2@v2.40.3"
 	"github.com/golangci/golangci-lint/cmd/golangci-lint"
 	"github.com/daixiang0/gci"
@@ -31,6 +32,22 @@ pushd "$tmp_dir"
 for tool in "${tools[@]}"; do
 	echo "Installing ${tool}"
 	GO111MODULE=on go install $tool
+	# If tool is vektra/mockery, we need to rename the binary to mockery-v1
+	if [[ $tool == "github.com/EngHabu/mockery/cmd/mockery" ]]; then
+		echo "Renaming mockery to mockery-v1"
+		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v1
+	fi
+	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-v2
+	if [[ $tool == "github.com/vektra/mockery/v2@v2.40.3" ]]; then
+		echo "Renaming mockery to mockery-v2"
+		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v2
+	fi
 done
+
+# Rename the mockerv1 binary to mockery to maintain compatibility with the existing makefile
+if [ -f $(go env GOPATH)/bin/mockery-v1 ]; then
+	echo "Renaming mockeryv1 to mockery"
+	mv $(go env GOPATH)/bin/mockery-v1 $(go env GOPATH)/bin/mockery
+fi
 
 popd

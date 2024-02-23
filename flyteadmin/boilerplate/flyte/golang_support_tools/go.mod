@@ -5,6 +5,7 @@ go 1.21
 toolchain go1.21.5
 
 require (
+	github.com/EngHabu/mockery v0.0.0-20220916190332-dde70e38baba
 	github.com/alvaroloes/enumer v1.1.2
 	github.com/flyteorg/flyte/flytestdlib v1.10.7
 	github.com/golangci/golangci-lint v1.53.3
