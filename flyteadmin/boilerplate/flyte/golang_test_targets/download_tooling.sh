@@ -32,22 +32,22 @@ pushd "$tmp_dir"
 for tool in "${tools[@]}"; do
 	echo "Installing ${tool}"
 	GO111MODULE=on go install $tool
-	# If tool is our mockery fork, we need to rename the binary to mockery-v1
+	# If tool is our mockery fork, we need to rename the binary to mockery-fork
 	if [[ $tool == "github.com/EngHabu/mockery/cmd/mockery" ]]; then
-		echo "Renaming mockery to mockery-v1"
-		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v1
+		echo "Renaming mockery to mockery-fork"
+		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-fork
 	fi
-	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-v2
+	# If tool is named vektra/mockery/v2, we need to rename the binary to mockery-vektra
 	if [[ $tool == "github.com/vektra/mockery/v2@v2.40.3" ]]; then
-		echo "Renaming mockery to mockery-v2"
-		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v2
+		echo "Renaming mockery to mockery-vektra"
+		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-vektra
 	fi
 done
 
-# Rename the mockery-v1 binary to mockery to maintain compatibility with the existing uses
-if [ -f $(go env GOPATH)/bin/mockery-v1 ]; then
-	echo "Renaming mockeryv1 to mockery"
-	mv $(go env GOPATH)/bin/mockery-v1 $(go env GOPATH)/bin/mockery
+# Rename the mockery-fork binary to mockery to maintain compatibility with the existing uses
+if [ -f $(go env GOPATH)/bin/mockery-fork ]; then
+	echo "Renaming mockery-fork to mockery"
+	mv $(go env GOPATH)/bin/mockery-fork $(go env GOPATH)/bin/mockery
 fi
 
 popd
