@@ -19,7 +19,7 @@ jobs:
       - name: Set versions
         run: |
           echo "FLYTECONSOLE_VERSION=$(yq eval '.flyteconsole.image.tag' charts/flyte-core/values.yaml)" >> $GITHUB_ENV
-          echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+          echo "FLYTE_VERSION=${{ github.event.pull_request.head.sha || github.sha }}" >> $GITHUB_ENV
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -38,7 +38,7 @@ jobs:
           images: |
             ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-sandbox
           tags: |
-            type=sha,format=long,prefix=
+            type=raw,value=${{ github.event.pull_request.head.sha || github.sha }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -76,7 +76,7 @@ jobs:
       - name: Set versions
         run: |
           echo "FLYTECONSOLE_VERSION=$(yq eval '.flyteconsole.image.tag' charts/flyte-core/values.yaml)" >> $GITHUB_ENV
-          echo "FLYTE_VERSION=${{ github.sha }}" >> $GITHUB_ENV
+          echo "FLYTE_VERSION=${{ github.event.pull_request.head.sha || github.sha }}" >> $GITHUB_ENV
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -95,7 +95,7 @@ jobs:
           images: |
             ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-sandbox-lite
           tags: |
-            type=sha,format=long,prefix=
+            type=raw,value=${{ github.event.pull_request.head.sha || github.sha }}
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx

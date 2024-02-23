@@ -53,7 +53,7 @@ jobs:
           images: ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ inputs.component }}
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
-            type=sha,format=long,prefix=
+            type=raw,value=${{ github.event.pull_request.head.sha || github.sha }}
       - name: Before Build
         run: ${{ inputs.before-build }}
       - name: Build and Push Image

@@ -29,8 +29,8 @@ jobs:
         run: |
           helm dep update ${{ matrix.chart }}
           helm package \
-            --app-version=${{ github.sha }} \
-            --version=0.0-${{ github.sha }} \
+            --app-version=${{ github.event.pull_request.head.sha || github.sha }} \
+            --version=0.0-${{ github.event.pull_request.head.sha || github.sha }} \
             ${{ matrix.chart }}
           
           if ! ls ${{ matrix.chart }}-* 2>&1 >/dev/null;

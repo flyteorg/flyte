@@ -38,15 +38,15 @@ jobs:
       - name: Tag image to release version (sha)
         run: |
           docker buildx imagetools create \
-            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary-release:${{ github.sha }}" \
-                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary:${{ github.sha }}"
+            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary-release:${{ github.event.pull_request.head.sha || github.sha }}" \
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary:${{ github.event.pull_request.head.sha || github.sha }}"
 
       - name: Tag image to release version (latest)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
           docker buildx imagetools create \
             --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary-release:latest" \
-                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary:${{ github.sha }}"
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/flyte-binary:${{ github.event.pull_request.head.sha || github.sha }}"
 
   publish-flyte-component-image:
     name: Publish flyte component image for the release version
@@ -84,12 +84,12 @@ jobs:
       - name: Tag image to release version (sha)
         run: |
           docker buildx imagetools create \
-            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}-release:${{ github.sha }}" \
-                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}:${{ github.sha }}"
+            --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}-release:${{ github.event.pull_request.head.sha || github.sha }}" \
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}:${{ github.event.pull_request.head.sha || github.sha }}"
       
       - name: Tag image to release version (latest)
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
         run: |
           docker buildx imagetools create \
             --tag "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}-release:latest" \
-                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}:${{ github.sha }}"
+                  "${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ matrix.component }}:${{ github.event.pull_request.head.sha || github.sha }}"
