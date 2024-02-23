@@ -1998,6 +1998,10 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		return expectedErr
 	}
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+		return nil
+	}
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
