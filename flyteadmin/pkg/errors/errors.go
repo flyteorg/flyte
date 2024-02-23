@@ -3,7 +3,6 @@ package errors
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -112,24 +111,34 @@ func NewIncompatibleClusterError(ctx context.Context, errorMsg, curCluster strin
 	return statusErr
 }
 
+func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string {
+	results := []string{}
+	map1 := make(map[string]jsondiff.Operation)
+	for _, obj := range jsonArray1 {
+		map1[obj.Path] = obj
+	}
+
+	for _, obj := range jsonArray2 {
+		if val, ok := map1[obj.Path]; ok {
+			result := fmt.Sprintf("%s: %s -> %s\t", obj.Path, obj.Value, val.Value)
+			results = append(results, result)
+		}
+	}
+	return results
+}
+
 func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.TaskTemplate, newSpec *core.TaskTemplate) FlyteAdminError {
-	errorMsg := "task with different structure already exists "
-	diff, err := jsondiff.Compare(oldSpec, newSpec)
-	if err != nil {
-		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg+"diff computation on two different structures failed")
-	}
-	diffString, err := json.Marshal(diff)
-	if err != nil {
-		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg+"marshal diff computation output failed")
-	}
-	errorMsg += string(diffString)
+	errorMsg := "task with different structure already exists:\n"
+	// omit source code file object storage path
+	diff, _ := jsondiff.Compare(oldSpec, newSpec, jsondiff.Ignores("/Target/Container/args/2"))
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec, jsondiff.Ignores("/Target/Container/args/2"))
+	rs := compareJsons(diff, rdiff)
+	errorMsg += strings.Join(rs, "\n")
 
 	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateTaskFailureReason{
 		Reason: &admin.CreateTaskFailureReason_ExistsDifferentStructure{
 			ExistsDifferentStructure: &admin.TaskErrorExistsDifferentStructure{
-				Id:      request.Id,
-				OldSpec: oldSpec,
-				NewSpec: newSpec,
+				Id: request.Id,
 			},
 		},
 	})
@@ -156,8 +165,14 @@ func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.Ta
 	return statusErr
 }
 
-func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest) FlyteAdminError {
-	errorMsg := "workflow with different structure already exists"
+func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldTemplate *core.TaskTemplate, newTemplate *core.TaskTemplate) FlyteAdminError {
+	errorMsg := "workflow with different structure already exists:\n"
+	// omit source code file object storage path
+	diff, _ := jsondiff.Compare(oldTemplate, newTemplate, jsondiff.Ignores("/Target/Container/args/2"))
+	rdiff, _ := jsondiff.Compare(newTemplate, oldTemplate, jsondiff.Ignores("/Target/Container/args/2"))
+	rs := compareJsons(diff, rdiff)
+	errorMsg += strings.Join(rs, "\n")
+
 	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateWorkflowFailureReason{
 		Reason: &admin.CreateWorkflowFailureReason_ExistsDifferentStructure{
 			ExistsDifferentStructure: &admin.WorkflowErrorExistsDifferentStructure{

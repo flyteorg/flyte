@@ -19377,12 +19377,6 @@ export namespace flyteidl {
 
             /** TaskErrorExistsDifferentStructure id */
             id?: (flyteidl.core.IIdentifier|null);
-
-            /** TaskErrorExistsDifferentStructure oldSpec */
-            oldSpec?: (flyteidl.core.ITaskTemplate|null);
-
-            /** TaskErrorExistsDifferentStructure newSpec */
-            newSpec?: (flyteidl.core.ITaskTemplate|null);
         }
 
         /** Represents a TaskErrorExistsDifferentStructure. */
@@ -19396,12 +19390,6 @@ export namespace flyteidl {
 
             /** TaskErrorExistsDifferentStructure id. */
             public id?: (flyteidl.core.IIdentifier|null);
-
-            /** TaskErrorExistsDifferentStructure oldSpec. */
-            public oldSpec?: (flyteidl.core.ITaskTemplate|null);
-
-            /** TaskErrorExistsDifferentStructure newSpec. */
-            public newSpec?: (flyteidl.core.ITaskTemplate|null);
 
             /**
              * Creates a new TaskErrorExistsDifferentStructure instance using the specified properties.

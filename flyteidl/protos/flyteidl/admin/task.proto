@@ -73,8 +73,6 @@ message TaskClosure {
 // The task id is already used and the structure is different
 message TaskErrorExistsDifferentStructure {
     core.Identifier id = 1;
-    core.TaskTemplate old_spec = 2;
-    core.TaskTemplate new_spec = 3;
 }
 
 // The task id is already used with an identical sctructure

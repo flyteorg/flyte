@@ -46543,8 +46543,6 @@
                  * @memberof flyteidl.admin
                  * @interface ITaskErrorExistsDifferentStructure
                  * @property {flyteidl.core.IIdentifier|null} [id] TaskErrorExistsDifferentStructure id
-                 * @property {flyteidl.core.ITaskTemplate|null} [oldSpec] TaskErrorExistsDifferentStructure oldSpec
-                 * @property {flyteidl.core.ITaskTemplate|null} [newSpec] TaskErrorExistsDifferentStructure newSpec
                  */
     
                 /**
@@ -46569,22 +46567,6 @@
                  * @instance
                  */
                 TaskErrorExistsDifferentStructure.prototype.id = null;
-    
-                /**
-                 * TaskErrorExistsDifferentStructure oldSpec.
-                 * @member {flyteidl.core.ITaskTemplate|null|undefined} oldSpec
-                 * @memberof flyteidl.admin.TaskErrorExistsDifferentStructure
-                 * @instance
-                 */
-                TaskErrorExistsDifferentStructure.prototype.oldSpec = null;
-    
-                /**
-                 * TaskErrorExistsDifferentStructure newSpec.
-                 * @member {flyteidl.core.ITaskTemplate|null|undefined} newSpec
-                 * @memberof flyteidl.admin.TaskErrorExistsDifferentStructure
-                 * @instance
-                 */
-                TaskErrorExistsDifferentStructure.prototype.newSpec = null;
     
                 /**
                  * Creates a new TaskErrorExistsDifferentStructure instance using the specified properties.
@@ -46612,10 +46594,6 @@
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
                         $root.flyteidl.core.Identifier.encode(message.id, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.oldSpec != null && message.hasOwnProperty("oldSpec"))
-                        $root.flyteidl.core.TaskTemplate.encode(message.oldSpec, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                    if (message.newSpec != null && message.hasOwnProperty("newSpec"))
-                        $root.flyteidl.core.TaskTemplate.encode(message.newSpec, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -46640,12 +46618,6 @@
                         case 1:
                             message.id = $root.flyteidl.core.Identifier.decode(reader, reader.uint32());
                             break;
-                        case 2:
-                            message.oldSpec = $root.flyteidl.core.TaskTemplate.decode(reader, reader.uint32());
-                            break;
-                        case 3:
-                            message.newSpec = $root.flyteidl.core.TaskTemplate.decode(reader, reader.uint32());
-                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -46669,16 +46641,6 @@
                         var error = $root.flyteidl.core.Identifier.verify(message.id);
                         if (error)
                             return "id." + error;
-                    }
-                    if (message.oldSpec != null && message.hasOwnProperty("oldSpec")) {
-                        var error = $root.flyteidl.core.TaskTemplate.verify(message.oldSpec);
-                        if (error)
-                            return "oldSpec." + error;
-                    }
-                    if (message.newSpec != null && message.hasOwnProperty("newSpec")) {
-                        var error = $root.flyteidl.core.TaskTemplate.verify(message.newSpec);
-                        if (error)
-                            return "newSpec." + error;
                     }
                     return null;
                 };

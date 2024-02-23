@@ -168,8 +168,12 @@ func (w *WorkflowManager) CreateWorkflow(
 		if bytes.Equal(workflowDigest, existingWorkflowModel.Digest) {
 			return nil, errors.NewWorkflowExistsIdenticalStructureError(ctx, &request)
 		}
+		existingWorkflow, err2 := util.GetWorkflow(ctx, w.db, w.storageClient, *request.Id)
+		if err2 != nil {
+			return nil, err2
+		}
 		// A workflow exists with different structure
-		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, &request)
+		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, &request, existingWorkflow.Closure.CompiledWorkflow.Tasks[0].Template, workflowClosure.CompiledWorkflow.Tasks[0].Template)
 	} else if flyteAdminError, ok := err.(errors.FlyteAdminError); !ok || flyteAdminError.Code() != codes.NotFound {
 		logger.Debugf(ctx, "Failed to get workflow for comparison in CreateWorkflow with ID [%+v] with err %v",
 			request.Id, err)

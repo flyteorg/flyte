@@ -317,16 +317,6 @@ export class TaskErrorExistsDifferentStructure extends Message<TaskErrorExistsDi
    */
   id?: Identifier;
 
-  /**
-   * @generated from field: flyteidl.core.TaskTemplate old_spec = 2;
-   */
-  oldSpec?: TaskTemplate;
-
-  /**
-   * @generated from field: flyteidl.core.TaskTemplate new_spec = 3;
-   */
-  newSpec?: TaskTemplate;
-
   constructor(data?: PartialMessage<TaskErrorExistsDifferentStructure>) {
     super();
     proto3.util.initPartial(data, this);
@@ -336,8 +326,6 @@ export class TaskErrorExistsDifferentStructure extends Message<TaskErrorExistsDi
   static readonly typeName = "flyteidl.admin.TaskErrorExistsDifferentStructure";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "message", T: Identifier },
-    { no: 2, name: "old_spec", kind: "message", T: TaskTemplate },
-    { no: 3, name: "new_spec", kind: "message", T: TaskTemplate },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskErrorExistsDifferentStructure {

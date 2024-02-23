@@ -89,16 +89,16 @@ func (t *TaskManager) CreateTask(
 		return nil, err
 	}
 	// See if a task exists and confirm whether it's an identical task or one that with a separate definition.
-	existingTask, err := util.GetTaskModel(ctx, t.db, request.Spec.Template.Id)
+	existingTaskModel, err := util.GetTaskModel(ctx, t.db, request.Spec.Template.Id)
 	if err == nil {
-		if bytes.Equal(taskDigest, existingTask.Digest) {
+		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
 			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, &request)
 		}
-		t2, err2 := util.GetTask(ctx, t.db, *request.Id)
+		existingTask, err2 := util.GetTask(ctx, t.db, *request.Id)
 		if err2 != nil {
-			return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, t2.Closure.CompiledTask.Template, compiledTask.Template)
+			return nil, err2
 		}
-		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, t2.Closure.CompiledTask.Template, compiledTask.Template)
+		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, existingTask.Closure.CompiledTask.Template, compiledTask.Template)
 	}
 	taskModel, err := transformers.CreateTaskModel(finalizedRequest, admin.TaskClosure{
 		CompiledTask: compiledTask,

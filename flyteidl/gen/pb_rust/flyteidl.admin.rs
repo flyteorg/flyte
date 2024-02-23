@@ -2914,10 +2914,6 @@ pub struct TaskClosure {
 pub struct TaskErrorExistsDifferentStructure {
     #[prost(message, optional, tag="1")]
     pub id: ::core::option::Option<super::core::Identifier>,
-    #[prost(message, optional, tag="2")]
-    pub old_spec: ::core::option::Option<super::core::TaskTemplate>,
-    #[prost(message, optional, tag="3")]
-    pub new_spec: ::core::option::Option<super::core::TaskTemplate>,
 }
 /// The task id is already used with an identical sctructure
 #[allow(clippy::derive_partial_eq_without_eq)]
