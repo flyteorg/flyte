@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"testing"
 	"time"
 
@@ -238,8 +239,11 @@ func setDefaultTaskCallbackForExecTest(repository interfaces.Repository) {
 
 func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 	mockStorage := commonMocks.GetMockStorageClient()
+	var mtx sync.RWMutex
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
+		mtx.RLock()
+		defer mtx.RUnlock()
 		if val, ok := mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).Store[reference]; ok {
 			_ = proto.Unmarshal(val, msg)
 			return nil
@@ -252,6 +256,8 @@ func getMockStorageForExecTest(ctx context.Context) *storage.DataStore {
 		if err != nil {
 			return err
 		}
+		mtx.Lock()
+		defer mtx.Unlock()
 		mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).Store[reference] = bytes
 		return nil
 	}
@@ -2001,6 +2007,10 @@ func TestRecoverExecution_GetExistingInputsFailure(t *testing.T) {
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
 		return expectedErr
+	}
+	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(
+		ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+		return nil
 	}
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
