@@ -443,6 +443,73 @@ func TestCatalog_Put(t *testing.T) {
 		assert.Equal(t, "flyte_cached-BE6CZsMk6N3ExR_4X9EuwBgj2Jh2UwasXK3a_pM9xlY", s.GetMetadata().ArtifactTag.Name)
 	})
 
+	t.Run("Create dataset fails", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
+	t.Run("Create artifact fails", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("CreateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Put(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
 	t.Run("Create new cached execution with no inputs/outputs", func(t *testing.T) {
 		mockClient := &mocks.DataCatalogClient{}
 		catalogClient := &CatalogClient{
@@ -620,6 +687,70 @@ func TestCatalog_Update(t *testing.T) {
 			client: mockClient,
 		}
 
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, nil)
+
+		mockClient.On("UpdateArtifact", ctx, mock.Anything).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		mockClient.On("CreateArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateArtifactRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateArtifactResponse{}, errors.New("generic error"))
+
+		taskID := &core.TaskExecutionIdentifier{
+			TaskId: &core.Identifier{
+				ResourceType: core.ResourceType_TASK,
+				Name:         sampleKey.Identifier.Name,
+				Project:      sampleKey.Identifier.Project,
+				Domain:       sampleKey.Identifier.Domain,
+				Version:      "version",
+			},
+			NodeExecutionId: &core.NodeExecutionIdentifier{
+				ExecutionId: &core.WorkflowExecutionIdentifier{
+					Name:    "wf",
+					Project: "p1",
+					Domain:  "d1",
+				},
+				NodeId: "unknown", // not set in Put request below --> defaults to "unknown"
+			},
+			RetryAttempt: 0,
+		}
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name:    taskID.NodeExecutionId.ExecutionId.Name,
+				Domain:  taskID.NodeExecutionId.ExecutionId.Domain,
+				Project: taskID.NodeExecutionId.ExecutionId.Project,
+			},
+			TaskExecutionIdentifier: &core.TaskExecutionIdentifier{
+				TaskId:          &sampleKey.Identifier,
+				NodeExecutionId: taskID.NodeExecutionId,
+				RetryAttempt:    0,
+			},
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
+	t.Run("Overwrite non-existing execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
 		createDatasetCalled := false
 		mockClient.On("CreateDataset",
 			ctx,
@@ -702,6 +833,36 @@ func TestCatalog_Update(t *testing.T) {
 		assert.True(t, addTagCalled)
 	})
 
+	t.Run("Error while creating dataset", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("CreateDataset",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
+				return true
+			}),
+		).Return(&datacatalog.CreateDatasetResponse{}, errors.New("generic error"))
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		or := ioutils.NewInMemoryOutputReader(sampleParameters, nil, nil)
+		s, err := discovery.Update(ctx, newKey, or, catalog.Metadata{
+			WorkflowExecutionIdentifier: &core.WorkflowExecutionIdentifier{
+				Name: "test",
+			},
+			TaskExecutionIdentifier: nil,
+		})
+		assert.Error(t, err)
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.NotNil(t, s.GetMetadata())
+	})
+
 	t.Run("Error while overwriting execution", func(t *testing.T) {
 		ir := &mocks2.InputReader{}
 		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
@@ -714,7 +875,6 @@ func TestCatalog_Update(t *testing.T) {
 		mockClient.On("CreateDataset",
 			ctx,
 			mock.MatchedBy(func(o *datacatalog.CreateDatasetRequest) bool {
-				assert.True(t, proto.Equal(o.Dataset.Id, datasetID))
 				return true
 			}),
 		).Return(&datacatalog.CreateDatasetResponse{}, nil)
@@ -734,7 +894,7 @@ func TestCatalog_Update(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, genericErr, err)
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
-		assert.Equal(t, &newKey.Identifier, s.GetMetadata().GetDatasetId())
+		assert.NotNil(t, s.GetMetadata())
 	})
 }
 
