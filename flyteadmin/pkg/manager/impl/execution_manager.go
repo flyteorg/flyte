@@ -11,6 +11,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/auth"
@@ -445,7 +446,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
-	// Prepare a skeleton workflow
+	// Prepare a skeleton workflow and launch plan
 	taskIdentifier := request.Spec.LaunchPlan
 	workflowModel, err :=
 		util.CreateOrGetWorkflowModel(ctx, request, m.db, m.workflowManager, m.namedEntityManager, taskIdentifier, &task)
@@ -457,13 +458,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if err != nil {
 		return nil, nil, err
 	}
-	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
-	if err != nil {
-		return nil, nil, err
-	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
-	workflow.Closure = closure
-	// Also prepare a skeleton launch plan.
+
 	launchPlan, err := util.CreateOrGetLaunchPlan(ctx, m.db, m.config, taskIdentifier,
 		workflow.Closure.CompiledWorkflow.Primary.Template.Interface, workflowModel.ID, request.Spec)
 	if err != nil {
@@ -488,6 +483,40 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		Domain:  request.Domain,
 		Name:    name,
 	}
+
+	// Overlap the blob store reads and writes
+	getClosureGroup, getClosureGroupCtx := errgroup.WithContext(ctx)
+	var closure *admin.WorkflowClosure
+	getClosureGroup.Go(func() error {
+		var err error
+		closure, err = util.FetchAndGetWorkflowClosure(getClosureGroupCtx, m.storageClient, workflowModel.RemoteClosureIdentifier)
+		return err
+	})
+
+	offloadInputsGroup, offloadInputsGroupCtx := errgroup.WithContext(ctx)
+	var inputsURI storage.DataReference
+	offloadInputsGroup.Go(func() error {
+		var err error
+		inputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, executionInputs, // or request.Inputs?
+			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+		return err
+	})
+
+	var userInputsURI storage.DataReference
+	offloadInputsGroup.Go(func() error {
+		var err error
+		userInputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, request.Inputs,
+			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+		return err
+	})
+
+	err = getClosureGroup.Wait()
+	if err != nil {
+		return nil, nil, err
+	}
+	closure.CreatedAt = workflow.Closure.CreatedAt
+	workflow.Closure = closure
+
 	ctx = getExecutionContext(ctx, workflowExecutionID)
 	namespace := common.GetNamespaceName(
 		m.config.NamespaceMappingConfiguration().GetNamespaceTemplate(), workflowExecutionID.Project, workflowExecutionID.Domain)
@@ -515,14 +544,6 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, workflow.Id, workflow.Closure.CompiledWorkflow)
 
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
-	if err != nil {
-		return nil, nil, err
-	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
-	if err != nil {
-		return nil, nil, err
-	}
 	executionConfig, err := m.getExecutionConfig(ctx, request, nil)
 	if err != nil {
 		return nil, nil, err
@@ -581,6 +602,11 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	if request.Spec.Metadata != nil && request.Spec.Metadata.ReferenceExecution != nil &&
 		request.Spec.Metadata.Mode == admin.ExecutionMetadata_RECOVERED {
 		executionParameters.RecoveryExecution = request.Spec.Metadata.ReferenceExecution
+	}
+
+	err = offloadInputsGroup.Wait()
+	if err != nil {
+		return nil, nil, err
 	}
 
 	workflowExecutor := plugins.Get[workflowengineInterfaces.WorkflowExecutor](m.pluginRegistry, plugins.PluginIDWorkflowExecutor)
@@ -833,13 +859,18 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to validate ExecutionCreateRequest %+v with err %v", request, err)
 		return nil, nil, nil, err
 	}
+
 	if request.Spec.LaunchPlan.ResourceType == core.ResourceType_TASK {
 		logger.Debugf(ctx, "Launching single task execution with [%+v]", request.Spec.LaunchPlan)
 		// When tasks can have defaults this will need to handle Artifacts as well.
 		ctx, model, err := m.launchSingleTaskExecution(ctx, request, requestedAt)
 		return ctx, model, nil, err
 	}
+	return m.launchExecution(ctx, request, requestedAt)
+}
 
+func (m *ExecutionManager) launchExecution(
+	ctx context.Context, request *admin.ExecutionCreateRequest, requestedAt time.Time) (context.Context, *models.Execution, []*models.ExecutionTag, error) {
 	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, request.Spec.LaunchPlan)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to get launch plan model for ExecutionCreateRequest %+v with err %v", request, err)
@@ -880,13 +911,6 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
 		return nil, nil, nil, err
 	}
-	closure, err := util.FetchAndGetWorkflowClosure(ctx, m.storageClient, workflowModel.RemoteClosureIdentifier)
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
-		return nil, nil, nil, err
-	}
-	closure.CreatedAt = workflow.Closure.CreatedAt
-	workflow.Closure = closure
 
 	name := util.GetExecutionName(request)
 	workflowExecutionID := &core.WorkflowExecutionIdentifier{
@@ -894,6 +918,43 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		Domain:  request.Domain,
 		Name:    name,
 	}
+
+	// Overlap the blob store reads and writes
+	getClosureGroup, getClosureGroupCtx := errgroup.WithContext(ctx)
+	var closure *admin.WorkflowClosure
+	getClosureGroup.Go(func() error {
+		var err error
+		closure, err = util.FetchAndGetWorkflowClosure(getClosureGroupCtx, m.storageClient, workflowModel.RemoteClosureIdentifier)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
+		}
+		return err
+	})
+
+	offloadInputsGroup, offloadInputsGroupCtx := errgroup.WithContext(ctx)
+	var inputsURI storage.DataReference
+	offloadInputsGroup.Go(func() error {
+		var err error
+		inputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, executionInputs,
+			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
+		return err
+	})
+
+	var userInputsURI storage.DataReference
+	offloadInputsGroup.Go(func() error {
+		var err error
+		userInputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, request.Inputs,
+			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
+		return err
+	})
+
+	err = getClosureGroup.Wait()
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	closure.CreatedAt = workflow.Closure.CreatedAt
+	workflow.Closure = closure
+
 	ctx = getExecutionContext(ctx, workflowExecutionID)
 	var requestSpec = request.Spec
 	if requestSpec.Metadata == nil {
@@ -918,15 +979,6 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 
 	// Dynamically assign execution queues.
 	m.populateExecutionQueue(ctx, workflow.Id, workflow.Closure.CompiledWorkflow)
-
-	inputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, executionInputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	userInputsURI, err := common.OffloadLiteralMap(ctx, m.storageClient, request.Inputs, workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
-	if err != nil {
-		return nil, nil, nil, err
-	}
 
 	executionConfig, err := m.getExecutionConfig(ctx, request, launchPlan)
 	if err != nil {
@@ -1004,6 +1056,11 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = requestSpec.GetNotifications().Notifications
 	} else if requestSpec.GetDisableAll() {
 		notificationsSettings = make([]*admin.Notification, 0)
+	}
+
+	err = offloadInputsGroup.Wait()
+	if err != nil {
+		return nil, nil, nil, err
 	}
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
