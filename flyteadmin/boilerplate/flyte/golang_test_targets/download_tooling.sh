@@ -32,7 +32,7 @@ pushd "$tmp_dir"
 for tool in "${tools[@]}"; do
 	echo "Installing ${tool}"
 	GO111MODULE=on go install $tool
-	# If tool is vektra/mockery, we need to rename the binary to mockery-v1
+	# If tool is our mockery fork, we need to rename the binary to mockery-v1
 	if [[ $tool == "github.com/EngHabu/mockery/cmd/mockery" ]]; then
 		echo "Renaming mockery to mockery-v1"
 		mv $(go env GOPATH)/bin/mockery $(go env GOPATH)/bin/mockery-v1
@@ -44,7 +44,7 @@ for tool in "${tools[@]}"; do
 	fi
 done
 
-# Rename the mockerv1 binary to mockery to maintain compatibility with the existing makefile
+# Rename the mockery-v1 binary to mockery to maintain compatibility with the existing uses
 if [ -f $(go env GOPATH)/bin/mockery-v1 ]; then
 	echo "Renaming mockeryv1 to mockery"
 	mv $(go env GOPATH)/bin/mockery-v1 $(go env GOPATH)/bin/mockery
