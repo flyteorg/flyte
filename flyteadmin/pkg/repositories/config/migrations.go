@@ -1187,6 +1187,7 @@ var ContinuedMigrations = []*gormigrate.Migration{
 		ID: "pg-continue-2024-02-launchplan",
 		Migrate: func(tx *gorm.DB) error {
 			type LaunchPlanScheduleType string
+			type LaunchConditionType string
 
 			type LaunchPlan struct {
 				ID         uint       `gorm:"index;autoIncrement;not null"`
@@ -1206,7 +1207,7 @@ var ContinuedMigrations = []*gormigrate.Migration{
 				Digest       []byte
 				ScheduleType LaunchPlanScheduleType
 				// store the type of event that this launch plan is triggered by, can be empty, or SCHED
-				LaunchConditionType string `gorm:"null"`
+				LaunchConditionType *LaunchConditionType `gorm:"null"`
 			}
 			return tx.AutoMigrate(&LaunchPlan{})
 		},
