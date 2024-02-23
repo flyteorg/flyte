@@ -19,6 +19,10 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 )
 
+var (
+	emptyListProjectFilters []common.InlineFilter
+)
+
 type ProjectManager struct {
 	db     repoInterfaces.Repository
 	config runtimeInterfaces.Configuration
@@ -61,11 +65,7 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 		// Add implicit active filters ordinarily added by database.
 		requestFilters = fmt.Sprintf("eq(state,%d)", admin.Project_ACTIVE)
 	}
-	spec := util.FilterSpec{
-		Org:            request.Org,
-		RequestFilters: requestFilters,
-	}
-	filters, err := util.GetDbFilters(spec, common.Project)
+	filters, err := util.AddRequestFilters(requestFilters, common.Project, emptyListProjectFilters)
 	if err != nil {
 		return nil, err
 	}

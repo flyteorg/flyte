@@ -49,10 +49,6 @@ func getMockApplicationConfigForProjectManagerTest() runtimeInterfaces.Applicati
 func expectedDefaultQueryExpr() []*common.GormQueryExpr {
 	return []*common.GormQueryExpr{
 		{
-			Query: "org = ?",
-			Args:  "",
-		},
-		{
 
 			Query: "state = ?",
 			Args:  "0",
@@ -112,12 +108,10 @@ func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
 			Direction: admin.Sort_DESCENDING,
 		},
 	}, "", "name desc", []*common.GormQueryExpr{
-		expectedDefaultQueryExpr()[0],
 		&common.GormQueryExpr{
 			Query: "name = ?",
 			Args:  "foo",
 		},
-		expectedDefaultQueryExpr()[1],
 	}, t)
 }
 
