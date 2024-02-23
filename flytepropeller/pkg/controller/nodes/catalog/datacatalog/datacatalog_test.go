@@ -733,8 +733,8 @@ func TestCatalog_Update(t *testing.T) {
 		})
 		assert.Error(t, err)
 		assert.Equal(t, genericErr, err)
-		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, s.GetCacheStatus())
-		assert.Nil(t, s.GetMetadata())
+		assert.Equal(t, core.CatalogCacheStatus_CACHE_PUT_FAILURE, s.GetCacheStatus())
+		assert.Equal(t, &newKey.Identifier, s.GetMetadata().GetDatasetId())
 	})
 }
 
