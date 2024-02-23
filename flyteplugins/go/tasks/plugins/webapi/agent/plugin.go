@@ -184,9 +184,9 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase.\n"+resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	}
 
 	// The default phase is undefined.
@@ -201,9 +201,9 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	case admin.State_RETRYABLE_FAILURE:
-		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	case admin.State_SUCCEEDED:
 		err = writeOutput(ctx, taskCtx, resource)
 		if err != nil {
