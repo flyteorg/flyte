@@ -61,10 +61,10 @@ func ValidateLaunchPlan(ctx context.Context,
 		if err := validateNotifications(request.Spec.EntityMetadata.Notifications); err != nil {
 			return err
 		}
-		if request.Spec.EntityMetadata.LaunchConditions != nil {
+		if request.GetSpec().GetEntityMetadata().GetLaunchConditions() != nil {
 			return errors.NewFlyteAdminErrorf(
 				codes.InvalidArgument,
-				"Launch condition must be empty, found %v", request.Spec.EntityMetadata.LaunchConditions)
+				"Launch condition must be empty, found %v", request.GetSpec().GetEntityMetadata().GetLaunchConditions())
 		}
 	}
 	return nil
