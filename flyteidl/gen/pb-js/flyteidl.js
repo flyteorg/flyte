@@ -7812,6 +7812,7 @@
                  * @property {flyteidl.core.ILiteralMap|null} [map] Literal map
                  * @property {string|null} [hash] Literal hash
                  * @property {Object.<string,string>|null} [metadata] Literal metadata
+                 * @property {string|null} [test] Literal test
                  */
     
                 /**
@@ -7870,6 +7871,14 @@
                  */
                 Literal.prototype.metadata = $util.emptyObject;
     
+                /**
+                 * Literal test.
+                 * @member {string} test
+                 * @memberof flyteidl.core.Literal
+                 * @instance
+                 */
+                Literal.prototype.test = "";
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
@@ -7919,6 +7928,8 @@
                     if (message.metadata != null && message.hasOwnProperty("metadata"))
                         for (var keys = Object.keys(message.metadata), i = 0; i < keys.length; ++i)
                             writer.uint32(/* id 5, wireType 2 =*/42).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.metadata[keys[i]]).ldelim();
+                    if (message.test != null && message.hasOwnProperty("test"))
+                        writer.uint32(/* id 6, wireType 2 =*/50).string(message.test);
                     return writer;
                 };
     
@@ -7959,6 +7970,9 @@
                             key = reader.string();
                             reader.pos++;
                             message.metadata[key] = reader.string();
+                            break;
+                        case 6:
+                            message.test = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -8019,6 +8033,9 @@
                             if (!$util.isString(message.metadata[key[i]]))
                                 return "metadata: string{k:string} expected";
                     }
+                    if (message.test != null && message.hasOwnProperty("test"))
+                        if (!$util.isString(message.test))
+                            return "test: string expected";
                     return null;
                 };
     

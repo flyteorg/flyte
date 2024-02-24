@@ -171,6 +171,10 @@
             "type": "string"
           },
           "description": "Additional metadata for literals."
+        },
+        "test": {
+          "type": "string",
+          "title": "Testing out gitattributes"
         }
       },
       "description": "A simple value. This supports any level of nesting (e.g. array of array of array of Blobs) as well as simple primitives."

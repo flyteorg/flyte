@@ -488,6 +488,9 @@ pub struct Literal {
     /// Additional metadata for literals.
     #[prost(map="string, string", tag="5")]
     pub metadata: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
+    /// Testing out gitattributes
+    #[prost(string, tag="6")]
+    pub test: ::prost::alloc::string::String,
     #[prost(oneof="literal::Value", tags="1, 2, 3")]
     pub value: ::core::option::Option<literal::Value>,
 }

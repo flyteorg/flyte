@@ -584,6 +584,13 @@ export class Literal extends Message<Literal> {
    */
   metadata: { [key: string]: string } = {};
 
+  /**
+   * Testing out gitattributes
+   *
+   * @generated from field: string test = 6;
+   */
+  test = "";
+
   constructor(data?: PartialMessage<Literal>) {
     super();
     proto3.util.initPartial(data, this);
@@ -597,6 +604,7 @@ export class Literal extends Message<Literal> {
     { no: 3, name: "map", kind: "message", T: LiteralMap, oneof: "value" },
     { no: 4, name: "hash", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "metadata", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 6, name: "test", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Literal {
