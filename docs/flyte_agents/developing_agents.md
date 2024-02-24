@@ -25,61 +25,70 @@ While agents can be written in any programming language, we currently only suppo
 
 ## Async agent interface specification
 
-To create a new async agent, extend the `AgentBase` class in the `flytekit.backend` module and implement `create`, `get`, and `delete` methods. All calls must be idempotent.
+To create a new async agent, extend the `AsyncAgentBase` and implement `create`, `get`, and `delete` methods. These methods need to be idempotent.
 
 - `create`: This method is used to initiate a new job. Users have the flexibility to use gRPC, REST, or an SDK to create a job.
 - `get`: This method retrieves the job resource (jobID or output literal) associated with the task, such as a BigQuery job ID or Databricks task ID.
 - `delete`: Invoking this method will send a request to delete the corresponding job.
 
 ```python
-from flytekit.extend.backend.base_agent import AgentBase, AgentRegistry
+from flytekit.extend.backend.base_agent import AsyncAgentBase, AgentRegistry, Resource
+from flytekit import StructuredDataset
 from dataclasses import dataclass
-import requests
 
 @dataclass
-class Metadata:
-    # FlytePropeller will pass the metadata specified in this class to the agent.
-    # For example, if you add job_id to the metadata, the agent will use the job_id to get the job status.
-    # If you add s3 file path, the agent will check if the file exists.
+class BigQueryMetadata(ResourceMeta):
+    """
+    This is the metadata for the job. For example, the id of the job.
+    """
     job_id: str
 
-class CustomAsyncAgent(AsyncAgentBase):
-    def __init__(self, task_type: str):
-        # Each agent should have a unique task type.
-        # The Flyte agent service will use the task type
-        # to find the corresponding agent.
-        self._task_type = task_type
+class BigQueryAgent(AsyncAgentBase):
+    def __init__(self):
+        super().__init__(task_type_name="saprk", metadata_type=BigQueryMetadata)
 
     def create(
         self,
-        output_prefix: str,
         task_template: TaskTemplate,
         inputs: typing.Optional[LiteralMap] = None,
         **kwargs,
-    ) -> TaskCreateResponse:
-        # 1. Submit the task to the external service (BigQuery, DataBricks, etc.)
-        # 2. Create metadata for the task, such as jobID.
-        # 3. Return the metadata, serialized to bytes.
-        res = requests.post(url, json=data)
-        return CreateTaskResponse(resource_meta=json.dumps(asdict(Metadata(job_id=str(res.job_id)))).encode("utf-8"))
+    ) -> BigQueryMetadata:
+        # Submit the job to BigQuery here.
+        return BigQueryMetadata(job_id=job_id, outputs={"o0": StructuredDataset(uri=result_table_uri))}
 
-    def get(self, resource_meta: bytes, **kwargs) -> TaskGetResponse:
-        # 1. Deserialize the metadata.
-        # 2. Use the metadata to get the job status.
-        # 3. Return the job status.
-        metadata = Metadata(**json.loads(resource_meta.decode("utf-8")))
-        res = requests.get(url, json={"job_id": metadata.job_id})
-        return GetTaskResponse(resource=Resource(state=res.state)
+    def get(self, resource_meta: BigQueryMetadata, **kwargs) -> Resource:
+        # Get the job status from BigQuery.
+        return Resource(phase=res.phase)
 
-    def delete(self, resource_meta: bytes, **kwargs) -> TaskDeleteResponse:
-        # 1. Deserialize the metadata.
-        # 2. Use the metadata to delete the job.
-        metadata = Metadata(**json.loads(resource_meta.decode("utf-8")))
-        requests.delete(url, json={"job_id": metadata.job_id})
-        return DeleteTaskResponse()
+    def delete(self, resource_meta: BigQueryMetadata, **kwargs):
+        # Delete the job from BigQuery.
+        ...
 
 # To register the custom agent
-AgentRegistry.register(CustomAsyncAgent())
+AgentRegistry.register(BigQueryAgent())
 ```
 
 For an example implementation, see the [BigQuery agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
+
+## Sync agent interface specification
+
+To create a new async agent, extend the `SyncAgentBase` class and implement `do` methods. This method need to be idempotent.
+
+- `do`: This method is used to execute the synchronous task, and the worker in Flyte will be blocked until the method returns.
+
+```python
+from flytekit.extend.backend.base_agent import SyncAgentBase, AgentRegistry, Resource
+
+class OpenAIAgent(SyncAgentBase):
+    def __init__(self):
+        super().__init__(task_type_name="openai")
+
+    def do(self, task_template: TaskTemplate, inputs: Optional[LiteralMap], **kwargs) -> Resource:
+        # Convert the literal map to python value.
+        ctx = FlyteContextManager.current_context()
+        python_inputs = TypeEngine.literal_map_to_kwargs(ctx, inputs, literal_types=task_template.interface.inputs)
+        # Call the OpenAI API here.
+        return Resource(phase=phaseTaskExecution.SUCCEEDED, outputs={"o0": "Hello world!"})
+
+AgentRegistry.register(OpenAIAgent())
+```
