@@ -140,9 +140,5 @@ build-component-image:  ## Build a component image
 ifndef COMPONENT
 	$(error COMPONENT environment variable is not set)
 endif
-	@if ! echo $(COMPONENTS) | grep -wq $(COMPONENT); then \
-		echo "Invalid COMPONENT=$(COMPONENT). Must be one of: $(COMPONENTS)"; \
-		exit 1; \
-	fi
 	@echo "Building $(COMPONENT) image"
 	@docker buildx build -f Dockerfile.$(COMPONENT) .
