@@ -101,8 +101,8 @@ build_native_flyte:
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
 
-.PHONY: go-tidy
-go-tidy:
+.PHONY: go-tidy-all
+go-tidy-all:  ## Run go mod tidy in all components
 	go mod tidy
 	make -C datacatalog go-tidy
 	make -C flyteadmin go-tidy
@@ -111,6 +111,26 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+
+.PHONY: goimports-all
+goimports-all:  ## Run goimports in all components
+	make -C datacatalog goimports
+	make -C flyteadmin goimports
+	make -C flyteidl goimports
+	make -C flytepropeller goimports
+	make -C flyteplugins goimports
+	make -C flytestdlib goimports
+	make -C flytecopilot goimports
+
+.PHONY: lint-all
+lint-all:  ## Lint all components
+	make -C datacatalog lint
+	make -C flyteadmin lint
+	make -C flyteidl lint
+	make -C flytepropeller lint
+	make -C flyteplugins lint
+	make -C flytestdlib lint
+	make -C flytecopilot lint
 
 .PHONY: build-component-image
 build-component-image:  ## Build a component image
