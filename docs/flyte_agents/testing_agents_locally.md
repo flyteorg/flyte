@@ -66,8 +66,6 @@ def hello_spark(partitions: int) -> float:
     return pi_val
 ```
 
-There are two ways to run the above example task locally.
-
 To execute the Spark task on the agent, it's essential to configure the raw-output-data-prefix with a remote path.
 This configuration ensures that Flytekit transfers the input data to the blob storage.
 Consequently, the Spark job running on Databricks can access the input data directly from the designated bucket.
