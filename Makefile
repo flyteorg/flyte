@@ -111,3 +111,11 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+
+.PHONY: build-component-image
+build-component-image:  ## Build a component image
+ifndef COMPONENT
+	$(error COMPONENT environment variable is not set)
+endif
+	@echo "Building $(COMPONENT) image"
+	@docker buildx build -f Dockerfile.$(COMPONENT) .
