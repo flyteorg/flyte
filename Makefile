@@ -11,6 +11,8 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
 PACKAGE ?=github.com/flyteorg/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
+COMPONENTS := datacatalog flyteadmin flytecopilot flyteidl flyteplugins flytepropeller flytestdlib
+
 
 .PHONY: cmd/single/dist
 cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
@@ -100,8 +102,6 @@ build_native_flyte:
 	docker build \
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
-
-COMPONENTS := datacatalog flyteadmin flytecopilot flyteidl flyteplugins flytepropeller flytestdlib
 
 go-tidy-all:  ## Run go mod tidy in all components
 	go mod tidy
