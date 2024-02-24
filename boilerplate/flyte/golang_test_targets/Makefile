@@ -20,7 +20,7 @@ lint: download_tooling #lints the package for common code smells
 # If code is failing goimports linter, this will fix.
 # skips 'vendor'
 .PHONY: goimports
-goimports:
+goimports: download_tooling
 	@../boilerplate/flyte/golang_test_targets/goimports
 
 .PHONY: mod_download

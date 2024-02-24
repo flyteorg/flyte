@@ -101,41 +101,48 @@ build_native_flyte:
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
 
-.PHONY: go-tidy-all
+COMPONENTS := datacatalog flyteadmin flytecopilot flyteidl flyteplugins flytepropeller flytestdlib
+
 go-tidy-all:  ## Run go mod tidy in all components
 	go mod tidy
-	make -C datacatalog go-tidy
-	make -C flyteadmin go-tidy
-	make -C flyteidl go-tidy
-	make -C flytepropeller go-tidy
-	make -C flyteplugins go-tidy
-	make -C flytestdlib go-tidy
-	make -C flytecopilot go-tidy
+	$(MAKE) $(addsuffix -go-tidy,$(COMPONENTS))
 
-.PHONY: goimports-all
 goimports-all:  ## Run goimports in all components
-	make -C datacatalog goimports
-	make -C flyteadmin goimports
-	make -C flyteidl goimports
-	make -C flytepropeller goimports
-	make -C flyteplugins goimports
-	make -C flytestdlib goimports
-	make -C flytecopilot goimports
+	$(MAKE) $(addsuffix -goimports,$(COMPONENTS))
 
-.PHONY: lint-all
+generate-all:  ## Run `make generate` on all components
+	$(MAKE) $(addsuffix -generate,$(COMPONENTS))
+
 lint-all:  ## Lint all components
-	make -C datacatalog lint
-	make -C flyteadmin lint
-	make -C flyteidl lint
-	make -C flytepropeller lint
-	make -C flyteplugins lint
-	make -C flytestdlib lint
-	make -C flytecopilot lint
+	$(MAKE) $(addsuffix -lint,$(COMPONENTS))
+
+test_unit-all:  ## Run `make test_unit` on all components
+	$(MAKE) $(addsuffix -test_unit,$(COMPONENTS))
+
+$(COMPONENTS:%=%-go-tidy):
+	make -C $(@:-go-tidy=) go-tidy
+
+$(COMPONENTS:%=%-goimports):
+	make -C $(@:-goimports=) goimports
+
+$(COMPONENTS:%=%-generate):
+	make -C $(@:-generate=) generate
+
+$(COMPONENTS:%=%-lint):
+	make -C $(@:-lint=) lint
+
+$(COMPONENTS:%=%-test_unit):
+	make -C $(@:-test_unit=) test_unit
 
 .PHONY: build-component-image
 build-component-image:  ## Build a component image
+# Check if COMPONENT is set and contained in COMPONENTS
 ifndef COMPONENT
 	$(error COMPONENT environment variable is not set)
 endif
+	@if ! echo $(COMPONENTS) | grep -wq $(COMPONENT); then \
+		echo "Invalid COMPONENT=$(COMPONENT). Must be one of: $(COMPONENTS)"; \
+		exit 1; \
+	fi
 	@echo "Building $(COMPONENT) image"
 	@docker buildx build -f Dockerfile.$(COMPONENT) .
