@@ -18,6 +18,7 @@ You can create different agent services that host different agents, e.g., a prod
 :class: with-shadow
 :::
 
+(using_agents_in_tasks)=
 ## Using agents in tasks
 
 If you need to connect to an external service in your workflow, we recommend using the corresponding agent rather than a web API plugin. Agents are designed to be scalable and can handle large workloads efficiently, and decrease load on FlytePropeller, since they run outside of it. You can also test agents locally without having to change the Flyte backend configuration, streamlining development.
