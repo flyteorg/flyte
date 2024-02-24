@@ -21,6 +21,9 @@ metadata:
     {{- if .Values.ingress.httpAnnotations }}
     {{- tpl ( .Values.ingress.httpAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
+    {{- if not .Values.ingress.separateGrpcIngress }}
+    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
+    {{- end }}
 spec:
   {{- if .Values.ingress.httpIngressClassName }}
   ingressClassName: {{ .Values.ingress.httpIngressClassName | quote }}
@@ -171,6 +174,9 @@ spec:
               number: {{ include "flyte-binary.service.http.port" . }}
         path: /oauth2/*
         pathType: ImplementationSpecific
+      {{- if not .Values.ingress.separateGrpcIngress }}
+      {{- include "flyte-binary.ingress.grpc.paths" . | nindent 6 }}
+      {{- end }}
       {{- if .Values.ingress.httpExtraPaths.append }}
       {{- tpl ( .Values.ingress.httpExtraPaths.append | toYaml ) . | nindent 6 }}
       {{- end }}

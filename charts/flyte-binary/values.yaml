@@ -324,11 +324,13 @@ service:
 # ingress Configure ingress for Flyte
 ingress:
   # create Create ingress resources
-  create: false
+  create: true
   # labels Add labels to ingress resources
   labels: {}
   # host Hostname to bind to ingress resources
   host: ""
+  # separateGrpcIngress Create a separate ingress resource for GRPC if true. Required for certain ingress controllers like nginx.
+  separateGrpcIngress: true
   # commonAnnotations Add common annotations to all ingress resources
   commonAnnotations: {}
   # httpAnnotations Add annotations to http ingress resource
