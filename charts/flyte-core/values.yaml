@@ -485,7 +485,7 @@ common:
     secretManifest: {}
   ingress:
     # --- Sets the ingressClassName
-    ingressClassName:
+    ingressClassName: ""
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
@@ -501,7 +501,7 @@ common:
     # --- albSSLRedirect adds a special route for ssl redirect. Only useful in combination with the AWS LoadBalancer Controller.
     albSSLRedirect: false
     # --- Ingress hostname
-    # host:
+    host: ""
     tls:
       enabled: false
       # --- Override default secret containing the tls certificate

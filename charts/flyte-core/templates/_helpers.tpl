@@ -261,3 +261,152 @@ storage:
   limits:
     maxDownloadMBs: {{ .Values.storage.limits.maxDownloadMBs }}
 {{- end }}
+
+{{/* Generate grpcRoutes for ingress */}}
+{{- define "ingress.grpcRoutes" -}}
+{{- $grpcPort := .Values.configmap.adminServer.server.security.secure | ternary 80 81 -}}
+- path: /flyteidl.service.SignalService
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.SignalService/*
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.AdminService
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.AdminService/*
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.DataProxyService
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.DataProxyService/*
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.AuthMetadataService
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.AuthMetadataService/*
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.IdentityService
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /flyteidl.service.IdentityService/*
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /grpc.health.v1.Health
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+- path: /grpc.health.v1.Health/*
+  pathType: ImplementationSpecific
+  backend:
+    {{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+    service:
+      name: flyteadmin
+      port:
+        number: {{ $grpcPort }}
+    {{- else }}
+    serviceName: flyteadmin
+    servicePort: {{ $grpcPort }}
+    {{- end }}
+{{- end -}}

@@ -1,0 +1,41 @@
+{{/* Certain ingress controllers like nginx cannot serve HTTP 1 and GRPC with a single ingress because GRPC can only */}}
+{{/* enabled on the ingress object, not on backend services (GRPC annotation is set on the ingress, not on the services). */}}
+
+{{- if and .Values.common.ingress.enabled .Values.common.ingress.separateGrpcIngress }}
+{{- $annotations := .Values.common.ingress.annotations | deepCopy -}}
+{{- $_ := merge $annotations .Values.common.ingress.separateGrpcIngressAnnotations -}}
+
+{{- if $.Capabilities.APIVersions.Has "networking.k8s.io/v1/Ingress" }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: networking.k8s.io/v1beta1
+{{- end }}
+kind: Ingress
+metadata:
+  name: {{ template "flyte.name" . }}-grpc
+  namespace: {{ template "flyte.namespace" . }}
+  {{- with $annotations }}
+  annotations:
+    {{- toYaml . | nindent 4}}
+  {{- end }}
+spec:
+  ingressClassName: {{ .Values.common.ingress.ingressClassName | quote }}
+  rules:
+    - host: {{ tpl (toYaml .Values.common.ingress.host) $ }}
+      http:
+        paths:
+          {{- include "ingress.grpcRoutes" . | nindent 10 -}}
+          {{- if .Values.common.ingress.albSSLRedirect }}
+          # - backend:
+          #     serviceName: ssl-redirect
+          #     servicePort: use-annotation
+          #   path: /*
+          #   pathType: ImplementationSpecific
+          {{- end }}
+  {{- if .Values.common.ingress.tls.enabled }}
+  tls:
+    - secretName: {{ .Values.common.ingress.tls.secretName | default (printf "%s-flyte-tls" .Release.Name) }}
+      hosts:
+        - {{ tpl (toYaml .Values.common.ingress.host) $ }}
+  {{ end }}
+{{- end }}
