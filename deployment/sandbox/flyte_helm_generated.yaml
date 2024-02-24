@@ -7601,10 +7601,10 @@ kind: Ingress
 metadata:
   name: flyte
   namespace: flyte
-  annotations: 
+  annotations:
     nginx.ingress.kubernetes.io/app-root: /console
 spec:
-  ingressClassName: 
+  ingressClassName: ""
   rules:
     - http:
         paths:
@@ -7766,8 +7766,6 @@ spec:
                 name: flyteadmin
                 port:
                   number: 80
-          
-          # NOTE: Port 81 in flyteadmin is the GRPC server port for FlyteAdmin.
           - path: /flyteidl.service.SignalService
             pathType: ImplementationSpecific
             backend:
