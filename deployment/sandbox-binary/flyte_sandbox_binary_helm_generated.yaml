@@ -436,3 +436,256 @@ spec:
                 name: flyte-flyte-binary-config-secret
         - name: state
           emptyDir: {}
+---
+# Source: flyte-binary/templates/ingress/grpc.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flyte-flyte-binary-grpc
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /flyteidl.service.AdminService
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.AdminService/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.DataProxyService
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.DataProxyService/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.AuthMetadataService
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.AuthMetadataService/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.IdentityService
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.IdentityService/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /grpc.health.v1.Health
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /grpc.health.v1.Health/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.SignalService
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+      - path: /flyteidl.service.SignalService/*
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: flyte-flyte-binary-grpc
+            port:
+              number: 8089
+---
+# Source: flyte-binary/templates/ingress/http.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: flyte-flyte-binary-http
+  namespace: "flyte"
+  labels:
+    helm.sh/chart: flyte-binary-v0.1.10
+    app.kubernetes.io/name: flyte-binary
+    app.kubernetes.io/instance: flyte
+    app.kubernetes.io/version: "1.16.0"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+spec:
+  rules:
+  - http:
+      paths:
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /console
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /console/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /api
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /api/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /healthcheck
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /v1/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /.well-known
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /.well-known/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /login
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /login/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /logout
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /logout/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /callback
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /callback/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /me
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /config
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /config/*
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /oauth2
+        pathType: ImplementationSpecific
+      - backend:
+          service:
+            name: flyte-flyte-binary-http
+            port:
+              number: 8088
+        path: /oauth2/*
+        pathType: ImplementationSpecific
