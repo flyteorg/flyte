@@ -31,7 +31,7 @@ class BigQueryTask(AsyncAgentExecutorMixin, SQLTask[BigQueryConfig]):
         ...
 ```
 
-Flytekit will automatically use the agent to run the task when running the workflow.
+Flytekit will automatically use the agent to run the task in the local execution.
 ```python
 bigquery_doge_coin = BigQueryTask(
     name=f"bigquery.doge_coin",
