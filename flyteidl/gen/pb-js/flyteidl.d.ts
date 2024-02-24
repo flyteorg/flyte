@@ -3265,9 +3265,6 @@ export namespace flyteidl {
 
             /** Literal metadata */
             metadata?: ({ [k: string]: string }|null);
-
-            /** Literal test */
-            test?: (string|null);
         }
 
         /** Represents a Literal. */
@@ -3293,9 +3290,6 @@ export namespace flyteidl {
 
             /** Literal metadata. */
             public metadata: { [k: string]: string };
-
-            /** Literal test. */
-            public test: string;
 
             /** Literal value. */
             public value?: ("scalar"|"collection"|"map");

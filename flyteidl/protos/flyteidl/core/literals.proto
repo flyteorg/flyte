@@ -111,9 +111,6 @@ message Literal {
 
     // Additional metadata for literals.
     map<string, string> metadata = 5;
-
-    // Testing out gitattributes
-    string test = 6;
 }
 
 // A collection of literals. This is a workaround since oneofs in proto messages cannot contain a repeated field.
