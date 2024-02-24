@@ -1,8 +1,5 @@
-# WARNING: THIS FILE IS MANAGED IN THE 'BOILERPLATE' REPO AND COPIED TO OTHER REPOSITORIES.
-# ONLY EDIT THIS FILE FROM WITHIN THE 'FLYTEORG/BOILERPLATE' REPOSITORY:
-#
-# TO OPT OUT OF UPDATES, SEE https://github.com/flyteorg/boilerplate/blob/master/Readme.rst
-
+clean:
+	rm -rf bin
 
 .PHONY: download_tooling
 download_tooling: #download dependencies (including test deps) for the package
@@ -11,6 +8,10 @@ download_tooling: #download dependencies (including test deps) for the package
 .PHONY: generate
 generate: download_tooling #generate go code
 	@../boilerplate/flyte/golang_test_targets/go-gen.sh
+
+.PHONY: go-tidy
+go-tidy: ## Runs go mod tidy
+	go mod tidy
 
 .PHONY: lint
 lint: download_tooling #lints the package for common code smells
@@ -50,8 +51,7 @@ test_unit_cover:
 test_unit_visual:
 	go test ./... -coverprofile /tmp/cover.out -covermode=count
 	go tool cover -html=/tmp/cover.out
-	
+
 .PHONY: test_unit_codecov
 test_unit_codecov:
 	go test ./... -race -coverprofile=coverage.txt -covermode=atomic
-	curl -s https://codecov.io/bash > codecov_bash.sh && bash codecov_bash.sh

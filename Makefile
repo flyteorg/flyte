@@ -26,10 +26,6 @@ compile: cmd/single/dist
 linux_compile: cmd/single/dist
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
 
-.PHONY: update_boilerplate
-update_boilerplate:
-	@boilerplate/update.sh
-
 .PHONY: kustomize
 kustomize:
 	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
