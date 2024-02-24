@@ -1,3 +1,3 @@
 docs/**/*html linguist-generated=true
-flyteidl/gen/** linguist-generated=true
+/flyteidl/gen/** linguist-generated=true
 
