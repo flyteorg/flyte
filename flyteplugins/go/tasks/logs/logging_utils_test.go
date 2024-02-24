@@ -210,6 +210,40 @@ func TestGetLogsForContainerInPod_All(t *testing.T) {
 	assert.Len(t, logs, 2)
 }
 
+func TestGetLogsForContainerInPod_HostName(t *testing.T) {
+	logPlugin, err := InitializeLogPlugins(&LogConfig{
+		IsKubernetesEnabled: true,
+		KubernetesURL:       "k8s.com",
+		IsCloudwatchEnabled: true,
+		CloudwatchRegion:    "us-east-1",
+		CloudwatchLogGroup:  "/kubernetes/flyte-production",
+	})
+	assert.NoError(t, err)
+
+	pod := &v1.Pod{
+		Spec: v1.PodSpec{
+			Containers: []v1.Container{
+				{
+					Name: "ContainerName",
+				},
+			},
+			Hostname: "my-hostname",
+		},
+		Status: v1.PodStatus{
+			ContainerStatuses: []v1.ContainerStatus{
+				{
+					ContainerID: "ContainerID",
+				},
+			},
+		},
+	}
+	pod.Name = podName
+
+	logs, err := GetLogsForContainerInPod(context.TODO(), logPlugin, dummyTaskExecID(), pod, 0, " Suffix", nil, nil)
+	assert.Nil(t, err)
+	assert.Len(t, logs, 2)
+}
+
 func TestGetLogsForContainerInPod_Stackdriver(t *testing.T) {
 	logPlugin, err := InitializeLogPlugins(&LogConfig{
 		IsStackDriverEnabled:       true,
