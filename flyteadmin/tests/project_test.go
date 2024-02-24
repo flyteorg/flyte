@@ -5,13 +5,13 @@ package tests
 
 import (
 	"context"
-	"github.com/flyteorg/flyte/flytestdlib/utils"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
+	"github.com/flyteorg/flyte/flytestdlib/utils"
 )
 
 func TestCreateProject(t *testing.T) {
