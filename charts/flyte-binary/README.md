@@ -124,7 +124,7 @@ Chart for basic single Flyte executable deployment
 | flyteagent.enabled | bool | `false` |  |
 | fullnameOverride | string | `""` |  |
 | ingress.commonAnnotations | object | `{}` |  |
-| ingress.create | bool | `true` |  |
+| ingress.create | bool | `false` |  |
 | ingress.grpcAnnotations | object | `{}` |  |
 | ingress.grpcExtraPaths.append | list | `[]` |  |
 | ingress.grpcExtraPaths.prepend | list | `[]` |  |

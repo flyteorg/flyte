@@ -324,7 +324,7 @@ service:
 # ingress Configure ingress for Flyte
 ingress:
   # create Create ingress resources
-  create: true
+  create: false
   # labels Add labels to ingress resources
   labels: {}
   # host Hostname to bind to ingress resources
