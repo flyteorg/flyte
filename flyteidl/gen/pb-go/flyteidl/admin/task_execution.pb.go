@@ -7,9 +7,6 @@
 package admin
 
 import (
-	reflect "reflect"
-	sync "sync"
-
 	core "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	event "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/event"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -17,6 +14,8 @@ import (
 	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	structpb "google.golang.org/protobuf/types/known/structpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	reflect "reflect"
+	sync "sync"
 )
 
 const (
