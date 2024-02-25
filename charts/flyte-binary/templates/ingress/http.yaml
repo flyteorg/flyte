@@ -175,8 +175,13 @@ spec:
         path: /oauth2/*
         pathType: ImplementationSpecific
       {{- if not .Values.ingress.separateGrpcIngress }}
-      {{- range .Values.ingress.grpcPaths }}
-      - backend:
+      {{- $paths := (include "flyte-binary.ingress.grpcPaths" .) | fromYamlArray }}
+      {{- range $path := $paths }}
+      - path: {{ $path }}
+        {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+        pathType: ImplementationSpecific
+        {{- end }}
+        backend:
           {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
           service:
             name: {{ include "flyte-binary.service.http.name" $ }}
@@ -186,10 +191,6 @@ spec:
           serviceName: {{ include "flyte-binary.service.http.name" $ }}
           servicePort: {{ include "flyte-binary.service.grpc.port" $ }}
           {{- end }}
-        path: {{ . }}
-        {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
-        pathType: ImplementationSpecific
-        {{- end }}
       {{- end }}
       {{- end }}
       {{- if .Values.ingress.httpExtraPaths.append }}
