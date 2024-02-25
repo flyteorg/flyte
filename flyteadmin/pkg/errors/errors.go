@@ -120,16 +120,16 @@ func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string
 
 	for _, obj := range jsonArray2 {
 		if val, ok := map1[obj.Path]; ok {
-			result := fmt.Sprintf("%s: %s -> %s\t", obj.Path, obj.Value, val.Value)
+			result := fmt.Sprintf("%v: %v -> %v\t", obj.Path, obj.Value, val.Value)
 			results = append(results, result)
 		}
 	}
 	return results
 }
 
-func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.TaskTemplate, newSpec *core.TaskTemplate) FlyteAdminError {
+func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.CompiledTask, newSpec *core.CompiledTask) FlyteAdminError {
 	errorMsg := "task with different structure already exists:\n"
-	// omit source code file object storage path
+	// omit file storage path changed message by ignoring `/args/2` differences computation
 	diff, _ := jsondiff.Compare(oldSpec, newSpec, jsondiff.Ignores("/Target/Container/args/2"))
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec, jsondiff.Ignores("/Target/Container/args/2"))
 	rs := compareJsons(diff, rdiff)
@@ -143,7 +143,7 @@ func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.Ta
 		},
 	})
 	if transformationErr != nil {
-		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
 		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
 	}
 	return statusErr
@@ -159,17 +159,17 @@ func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.Ta
 		},
 	})
 	if transformationErr != nil {
-		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
 		return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
 	}
 	return statusErr
 }
 
-func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldTemplate *core.TaskTemplate, newTemplate *core.TaskTemplate) FlyteAdminError {
+func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldSpec *core.CompiledWorkflowClosure, newSpec *core.CompiledWorkflowClosure) FlyteAdminError {
 	errorMsg := "workflow with different structure already exists:\n"
-	// omit source code file object storage path
-	diff, _ := jsondiff.Compare(oldTemplate, newTemplate, jsondiff.Ignores("/Target/Container/args/2"))
-	rdiff, _ := jsondiff.Compare(newTemplate, oldTemplate, jsondiff.Ignores("/Target/Container/args/2"))
+	// omit file storage path changed message by ignoring `/args/2` differences computation
+	diff, _ := jsondiff.Compare(oldSpec, newSpec, jsondiff.Ignores("/Target/Container/args/2"))
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec, jsondiff.Ignores("/Target/Container/args/2"))
 	rs := compareJsons(diff, rdiff)
 	errorMsg += strings.Join(rs, "\n")
 
@@ -181,7 +181,7 @@ func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admi
 		},
 	})
 	if transformationErr != nil {
-		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
 		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
 	}
 	return statusErr
@@ -197,7 +197,7 @@ func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admi
 		},
 	})
 	if transformationErr != nil {
-		logger.Panicf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
+		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
 		return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
 	}
 	return statusErr
