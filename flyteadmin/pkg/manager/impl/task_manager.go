@@ -94,11 +94,12 @@ func (t *TaskManager) CreateTask(
 		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
 			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, &request)
 		}
-		existingTask, err2 := util.GetTask(ctx, t.db, *request.Id)
+
+		existingTask, err2 := transformers.FromTaskModel(*existingTaskModel)
 		if err2 != nil {
 			return nil, err2
 		}
-		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, existingTask.Closure.CompiledTask.Template, compiledTask.Template)
+		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, existingTask.Closure.GetCompiledTask(), compiledTask)
 	}
 	taskModel, err := transformers.CreateTaskModel(finalizedRequest, admin.TaskClosure{
 		CompiledTask: compiledTask,
