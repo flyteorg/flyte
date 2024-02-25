@@ -94,7 +94,6 @@ func (t *TaskManager) CreateTask(
 		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
 			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, &request)
 		}
-
 		existingTask, err2 := transformers.FromTaskModel(*existingTaskModel)
 		if err2 != nil {
 			return nil, err2

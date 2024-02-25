@@ -46,6 +46,52 @@ func TestNewIncompatibleClusterError(t *testing.T) {
 	assert.True(t, ok)
 }
 
+func TestNewTaskExistsDifferentStructureError(t *testing.T) {
+	t := &admin.TaskCreateRequest{
+		Id: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "testProj",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "ver",
+		},
+	}
+	statusErr := NewTaskExistsDifferentStructureError(context.Background(), t)
+	assert.NotNil(t, statusErr)
+	s, ok := status.FromError(statusErr)
+	assert.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, s.Code())
+	assert.Equal(t, "task with different structure already exists", s.Message())
+
+	details, ok := s.Details()[0].(*admin.CreateTaskFailureReason)
+	assert.True(t, ok)
+	_, ok = details.GetReason().(*admin.CreateTaskFailureReason_ExistsDifferentStructure)
+	assert.True(t, ok)
+}
+
+func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
+	t := &admin.TaskCreateRequest{
+		Id: &core.Identifier{
+			ResourceType: core.ResourceType_TASK,
+			Project:      "testProj",
+			Domain:       "domain",
+			Name:         "name",
+			Version:      "ver",
+		},
+	}
+	statusErr := NewTaskExistsIdenticalStructureError(context.Background(), t)
+	assert.NotNil(t, statusErr)
+	s, ok := status.FromError(statusErr)
+	assert.True(t, ok)
+	assert.Equal(t, codes.AlreadyExists, s.Code())
+	assert.Equal(t, "task with identical structure already exists", s.Message())
+
+	details, ok := s.Details()[0].(*admin.CreateTaskFailureReason)
+	assert.True(t, ok)
+	_, ok = details.GetReason().(*admin.CreateTaskFailureReason_ExistsIdenticalStructure)
+	assert.True(t, ok)
+}
+
 func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
 	wf := &admin.WorkflowCreateRequest{
 		Id: &core.Identifier{
