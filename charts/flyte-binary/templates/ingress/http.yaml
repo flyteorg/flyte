@@ -21,9 +21,6 @@ metadata:
     {{- if .Values.ingress.httpAnnotations }}
     {{- tpl ( .Values.ingress.httpAnnotations | toYaml ) . | nindent 4 }}
     {{- end }}
-    {{- if not .Values.ingress.separateGrpcIngress }}
-    nginx.ingress.kubernetes.io/backend-protocol: "GRPC"
-    {{- end }}
 spec:
   {{- if .Values.ingress.httpIngressClassName }}
   ingressClassName: {{ .Values.ingress.httpIngressClassName | quote }}
