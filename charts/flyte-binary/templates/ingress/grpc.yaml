@@ -38,7 +38,22 @@ spec:
       {{- if .Values.ingress.grpcExtraPaths.prepend }}
       {{- tpl ( .Values.ingress.grpcExtraPaths.prepend | toYaml ) . | nindent 6 }}
       {{- end }}
-      {{- include "flyte-binary.ingress.grpc.paths" . | nindent 6 }}
+      {{- range .Values.ingress.grpcPaths }}
+        - path: {{ . }}
+          {{- if semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion }}
+          pathType: ImplementationSpecific
+          {{- end }}
+          backend:
+            {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
+            service:
+              name: {{ include "flyte-binary.service.grpc.name" $ }}
+              port:
+                number: {{ include "flyte-binary.service.grpc.port" $ }}
+            {{- else }}
+              serviceName: {{ include "flyte-binary.service.grpc.name" $ }}
+              servicePort: {{ include "flyte-binary.service.grpc.port" $ }}
+            {{- end }}
+      {{- end }}
       {{- if .Values.ingress.grpcExtraPaths.append }}
       {{- tpl ( .Values.ingress.grpcExtraPaths.append | toYaml ) . | nindent 6 }}
       {{- end }}

@@ -330,7 +330,7 @@ ingress:
   # host Hostname to bind to ingress resources
   host: ""
   # separateGrpcIngress Create a separate ingress resource for GRPC if true. Required for certain ingress controllers like nginx.
-  separateGrpcIngress: true
+  separateGrpcIngress: false
   # commonAnnotations Add common annotations to all ingress resources
   commonAnnotations: {}
   # httpAnnotations Add annotations to http ingress resource
@@ -349,6 +349,20 @@ ingress:
   httpTls: []
   # grpcTls Add TLS configuration to grpc ingress resource. Overrides `tls`
   grpcTls: []
+  # grpcPaths Add default paths to grpc ingress rule
+  grpcPaths:
+    - /flyteidl.service.AdminService
+    - /flyteidl.service.AdminService/*
+    - /flyteidl.service.DataProxyService
+    - /flyteidl.service.DataProxyService/*
+    - /flyteidl.service.AuthMetadataService
+    - /flyteidl.service.AuthMetadataService/*
+    - /flyteidl.service.IdentityService
+    - /flyteidl.service.IdentityService/*
+    - /grpc.health.v1.Health
+    - /grpc.health.v1.Health/*
+    - /flyteidl.service.SignalService
+    - /flyteidl.service.SignalService/*
   # httpExtraPaths Add extra paths to http ingress rule
   httpExtraPaths:
     prepend: []
