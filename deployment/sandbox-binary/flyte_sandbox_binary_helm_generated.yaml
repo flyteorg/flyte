@@ -255,31 +255,6 @@ subjects:
     name: flyte-flyte-binary
     namespace: "flyte"
 ---
-# Source: flyte-binary/templates/service/grpc.yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: flyte-flyte-binary-grpc
-  namespace: "flyte"
-  labels:
-    helm.sh/chart: flyte-binary-v0.1.10
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/version: "1.16.0"
-    app.kubernetes.io/managed-by: Helm
-  annotations:
-spec:
-  type: ClusterIP
-  ports:
-    - name: grpc
-      port: 8089
-      targetPort: grpc
-      nodePort: null
-  selector:
-    app.kubernetes.io/name: flyte-binary
-    app.kubernetes.io/instance: flyte
-    app.kubernetes.io/component: flyte-binary
----
 # Source: flyte-binary/templates/service/http.yaml
 apiVersion: v1
 kind: Service
@@ -299,6 +274,10 @@ spec:
     - name: http
       port: 8088
       targetPort: http
+      nodePort: null
+    - name: grpc
+      port: 8089
+      targetPort: grpc
       nodePort: null
   selector:
     app.kubernetes.io/name: flyte-binary
