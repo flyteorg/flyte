@@ -13,6 +13,12 @@ The Flyte agent framework enables rapid agent development, since agents are deco
 
 If you need to create a new type of task, we recommend creating a new agent to run it rather than running the task in a pod. After testing the new agent, you can update your FlytePropeller configMap to specify the type of task that the agent should run.
 
+```{note}
+
+We strongly encourage you to contribute your agent to the Flyte community. To do so, follow the steps in "[Contributing to Flyte](https://docs.flyte.org/en/latest/community/contribute.html)", and reach out to us on [Slack](https://docs.flyte.org/en/latest/community/contribute.html#) if you have any questions.
+
+```
+
 There are two types of agents: **async** and **sync**.
 * **Async agents** enable long-running jobs that execute on an external platform over time. They communicate with external services that have asynchronous APIs that support `create`, `get`, and `delete` operations. The vast majority of agents are async agents.
 * **Sync agents** enable request/response services that return immediate outputs (e.g. calling an internal API to fetch data or communicating with the OpenAI API).
@@ -83,3 +89,9 @@ AgentRegistry.register(CustomAsyncAgent())
 ```
 
 For an example implementation, see the [BigQuery agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
+
+```{note}
+
+To contribute 
+
+```
