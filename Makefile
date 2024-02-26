@@ -107,9 +107,6 @@ go-tidy-all:  ## Run go mod tidy in all components
 	go mod tidy
 	$(MAKE) $(addsuffix -go-tidy,$(COMPONENTS))
 
-goimports-all:  ## Run goimports in all components
-	$(MAKE) $(addsuffix -goimports,$(COMPONENTS))
-
 generate-all:  ## Run `make generate` on all components
 	$(MAKE) $(addsuffix -generate,$(COMPONENTS))
 

@@ -17,12 +17,6 @@ go-tidy: ## Runs go mod tidy
 lint: download_tooling #lints the package for common code smells
 	GL_DEBUG=linters_output,env golangci-lint run --deadline=5m --exclude deprecated -v
 
-# If code is failing goimports linter, this will fix.
-# skips 'vendor'
-.PHONY: goimports
-goimports: download_tooling
-	@../boilerplate/flyte/golang_test_targets/goimports
-
 .PHONY: mod_download
 mod_download: #download dependencies (including test deps) for the package
 	go mod download

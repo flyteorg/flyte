@@ -22,7 +22,6 @@ tools=(
 	"github.com/daixiang0/gci"
 	"github.com/alvaroloes/enumer"
 	"github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc"
-	"golang.org/x/tools/cmd/goimports@v0.18.0"
 )
 
 tmp_dir=$(mktemp -d -t gotooling-XXX)
