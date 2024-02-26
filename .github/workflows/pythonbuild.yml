@@ -28,7 +28,7 @@ jobs:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
         with:
-          filter: tree:0
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -75,7 +75,7 @@ jobs:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
         with:
-          filter: tree:0
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -114,7 +114,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          filter: tree:0
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -155,7 +155,7 @@ jobs:
       # and tags to work.
       - uses: actions/checkout@v4
         with:
-          filter: tree:0
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -273,7 +273,7 @@ jobs:
       - uses: insightsengineering/disk-space-reclaimer@v1
       - uses: actions/checkout@v4
         with:
-          filter: tree:0
+          fetch-depth: 0
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -316,7 +316,7 @@ jobs:
       - name: Fetch the code
         uses: actions/checkout@v4
         with:
-          filter: tree:0
+          fetch-depth: 0
       - name: Set up Python 3.8
         uses: actions/setup-python@v4
         with:
