@@ -1,0 +1,13 @@
+FROM condaforge/mambaforge:latest
+
+RUN conda install -c conda-forge conda-lock
+RUN --mount=type=bind,source=monodocs-environment.lock.yaml,target=monodocs-environment.lock.yaml \
+    conda-lock install -n monodocs-env monodocs-environment.lock.yaml
+
+ENV SETUPTOOLS_SCM_PRETEND_VERSION 2.0.0
+COPY flyteidl flyteidl
+SHELL ["conda", "run", "-n", "monodocs-env", "/bin/bash", "-c"]
+RUN python -m pip install ./flyteidl
+
+WORKDIR /docs
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "monodocs-env", "sphinx-build"]
