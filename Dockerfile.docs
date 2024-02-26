@@ -7,7 +7,8 @@ RUN --mount=type=bind,source=monodocs-environment.lock.yaml,target=monodocs-envi
 ENV SETUPTOOLS_SCM_PRETEND_VERSION 2.0.0
 COPY flyteidl flyteidl
 SHELL ["conda", "run", "-n", "monodocs-env", "/bin/bash", "-c"]
+RUN python -m pip install sphinx-autobuild
 RUN python -m pip install ./flyteidl
 
-WORKDIR /docs
-ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "monodocs-env", "sphinx-build"]
+WORKDIR docs
+ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "monodocs-env"]
