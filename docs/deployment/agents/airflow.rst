@@ -1,19 +1,11 @@
-.. _deployment-agent-setup-bigquery:
+.. _deployment-agent-setup-airflow:
 
-Google BigQuery agent
-======================
+Airflow agent
+=================
 
-This guide provides an overview of setting up BigQuery agent in your Flyte deployment.
-Please note that the BigQuery agent requires Flyte deployment in the GCP cloud;
-it is not compatible with demo/AWS/Azure.
-
-Set up the GCP Flyte cluster
-----------------------------
-
-* Ensure you have a functional Flyte cluster running in `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__.
-* Create a service account for BigQuery. For more details, refer to: https://cloud.google.com/bigquery/docs/quickstarts/quickstart-client-libraries.
-* Verify that you have the correct kubeconfig and have selected the appropriate Kubernetes context.
-* Confirm that you have the correct Flytectl configuration at ``~/.flyte/config.yaml``.
+This guide provides an overview of how to set up the Airflow agent in your Flyte deployment.
+Please note that the you don't need an Airflow cluster to run the Airflow tasks, since Flytekit will
+automatically compile Airflow tasks to Flyte tasks and execute them on the Flyte cluster.
 
 Specify agent configuration
 ----------------------------
@@ -30,7 +22,7 @@ Specify agent configuration
 
       .. code-block:: yaml
         :emphasize-lines: 7,11,16
-  
+
         tasks:
           task-plugins:
             enabled-plugins:
@@ -41,12 +33,12 @@ Specify agent configuration
             default-for-task-types:
               - container: container
               - container_array: k8s-array
-              - bigquery_query_job_task: agent-service
-        
+              - airflow: agent-service
+
         plugins:
           agent-service:
             supportedTaskTypes:
-            - bigquery_query_job_task
+            - airflow
 
     .. group-tab:: Flyte core
 
@@ -70,13 +62,12 @@ Specify agent configuration
                   container: container
                   sidecar: sidecar
                   container_array: k8s-array
-                  bigquery_query_job_task: agent-service
+                  airflow: agent-service
             plugins:
               agent-service:
                 supportedTaskTypes:
-                - bigquery_query_job_task
+                - airflow
 
-Ensure that the propeller has the correct service account for BigQuery.
 
 Upgrade the Flyte Helm release
 ------------------------------
@@ -103,4 +94,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For BigQuery agent on the Flyte cluster, see `BigQuery agent <https://docs.flyte.org/en/latest/flytesnacks/examples/bigquery_integration/bigquery_agent.html>`_.
+For Airflow agent on the Flyte cluster, see `Airflow agent <https://docs.flyte.org/en/latest/flytesnacks/examples/airflow_agent/index.html>`_.
