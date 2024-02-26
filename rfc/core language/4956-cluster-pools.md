@@ -83,7 +83,7 @@ We don’t expect any additional overhead for execution or impact in terms of AP
 
 ## 6 Alternatives
 
-As mentioned above, the only alternative we have implemented today is using the [Execution Cluster Labels](https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html#configure-execution-cluster-labels). Even though we could make this work for our use case it’s not ideal and can bring further problems when we want to route executions to different clusters from the same Project/Domain.
+As mentioned above, the only alternative we have implemented today is using the [Execution Cluster Labels](https://docs.flyte.org/en/latest/deployment/deployment/multicluster.html#configure-execution-cluster-labels). This can bring further problems when we want to route executions to different clusters from the same Project/Domain.
 
 ## 7 Potential Impact and Dependencies
 
