@@ -119,6 +119,10 @@ jobs:
 
   build_docker_images:
     name: Build Images
-    uses: ./.github/workflows/publish-images.yml
+    uses: ./.github/workflows/build-and-push-all-docker-images.yml
     with:
       push: false
+
+  build_and_test_single_binary:
+    name: Build and Test Single Binary Image
+    uses: ./.github/workflows/build-and-test-single-binary-image.yml

@@ -12,12 +12,12 @@ jobs:
   test-bootstrap:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-go@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
           go-version: "1.21"
       - name: golangci-lint
-        uses: golangci/golangci-lint-action@v3
+        uses: golangci/golangci-lint-action@v4
         with:
           working-directory: docker/sandbox-bundled/bootstrap
       - name: Check formatting
@@ -34,9 +34,9 @@ jobs:
     needs: [test-bootstrap]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Setup Golang caches
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             /root/.cache/go-build
@@ -61,7 +61,7 @@ jobs:
           registry-type: public
       - name: Prepare Image Names
         id: image-names
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           # list of Docker images to use as base name for tags
           images: |
@@ -70,14 +70,14 @@ jobs:
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
             type=raw,value=${{ github.event.pull_request.head.sha || github.sha }}
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Setup destination directories for image tarballs
         run: |
           mkdir -p docker/sandbox-bundled/images/tar/{arm64,amd64}
       - name: Export ARM64 Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/arm64
@@ -88,7 +88,7 @@ jobs:
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/arm64/flyte-binary.tar
       - name: Export AMD64 Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64
@@ -99,12 +99,12 @@ jobs:
           file: Dockerfile
           outputs: type=docker,dest=docker/sandbox-bundled/images/tar/amd64/flyte-binary.tar
       - name: Upload single binary image
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
       - name: Build and push Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/arm64, linux/amd64
@@ -129,18 +129,18 @@ jobs:
           FLYTESNACKS_VERSION="$(curl --silent https://api.github.com/repos/flyteorg/flytesnacks/releases/latest | jq -r .tag_name)"
           echo "FLYTESNACKS_VERSION=${FLYTESNACKS_VERSION}" >> ${GITHUB_ENV}
       - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: image=moby/buildkit:master
           buildkitd-flags: "--allow-insecure-entitlement security.insecure"
       - name: Build sandbox image for functional tests
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: docker/sandbox-bundled
           load: true
@@ -151,7 +151,7 @@ jobs:
       - name: Prune Docker Buildx cache to reclaim storage
         run: docker buildx prune --all --force
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - uses: unionai/flytectl-setup-action@v0.0.1
@@ -174,7 +174,7 @@ jobs:
           pip install flytekit flytekitplugins-deck-standard
           pip freeze
       - name: Checkout flytesnacks
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: flyteorg/flytesnacks
           path: flytesnacks
@@ -201,15 +201,15 @@ jobs:
     needs: [build-and-push-single-binary-image]
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+        uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
         with:
           name: single-binary-image
           path: docker/sandbox-bundled/images/tar
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
         with:
           driver-opts: image=moby/buildkit:master
           buildkitd-flags: "--allow-insecure-entitlement security.insecure"
@@ -229,7 +229,7 @@ jobs:
           registry-type: public
       - name: Prepare Image Names
         id: image-names
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           # list of Docker images to use as base name for tags
           images: |
@@ -238,7 +238,7 @@ jobs:
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
             type=raw,value=${{ github.event.pull_request.head.sha || github.sha }}
       - name: Build and push multi-arch image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: docker/sandbox-bundled
           allow: "security.insecure"

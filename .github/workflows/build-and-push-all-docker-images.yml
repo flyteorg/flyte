@@ -1,16 +1,15 @@
-name: Build & Push All Components Images
+name: Build & Push All Component Docker Images
 
 on:
   workflow_call:
     inputs:
       push:
-        description: "Push to registry"
+        description: "Whether to push built images to registry"
         required: true
         type: boolean
 
 jobs:
   push_docker_image:
-    name: Build & Push Image
     strategy:
       fail-fast: false
       matrix:
@@ -20,7 +19,7 @@ jobs:
           - flytecopilot
           - flytepropeller
           - flytescheduler
-    uses: ./.github/workflows/publish.yml
+    uses: ./.github/workflows/build-and-push-docker-image.yml
     with:
       component: ${{ matrix.component }}
       dockerfile: Dockerfile.${{ matrix.component }}

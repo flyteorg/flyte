@@ -4,21 +4,17 @@ on:
   workflow_call:
     inputs:
       component:
-        description: "Component Name"
+        description: "Flyte component name"
         required: true
         type: string
       dockerfile:
-        description: "Dockerfile name"
+        description: "Dockerfile"
         required: true
         type: string
       push:
-        description: "Push to registry"
+        description: "Whether to push built image to registry"
         required: true
         type: boolean
-      before-build:
-        description: "Script to run before build"
-        required: false
-        type: string
 
 permissions:
   id-token: write
@@ -26,16 +22,14 @@ permissions:
 
 jobs:
   push-github:
-    name: Push to Github Registry
+    name: Build and Push Image To ECR
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: '0'
+      - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v2
+        uses: docker/setup-qemu-action@v3
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@v3
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -48,16 +42,14 @@ jobs:
           registry-type: public
       - name: Prepare Image Tags
         id: tags
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           images: ${{ steps.ecr-login.outputs.registry }}/p6w6o0n4/${{ inputs.component }}
           tags: |
             type=raw,value=latest,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/master' }}
             type=raw,value=${{ github.event.pull_request.head.sha || github.sha }}
-      - name: Before Build
-        run: ${{ inputs.before-build }}
       - name: Build and Push Image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v5
         with:
           context: .
           file: ${{ inputs.dockerfile }}

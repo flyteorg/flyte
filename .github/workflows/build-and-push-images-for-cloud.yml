@@ -1,0 +1,18 @@
+name: Build & Publish Images Used by Cloud
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-push-docker-images:
+    uses: ./.github/workflows/build-and-push-all-docker-images.yml
+    with:
+      push: true
