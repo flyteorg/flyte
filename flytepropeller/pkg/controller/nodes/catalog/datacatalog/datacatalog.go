@@ -251,8 +251,12 @@ func (m *CatalogClient) createArtifact(ctx context.Context, key catalog.Key, dat
 	}
 	_, err = m.client.AddTag(ctx, &datacatalog.AddTagRequest{Tag: tag})
 	if err != nil {
-		logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedArtifact.Id, err)
-		return catalog.Status{}, err
+		if status.Code(err) == codes.AlreadyExists {
+			logger.Warnf(ctx, "Tag %v already exists for Artifact %v (idempotent)", tagName, cachedArtifact.Id)
+		} else {
+			logger.Errorf(ctx, "Failed to add tag %+v for artifact %+v, err: %+v", tagName, cachedArtifact.Id, err)
+			return catalog.Status{}, err
+		}
 	}
 
 	logger.Debugf(ctx, "Successfully created artifact %+v for key %+v, dataset %+v and execution %+v", cachedArtifact, key, datasetID, metadata)
