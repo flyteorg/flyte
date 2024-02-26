@@ -82,17 +82,25 @@ helm_install: ## Install helm charts
 helm_upgrade: ## Upgrade helm charts
 	helm upgrade flyte --debug ./charts/flyte -f ./charts/flyte/values.yaml --create-namespace --namespace=flyte
 
+# Used in CI
 .PHONY: docs
 docs:
 	make -C docs clean html SPHINXOPTS=-W
 
+# Used in local development
 .PHONY: build-dev-docs-image
 build-dev-docs-image:
 	docker buildx build -t flyte-dev-docs:latest -f Dockerfile.docs .
 
+# Build docs in docker container for local development
+.PHONY: dev-docs-build
+dev-docs-build: build-dev-docs-image
+	docker run --rm --pull never -v ./docs:/docs --user $$(id -u):$$(id -g) flyte-dev-docs:latest sphinx-build -M html . _build
+
+# Build docs in docker container for local development with hot-reload
 .PHONY: dev-docs
-dev-docs:
-	docker run --rm --pull never -v ./docs:/docs flyte-dev-docs:latest -M html . _build
+dev-docs: build-dev-docs-image
+	docker run --rm --pull never -p 8000:8000 -v ./docs:/docs --user $$(id -u):$$(id -g) flyte-dev-docs:latest sphinx-autobuild --host 0.0.0.0 --re-ignore '_build|_src|_tags|api|examples|flytectl|flytekit|flytesnacks|protos|tests' . ./_build/html
 
 .PHONY: help
 help: SHELL := /bin/sh
