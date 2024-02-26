@@ -86,6 +86,14 @@ helm_upgrade: ## Upgrade helm charts
 docs:
 	make -C docs clean html SPHINXOPTS=-W
 
+.PHONY: build-dev-docs-image
+build-dev-docs-image:
+	docker buildx build -t flyte-dev-docs:latest -f Dockerfile.docs .
+
+.PHONY: dev-docs
+dev-docs:
+	docker run --rm --pull never -v ./docs:/docs flyte-dev-docs:latest -M html . _build
+
 .PHONY: help
 help: SHELL := /bin/sh
 help: ## List available commands and their usage
