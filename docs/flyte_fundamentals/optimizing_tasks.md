@@ -243,7 +243,7 @@ When this task is executed on a Flyte cluster, it automatically provisions all o
 the resources that you need. In this case, that need is distributed
 training, but Flyte also provides integrations for {ref}`Spark <plugins-spark-k8s>`,
 {ref}`Ray <kube-ray-op>`, {ref}`MPI <kf-mpi-op>`, {ref}`Sagemaker <aws-sagemaker>`,
-{ref}`Snowflake <plugins-snowflake>`, and more.
+{ref}`Snowflake <snowflake_agent>`, and more.
 
 Even though Flyte itself is a powerful compute engine and orchestrator for
 data engineering, machine learning, and analytics, perhaps you have existing
