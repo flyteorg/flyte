@@ -4776,7 +4776,7 @@
               "defaults": {
                 "decimals": null,
                 "links": [],
-                "max": 100,
+                "max": 200,
                 "min": 0,
                 "title": null,
                 "unit": "none"
@@ -4810,11 +4810,11 @@
           },
           "repeat": null,
           "repeatDirection": null,
-          "span": 2,
+          "span": 12,
           "targets": [
             {
               "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateExecution\"}",
+              "expr": "sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
               "format": "heatmap",
               "hide": false,
               "instant": false,
@@ -4822,7 +4822,7 @@
               "intervalFactor": 2,
               "legendFormat": "{{le}}",
               "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateExecution\"}",
+              "query": "sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -4830,763 +4830,7 @@
           ],
           "timeFrom": null,
           "timeShift": null,
-          "title": "CreateExecution latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 37,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateNodeEvent\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateNodeEvent\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "CreateNodeEvent latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 38,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateTaskEvent\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateTaskEvent\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "CreateTaskEvent latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 39,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateWorkflowEvent\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"CreateWorkflowEvent\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "CreateWorkflowEvent latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 40,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"GetExecution\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"GetExecution\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "GetExecution latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 41,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"GetExecutionData\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"GetExecutionData\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "GetExecutionData latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 42,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"GetLaunchPlan\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"GetLaunchPlan\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "GetLaunchPlan latency",
-          "transformations": [],
-          "transparent": false,
-          "type": "bargauge"
-        },
-        {
-          "cacheTimeout": null,
-          "datasource": "${DS_PROM}",
-          "description": null,
-          "editable": true,
-          "error": false,
-          "fieldConfig": {
-            "defaults": {
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "index": 0,
-                    "line": true,
-                    "op": "gt",
-                    "value": "null",
-                    "yaxis": "left"
-                  },
-                  {
-                    "color": "red",
-                    "index": 1,
-                    "line": true,
-                    "op": "gt",
-                    "value": 80.0,
-                    "yaxis": "left"
-                  }
-                ]
-              }
-            }
-          },
-          "gridPos": null,
-          "height": null,
-          "hideTimeOverride": false,
-          "id": 43,
-          "interval": null,
-          "links": [],
-          "maxDataPoints": 100,
-          "maxPerRow": null,
-          "minSpan": null,
-          "options": {
-            "displayMode": "gradient",
-            "fieldOptions": {
-              "calcs": [
-                "sum"
-              ],
-              "defaults": {
-                "decimals": null,
-                "links": [],
-                "max": 100,
-                "min": 0,
-                "title": null,
-                "unit": "none"
-              },
-              "limit": null,
-              "mappings": [],
-              "override": {},
-              "thresholds": [
-                {
-                  "color": "green",
-                  "index": 0,
-                  "line": true,
-                  "op": "gt",
-                  "value": "null",
-                  "yaxis": "left"
-                },
-                {
-                  "color": "red",
-                  "index": 1,
-                  "line": true,
-                  "op": "gt",
-                  "value": 80.0,
-                  "yaxis": "left"
-                }
-              ],
-              "values": false
-            },
-            "orientation": "vertical",
-            "showThresholdLabels": false,
-            "showThresholdMarkers": true
-          },
-          "repeat": null,
-          "repeatDirection": null,
-          "span": 2,
-          "targets": [
-            {
-              "datasource": null,
-              "expr": "grpc_client_handling_seconds_bucket{grpc_method=\"GetOrExtendReservation\"}",
-              "format": "heatmap",
-              "hide": false,
-              "instant": false,
-              "interval": "",
-              "intervalFactor": 2,
-              "legendFormat": "{{le}}",
-              "metric": "",
-              "query": "grpc_client_handling_seconds_bucket{grpc_method=\"GetOrExtendReservation\"}",
-              "refId": "A",
-              "step": 10,
-              "target": ""
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "GetOrExtendReservation latency",
+          "title": "All GRPC calls latency",
           "transformations": [],
           "transparent": false,
           "type": "bargauge"
@@ -5627,7 +4871,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 44,
+          "id": 37,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5754,7 +4998,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 45,
+          "id": 38,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -5881,7 +5125,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 46,
+          "id": 39,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6008,7 +5252,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 47,
+          "id": 40,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6135,7 +5379,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 48,
+          "id": 41,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6262,7 +5506,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 49,
+          "id": 42,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6389,7 +5633,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 50,
+          "id": 43,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6516,7 +5760,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 51,
+          "id": 44,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6653,7 +5897,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 52,
+          "id": 45,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6780,7 +6024,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 53,
+          "id": 46,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -6907,7 +6151,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 54,
+          "id": 47,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7034,7 +6278,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 55,
+          "id": 48,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7161,7 +6405,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 56,
+          "id": 49,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7298,7 +6542,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 57,
+          "id": 50,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7425,7 +6669,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 58,
+          "id": 51,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7562,7 +6806,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 59,
+          "id": 52,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7689,7 +6933,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 60,
+          "id": 53,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7816,7 +7060,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 61,
+          "id": 54,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -7953,7 +7197,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 62,
+          "id": 55,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -8080,7 +7324,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 63,
+          "id": 56,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -8207,7 +7451,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 64,
+          "id": 57,
           "interval": null,
           "isNew": true,
           "legend": {
@@ -8334,7 +7578,7 @@
           "gridPos": null,
           "height": null,
           "hideTimeOverride": false,
-          "id": 65,
+          "id": 58,
           "interval": null,
           "isNew": true,
           "legend": {

@@ -526,14 +526,14 @@ class FlytePropeller(object):
         ]
 
     @staticmethod
-    def grpc_latency_histogram(grpc_method: str) -> Graph:
+    def grpc_latency_histogram() -> Graph:
         return BarGauge(
-            title=f"{grpc_method} latency",
+            title="All GRPC calls latency",
             calc="sum",
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr=f'grpc_client_handling_seconds_bucket{{grpc_method="{grpc_method}"}}',
+                    expr="sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
                     refId="A",
                     format="heatmap",
                     legendFormat=r"{{le}}",
@@ -541,6 +541,7 @@ class FlytePropeller(object):
             ],
             displayMode="gradient",
             orientation="vertical",
+            max=200,
         )
 
     @staticmethod
@@ -627,14 +628,7 @@ class FlytePropeller(object):
             title="GRPC latency metrics",
             collapse=collapse,
             panels=[
-                FlytePropeller.grpc_latency_histogram("CreateExecution"),
-                FlytePropeller.grpc_latency_histogram("CreateNodeEvent"),
-                FlytePropeller.grpc_latency_histogram("CreateTaskEvent"),
-                FlytePropeller.grpc_latency_histogram("CreateWorkflowEvent"),
-                FlytePropeller.grpc_latency_histogram("GetExecution"),
-                FlytePropeller.grpc_latency_histogram("GetExecutionData"),
-                FlytePropeller.grpc_latency_histogram("GetLaunchPlan"),
-                FlytePropeller.grpc_latency_histogram("GetOrExtendReservation"),
+                FlytePropeller.grpc_latency_histogram(),
             ],
         )
         return r
