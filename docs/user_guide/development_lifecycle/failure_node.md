@@ -11,7 +11,7 @@ For example, workflow involves creating a cluster at the beginning, followed by 
 
 A failure node can be incorporated into the workflow to address this issue. This ensures that critical actions, such as deleting the cluster, are executed even in the event of failures occurring throughout the workflow execution.
 
-```{python}
+```python
 from flytekit import WorkflowFailurePolicy, task, workflow
 
 
@@ -23,7 +23,7 @@ def create_cluster(name: str):
 
 Create a task that will fail during execution.
 
-```{python}
+```python
 @task
 def t1(a: int, b: str):
     print(f"{a} {b}")
@@ -37,7 +37,7 @@ def delete_cluster(name: str):
 
 Create a task that will be executed if any of the tasks in the workflow fail.
 
-```{python}
+```python
 @task
 def clean_up(name: str):
     print(f"Cleaning up cluster {name}")
@@ -51,7 +51,7 @@ Specify the `on_failure` to a cleanup task. This task will be executed if any of
 The input of `clean_up` should be the exact same as the input of the workflow.
 :::
 
-```{python}
+```python
 @workflow(on_failure=clean_up)
 def subwf(name: str):
     c = create_cluster(name=name)
@@ -62,7 +62,7 @@ def subwf(name: str):
 
 By setting the failure policy to `FAIL_AFTER_EXECUTABLE_NODES_COMPLETE` to ensure that the `wf1` is executed even if the subworkflow fails. In this case, both parent and child workflows will fail, resulting in the `clean_up` task being executed twice.
 
-```{python}
+```python
 @workflow(on_failure=clean_up, failure_policy=WorkflowFailurePolicy.FAIL_AFTER_EXECUTABLE_NODES_COMPLETE)
 def wf1(name: str = "my_cluster"):
     c = create_cluster(name=name)
@@ -79,7 +79,7 @@ def clean_up_wf(name: str):
 
 You can also set the `on_failure` to a workflow. This workflow will be executed if any of the tasks in the workflow fail.
 
-```{python}
+```python
 @workflow(on_failure=clean_up_wf)
 def wf2(name: str = "my_cluster"):
     c = create_cluster(name=name)
