@@ -155,20 +155,10 @@ To understand how the below components interact with each other, refer to :ref:`
 
 To build the Flyte docs locally you will need the following prerequisites:
 
-* Install ``conda``.
-    *  We recommend Miniconda installed with an `official installer <https://docs.conda.io/projects/miniconda/en/latest/index.html#latest-miniconda-installer-links>`__.
 * Install `conda-lock <https://github.com/conda/conda-lock>`__.
-* In the ``flyteorg/flyte`` root directory run:
-    * ``conda-lock install --name monodocs-env monodocs-environment.lock.yaml``
-    * ``conda activate monodocs-env``
-    * ``pip install ./flyteidl``
-
-This will set up the Python virtual environment for building the docs. Here we called it ``monodocs-env``.
-
-To actually build the docs, activate ``monodocs-env`` and (in the ``flyteorg/flyte`` root directory) run:
-    * ``make docs``
-
-The resulting ``html`` files will be in ``docs/_build/html``. You can view them by running `open docs/_build/html/index.html`
+* In the ``flyteorg/flyte`` root directory you can run:
+    * ``make dev-docs-build`` to build the documentation locally. The build will be in the ``docs/_build/html`` directory.
+    * Alternatively, you can use ``make dev-docs`` to build the documentation with live reload. Open the browser to ``http://localhost:8000`` to see the documentation.
 
 ``flyteidl``
 ************
