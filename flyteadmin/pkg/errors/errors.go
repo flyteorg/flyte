@@ -120,7 +120,7 @@ func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string
 
 	for _, obj := range jsonArray2 {
 		if val, ok := map1[obj.Path]; ok {
-			result := fmt.Sprintf("%v: %v -> %v\t", obj.Path, obj.Value, val.Value)
+			result := fmt.Sprintf("\t\t- %v: %v -> %v", obj.Path, obj.Value, val.Value)
 			results = append(results, result)
 		}
 	}
@@ -129,48 +129,27 @@ func compareJsons(jsonArray1 jsondiff.Patch, jsonArray2 jsondiff.Patch) []string
 
 func NewTaskExistsDifferentStructureError(ctx context.Context, request *admin.TaskCreateRequest, oldSpec *core.CompiledTask, newSpec *core.CompiledTask) FlyteAdminError {
 	errorMsg := "task with different structure already exists:\n"
-	// omit file storage path changed message by ignoring `/args/2` differences computation
-	diff, _ := jsondiff.Compare(oldSpec, newSpec, jsondiff.Ignores("/Target/Container/args/2"))
-	rdiff, _ := jsondiff.Compare(newSpec, oldSpec, jsondiff.Ignores("/Target/Container/args/2"))
+	diff, _ := jsondiff.Compare(oldSpec, newSpec)
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
+
 	errorMsg += strings.Join(rs, "\n")
 
-	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateTaskFailureReason{
-		Reason: &admin.CreateTaskFailureReason_ExistsDifferentStructure{
-			ExistsDifferentStructure: &admin.TaskErrorExistsDifferentStructure{
-				Id: request.Id,
-			},
-		},
-	})
-	if transformationErr != nil {
-		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
-	}
-	return statusErr
+	return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+
 }
 
 func NewTaskExistsIdenticalStructureError(ctx context.Context, request *admin.TaskCreateRequest) FlyteAdminError {
 	errorMsg := "task with identical structure already exists"
-	statusErr, transformationErr := NewFlyteAdminError(codes.AlreadyExists, errorMsg).WithDetails(&admin.CreateTaskFailureReason{
-		Reason: &admin.CreateTaskFailureReason_ExistsIdenticalStructure{
-			ExistsIdenticalStructure: &admin.TaskErrorExistsIdenticalStructure{
-				Id: request.Id,
-			},
-		},
-	})
-	if transformationErr != nil {
-		logger.Errorf(ctx, "Failed to wrap grpc status in type 'Error': %v", transformationErr)
-		return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
-	}
-	return statusErr
+	return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
 }
 
 func NewWorkflowExistsDifferentStructureError(ctx context.Context, request *admin.WorkflowCreateRequest, oldSpec *core.CompiledWorkflowClosure, newSpec *core.CompiledWorkflowClosure) FlyteAdminError {
 	errorMsg := "workflow with different structure already exists:\n"
-	// omit file storage path changed message by ignoring `/args/2` differences computation
-	diff, _ := jsondiff.Compare(oldSpec, newSpec, jsondiff.Ignores("/Target/Container/args/2"))
-	rdiff, _ := jsondiff.Compare(newSpec, oldSpec, jsondiff.Ignores("/Target/Container/args/2"))
+	diff, _ := jsondiff.Compare(oldSpec, newSpec)
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
+
 	errorMsg += strings.Join(rs, "\n")
 
 	statusErr, transformationErr := NewFlyteAdminError(codes.InvalidArgument, errorMsg).WithDetails(&admin.CreateWorkflowFailureReason{

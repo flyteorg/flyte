@@ -13,6 +13,14 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 )
 
+var identifier = core.Identifier{
+	ResourceType: core.ResourceType_TASK,
+	Project:      "testProj",
+	Domain:       "domain",
+	Name:         "name",
+	Version:      "ver",
+}
+
 func TestGrpcStatusError(t *testing.T) {
 
 	msg := "some error"
@@ -47,67 +55,125 @@ func TestNewIncompatibleClusterError(t *testing.T) {
 }
 
 func TestNewTaskExistsDifferentStructureError(t *testing.T) {
-	t := &admin.TaskCreateRequest{
-		Id: &core.Identifier{
-			ResourceType: core.ResourceType_TASK,
-			Project:      "testProj",
-			Domain:       "domain",
-			Name:         "name",
-			Version:      "ver",
+	req := &admin.TaskCreateRequest{
+		Id: &identifier,
+	}
+
+	oldTask := &core.CompiledTask{
+		Template: &core.TaskTemplate{
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{
+								Name:  core.Resources_CPU,
+								Value: "150m",
+							},
+						},
+					},
+				},
+			},
+			Id: &identifier,
 		},
 	}
-	statusErr := NewTaskExistsDifferentStructureError(context.Background(), t)
+
+	newTask := &core.CompiledTask{
+		Template: &core.TaskTemplate{
+			Target: &core.TaskTemplate_Container{
+				Container: &core.Container{
+					Resources: &core.Resources{
+						Requests: []*core.Resources_ResourceEntry{
+							{
+								Name:  core.Resources_CPU,
+								Value: "250m",
+							},
+						},
+					},
+				},
+			},
+			Id: &identifier,
+		},
+	}
+
+	statusErr := NewTaskExistsDifferentStructureError(context.Background(), req, oldTask, newTask)
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "task with different structure already exists", s.Message())
-
-	details, ok := s.Details()[0].(*admin.CreateTaskFailureReason)
-	assert.True(t, ok)
-	_, ok = details.GetReason().(*admin.CreateTaskFailureReason_ExistsDifferentStructure)
-	assert.True(t, ok)
+	assert.Equal(t, "task with different structure already exists:\n\t\t- /template/Target/Container/resources/requests/0/value: 150m -> 250m", s.Message())
 }
 
 func TestNewTaskExistsIdenticalStructureError(t *testing.T) {
-	t := &admin.TaskCreateRequest{
-		Id: &core.Identifier{
-			ResourceType: core.ResourceType_TASK,
-			Project:      "testProj",
-			Domain:       "domain",
-			Name:         "name",
-			Version:      "ver",
-		},
+	req := &admin.TaskCreateRequest{
+		Id: &identifier,
 	}
-	statusErr := NewTaskExistsIdenticalStructureError(context.Background(), t)
+	statusErr := NewTaskExistsIdenticalStructureError(context.Background(), req)
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.AlreadyExists, s.Code())
 	assert.Equal(t, "task with identical structure already exists", s.Message())
-
-	details, ok := s.Details()[0].(*admin.CreateTaskFailureReason)
-	assert.True(t, ok)
-	_, ok = details.GetReason().(*admin.CreateTaskFailureReason_ExistsIdenticalStructure)
-	assert.True(t, ok)
 }
 
 func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
-	wf := &admin.WorkflowCreateRequest{
-		Id: &core.Identifier{
-			ResourceType: core.ResourceType_WORKFLOW,
-			Project:      "testProj",
-			Domain:       "domain",
-			Name:         "name",
-			Version:      "ver",
+	req := &admin.WorkflowCreateRequest{
+		Id: &identifier,
+	}
+
+	oldWorkflow := &core.CompiledWorkflowClosure{
+		Primary: &core.CompiledWorkflow{
+			Connections: &core.ConnectionSet{
+				Upstream: map[string]*core.ConnectionSet_IdList{
+					"foo": &core.ConnectionSet_IdList{
+						Ids: []string{"start-node"},
+					},
+					"end-node": &core.ConnectionSet_IdList{
+						Ids: []string{"foo"},
+					},
+				},
+			},
+			Template: &core.WorkflowTemplate{
+				Nodes: []*core.Node{
+					&core.Node{
+						Id:     "foo",
+						Target: &core.Node_TaskNode{},
+					},
+				},
+				Id: &identifier,
+			},
 		},
 	}
-	statusErr := NewWorkflowExistsDifferentStructureError(context.Background(), wf)
+
+	newWorkflow := &core.CompiledWorkflowClosure{
+		Primary: &core.CompiledWorkflow{
+			Connections: &core.ConnectionSet{
+				Upstream: map[string]*core.ConnectionSet_IdList{
+					"bar": &core.ConnectionSet_IdList{
+						Ids: []string{"start-node"},
+					},
+					"end-node": &core.ConnectionSet_IdList{
+						Ids: []string{"bar"},
+					},
+				},
+			},
+			Template: &core.WorkflowTemplate{
+				Nodes: []*core.Node{
+					&core.Node{
+						Id:     "bar",
+						Target: &core.Node_TaskNode{},
+					},
+				},
+				Id: &identifier,
+			},
+		},
+	}
+
+	statusErr := NewWorkflowExistsDifferentStructureError(context.Background(), req, oldWorkflow, newWorkflow)
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
 	assert.Equal(t, codes.InvalidArgument, s.Code())
-	assert.Equal(t, "workflow with different structure already exists", s.Message())
+	assert.Equal(t, "workflow with different structure already exists:\n\t\t- /primary/connections/upstream/bar: <nil> -> map[ids:[start-node]]\n\t\t- /primary/connections/upstream/end-node/ids/0: foo -> bar\n\t\t- /primary/connections/upstream/foo: map[ids:[start-node]] -> <nil>\n\t\t- /primary/template/nodes/0/id: foo -> bar", s.Message())
 
 	details, ok := s.Details()[0].(*admin.CreateWorkflowFailureReason)
 	assert.True(t, ok)
@@ -117,13 +183,7 @@ func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
 
 func TestNewWorkflowExistsIdenticalStructureError(t *testing.T) {
 	wf := &admin.WorkflowCreateRequest{
-		Id: &core.Identifier{
-			ResourceType: core.ResourceType_WORKFLOW,
-			Project:      "testProj",
-			Domain:       "domain",
-			Name:         "name",
-			Version:      "ver",
-		},
+		Id: &identifier,
 	}
 	statusErr := NewWorkflowExistsIdenticalStructureError(context.Background(), wf)
 	assert.NotNil(t, statusErr)
