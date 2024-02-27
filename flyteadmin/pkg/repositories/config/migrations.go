@@ -1182,6 +1182,11 @@ var NoopMigrations = []*gormigrate.Migration{
 	},
 }
 
+// ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we
+// wrote to bring the then-existing migrations up to the Gorm standard, which is to write from scratch, each struct
+// that we want auto-migrated, inside each function. Previously we had not been doing that. The idea is that we will
+// one day delete the migrations prior to the no-op series. New migrations should continue in this array here, again
+// using the proper Gorm methodology of including the struct definitions inside each migration function.
 var ContinuedMigrations = []*gormigrate.Migration{
 	{
 		ID: "pg-continue-2024-02-launchplan",
