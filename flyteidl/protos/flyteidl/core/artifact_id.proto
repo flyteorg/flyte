@@ -20,12 +20,28 @@ message ArtifactKey {
 message ArtifactBindingData {
   // These two fields are only relevant in the partition value case
   oneof partition_data {
-    string partition_key = 2;
-    bool bind_to_time_partition = 3;
+    string partition_key = 1;
+    bool bind_to_time_partition = 2;
   }
 
   // This is only relevant in the time partition case
-  string transform = 4;
+  TimeTransform time_transform = 3;
+}
+
+enum Granularity {
+  MINUTE = 0;
+  HOUR = 1;
+  DAY = 2; // default
+  MONTH = 3;
+}
+
+enum Operator {
+  MINUS = 0;
+}
+
+message TimeTransform {
+  string transform = 1;
+  Operator op = 2;
 }
 
 message InputBindingData {
@@ -50,6 +66,7 @@ message Partitions {
 
 message TimePartition {
   LabelValue value = 1;
+  Granularity granularity = 2;
 }
 
 message ArtifactID {

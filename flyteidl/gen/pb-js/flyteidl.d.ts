@@ -84,8 +84,8 @@ export namespace flyteidl {
             /** ArtifactBindingData bindToTimePartition */
             bindToTimePartition?: (boolean|null);
 
-            /** ArtifactBindingData transform */
-            transform?: (string|null);
+            /** ArtifactBindingData timeTransform */
+            timeTransform?: (flyteidl.core.ITimeTransform|null);
         }
 
         /** Represents an ArtifactBindingData. */
@@ -103,8 +103,8 @@ export namespace flyteidl {
             /** ArtifactBindingData bindToTimePartition. */
             public bindToTimePartition: boolean;
 
-            /** ArtifactBindingData transform. */
-            public transform: string;
+            /** ArtifactBindingData timeTransform. */
+            public timeTransform?: (flyteidl.core.ITimeTransform|null);
 
             /** ArtifactBindingData partitionData. */
             public partitionData?: ("partitionKey"|"bindToTimePartition");
@@ -136,6 +136,77 @@ export namespace flyteidl {
 
             /**
              * Verifies an ArtifactBindingData message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Granularity enum. */
+        enum Granularity {
+            MINUTE = 0,
+            HOUR = 1,
+            DAY = 2,
+            MONTH = 3
+        }
+
+        /** Operator enum. */
+        enum Operator {
+            MINUS = 0
+        }
+
+        /** Properties of a TimeTransform. */
+        interface ITimeTransform {
+
+            /** TimeTransform transform */
+            transform?: (string|null);
+
+            /** TimeTransform op */
+            op?: (flyteidl.core.Operator|null);
+        }
+
+        /** Represents a TimeTransform. */
+        class TimeTransform implements ITimeTransform {
+
+            /**
+             * Constructs a new TimeTransform.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITimeTransform);
+
+            /** TimeTransform transform. */
+            public transform: string;
+
+            /** TimeTransform op. */
+            public op: flyteidl.core.Operator;
+
+            /**
+             * Creates a new TimeTransform instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TimeTransform instance
+             */
+            public static create(properties?: flyteidl.core.ITimeTransform): flyteidl.core.TimeTransform;
+
+            /**
+             * Encodes the specified TimeTransform message. Does not implicitly {@link flyteidl.core.TimeTransform.verify|verify} messages.
+             * @param message TimeTransform message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITimeTransform, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TimeTransform message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TimeTransform
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TimeTransform;
+
+            /**
+             * Verifies a TimeTransform message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -324,6 +395,9 @@ export namespace flyteidl {
 
             /** TimePartition value */
             value?: (flyteidl.core.ILabelValue|null);
+
+            /** TimePartition granularity */
+            granularity?: (flyteidl.core.Granularity|null);
         }
 
         /** Represents a TimePartition. */
@@ -337,6 +411,9 @@ export namespace flyteidl {
 
             /** TimePartition value. */
             public value?: (flyteidl.core.ILabelValue|null);
+
+            /** TimePartition granularity. */
+            public granularity: flyteidl.core.Granularity;
 
             /**
              * Creates a new TimePartition instance using the specified properties.

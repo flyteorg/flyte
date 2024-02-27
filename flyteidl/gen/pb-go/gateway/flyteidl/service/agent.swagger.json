@@ -843,8 +843,8 @@
         "bind_to_time_partition": {
           "type": "boolean"
         },
-        "transform": {
-          "type": "string",
+        "time_transform": {
+          "$ref": "#/definitions/coreTimeTransform",
           "title": "This is only relevant in the time partition case"
         }
       },
@@ -1092,6 +1092,17 @@
         }
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
+    "coreGranularity": {
+      "type": "string",
+      "enum": [
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "MONTH"
+      ],
+      "default": "MINUTE",
+      "title": "- DAY: default"
     },
     "coreIOStrategy": {
       "type": "object",
@@ -1847,6 +1858,20 @@
       "properties": {
         "value": {
           "$ref": "#/definitions/coreLabelValue"
+        },
+        "granularity": {
+          "$ref": "#/definitions/coreGranularity"
+        }
+      }
+    },
+    "coreTimeTransform": {
+      "type": "object",
+      "properties": {
+        "transform": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/flyteidlcoreOperator"
         }
       }
     },
@@ -2070,6 +2095,13 @@
         }
       },
       "description": "A generic key value pair."
+    },
+    "flyteidlcoreOperator": {
+      "type": "string",
+      "enum": [
+        "MINUS"
+      ],
+      "default": "MINUS"
     },
     "flyteidlcoreSchema": {
       "type": "object",

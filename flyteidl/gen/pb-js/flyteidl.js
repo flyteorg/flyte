@@ -203,7 +203,7 @@
                  * @interface IArtifactBindingData
                  * @property {string|null} [partitionKey] ArtifactBindingData partitionKey
                  * @property {boolean|null} [bindToTimePartition] ArtifactBindingData bindToTimePartition
-                 * @property {string|null} [transform] ArtifactBindingData transform
+                 * @property {flyteidl.core.ITimeTransform|null} [timeTransform] ArtifactBindingData timeTransform
                  */
     
                 /**
@@ -238,12 +238,12 @@
                 ArtifactBindingData.prototype.bindToTimePartition = false;
     
                 /**
-                 * ArtifactBindingData transform.
-                 * @member {string} transform
+                 * ArtifactBindingData timeTransform.
+                 * @member {flyteidl.core.ITimeTransform|null|undefined} timeTransform
                  * @memberof flyteidl.core.ArtifactBindingData
                  * @instance
                  */
-                ArtifactBindingData.prototype.transform = "";
+                ArtifactBindingData.prototype.timeTransform = null;
     
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
@@ -284,11 +284,11 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.partitionKey != null && message.hasOwnProperty("partitionKey"))
-                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.partitionKey);
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.partitionKey);
                     if (message.bindToTimePartition != null && message.hasOwnProperty("bindToTimePartition"))
-                        writer.uint32(/* id 3, wireType 0 =*/24).bool(message.bindToTimePartition);
-                    if (message.transform != null && message.hasOwnProperty("transform"))
-                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.transform);
+                        writer.uint32(/* id 2, wireType 0 =*/16).bool(message.bindToTimePartition);
+                    if (message.timeTransform != null && message.hasOwnProperty("timeTransform"))
+                        $root.flyteidl.core.TimeTransform.encode(message.timeTransform, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     return writer;
                 };
     
@@ -310,14 +310,14 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 2:
+                        case 1:
                             message.partitionKey = reader.string();
                             break;
-                        case 3:
+                        case 2:
                             message.bindToTimePartition = reader.bool();
                             break;
-                        case 4:
-                            message.transform = reader.string();
+                        case 3:
+                            message.timeTransform = $root.flyteidl.core.TimeTransform.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -351,13 +351,176 @@
                         if (typeof message.bindToTimePartition !== "boolean")
                             return "bindToTimePartition: boolean expected";
                     }
-                    if (message.transform != null && message.hasOwnProperty("transform"))
-                        if (!$util.isString(message.transform))
-                            return "transform: string expected";
+                    if (message.timeTransform != null && message.hasOwnProperty("timeTransform")) {
+                        var error = $root.flyteidl.core.TimeTransform.verify(message.timeTransform);
+                        if (error)
+                            return "timeTransform." + error;
+                    }
                     return null;
                 };
     
                 return ArtifactBindingData;
+            })();
+    
+            /**
+             * Granularity enum.
+             * @name flyteidl.core.Granularity
+             * @enum {string}
+             * @property {number} MINUTE=0 MINUTE value
+             * @property {number} HOUR=1 HOUR value
+             * @property {number} DAY=2 DAY value
+             * @property {number} MONTH=3 MONTH value
+             */
+            core.Granularity = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "MINUTE"] = 0;
+                values[valuesById[1] = "HOUR"] = 1;
+                values[valuesById[2] = "DAY"] = 2;
+                values[valuesById[3] = "MONTH"] = 3;
+                return values;
+            })();
+    
+            /**
+             * Operator enum.
+             * @name flyteidl.core.Operator
+             * @enum {string}
+             * @property {number} MINUS=0 MINUS value
+             */
+            core.Operator = (function() {
+                var valuesById = {}, values = Object.create(valuesById);
+                values[valuesById[0] = "MINUS"] = 0;
+                return values;
+            })();
+    
+            core.TimeTransform = (function() {
+    
+                /**
+                 * Properties of a TimeTransform.
+                 * @memberof flyteidl.core
+                 * @interface ITimeTransform
+                 * @property {string|null} [transform] TimeTransform transform
+                 * @property {flyteidl.core.Operator|null} [op] TimeTransform op
+                 */
+    
+                /**
+                 * Constructs a new TimeTransform.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a TimeTransform.
+                 * @implements ITimeTransform
+                 * @constructor
+                 * @param {flyteidl.core.ITimeTransform=} [properties] Properties to set
+                 */
+                function TimeTransform(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * TimeTransform transform.
+                 * @member {string} transform
+                 * @memberof flyteidl.core.TimeTransform
+                 * @instance
+                 */
+                TimeTransform.prototype.transform = "";
+    
+                /**
+                 * TimeTransform op.
+                 * @member {flyteidl.core.Operator} op
+                 * @memberof flyteidl.core.TimeTransform
+                 * @instance
+                 */
+                TimeTransform.prototype.op = 0;
+    
+                /**
+                 * Creates a new TimeTransform instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.TimeTransform
+                 * @static
+                 * @param {flyteidl.core.ITimeTransform=} [properties] Properties to set
+                 * @returns {flyteidl.core.TimeTransform} TimeTransform instance
+                 */
+                TimeTransform.create = function create(properties) {
+                    return new TimeTransform(properties);
+                };
+    
+                /**
+                 * Encodes the specified TimeTransform message. Does not implicitly {@link flyteidl.core.TimeTransform.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.TimeTransform
+                 * @static
+                 * @param {flyteidl.core.ITimeTransform} message TimeTransform message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                TimeTransform.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.transform != null && message.hasOwnProperty("transform"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.transform);
+                    if (message.op != null && message.hasOwnProperty("op"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.op);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a TimeTransform message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.TimeTransform
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.TimeTransform} TimeTransform
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                TimeTransform.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.TimeTransform();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.transform = reader.string();
+                            break;
+                        case 2:
+                            message.op = reader.int32();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a TimeTransform message.
+                 * @function verify
+                 * @memberof flyteidl.core.TimeTransform
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                TimeTransform.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.transform != null && message.hasOwnProperty("transform"))
+                        if (!$util.isString(message.transform))
+                            return "transform: string expected";
+                    if (message.op != null && message.hasOwnProperty("op"))
+                        switch (message.op) {
+                        default:
+                            return "op: enum value expected";
+                        case 0:
+                            break;
+                        }
+                    return null;
+                };
+    
+                return TimeTransform;
             })();
     
             core.InputBindingData = (function() {
@@ -802,6 +965,7 @@
                  * @memberof flyteidl.core
                  * @interface ITimePartition
                  * @property {flyteidl.core.ILabelValue|null} [value] TimePartition value
+                 * @property {flyteidl.core.Granularity|null} [granularity] TimePartition granularity
                  */
     
                 /**
@@ -826,6 +990,14 @@
                  * @instance
                  */
                 TimePartition.prototype.value = null;
+    
+                /**
+                 * TimePartition granularity.
+                 * @member {flyteidl.core.Granularity} granularity
+                 * @memberof flyteidl.core.TimePartition
+                 * @instance
+                 */
+                TimePartition.prototype.granularity = 0;
     
                 /**
                  * Creates a new TimePartition instance using the specified properties.
@@ -853,6 +1025,8 @@
                         writer = $Writer.create();
                     if (message.value != null && message.hasOwnProperty("value"))
                         $root.flyteidl.core.LabelValue.encode(message.value, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    if (message.granularity != null && message.hasOwnProperty("granularity"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int32(message.granularity);
                     return writer;
                 };
     
@@ -876,6 +1050,9 @@
                         switch (tag >>> 3) {
                         case 1:
                             message.value = $root.flyteidl.core.LabelValue.decode(reader, reader.uint32());
+                            break;
+                        case 2:
+                            message.granularity = reader.int32();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -901,6 +1078,16 @@
                         if (error)
                             return "value." + error;
                     }
+                    if (message.granularity != null && message.hasOwnProperty("granularity"))
+                        switch (message.granularity) {
+                        default:
+                            return "granularity: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                            break;
+                        }
                     return null;
                 };
     

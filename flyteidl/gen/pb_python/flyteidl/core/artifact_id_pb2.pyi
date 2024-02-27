@@ -1,11 +1,28 @@
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from google.protobuf.internal import containers as _containers
+from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
 from typing import ClassVar as _ClassVar, Mapping as _Mapping, Optional as _Optional, Union as _Union
 
 DESCRIPTOR: _descriptor.FileDescriptor
+
+class Granularity(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    MINUTE: _ClassVar[Granularity]
+    HOUR: _ClassVar[Granularity]
+    DAY: _ClassVar[Granularity]
+    MONTH: _ClassVar[Granularity]
+
+class Operator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+    __slots__ = []
+    MINUS: _ClassVar[Operator]
+MINUTE: Granularity
+HOUR: Granularity
+DAY: Granularity
+MONTH: Granularity
+MINUS: Operator
 
 class ArtifactKey(_message.Message):
     __slots__ = ["project", "domain", "name", "org"]
@@ -20,14 +37,22 @@ class ArtifactKey(_message.Message):
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ArtifactBindingData(_message.Message):
-    __slots__ = ["partition_key", "bind_to_time_partition", "transform"]
+    __slots__ = ["partition_key", "bind_to_time_partition", "time_transform"]
     PARTITION_KEY_FIELD_NUMBER: _ClassVar[int]
     BIND_TO_TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
-    TRANSFORM_FIELD_NUMBER: _ClassVar[int]
+    TIME_TRANSFORM_FIELD_NUMBER: _ClassVar[int]
     partition_key: str
     bind_to_time_partition: bool
+    time_transform: TimeTransform
+    def __init__(self, partition_key: _Optional[str] = ..., bind_to_time_partition: bool = ..., time_transform: _Optional[_Union[TimeTransform, _Mapping]] = ...) -> None: ...
+
+class TimeTransform(_message.Message):
+    __slots__ = ["transform", "op"]
+    TRANSFORM_FIELD_NUMBER: _ClassVar[int]
+    OP_FIELD_NUMBER: _ClassVar[int]
     transform: str
-    def __init__(self, partition_key: _Optional[str] = ..., bind_to_time_partition: bool = ..., transform: _Optional[str] = ...) -> None: ...
+    op: Operator
+    def __init__(self, transform: _Optional[str] = ..., op: _Optional[_Union[Operator, str]] = ...) -> None: ...
 
 class InputBindingData(_message.Message):
     __slots__ = ["var"]
@@ -61,10 +86,12 @@ class Partitions(_message.Message):
     def __init__(self, value: _Optional[_Mapping[str, LabelValue]] = ...) -> None: ...
 
 class TimePartition(_message.Message):
-    __slots__ = ["value"]
+    __slots__ = ["value", "granularity"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
+    GRANULARITY_FIELD_NUMBER: _ClassVar[int]
     value: LabelValue
-    def __init__(self, value: _Optional[_Union[LabelValue, _Mapping]] = ...) -> None: ...
+    granularity: Granularity
+    def __init__(self, value: _Optional[_Union[LabelValue, _Mapping]] = ..., granularity: _Optional[_Union[Granularity, str]] = ...) -> None: ...
 
 class ArtifactID(_message.Message):
     __slots__ = ["artifact_key", "version", "partitions", "time_partition"]

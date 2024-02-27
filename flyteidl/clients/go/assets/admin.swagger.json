@@ -4197,20 +4197,6 @@
       ],
       "default": "SINGLE"
     },
-    "ComparisonExpressionOperator": {
-      "type": "string",
-      "enum": [
-        "EQ",
-        "NEQ",
-        "GT",
-        "GTE",
-        "LT",
-        "LTE"
-      ],
-      "default": "EQ",
-      "description": "- GT: Greater Than\n - LT: Less Than",
-      "title": "Binary Operator for each expression"
-    },
     "ConjunctionExpressionLogicalOperator": {
       "type": "string",
       "enum": [
@@ -6481,8 +6467,8 @@
         "bind_to_time_partition": {
           "type": "boolean"
         },
-        "transform": {
-          "type": "string",
+        "time_transform": {
+          "$ref": "#/definitions/coreTimeTransform",
           "title": "This is only relevant in the time partition case"
         }
       },
@@ -6750,7 +6736,7 @@
       "type": "object",
       "properties": {
         "operator": {
-          "$ref": "#/definitions/ComparisonExpressionOperator"
+          "$ref": "#/definitions/coreComparisonExpressionOperator"
         },
         "left_value": {
           "$ref": "#/definitions/coreOperand"
@@ -6760,6 +6746,20 @@
         }
       },
       "description": "Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.\nEach expression results in a boolean result."
+    },
+    "coreComparisonExpressionOperator": {
+      "type": "string",
+      "enum": [
+        "EQ",
+        "NEQ",
+        "GT",
+        "GTE",
+        "LT",
+        "LTE"
+      ],
+      "default": "EQ",
+      "description": "- GT: Greater Than\n - LT: Less Than",
+      "title": "Binary Operator for each expression"
     },
     "coreCompiledLaunchPlan": {
       "type": "object",
@@ -7037,6 +7037,17 @@
         }
       },
       "description": "GateNode refers to the condition that is required for the gate to successfully complete."
+    },
+    "coreGranularity": {
+      "type": "string",
+      "enum": [
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "MONTH"
+      ],
+      "default": "MINUTE",
+      "title": "- DAY: default"
     },
     "coreIOStrategy": {
       "type": "object",
@@ -8145,6 +8156,20 @@
       "properties": {
         "value": {
           "$ref": "#/definitions/coreLabelValue"
+        },
+        "granularity": {
+          "$ref": "#/definitions/coreGranularity"
+        }
+      }
+    },
+    "coreTimeTransform": {
+      "type": "object",
+      "properties": {
+        "transform": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/flyteidlcoreOperator"
         }
       }
     },
@@ -8837,6 +8862,13 @@
         }
       },
       "description": "A generic key value pair."
+    },
+    "flyteidlcoreOperator": {
+      "type": "string",
+      "enum": [
+        "MINUS"
+      ],
+      "default": "MINUS"
     },
     "flyteidlcoreSchema": {
       "type": "object",
