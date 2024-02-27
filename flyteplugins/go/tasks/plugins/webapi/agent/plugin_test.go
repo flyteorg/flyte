@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"golang.org/x/exp/maps"
 
+	agentMocks "github.com/flyteorg/flyte/flyteidl/clients/go/admin/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	flyteIdlCore "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -17,7 +18,6 @@ import (
 	pluginsCore "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	pluginCoreMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/mocks"
 	webapiPlugin "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi/mocks"
-	agentMocks "github.com/flyteorg/flyte/flyteplugins/go/tasks/plugins/webapi/agent/mocks"
 	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
@@ -31,8 +31,8 @@ func TestPlugin(t *testing.T) {
 	cfg := defaultConfig
 	cfg.WebAPI.Caching.Workers = 1
 	cfg.WebAPI.Caching.ResyncInterval.Duration = 5 * time.Second
-	cfg.DefaultAgent = Agent{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
-	cfg.Agents = map[string]*Agent{"spark_agent": {Endpoint: "localhost:80"}}
+	cfg.DefaultAgent = Deployment{Endpoint: "test-agent.flyte.svc.cluster.local:80"}
+	cfg.AgentDeployments = map[string]*Deployment{"spark_agent": {Endpoint: "localhost:80"}}
 	cfg.AgentForTaskTypes = map[string]string{"spark": "spark_agent", "bar": "bar_agent"}
 
 	plugin := Plugin{
@@ -52,34 +52,38 @@ func TestPlugin(t *testing.T) {
 	})
 
 	t.Run("test newAgentPlugin", func(t *testing.T) {
-		p := newMockAgentPlugin()
+		p := newMockAsyncAgentPlugin()
 		assert.NotNil(t, p)
 		assert.Equal(t, "agent-service", p.ID)
 		assert.NotNil(t, p.PluginLoader)
 	})
 
 	t.Run("test getFinalAgent", func(t *testing.T) {
-		agentRegistry := map[string]*Agent{"spark": {Endpoint: "localhost:80"}}
-		agent := getFinalAgent("spark", &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, "localhost:80")
-		agent = getFinalAgent("foo", &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
-		agent = getFinalAgent("bar", &cfg, agentRegistry)
-		assert.Equal(t, agent.Endpoint, cfg.DefaultAgent.Endpoint)
+		agent := &Agent{AgentDeployment: &Deployment{Endpoint: "localhost:80"}}
+		agentRegistry := Registry{"spark": {defaultTaskTypeVersion: agent}}
+		spark := &admin.TaskCategory{Name: "spark", Version: defaultTaskTypeVersion}
+		foo := &admin.TaskCategory{Name: "foo", Version: defaultTaskTypeVersion}
+		bar := &admin.TaskCategory{Name: "bar", Version: defaultTaskTypeVersion}
+		agentDeployment, _ := getFinalAgent(spark, &cfg, agentRegistry)
+		assert.Equal(t, agentDeployment.Endpoint, "localhost:80")
+		agentDeployment, _ = getFinalAgent(foo, &cfg, agentRegistry)
+		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
+		agentDeployment, _ = getFinalAgent(bar, &cfg, agentRegistry)
+		assert.Equal(t, agentDeployment.Endpoint, cfg.DefaultAgent.Endpoint)
 	})
 
 	t.Run("test getFinalTimeout", func(t *testing.T) {
-		timeout := getFinalTimeout("CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		timeout := getFinalTimeout("CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.Equal(t, 1*time.Millisecond, timeout.Duration)
-		timeout = getFinalTimeout("DeleteTask", &Agent{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
+		timeout = getFinalTimeout("DeleteTask", &Deployment{Endpoint: "localhost:8080", DefaultTimeout: config.Duration{Duration: 10 * time.Second}})
 		assert.Equal(t, 10*time.Second, timeout.Duration)
 	})
 
 	t.Run("test getFinalContext", func(t *testing.T) {
-		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &Agent{})
+		ctx, _ := getFinalContext(context.TODO(), "DeleteTask", &Deployment{})
 		assert.Equal(t, context.TODO(), ctx)
 
-		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Agent{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
+		ctx, _ = getFinalContext(context.TODO(), "CreateTask", &Deployment{Endpoint: "localhost:8080", Timeouts: map[string]config.Duration{"CreateTask": {Duration: 1 * time.Millisecond}}})
 		assert.NotEqual(t, context.TODO(), ctx)
 	})
 
@@ -270,11 +274,15 @@ func TestPlugin(t *testing.T) {
 func getMockMetadataServiceClient() *agentMocks.AgentMetadataServiceClient {
 	mockMetadataServiceClient := new(agentMocks.AgentMetadataServiceClient)
 	mockRequest := &admin.ListAgentsRequest{}
+	supportedTaskCategories := make([]*admin.TaskCategory, 3)
+	supportedTaskCategories[0] = &admin.TaskCategory{Name: "task1", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[1] = &admin.TaskCategory{Name: "task2", Version: defaultTaskTypeVersion}
+	supportedTaskCategories[2] = &admin.TaskCategory{Name: "task3", Version: defaultTaskTypeVersion}
 	mockResponse := &admin.ListAgentsResponse{
 		Agents: []*admin.Agent{
 			{
-				Name:               "test-agent",
-				SupportedTaskTypes: []string{"task1", "task2", "task3"},
+				Name:                    "test-agent",
+				SupportedTaskCategories: supportedTaskCategories,
 			},
 		},
 	}
@@ -290,12 +298,12 @@ func TestInitializeAgentRegistry(t *testing.T) {
 	agentMetadataClients[defaultAgentEndpoint] = getMockMetadataServiceClient()
 
 	cs := &ClientSet{
-		agentClients:         agentClients,
+		asyncAgentClients:    agentClients,
 		agentMetadataClients: agentMetadataClients,
 	}
 
 	cfg := defaultConfig
-	cfg.Agents = map[string]*Agent{"custom_agent": {Endpoint: defaultAgentEndpoint}}
+	cfg.AgentDeployments = map[string]*Deployment{"custom_agent": {Endpoint: defaultAgentEndpoint}}
 	cfg.AgentForTaskTypes = map[string]string{"task1": "agent-deployment-1", "task2": "agent-deployment-2"}
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)

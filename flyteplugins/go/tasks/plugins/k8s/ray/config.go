@@ -23,6 +23,7 @@ var (
 		DashboardHost:            "0.0.0.0",
 		EnableUsageStats:         false,
 		KubeRayCrdVersion:        "v1alpha1",
+		ServiceAccount:           "default",
 		Defaults: DefaultConfig{
 			HeadNode: NodeConfig{
 				StartParameters: map[string]string{
@@ -87,6 +88,7 @@ type Config struct {
 	Defaults             DefaultConfig                 `json:"defaults" pflag:"-,Default configuration for ray jobs"`
 	EnableUsageStats     bool                          `json:"enableUsageStats" pflag:",Enable usage stats for ray jobs. These stats are submitted to usage-stats.ray.io per https://docs.ray.io/en/latest/cluster/usage-stats.html"`
 	KubeRayCrdVersion    string                        `json:"kubeRayCrdVersion" pflag:",Version of the Ray CRD to use when creating RayClusters or RayJobs."`
+	ServiceAccount       string                        `json:"serviceAccount" pflag:",The k8s service account to run as"`
 }
 
 type DefaultConfig struct {

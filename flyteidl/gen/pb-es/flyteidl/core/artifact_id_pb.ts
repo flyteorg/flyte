@@ -27,6 +27,11 @@ export class ArtifactKey extends Message<ArtifactKey> {
    */
   name = "";
 
+  /**
+   * @generated from field: string org = 4;
+   */
+  org = "";
+
   constructor(data?: PartialMessage<ArtifactKey>) {
     super();
     proto3.util.initPartial(data, this);
@@ -38,6 +43,7 @@ export class ArtifactKey extends Message<ArtifactKey> {
     { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArtifactKey {

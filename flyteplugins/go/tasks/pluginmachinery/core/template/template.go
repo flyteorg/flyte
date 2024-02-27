@@ -47,6 +47,7 @@ var perRetryUniqueKey = regexp.MustCompile(`(?i){{\s*[\.$]PerRetryUniqueKey\s*}}
 var taskTemplateRegex = regexp.MustCompile(`(?i){{\s*[\.$]TaskTemplatePath\s*}}`)
 var prevCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]PrevCheckpointPrefix\s*}}`)
 var currCheckpointPrefixRegex = regexp.MustCompile(`(?i){{\s*[\.$]CheckpointOutputPrefix\s*}}`)
+var namespaceRegex = regexp.MustCompile(`(?i){{\s*[\.$]Namespace\s*}}`)
 
 type ErrorCollection struct {
 	Errors []error
@@ -126,6 +127,9 @@ func render(ctx context.Context, inputTemplate string, params Parameters, perRet
 		}
 		val = taskTemplateRegex.ReplaceAllString(val, p.String())
 	}
+
+	// Replace namespace last, in case it was embedded in other templates
+	val = namespaceRegex.ReplaceAllString(val, params.TaskExecMetadata.GetNamespace())
 
 	inputs, err := params.Inputs.Get(ctx)
 	if err != nil {

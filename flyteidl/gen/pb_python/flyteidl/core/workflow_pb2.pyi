@@ -199,17 +199,21 @@ class WorkflowTemplate(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., metadata: _Optional[_Union[WorkflowMetadata, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., nodes: _Optional[_Iterable[_Union[Node, _Mapping]]] = ..., outputs: _Optional[_Iterable[_Union[_literals_pb2.Binding, _Mapping]]] = ..., failure_node: _Optional[_Union[Node, _Mapping]] = ..., metadata_defaults: _Optional[_Union[WorkflowMetadataDefaults, _Mapping]] = ...) -> None: ...
 
 class TaskNodeOverrides(_message.Message):
-    __slots__ = ["resources", "extended_resources"]
+    __slots__ = ["resources", "extended_resources", "container_image"]
     RESOURCES_FIELD_NUMBER: _ClassVar[int]
     EXTENDED_RESOURCES_FIELD_NUMBER: _ClassVar[int]
+    CONTAINER_IMAGE_FIELD_NUMBER: _ClassVar[int]
     resources: _tasks_pb2.Resources
     extended_resources: _tasks_pb2.ExtendedResources
-    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...
+    container_image: str
+    def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ..., container_image: _Optional[str] = ...) -> None: ...
 
 class LaunchPlanTemplate(_message.Message):
-    __slots__ = ["id", "interface"]
+    __slots__ = ["id", "interface", "fixed_inputs"]
     ID_FIELD_NUMBER: _ClassVar[int]
     INTERFACE_FIELD_NUMBER: _ClassVar[int]
+    FIXED_INPUTS_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.Identifier
     interface: _interface_pb2.TypedInterface
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ...) -> None: ...
+    fixed_inputs: _literals_pb2.LiteralMap
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., fixed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...

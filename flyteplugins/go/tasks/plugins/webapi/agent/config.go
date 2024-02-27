@@ -39,7 +39,7 @@ var (
 				Value: 50,
 			},
 		},
-		DefaultAgent: Agent{
+		DefaultAgent: Deployment{
 			Endpoint:       "",
 			Insecure:       true,
 			DefaultTimeout: config.Duration{Duration: 10 * time.Second},
@@ -61,19 +61,19 @@ type Config struct {
 	ResourceConstraints core.ResourceConstraintsSpec `json:"resourceConstraints" pflag:"-,Defines resource constraints on how many executions to be created per project/overall at any given time."`
 
 	// The default agent if there does not exist a more specific matching against task types
-	DefaultAgent Agent `json:"defaultAgent" pflag:",The default agent."`
+	DefaultAgent Deployment `json:"defaultAgent" pflag:",The default agent."`
 
-	// The agents used to match against specific task types. {AgentId: Agent}
-	Agents map[string]*Agent `json:"agents" pflag:",The agents."`
+	// The agents used to match against specific task types. {agentDeploymentID: AgentDeployment}
+	AgentDeployments map[string]*Deployment `json:"agents" pflag:",The agents."`
 
-	// Maps task types to their agents. {TaskType: AgentId}
+	// Maps task types to their agents. {TaskType: agentDeploymentID}
 	AgentForTaskTypes map[string]string `json:"agentForTaskTypes" pflag:"-,"`
 
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
 	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 }
 
-type Agent struct {
+type Deployment struct {
 	// Endpoint points to an agent gRPC endpoint
 	Endpoint string `json:"endpoint"`
 
