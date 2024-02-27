@@ -127,6 +127,24 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVa
 		value := os.Getenv(envVarName)
 		envVars = append(envVars, v1.EnvVar{Name: k, Value: value})
 	}
+	for _, configMapName := range config.GetK8sPluginConfig().DefaultEnvVarsFromConfigMaps {
+		envVars = append(envVars, v1.EnvVar{
+			ValueFrom: &v1.EnvVarSource{
+				ConfigMapKeyRef: &v1.ConfigMapKeySelector{
+					Key: configMapName,
+				},
+			},
+		})
+	}
+	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvVarsFromSecrets {
+		envVars = append(envVars, v1.EnvVar{
+			ValueFrom: &v1.EnvVarSource{
+				SecretKeyRef: &v1.SecretKeySelector{
+					Key: secretName,
+				},
+			},
+		})
+	}
 
 	return envVars
 }
