@@ -3,7 +3,7 @@ import typing
 from grafanalib.core import (MILLISECONDS_FORMAT, NO_FORMAT, OPS_FORMAT,
                              PERCENT_FORMAT, SECONDS_FORMAT, SHORT_FORMAT,
                              Dashboard, DataSourceInput, Gauge, Graph, Row,
-                             Stat, Target, YAxes, YAxis, single_y_axis)
+                             Stat, Target, YAxes, YAxis, single_y_axis, BarGauge)
 
 # ------------------------------
 # For Gostats we recommend using
@@ -526,6 +526,24 @@ class FlytePropeller(object):
         ]
 
     @staticmethod
+    def grpc_latency_histogram(grpc_method: str) -> Graph:
+        return BarGauge(
+            title=f"{grpc_method} latency",
+            calc="sum",
+            dataSource=DATASOURCE,
+            targets=[
+                Target(
+                    expr=f'grpc_client_handling_seconds_bucket{{grpc_method="{grpc_method}"}}',
+                    refId="A",
+                    format="heatmap",
+                    legendFormat=r"{{le}}",
+                ),
+            ],
+            displayMode="gradient",
+            orientation="vertical",
+        )
+
+    @staticmethod
     def wf_store_latency(collapse: bool) -> Row:
         return Row(
             title="etcD write metrics",
@@ -601,6 +619,24 @@ class FlytePropeller(object):
         r.panels.extend(FlytePropeller.task_event_recording())
         r.panels.extend(FlytePropeller.dynamic_wf_build())
         r.panels.append(FlytePropeller.admin_launcher_cache())
+        return r
+
+    @staticmethod
+    def grpc_metrics(collapse: bool) -> Row:
+        r = Row(
+            title="GRPC latency metrics",
+            collapse=collapse,
+            panels=[
+                FlytePropeller.grpc_latency_histogram("CreateExecution"),
+                FlytePropeller.grpc_latency_histogram("CreateNodeEvent"),
+                FlytePropeller.grpc_latency_histogram("CreateTaskEvent"),
+                FlytePropeller.grpc_latency_histogram("CreateWorkflowEvent"),
+                FlytePropeller.grpc_latency_histogram("GetExecution"),
+                FlytePropeller.grpc_latency_histogram("GetExecutionData"),
+                FlytePropeller.grpc_latency_histogram("GetLaunchPlan"),
+                FlytePropeller.grpc_latency_histogram("GetOrExtendReservation"),
+            ],
+        )
         return r
 
     @staticmethod
@@ -852,11 +888,11 @@ class FlytePropeller(object):
                             refId="A",
                         ),
                     ],
-                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),                
+                    yAxes=single_y_axis(format=MILLISECONDS_FORMAT),
                 ),
             ],
         )
-    
+
     @staticmethod
     def workflowstore(collapse: bool) -> Row:
         return Row(
@@ -908,6 +944,7 @@ class FlytePropeller(object):
             FlytePropeller.metastore_latencies(True),
             FlytePropeller.node_metrics(True),
             FlytePropeller.perf_metrics(True),
+            FlytePropeller.grpc_metrics(True),
             FlytePropeller.workflow_latencies(False),
             FlytePropeller.wf_store_latency(False),
             FlytePropeller.k8s_pod_informers(True),
