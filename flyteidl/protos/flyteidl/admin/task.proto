@@ -69,21 +69,3 @@ message TaskClosure {
     // Time at which the task was created.
     google.protobuf.Timestamp created_at = 2;
 }
-
-// The task id is already used and the structure is different
-message TaskErrorExistsDifferentStructure {
-    core.Identifier id = 1;
-}
-
-// The task id is already used with an identical sctructure
-message TaskErrorExistsIdenticalStructure {
-    core.Identifier id = 1;
-}
-
-// When a CreateTaskRequest fails due to matching id
-message CreateTaskFailureReason {
-    oneof reason {
-        TaskErrorExistsDifferentStructure exists_different_structure = 1;
-        TaskErrorExistsIdenticalStructure exists_identical_structure = 2;
-    }
-}

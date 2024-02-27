@@ -2908,38 +2908,6 @@ pub struct TaskClosure {
     #[prost(message, optional, tag="2")]
     pub created_at: ::core::option::Option<::prost_types::Timestamp>,
 }
-/// The task id is already used and the structure is different
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskErrorExistsDifferentStructure {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-}
-/// The task id is already used with an identical sctructure
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct TaskErrorExistsIdenticalStructure {
-    #[prost(message, optional, tag="1")]
-    pub id: ::core::option::Option<super::core::Identifier>,
-}
-/// When a CreateTaskRequest fails due to matching id
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct CreateTaskFailureReason {
-    #[prost(oneof="create_task_failure_reason::Reason", tags="1, 2")]
-    pub reason: ::core::option::Option<create_task_failure_reason::Reason>,
-}
-/// Nested message and enum types in `CreateTaskFailureReason`.
-pub mod create_task_failure_reason {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Reason {
-        #[prost(message, tag="1")]
-        ExistsDifferentStructure(super::TaskErrorExistsDifferentStructure),
-        #[prost(message, tag="2")]
-        ExistsIdenticalStructure(super::TaskErrorExistsIdenticalStructure),
-    }
-}
 /// A message used to fetch a single task execution entity.
 /// See :ref:`ref_flyteidl.admin.TaskExecution` for more details
 #[allow(clippy::derive_partial_eq_without_eq)]

@@ -55,23 +55,3 @@ class TaskClosure(_message.Message):
     compiled_task: _compiler_pb2.CompiledTask
     created_at: _timestamp_pb2.Timestamp
     def __init__(self, compiled_task: _Optional[_Union[_compiler_pb2.CompiledTask, _Mapping]] = ..., created_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...) -> None: ...
-
-class TaskErrorExistsDifferentStructure(_message.Message):
-    __slots__ = ["id"]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    id: _identifier_pb2.Identifier
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
-
-class TaskErrorExistsIdenticalStructure(_message.Message):
-    __slots__ = ["id"]
-    ID_FIELD_NUMBER: _ClassVar[int]
-    id: _identifier_pb2.Identifier
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
-
-class CreateTaskFailureReason(_message.Message):
-    __slots__ = ["exists_different_structure", "exists_identical_structure"]
-    EXISTS_DIFFERENT_STRUCTURE_FIELD_NUMBER: _ClassVar[int]
-    EXISTS_IDENTICAL_STRUCTURE_FIELD_NUMBER: _ClassVar[int]
-    exists_different_structure: TaskErrorExistsDifferentStructure
-    exists_identical_structure: TaskErrorExistsIdenticalStructure
-    def __init__(self, exists_different_structure: _Optional[_Union[TaskErrorExistsDifferentStructure, _Mapping]] = ..., exists_identical_structure: _Optional[_Union[TaskErrorExistsIdenticalStructure, _Mapping]] = ...) -> None: ...
