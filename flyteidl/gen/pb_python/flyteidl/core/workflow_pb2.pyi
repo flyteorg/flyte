@@ -207,9 +207,11 @@ class TaskNodeOverrides(_message.Message):
     def __init__(self, resources: _Optional[_Union[_tasks_pb2.Resources, _Mapping]] = ..., extended_resources: _Optional[_Union[_tasks_pb2.ExtendedResources, _Mapping]] = ...) -> None: ...
 
 class LaunchPlanTemplate(_message.Message):
-    __slots__ = ["id", "interface"]
+    __slots__ = ["id", "interface", "fixed_inputs"]
     ID_FIELD_NUMBER: _ClassVar[int]
     INTERFACE_FIELD_NUMBER: _ClassVar[int]
+    FIXED_INPUTS_FIELD_NUMBER: _ClassVar[int]
     id: _identifier_pb2.Identifier
     interface: _interface_pb2.TypedInterface
-    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ...) -> None: ...
+    fixed_inputs: _literals_pb2.LiteralMap
+    def __init__(self, id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., interface: _Optional[_Union[_interface_pb2.TypedInterface, _Mapping]] = ..., fixed_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ...) -> None: ...
