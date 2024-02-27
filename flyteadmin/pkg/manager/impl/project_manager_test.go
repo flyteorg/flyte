@@ -115,6 +115,19 @@ func TestListProjects_HighLimit_SortBy_Filter(t *testing.T) {
 	}, t)
 }
 
+func TestListProjects_HighLimit_WithOrgFilter(t *testing.T) {
+	testListProjects(admin.ProjectListRequest{
+		Token:   "1",
+		Limit:   999,
+		Filters: "eq(org,foo)",
+	}, "", "identifier asc", []*common.GormQueryExpr{
+		&common.GormQueryExpr{
+			Query: "org = ?",
+			Args:  "foo",
+		},
+	}, t)
+}
+
 func TestListProjects_NoToken_NoLimit(t *testing.T) {
 	testListProjects(admin.ProjectListRequest{}, "", "identifier asc", expectedDefaultQueryExpr(), t)
 }

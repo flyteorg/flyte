@@ -9,6 +9,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/interfaces"
@@ -17,10 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
-)
-
-var (
-	emptyListProjectFilters []common.InlineFilter
+	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
 type ProjectManager struct {
@@ -65,7 +63,16 @@ func (m *ProjectManager) ListProjects(ctx context.Context, request admin.Project
 		// Add implicit active filters ordinarily added by database.
 		requestFilters = fmt.Sprintf("eq(state,%d)", admin.Project_ACTIVE)
 	}
-	filters, err := util.AddRequestFilters(requestFilters, common.Project, emptyListProjectFilters)
+	var listProjectFilters []common.InlineFilter
+	// Only explicitly add an org filter if it is included in the request.
+	if len(request.Org) > 0 {
+		orgFilter, err := util.GetSingleValueEqualityFilter(common.Project, shared.Org, request.GetOrg())
+		if err != nil {
+			logger.Error(ctx, "failed to add org filter to list projects request for org: %s and err: %v", request.GetOrg(), err)
+		}
+		listProjectFilters = append(listProjectFilters, orgFilter)
+	}
+	filters, err := util.AddRequestFilters(requestFilters, common.Project, listProjectFilters)
 	if err != nil {
 		return nil, err
 	}
