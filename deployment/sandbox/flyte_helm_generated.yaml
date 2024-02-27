@@ -652,6 +652,8 @@ data:
         - FLYTE_AWS_ENDPOINT: http://minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+        default-env-vars-from-configmaps: []
+        default-env-vars-from-secrets: []
         default-memory: 200Mi
   logger.yaml: | 
     logger:
@@ -7172,7 +7174,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "348a3f88031dd95422276b1d3162236cfae3cf720040a8465668611ca6b1948"
+        configChecksum: "8aecf4367155815507c20281571bb08e78ea9ed12376fff6f7b9ff2f8f669d9"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7246,7 +7248,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.10.7
       annotations:
-        configChecksum: "348a3f88031dd95422276b1d3162236cfae3cf720040a8465668611ca6b1948"
+        configChecksum: "8aecf4367155815507c20281571bb08e78ea9ed12376fff6f7b9ff2f8f669d9"
     spec:
       securityContext: 
         fsGroup: 65534
