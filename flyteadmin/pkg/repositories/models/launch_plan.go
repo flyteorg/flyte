@@ -38,7 +38,7 @@ type LaunchPlan struct {
 	// Hash of the launch plan
 	Digest              []byte
 	ScheduleType        LaunchPlanScheduleType
-	LaunchConditionType *LaunchConditionType `gorm:"index:idx_launch_plans_launch_conditions,where:age > 10"`
+	LaunchConditionType *LaunchConditionType `gorm:"index:idx_launch_plans_launch_conditions,where:launch_condition_type is not null"`
 }
 
 var LaunchPlanColumns = modelColumns(LaunchPlan{})
