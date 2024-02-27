@@ -87,9 +87,12 @@ helm_upgrade: ## Upgrade helm charts
 docs:
 	make -C docs clean html SPHINXOPTS=-W
 
+monodocs-environment.lock.yaml: monodocs-environment.yaml
+	conda-lock lock --file monodocs-environment.yaml --lockfile monodocs-environment.lock.yaml --channel conda-forge
+
 # Used in local development
 .PHONY: build-dev-docs-image
-build-dev-docs-image:
+build-dev-docs-image: monodocs-environment.lock.yaml
 	docker buildx build -t flyte-dev-docs:latest -f Dockerfile.docs .
 
 # Build docs in docker container for local development
