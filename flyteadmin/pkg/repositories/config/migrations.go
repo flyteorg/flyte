@@ -1207,25 +1207,12 @@ var ContinuedMigrations = []*gormigrate.Migration{
 				Digest       []byte
 				ScheduleType LaunchPlanScheduleType
 				// store the type of event that this launch plan is triggered by, can be empty, or SCHED
-				LaunchConditionType *LaunchConditionType `gorm:"null"`
+				LaunchConditionType *LaunchConditionType `gorm:"type:varchar(32);index:idx_launch_plans_launch_conditions,where:launch_condition_type is not null"`
 			}
 			return tx.AutoMigrate(&LaunchPlan{})
 		},
 		Rollback: func(tx *gorm.DB) error {
 			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
-		},
-	},
-	{
-		ID: "pg-continue-2024-02-launch-index",
-		Migrate: func(tx *gorm.DB) error {
-			sql := `CREATE INDEX idx_launch_plans_launch_conditions ON launch_plans (launch_condition_type) WHERE launch_condition_type IS NOT NULL;`
-			return tx.Exec(sql).Error
-		},
-		Rollback: func(tx *gorm.DB) error {
-			if err := tx.Exec("DROP INDEX IF EXISTS idx_launch_plans_launch_conditions;").Error; err != nil {
-				return err
-			}
-			return nil
 		},
 	},
 }
