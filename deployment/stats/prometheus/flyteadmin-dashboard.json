@@ -114,7 +114,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
+              "expr": "sum by(le) (rate(grpc_server_handling_seconds_bucket[5m]))",
               "format": "heatmap",
               "hide": false,
               "instant": false,
@@ -122,7 +122,7 @@
               "intervalFactor": 2,
               "legendFormat": "{{le}}",
               "metric": "",
-              "query": "sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
+              "query": "sum by(le) (rate(grpc_server_handling_seconds_bucket[5m]))",
               "refId": "A",
               "step": 10,
               "target": ""

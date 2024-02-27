@@ -216,7 +216,7 @@ class FlyteAdmin(object):
             dataSource=DATASOURCE,
             targets=[
                 Target(
-                    expr="sum by(le) (rate(grpc_client_handling_seconds_bucket[5m]))",
+                    expr="sum by(le) (rate(grpc_server_handling_seconds_bucket[5m]))",
                     refId="A",
                     format="heatmap",
                     legendFormat=r"{{le}}",
