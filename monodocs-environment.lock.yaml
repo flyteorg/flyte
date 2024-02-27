@@ -18088,6 +18088,28 @@ package:
     sha256: 2bd0c30779653e4dd120300cbd9ca412c480738cc2241f6dea477a883f299e04
   category: main
   optional: false
+- name: sphinx-new-tab-link
+  version: 0.2.3
+  manager: pip
+  platform: linux-64
+  dependencies:
+    sphinx: '*'
+  url: https://files.pythonhosted.org/packages/23/b4/8269282568ac9e26dbefdbdb642e89b8f2b211ef9f5f00f50a466c05f0b6/sphinx_new_tab_link-0.2.3-py3-none-any.whl
+  hash:
+    sha256: 2321b633170d8e33acae8afb96b3d7d9a8b3f081271987ae12a53151e2a0ab56
+  category: main
+  optional: false
+- name: sphinx-new-tab-link
+  version: 0.2.3
+  manager: pip
+  platform: osx-arm64
+  dependencies:
+    sphinx: '*'
+  url: https://files.pythonhosted.org/packages/23/b4/8269282568ac9e26dbefdbdb642e89b8f2b211ef9f5f00f50a466c05f0b6/sphinx_new_tab_link-0.2.3-py3-none-any.whl
+  hash:
+    sha256: 2321b633170d8e33acae8afb96b3d7d9a8b3f081271987ae12a53151e2a0ab56
+  category: main
+  optional: false
 - name: sphinxcontrib-video
   version: 0.2.0
   manager: pip
