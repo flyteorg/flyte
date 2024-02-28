@@ -24,7 +24,7 @@ For example, you need to set the `GOOGLE_APPLICATION_CREDENTIALS` environment va
 
 ```
 
-Adding `AsyncAgentExecutorMixin` to this class to tell flytekit to use the agent to run the task.
+Add `AsyncAgentExecutorMixin` to this class to tell flytekit to use the agent to run the task.
 ```python
 class BigQueryTask(AsyncAgentExecutorMixin, SQLTask[BigQueryConfig]):
     def __init__(self, name: str, **kwargs):
@@ -66,12 +66,11 @@ def hello_spark(partitions: int) -> float:
     return pi_val
 ```
 
-To execute the Spark task on the agent, it's essential to configure the raw-output-data-prefix with a remote path.
-This configuration ensures that Flytekit transfers the input data to the blob storage.
-Consequently, the Spark job running on Databricks can access the input data directly from the designated bucket.
+To execute the Spark task on the agent, you must configure the `raw-output-data-prefix` with a remote path.
+This configuration ensures that flytekit transfers the input data to the blob storage and allows the Spark job running on Databricks to access the input data directly from the designated bucket.
 
 ```{note}
-The Spark task will run locally if the raw-output-data-prefix is not set.
+The Spark task will run locally if the `raw-output-data-prefix` is not set.
 ```
 
 ```bash

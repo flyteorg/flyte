@@ -25,7 +25,7 @@ While agents can be written in any programming language, we currently only suppo
 
 ## Async agent interface specification
 
-To create a new async agent, extend the `AsyncAgentBase` and implement `create`, `get`, and `delete` methods. These methods need to be idempotent.
+To create a new async agent, extend the `AsyncAgentBase` and implement `create`, `get`, and `delete` methods. These methods must be idempotent.
 
 - `create`: This method is used to initiate a new job. Users have the flexibility to use gRPC, REST, or an SDK to create a job.
 - `get`: This method retrieves the job resource (jobID or output literal) associated with the task, such as a BigQuery job ID or Databricks task ID.
@@ -45,7 +45,7 @@ class BigQueryMetadata(ResourceMeta):
 
 class BigQueryAgent(AsyncAgentBase):
     def __init__(self):
-        super().__init__(task_type_name="saprk", metadata_type=BigQueryMetadata)
+        super().__init__(task_type_name="bigquery", metadata_type=BigQueryMetadata)
 
     def create(
         self,
@@ -72,7 +72,7 @@ For an example implementation, see the [BigQuery agent](https://github.com/flyte
 
 ## Sync agent interface specification
 
-To create a new async agent, extend the `SyncAgentBase` class and implement `do` methods. This method need to be idempotent.
+To create a new sync agent, extend the `SyncAgentBase` class and implement a `do` method. This method must be idempotent.
 
 - `do`: This method is used to execute the synchronous task, and the worker in Flyte will be blocked until the method returns.
 
