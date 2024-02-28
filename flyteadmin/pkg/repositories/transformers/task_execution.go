@@ -338,13 +338,12 @@ func mergeExternalResource(ctx context.Context, existing, latest *event.External
 		}
 	}
 
-
 	return existing, nil
 }
 
 // mergeExternalResources combines lists of external resources. This involves appending new
 // resources and updating in-place resources attributes.
-func mergeExternalResources(ctx context.Context, existing, latest []*event.ExternalResourceInfo, parentNodeExecutionId *core.NodeExecutionIdentifier, taskID *core.Identifier,
+func mergeExternalResources(ctx context.Context, existing, latest []*event.ExternalResourceInfo, parentNodeExecutionID *core.NodeExecutionIdentifier, taskID *core.Identifier,
 	retryAttempt uint32, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) ([]*event.ExternalResourceInfo, error) {
 
 	if len(latest) == 0 {
@@ -367,7 +366,7 @@ func mergeExternalResources(ctx context.Context, existing, latest []*event.Exter
 			existing = append(existing, externalResource)
 		} else if existing[index].GetIndex() == externalResource.GetIndex() && existing[index].GetRetryAttempt() == externalResource.GetRetryAttempt() {
 			externalResource, err := mergeExternalResource(ctx, existing[index], externalResource,
-				parentNodeExecutionId, taskID, retryAttempt, inlineEventDataPolicy, storageClient)
+				parentNodeExecutionID, taskID, retryAttempt, inlineEventDataPolicy, storageClient)
 			if err != nil {
 				return nil, err
 			}
@@ -385,7 +384,7 @@ func mergeExternalResources(ctx context.Context, existing, latest []*event.Exter
 
 // mergeMetadata merges an existing TaskExecutionMetadata instance with the provided instance. This
 // includes updating non-defaulted fields and merging ExternalResources.
-func mergeMetadata(ctx context.Context, existing, latest *event.TaskExecutionMetadata, parentNodeExecutionId *core.NodeExecutionIdentifier, taskID *core.Identifier,
+func mergeMetadata(ctx context.Context, existing, latest *event.TaskExecutionMetadata, parentNodeExecutionID *core.NodeExecutionIdentifier, taskID *core.Identifier,
 	retryAttempt uint32, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) (*event.TaskExecutionMetadata, error) {
 
 	if existing == nil {
@@ -400,7 +399,7 @@ func mergeMetadata(ctx context.Context, existing, latest *event.TaskExecutionMet
 		existing.GeneratedName = latest.GeneratedName
 	}
 	externalResources, err := mergeExternalResources(ctx, existing.ExternalResources, latest.ExternalResources,
-		parentNodeExecutionId, taskID, retryAttempt, inlineEventDataPolicy, storageClient)
+		parentNodeExecutionID, taskID, retryAttempt, inlineEventDataPolicy, storageClient)
 	if err != nil {
 		return nil, err
 	}

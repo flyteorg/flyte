@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -13,6 +12,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 
 	"github.com/go-test/deep"
 	"github.com/golang/protobuf/jsonpb"
@@ -27,6 +28,7 @@ import (
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/errors"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/transformers/k8s"
+	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
 )
 
 var update = flag.Bool("update", false, "Update .golden files")

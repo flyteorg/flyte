@@ -317,7 +317,7 @@ func TestValidateSchedule_ArgNotFixed(t *testing.T) {
 	})
 	t.Run("with rate", func(t *testing.T) {
 		request := testutils.GetLaunchPlanRequestWithFixedRateSchedule(2, admin.FixedRateUnit_HOUR)
-		
+
 		err := validateSchedule(request, inputMap)
 		assert.NotNil(t, err)
 	})
