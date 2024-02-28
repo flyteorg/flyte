@@ -85,6 +85,9 @@ pub struct CreateUploadLocationResponse {
     /// ExpiresAt defines when will the signed URL expires.
     #[prost(message, optional, tag="3")]
     pub expires_at: ::core::option::Option<::prost_types::Timestamp>,
+    /// Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+    #[prost(map="string, string", tag="4")]
+    pub headers: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 /// CreateUploadLocationRequest specified request for the CreateUploadLocation API.
 /// The implementation in data proxy service will create the s3 location with some server side configured prefixes,
@@ -139,9 +142,6 @@ pub struct CreateDownloadLocationRequest {
     /// +optional. The default value comes from a global config.
     #[prost(message, optional, tag="2")]
     pub expires_in: ::core::option::Option<::prost_types::Duration>,
-    /// Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
-    #[prost(map="string, string", tag="3")]
-    pub headers: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

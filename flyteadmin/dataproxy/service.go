@@ -140,6 +140,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		SignedUrl: resp.URL.String(),
 		NativeUrl: storagePath.String(),
 		ExpiresAt: timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration())),
+		Headers:   getExtraHeaders(storagePath, md5),
 	}, nil
 }
 
@@ -272,6 +273,19 @@ func (s Service) validateCreateDownloadLinkRequest(req *service.CreateDownloadLi
 	}
 
 	return req, nil
+}
+
+func getExtraHeaders(reference storage.DataReference, contentMd5 string) map[string]string {
+	headers := map[string]string{"Content-Length": strconv.Itoa(len(contentMd5)), "Content-MD5": contentMd5}
+	if strings.HasPrefix(reference.String(), "s3://") {
+		headers[fmt.Sprintf("x-amz-meta-%s", stow.FlyteContentMD5)] = contentMd5
+	} else if strings.HasPrefix(reference.String(), "gs://") {
+		headers[fmt.Sprintf("x-goog-meta-%s", stow.FlyteContentMD5)] = contentMd5
+	} else if strings.HasPrefix(reference.String(), "abfs://") {
+		headers[fmt.Sprintf("x-ms-meta-%s", stow.FlyteContentMD5)] = contentMd5
+		headers["x-ms-blob-type"] = "BlockBlob" // https://learn.microsoft.com/en-us/rest/api/storageservices/put-blob?tabs=microsoft-entra-id#remarks
+	}
+	return headers
 }
 
 // createStorageLocation creates a location in storage destination to maximize read/write performance in most

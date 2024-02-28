@@ -22621,6 +22621,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt */
             expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers */
+            headers?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateUploadLocationResponse. */
@@ -22640,6 +22643,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt. */
             public expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers. */
+            public headers: { [k: string]: string };
 
             /**
              * Creates a new CreateUploadLocationResponse instance using the specified properties.
@@ -22770,9 +22776,6 @@ export namespace flyteidl {
 
             /** CreateDownloadLocationRequest expiresIn */
             expiresIn?: (google.protobuf.IDuration|null);
-
-            /** CreateDownloadLocationRequest headers */
-            headers?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateDownloadLocationRequest. */
@@ -22789,9 +22792,6 @@ export namespace flyteidl {
 
             /** CreateDownloadLocationRequest expiresIn. */
             public expiresIn?: (google.protobuf.IDuration|null);
-
-            /** CreateDownloadLocationRequest headers. */
-            public headers: { [k: string]: string };
 
             /**
              * Creates a new CreateDownloadLocationRequest instance using the specified properties.

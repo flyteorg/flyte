@@ -114,13 +114,6 @@
             "in": "query",
             "required": false,
             "type": "string"
-          },
-          {
-            "name": "headers[string]",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
-            "in": "query",
-            "required": false,
-            "type": "string"
           }
         ],
         "tags": [
@@ -778,6 +771,13 @@
           "type": "string",
           "format": "date-time",
           "description": "ExpiresAt defines when will the signed URL expires."
+        },
+        "headers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file."
         }
       }
     },
