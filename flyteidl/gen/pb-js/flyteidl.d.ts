@@ -8781,6 +8781,9 @@ export namespace flyteidl {
             /** ExternalResourceInfo logs */
             logs?: (flyteidl.core.ITaskLog[]|null);
 
+            /** ExternalResourceInfo catalogKey */
+            catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
             /** ExternalResourceInfo outputUri */
             outputUri?: (string|null);
 
@@ -8817,6 +8820,9 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs. */
             public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo catalogKey. */
+            public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
 
             /** ExternalResourceInfo outputUri. */
             public outputUri: string;

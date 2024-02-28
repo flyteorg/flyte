@@ -272,16 +272,19 @@ message ExternalResourceInfo {
     // log information for the external resource execution
     repeated core.TaskLog logs = 6;
 
+    // TODO @hamersaw - docs
+    core.CatalogMetadata catalog_key = 7;
+
     oneof output_result {
         // URI to the output of the execution, it will be in a format that encodes all the information
         // including Cloud source provider. ie., s3://...
-        string output_uri = 9;
+        string output_uri = 8;
 
         // Error information for the execution
-        core.ExecutionError error = 10;
+        core.ExecutionError error = 9;
 
         // Raw output data produced by this task execution.
-        core.LiteralMap output_data = 17;
+        core.LiteralMap output_data = 10;
     }
 }
 

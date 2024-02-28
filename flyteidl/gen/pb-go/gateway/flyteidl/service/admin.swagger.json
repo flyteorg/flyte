@@ -8434,6 +8434,10 @@
           },
           "title": "log information for the external resource execution"
         },
+        "catalog_key": {
+          "$ref": "#/definitions/coreCatalogMetadata",
+          "title": "TODO @hamersaw - docs"
+        },
         "output_uri": {
           "type": "string",
           "description": "URI to the output of the execution, it will be in a format that encodes all the information\nincluding Cloud source provider. ie., s3://..."
