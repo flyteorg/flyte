@@ -62,11 +62,13 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 
 	// process events
 	cacheStatus := idlcore.CatalogCacheStatus_CACHE_DISABLED
+	var catalogKey *idlcore.CatalogMetadata
 	for _, nodeExecutionEvent := range e.nodeEvents {
 		switch target := nodeExecutionEvent.TargetMetadata.(type) {
 		case *event.NodeExecutionEvent_TaskNodeMetadata:
 			if target.TaskNodeMetadata != nil {
 				cacheStatus = target.TaskNodeMetadata.CacheStatus
+				catalogKey = target.TaskNodeMetadata.CatalogKey
 			}
 		}
 	}
@@ -80,7 +82,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			RetryAttempt: retryAttempt,
 			Phase:        idlcore.TaskExecution_SUCCEEDED,
 			CacheStatus:  cacheStatus,
-			// TODO @hamersaw - how do we send OutputResult here?
+			CatalogKey:   catalogKey,
 		})
 	}
 

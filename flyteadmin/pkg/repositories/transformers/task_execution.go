@@ -308,6 +308,9 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 	if latest.CacheStatus != core.CatalogCacheStatus_CACHE_DISABLED && existing.CacheStatus != latest.CacheStatus {
 		existing.CacheStatus = latest.CacheStatus
 	}
+	if latest.CatalogKey != nil {
+		existing.CatalogKey = latest.CatalogKey
+	}
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
 
 	// TODO @hamersaw - docs
