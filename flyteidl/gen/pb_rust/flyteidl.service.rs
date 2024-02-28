@@ -122,6 +122,10 @@ pub struct CreateUploadLocationRequest {
     /// +optional
     #[prost(string, tag="6")]
     pub filename_root: ::prost::alloc::string::String,
+    /// If true, the data proxy will add extra header (x-ams-meta-, x-goog-meta, etc) to the signed URL and
+    /// it will force clients to add metadata to the object.
+    #[prost(bool, tag="7")]
+    pub add_metadata: bool,
 }
 /// CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -135,6 +139,9 @@ pub struct CreateDownloadLocationRequest {
     /// +optional. The default value comes from a global config.
     #[prost(message, optional, tag="2")]
     pub expires_in: ::core::option::Option<::prost_types::Duration>,
+    /// Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+    #[prost(map="string, string", tag="3")]
+    pub headers: ::std::collections::HashMap<::prost::alloc::string::String, ::prost::alloc::string::String>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

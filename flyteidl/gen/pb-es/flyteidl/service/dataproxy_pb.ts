@@ -152,6 +152,14 @@ export class CreateUploadLocationRequest extends Message<CreateUploadLocationReq
    */
   filenameRoot = "";
 
+  /**
+   * If true, the data proxy will add extra header (x-ams-meta-, x-goog-meta, etc) to the signed URL and
+   * it will force clients to add metadata to the object.
+   *
+   * @generated from field: bool add_metadata = 7;
+   */
+  addMetadata = false;
+
   constructor(data?: PartialMessage<CreateUploadLocationRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -166,6 +174,7 @@ export class CreateUploadLocationRequest extends Message<CreateUploadLocationReq
     { no: 4, name: "expires_in", kind: "message", T: Duration },
     { no: 5, name: "content_md5", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 6, name: "filename_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "add_metadata", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateUploadLocationRequest {
@@ -208,6 +217,13 @@ export class CreateDownloadLocationRequest extends Message<CreateDownloadLocatio
    */
   expiresIn?: Duration;
 
+  /**
+   * Data proxy generates these headers for client, and they have to add these headers to the request when uploading the file.
+   *
+   * @generated from field: map<string, string> headers = 3;
+   */
+  headers: { [key: string]: string } = {};
+
   constructor(data?: PartialMessage<CreateDownloadLocationRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -218,6 +234,7 @@ export class CreateDownloadLocationRequest extends Message<CreateDownloadLocatio
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "native_url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "expires_in", kind: "message", T: Duration },
+    { no: 3, name: "headers", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateDownloadLocationRequest {

@@ -53,6 +53,8 @@ type SignedURLProperties struct {
 	ExpiresIn time.Duration
 	// ContentMD5 defines the expected hash of the generated file. It's strongly recommended setting it.
 	ContentMD5 string
+	// AddMetadata Add extra metadata to the signed URL if it's true.
+	AddMetadata bool
 }
 
 type SignedURLResponse struct {

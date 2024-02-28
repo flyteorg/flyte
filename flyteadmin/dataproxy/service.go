@@ -125,9 +125,10 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 
 	logger.Infof(ctx, "CreateSignedURL for", storagePath)
 	resp, err := s.dataStore.CreateSignedURL(ctx, storagePath, storage.SignedURLProperties{
-		Scope:      stow.ClientMethodPut,
-		ExpiresIn:  req.ExpiresIn.AsDuration(),
-		ContentMD5: md5,
+		Scope:       stow.ClientMethodPut,
+		ExpiresIn:   req.ExpiresIn.AsDuration(),
+		ContentMD5:  md5,
+		AddMetadata: req.AddMetadata,
 	})
 
 	if err != nil {

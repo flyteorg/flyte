@@ -229,3 +229,5 @@ replace (
 	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20230905202853-d090da108d2f
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
 )
+
+replace github.com/flyteorg/stow => github.com/pingsutw/stow v0.3.6-0.20240228091138-cafd670a5c8d
