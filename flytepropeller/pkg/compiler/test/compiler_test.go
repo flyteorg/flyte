@@ -13,8 +13,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/flyteorg/flyte/flytepropeller/pkg/visualize"
-
 	"github.com/go-test/deep"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
