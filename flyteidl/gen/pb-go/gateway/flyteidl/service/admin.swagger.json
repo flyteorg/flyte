@@ -8433,6 +8433,18 @@
             "$ref": "#/definitions/coreTaskLog"
           },
           "title": "log information for the external resource execution"
+        },
+        "output_uri": {
+          "type": "string",
+          "description": "URI to the output of the execution, it will be in a format that encodes all the information\nincluding Cloud source provider. ie., s3://..."
+        },
+        "error": {
+          "$ref": "#/definitions/coreExecutionError",
+          "title": "Error information for the execution"
+        },
+        "output_data": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "description": "Raw output data produced by this task execution."
         }
       },
       "description": "This message contains metadata about external resources produced or used by a specific task execution."
