@@ -1326,7 +1326,8 @@ func TestMergeExternalResource(t *testing.T) {
 
 	for _, mergeTestCase := range testCases {
 		t.Run(mergeTestCase.name, func(t *testing.T) {
-			actual := mergeExternalResource(mergeTestCase.existing, mergeTestCase.latest)
+			actual, err := mergeExternalResource(context.TODO(), mergeTestCase.existing, mergeTestCase.latest, nil, nil, 0, 0, nil)
+			assert.Nil(t, err)
 			assert.True(t, proto.Equal(mergeTestCase.expected, actual))
 		})
 	}
@@ -1511,7 +1512,8 @@ func TestMergeExternalResources(t *testing.T) {
 
 	for _, mergeTestCase := range testCases {
 		t.Run(mergeTestCase.name, func(t *testing.T) {
-			actual := mergeExternalResources(mergeTestCase.existing, mergeTestCase.latest)
+			actual, err := mergeExternalResources(context.TODO(), mergeTestCase.existing, mergeTestCase.latest, nil, nil, 0, 0, nil)
+			assert.Nil(t, err)
 			assert.Equal(t, len(mergeTestCase.expected), len(actual))
 			for idx, expectedExternalResource := range mergeTestCase.expected {
 				assert.True(t, proto.Equal(expectedExternalResource, actual[idx]))
@@ -1588,7 +1590,8 @@ func TestMergeMetadata(t *testing.T) {
 
 	for _, mergeTestCase := range testCases {
 		t.Run(mergeTestCase.name, func(t *testing.T) {
-			metadata := mergeMetadata(mergeTestCase.existing, mergeTestCase.latest)
+			metadata, err := mergeMetadata(context.TODO(), mergeTestCase.existing, mergeTestCase.latest, nil, nil, 0, 0, nil)
+			assert.Nil(t, err)
 			assert.True(t, proto.Equal(mergeTestCase.expected, metadata))
 		})
 	}
