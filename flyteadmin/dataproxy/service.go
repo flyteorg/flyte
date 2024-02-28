@@ -48,11 +48,13 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	// If it doesn't exist, then proceed as normal.
 
 	if len(req.Project) == 0 || len(req.Domain) == 0 {
+		logger.Errorf(ctx, "project and domain are required parameters")
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "project and domain are required parameters")
 	}
 
 	// At least one of the hash or manually given prefix must be provided.
 	if len(req.FilenameRoot) == 0 && len(req.ContentMd5) == 0 {
+		logger.Errorf(ctx, "content_md5 or filename_root is a required parameter")
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"content_md5 or filename_root is a required parameter")
 	}
@@ -62,12 +64,12 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		knownLocation, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
 			req.Project, req.Domain, req.FilenameRoot, req.Filename)
 		if err != nil {
+			logger.Errorf(ctx, "failed to create storage location. Error %v", err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create storage location, Error: %v", err)
 		}
-		logger.Infof(ctx, "knownLocation", knownLocation)
 		metadata, err := s.dataStore.Head(ctx, knownLocation)
 		if err != nil {
-			logger.Infof(ctx, "failed to head", err)
+			logger.Errorf(ctx, "failed to check if file exists at location [%s], Error: %v", knownLocation.String(), err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to check if file exists at location [%s], Error: %v", knownLocation.String(), err)
 		}
 		if metadata.Exists() {
@@ -81,14 +83,12 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 			logger.Infof(ctx, "metadata.ContentMD5() [%v]", metadata.ContentMD5())
 			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
 			if len(metadata.ContentMD5()) != 0 && base64Digest != metadata.ContentMD5() {
-				logger.Debugf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
+				logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
 			logger.Debugf(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
 		}
 	}
-
-	logger.Infof(ctx, "Kevin Kevin Kevin")
 
 	if expiresIn := req.ExpiresIn; expiresIn != nil {
 		if !expiresIn.IsValid() {
@@ -119,7 +119,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
 		req.Project, req.Domain, prefix, req.Filename)
 	if err != nil {
-		logger.Infof(ctx, "failed to create storage location", err)
+		logger.Errorf(ctx, "failed to create shardedStorageLocation. Error %v", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
 	}
 
