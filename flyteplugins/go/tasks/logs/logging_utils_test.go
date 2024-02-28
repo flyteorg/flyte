@@ -302,7 +302,7 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "Stackdriver Logs my-Suffix",
 			},
-		})
+		}, "")
 	})
 
 	t.Run("StackDriver", func(t *testing.T) {
@@ -315,11 +315,11 @@ func TestGetLogsForContainerInPod_LegacyTemplate(t *testing.T) {
 				MessageFormat: core.TaskLog_JSON,
 				Name:          "Stackdriver Logs my-Suffix",
 			},
-		})
+		}, "")
 	})
 }
 
-func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog) {
+func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.TaskTemplate, expectedTaskLogs []*core.TaskLog, hostname string) {
 	logPlugin, err := InitializeLogPlugins(config)
 	assert.NoError(tb, err)
 
@@ -334,6 +334,7 @@ func assertTestSucceeded(tb testing.TB, config *LogConfig, taskTemplate *core.Ta
 					Name: "ContainerName",
 				},
 			},
+			Hostname: hostname,
 		},
 		Status: v1.PodStatus{
 			ContainerStatuses: []v1.ContainerStatus{
@@ -381,7 +382,27 @@ func TestGetLogsForContainerInPod_Templates(t *testing.T) {
 			MessageFormat: core.TaskLog_JSON,
 			Name:          "Internal my-Suffix",
 		},
-	})
+	}, "")
+}
+
+func TestGetLogsForContainerInPodTemplates_Hostname(t *testing.T) {
+	assertTestSucceeded(t, &LogConfig{
+		Templates: []tasklog.TemplateLogPlugin{
+			{
+				DisplayName: "StackDriver",
+				TemplateURIs: []string{
+					"{{ .hostname }}/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				},
+				MessageFormat: core.TaskLog_JSON,
+			},
+		},
+	}, nil, []*core.TaskLog{
+		{
+			Uri:           "my-hostname/my-namespace/my-pod/ContainerName/ContainerID",
+			MessageFormat: core.TaskLog_JSON,
+			Name:          "StackDriver my-Suffix",
+		},
+	}, "my-hostname")
 }
 
 func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
@@ -541,7 +562,7 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs)
+			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs, "")
 		})
 	}
 }
