@@ -290,13 +290,15 @@ func mergeCustom(existing, latest *_struct.Struct) (*_struct.Struct, error) {
 
 // mergeExternalResource combines the latest ExternalResourceInfo proto with an existing instance
 // by updating fields and merging logs.
-func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.ExternalResourceInfo {
+func mergeExternalResource(ctx context.Context, existing, latest *event.ExternalResourceInfo, parentNodeExecutionID *core.NodeExecutionIdentifier, taskID *core.Identifier,
+	retryAttempt uint32, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) (*event.ExternalResourceInfo, error) {
+
 	if existing == nil {
-		return latest
+		return latest, nil
 	}
 
 	if latest == nil {
-		return existing
+		return existing, nil
 	}
 
 	if latest.ExternalId != "" && existing.ExternalId != latest.ExternalId {
@@ -317,37 +319,36 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 	if len(latest.GetOutputUri()) > 0 || latest.GetError() != nil {
 		existing.OutputResult = latest.GetOutputResult()
 	} else if latest.GetOutputData() != nil {
-		existing.OutputResult = latest.GetOutputResult()
-
 		// TODO @hamersaw - handle offloading outputs
-		/*switch inlineEventDataPolicy {
+		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			existing.OutputResult = latest.GetOutputResult()
 		default:
 			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
-				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
-				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
-				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
-				strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), OutputsObjectSuffix)
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, latest.GetOutputData(), parentNodeExecutionID.ExecutionId.Project,
+				parentNodeExecutionID.ExecutionId.Domain, parentNodeExecutionID.ExecutionId.Name, parentNodeExecutionID.NodeId, taskID.Project,
+				taskID.Domain, taskID.Name, taskID.Version, strconv.FormatUint(uint64(retryAttempt), 10), strconv.FormatUint(uint64(latest.Index), 10),
+				strconv.FormatUint(uint64(latest.RetryAttempt), 10), OutputsObjectSuffix)
 			if err != nil {
-				return err
+				return nil, err
 			}
-			closure.OutputResult = &admin.TaskExecutionClosure_OutputUri{
+			existing.OutputResult = &event.ExternalResourceInfo_OutputUri{
 				OutputUri: uri.String(),
 			}
-		}*/
+		}
 	}
 
 
-	return existing
+	return existing, nil
 }
 
 // mergeExternalResources combines lists of external resources. This involves appending new
 // resources and updating in-place resources attributes.
-func mergeExternalResources(existing, latest []*event.ExternalResourceInfo) []*event.ExternalResourceInfo {
+func mergeExternalResources(ctx context.Context, existing, latest []*event.ExternalResourceInfo, parentNodeExecutionId *core.NodeExecutionIdentifier, taskID *core.Identifier,
+	retryAttempt uint32, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) ([]*event.ExternalResourceInfo, error) {
+
 	if len(latest) == 0 {
-		return existing
+		return existing, nil
 	}
 
 	for _, externalResource := range latest {
@@ -365,7 +366,13 @@ func mergeExternalResources(existing, latest []*event.ExternalResourceInfo) []*e
 		if index >= len(existing) {
 			existing = append(existing, externalResource)
 		} else if existing[index].GetIndex() == externalResource.GetIndex() && existing[index].GetRetryAttempt() == externalResource.GetRetryAttempt() {
-			existing[index] = mergeExternalResource(existing[index], externalResource)
+			externalResource, err := mergeExternalResource(ctx, existing[index], externalResource,
+				parentNodeExecutionId, taskID, retryAttempt, inlineEventDataPolicy, storageClient)
+			if err != nil {
+				return nil, err
+			}
+
+			existing[index] = externalResource
 		} else {
 			existing = append(existing, &event.ExternalResourceInfo{})
 			copy(existing[index+1:], existing[index:])
@@ -373,24 +380,31 @@ func mergeExternalResources(existing, latest []*event.ExternalResourceInfo) []*e
 		}
 	}
 
-	return existing
+	return existing, nil
 }
 
 // mergeMetadata merges an existing TaskExecutionMetadata instance with the provided instance. This
 // includes updating non-defaulted fields and merging ExternalResources.
-func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExecutionMetadata {
+func mergeMetadata(ctx context.Context, existing, latest *event.TaskExecutionMetadata, parentNodeExecutionId *core.NodeExecutionIdentifier, taskID *core.Identifier,
+	retryAttempt uint32, inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) (*event.TaskExecutionMetadata, error) {
+
 	if existing == nil {
-		return latest
+		return latest, nil
 	}
 
 	if latest == nil {
-		return existing
+		return existing, nil
 	}
 
 	if latest.GeneratedName != "" && existing.GeneratedName != latest.GeneratedName {
 		existing.GeneratedName = latest.GeneratedName
 	}
-	existing.ExternalResources = mergeExternalResources(existing.ExternalResources, latest.ExternalResources)
+	externalResources, err := mergeExternalResources(ctx, existing.ExternalResources, latest.ExternalResources,
+		parentNodeExecutionId, taskID, retryAttempt, inlineEventDataPolicy, storageClient)
+	if err != nil {
+		return nil, err
+	}
+	existing.ExternalResources = externalResources
 	existing.ResourcePoolInfo = latest.ResourcePoolInfo
 	if latest.PluginIdentifier != "" && existing.PluginIdentifier != latest.PluginIdentifier {
 		existing.PluginIdentifier = latest.PluginIdentifier
@@ -399,7 +413,7 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 		existing.InstanceClass = latest.InstanceClass
 	}
 
-	return existing
+	return existing, nil
 }
 
 func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
@@ -466,7 +480,12 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 	if err != nil {
 		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task event custom_info with error: %v", err)
 	}
-	taskExecutionClosure.Metadata = mergeMetadata(taskExecutionClosure.Metadata, request.Event.Metadata)
+	metadata, err := mergeMetadata(ctx, taskExecutionClosure.Metadata, request.Event.Metadata,
+		request.Event.ParentNodeExecutionId, request.Event.TaskId, request.Event.RetryAttempt, inlineEventDataPolicy, storageClient)
+	if err != nil {
+		return errors.NewFlyteAdminErrorf(codes.Internal, "failed to merge task metadata with error: %v", err)
+	}
+	taskExecutionClosure.Metadata = metadata
 	if request.Event.EventVersion > taskExecutionClosure.EventVersion {
 		taskExecutionClosure.EventVersion = request.Event.EventVersion
 	}
