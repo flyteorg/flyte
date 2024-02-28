@@ -315,11 +315,11 @@ func mergeExternalResource(ctx context.Context, existing, latest *event.External
 	}
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
 
-	// TODO @hamersaw - docs
+	// set ouptut metadata if exists
 	if len(latest.GetOutputUri()) > 0 || latest.GetError() != nil {
 		existing.OutputResult = latest.GetOutputResult()
 	} else if latest.GetOutputData() != nil {
-		// TODO @hamersaw - handle offloading outputs
+		// handle offloading outputs if inlineEventDataPolicy dictates
 		switch inlineEventDataPolicy {
 		case interfaces.InlineEventDataPolicyStoreInline:
 			existing.OutputResult = latest.GetOutputResult()
