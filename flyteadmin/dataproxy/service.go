@@ -129,7 +129,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		Scope:       stow.ClientMethodPut,
 		ExpiresIn:   req.ExpiresIn.AsDuration(),
 		ContentMD5:  md5,
-		AddMetadata: true,
+		AddMetadata: req.AddMetadata,
 	})
 
 	if err != nil {
