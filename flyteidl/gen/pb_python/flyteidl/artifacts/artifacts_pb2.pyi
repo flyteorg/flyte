@@ -88,12 +88,12 @@ class ArtifactSpec(_message.Message):
     def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
 
 class Trigger(_message.Message):
-    __slots__ = ["trigger_id", "triggers"]
-    TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
-    TRIGGERS_FIELD_NUMBER: _ClassVar[int]
-    trigger_id: _identifier_pb2.Identifier
-    triggers: _containers.RepeatedCompositeFieldContainer[_artifact_id_pb2.ArtifactID]
-    def __init__(self, trigger_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., triggers: _Optional[_Iterable[_Union[_artifact_id_pb2.ArtifactID, _Mapping]]] = ...) -> None: ...
+    __slots__ = ["trigger", "trigger_inputs"]
+    TRIGGER_FIELD_NUMBER: _ClassVar[int]
+    TRIGGER_INPUTS_FIELD_NUMBER: _ClassVar[int]
+    trigger: _artifact_id_pb2.ArtifactID
+    trigger_inputs: _interface_pb2.ParameterMap
+    def __init__(self, trigger: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., trigger_inputs: _Optional[_Union[_interface_pb2.ParameterMap, _Mapping]] = ...) -> None: ...
 
 class CreateArtifactResponse(_message.Message):
     __slots__ = ["artifact"]
@@ -176,6 +176,16 @@ class AddTagRequest(_message.Message):
     def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ..., value: _Optional[str] = ..., overwrite: bool = ...) -> None: ...
 
 class AddTagResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
+class ActivateTriggerRequest(_message.Message):
+    __slots__ = ["trigger_id"]
+    TRIGGER_ID_FIELD_NUMBER: _ClassVar[int]
+    trigger_id: _identifier_pb2.Identifier
+    def __init__(self, trigger_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ...) -> None: ...
+
+class ActivateTriggerResponse(_message.Message):
     __slots__ = []
     def __init__(self) -> None: ...
 

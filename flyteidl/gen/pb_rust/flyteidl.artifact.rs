@@ -76,13 +76,11 @@ pub struct ArtifactSpec {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct Trigger {
-    /// This will be set to a launch plan type, but note that this is different than the actual launch plan type.
+    /// This is a partial artifact ID that will be triggered on
     #[prost(message, optional, tag="1")]
-    pub trigger_id: ::core::option::Option<super::core::Identifier>,
-    /// These are partial artifact IDs that will be triggered on
-    /// Consider making these ArtifactQuery instead.
-    #[prost(message, repeated, tag="2")]
-    pub triggers: ::prost::alloc::vec::Vec<super::core::ArtifactId>,
+    pub trigger: ::core::option::Option<super::core::ArtifactId>,
+    #[prost(message, optional, tag="2")]
+    pub trigger_inputs: ::core::option::Option<super::core::ParameterMap>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -203,6 +201,16 @@ pub struct AddTagResponse {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ActivateTriggerRequest {
+    #[prost(message, optional, tag="1")]
+    pub trigger_id: ::core::option::Option<super::core::Identifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ActivateTriggerResponse {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct CreateTriggerRequest {
     #[prost(message, optional, tag="1")]
     pub trigger_launch_plan: ::core::option::Option<super::admin::LaunchPlan>,
@@ -214,6 +222,7 @@ pub struct CreateTriggerResponse {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct DeactivateTriggerRequest {
+    /// Note that Trigger IDs are now 1:1 with Launch Plan IDs
     #[prost(message, optional, tag="1")]
     pub trigger_id: ::core::option::Option<super::core::Identifier>,
 }

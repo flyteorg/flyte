@@ -1183,7 +1183,6 @@ var NoopMigrations = []*gormigrate.Migration{
 }
 
 var UnionMigrations = []*gormigrate.Migration{
-
 	{
 		ID: "2024-01-01-org-primary-key",
 		Migrate: func(tx *gorm.DB) error {
@@ -1195,7 +1194,47 @@ var UnionMigrations = []*gormigrate.Migration{
 	},
 }
 
-var Migrations = append(LegacyMigrations, append(NoopMigrations, UnionMigrations...)...)
+// ContinuedMigrations - Above are a series of migrations labeled as no-op migrations. These are migrations that we
+// wrote to bring the then-existing migrations up to the Gorm standard, which is to write from scratch, each struct
+// that we want auto-migrated, inside each function. Previously we had not been doing that. The idea is that we will
+// one day delete the migrations prior to the no-op series. New migrations should continue in this array here, again
+// using the proper Gorm methodology of including the struct definitions inside each migration function.
+var ContinuedMigrations = []*gormigrate.Migration{
+	{
+		ID: "pg-continue-2024-02-launchplan",
+		Migrate: func(tx *gorm.DB) error {
+			type LaunchPlanScheduleType string
+			type LaunchConditionType string
+
+			type LaunchPlan struct {
+				ID         uint       `gorm:"index;autoIncrement;not null"`
+				CreatedAt  time.Time  `gorm:"type:time"`
+				UpdatedAt  time.Time  `gorm:"type:time"`
+				DeletedAt  *time.Time `gorm:"index"`
+				Project    string     `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
+				Domain     string     `gorm:"primary_key;index:lp_project_domain_name_idx,lp_project_domain_idx" valid:"length(0|255)"`
+				Name       string     `gorm:"primary_key;index:lp_project_domain_name_idx" valid:"length(0|255)"`
+				Version    string     `gorm:"primary_key" valid:"length(0|255)"`
+				Spec       []byte     `gorm:"not null"`
+				WorkflowID uint       `gorm:"index"`
+				Closure    []byte     `gorm:"not null"`
+				// GORM doesn't save the zero value for ints, so we use a pointer for the State field
+				State *int32 `gorm:"default:0"`
+				// Hash of the launch plan
+				Digest       []byte
+				ScheduleType LaunchPlanScheduleType
+				// store the type of event that this launch plan is triggered by, can be empty, or SCHED
+				LaunchConditionType *LaunchConditionType `gorm:"type:varchar(32);index:idx_launch_plans_launch_conditions,where:launch_condition_type is not null"`
+			}
+			return tx.AutoMigrate(&LaunchPlan{})
+		},
+		Rollback: func(tx *gorm.DB) error {
+			return tx.Table("launch_plans").Migrator().DropColumn(&models.LaunchPlan{}, "launch_condition_type")
+		},
+	},
+}
+
+var Migrations = append(LegacyMigrations, append(NoopMigrations, append(ContinuedMigrations, UnionMigrations...)...)...)
 
 func alterTableColumnType(db *sql.DB, columnName, columnType string) error {
 	var err error

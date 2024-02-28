@@ -71,6 +71,38 @@ func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.Laun
 	return nil
 }
 
+func (a *ArtifactRegistry) ActivateTrigger(ctx context.Context, identifier *core.Identifier) error {
+	if a == nil || a.client == nil {
+		logger.Debugf(ctx, "Artifact client not configured, skipping activate [%+v]", identifier)
+		return fmt.Errorf("artifact client not configured")
+	}
+	_, err := a.client.ActivateTrigger(ctx, &artifacts.ActivateTriggerRequest{
+		TriggerId: identifier,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed to activate trigger [%+v] err: %v", identifier, err)
+		return err
+	}
+	logger.Debugf(ctx, "Activated trigger [%+v]", identifier)
+	return nil
+}
+
+func (a *ArtifactRegistry) DeactivateTrigger(ctx context.Context, identifier *core.Identifier) error {
+	if a == nil || a.client == nil {
+		logger.Debugf(ctx, "Artifact client not configured, skipping deactivate [%+v]", identifier)
+		return fmt.Errorf("artifact client not configured")
+	}
+	_, err := a.client.DeactivateTrigger(ctx, &artifacts.DeactivateTriggerRequest{
+		TriggerId: identifier,
+	})
+	if err != nil {
+		logger.Errorf(ctx, "Failed to deactivate trigger [%+v] err: %v", identifier, err)
+		return err
+	}
+	logger.Debugf(ctx, "Deactivated trigger [%+v]", identifier)
+	return nil
+}
+
 func (a *ArtifactRegistry) GetClient() artifacts.ArtifactRegistryClient {
 	if a == nil {
 		return nil

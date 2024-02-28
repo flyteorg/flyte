@@ -18,8 +18,6 @@ message ArtifactKey {
 
 // Only valid for triggers
 message ArtifactBindingData {
-  uint32 index = 1;
-
   // These two fields are only relevant in the partition value case
   oneof partition_data {
     string partition_key = 2;

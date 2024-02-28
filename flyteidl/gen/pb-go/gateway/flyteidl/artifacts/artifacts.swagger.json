@@ -142,6 +142,38 @@
         ]
       }
     },
+    "/artifacts/api/v1/trigger/activate": {
+      "post": {
+        "operationId": "ArtifactRegistry_ActivateTrigger",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/artifactActivateTriggerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/artifactActivateTriggerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ArtifactRegistry"
+        ]
+      }
+    },
     "/artifacts/api/v1/trigger/deactivate": {
       "patch": {
         "operationId": "ArtifactRegistry_DeactivateTrigger",
@@ -275,13 +307,6 @@
             "required": false,
             "type": "string",
             "format": "date-time"
-          },
-          {
-            "name": "artifact_id.time_partition.value.triggered_binding.index",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "format": "int64"
           },
           {
             "name": "artifact_id.time_partition.value.triggered_binding.partition_key",
@@ -726,6 +751,17 @@
       },
       "description": "Defines a slack notification specification."
     },
+    "artifactActivateTriggerRequest": {
+      "type": "object",
+      "properties": {
+        "trigger_id": {
+          "$ref": "#/definitions/coreIdentifier"
+        }
+      }
+    },
+    "artifactActivateTriggerResponse": {
+      "type": "object"
+    },
     "artifactArtifactConsumer": {
       "type": "object",
       "properties": {
@@ -823,7 +859,8 @@
       "type": "object",
       "properties": {
         "trigger_id": {
-          "$ref": "#/definitions/coreIdentifier"
+          "$ref": "#/definitions/coreIdentifier",
+          "title": "Note that Trigger IDs are now 1:1 with Launch Plan IDs"
         }
       }
     },
@@ -920,10 +957,6 @@
     "coreArtifactBindingData": {
       "type": "object",
       "properties": {
-        "index": {
-          "type": "integer",
-          "format": "int64"
-        },
         "partition_key": {
           "type": "string"
         },

@@ -34,6 +34,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.CreateTriggerRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.CreateTriggerResponse.FromString,
                 )
+        self.ActivateTrigger = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/ActivateTrigger',
+                request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ActivateTriggerRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ActivateTriggerResponse.FromString,
+                )
         self.DeactivateTrigger = channel.unary_unary(
                 '/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger',
                 request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateTriggerRequest.SerializeToString,
@@ -98,6 +103,12 @@ class ArtifactRegistryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def CreateTrigger(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ActivateTrigger(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -173,6 +184,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.CreateTrigger,
                     request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.CreateTriggerRequest.FromString,
                     response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.CreateTriggerResponse.SerializeToString,
+            ),
+            'ActivateTrigger': grpc.unary_unary_rpc_method_handler(
+                    servicer.ActivateTrigger,
+                    request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ActivateTriggerRequest.FromString,
+                    response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.ActivateTriggerResponse.SerializeToString,
             ),
             'DeactivateTrigger': grpc.unary_unary_rpc_method_handler(
                     servicer.DeactivateTrigger,
@@ -289,6 +305,23 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/CreateTrigger',
             flyteidl_dot_artifacts_dot_artifacts__pb2.CreateTriggerRequest.SerializeToString,
             flyteidl_dot_artifacts_dot_artifacts__pb2.CreateTriggerResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ActivateTrigger(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/ActivateTrigger',
+            flyteidl_dot_artifacts_dot_artifacts__pb2.ActivateTriggerRequest.SerializeToString,
+            flyteidl_dot_artifacts_dot_artifacts__pb2.ActivateTriggerResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -9,8 +9,8 @@ import { ArtifactID, ArtifactKey, ArtifactQuery, Partitions } from "../core/arti
 import { Identifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { Literal } from "../core/literals_pb.js";
 import { LiteralType } from "../core/types_pb.js";
-import { LaunchPlan } from "../admin/launch_plan_pb.js";
 import { ParameterMap, VariableMap } from "../core/interface_pb.js";
+import { LaunchPlan } from "../admin/launch_plan_pb.js";
 
 /**
  * @generated from message flyteidl.artifact.Artifact
@@ -320,19 +320,16 @@ export class ArtifactSpec extends Message<ArtifactSpec> {
  */
 export class Trigger extends Message<Trigger> {
   /**
-   * This will be set to a launch plan type, but note that this is different than the actual launch plan type.
+   * This is a partial artifact ID that will be triggered on
    *
-   * @generated from field: flyteidl.core.Identifier trigger_id = 1;
+   * @generated from field: flyteidl.core.ArtifactID trigger = 1;
    */
-  triggerId?: Identifier;
+  trigger?: ArtifactID;
 
   /**
-   * These are partial artifact IDs that will be triggered on
-   * Consider making these ArtifactQuery instead.
-   *
-   * @generated from field: repeated flyteidl.core.ArtifactID triggers = 2;
+   * @generated from field: flyteidl.core.ParameterMap trigger_inputs = 2;
    */
-  triggers: ArtifactID[] = [];
+  triggerInputs?: ParameterMap;
 
   constructor(data?: PartialMessage<Trigger>) {
     super();
@@ -342,8 +339,8 @@ export class Trigger extends Message<Trigger> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.artifact.Trigger";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "trigger_id", kind: "message", T: Identifier },
-    { no: 2, name: "triggers", kind: "message", T: ArtifactID, repeated: true },
+    { no: 1, name: "trigger", kind: "message", T: ArtifactID },
+    { no: 2, name: "trigger_inputs", kind: "message", T: ParameterMap },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Trigger {
@@ -806,6 +803,74 @@ export class AddTagResponse extends Message<AddTagResponse> {
 }
 
 /**
+ * @generated from message flyteidl.artifact.ActivateTriggerRequest
+ */
+export class ActivateTriggerRequest extends Message<ActivateTriggerRequest> {
+  /**
+   * @generated from field: flyteidl.core.Identifier trigger_id = 1;
+   */
+  triggerId?: Identifier;
+
+  constructor(data?: PartialMessage<ActivateTriggerRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.ActivateTriggerRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "trigger_id", kind: "message", T: Identifier },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ActivateTriggerRequest {
+    return new ActivateTriggerRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ActivateTriggerRequest {
+    return new ActivateTriggerRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ActivateTriggerRequest {
+    return new ActivateTriggerRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ActivateTriggerRequest | PlainMessage<ActivateTriggerRequest> | undefined, b: ActivateTriggerRequest | PlainMessage<ActivateTriggerRequest> | undefined): boolean {
+    return proto3.util.equals(ActivateTriggerRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.artifact.ActivateTriggerResponse
+ */
+export class ActivateTriggerResponse extends Message<ActivateTriggerResponse> {
+  constructor(data?: PartialMessage<ActivateTriggerResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.ActivateTriggerResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ActivateTriggerResponse {
+    return new ActivateTriggerResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ActivateTriggerResponse {
+    return new ActivateTriggerResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ActivateTriggerResponse {
+    return new ActivateTriggerResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ActivateTriggerResponse | PlainMessage<ActivateTriggerResponse> | undefined, b: ActivateTriggerResponse | PlainMessage<ActivateTriggerResponse> | undefined): boolean {
+    return proto3.util.equals(ActivateTriggerResponse, a, b);
+  }
+}
+
+/**
  * @generated from message flyteidl.artifact.CreateTriggerRequest
  */
 export class CreateTriggerRequest extends Message<CreateTriggerRequest> {
@@ -878,6 +943,8 @@ export class CreateTriggerResponse extends Message<CreateTriggerResponse> {
  */
 export class DeactivateTriggerRequest extends Message<DeactivateTriggerRequest> {
   /**
+   * Note that Trigger IDs are now 1:1 with Launch Plan IDs
+   *
    * @generated from field: flyteidl.core.Identifier trigger_id = 1;
    */
   triggerId?: Identifier;

@@ -30,6 +30,7 @@ import (
 type launchPlanMetrics struct {
 	Scope                 promutils.Scope
 	FailedScheduleUpdates prometheus.Counter
+	FailedTriggerUpdates  prometheus.Counter
 	SpecSizeBytes         prometheus.Summary
 	ClosureSizeBytes      prometheus.Summary
 }
@@ -99,7 +100,7 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		if err != nil {
 			return nil, err
 		}
-		return &admin.LaunchPlanCreateResponse{}, nil
+		logger.Debugf(ctx, "successfully registered trigger launch plan, continuing %v", launchPlan.Id)
 	}
 
 	existingLaunchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *request.Id)
@@ -285,6 +286,19 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 			return nil, err
 		}
 	}
+
+	// Send off activeness to trigger engine here, like we do for schedules above
+	if m.config.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		if launchPlanModel.LaunchConditionType != nil && *launchPlanModel.LaunchConditionType == models.LaunchConditionTypeARTIFACT {
+			err = m.artifactRegistry.DeactivateTrigger(ctx, request.Id)
+			if err != nil {
+				logger.Debugf(ctx, "failed to deactivate trigger for launch plan [%+v] with err: %v", request.Id, err)
+				m.metrics.FailedTriggerUpdates.Inc()
+				return nil, err
+			}
+		}
+	}
+
 	err = m.db.LaunchPlanRepo().Update(ctx, launchPlanModel)
 	if err != nil {
 		logger.Debugf(ctx, "Failed to update launchPlanModel with ID [%+v] with err %v", request.Id, err)
@@ -292,6 +306,43 @@ func (m *LaunchPlanManager) disableLaunchPlan(ctx context.Context, request admin
 	}
 	logger.Debugf(ctx, "disabled launch plan: [%+v]", request.Id)
 	return &admin.LaunchPlanUpdateResponse{}, nil
+}
+
+func (m *LaunchPlanManager) updateTriggers(ctx context.Context, newlyActiveLaunchPlan models.LaunchPlan, formerlyActiveLaunchPlan *models.LaunchPlan) error {
+	var err error
+
+	if newlyActiveLaunchPlan.LaunchConditionType != nil && *newlyActiveLaunchPlan.LaunchConditionType == models.LaunchConditionTypeARTIFACT {
+		newID := &core.Identifier{
+			Org:     newlyActiveLaunchPlan.Org,
+			Project: newlyActiveLaunchPlan.Project,
+			Domain:  newlyActiveLaunchPlan.Domain,
+			Name:    newlyActiveLaunchPlan.Name,
+			Version: newlyActiveLaunchPlan.Version,
+		}
+		err = m.artifactRegistry.ActivateTrigger(ctx, newID)
+		if err != nil {
+			logger.Infof(ctx, "failed to activate launch plan trigger [%+v] err: %v", newID, err)
+			return err
+		}
+	}
+
+	// Also update the old one, similar to schedule
+	if formerlyActiveLaunchPlan != nil && formerlyActiveLaunchPlan.LaunchConditionType != nil && *formerlyActiveLaunchPlan.LaunchConditionType == models.LaunchConditionTypeARTIFACT {
+		formerID := core.Identifier{
+			Org:     formerlyActiveLaunchPlan.Org,
+			Project: formerlyActiveLaunchPlan.Project,
+			Domain:  formerlyActiveLaunchPlan.Domain,
+			Name:    formerlyActiveLaunchPlan.Name,
+			Version: formerlyActiveLaunchPlan.Version,
+		}
+		err = m.artifactRegistry.DeactivateTrigger(ctx, &formerID)
+		if err != nil {
+			logger.Infof(ctx, "failed to deactivate launch plan trigger [%+v] err: %v", formerlyActiveLaunchPlan.LaunchPlanKey, err)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
@@ -346,6 +397,16 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 		return nil, err
 	}
 
+	// Send off activeness to trigger engine here, like we do for schedules above, but only if the type is of trigger.
+	if m.config.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		err = m.updateTriggers(ctx, newlyActiveLaunchPlanModel, formerlyActiveLaunchPlanModel)
+		if err != nil {
+			m.metrics.FailedTriggerUpdates.Inc()
+			logger.Debugf(ctx, "failed to update trigger for launch plan [%+v] with err: %v", request.Id, err)
+			return nil, err
+		}
+	}
+
 	// This operation is takes in the (formerly) active launch plan version as only one version can be active at a time.
 	// Setting the desired launch plan to active also requires disabling the existing active launch plan version.
 	err = m.db.LaunchPlanRepo().SetActive(ctx, newlyActiveLaunchPlanModel, formerlyActiveLaunchPlanModel)
@@ -354,8 +415,8 @@ func (m *LaunchPlanManager) enableLaunchPlan(ctx context.Context, request admin.
 			"Failed to set launchPlanModel with ID [%+v] to active with err %v", request.Id, err)
 		return nil, err
 	}
-	return &admin.LaunchPlanUpdateResponse{}, nil
 
+	return &admin.LaunchPlanUpdateResponse{}, nil
 }
 
 func (m *LaunchPlanManager) UpdateLaunchPlan(ctx context.Context, request admin.LaunchPlanUpdateRequest) (
@@ -586,8 +647,9 @@ func NewLaunchPlanManager(
 		Scope: scope,
 		FailedScheduleUpdates: scope.MustNewCounter("failed_schedule_updates",
 			"count of unsuccessful attempts to update the schedules when updating launch plan version"),
-		SpecSizeBytes:    scope.MustNewSummary("spec_size_bytes", "size in bytes of serialized launch plan spec"),
-		ClosureSizeBytes: scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized launch plan closure"),
+		FailedTriggerUpdates: scope.MustNewCounter("failed_trigger_updates", "count of failed attempts to activate/deactivate triggers"),
+		SpecSizeBytes:        scope.MustNewSummary("spec_size_bytes", "size in bytes of serialized launch plan spec"),
+		ClosureSizeBytes:     scope.MustNewSummary("closure_size_bytes", "size in bytes of serialized launch plan closure"),
 	}
 	return &LaunchPlanManager{
 		db:               db,

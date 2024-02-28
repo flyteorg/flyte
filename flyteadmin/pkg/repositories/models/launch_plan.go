@@ -20,7 +20,17 @@ const (
 	LaunchPlanScheduleTypeRATE LaunchPlanScheduleType = "RATE"
 )
 
-// Database model to encapsulate a launch plan.
+type LaunchConditionType string
+
+const (
+	// LaunchConditionTypeSCHED is the const representing the launch plan has a CRON type of schedule
+	LaunchConditionTypeSCHED LaunchConditionType = "SCHED"
+
+	// LaunchConditionTypeARTIFACT means this launch plan can be kicked off by the trigger engine in artifacts service
+	LaunchConditionTypeARTIFACT LaunchConditionType = "ARTIFACT"
+)
+
+// LaunchPlan Database model to encapsulate a launch plan.
 type LaunchPlan struct {
 	BaseModel
 	LaunchPlanKey
@@ -30,8 +40,9 @@ type LaunchPlan struct {
 	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
 	State *int32 `gorm:"default:0"`
 	// Hash of the launch plan
-	Digest       []byte
-	ScheduleType LaunchPlanScheduleType
+	Digest              []byte
+	ScheduleType        LaunchPlanScheduleType
+	LaunchConditionType *LaunchConditionType `gorm:"type:varchar(32);index:idx_launch_plans_launch_conditions,where:launch_condition_type is not null"`
 }
 
 var LaunchPlanColumns = modelColumns(LaunchPlan{})

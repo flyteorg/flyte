@@ -78,9 +78,6 @@ export namespace flyteidl {
         /** Properties of an ArtifactBindingData. */
         interface IArtifactBindingData {
 
-            /** ArtifactBindingData index */
-            index?: (number|null);
-
             /** ArtifactBindingData partitionKey */
             partitionKey?: (string|null);
 
@@ -99,9 +96,6 @@ export namespace flyteidl {
              * @param [properties] Properties to set
              */
             constructor(properties?: flyteidl.core.IArtifactBindingData);
-
-            /** ArtifactBindingData index. */
-            public index: number;
 
             /** ArtifactBindingData partitionKey. */
             public partitionKey: string;
@@ -13285,7 +13279,8 @@ export namespace flyteidl {
                 SYSTEM = 2,
                 RELAUNCH = 3,
                 CHILD_WORKFLOW = 4,
-                RECOVERED = 5
+                RECOVERED = 5,
+                TRIGGER = 6
             }
         }
 

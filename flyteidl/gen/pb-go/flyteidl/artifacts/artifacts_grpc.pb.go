@@ -23,6 +23,7 @@ const (
 	ArtifactRegistry_GetArtifact_FullMethodName           = "/flyteidl.artifact.ArtifactRegistry/GetArtifact"
 	ArtifactRegistry_SearchArtifacts_FullMethodName       = "/flyteidl.artifact.ArtifactRegistry/SearchArtifacts"
 	ArtifactRegistry_CreateTrigger_FullMethodName         = "/flyteidl.artifact.ArtifactRegistry/CreateTrigger"
+	ArtifactRegistry_ActivateTrigger_FullMethodName       = "/flyteidl.artifact.ArtifactRegistry/ActivateTrigger"
 	ArtifactRegistry_DeactivateTrigger_FullMethodName     = "/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger"
 	ArtifactRegistry_DeactivateAllTriggers_FullMethodName = "/flyteidl.artifact.ArtifactRegistry/DeactivateAllTriggers"
 	ArtifactRegistry_AddTag_FullMethodName                = "/flyteidl.artifact.ArtifactRegistry/AddTag"
@@ -41,6 +42,7 @@ type ArtifactRegistryClient interface {
 	GetArtifact(ctx context.Context, in *GetArtifactRequest, opts ...grpc.CallOption) (*GetArtifactResponse, error)
 	SearchArtifacts(ctx context.Context, in *SearchArtifactsRequest, opts ...grpc.CallOption) (*SearchArtifactsResponse, error)
 	CreateTrigger(ctx context.Context, in *CreateTriggerRequest, opts ...grpc.CallOption) (*CreateTriggerResponse, error)
+	ActivateTrigger(ctx context.Context, in *ActivateTriggerRequest, opts ...grpc.CallOption) (*ActivateTriggerResponse, error)
 	DeactivateTrigger(ctx context.Context, in *DeactivateTriggerRequest, opts ...grpc.CallOption) (*DeactivateTriggerResponse, error)
 	DeactivateAllTriggers(ctx context.Context, in *DeactivateAllTriggersRequest, opts ...grpc.CallOption) (*DeactivateAllTriggersResponse, error)
 	AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error)
@@ -89,6 +91,15 @@ func (c *artifactRegistryClient) SearchArtifacts(ctx context.Context, in *Search
 func (c *artifactRegistryClient) CreateTrigger(ctx context.Context, in *CreateTriggerRequest, opts ...grpc.CallOption) (*CreateTriggerResponse, error) {
 	out := new(CreateTriggerResponse)
 	err := c.cc.Invoke(ctx, ArtifactRegistry_CreateTrigger_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *artifactRegistryClient) ActivateTrigger(ctx context.Context, in *ActivateTriggerRequest, opts ...grpc.CallOption) (*ActivateTriggerResponse, error) {
+	out := new(ActivateTriggerResponse)
+	err := c.cc.Invoke(ctx, ArtifactRegistry_ActivateTrigger_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -175,6 +186,7 @@ type ArtifactRegistryServer interface {
 	GetArtifact(context.Context, *GetArtifactRequest) (*GetArtifactResponse, error)
 	SearchArtifacts(context.Context, *SearchArtifactsRequest) (*SearchArtifactsResponse, error)
 	CreateTrigger(context.Context, *CreateTriggerRequest) (*CreateTriggerResponse, error)
+	ActivateTrigger(context.Context, *ActivateTriggerRequest) (*ActivateTriggerResponse, error)
 	DeactivateTrigger(context.Context, *DeactivateTriggerRequest) (*DeactivateTriggerResponse, error)
 	DeactivateAllTriggers(context.Context, *DeactivateAllTriggersRequest) (*DeactivateAllTriggersResponse, error)
 	AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error)
@@ -200,6 +212,9 @@ func (UnimplementedArtifactRegistryServer) SearchArtifacts(context.Context, *Sea
 }
 func (UnimplementedArtifactRegistryServer) CreateTrigger(context.Context, *CreateTriggerRequest) (*CreateTriggerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTrigger not implemented")
+}
+func (UnimplementedArtifactRegistryServer) ActivateTrigger(context.Context, *ActivateTriggerRequest) (*ActivateTriggerResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ActivateTrigger not implemented")
 }
 func (UnimplementedArtifactRegistryServer) DeactivateTrigger(context.Context, *DeactivateTriggerRequest) (*DeactivateTriggerResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateTrigger not implemented")
@@ -305,6 +320,24 @@ func _ArtifactRegistry_CreateTrigger_Handler(srv interface{}, ctx context.Contex
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ArtifactRegistryServer).CreateTrigger(ctx, req.(*CreateTriggerRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArtifactRegistry_ActivateTrigger_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ActivateTriggerRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactRegistryServer).ActivateTrigger(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactRegistry_ActivateTrigger_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactRegistryServer).ActivateTrigger(ctx, req.(*ActivateTriggerRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -475,6 +508,10 @@ var ArtifactRegistry_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateTrigger",
 			Handler:    _ArtifactRegistry_CreateTrigger_Handler,
+		},
+		{
+			MethodName: "ActivateTrigger",
+			Handler:    _ArtifactRegistry_ActivateTrigger_Handler,
 		},
 		{
 			MethodName: "DeactivateTrigger",

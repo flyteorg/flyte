@@ -78,12 +78,10 @@ message ArtifactSpec {
 }
 
 message Trigger {
-  // This will be set to a launch plan type, but note that this is different than the actual launch plan type.
-  core.Identifier trigger_id = 1;
+  // This is a partial artifact ID that will be triggered on
+  core.ArtifactID trigger = 1;
 
-  // These are partial artifact IDs that will be triggered on
-  // Consider making these ArtifactQuery instead.
-  repeated core.ArtifactID triggers = 2;
+  core.ParameterMap trigger_inputs = 2;
 }
 
 
@@ -160,6 +158,12 @@ message AddTagRequest {
 
 message AddTagResponse {}
 
+message ActivateTriggerRequest {
+  core.Identifier trigger_id = 1;
+}
+
+message ActivateTriggerResponse {}
+
 message CreateTriggerRequest {
   admin.LaunchPlan trigger_launch_plan = 1;
 }
@@ -167,6 +171,7 @@ message CreateTriggerRequest {
 message CreateTriggerResponse {}
 
 message DeactivateTriggerRequest {
+  // Note that Trigger IDs are now 1:1 with Launch Plan IDs
   core.Identifier trigger_id = 1;
 }
 
@@ -238,6 +243,13 @@ service ArtifactRegistry {
   }
 
   rpc CreateTrigger (CreateTriggerRequest) returns (CreateTriggerResponse) {}
+
+  rpc ActivateTrigger (ActivateTriggerRequest) returns (ActivateTriggerResponse) {
+    option (google.api.http) = {
+      post: "/artifacts/api/v1/trigger/activate"
+      body: "*"
+    };
+  }
 
   rpc DeactivateTrigger (DeactivateTriggerRequest) returns (DeactivateTriggerResponse) {
     option (google.api.http) = {

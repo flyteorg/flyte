@@ -3,6 +3,8 @@ package validation
 import (
 	"context"
 
+
+	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -11,6 +13,7 @@ import (
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler/validators"
 )
@@ -54,11 +57,21 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := validateSchedule(request, expectedInputs); err != nil {
 		return err
 	}
+
 	// Augment default inputs with the unbound workflow inputs.
 	request.Spec.DefaultInputs = expectedInputs
 	if request.Spec.EntityMetadata != nil {
 		if err := validateNotifications(request.Spec.EntityMetadata.Notifications); err != nil {
 			return err
+		}
+		if request.GetSpec().GetEntityMetadata().GetLaunchConditions() != nil {
+			// Rather than returning an error if present like we do in oss, let's check to make sure it's the of
+			// the right type and continue.
+			idlTrigger := artifacts.Trigger{}
+			err = ptypes.UnmarshalAny(request.GetSpec().GetEntityMetadata().GetLaunchConditions(), &idlTrigger)
+			if err != nil {
+				return errors.NewFlyteAdminError(codes.InvalidArgument, "failed to unmarshal spec")
+			}
 		}
 	}
 	return nil

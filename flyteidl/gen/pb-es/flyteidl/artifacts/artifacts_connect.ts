@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddTagRequest, AddTagResponse, CreateArtifactRequest, CreateArtifactResponse, CreateTriggerRequest, CreateTriggerResponse, DeactivateAllTriggersRequest, DeactivateAllTriggersResponse, DeactivateTriggerRequest, DeactivateTriggerResponse, ExecutionInputsRequest, ExecutionInputsResponse, FindByWorkflowExecRequest, GetArtifactRequest, GetArtifactResponse, ListUsageRequest, ListUsageResponse, RegisterConsumerRequest, RegisterProducerRequest, RegisterResponse, SearchArtifactsRequest, SearchArtifactsResponse } from "./artifacts_pb.js";
+import { ActivateTriggerRequest, ActivateTriggerResponse, AddTagRequest, AddTagResponse, CreateArtifactRequest, CreateArtifactResponse, CreateTriggerRequest, CreateTriggerResponse, DeactivateAllTriggersRequest, DeactivateAllTriggersResponse, DeactivateTriggerRequest, DeactivateTriggerResponse, ExecutionInputsRequest, ExecutionInputsResponse, FindByWorkflowExecRequest, GetArtifactRequest, GetArtifactResponse, ListUsageRequest, ListUsageResponse, RegisterConsumerRequest, RegisterProducerRequest, RegisterResponse, SearchArtifactsRequest, SearchArtifactsResponse } from "./artifacts_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -46,6 +46,15 @@ export const ArtifactRegistry = {
       name: "CreateTrigger",
       I: CreateTriggerRequest,
       O: CreateTriggerResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc flyteidl.artifact.ArtifactRegistry.ActivateTrigger
+     */
+    activateTrigger: {
+      name: "ActivateTrigger",
+      I: ActivateTriggerRequest,
+      O: ActivateTriggerResponse,
       kind: MethodKind.Unary,
     },
     /**
