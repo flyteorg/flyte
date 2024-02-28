@@ -205,6 +205,8 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/json", &runtime.JSONPb{
 		MarshalOptions: protojson.MarshalOptions{
 			UseProtoNames: true,
+			EmitUnpopulated: true,
+			EmitDefaultValues: true,
 		},
 	}))
 
