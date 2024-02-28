@@ -30,6 +30,11 @@ jobs:
       - uses: actions/setup-python@v3
         with:
           python-version: 3.11
+      - id: load-docker-cache-cacheservice
+        uses: actions/cache@v3
+        with:
+          path: /tmp/tmp/docker-images-cacheservice
+          key: ${{ inputs.cache_key }}-cacheservice
       - id: load-docker-cache-datacatalog
         uses: actions/cache@v3
         with:
@@ -52,6 +57,7 @@ jobs:
           key: ${{ inputs.cache_key }}-flytepropeller
       - name: Create Sandbox Cluster
         run: |
+          cp /tmp/tmp/docker-images-cacheservice/snapshot-cacheservice.tar snapshot-cacheservice.tar
           cp /tmp/tmp/docker-images-datacatalog/snapshot-datacatalog.tar snapshot-datacatalog.tar
           cp /tmp/tmp/docker-images-flyteadmin/snapshot-flyteadmin.tar snapshot-flyteadmin.tar
           cp /tmp/tmp/docker-images-flytecopilot/snapshot-flytecopilot.tar snapshot-flytecopilot.tar
@@ -60,6 +66,7 @@ jobs:
           flytectl sandbox start --source=$(pwd)
       - name: Prime docker cache
         run: |
+          flytectl sandbox exec -- docker load -i /root/snapshot-cacheservice.tar
           flytectl sandbox exec -- docker load -i /root/snapshot-datacatalog.tar
           flytectl sandbox exec -- docker load -i /root/snapshot-flyteadmin.tar
           flytectl sandbox exec -- docker load -i /root/snapshot-flytecopilot.tar
@@ -107,10 +114,11 @@ jobs:
         run: |
           flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
           flytectl sandbox exec -- helm repo update
-          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
+          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest,cacheservice.image.repository=${{ github.repository_owner }}/cacheservice,cacheservice.image.tag=latest
           # TODO(monorepo): the following commands are not correct.
           # we have to separate the calls to replace the images into different commands.
           # flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait \
+          #   --set cacheservice.image.repository=${{ github.repository_owner }}/cacheservice,cacheservice.image.tag=latest
           #   --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
           #   --set flyteadmin.image.repository=${{ github.repository_owner }}/datacalog,flyteadmin.image.tag=latest
           #   --set flytecopilot.image.repository=${{ github.repository_owner }}/datacalog,flytecopilot.image.tag=latest

@@ -108,6 +108,7 @@ build_native_flyte:
 .PHONY: go-tidy
 go-tidy:
 	go mod tidy
+	make -C cacheservice go-tidy
 	make -C datacatalog go-tidy
 	make -C flyteadmin go-tidy
 	make -C flyteidl go-tidy

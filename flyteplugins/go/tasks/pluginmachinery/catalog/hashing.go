@@ -3,7 +3,6 @@ package catalog
 import (
 	"context"
 	"encoding/base64"
-
 	"k8s.io/utils/strings/slices"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -80,4 +79,23 @@ func HashLiteralMap(ctx context.Context, literalMap *core.LiteralMap, cacheIgnor
 	}
 
 	return base64.RawURLEncoding.EncodeToString(inputsHash), nil
+}
+
+func HashIdentifierExceptVersion(ctx context.Context, id core.Identifier) (string, error) {
+
+	// Exclude version from the ID hash to support cache hits across different versions of the same resource
+	idCopy := &core.Identifier{
+		ResourceType: id.ResourceType,
+		Project:      id.Project,
+		Domain:       id.Domain,
+		Name:         id.Name,
+		Org:          id.Org,
+	}
+
+	hash, err := pbhash.ComputeHashString(ctx, idCopy)
+	if err != nil {
+		return "", err
+	}
+
+	return hash, nil
 }

@@ -65,7 +65,7 @@ func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.Type
 }
 
 func generateDataSetVersionFromTask(ctx context.Context, taskInterface core.TypedInterface, cacheVersion string) (string, error) {
-	signatureHash, err := generateTaskSignatureHash(ctx, taskInterface)
+	signatureHash, err := GenerateInterfaceSignatureHash(ctx, taskInterface)
 	if err != nil {
 		return "", err
 	}
@@ -78,16 +78,16 @@ func generateDataSetVersionFromTask(ctx context.Context, taskInterface core.Type
 	return fmt.Sprintf("%s-%s", cacheVersion, signatureHash), nil
 }
 
-func generateTaskSignatureHash(ctx context.Context, taskInterface core.TypedInterface) (string, error) {
+func GenerateInterfaceSignatureHash(ctx context.Context, resourceInterface core.TypedInterface) (string, error) {
 	taskInputs := &emptyVariableMap
 	taskOutputs := &emptyVariableMap
 
-	if taskInterface.Inputs != nil && len(taskInterface.Inputs.Variables) != 0 {
-		taskInputs = taskInterface.Inputs
+	if resourceInterface.Inputs != nil && len(resourceInterface.Inputs.Variables) != 0 {
+		taskInputs = resourceInterface.Inputs
 	}
 
-	if taskInterface.Outputs != nil && len(taskInterface.Outputs.Variables) != 0 {
-		taskOutputs = taskInterface.Outputs
+	if resourceInterface.Outputs != nil && len(resourceInterface.Outputs.Variables) != 0 {
+		taskOutputs = resourceInterface.Outputs
 	}
 
 	inputHash, err := pbhash.ComputeHash(ctx, taskInputs)
@@ -152,13 +152,13 @@ func DatasetIDToIdentifier(id *datacatalog.DatasetID) *core.Identifier {
 
 // With Node-Node relationship this is bound to change. So lets keep it extensible
 const (
-	taskVersionKey     = "task-version"
-	execNameKey        = "execution-name"
-	execDomainKey      = "exec-domain"
-	execProjectKey     = "exec-project"
-	execNodeIDKey      = "exec-node"
-	execTaskAttemptKey = "exec-attempt"
-	execOrgKey         = "exec-rog"
+	TaskVersionKey     = "task-version"
+	ExecNameKey        = "execution-name"
+	ExecDomainKey      = "exec-domain"
+	ExecProjectKey     = "exec-project"
+	ExecNodeIDKey      = "exec-node"
+	ExecTaskAttemptKey = "exec-attempt"
+	ExecOrgKey         = "exec-rog"
 )
 
 // Understanding Catalog Identifiers
@@ -173,7 +173,7 @@ func GetDatasetMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier) 
 	}
 	return &datacatalog.Metadata{
 		KeyMap: map[string]string{
-			taskVersionKey: taskExecutionID.TaskId.Version,
+			TaskVersionKey: taskExecutionID.TaskId.Version,
 		},
 	}
 }
@@ -184,12 +184,12 @@ func GetArtifactMetadataForSource(taskExecutionID *core.TaskExecutionIdentifier)
 	}
 	return &datacatalog.Metadata{
 		KeyMap: map[string]string{
-			execProjectKey:     taskExecutionID.NodeExecutionId.GetExecutionId().GetProject(),
-			execDomainKey:      taskExecutionID.NodeExecutionId.GetExecutionId().GetDomain(),
-			execNameKey:        taskExecutionID.NodeExecutionId.GetExecutionId().GetName(),
-			execNodeIDKey:      taskExecutionID.NodeExecutionId.GetNodeId(),
-			execTaskAttemptKey: strconv.Itoa(int(taskExecutionID.GetRetryAttempt())),
-			execOrgKey:         taskExecutionID.GetNodeExecutionId().GetExecutionId().GetOrg(),
+			ExecProjectKey:     taskExecutionID.NodeExecutionId.GetExecutionId().GetProject(),
+			ExecDomainKey:      taskExecutionID.NodeExecutionId.GetExecutionId().GetDomain(),
+			ExecNameKey:        taskExecutionID.NodeExecutionId.GetExecutionId().GetName(),
+			ExecNodeIDKey:      taskExecutionID.NodeExecutionId.GetNodeId(),
+			ExecTaskAttemptKey: strconv.Itoa(int(taskExecutionID.GetRetryAttempt())),
+			ExecOrgKey:         taskExecutionID.GetNodeExecutionId().GetExecutionId().GetOrg(),
 		},
 	}
 }
@@ -205,8 +205,8 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 		artifactMd = &datacatalog.Metadata{KeyMap: map[string]string{}}
 	}
 
-	// Jul-06-2020 DataCatalog stores only wfExecutionKey & taskVersionKey So we will default the project / domain to the current dataset's project domain
-	val := GetOrDefault(artifactMd.KeyMap, execTaskAttemptKey, "0")
+	// Jul-06-2020 DataCatalog stores only wfExecutionKey & TaskVersionKey So we will default the project / domain to the current dataset's project domain
+	val := GetOrDefault(artifactMd.KeyMap, ExecTaskAttemptKey, "0")
 	attempt, err := strconv.ParseUint(val, 10, 32)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse [%v] to integer. Error: %w", val, err)
@@ -218,17 +218,17 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 			Project:      currentID.Project,
 			Domain:       currentID.Domain,
 			Name:         currentID.Name,
-			Version:      GetOrDefault(datasetMd.KeyMap, taskVersionKey, "unknown"),
+			Version:      GetOrDefault(datasetMd.KeyMap, TaskVersionKey, "unknown"),
 			Org:          currentID.Org,
 		},
 		RetryAttempt: uint32(attempt),
 		NodeExecutionId: &core.NodeExecutionIdentifier{
-			NodeId: GetOrDefault(artifactMd.KeyMap, execNodeIDKey, "unknown"),
+			NodeId: GetOrDefault(artifactMd.KeyMap, ExecNodeIDKey, "unknown"),
 			ExecutionId: &core.WorkflowExecutionIdentifier{
-				Project: GetOrDefault(artifactMd.KeyMap, execProjectKey, currentID.GetProject()),
-				Domain:  GetOrDefault(artifactMd.KeyMap, execDomainKey, currentID.GetDomain()),
-				Name:    GetOrDefault(artifactMd.KeyMap, execNameKey, "unknown"),
-				Org:     GetOrDefault(artifactMd.KeyMap, execOrgKey, currentID.GetOrg()),
+				Project: GetOrDefault(artifactMd.KeyMap, ExecProjectKey, currentID.GetProject()),
+				Domain:  GetOrDefault(artifactMd.KeyMap, ExecDomainKey, currentID.GetDomain()),
+				Name:    GetOrDefault(artifactMd.KeyMap, ExecNameKey, "unknown"),
+				Org:     GetOrDefault(artifactMd.KeyMap, ExecOrgKey, currentID.GetOrg()),
 			},
 		},
 	}, nil
