@@ -1245,7 +1245,8 @@
     "flyteidlcoreOperator": {
       "type": "string",
       "enum": [
-        "MINUS"
+        "MINUS",
+        "PLUS"
       ],
       "default": "MINUS"
     },

@@ -888,6 +888,7 @@ impl Granularity {
 #[repr(i32)]
 pub enum Operator {
     Minus = 0,
+    Plus = 1,
 }
 impl Operator {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -897,12 +898,14 @@ impl Operator {
     pub fn as_str_name(&self) -> &'static str {
         match self {
             Operator::Minus => "MINUS",
+            Operator::Plus => "PLUS",
         }
     }
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
             "MINUS" => Some(Self::Minus),
+            "PLUS" => Some(Self::Plus),
             _ => None,
         }
     }

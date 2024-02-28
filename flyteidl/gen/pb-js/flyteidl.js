@@ -385,10 +385,12 @@
              * @name flyteidl.core.Operator
              * @enum {string}
              * @property {number} MINUS=0 MINUS value
+             * @property {number} PLUS=1 PLUS value
              */
             core.Operator = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
                 values[valuesById[0] = "MINUS"] = 0;
+                values[valuesById[1] = "PLUS"] = 1;
                 return values;
             })();
     
@@ -515,6 +517,7 @@
                         default:
                             return "op: enum value expected";
                         case 0:
+                        case 1:
                             break;
                         }
                     return null;

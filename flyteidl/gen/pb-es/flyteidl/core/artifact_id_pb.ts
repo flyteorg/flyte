@@ -48,10 +48,16 @@ export enum Operator {
    * @generated from enum value: MINUS = 0;
    */
   MINUS = 0,
+
+  /**
+   * @generated from enum value: PLUS = 1;
+   */
+  PLUS = 1,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Operator)
 proto3.util.setEnumType(Operator, "flyteidl.core.Operator", [
   { no: 0, name: "MINUS" },
+  { no: 1, name: "PLUS" },
 ]);
 
 /**

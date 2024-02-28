@@ -18,11 +18,13 @@ class Granularity(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
 class Operator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     MINUS: _ClassVar[Operator]
+    PLUS: _ClassVar[Operator]
 MINUTE: Granularity
 HOUR: Granularity
 DAY: Granularity
 MONTH: Granularity
 MINUS: Operator
+PLUS: Operator
 
 class ArtifactKey(_message.Message):
     __slots__ = ["project", "domain", "name", "org"]

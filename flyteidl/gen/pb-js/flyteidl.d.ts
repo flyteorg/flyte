@@ -152,7 +152,8 @@ export namespace flyteidl {
 
         /** Operator enum. */
         enum Operator {
-            MINUS = 0
+            MINUS = 0,
+            PLUS = 1
         }
 
         /** Properties of a TimeTransform. */

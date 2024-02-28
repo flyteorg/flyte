@@ -37,6 +37,7 @@ enum Granularity {
 
 enum Operator {
   MINUS = 0;
+  PLUS = 1;
 }
 
 message TimeTransform {
