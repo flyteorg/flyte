@@ -339,7 +339,8 @@ import_projects_config = {
     "source_regex_mapping": REPLACE_PATTERNS,
     "list_table_toc": [
        "flytesnacks/tutorials",
-        "flytesnacks/integrations",
+       "flytesnacks/integrations",
+       "flytesnacks/deprecated_integrations"
     ],
     "dev_build": bool(int(os.environ.get("MONODOCS_DEV_BUILD", 1))),
 }
