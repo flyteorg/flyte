@@ -15,12 +15,15 @@ flyte: FLYTECONSOLE_VERSION := latest
 flyte:
 	$(foreach arch,amd64 arm64,$(call FLYTE_BINARY_BUILD,$(arch)))
 
-.PHONY: manifests
-manifests:
-	mkdir -p manifests
+.PHONY: dep_update
+dep_update:
 	helm dependency update ../../charts/flyteagent
 	helm dependency update ../../charts/flyte-binary
 	helm dependency update ../../charts/flyte-sandbox
+
+.PHONY: manifests
+manifests:
+	mkdir -p manifests
 	kustomize build \
 		--enable-helm \
 		--load-restrictor=LoadRestrictionsNone \
@@ -35,7 +38,7 @@ manifests:
 		kustomize/complete-agent > manifests/complete-agent.yaml
 
 .PHONY: build
-build: flyte manifests
+build: flyte dep_update manifests
 	[ -n "$(shell docker buildx ls | awk '/^flyte-sandbox / {print $$1}')" ] || \
 		docker buildx create --name flyte-sandbox \
 		--driver docker-container --driver-opt image=moby/buildkit:master \
