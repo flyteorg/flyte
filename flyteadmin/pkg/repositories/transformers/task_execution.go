@@ -315,7 +315,7 @@ func mergeExternalResource(ctx context.Context, existing, latest *event.External
 	}
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
 
-	// set ouptut metadata if exists
+	// set output metadata if exists
 	if len(latest.GetOutputUri()) > 0 || latest.GetError() != nil {
 		existing.OutputResult = latest.GetOutputResult()
 	} else if latest.GetOutputData() != nil {
