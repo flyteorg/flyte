@@ -903,7 +903,7 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
   logs: TaskLog[] = [];
 
   /**
-   * TODO @hamersaw - docs
+   * This structure carries the catalog artifact information
    *
    * @generated from field: flyteidl.core.CatalogMetadata catalog_key = 7;
    */

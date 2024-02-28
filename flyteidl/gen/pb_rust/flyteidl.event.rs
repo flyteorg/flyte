@@ -317,7 +317,7 @@ pub struct ExternalResourceInfo {
     /// log information for the external resource execution
     #[prost(message, repeated, tag="6")]
     pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
-    /// TODO @hamersaw - docs
+    /// This structure carries the catalog artifact information
     #[prost(message, optional, tag="7")]
     pub catalog_key: ::core::option::Option<super::core::CatalogMetadata>,
     #[prost(oneof="external_resource_info::OutputResult", tags="8, 9, 10")]

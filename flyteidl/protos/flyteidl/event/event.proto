@@ -272,7 +272,7 @@ message ExternalResourceInfo {
     // log information for the external resource execution
     repeated core.TaskLog logs = 6;
 
-    // TODO @hamersaw - docs
+    // This structure carries the catalog artifact information
     core.CatalogMetadata catalog_key = 7;
 
     oneof output_result {

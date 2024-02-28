@@ -1203,7 +1203,7 @@ type ExternalResourceInfo struct {
 	CacheStatus core.CatalogCacheStatus `protobuf:"varint,5,opt,name=cache_status,json=cacheStatus,proto3,enum=flyteidl.core.CatalogCacheStatus" json:"cache_status,omitempty"`
 	// log information for the external resource execution
 	Logs []*core.TaskLog `protobuf:"bytes,6,rep,name=logs,proto3" json:"logs,omitempty"`
-	// TODO @hamersaw - docs
+	// This structure carries the catalog artifact information
 	CatalogKey *core.CatalogMetadata `protobuf:"bytes,7,opt,name=catalog_key,json=catalogKey,proto3" json:"catalog_key,omitempty"`
 	// Types that are assignable to OutputResult:
 	//

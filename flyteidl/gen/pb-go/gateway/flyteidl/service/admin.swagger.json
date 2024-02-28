@@ -8436,7 +8436,7 @@
         },
         "catalog_key": {
           "$ref": "#/definitions/coreCatalogMetadata",
-          "title": "TODO @hamersaw - docs"
+          "title": "This structure carries the catalog artifact information"
         },
         "output_uri": {
           "type": "string",
