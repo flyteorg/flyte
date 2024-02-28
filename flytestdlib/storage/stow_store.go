@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/url"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -232,8 +233,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			// Err will be caught below
 		} else {
 			t.Stop()
-			contentMD5, _ := metadata["flytecontentmd5"].(string)
-			fmt.Println("metadata metadata metadata", metadata)
+			contentMD5, _ := metadata[strings.ToLower(stow.FlyteContentMD5)].(string)
 			return StowMetadata{
 				exists:     true,
 				size:       size,
