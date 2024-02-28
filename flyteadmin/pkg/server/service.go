@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
 	"net"
 	"net/http"
 	"strings"
@@ -201,6 +202,11 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	var gwmuxOptions = make([]runtime.ServeMuxOption, 0)
 	// This option means that http requests are served with protobufs, instead of json. We always want this.
 	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/octet-stream", &runtime.ProtoMarshaller{}))
+	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/json", &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames: true,
+		},
+	}))
 
 	// This option sets subject in the user info response
 	gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(auth.GetUserInfoForwardResponseHandler()))
