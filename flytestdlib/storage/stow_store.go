@@ -207,8 +207,6 @@ func (s *StowStore) getContainer(ctx context.Context, locID locationID, containe
 }
 
 func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
-	fmt.Println("StowStore.Head", reference)
-
 	_, c, k, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
