@@ -310,6 +310,33 @@ func mergeExternalResource(existing, latest *event.ExternalResourceInfo) *event.
 	}
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
 
+	// TODO @hamersaw - docs
+	if len(latest.GetOutputUri()) > 0 || latest.GetError() != nil {
+		existing.OutputResult = latest.GetOutputResult()
+	} else if latest.GetOutputData() != nil {
+		existing.OutputResult = latest.GetOutputResult()
+
+		// TODO @hamersaw - handle offloading outputs
+		/*switch inlineEventDataPolicy {
+		case interfaces.InlineEventDataPolicyStoreInline:
+			existing.OutputResult = latest.GetOutputResult()
+		default:
+			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
+			uri, err := common.OffloadLiteralMap(ctx, storageClient, request.Event.GetOutputData(),
+				request.Event.ParentNodeExecutionId.ExecutionId.Project, request.Event.ParentNodeExecutionId.ExecutionId.Domain,
+				request.Event.ParentNodeExecutionId.ExecutionId.Name, request.Event.ParentNodeExecutionId.NodeId,
+				request.Event.TaskId.Project, request.Event.TaskId.Domain, request.Event.TaskId.Name, request.Event.TaskId.Version,
+				strconv.FormatUint(uint64(request.Event.RetryAttempt), 10), OutputsObjectSuffix)
+			if err != nil {
+				return err
+			}
+			closure.OutputResult = &admin.TaskExecutionClosure_OutputUri{
+				OutputUri: uri.String(),
+			}
+		}*/
+	}
+
+
 	return existing
 }
 

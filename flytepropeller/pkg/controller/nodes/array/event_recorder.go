@@ -80,6 +80,7 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			RetryAttempt: retryAttempt,
 			Phase:        idlcore.TaskExecution_SUCCEEDED,
 			CacheStatus:  cacheStatus,
+			// TODO @hamersaw - how do we send OutputResult here?
 		})
 	}
 
@@ -88,14 +89,30 @@ func (e *externalResourcesEventRecorder) process(ctx context.Context, nCtx inter
 			log.Name = fmt.Sprintf("%s-%d", log.Name, index)
 		}
 
-		e.externalResources = append(e.externalResources, &event.ExternalResourceInfo{
+		externalResourceInfo := &event.ExternalResourceInfo{
 			ExternalId:   externalResourceID,
 			Index:        uint32(index),
 			Logs:         taskExecutionEvent.Logs,
 			RetryAttempt: retryAttempt,
 			Phase:        taskExecutionEvent.Phase,
 			CacheStatus:  cacheStatus,
-		})
+		}
+
+		if len(taskExecutionEvent.GetOutputUri()) > 0 {
+			externalResourceInfo.OutputResult = &event.ExternalResourceInfo_OutputUri{
+				OutputUri: taskExecutionEvent.GetOutputUri(),
+			}
+		} else if taskExecutionEvent.GetOutputData() != nil {
+			externalResourceInfo.OutputResult = &event.ExternalResourceInfo_OutputData{
+				OutputData: taskExecutionEvent.GetOutputData(),
+			}
+		} else if taskExecutionEvent.GetError() != nil {
+			externalResourceInfo.OutputResult = &event.ExternalResourceInfo_Error{
+				Error: taskExecutionEvent.GetError(),
+			}
+		}
+
+		e.externalResources = append(e.externalResources, externalResourceInfo)
 	}
 
 	// clear nodeEvents and taskEvents
