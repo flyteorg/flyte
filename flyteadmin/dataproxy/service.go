@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/base32"
 	"encoding/base64"
-	"encoding/hex"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -65,8 +64,10 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		if err != nil {
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create storage location, Error: %v", err)
 		}
+		logger.Infof(ctx, "knownLocation", knownLocation)
 		metadata, err := s.dataStore.Head(ctx, knownLocation)
 		if err != nil {
+			logger.Infof(ctx, "failed to head", err)
 			return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to check if file exists at location [%s], Error: %v", knownLocation.String(), err)
 		}
 		if metadata.Exists() {
@@ -76,17 +77,18 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 			if len(req.ContentMd5) == 0 {
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
-			// Re-encode the hash 3-ways to support matching, hex, base32 and base64
-			hexDigest := hex.EncodeToString(req.ContentMd5)
-			base32Digest := base32.StdEncoding.EncodeToString(req.ContentMd5)
+			logger.Infof(ctx, "req.ContentMd5 [%v]", base64.StdEncoding.EncodeToString(req.ContentMd5))
+			logger.Infof(ctx, "metadata.ContentMD5() [%v]", metadata.ContentMD5())
 			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
-			if hexDigest != metadata.Etag() && base32Digest != metadata.Etag() && base64Digest != metadata.Etag() {
+			if len(metadata.ContentMD5()) != 0 && base64Digest != metadata.ContentMD5() {
 				logger.Debugf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
 			logger.Debugf(ctx, "File already exists at location [%v] but allowing rewrite", knownLocation)
 		}
 	}
+
+	logger.Infof(ctx, "Kevin Kevin Kevin")
 
 	if expiresIn := req.ExpiresIn; expiresIn != nil {
 		if !expiresIn.IsValid() {
@@ -117,9 +119,11 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	storagePath, err := createStorageLocation(ctx, s.dataStore, s.cfg.Upload,
 		req.Project, req.Domain, prefix, req.Filename)
 	if err != nil {
+		logger.Infof(ctx, "failed to create storage location", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
 	}
 
+	logger.Infof(ctx, "CreateSignedURL for", storagePath)
 	resp, err := s.dataStore.CreateSignedURL(ctx, storagePath, storage.SignedURLProperties{
 		Scope:      stow.ClientMethodPut,
 		ExpiresIn:  req.ExpiresIn.AsDuration(),
@@ -127,6 +131,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	})
 
 	if err != nil {
+		logger.Errorf(ctx, "failed to create signed url. Error:", err)
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create a signed url. Error: %v", err)
 	}
 

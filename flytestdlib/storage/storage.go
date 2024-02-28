@@ -34,6 +34,7 @@ type Metadata interface {
 	Exists() bool
 	Size() int64
 	Etag() string
+	ContentMD5() string
 }
 
 // DataStore is a simplified interface for accessing and storing data in one of the Cloud stores.

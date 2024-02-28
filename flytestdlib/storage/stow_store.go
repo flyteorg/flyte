@@ -104,9 +104,10 @@ type stowMetrics struct {
 
 // StowMetadata that will be returned
 type StowMetadata struct {
-	exists bool
-	size   int64
-	etag   string
+	exists     bool
+	size       int64
+	etag       string
+	contentMD5 string
 }
 
 func (s StowMetadata) Size() int64 {
@@ -119,6 +120,10 @@ func (s StowMetadata) Exists() bool {
 
 func (s StowMetadata) Etag() string {
 	return s.etag
+}
+
+func (s StowMetadata) ContentMD5() string {
+	return s.contentMD5
 }
 
 // Implements DataStore to talk to stow location store.
@@ -201,6 +206,8 @@ func (s *StowStore) getContainer(ctx context.Context, locID locationID, containe
 }
 
 func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata, error) {
+	fmt.Println("StowStore.Head", reference)
+
 	_, c, k, err := reference.Split()
 	if err != nil {
 		s.metrics.BadReference.Inc(ctx)
@@ -221,12 +228,17 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			// Err will be caught below
 		} else if etag, err := item.ETag(); err != nil {
 			// Err will be caught below
+		} else if metadata, err := item.Metadata(); err != nil {
+			// Err will be caught below
 		} else {
 			t.Stop()
+			contentMD5, _ := metadata["flytecontentmd5"].(string)
+			fmt.Println("metadata metadata metadata", metadata)
 			return StowMetadata{
-				exists: true,
-				size:   size,
-				etag:   etag,
+				exists:     true,
+				size:       size,
+				etag:       etag,
+				contentMD5: contentMD5,
 			}, nil
 		}
 	}
