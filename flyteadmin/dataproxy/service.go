@@ -76,11 +76,12 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 			// Basically if the file exists, then error unless the user also provided a hash and it matches.
 			// Keep in mind this is just a best effort attempt. There can easily be race conditions where two users
 			// request the same file at the same time and one of the writes is lost.
+			logger.Infof(ctx, "req.ContentMd5 [%v]", base64.StdEncoding.EncodeToString(req.ContentMd5))
+			logger.Infof(ctx, "metadata.ContentMD5() [%v]", metadata.ContentMD5())
+
 			if len(req.ContentMd5) == 0 {
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
-			logger.Infof(ctx, "req.ContentMd5 [%v]", base64.StdEncoding.EncodeToString(req.ContentMd5))
-			logger.Infof(ctx, "metadata.ContentMD5() [%v]", metadata.ContentMD5())
 			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
 			if len(metadata.ContentMD5()) != 0 && base64Digest != metadata.ContentMD5() {
 				logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
@@ -128,7 +129,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		Scope:       stow.ClientMethodPut,
 		ExpiresIn:   req.ExpiresIn.AsDuration(),
 		ContentMD5:  md5,
-		AddMetadata: req.AddMetadata,
+		AddMetadata: true,
 	})
 
 	if err != nil {
