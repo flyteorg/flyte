@@ -475,7 +475,7 @@ func (c *recursiveNodeExecutor) WithNodeExecutionContextBuilder(nCtxBuilder inte
 
 // nodeExecutor implements the NodeExecutor interface and is responsible for executing a single node.
 type nodeExecutor struct {
-	cache                           catalog.Client
+	catalog                         catalog.Client
 	clusterID                       string
 	enableCRDebugMetadata           bool
 	defaultActiveDeadline           time.Duration
@@ -1444,7 +1444,7 @@ func replaceRemotePrefix(ctx context.Context, s string) string {
 
 func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *storage.DataStore, enQWorkflow v1alpha1.EnqueueWorkflow, eventSink events.EventSink,
 	workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader, maxDatasetSize int64, defaultRawOutputPrefix storage.DataReference, kubeClient executors.Client,
-	cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
+	catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig, clusterID string, signalClient service.SignalServiceClient,
 	nodeHandlerFactory interfaces.HandlerFactory, scope promutils.Scope) (interfaces.Node, error) {
 
 	// TODO we may want to make this configurable.
@@ -1488,7 +1488,7 @@ func NewExecutor(ctx context.Context, nodeConfig config.NodeConfig, store *stora
 	}
 
 	nodeExecutor := &nodeExecutor{
-		cache:                           cacheClient,
+		catalog:                         catalogClient,
 		clusterID:                       clusterID,
 		enableCRDebugMetadata:           nodeConfig.EnableCRDebugMetadata,
 		defaultActiveDeadline:           nodeConfig.DefaultDeadlines.DefaultNodeActiveDeadline.Duration,

@@ -13,7 +13,6 @@ RUN apk add git openssh-client make curl
 
 WORKDIR /go/src/github.com/flyteorg/flytepropeller
 
-COPY cacheservice ../cacheservice
 COPY datacatalog ../datacatalog
 COPY flyteadmin ../flyteadmin
 COPY flytecopilot ../flytecopilot

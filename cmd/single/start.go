@@ -5,8 +5,18 @@ import (
 	"net/http"
 	"os"
 
-	cacheserviceConfig "github.com/flyteorg/flyte/cacheservice/pkg/config"
-	"github.com/flyteorg/flyte/cacheservice/pkg/rpc/cacheservice"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	_ "github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
+
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
 	datacatalogRepo "github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	datacatalog "github.com/flyteorg/flyte/datacatalog/pkg/rpc/datacatalogservice"
@@ -29,16 +39,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	_ "github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
-	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
-	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
 const defaultNamespace = "all"
@@ -50,11 +50,6 @@ func startDataCatalog(ctx context.Context, _ DataCatalog) error {
 	}
 	catalogCfg := datacatalogConfig.GetConfig()
 	return datacatalog.ServeInsecure(ctx, catalogCfg)
-}
-
-func startCacheService(ctx context.Context, _ CacheService) error {
-	cacheCfg := cacheserviceConfig.GetConfig()
-	return cacheservice.ServeInsecure(ctx, cacheCfg)
 }
 
 func startClusterResourceController(ctx context.Context) error {
@@ -240,17 +235,6 @@ var startCmd = &cobra.Command{
 				err := startDataCatalog(childCtx, cfg.DataCatalog)
 				if err != nil {
 					logger.Panicf(childCtx, "Failed to start Datacatalog, err: %v", err)
-					return err
-				}
-				return nil
-			})
-		}
-
-		if !cfg.CacheService.Disabled {
-			g.Go(func() error {
-				err := startCacheService(childCtx, cfg.CacheService)
-				if err != nil {
-					logger.Panicf(childCtx, "Failed to start CacheService, err: %v", err)
 					return err
 				}
 				return nil

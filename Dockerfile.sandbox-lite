@@ -15,7 +15,6 @@ RUN apk add --no-cache build-base
 COPY go.mod go.sum /app/flyte/
 WORKDIR /app/flyte
 
-COPY cacheservice cacheservice
 COPY datacatalog datacatalog
 COPY flyteadmin flyteadmin
 COPY flytecopilot flytecopilot

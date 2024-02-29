@@ -10,10 +10,9 @@ var (
 )
 
 type Config struct {
-	Propeller    Propeller    `json:"propeller" pflag:",Configuration to disable propeller or any of its components."`
-	Admin        Admin        `json:"admin" pflag:",Configuration to disable FlyteAdmin or any of its components"`
-	DataCatalog  DataCatalog  `json:"dataCatalog" pflag:",Configuration to disable DataCatalog or any of its components"`
-	CacheService CacheService `json:"cacheService" pflag:",Configuration to disable CacheService or any of its components"`
+	Propeller   Propeller   `json:"propeller" pflag:",Configuration to disable propeller or any of its components."`
+	Admin       Admin       `json:"admin" pflag:",Configuration to disable FlyteAdmin or any of its components"`
+	DataCatalog DataCatalog `json:"dataCatalog" pflag:",Configuration to disable DataCatalog or any of its components"`
 }
 
 type Propeller struct {
@@ -30,10 +29,6 @@ type Admin struct {
 
 type DataCatalog struct {
 	Disabled bool `json:"disabled" pflag:",Disables datacatalog in the single binary mode"`
-}
-
-type CacheService struct {
-	Disabled bool `json:"disabled" pflag:",Disables cacheservice in the single binary mode"`
 }
 
 // GetConfig returns a handle to the configuration for Flyte Single Binary

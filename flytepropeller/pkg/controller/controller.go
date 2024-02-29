@@ -412,10 +412,10 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	flytek8s.DefaultPodTemplateStore.SetDefaultNamespace(podNamespace)
 
-	logger.Info(ctx, "Setting up Cache client.")
-	cacheClient, err := catalog.NewCacheClient(ctx, store, authOpts...)
+	logger.Info(ctx, "Setting up Catalog client.")
+	catalogClient, err := catalog.NewCatalogClient(ctx, authOpts...)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Failed to create cache client")
+		return nil, errors.Wrapf(err, "Failed to create datacatalog client")
 	}
 
 	workQ, err := NewCompositeWorkQueue(ctx, cfg.Queue, scope)
@@ -433,14 +433,14 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	recoveryClient := recovery.NewClient(adminClient)
 	nodeHandlerFactory, err := factory.NewHandlerFactory(ctx, launchPlanActor, launchPlanActor,
-		kubeClient, kubeClientset, cacheClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
+		kubeClient, kubeClientset, catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to create node handler factory")
 	}
 
 	nodeExecutor, err := nodes.NewExecutor(ctx, cfg.NodeConfig, store, controller.enqueueWorkflowForNodeUpdates, eventSink,
 		launchPlanActor, launchPlanActor, cfg.MaxDatasetSizeBytes, storage.DataReference(cfg.DefaultRawOutputPrefix), kubeClient,
-		cacheClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
+		catalogClient, recoveryClient, &cfg.EventConfig, cfg.ClusterID, signalClient, nodeHandlerFactory, scope)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to create Controller.")
 	}

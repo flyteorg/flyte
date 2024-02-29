@@ -208,11 +208,11 @@ func TestCatalog_Get(t *testing.T) {
 			},
 		}
 
-		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Name, sampleArtifact.GetMetadata().KeyMap[ExecNameKey])
-		assert.Equal(t, taskID.NodeExecutionId.NodeId, sampleArtifact.GetMetadata().KeyMap[ExecNodeIDKey])
-		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Project, sampleArtifact.GetMetadata().KeyMap[ExecProjectKey])
-		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Domain, sampleArtifact.GetMetadata().KeyMap[ExecDomainKey])
-		assert.Equal(t, strconv.Itoa(int(taskID.RetryAttempt)), sampleArtifact.GetMetadata().KeyMap[ExecTaskAttemptKey])
+		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Name, sampleArtifact.GetMetadata().KeyMap[execNameKey])
+		assert.Equal(t, taskID.NodeExecutionId.NodeId, sampleArtifact.GetMetadata().KeyMap[execNodeIDKey])
+		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Project, sampleArtifact.GetMetadata().KeyMap[execProjectKey])
+		assert.Equal(t, taskID.NodeExecutionId.ExecutionId.Domain, sampleArtifact.GetMetadata().KeyMap[execDomainKey])
+		assert.Equal(t, strconv.Itoa(int(taskID.RetryAttempt)), sampleArtifact.GetMetadata().KeyMap[execTaskAttemptKey])
 
 		mockClient.On("GetArtifact",
 			ctx,

@@ -8,8 +8,6 @@ ROOT_DIR=${CUR_DIR}/..
 OUTPUT_DIR="${ROOT_DIR}"/docs/deployment/configuration/generated
 GOBIN=${GOPATH:-~/go}/bin
 
-make -C cacheservice compile
-mv cacheservice/bin/cacheservice ${GOBIN}/cacheservice
 make -C datacatalog compile
 mv datacatalog/bin/datacatalog ${GOBIN}/datacatalog
 make -C flyteadmin compile

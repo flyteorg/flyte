@@ -217,7 +217,6 @@ require (
 retract v1.1.94
 
 replace (
-	github.com/flyteorg/flyte/cacheservice => ../cacheservice
 	github.com/flyteorg/flyte/datacatalog => ../datacatalog
 	github.com/flyteorg/flyte/flyteadmin => ../flyteadmin
 	github.com/flyteorg/flyte/flyteidl => ../flyteidl

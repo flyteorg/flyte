@@ -14,7 +14,6 @@ jobs:
       fail-fast: false
       matrix:
         component:
-          - cacheservice
           - datacatalog
           - flyteadmin
           - flytecopilot

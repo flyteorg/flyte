@@ -32,7 +32,7 @@ type handlerFactory struct {
 	launchPlanReader launchplan.Reader
 	kubeClient       executors.Client
 	kubeClientset    kubernetes.Interface
-	cacheClient      catalog.Client
+	catalogClient    catalog.Client
 	recoveryClient   recovery.Client
 	eventConfig      *config.EventConfig
 	clusterID        string
@@ -49,7 +49,7 @@ func (f *handlerFactory) GetHandler(kind v1alpha1.NodeKind) (interfaces.NodeHand
 }
 
 func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, setup interfaces.SetupContext) error {
-	t, err := task.New(ctx, f.kubeClient, f.kubeClientset, f.cacheClient, f.eventConfig, f.clusterID, f.scope)
+	t, err := task.New(ctx, f.kubeClient, f.kubeClientset, f.catalogClient, f.eventConfig, f.clusterID, f.scope)
 	if err != nil {
 		return err
 	}
@@ -78,7 +78,7 @@ func (f *handlerFactory) Setup(ctx context.Context, executor interfaces.Node, se
 }
 
 func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor, launchPlanReader launchplan.Reader,
-	kubeClient executors.Client, kubeClientset kubernetes.Interface, cacheClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
+	kubeClient executors.Client, kubeClientset kubernetes.Interface, catalogClient catalog.Client, recoveryClient recovery.Client, eventConfig *config.EventConfig,
 	clusterID string, signalClient service.SignalServiceClient, scope promutils.Scope) (interfaces.HandlerFactory, error) {
 
 	return &handlerFactory{
@@ -86,7 +86,7 @@ func NewHandlerFactory(ctx context.Context, workflowLauncher launchplan.Executor
 		launchPlanReader: launchPlanReader,
 		kubeClient:       kubeClient,
 		kubeClientset:    kubeClientset,
-		cacheClient:      cacheClient,
+		catalogClient:    catalogClient,
 		recoveryClient:   recoveryClient,
 		eventConfig:      eventConfig,
 		clusterID:        clusterID,

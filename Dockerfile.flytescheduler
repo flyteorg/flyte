@@ -16,7 +16,6 @@ RUN mkdir /artifacts
 
 WORKDIR /go/src/github.com/flyteorg/flyteadmin
 
-COPY cacheservice ../cacheservice
 COPY datacatalog ../datacatalog
 COPY flyteadmin .
 COPY flytecopilot ../flytecopilot

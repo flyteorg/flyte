@@ -10,7 +10,6 @@ ENV GOOS linux
 
 WORKDIR /flyteorg/build
 
-COPY cacheservice cacheservice
 COPY datacatalog datacatalog
 COPY flyteadmin flyteadmin
 COPY flytecopilot flytecopilot
