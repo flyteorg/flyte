@@ -93,7 +93,7 @@ type K8sPluginConfig struct {
 	// Provide additional environment variable parts from configMaps
 	DefaultEnvVarsFromConfigMaps []string `json:"default-env-vars-from-configmaps" pflag:"-,Additional environment variables should be injected into each pod from these configMaps"`
 	// Provide additional environment variable parts from secrets
-	DefaultEnvVarsFromSecrets []string `json:"default-env-vars-from-secrets" pflag:"-,Additonal environment variables should be injected into each pod from these secret"`
+	DefaultEnvVarsFromSecrets []string `json:"default-env-vars-from-secrets" pflag:"-,Additional environment variables should be injected into each pod from these secret"`
 
 	// default cpu requests for a container
 	DefaultCPURequest resource.Quantity `json:"default-cpus" pflag:",Defines a default value for cpu for containers if not specified."`
