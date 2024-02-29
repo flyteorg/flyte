@@ -30,6 +30,7 @@ import (
 
 const (
 	FailureTypeLabel contextutils.Key = "failure_type"
+	FlyteContentMD5                   = "flyteContentMD5"
 )
 
 var fQNFn = map[string]func(string) DataReference{
@@ -231,7 +232,7 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 			// Err will be caught below
 		} else {
 			t.Stop()
-			contentMD5, _ := metadata[strings.ToLower(stow.FlyteContentMD5)].(string)
+			contentMD5, _ := metadata[strings.ToLower(FlyteContentMD5)].(string)
 			return StowMetadata{
 				exists:     true,
 				size:       size,
@@ -356,9 +357,9 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 	}
 
 	urlStr, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
-		ExpiresIn:   properties.ExpiresIn,
-		ContentMD5:  properties.ContentMD5,
-		AddMetadata: properties.AddMetadata,
+		ExpiresIn:  properties.ExpiresIn,
+		ContentMD5: properties.ContentMD5,
+		Metadata:   properties.Metadata,
 	})
 
 	if err != nil {

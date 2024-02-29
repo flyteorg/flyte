@@ -229,7 +229,7 @@ replace (
 	github.com/flyteorg/flyte/flyteplugins => ./flyteplugins
 	github.com/flyteorg/flyte/flytepropeller => ./flytepropeller
 	github.com/flyteorg/flyte/flytestdlib => ./flytestdlib
-	github.com/flyteorg/stow => github.com/pingsutw/stow v0.3.6-0.20240228091138-cafd670a5c8d
+	github.com/flyteorg/stow => github.com/pingsutw/stow v0.3.6-0.20240229093623-86cb63d6001a
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.8
 	github.com/robfig/cron/v3 => github.com/unionai/cron/v3 v3.0.2-0.20220915080349-5790c370e63a
 	k8s.io/api => k8s.io/api v0.28.2

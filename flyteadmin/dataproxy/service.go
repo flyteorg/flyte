@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base32"
 	"encoding/base64"
+	"encoding/hex"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -48,13 +49,13 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	// If it doesn't exist, then proceed as normal.
 
 	if len(req.Project) == 0 || len(req.Domain) == 0 {
-		logger.Errorf(ctx, "project and domain are required parameters")
+		logger.Infof(ctx, "project and domain are required parameters")
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "project and domain are required parameters")
 	}
 
 	// At least one of the hash or manually given prefix must be provided.
 	if len(req.FilenameRoot) == 0 && len(req.ContentMd5) == 0 {
-		logger.Errorf(ctx, "content_md5 or filename_root is a required parameter")
+		logger.Infof(ctx, "content_md5 or filename_root is a required parameter")
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"content_md5 or filename_root is a required parameter")
 	}
@@ -80,6 +81,16 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}
 			base64Digest := base64.StdEncoding.EncodeToString(req.ContentMd5)
+			if len(metadata.ContentMD5()) == 0 {
+				// For backward compatibility, dataproxy assumes that the Etag exists if ContentMD5 is not in the metadata.
+				// Data proxy won't allow people to overwrite the file if both the Etag and the ContentMD5 do not exist.
+				hexDigest := hex.EncodeToString(req.ContentMd5)
+				base32Digest := base32.StdEncoding.EncodeToString(req.ContentMd5)
+				if hexDigest != metadata.Etag() && base32Digest != metadata.Etag() && base64Digest != metadata.Etag() {
+					logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
+					return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
+				}
+			}
 			if len(metadata.ContentMD5()) != 0 && base64Digest != metadata.ContentMD5() {
 				logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
@@ -105,7 +116,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		req.Filename = rand.String(s.cfg.Upload.DefaultFileNameLength)
 	}
 
-	md5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
+	base64digestMD5 := base64.StdEncoding.EncodeToString(req.ContentMd5)
 
 	var prefix string
 	if len(req.FilenameRoot) > 0 {
@@ -121,12 +132,17 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		return nil, errors.NewFlyteAdminErrorf(codes.Internal, "failed to create shardedStorageLocation, Error: %v", err)
 	}
 
-	logger.Infof(ctx, "CreateSignedURL for", storagePath)
+	metadata := make(map[string]string)
+
+	if req.AddMetadata {
+		metadata[storage.FlyteContentMD5] = base64digestMD5
+	}
+
 	resp, err := s.dataStore.CreateSignedURL(ctx, storagePath, storage.SignedURLProperties{
-		Scope:       stow.ClientMethodPut,
-		ExpiresIn:   req.ExpiresIn.AsDuration(),
-		ContentMD5:  md5,
-		AddMetadata: req.AddMetadata,
+		Scope:      stow.ClientMethodPut,
+		ExpiresIn:  req.ExpiresIn.AsDuration(),
+		ContentMD5: base64digestMD5,
+		Metadata:   metadata,
 	})
 
 	if err != nil {
@@ -138,7 +154,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 		SignedUrl: resp.URL.String(),
 		NativeUrl: storagePath.String(),
 		ExpiresAt: timestamppb.New(time.Now().Add(req.ExpiresIn.AsDuration())),
-		Headers:   getExtraHeaders(storagePath, md5, req.AddMetadata),
+		Headers:   getExtraHeaders(storagePath, base64digestMD5, req.AddMetadata),
 	}, nil
 }
 
@@ -277,11 +293,11 @@ func getExtraHeaders(reference storage.DataReference, contentMd5 string, addMeta
 	headers := map[string]string{"Content-Length": strconv.Itoa(len(contentMd5)), "Content-MD5": contentMd5}
 	if addMetadata {
 		if strings.HasPrefix(reference.String(), "s3://") {
-			headers[fmt.Sprintf("x-amz-meta-%s", stow.FlyteContentMD5)] = contentMd5
+			headers[fmt.Sprintf("x-amz-meta-%s", storage.FlyteContentMD5)] = contentMd5
 		} else if strings.HasPrefix(reference.String(), "gs://") {
-			headers[fmt.Sprintf("x-goog-meta-%s", stow.FlyteContentMD5)] = contentMd5
+			headers[fmt.Sprintf("x-goog-meta-%s", storage.FlyteContentMD5)] = contentMd5
 		} else if strings.HasPrefix(reference.String(), "abfs://") {
-			headers[fmt.Sprintf("x-ms-meta-%s", stow.FlyteContentMD5)] = contentMd5
+			headers[fmt.Sprintf("x-ms-meta-%s", storage.FlyteContentMD5)] = contentMd5
 			headers["x-ms-blob-type"] = "BlockBlob" // https://learn.microsoft.com/en-us/rest/api/storageservices/put-blob?tabs=microsoft-entra-id#remarks
 		}
 	}
