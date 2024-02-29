@@ -1195,6 +1195,7 @@ ray (`ray.Config`_)
     enabled: false
     endpoint: ""
     name: ""
+  serviceAccount: default
   serviceType: NodePort
   shutdownAfterJobFinishes: true
   ttlSecondsAfterFinished: 3600
@@ -1342,7 +1343,7 @@ resourceConstraints (`core.ResourceConstraintsSpec`_)
     Value: 100
   
 
-defaultAgent (`agent.Agent`_)
+defaultAgent (`agent.Deployment`_)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The default agent.
@@ -1358,7 +1359,7 @@ The default agent.
   timeouts: null
   
 
-agents (map[string]*agent.Agent)
+agents (map[string]*agent.Deployment)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 The agents.
@@ -1391,7 +1392,7 @@ supportedTaskTypes ([]string)
   - task_type_2
   
 
-agent.Agent
+agent.Deployment
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 endpoint (string)
@@ -3565,6 +3566,18 @@ Version of the Ray CRD to use when creating RayClusters or RayJobs.
 .. code-block:: yaml
 
   v1alpha1
+  
+
+serviceAccount (string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+The k8s service account to run as
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  default
   
 
 ray.DefaultConfig
