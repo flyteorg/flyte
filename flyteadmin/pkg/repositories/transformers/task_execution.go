@@ -316,24 +316,26 @@ func mergeExternalResource(ctx context.Context, existing, latest *event.External
 	existing.Logs = mergeLogs(existing.Logs, latest.Logs)
 
 	// set output metadata if exists
-	if len(latest.GetOutputUri()) > 0 || latest.GetError() != nil {
-		existing.OutputResult = latest.GetOutputResult()
-	} else if latest.GetOutputData() != nil {
-		// handle offloading outputs if inlineEventDataPolicy dictates
-		switch inlineEventDataPolicy {
-		case interfaces.InlineEventDataPolicyStoreInline:
+	if existing.OutputResult != nil {
+		if len(latest.GetOutputUri()) > 0 || latest.GetError() != nil {
 			existing.OutputResult = latest.GetOutputResult()
-		default:
-			logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
-			uri, err := common.OffloadLiteralMap(ctx, storageClient, latest.GetOutputData(), parentNodeExecutionID.ExecutionId.Project,
-				parentNodeExecutionID.ExecutionId.Domain, parentNodeExecutionID.ExecutionId.Name, parentNodeExecutionID.NodeId, taskID.Project,
-				taskID.Domain, taskID.Name, taskID.Version, strconv.FormatUint(uint64(retryAttempt), 10), strconv.FormatUint(uint64(latest.Index), 10),
-				strconv.FormatUint(uint64(latest.RetryAttempt), 10), OutputsObjectSuffix)
-			if err != nil {
-				return nil, err
-			}
-			existing.OutputResult = &event.ExternalResourceInfo_OutputUri{
-				OutputUri: uri.String(),
+		} else if latest.GetOutputData() != nil {
+			// handle offloading outputs if inlineEventDataPolicy dictates
+			switch inlineEventDataPolicy {
+			case interfaces.InlineEventDataPolicyStoreInline:
+				existing.OutputResult = latest.GetOutputResult()
+			default:
+				logger.Debugf(ctx, "Offloading outputs per InlineEventDataPolicy")
+				uri, err := common.OffloadLiteralMap(ctx, storageClient, latest.GetOutputData(), parentNodeExecutionID.ExecutionId.Project,
+					parentNodeExecutionID.ExecutionId.Domain, parentNodeExecutionID.ExecutionId.Name, parentNodeExecutionID.NodeId, taskID.Project,
+					taskID.Domain, taskID.Name, taskID.Version, strconv.FormatUint(uint64(retryAttempt), 10), strconv.FormatUint(uint64(latest.Index), 10),
+					strconv.FormatUint(uint64(latest.RetryAttempt), 10), OutputsObjectSuffix)
+				if err != nil {
+					return nil, err
+				}
+				existing.OutputResult = &event.ExternalResourceInfo_OutputUri{
+					OutputUri: uri.String(),
+				}
 			}
 		}
 	}
