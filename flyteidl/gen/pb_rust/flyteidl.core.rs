@@ -730,8 +730,6 @@ pub struct ArtifactKey {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactBindingData {
-    #[prost(uint32, tag="1")]
-    pub index: u32,
     /// This is only relevant in the time partition case
     #[prost(string, tag="4")]
     pub transform: ::prost::alloc::string::String,

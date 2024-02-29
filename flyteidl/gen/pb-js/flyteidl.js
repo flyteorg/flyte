@@ -201,7 +201,6 @@
                  * Properties of an ArtifactBindingData.
                  * @memberof flyteidl.core
                  * @interface IArtifactBindingData
-                 * @property {number|null} [index] ArtifactBindingData index
                  * @property {string|null} [partitionKey] ArtifactBindingData partitionKey
                  * @property {boolean|null} [bindToTimePartition] ArtifactBindingData bindToTimePartition
                  * @property {string|null} [transform] ArtifactBindingData transform
@@ -221,14 +220,6 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
-    
-                /**
-                 * ArtifactBindingData index.
-                 * @member {number} index
-                 * @memberof flyteidl.core.ArtifactBindingData
-                 * @instance
-                 */
-                ArtifactBindingData.prototype.index = 0;
     
                 /**
                  * ArtifactBindingData partitionKey.
@@ -292,8 +283,6 @@
                 ArtifactBindingData.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.index != null && message.hasOwnProperty("index"))
-                        writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.index);
                     if (message.partitionKey != null && message.hasOwnProperty("partitionKey"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.partitionKey);
                     if (message.bindToTimePartition != null && message.hasOwnProperty("bindToTimePartition"))
@@ -321,9 +310,6 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 1:
-                            message.index = reader.uint32();
-                            break;
                         case 2:
                             message.partitionKey = reader.string();
                             break;
@@ -353,9 +339,6 @@
                     if (typeof message !== "object" || message === null)
                         return "object expected";
                     var properties = {};
-                    if (message.index != null && message.hasOwnProperty("index"))
-                        if (!$util.isInteger(message.index))
-                            return "index: integer expected";
                     if (message.partitionKey != null && message.hasOwnProperty("partitionKey")) {
                         properties.partitionData = 1;
                         if (!$util.isString(message.partitionKey))
@@ -33227,6 +33210,7 @@
                         case 3:
                         case 4:
                         case 5:
+                        case 6:
                             break;
                         }
                     if (message.principal != null && message.hasOwnProperty("principal"))
@@ -33277,6 +33261,7 @@
                  * @property {number} RELAUNCH=3 RELAUNCH value
                  * @property {number} CHILD_WORKFLOW=4 CHILD_WORKFLOW value
                  * @property {number} RECOVERED=5 RECOVERED value
+                 * @property {number} TRIGGER=6 TRIGGER value
                  */
                 ExecutionMetadata.ExecutionMode = (function() {
                     var valuesById = {}, values = Object.create(valuesById);
@@ -33286,6 +33271,7 @@
                     values[valuesById[3] = "RELAUNCH"] = 3;
                     values[valuesById[4] = "CHILD_WORKFLOW"] = 4;
                     values[valuesById[5] = "RECOVERED"] = 5;
+                    values[valuesById[6] = "TRIGGER"] = 6;
                     return values;
                 })();
     
