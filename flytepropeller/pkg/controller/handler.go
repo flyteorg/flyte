@@ -63,6 +63,7 @@ func newPropellerMetrics(scope promutils.Scope) *propellerMetrics {
 func RecordSystemError(w *v1alpha1.FlyteWorkflow, err error) *v1alpha1.FlyteWorkflow {
 	// Let's mark these as system errors.
 	// We only want to increase failed attempts and discard any other partial changes to the CRD.
+	// @@@ Can we send message here?
 	wfDeepCopy := w.DeepCopy()
 	wfDeepCopy.GetExecutionStatus().IncFailedAttempts()
 	wfDeepCopy.GetExecutionStatus().SetMessage(err.Error())
@@ -142,6 +143,7 @@ func (p *Propeller) TryMutateWorkflow(ctx context.Context, originalW *v1alpha1.F
 			err = p.workflowExecutor.HandleFlyteWorkflow(ctx, mutableW)
 		}()
 		if err != nil {
+			// we shoulde send message to flyteadmin->flyteconsole here.
 			logger.Errorf(ctx, "Error when trying to reconcile workflow. Error [%v]. Error Type[%v]",
 				err, reflect.TypeOf(err))
 			p.metrics.SystemError.Inc(ctx)

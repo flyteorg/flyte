@@ -595,6 +595,7 @@ func (in *NodeStatus) GetOrCreateArrayNodeStatus() MutableArrayNodeStatus {
 }
 
 func (in *NodeStatus) UpdatePhase(p NodePhase, occurredAt metav1.Time, reason string, enableCRDebugMetadata bool, err *core.ExecutionError) {
+	logger.Infof(context.Background(), "@@@ NodePhase:[%v],\n occurredAt:[%v], \nreason:[%v], \nenableCRDebugMetadata:[%v], \nerr:[%v]", p, occurredAt, reason, enableCRDebugMetadata, err)
 	if in.Phase == p && in.Message == reason {
 		// We will not update the phase multiple times. This prevents the comparison from returning false positive
 		return

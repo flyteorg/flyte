@@ -88,6 +88,10 @@ func (c CorePlugin) Handle(ctx context.Context, tCtx core.TaskExecutionContext) 
 	}
 
 	if err != nil {
+		// can't be unknown transition here
+		// if xxx, core.DoTransition(phaseInfo)
+		// return core.DoTransition(phaseInfo), err // not sure will there be potential system crash
+		logger.Infof(ctx, "@@@ trigger error here:[%v]", err)
 		return core.UnknownTransition, err
 	}
 

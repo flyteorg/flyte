@@ -271,13 +271,15 @@ func (c *workflowExecutor) IdempotentReportEvent(ctx context.Context, e *event.W
 }
 
 func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.WorkflowExecutionIdentifier, wStatus v1alpha1.ExecutableWorkflowStatus, toStatus Status) error {
-	if wStatus.GetPhase() != toStatus.TransitionToPhase {
+	if true || wStatus.GetPhase() != toStatus.TransitionToPhase {
 		logger.Debugf(ctx, "Transitioning/Recording event for workflow state transition [%s] -> [%s]", wStatus.GetPhase().String(), toStatus.TransitionToPhase.String())
 
 		wfEvent := &event.WorkflowExecutionEvent{
 			ExecutionId: execID,
 			ProducerId:  c.clusterID,
 		}
+		logger.Infof(ctx, "@@@ wfEvent:[%v]", wfEvent)
+		logger.Infof(ctx, "@@@ wStatus.GetExecutionError():[%v]", wStatus.GetExecutionError())
 		previousError := wStatus.GetExecutionError()
 		switch toStatus.TransitionToPhase {
 		case v1alpha1.WorkflowPhaseReady:
@@ -285,6 +287,7 @@ func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.W
 			return nil
 		case v1alpha1.WorkflowPhaseRunning:
 			wfEvent.Phase = core.WorkflowExecution_RUNNING
+			// change wfStatus.getmessage?
 			wStatus.UpdatePhase(v1alpha1.WorkflowPhaseRunning, "Workflow Started", nil)
 			wfEvent.OccurredAt = utils.GetProtoTime(wStatus.GetStartedAt())
 		case v1alpha1.WorkflowPhaseFailing:
