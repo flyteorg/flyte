@@ -4,7 +4,7 @@
 ### User Improvements
 Support for [Optional types](https://github.com/flyteorg/flyte/issues/2426). With the inclusion of Union types in flytekit, we can now support optional types.
 
-[Flyte Deck](https://github.com/flyteorg/flyte/issues/2175) is now available. Please take a look at the [documentation](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/flyte_basics/deck.html#sphx-glr-auto-core-flyte-basics-deck-py) and also the [OSS presentation](https://www.youtube.com/watch?v=KqyBYIaAZ7c) that was done a few weeks back.
+[Flyte Deck](https://github.com/flyteorg/flyte/issues/2175) is now available. Please take a look at the [documentation](https://docs.flyte.org/en/latest/user_guide/development_lifecycle/decks.html) and also the [OSS presentation](https://www.youtube.com/watch?v=KqyBYIaAZ7c) that was done a few weeks back.
 
 
 ### Backend Improvements

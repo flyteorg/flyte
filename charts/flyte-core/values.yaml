@@ -16,7 +16,7 @@ flyteadmin:
   image:
     # -- Docker image for Flyteadmin deployment
     repository: cr.flyte.org/flyteorg/flyteadmin # FLYTEADMIN_IMAGE
-    tag: v1.10.7-b4 # FLYTEADMIN_TAG
+    tag: v1.11.0-b0 # FLYTEADMIN_TAG
     pullPolicy: IfNotPresent
   # -- Additional flyteadmin container environment variables
   #
@@ -111,6 +111,14 @@ flyteadmin:
   extraArgs: {}
   # -- Sets priorityClassName for flyteadmin pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flyteadmin pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
   # -- Settings for flyteadmin service monitor
   serviceMonitor:
@@ -134,7 +142,7 @@ flytescheduler:
     # -- Docker image for Flytescheduler deployment
     repository: cr.flyte.org/flyteorg/flytescheduler # FLYTESCHEDULER_IMAGE
     # -- Docker image tag
-    tag: v1.10.7-b4 # FLYTESCHEDULER_TAG
+    tag: v1.11.0-b0 # FLYTESCHEDULER_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytescheduler deployment
@@ -179,6 +187,14 @@ flytescheduler:
   additionalContainers: []
   # -- Sets priorityClassName for flyte scheduler pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flytescheduler pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # DATACATALOG SETTINGS
@@ -192,7 +208,7 @@ datacatalog:
     # -- Docker image for Datacatalog deployment
     repository: cr.flyte.org/flyteorg/datacatalog # DATACATALOG_IMAGE
     # -- Docker image tag
-    tag: v1.10.7-b4 # DATACATALOG_TAG
+    tag: v1.11.0-b0 # DATACATALOG_TAG
     # -- Docker image pull policy
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Datacatalog deployment
@@ -242,6 +258,14 @@ datacatalog:
   extraArgs: {}
   # -- Sets priorityClassName for datacatalog pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for datacatalog pod(s).
+  securityContext:
+    runAsNonRoot: true
+    fsGroup: 1001
+    runAsUser: 1001
+    fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
 #
 # FLYTE_AGENT SETTINGS
@@ -255,6 +279,8 @@ flyteagent:
         defaultAgent:
           endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
           insecure: true
+  # -- Labels for flyteagent pods
+  podLabels: {}
 
 #
 # FLYTEPROPELLER SETTINGS
@@ -270,7 +296,7 @@ flytepropeller:
   image:
     # -- Docker image for Flytepropeller deployment
     repository: cr.flyte.org/flyteorg/flytepropeller # FLYTEPROPELLER_IMAGE
-    tag: v1.10.7-b4 # FLYTEPROPELLER_TAG
+    tag: v1.11.0-b0 # FLYTEPROPELLER_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flytepropeller deployment
   resources:
@@ -320,6 +346,11 @@ flytepropeller:
   clusterName: ""
   # -- Sets priorityClassName for propeller pod(s).
   priorityClassName: ""
+  # -- Sets securityContext for flytepropeller pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
 
   # -- Settings for flytepropeller service
   service:
@@ -348,7 +379,7 @@ flyteconsole:
   image:
     # -- Docker image for Flyteconsole deployment
     repository: cr.flyte.org/flyteorg/flyteconsole # FLYTECONSOLE_IMAGE
-    tag: v1.10.2 # FLYTECONSOLE_TAG
+    tag: v1.10.3 # FLYTECONSOLE_TAG
     pullPolicy: IfNotPresent
   # -- Default resources requests and limits for Flyteconsole deployment
   resources:
@@ -382,6 +413,13 @@ flyteconsole:
   priorityClassName: ""
    # -- ImagePullSecrets to assign to the Flyteconsole deployment
   imagePullSecrets: []
+  # -- Sets securityContext for flyteconsole pod(s).
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1000
+    fsGroupChangePolicy: "OnRootMismatch"
+    seLinuxOptions:
+      type: spc_t
 
 # It will enable the redoc route in ingress
 deployRedoc: false
@@ -419,6 +457,14 @@ webhook:
     annotations:
       projectcontour.io/upstream-protocol.h2c: grpc
     type: ClusterIP
+  # -- Sets securityContext for webhook pod(s).
+  securityContext:
+    fsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 1001
+    fsGroupChangePolicy: "Always"
+    seLinuxOptions:
+      type: spc_t
 
 # ------------------------------------------------
 #
@@ -432,6 +478,8 @@ common:
     # -- Specify your Secret (with sensitive data) or pseudo-manifest (without sensitive data). See https://github.com/godaddy/kubernetes-external-secrets
     secretManifest: {}
   ingress:
+    # --- Sets the ingressClassName
+    ingressClassName:
     # --- Enable or disable creating Ingress for Flyte. Relevant to disable when using e.g. Istio as ingress controller.
     enabled: true
     # --- Enable or disable HMR route to flyteconsole. This is useful only for frontend development.
@@ -646,11 +694,9 @@ configmap:
       defaults:
         cpu: 100m
         memory: 500Mi
-        ephemeralStorage: 500Mi
       limits:
         cpu: 2
         memory: 1Gi
-        ephemeralStorage: 20Mi
         gpu: 1
 
   # -- Admin Client configuration [structure](https://pkg.go.dev/github.com/flyteorg/flytepropeller/pkg/controller/nodes/subworkflow/launchplan#AdminConfig)
@@ -679,7 +725,7 @@ configmap:
         # -- Structure documented [here](https://pkg.go.dev/github.com/lyft/flyteplugins@v0.5.28/go/tasks/pluginmachinery/flytek8s/config#FlyteCoPilotConfig)
         co-pilot:
           name: flyte-copilot-
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.10.7-b4 # FLYTECOPILOT_IMAGE
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.0-b0 # FLYTECOPILOT_IMAGE
           start-timeout: 30s
 
   # -- Core propeller configuration

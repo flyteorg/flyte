@@ -37,6 +37,7 @@ kustomize:
 .PHONY: helm
 helm: ## Generate K8s Manifest from Helm Charts.
 	bash script/generate_helm.sh
+	make -C docker/sandbox-bundled manifests
 
 .PHONY: release_automation
 release_automation:

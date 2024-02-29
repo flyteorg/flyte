@@ -27,6 +27,11 @@ export class ArtifactKey extends Message<ArtifactKey> {
    */
   name = "";
 
+  /**
+   * @generated from field: string org = 4;
+   */
+  org = "";
+
   constructor(data?: PartialMessage<ArtifactKey>) {
     super();
     proto3.util.initPartial(data, this);
@@ -38,6 +43,7 @@ export class ArtifactKey extends Message<ArtifactKey> {
     { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArtifactKey {
@@ -63,11 +69,6 @@ export class ArtifactKey extends Message<ArtifactKey> {
  * @generated from message flyteidl.core.ArtifactBindingData
  */
 export class ArtifactBindingData extends Message<ArtifactBindingData> {
-  /**
-   * @generated from field: uint32 index = 1;
-   */
-  index = 0;
-
   /**
    * These two fields are only relevant in the partition value case
    *
@@ -102,7 +103,6 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.ArtifactBindingData";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
     { no: 2, name: "partition_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "partition_data" },
     { no: 3, name: "bind_to_time_partition", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "partition_data" },
     { no: 4, name: "transform", kind: "scalar", T: 9 /* ScalarType.STRING */ },
