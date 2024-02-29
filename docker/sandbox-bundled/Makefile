@@ -22,7 +22,7 @@ dep_update:
 	helm dependency update ../../charts/flyte-sandbox
 
 .PHONY: manifests
-manifests:
+manifests: dep_update
 	mkdir -p manifests
 	kustomize build \
 		--enable-helm \
