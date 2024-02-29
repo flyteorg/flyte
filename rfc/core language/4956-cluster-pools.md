@@ -21,7 +21,7 @@ Additionally, we would like to have the possibility of different executions targ
 
 ## 3 Proposed Implementation
 
-We plan to use the `cluster_assignement` field (refer to [proto](https://github.com/flyteorg/flyte/blob/master/flyteidl/protos/flyteidl/admin/execution.proto#L312)) in each execution, this is a ClusterAssignment object with a `cluster_pool_name` which would be the field that contains a string with the corresponding ClusterPool ID.
+We plan to use the `cluster_assignement` field (refer to [proto](https://github.com/flyteorg/flyte/blob/a2a63eb893bdff3c2d1a01242d0d25b73f287b1f/flyteidl/protos/flyteidl/admin/execution.proto#L315)) in each execution, this is a ClusterAssignment object with a `cluster_pool_name` which would be the field that contains a string with the corresponding ClusterPool ID.
 
 In the FlyteAdmin configuration we have a list of `clusterpool_config` with all the different available pools and corresponding clusters.
 
