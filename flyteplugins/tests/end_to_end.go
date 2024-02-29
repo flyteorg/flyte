@@ -147,6 +147,7 @@ func RunPluginEndToEndTest(t *testing.T, executor pluginCore.Plugin, template *i
 		Limits:   map[v1.ResourceName]resource.Quantity{},
 	})
 	overrides.OnGetExtendedResources().Return(&idlCore.ExtendedResources{})
+	overrides.OnGetContainerImage().Return("")
 
 	tMeta := &coreMocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)

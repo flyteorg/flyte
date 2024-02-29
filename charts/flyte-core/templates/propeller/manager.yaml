@@ -43,8 +43,10 @@ template:
       volumeMounts:
         - name: config-volume
           mountPath: /etc/flyte/config
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           mountPath: /etc/secrets/
+        {{- end }}
       {{- if .Values.flytepropeller.terminationMessagePolicy }}
       terminationMessagePolicy: "{{ .Values.flytepropeller.terminationMessagePolicy }}"
       {{- end }}
@@ -53,9 +55,11 @@ template:
     - configMap:
         name: flyte-propeller-config
       name: config-volume
+    {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
     - name: auth
       secret:
         secretName: flyte-secret-auth
+    {{- end }}
     {{- with .Values.flytepropeller.nodeSelector }}
     nodeSelector: {{ tpl (toYaml .) $ | nindent 6 }}
     {{- end }}

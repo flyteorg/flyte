@@ -18,7 +18,7 @@
 - dbt plugin (https://github.com/flyteorg/flyte/issues/2202)
 - cache overriding behavior is now open to all types (https://github.com/flyteorg/flyte/issues/2912)
 - Bug: Fallback to pickling in the case of unknown types used Unions (https://github.com/flyteorg/flyte/issues/2823)
-- [pyflyte run](https://docs.flyte.org/en/latest/api/flytekit/design/clis.html#pyflyte-run) now supports [imperative workflows](https://docs.flyte.org/en/latest/flytesnacks/examples/basics/imperative_workflow.html)
+- [pyflyte run](https://docs.flyte.org/en/latest/api/flytekit/design/clis.html#pyflyte-run) now supports [imperative workflows](https://docs.flyte.org/en/latest/user_guide/basics/imperative_workflows.html)
 - Newlines are now stripped from client secrets (https://github.com/flyteorg/flytekit/pull/1163)
 - Ensure repeatability in the generation of cache keys in the case of dictionaries (https://github.com/flyteorg/flytekit/pull/1126)
 - Support for multiple images in the yaml config file (https://github.com/flyteorg/flytekit/pull/1106)

@@ -20,16 +20,14 @@ class ArtifactKey(_message.Message):
     def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., name: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
 
 class ArtifactBindingData(_message.Message):
-    __slots__ = ["index", "partition_key", "bind_to_time_partition", "transform"]
-    INDEX_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["partition_key", "bind_to_time_partition", "transform"]
     PARTITION_KEY_FIELD_NUMBER: _ClassVar[int]
     BIND_TO_TIME_PARTITION_FIELD_NUMBER: _ClassVar[int]
     TRANSFORM_FIELD_NUMBER: _ClassVar[int]
-    index: int
     partition_key: str
     bind_to_time_partition: bool
     transform: str
-    def __init__(self, index: _Optional[int] = ..., partition_key: _Optional[str] = ..., bind_to_time_partition: bool = ..., transform: _Optional[str] = ...) -> None: ...
+    def __init__(self, partition_key: _Optional[str] = ..., bind_to_time_partition: bool = ..., transform: _Optional[str] = ...) -> None: ...
 
 class InputBindingData(_message.Message):
     __slots__ = ["var"]

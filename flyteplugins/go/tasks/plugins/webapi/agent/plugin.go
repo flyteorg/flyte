@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/gob"
 	"fmt"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -14,23 +15,26 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	flyteIO "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+
 type Plugin struct {
 	metricScope   promutils.Scope
 	cfg           *Config
 	cs            *ClientSet
-	agentRegistry map[string]*Agent // map[taskType] => Agent
+	agentRegistry Registry
 }
 
 type ResourceWrapper struct {
-	Phase    flyteIdl.TaskExecution_Phase
-	State    admin.State // This is deprecated.
+	Phase flyteIdl.TaskExecution_Phase
+	// Deprecated: Please Use Phase instead.
+	State    admin.State
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
@@ -38,9 +42,8 @@ type ResourceWrapper struct {
 
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
-	Token             string
 	AgentResourceMeta []byte
-	TaskType          string
+	TaskCategory      admin.TaskCategory
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -79,62 +82,125 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 			return nil, nil, err
 		}
 		taskTemplate.GetContainer().Args = modifiedArgs
+		defer func() {
+			// Restore unrendered template for subsequent renders.
+			taskTemplate.GetContainer().Args = argTemplate
+		}()
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
-
-	client := p.cs.agentClients[agent.Endpoint]
-	if client == nil {
-		return nil, nil, fmt.Errorf("default agent is not connected, please check if endpoint:[%v] is up and running", agent.Endpoint)
-	}
+	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
+	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
+
+	if isSync {
+		client, err := p.getSyncAgentClient(ctx, agent)
+		if err != nil {
+			return nil, nil, err
+		}
+		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
+	}
+
+	// Use async agent client
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return nil, nil, err
+	}
+	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Restore unrendered template for subsequent renders.
-	if taskTemplate.GetContainer() != nil {
-		taskTemplate.GetContainer().Args = argTemplate
-	}
-
-	// If the agent returned a resource, we assume this is a synchronous task.
-	// The state should be a terminal state, for example, SUCCEEDED, PERMANENT_FAILURE, or RETRYABLE_FAILURE.
-	if res.GetResource() != nil {
-		logger.Infof(ctx, "Agent is executing a synchronous task.")
-		return nil,
-			ResourceWrapper{
-				Phase:    res.GetResource().Phase,
-				State:    res.GetResource().State,
-				Outputs:  res.GetResource().Outputs,
-				Message:  res.GetResource().Message,
-				LogLinks: res.GetResource().LogLinks,
-			}, nil
-	}
-
-	logger.Infof(ctx, "Agent is executing an asynchronous task.")
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
-		Token:             "",
-		TaskType:          taskTemplate.Type,
+		TaskCategory:      taskCategory,
 	}, nil, nil
+}
+
+func (p Plugin) ExecuteTaskSync(
+	ctx context.Context,
+	client service.SyncAgentServiceClient,
+	header *admin.CreateRequestHeader,
+	inputs *flyteIdl.LiteralMap,
+) (webapi.ResourceMeta, webapi.Resource, error) {
+	stream, err := client.ExecuteTaskSync(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	headerProto := &admin.ExecuteTaskSyncRequest{
+		Part: &admin.ExecuteTaskSyncRequest_Header{
+			Header: header,
+		},
+	}
+
+	err = stream.Send(headerProto)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to send headerProto with error: %w", err)
+	}
+	inputsProto := &admin.ExecuteTaskSyncRequest{
+		Part: &admin.ExecuteTaskSyncRequest_Inputs{
+			Inputs: inputs,
+		},
+	}
+	err = stream.Send(inputsProto)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
+	}
+
+	in, err := stream.Recv()
+	if err != nil {
+		return nil, nil, err
+	}
+	if in.GetHeader() == nil {
+		return nil, nil, fmt.Errorf("expected header in the response, but got none")
+	}
+	// TODO: Read the streaming output from the agent, and merge it into the final output.
+	// For now, Propeller assumes that the output is always in the header.
+	resource := in.GetHeader().GetResource()
+
+	if err := stream.CloseSend(); err != nil {
+		return nil, nil, err
+	}
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+		return nil, nil, err
+	}
+
+	return nil, ResourceWrapper{
+		Phase:    resource.Phase,
+		Outputs:  resource.Outputs,
+		Message:  resource.Message,
+		LogLinks: resource.LogLinks,
+	}, err
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
 
-	client := p.cs.agentClients[agent.Endpoint]
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return nil, err
+	}
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	request := &admin.GetTaskRequest{
+		TaskType:     metadata.TaskCategory.Name,
+		TaskCategory: &metadata.TaskCategory,
+		ResourceMeta: metadata.AgentResourceMeta,
+	}
+	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +210,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		State:    res.Resource.State,
 		Outputs:  res.Resource.Outputs,
 		Message:  res.Resource.Message,
-		LogLinks: res.LogLinks,
+		LogLinks: res.Resource.LogLinks,
 	}, nil
 }
 
@@ -153,13 +219,21 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
 
-	client := p.cs.agentClients[agent.Endpoint]
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return err
+	}
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	_, err := client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	request := &admin.DeleteTaskRequest{
+		TaskType:     metadata.TaskCategory.Name,
+		TaskCategory: &metadata.TaskCategory,
+		ResourceMeta: metadata.AgentResourceMeta,
+	}
+	_, err = client.DeleteTask(finalCtx, request)
 	return err
 }
 
@@ -177,16 +251,16 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource)
+		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase.\n"+resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	}
 
 	// The default phase is undefined.
@@ -201,11 +275,11 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	case admin.State_RETRYABLE_FAILURE:
-		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	case admin.State_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource)
+		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
@@ -215,7 +289,33 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
+func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
+	client, ok := p.cs.syncAgentClients[agent.Endpoint]
+	if !ok {
+		conn, err := getGrpcConnection(ctx, agent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+		}
+		client = service.NewSyncAgentServiceClient(conn)
+		p.cs.syncAgentClients[agent.Endpoint] = client
+	}
+	return client, nil
+}
+
+func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
+	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
+	if !ok {
+		conn, err := getGrpcConnection(ctx, agent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+		}
+		client = service.NewAsyncAgentServiceClient(conn)
+		p.cs.asyncAgentClients[agent.Endpoint] = client
+	}
+	return client, nil
+}
+
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err
@@ -226,23 +326,23 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 		return nil
 	}
 
-	var opReader io.OutputReader
-	if resource.Outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output.")
-		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
+	var opReader flyteIO.OutputReader
+	if outputs != nil {
+		logger.Debugf(ctx, "AgentDeployment returned an output.")
+		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
-		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
+		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType string, cfg *Config, agentRegistry map[string]*Agent) *Agent {
-	if agent, exists := agentRegistry[taskType]; exists {
-		return agent
+func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
+	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
+		return agent.AgentDeployment, agent.IsSync
 	}
 
-	return &cfg.DefaultAgent
+	return &cfg.DefaultAgent, false
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
@@ -271,7 +371,7 @@ func newAgentPlugin() webapi.PluginEntry {
 
 	cfg := GetConfig()
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "Agent supports task types: %v", supportedTaskTypes)
+	logger.Infof(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
