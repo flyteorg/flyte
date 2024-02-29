@@ -180,6 +180,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 					},
 				},
 			},
+			Spec: &admin.LaunchPlanSpec{
+				FixedInputs: &core.LiteralMap{},
+			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
 		n := &mocks.Node{}
@@ -252,6 +255,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 					},
 				},
 			},
+			Spec: &admin.LaunchPlanSpec{
+				FixedInputs: &core.LiteralMap{},
+			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
 		n := &mocks.Node{}
@@ -320,6 +326,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 						},
 					},
 				},
+			},
+			Spec: &admin.LaunchPlanSpec{
+				FixedInputs: &core.LiteralMap{},
 			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
@@ -403,6 +412,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 						},
 					},
 				},
+			},
+			Spec: &admin.LaunchPlanSpec{
+				FixedInputs: &core.LiteralMap{},
 			},
 		}, nil)
 		h := &mocks6.TaskNodeHandler{}
@@ -497,7 +509,7 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 		composedPBStore.OnWriteRawMatch(
 			mock.MatchedBy(func(ctx context.Context) bool { return true }),
 			storage.DataReference("s3://my-s3-bucket/foo/bar/futures_compiled.pb"),
-			int64(1501),
+			int64(1892),
 			storage.Options{},
 			mock.MatchedBy(func(rdr *bytes.Reader) bool { return true })).Return(errors.New("foo"))
 		composedPBStore.OnWriteProtobufMatch(
@@ -550,6 +562,9 @@ func Test_dynamicNodeHandler_buildContextualDynamicWorkflow_withLaunchPlans(t *t
 						},
 					},
 				},
+			},
+			Spec: &admin.LaunchPlanSpec{
+				FixedInputs: &core.LiteralMap{},
 			},
 		}, nil)
 

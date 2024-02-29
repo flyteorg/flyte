@@ -75,11 +75,24 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		return nil, !errs.HasErrors()
 	}
 
-	var interruptible *bool
+	var cacheable, cacheSerializable, interruptible *bool
+	var cacheVersion *string
 	var name string
-	if n.GetMetadata() != nil {
-		if n.GetMetadata().GetInterruptibleValue() != nil {
-			interruptVal := n.GetMetadata().GetInterruptible()
+	if nodeMetadata := n.GetMetadata(); nodeMetadata != nil {
+		if nodeMetadata.GetCacheableValue() != nil {
+			cacheableVal := nodeMetadata.GetCacheable()
+			cacheable = &cacheableVal
+		}
+		if nodeMetadata.GetCacheVersionValue() != nil {
+			cacheVersionVal := nodeMetadata.GetCacheVersion()
+			cacheVersion = &cacheVersionVal
+		}
+		if nodeMetadata.GetCacheSerializableValue() != nil {
+			cacheSerializableVal := nodeMetadata.GetCacheSerializable()
+			cacheSerializable = &cacheSerializableVal
+		}
+		if nodeMetadata.GetInterruptibleValue() != nil {
+			interruptVal := nodeMetadata.GetInterruptible()
 			interruptible = &interruptVal
 		}
 		name = n.GetMetadata().Name
@@ -96,6 +109,9 @@ func buildNodeSpec(n *core.Node, tasks []*core.CompiledTask, errs errors.Compile
 		InputBindings:     toBindingValueArray(n.GetInputs()),
 		ActiveDeadline:    activeDeadline,
 		Interruptible:     interruptible,
+		Cacheable:         cacheable,
+		CacheVersion:      cacheVersion,
+		CacheSerializable: cacheSerializable,
 	}
 
 	switch v := n.GetTarget().(type) {

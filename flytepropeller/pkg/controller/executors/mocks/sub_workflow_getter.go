@@ -12,6 +12,40 @@ type SubWorkflowGetter struct {
 	mock.Mock
 }
 
+type SubWorkflowGetter_FindLaunchPlan struct {
+	*mock.Call
+}
+
+func (_m SubWorkflowGetter_FindLaunchPlan) Return(_a0 v1alpha1.ExecutableLaunchPlan) *SubWorkflowGetter_FindLaunchPlan {
+	return &SubWorkflowGetter_FindLaunchPlan{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *SubWorkflowGetter) OnFindLaunchPlan(id v1alpha1.Identifier) *SubWorkflowGetter_FindLaunchPlan {
+	c_call := _m.On("FindLaunchPlan", id)
+	return &SubWorkflowGetter_FindLaunchPlan{Call: c_call}
+}
+
+func (_m *SubWorkflowGetter) OnFindLaunchPlanMatch(matchers ...interface{}) *SubWorkflowGetter_FindLaunchPlan {
+	c_call := _m.On("FindLaunchPlan", matchers...)
+	return &SubWorkflowGetter_FindLaunchPlan{Call: c_call}
+}
+
+// FindLaunchPlan provides a mock function with given fields: id
+func (_m *SubWorkflowGetter) FindLaunchPlan(id v1alpha1.Identifier) v1alpha1.ExecutableLaunchPlan {
+	ret := _m.Called(id)
+
+	var r0 v1alpha1.ExecutableLaunchPlan
+	if rf, ok := ret.Get(0).(func(v1alpha1.Identifier) v1alpha1.ExecutableLaunchPlan); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.ExecutableLaunchPlan)
+		}
+	}
+
+	return r0
+}
+
 type SubWorkflowGetter_FindSubWorkflow struct {
 	*mock.Call
 }

@@ -42,6 +42,45 @@ func computeCatalogReservationOwnerID(nCtx interfaces.NodeExecutionContext) (str
 	return ownerID, nil
 }
 
+// isCacheableWithOverrides returns two booleans indicating if the node is cacheable and cache
+// serializable respectively. This function first checks this information from the handler and then
+// applies any overrides from the NodeMetadata.
+func isCacheableWithOverrides(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (bool, bool, error) {
+	cacheable, cacheSerializable, err := cacheHandler.IsCacheable(ctx, nCtx)
+	if err != nil {
+		return false, false, errors.Wrapf(err, "failed to initialize the cacheable")
+	}
+
+	// apply overrides from NodeMetadata
+	node := nCtx.Node()
+	if node.IsCacheable() != nil {
+		cacheable = *node.IsCacheable()
+	}
+
+	if node.IsCacheSerializable() != nil {
+		cacheSerializable = *node.IsCacheSerializable()
+	}
+
+	return cacheable, cacheSerializable, nil
+}
+
+// getCatalogKeyWithOverride returns a unique key to identify this node in the cache. It first
+// constructs the key using the handler and then applies any overrides from the NodeMetadata.
+func getCatalogKeyWithOverrides(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Key, error) {
+	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
+	if err != nil {
+		return catalog.Key{}, errors.Wrapf(err, "failed to initialize the catalogKey")
+	}
+
+	// apply overrides from NodeMetadata
+	node := nCtx.Node()
+	if node.GetCacheVersion() != nil {
+		catalogKey.CacheVersion = *node.GetCacheVersion()
+	}
+
+	return catalogKey, nil
+}
+
 // updatePhaseCacheInfo adds the cache and catalog reservation metadata to the PhaseInfo. This
 // ensures this information is reported in events and available within FlyteAdmin.
 func updatePhaseCacheInfo(phaseInfo handler.PhaseInfo, cacheStatus *catalog.Status, reservationStatus *core.CatalogReservation_Status) handler.PhaseInfo {
@@ -77,7 +116,7 @@ func updatePhaseCacheInfo(phaseInfo handler.PhaseInfo, cacheStatus *catalog.Stat
 // CheckCatalogCache uses the handler and contexts to check if cached outputs for the current node
 // exist. If the exist, this function also copies the outputs to this node.
 func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Entry, error) {
-	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
+	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
 		return catalog.Entry{}, errors.Wrapf(err, "failed to initialize the catalogKey")
 	}
@@ -134,7 +173,7 @@ func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.No
 func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	cacheHandler interfaces.CacheableNodeHandler, heartbeatInterval time.Duration) (catalog.ReservationEntry, error) {
 
-	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
+	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
 		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_DISABLED),
 			errors.Wrapf(err, "failed to initialize the catalogKey")
@@ -171,7 +210,7 @@ func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx i
 func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx interfaces.NodeExecutionContext,
 	cacheHandler interfaces.CacheableNodeHandler) (catalog.ReservationEntry, error) {
 
-	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
+	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
 		return catalog.NewReservationEntryStatus(core.CatalogReservation_RESERVATION_DISABLED),
 			errors.Wrapf(err, "failed to initialize the catalogKey")
@@ -197,7 +236,7 @@ func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx inter
 // WriteCatalogCache relays the outputs of this node to the cache. This allows future executions
 // to reuse these data to avoid recomputation.
 func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Status, error) {
-	catalogKey, err := cacheHandler.GetCatalogKey(ctx, nCtx)
+	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
 		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), errors.Wrapf(err, "failed to initialize the catalogKey")
 	}
@@ -212,8 +251,15 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 
 	outputPaths := ioutils.NewReadOnlyOutputFilePaths(ctx, nCtx.DataStore(), nCtx.NodeStatus().GetOutputDir())
 	outputReader := ioutils.NewRemoteFileOutputReader(ctx, nCtx.DataStore(), outputPaths, nCtx.MaxDatasetSizeBytes())
-	metadata := catalog.Metadata{
-		TaskExecutionIdentifier: task.GetTaskExecutionIdentifier(nCtx),
+
+	metadata := catalog.Metadata{}
+	if node, exists := nCtx.ContextualNodeLookup().GetNode(nCtx.NodeID()); exists {
+		switch node.GetKind() {
+		case v1alpha1.NodeKindTask:
+			metadata.TaskExecutionIdentifier = task.GetTaskExecutionIdentifier(nCtx)
+		default:
+			metadata.NodeExecutionIdentifier = nCtx.NodeExecutionMetadata().GetNodeExecutionID()
+		}
 	}
 
 	// ignores discovery write failures

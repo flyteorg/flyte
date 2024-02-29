@@ -18,6 +18,40 @@ type MetaExtended struct {
 	mock.Mock
 }
 
+type MetaExtended_FindLaunchPlan struct {
+	*mock.Call
+}
+
+func (_m MetaExtended_FindLaunchPlan) Return(_a0 v1alpha1.ExecutableLaunchPlan) *MetaExtended_FindLaunchPlan {
+	return &MetaExtended_FindLaunchPlan{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *MetaExtended) OnFindLaunchPlan(id v1alpha1.Identifier) *MetaExtended_FindLaunchPlan {
+	c_call := _m.On("FindLaunchPlan", id)
+	return &MetaExtended_FindLaunchPlan{Call: c_call}
+}
+
+func (_m *MetaExtended) OnFindLaunchPlanMatch(matchers ...interface{}) *MetaExtended_FindLaunchPlan {
+	c_call := _m.On("FindLaunchPlan", matchers...)
+	return &MetaExtended_FindLaunchPlan{Call: c_call}
+}
+
+// FindLaunchPlan provides a mock function with given fields: id
+func (_m *MetaExtended) FindLaunchPlan(id v1alpha1.Identifier) v1alpha1.ExecutableLaunchPlan {
+	ret := _m.Called(id)
+
+	var r0 v1alpha1.ExecutableLaunchPlan
+	if rf, ok := ret.Get(0).(func(v1alpha1.Identifier) v1alpha1.ExecutableLaunchPlan); ok {
+		r0 = rf(id)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(v1alpha1.ExecutableLaunchPlan)
+		}
+	}
+
+	return r0
+}
+
 type MetaExtended_FindSubWorkflow struct {
 	*mock.Call
 }

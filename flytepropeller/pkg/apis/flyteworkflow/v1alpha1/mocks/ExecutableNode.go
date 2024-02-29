@@ -120,6 +120,40 @@ func (_m *ExecutableNode) GetBranchNode() v1alpha1.ExecutableBranchNode {
 	return r0
 }
 
+type ExecutableNode_GetCacheVersion struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_GetCacheVersion) Return(_a0 *string) *ExecutableNode_GetCacheVersion {
+	return &ExecutableNode_GetCacheVersion{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnGetCacheVersion() *ExecutableNode_GetCacheVersion {
+	c_call := _m.On("GetCacheVersion")
+	return &ExecutableNode_GetCacheVersion{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnGetCacheVersionMatch(matchers ...interface{}) *ExecutableNode_GetCacheVersion {
+	c_call := _m.On("GetCacheVersion", matchers...)
+	return &ExecutableNode_GetCacheVersion{Call: c_call}
+}
+
+// GetCacheVersion provides a mock function with given fields:
+func (_m *ExecutableNode) GetCacheVersion() *string {
+	ret := _m.Called()
+
+	var r0 *string
+	if rf, ok := ret.Get(0).(func() *string); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*string)
+		}
+	}
+
+	return r0
+}
+
 type ExecutableNode_GetConfig struct {
 	*mock.Call
 }
@@ -550,6 +584,74 @@ func (_m *ExecutableNode) GetWorkflowNode() v1alpha1.ExecutableWorkflowNode {
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(v1alpha1.ExecutableWorkflowNode)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNode_IsCacheSerializable struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_IsCacheSerializable) Return(_a0 *bool) *ExecutableNode_IsCacheSerializable {
+	return &ExecutableNode_IsCacheSerializable{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnIsCacheSerializable() *ExecutableNode_IsCacheSerializable {
+	c_call := _m.On("IsCacheSerializable")
+	return &ExecutableNode_IsCacheSerializable{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnIsCacheSerializableMatch(matchers ...interface{}) *ExecutableNode_IsCacheSerializable {
+	c_call := _m.On("IsCacheSerializable", matchers...)
+	return &ExecutableNode_IsCacheSerializable{Call: c_call}
+}
+
+// IsCacheSerializable provides a mock function with given fields:
+func (_m *ExecutableNode) IsCacheSerializable() *bool {
+	ret := _m.Called()
+
+	var r0 *bool
+	if rf, ok := ret.Get(0).(func() *bool); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*bool)
+		}
+	}
+
+	return r0
+}
+
+type ExecutableNode_IsCacheable struct {
+	*mock.Call
+}
+
+func (_m ExecutableNode_IsCacheable) Return(_a0 *bool) *ExecutableNode_IsCacheable {
+	return &ExecutableNode_IsCacheable{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *ExecutableNode) OnIsCacheable() *ExecutableNode_IsCacheable {
+	c_call := _m.On("IsCacheable")
+	return &ExecutableNode_IsCacheable{Call: c_call}
+}
+
+func (_m *ExecutableNode) OnIsCacheableMatch(matchers ...interface{}) *ExecutableNode_IsCacheable {
+	c_call := _m.On("IsCacheable", matchers...)
+	return &ExecutableNode_IsCacheable{Call: c_call}
+}
+
+// IsCacheable provides a mock function with given fields:
+func (_m *ExecutableNode) IsCacheable() *bool {
+	ret := _m.Called()
+
+	var r0 *bool
+	if rf, ok := ret.Get(0).(func() *bool); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*bool)
 		}
 	}
 

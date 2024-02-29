@@ -80,6 +80,40 @@ func (_m *InterfaceProvider) GetExpectedOutputs() *core.VariableMap {
 	return r0
 }
 
+type InterfaceProvider_GetFixedInputs struct {
+	*mock.Call
+}
+
+func (_m InterfaceProvider_GetFixedInputs) Return(_a0 *core.LiteralMap) *InterfaceProvider_GetFixedInputs {
+	return &InterfaceProvider_GetFixedInputs{Call: _m.Call.Return(_a0)}
+}
+
+func (_m *InterfaceProvider) OnGetFixedInputs() *InterfaceProvider_GetFixedInputs {
+	c_call := _m.On("GetFixedInputs")
+	return &InterfaceProvider_GetFixedInputs{Call: c_call}
+}
+
+func (_m *InterfaceProvider) OnGetFixedInputsMatch(matchers ...interface{}) *InterfaceProvider_GetFixedInputs {
+	c_call := _m.On("GetFixedInputs", matchers...)
+	return &InterfaceProvider_GetFixedInputs{Call: c_call}
+}
+
+// GetFixedInputs provides a mock function with given fields:
+func (_m *InterfaceProvider) GetFixedInputs() *core.LiteralMap {
+	ret := _m.Called()
+
+	var r0 *core.LiteralMap
+	if rf, ok := ret.Get(0).(func() *core.LiteralMap); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*core.LiteralMap)
+		}
+	}
+
+	return r0
+}
+
 type InterfaceProvider_GetID struct {
 	*mock.Call
 }

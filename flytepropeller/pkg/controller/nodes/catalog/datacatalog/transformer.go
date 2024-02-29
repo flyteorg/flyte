@@ -15,9 +15,15 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/pbhash"
 )
 
-const cachedTaskTag = "flyte_cached"
-const taskNamespace = "flyte_task"
-const maxParamHashLength = 8
+const (
+	cachedTaskTag = "flyte_cached"
+
+	launchplanNamespace = "flyte_lp"
+	taskNamespace       = "flyte_task"
+	workflowNamespace   = "flyte_wf"
+
+	maxParamHashLength = 8
+)
 
 // Declare the definition of empty literal and variable maps. This is important because we hash against
 // the literal and variable maps. So Nil and empty literals and variable maps should translate to these definitions
@@ -25,8 +31,19 @@ const maxParamHashLength = 8
 var emptyLiteralMap = core.LiteralMap{Literals: map[string]*core.Literal{}}
 var emptyVariableMap = core.VariableMap{Variables: map[string]*core.Variable{}}
 
-func getDatasetNameFromTask(taskID core.Identifier) string {
-	return fmt.Sprintf("%s-%s", taskNamespace, taskID.Name)
+func getDatasetName(id core.Identifier) (string, error) {
+	var namespace string
+	switch id.ResourceType {
+	case core.ResourceType_LAUNCH_PLAN:
+		namespace = launchplanNamespace
+	case core.ResourceType_TASK:
+		namespace = taskNamespace
+	case core.ResourceType_WORKFLOW:
+		namespace = workflowNamespace
+	default:
+		return "", fmt.Errorf("unsupported resource type [%v] for id [%v]", id.ResourceType, id)
+	}
+	return fmt.Sprintf("%s-%s", namespace, id.Name), nil
 }
 
 // Transform the artifact Data into task execution outputs as a literal map
@@ -64,7 +81,7 @@ func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.Type
 	return &core.LiteralMap{Literals: outputs}, nil
 }
 
-func generateDataSetVersionFromTask(ctx context.Context, taskInterface core.TypedInterface, cacheVersion string) (string, error) {
+func generateDataSetVersion(ctx context.Context, taskInterface core.TypedInterface, cacheVersion string) (string, error) {
 	signatureHash, err := generateTaskSignatureHash(ctx, taskInterface)
 	if err != nil {
 		return "", err
@@ -127,8 +144,13 @@ func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cache
 // Get the DataSetID for a task.
 // NOTE: the version of the task is a combination of both the discoverable_version and the task signature.
 // This is because the interface may of changed even if the discoverable_version hadn't.
-func GenerateDatasetIDForTask(ctx context.Context, k catalog.Key) (*datacatalog.DatasetID, error) {
-	datasetVersion, err := generateDataSetVersionFromTask(ctx, k.TypedInterface, k.CacheVersion)
+func GenerateDatasetID(ctx context.Context, k catalog.Key) (*datacatalog.DatasetID, error) {
+	datasetVersion, err := generateDataSetVersion(ctx, k.TypedInterface, k.CacheVersion)
+	if err != nil {
+		return nil, err
+	}
+
+	name, err := getDatasetName(k.Identifier)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +158,7 @@ func GenerateDatasetIDForTask(ctx context.Context, k catalog.Key) (*datacatalog.
 	datasetID := &datacatalog.DatasetID{
 		Project: k.Identifier.Project,
 		Domain:  k.Identifier.Domain,
-		Name:    getDatasetNameFromTask(k.Identifier),
+		Name:    name,
 		Version: datasetVersion,
 		Org:     k.Identifier.Org,
 	}
