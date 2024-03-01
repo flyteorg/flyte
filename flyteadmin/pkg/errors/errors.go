@@ -182,6 +182,22 @@ func NewWorkflowExistsIdenticalStructureError(ctx context.Context, request *admi
 	return statusErr
 }
 
+func NewLaunchPlanExistsDifferentStructureError(ctx context.Context, request *admin.LaunchPlanCreateRequest, oldSpec *admin.LaunchPlanSpec, newSpec *admin.LaunchPlanSpec) FlyteAdminError {
+	errorMsg := "launch plan with different structure already exists:\n"
+	diff, _ := jsondiff.Compare(oldSpec, newSpec)
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
+	rs := compareJsons(diff, rdiff)
+
+	errorMsg += strings.Join(rs, "\n")
+
+	return NewFlyteAdminErrorf(codes.InvalidArgument, errorMsg)
+}
+
+func NewLaunchPlanExistsIdenticalStructureError(ctx context.Context, request *admin.LaunchPlanCreateRequest) FlyteAdminError {
+	errorMsg := "launch plan with identical structure already exists"
+	return NewFlyteAdminErrorf(codes.AlreadyExists, errorMsg)
+}
+
 func IsDoesNotExistError(err error) bool {
 	adminError, ok := err.(FlyteAdminError)
 	return ok && adminError.Code() == codes.NotFound

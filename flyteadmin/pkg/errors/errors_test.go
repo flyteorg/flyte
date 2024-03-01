@@ -182,10 +182,10 @@ func TestNewWorkflowExistsDifferentStructureError(t *testing.T) {
 }
 
 func TestNewWorkflowExistsIdenticalStructureError(t *testing.T) {
-	wf := &admin.WorkflowCreateRequest{
+	req := &admin.WorkflowCreateRequest{
 		Id: &identifier,
 	}
-	statusErr := NewWorkflowExistsIdenticalStructureError(context.Background(), wf)
+	statusErr := NewWorkflowExistsIdenticalStructureError(context.Background(), req)
 	assert.NotNil(t, statusErr)
 	s, ok := status.FromError(statusErr)
 	assert.True(t, ok)
@@ -196,6 +196,55 @@ func TestNewWorkflowExistsIdenticalStructureError(t *testing.T) {
 	assert.True(t, ok)
 	_, ok = details.GetReason().(*admin.CreateWorkflowFailureReason_ExistsIdenticalStructure)
 	assert.True(t, ok)
+}
+
+func TestNewLaunchPlanExistsDifferentStructureError(t *testing.T) {
+	req := &admin.LaunchPlanCreateRequest{
+		Id: &identifier,
+	}
+
+	oldLaunchPlan := &admin.LaunchPlan{
+		Spec: &admin.LaunchPlanSpec{
+			WorkflowId: &core.Identifier{
+				Project: "testProj",
+				Domain:  "domain",
+				Name:    "lp_name",
+				Version: "ver1",
+			},
+		},
+		Id: &identifier,
+	}
+
+	newLaunchPlan := &admin.LaunchPlan{
+		Spec: &admin.LaunchPlanSpec{
+			WorkflowId: &core.Identifier{
+				Project: "testProj",
+				Domain:  "domain",
+				Name:    "lp_name",
+				Version: "ver2",
+			},
+		},
+		Id: &identifier,
+	}
+
+	statusErr := NewLaunchPlanExistsDifferentStructureError(context.Background(), req, oldLaunchPlan.Spec, newLaunchPlan.Spec)
+	assert.NotNil(t, statusErr)
+	s, ok := status.FromError(statusErr)
+	assert.True(t, ok)
+	assert.Equal(t, codes.InvalidArgument, s.Code())
+	assert.Equal(t, "launch plan with different structure already exists:\n\t\t- /workflow_id/version: ver1 -> ver2", s.Message())
+}
+
+func TestNewLaunchPlanExistsIdenticalStructureError(t *testing.T) {
+	req := &admin.LaunchPlanCreateRequest{
+		Id: &identifier,
+	}
+	statusErr := NewLaunchPlanExistsIdenticalStructureError(context.Background(), req)
+	assert.NotNil(t, statusErr)
+	s, ok := status.FromError(statusErr)
+	assert.True(t, ok)
+	assert.Equal(t, codes.AlreadyExists, s.Code())
+	assert.Equal(t, "launch plan with identical structure already exists", s.Message())
 }
 
 func TestIsDoesNotExistError(t *testing.T) {
