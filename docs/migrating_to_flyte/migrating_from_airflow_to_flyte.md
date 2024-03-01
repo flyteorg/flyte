@@ -5,6 +5,9 @@
 Flyte can compile Airflow tasks into Flyte tasks without changing code, which allows you 
 to migrate your Airflow DAGs to Flyte with minimal effort.
 
+In addition to migration capabilities, Flyte users can seamlessly integrate Airflow tasks into their workflows, leveraging the ecosystem of Airflow operators and sensors.
+By combining the robust Airflow ecosystem with Flyte's capabilities such as caching, versioning, and reproducibility, users can run more complex data and machine learning workflows with ease.
+
 ## Prerequisites
 
 - Install `flytekitplugins-airflow` in your Python environment.
@@ -71,3 +74,8 @@ your Airflow `BashOperator` task on the Airflow agent.
 ```bash
 pyflyte run --remote workflows.py airflow_wf
 ```
+
+:::{note}
+Many Airflow operators and sensors have been tested on Flyte, but some may not work as expected.
+If you encounter any issues, please file an [issue](https://github.com/flyteorg/flyte/issues) or reach out to the Flyte community on [Slack](https://slack.flyte.org/).
+:::
