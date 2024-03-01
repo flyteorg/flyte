@@ -144,10 +144,11 @@ export namespace flyteidl {
 
         /** Granularity enum. */
         enum Granularity {
-            MINUTE = 0,
-            HOUR = 1,
-            DAY = 2,
-            MONTH = 3
+            UNSET = 0,
+            MINUTE = 1,
+            HOUR = 2,
+            DAY = 3,
+            MONTH = 4
         }
 
         /** Operator enum. */

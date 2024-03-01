@@ -11,33 +11,39 @@ import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
  */
 export enum Granularity {
   /**
-   * @generated from enum value: MINUTE = 0;
+   * @generated from enum value: UNSET = 0;
    */
-  MINUTE = 0,
+  UNSET = 0,
 
   /**
-   * @generated from enum value: HOUR = 1;
+   * @generated from enum value: MINUTE = 1;
    */
-  HOUR = 1,
+  MINUTE = 1,
+
+  /**
+   * @generated from enum value: HOUR = 2;
+   */
+  HOUR = 2,
 
   /**
    * default
    *
-   * @generated from enum value: DAY = 2;
+   * @generated from enum value: DAY = 3;
    */
-  DAY = 2,
+  DAY = 3,
 
   /**
-   * @generated from enum value: MONTH = 3;
+   * @generated from enum value: MONTH = 4;
    */
-  MONTH = 3,
+  MONTH = 4,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Granularity)
 proto3.util.setEnumType(Granularity, "flyteidl.core.Granularity", [
-  { no: 0, name: "MINUTE" },
-  { no: 1, name: "HOUR" },
-  { no: 2, name: "DAY" },
-  { no: 3, name: "MONTH" },
+  { no: 0, name: "UNSET" },
+  { no: 1, name: "MINUTE" },
+  { no: 2, name: "HOUR" },
+  { no: 3, name: "DAY" },
+  { no: 4, name: "MONTH" },
 ]);
 
 /**
@@ -376,7 +382,7 @@ export class TimePartition extends Message<TimePartition> {
   /**
    * @generated from field: flyteidl.core.Granularity granularity = 2;
    */
-  granularity = Granularity.MINUTE;
+  granularity = Granularity.UNSET;
 
   constructor(data?: PartialMessage<TimePartition>) {
     super();

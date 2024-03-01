@@ -7041,12 +7041,13 @@
     "coreGranularity": {
       "type": "string",
       "enum": [
+        "UNSET",
         "MINUTE",
         "HOUR",
         "DAY",
         "MONTH"
       ],
-      "default": "MINUTE",
+      "default": "UNSET",
       "title": "- DAY: default"
     },
     "coreIOStrategy": {

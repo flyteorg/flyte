@@ -10,6 +10,7 @@ DESCRIPTOR: _descriptor.FileDescriptor
 
 class Granularity(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
+    UNSET: _ClassVar[Granularity]
     MINUTE: _ClassVar[Granularity]
     HOUR: _ClassVar[Granularity]
     DAY: _ClassVar[Granularity]
@@ -19,6 +20,7 @@ class Operator(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
     __slots__ = []
     MINUS: _ClassVar[Operator]
     PLUS: _ClassVar[Operator]
+UNSET: Granularity
 MINUTE: Granularity
 HOUR: Granularity
 DAY: Granularity

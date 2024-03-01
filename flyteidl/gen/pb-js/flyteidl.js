@@ -366,17 +366,19 @@
              * Granularity enum.
              * @name flyteidl.core.Granularity
              * @enum {string}
-             * @property {number} MINUTE=0 MINUTE value
-             * @property {number} HOUR=1 HOUR value
-             * @property {number} DAY=2 DAY value
-             * @property {number} MONTH=3 MONTH value
+             * @property {number} UNSET=0 UNSET value
+             * @property {number} MINUTE=1 MINUTE value
+             * @property {number} HOUR=2 HOUR value
+             * @property {number} DAY=3 DAY value
+             * @property {number} MONTH=4 MONTH value
              */
             core.Granularity = (function() {
                 var valuesById = {}, values = Object.create(valuesById);
-                values[valuesById[0] = "MINUTE"] = 0;
-                values[valuesById[1] = "HOUR"] = 1;
-                values[valuesById[2] = "DAY"] = 2;
-                values[valuesById[3] = "MONTH"] = 3;
+                values[valuesById[0] = "UNSET"] = 0;
+                values[valuesById[1] = "MINUTE"] = 1;
+                values[valuesById[2] = "HOUR"] = 2;
+                values[valuesById[3] = "DAY"] = 3;
+                values[valuesById[4] = "MONTH"] = 4;
                 return values;
             })();
     
@@ -1089,6 +1091,7 @@
                         case 1:
                         case 2:
                         case 3:
+                        case 4:
                             break;
                         }
                     return null;

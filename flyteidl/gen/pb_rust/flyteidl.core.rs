@@ -854,11 +854,12 @@ pub mod artifact_query {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]
 pub enum Granularity {
-    Minute = 0,
-    Hour = 1,
+    Unset = 0,
+    Minute = 1,
+    Hour = 2,
     /// default
-    Day = 2,
-    Month = 3,
+    Day = 3,
+    Month = 4,
 }
 impl Granularity {
     /// String value of the enum field names used in the ProtoBuf definition.
@@ -867,6 +868,7 @@ impl Granularity {
     /// (if the ProtoBuf definition does not change) and safe for programmatic use.
     pub fn as_str_name(&self) -> &'static str {
         match self {
+            Granularity::Unset => "UNSET",
             Granularity::Minute => "MINUTE",
             Granularity::Hour => "HOUR",
             Granularity::Day => "DAY",
@@ -876,6 +878,7 @@ impl Granularity {
     /// Creates an enum from field names used in the ProtoBuf definition.
     pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
         match value {
+            "UNSET" => Some(Self::Unset),
             "MINUTE" => Some(Self::Minute),
             "HOUR" => Some(Self::Hour),
             "DAY" => Some(Self::Day),
