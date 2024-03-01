@@ -466,6 +466,16 @@ webhook:
     seLinuxOptions:
       type: spc_t
 
+  resources:
+    limits:
+      cpu: 200m
+      ephemeral-storage: 100Mi
+      memory: 200Mi
+    requests:
+      cpu: 10m
+      ephemeral-storage: 50Mi
+      memory: 100Mi
+
 # ------------------------------------------------
 #
 # COMMON SETTINGS

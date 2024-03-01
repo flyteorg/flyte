@@ -290,6 +290,12 @@ helm install gateway bitnami/contour -n flyte
 | storage.s3.secretKey | string | `""` | AWS IAM user secret access key to use for S3 bucket auth, only used if authType is set to accesskey |
 | storage.type | string | `"sandbox"` | Sets the storage type. Supported values are sandbox, s3, gcs and custom. |
 | webhook.enabled | bool | `true` | enable or disable secrets webhook |
+| webhook.resources.limits.cpu | string | `"200m"` |  |
+| webhook.resources.limits.ephemeral-storage | string | `"100Mi"` |  |
+| webhook.resources.limits.memory | string | `"200Mi"` |  |
+| webhook.resources.requests.cpu | string | `"10m"` |  |
+| webhook.resources.requests.ephemeral-storage | string | `"50Mi"` |  |
+| webhook.resources.requests.memory | string | `"100Mi"` |  |
 | webhook.securityContext | object | `{"fsGroup":65534,"fsGroupChangePolicy":"Always","runAsNonRoot":true,"runAsUser":1001,"seLinuxOptions":{"type":"spc_t"}}` | Sets securityContext for webhook pod(s). |
 | webhook.service | object | `{"annotations":{"projectcontour.io/upstream-protocol.h2c":"grpc"},"type":"ClusterIP"}` | Service settings for the webhook |
 | webhook.serviceAccount | object | `{"annotations":{},"create":true,"imagePullSecrets":[]}` | Configuration for service accounts for the webhook |
