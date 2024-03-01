@@ -4,6 +4,8 @@ package flyteidl.plugins;
 
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugins";
 
+import "google/protobuf/duration.proto";
+
 // Describes a job that can process independent pieces of data concurrently. Multiple copies of the runnable component
 // will be executed concurrently.
 message ArrayJob {
@@ -27,4 +29,7 @@ message ArrayJob {
         // job can be marked successful.
         float min_success_ratio = 4;
     }
+
+    // The timeout of individual subnodes
+    google.protobuf.Duration timeout = 5;
 }
