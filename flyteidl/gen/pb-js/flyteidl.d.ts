@@ -267,6 +267,52 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a RuntimeBinding. */
+        interface IRuntimeBinding {
+        }
+
+        /** Represents a RuntimeBinding. */
+        class RuntimeBinding implements IRuntimeBinding {
+
+            /**
+             * Constructs a new RuntimeBinding.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IRuntimeBinding);
+
+            /**
+             * Creates a new RuntimeBinding instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RuntimeBinding instance
+             */
+            public static create(properties?: flyteidl.core.IRuntimeBinding): flyteidl.core.RuntimeBinding;
+
+            /**
+             * Encodes the specified RuntimeBinding message. Does not implicitly {@link flyteidl.core.RuntimeBinding.verify|verify} messages.
+             * @param message RuntimeBinding message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IRuntimeBinding, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RuntimeBinding message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RuntimeBinding
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.RuntimeBinding;
+
+            /**
+             * Verifies a RuntimeBinding message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a LabelValue. */
         interface ILabelValue {
 
@@ -281,6 +327,9 @@ export namespace flyteidl {
 
             /** LabelValue inputBinding */
             inputBinding?: (flyteidl.core.IInputBindingData|null);
+
+            /** LabelValue runtimeBinding */
+            runtimeBinding?: (flyteidl.core.IRuntimeBinding|null);
         }
 
         /** Represents a LabelValue. */
@@ -304,8 +353,11 @@ export namespace flyteidl {
             /** LabelValue inputBinding. */
             public inputBinding?: (flyteidl.core.IInputBindingData|null);
 
+            /** LabelValue runtimeBinding. */
+            public runtimeBinding?: (flyteidl.core.IRuntimeBinding|null);
+
             /** LabelValue value. */
-            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding");
+            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding"|"runtimeBinding");
 
             /**
              * Creates a new LabelValue instance using the specified properties.

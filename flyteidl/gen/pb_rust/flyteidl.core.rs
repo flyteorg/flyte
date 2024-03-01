@@ -765,8 +765,12 @@ pub struct InputBindingData {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RuntimeBinding {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LabelValue {
-    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4, 5")]
     pub value: ::core::option::Option<label_value::Value>,
 }
 /// Nested message and enum types in `LabelValue`.
@@ -784,6 +788,8 @@ pub mod label_value {
         TriggeredBinding(super::ArtifactBindingData),
         #[prost(message, tag="4")]
         InputBinding(super::InputBindingData),
+        #[prost(message, tag="5")]
+        RuntimeBinding(super::RuntimeBinding),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]

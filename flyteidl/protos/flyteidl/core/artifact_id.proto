@@ -50,6 +50,8 @@ message InputBindingData {
   string var = 1;
 }
 
+message RuntimeBinding {}
+
 message LabelValue {
   oneof value {
     // The string static value is for use in the Partitions object
@@ -59,6 +61,7 @@ message LabelValue {
     google.protobuf.Timestamp time_value = 2;
     ArtifactBindingData triggered_binding = 3;
     InputBindingData input_binding = 4;
+    RuntimeBinding runtime_binding = 5;
   }
 }
 

@@ -7217,6 +7217,9 @@
         },
         "input_binding": {
           "$ref": "#/definitions/coreInputBindingData"
+        },
+        "runtime_binding": {
+          "$ref": "#/definitions/coreRuntimeBinding"
         }
       }
     },
@@ -7699,6 +7702,9 @@
         }
       },
       "description": "Retry strategy associated with an executable unit."
+    },
+    "coreRuntimeBinding": {
+      "type": "object"
     },
     "coreRuntimeMetadata": {
       "type": "object",

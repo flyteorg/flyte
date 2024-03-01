@@ -64,17 +64,23 @@ class InputBindingData(_message.Message):
     var: str
     def __init__(self, var: _Optional[str] = ...) -> None: ...
 
+class RuntimeBinding(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
 class LabelValue(_message.Message):
-    __slots__ = ["static_value", "time_value", "triggered_binding", "input_binding"]
+    __slots__ = ["static_value", "time_value", "triggered_binding", "input_binding", "runtime_binding"]
     STATIC_VALUE_FIELD_NUMBER: _ClassVar[int]
     TIME_VALUE_FIELD_NUMBER: _ClassVar[int]
     TRIGGERED_BINDING_FIELD_NUMBER: _ClassVar[int]
     INPUT_BINDING_FIELD_NUMBER: _ClassVar[int]
+    RUNTIME_BINDING_FIELD_NUMBER: _ClassVar[int]
     static_value: str
     time_value: _timestamp_pb2.Timestamp
     triggered_binding: ArtifactBindingData
     input_binding: InputBindingData
-    def __init__(self, static_value: _Optional[str] = ..., time_value: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., triggered_binding: _Optional[_Union[ArtifactBindingData, _Mapping]] = ..., input_binding: _Optional[_Union[InputBindingData, _Mapping]] = ...) -> None: ...
+    runtime_binding: RuntimeBinding
+    def __init__(self, static_value: _Optional[str] = ..., time_value: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., triggered_binding: _Optional[_Union[ArtifactBindingData, _Mapping]] = ..., input_binding: _Optional[_Union[InputBindingData, _Mapping]] = ..., runtime_binding: _Optional[_Union[RuntimeBinding, _Mapping]] = ...) -> None: ...
 
 class Partitions(_message.Message):
     __slots__ = ["value"]

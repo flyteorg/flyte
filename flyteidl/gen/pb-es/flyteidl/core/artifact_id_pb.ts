@@ -266,6 +266,37 @@ export class InputBindingData extends Message<InputBindingData> {
 }
 
 /**
+ * @generated from message flyteidl.core.RuntimeBinding
+ */
+export class RuntimeBinding extends Message<RuntimeBinding> {
+  constructor(data?: PartialMessage<RuntimeBinding>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.RuntimeBinding";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RuntimeBinding {
+    return new RuntimeBinding().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RuntimeBinding {
+    return new RuntimeBinding().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RuntimeBinding {
+    return new RuntimeBinding().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RuntimeBinding | PlainMessage<RuntimeBinding> | undefined, b: RuntimeBinding | PlainMessage<RuntimeBinding> | undefined): boolean {
+    return proto3.util.equals(RuntimeBinding, a, b);
+  }
+}
+
+/**
  * @generated from message flyteidl.core.LabelValue
  */
 export class LabelValue extends Message<LabelValue> {
@@ -300,6 +331,12 @@ export class LabelValue extends Message<LabelValue> {
      */
     value: InputBindingData;
     case: "inputBinding";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.RuntimeBinding runtime_binding = 5;
+     */
+    value: RuntimeBinding;
+    case: "runtimeBinding";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<LabelValue>) {
@@ -314,6 +351,7 @@ export class LabelValue extends Message<LabelValue> {
     { no: 2, name: "time_value", kind: "message", T: Timestamp, oneof: "value" },
     { no: 3, name: "triggered_binding", kind: "message", T: ArtifactBindingData, oneof: "value" },
     { no: 4, name: "input_binding", kind: "message", T: InputBindingData, oneof: "value" },
+    { no: 5, name: "runtime_binding", kind: "message", T: RuntimeBinding, oneof: "value" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LabelValue {

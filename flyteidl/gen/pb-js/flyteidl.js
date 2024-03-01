@@ -638,6 +638,99 @@
                 return InputBindingData;
             })();
     
+            core.RuntimeBinding = (function() {
+    
+                /**
+                 * Properties of a RuntimeBinding.
+                 * @memberof flyteidl.core
+                 * @interface IRuntimeBinding
+                 */
+    
+                /**
+                 * Constructs a new RuntimeBinding.
+                 * @memberof flyteidl.core
+                 * @classdesc Represents a RuntimeBinding.
+                 * @implements IRuntimeBinding
+                 * @constructor
+                 * @param {flyteidl.core.IRuntimeBinding=} [properties] Properties to set
+                 */
+                function RuntimeBinding(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * Creates a new RuntimeBinding instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.core.RuntimeBinding
+                 * @static
+                 * @param {flyteidl.core.IRuntimeBinding=} [properties] Properties to set
+                 * @returns {flyteidl.core.RuntimeBinding} RuntimeBinding instance
+                 */
+                RuntimeBinding.create = function create(properties) {
+                    return new RuntimeBinding(properties);
+                };
+    
+                /**
+                 * Encodes the specified RuntimeBinding message. Does not implicitly {@link flyteidl.core.RuntimeBinding.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.core.RuntimeBinding
+                 * @static
+                 * @param {flyteidl.core.IRuntimeBinding} message RuntimeBinding message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                RuntimeBinding.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes a RuntimeBinding message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.core.RuntimeBinding
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.core.RuntimeBinding} RuntimeBinding
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                RuntimeBinding.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.core.RuntimeBinding();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies a RuntimeBinding message.
+                 * @function verify
+                 * @memberof flyteidl.core.RuntimeBinding
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                RuntimeBinding.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    return null;
+                };
+    
+                return RuntimeBinding;
+            })();
+    
             core.LabelValue = (function() {
     
                 /**
@@ -648,6 +741,7 @@
                  * @property {google.protobuf.ITimestamp|null} [timeValue] LabelValue timeValue
                  * @property {flyteidl.core.IArtifactBindingData|null} [triggeredBinding] LabelValue triggeredBinding
                  * @property {flyteidl.core.IInputBindingData|null} [inputBinding] LabelValue inputBinding
+                 * @property {flyteidl.core.IRuntimeBinding|null} [runtimeBinding] LabelValue runtimeBinding
                  */
     
                 /**
@@ -697,17 +791,25 @@
                  */
                 LabelValue.prototype.inputBinding = null;
     
+                /**
+                 * LabelValue runtimeBinding.
+                 * @member {flyteidl.core.IRuntimeBinding|null|undefined} runtimeBinding
+                 * @memberof flyteidl.core.LabelValue
+                 * @instance
+                 */
+                LabelValue.prototype.runtimeBinding = null;
+    
                 // OneOf field names bound to virtual getters and setters
                 var $oneOfFields;
     
                 /**
                  * LabelValue value.
-                 * @member {"staticValue"|"timeValue"|"triggeredBinding"|"inputBinding"|undefined} value
+                 * @member {"staticValue"|"timeValue"|"triggeredBinding"|"inputBinding"|"runtimeBinding"|undefined} value
                  * @memberof flyteidl.core.LabelValue
                  * @instance
                  */
                 Object.defineProperty(LabelValue.prototype, "value", {
-                    get: $util.oneOfGetter($oneOfFields = ["staticValue", "timeValue", "triggeredBinding", "inputBinding"]),
+                    get: $util.oneOfGetter($oneOfFields = ["staticValue", "timeValue", "triggeredBinding", "inputBinding", "runtimeBinding"]),
                     set: $util.oneOfSetter($oneOfFields)
                 });
     
@@ -743,6 +845,8 @@
                         $root.flyteidl.core.ArtifactBindingData.encode(message.triggeredBinding, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.inputBinding != null && message.hasOwnProperty("inputBinding"))
                         $root.flyteidl.core.InputBindingData.encode(message.inputBinding, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+                    if (message.runtimeBinding != null && message.hasOwnProperty("runtimeBinding"))
+                        $root.flyteidl.core.RuntimeBinding.encode(message.runtimeBinding, writer.uint32(/* id 5, wireType 2 =*/42).fork()).ldelim();
                     return writer;
                 };
     
@@ -775,6 +879,9 @@
                             break;
                         case 4:
                             message.inputBinding = $root.flyteidl.core.InputBindingData.decode(reader, reader.uint32());
+                            break;
+                        case 5:
+                            message.runtimeBinding = $root.flyteidl.core.RuntimeBinding.decode(reader, reader.uint32());
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -829,6 +936,16 @@
                             var error = $root.flyteidl.core.InputBindingData.verify(message.inputBinding);
                             if (error)
                                 return "inputBinding." + error;
+                        }
+                    }
+                    if (message.runtimeBinding != null && message.hasOwnProperty("runtimeBinding")) {
+                        if (properties.value === 1)
+                            return "value: multiple values";
+                        properties.value = 1;
+                        {
+                            var error = $root.flyteidl.core.RuntimeBinding.verify(message.runtimeBinding);
+                            if (error)
+                                return "runtimeBinding." + error;
                         }
                     }
                     return null;
