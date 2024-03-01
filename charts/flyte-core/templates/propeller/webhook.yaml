@@ -103,7 +103,9 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+          {{- if .Values.webhook.resources -}}
           resources: {{- toYaml .Values.webhook.resources | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config
