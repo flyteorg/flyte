@@ -13,6 +13,7 @@ private_images
 caching
 cache_serializing
 decks
+failure_node
 creating_a_new_project
 running_tasks
 running_workflows

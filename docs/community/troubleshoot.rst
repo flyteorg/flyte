@@ -133,3 +133,21 @@ Example output:
  $ kubectl annotate serviceaccount -n <flyte-namespace> <http://eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>
 
 - Refer to this community-maintained `guides <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/03-roles-service-accounts.md>`_ for further information about Flyte deployment on EKS
+
+``FlyteScopedUserException: 'JavaPackage' object is not callable`` when running a Spark task
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Please add ``spark`` to the list of `enabled-plugins` in the config yaml file. For example,
+
+.. code-block:: yaml
+
+  tasks:
+    task-plugins:
+      enabled-plugins:
+        - container
+        - sidecar
+        - K8S-ARRAY
+        - spark
+      default-for-task-types:
+        - container: container
+        - container_array: K8S-ARRAY
