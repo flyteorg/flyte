@@ -6,6 +6,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
@@ -23,7 +24,16 @@ var testLiteralMap = &core.LiteralMap{
 	},
 }
 
-const testOutputsURI = "s3://foo/bar/outputs.pb"
+const testOutputsURI = "s3://bucket/bar/outputs.pb"
+
+type objectStoreMock struct {
+	mock.Mock
+}
+
+func (m *objectStoreMock) GetObject(_ context.Context, req GetObjectRequest) (GetObjectResponse, error) {
+	args := m.Called(req)
+	return args.Get(0).(GetObjectResponse), args.Error(1)
+}
 
 func TestShouldFetchData(t *testing.T) {
 	t.Run("local config", func(t *testing.T) {
@@ -111,10 +121,10 @@ func TestShouldFetchOutputData(t *testing.T) {
 }
 
 func TestGetInputs(t *testing.T) {
-	inputsURI := "s3://foo/bar/inputs.pb"
+	inputsURI := "s3://bucket/bar/inputs.pb"
 
 	expectedURLBlob := admin.UrlBlob{
-		Url:   "s3://foo/signed/inputs.pb",
+		Url:   "s3://bucket/signed/inputs.pb",
 		Bytes: 1000,
 	}
 
@@ -137,28 +147,53 @@ func TestGetInputs(t *testing.T) {
 	}
 
 	t.Run("should sign URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: true,
-		}
-		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: true}
+
+		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, project, domain, inputsURI, nil)
+
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
 		assert.True(t, proto.Equal(inputURLBlob, &expectedURLBlob))
 	})
+
 	t.Run("should not sign URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: false,
-		}
-		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, inputsURI)
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
+
+		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, project, domain, inputsURI, nil)
+
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
 		assert.Empty(t, inputURLBlob)
+	})
+
+	t.Run("download inputs over data plane object store", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
+		store := &objectStoreMock{}
+		bts, _ := proto.Marshal(testLiteralMap)
+		store.
+			On("GetObject", GetObjectRequest{
+				Project: project,
+				Domain:  domain,
+				Prefix:  "/foo/bar",
+			}).
+			Return(GetObjectResponse{Contents: bts}, nil).
+			Once()
+
+		ctx := context.TODO()
+		inputURI := "s3://wrong/foo/bar"
+
+		fullInputs, inputURLBlob, err := GetInputs(ctx, mockRemoteURL, &remoteDataConfig, mockStorage, project, domain, inputURI, store)
+
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
+		assert.Empty(t, inputURLBlob)
+		store.AssertExpectations(t)
 	})
 }
 
 func TestGetOutputs(t *testing.T) {
 	expectedURLBlob := admin.UrlBlob{
-		Url:   "s3://foo/signed/outputs.pb",
+		Url:   "s3://bucket/signed/outputs.pb",
 		Bytes: 1000,
 	}
 
@@ -185,25 +220,51 @@ func TestGetOutputs(t *testing.T) {
 		},
 	}
 	t.Run("offloaded outputs with signed URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: true,
-		}
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: true}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, project, domain, nil)
+
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 		assert.True(t, proto.Equal(outputURLBlob, &expectedURLBlob))
 	})
-	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
-		remoteDataConfig.SignedURL = interfaces.SignedURL{
-			Enabled: false,
-		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
+
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, project, domain, nil)
+
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 		assert.Empty(t, outputURLBlob)
 	})
+
+	t.Run("download outputs via data plane object store", func(t *testing.T) {
+		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
+		store := &objectStoreMock{}
+		bts, _ := proto.Marshal(testLiteralMap)
+		store.
+			On("GetObject", GetObjectRequest{
+				Project: project,
+				Domain:  domain,
+				Prefix:  "/foo/bar",
+			}).
+			Return(GetObjectResponse{Contents: bts}, nil).
+			Once()
+		testClosure := &admin.NodeExecutionClosure{
+			OutputResult: &admin.NodeExecutionClosure_OutputUri{
+				OutputUri: "s3://wrong/foo/bar",
+			},
+		}
+
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, testClosure, project, domain, store)
+
+		assert.NoError(t, err)
+		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
+		assert.Empty(t, outputURLBlob)
+		store.AssertExpectations(t)
+	})
+
 	t.Run("inline outputs", func(t *testing.T) {
 		mockRemoteURL := urlMocks.NewMockRemoteURL()
 		mockRemoteURL.(*urlMocks.MockRemoteURL).GetCallback = func(ctx context.Context, uri string) (admin.UrlBlob, error) {
@@ -225,7 +286,8 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure)
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, project, domain, nil)
+
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
 		assert.Empty(t, outputURLBlob)

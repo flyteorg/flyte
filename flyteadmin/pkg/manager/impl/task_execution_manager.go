@@ -21,6 +21,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -52,6 +53,7 @@ type TaskExecutionManager struct {
 	urlData              dataInterfaces.RemoteURLInterface
 	notificationClient   notificationInterfaces.Publisher
 	cloudEventsPublisher cloudeventInterfaces.Publisher
+	pluginRegistry       *plugins.Registry
 }
 
 func getTaskExecutionContext(ctx context.Context, identifier *core.TaskExecutionIdentifier) context.Context {
@@ -310,13 +312,28 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.InputUri)
+	objectStore := plugins.Get[util.ObjectStore](m.pluginRegistry, plugins.PluginIDObjectStore)
+	id := request.GetId().GetNodeExecutionId().GetExecutionId()
+	inputs, inputURLBlob, err := util.GetInputs(ctx,
+		m.urlData,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient,
+		id.Project,
+		id.Domain,
+		taskExecution.InputUri,
+		objectStore)
 	if err != nil {
 		return nil, err
 	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.Closure)
+
+	outputs, outputURLBlob, err := util.GetOutputs(ctx,
+		m.urlData,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient,
+		taskExecution.Closure,
+		id.Project,
+		id.Domain,
+		objectStore)
 	if err != nil {
 		return nil, err
 	}
@@ -340,7 +357,8 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 
 func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
-	publisher notificationInterfaces.Publisher, cloudEventsPublisher cloudeventInterfaces.Publisher) interfaces.TaskExecutionInterface {
+	publisher notificationInterfaces.Publisher, cloudEventsPublisher cloudeventInterfaces.Publisher,
+	pluginRegistry *plugins.Registry) interfaces.TaskExecutionInterface {
 
 	metrics := taskExecutionMetrics{
 		Scope: scope,
@@ -373,5 +391,6 @@ func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 		urlData:              urlData,
 		notificationClient:   publisher,
 		cloudEventsPublisher: cloudEventsPublisher,
+		pluginRegistry:       pluginRegistry,
 	}
 }

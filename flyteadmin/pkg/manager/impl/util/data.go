@@ -2,6 +2,9 @@ package util
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+	"strings"
 
 	"github.com/golang/protobuf/proto"
 
@@ -19,6 +22,20 @@ const (
 	DeckFile    = "deck.html"
 )
 
+type GetObjectRequest struct {
+	Project string
+	Domain  string
+	Prefix  string
+}
+
+type GetObjectResponse struct {
+	Contents []byte
+}
+
+type ObjectStore interface {
+	GetObject(context.Context, GetObjectRequest) (GetObjectResponse, error)
+}
+
 func shouldFetchData(config *runtimeInterfaces.RemoteDataConfig, urlBlob admin.UrlBlob) bool {
 	return config.Scheme == common.Local || config.Scheme == common.None || config.MaxSizeInBytes == 0 ||
 		urlBlob.Bytes < config.MaxSizeInBytes
@@ -29,9 +46,13 @@ func shouldFetchOutputData(config *runtimeInterfaces.RemoteDataConfig, urlBlob a
 }
 
 // GetInputs returns an inputs URL blob and if config settings permit, inline inputs data for an execution.
-func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
-	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, inputURI string) (
-	*core.LiteralMap, *admin.UrlBlob, error) {
+func GetInputs(ctx context.Context,
+	urlData dataInterfaces.RemoteURLInterface,
+	remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
+	storageClient *storage.DataStore,
+	project, domain, inputURI string,
+	objectStore ObjectStore,
+) (*core.LiteralMap, *admin.UrlBlob, error) {
 	var inputsURLBlob admin.UrlBlob
 	var fullInputs core.LiteralMap
 
@@ -48,7 +69,12 @@ func GetInputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	}
 
 	if shouldFetchData(remoteDataConfig, inputsURLBlob) {
-		err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
+		base := string(storageClient.GetBaseContainerFQN(ctx))
+		if strings.HasPrefix(inputURI, base) {
+			err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
+		} else {
+			err = readFromDataPlane(ctx, objectStore, project, domain, inputURI, &fullInputs)
+		}
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the input data.
@@ -95,17 +121,22 @@ func ToExecutionClosureInterface(closure *admin.ExecutionClosure) ExecutionClosu
 }
 
 // GetOutputs returns an outputs URL blob and if config settings permit, inline outputs data for an execution.
-func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
-	remoteDataConfig *runtimeInterfaces.RemoteDataConfig, storageClient *storage.DataStore, closure ExecutionClosure) (
-	*core.LiteralMap, *admin.UrlBlob, error) {
+func GetOutputs(ctx context.Context,
+	urlData dataInterfaces.RemoteURLInterface,
+	remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
+	storageClient *storage.DataStore,
+	closure ExecutionClosure,
+	project, domain string,
+	objectStore ObjectStore,
+) (*core.LiteralMap, *admin.UrlBlob, error) {
 	var outputsURLBlob admin.UrlBlob
 	var fullOutputs = &core.LiteralMap{}
 	if closure == nil {
 		return fullOutputs, &outputsURLBlob, nil
 	}
 
+	var err error
 	if len(closure.GetOutputUri()) > 0 && remoteDataConfig.SignedURL.Enabled {
-		var err error
 		outputsURLBlob, err = urlData.Get(ctx, closure.GetOutputUri())
 		if err != nil {
 			return nil, nil, err
@@ -119,7 +150,12 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 			logger.Debugf(ctx, "execution closure contains output data that exceeds max data size for responses")
 		}
 	} else if shouldFetchOutputData(remoteDataConfig, outputsURLBlob, closure.GetOutputUri()) {
-		err := storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
+		base := string(storageClient.GetBaseContainerFQN(ctx))
+		if strings.HasPrefix(closure.GetOutputUri(), base) {
+			err = storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
+		} else {
+			err = readFromDataPlane(ctx, objectStore, project, domain, closure.GetOutputUri(), fullOutputs)
+		}
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
 			// Instead we return the signed URL blob so that the client can use that to fetch the output data.
@@ -128,4 +164,34 @@ func GetOutputs(ctx context.Context, urlData dataInterfaces.RemoteURLInterface,
 	}
 
 	return fullOutputs, &outputsURLBlob, nil
+}
+
+func readFromDataPlane(ctx context.Context,
+	objectStore ObjectStore,
+	project, domain, reference string,
+	msg proto.Message,
+) error {
+	if objectStore == nil {
+		return fmt.Errorf("no object store implementation found")
+	}
+
+	refURL, err := url.Parse(reference)
+	if err != nil {
+		return fmt.Errorf("failed to parse data reference: %w", err)
+	}
+
+	out, err := objectStore.GetObject(ctx, GetObjectRequest{
+		Prefix:  refURL.Path,
+		Project: project,
+		Domain:  domain,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to fetch object: %w", err)
+	}
+
+	err = proto.Unmarshal(out.Contents, msg)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal object contents: %w", err)
+	}
+	return nil
 }

@@ -1757,16 +1757,33 @@ func (m *ExecutionManager) GetExecutionData(
 			return nil, err
 		}
 	}
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, executionModel.InputsURI.String())
+
+	id := request.GetId()
+	objectStore := plugins.Get[util.ObjectStore](m.pluginRegistry, plugins.PluginIDObjectStore)
+	inputs, inputURLBlob, err := util.GetInputs(ctx,
+		m.urlData,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient,
+		id.Project,
+		id.Domain,
+		executionModel.InputsURI.String(),
+		objectStore)
 	if err != nil {
 		return nil, err
 	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
+
+	outputs, outputURLBlob, err := util.GetOutputs(ctx,
+		m.urlData,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient,
+		util.ToExecutionClosureInterface(execution.Closure),
+		id.Project,
+		id.Domain,
+		objectStore)
 	if err != nil {
 		return nil, err
 	}
+
 	response := &admin.WorkflowExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,

@@ -24,6 +24,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/transformers"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
+	"github.com/flyteorg/flyte/flyteadmin/plugins"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
@@ -56,6 +57,7 @@ type NodeExecutionManager struct {
 	eventPublisher      notificationInterfaces.Publisher
 	cloudEventPublisher cloudeventInterfaces.Publisher
 	dbEventWriter       eventWriter.NodeExecutionEventWriter
+	pluginRegistry      *plugins.Registry
 }
 
 type updateNodeExecutionStatus int
@@ -531,14 +533,28 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, nodeExecution.InputUri)
+	id := request.GetId().GetExecutionId()
+	objectStore := plugins.Get[util.ObjectStore](m.pluginRegistry, plugins.PluginIDObjectStore)
+	inputs, inputURLBlob, err := util.GetInputs(ctx,
+		m.urlData,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient,
+		id.Project,
+		id.Domain,
+		nodeExecution.InputUri,
+		objectStore)
 	if err != nil {
 		return nil, err
 	}
 
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, nodeExecution.Closure)
+	outputs, outputURLBlob, err := util.GetOutputs(ctx,
+		m.urlData,
+		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+		m.storageClient,
+		nodeExecution.Closure,
+		id.Project,
+		id.Domain,
+		objectStore)
 	if err != nil {
 		return nil, err
 	}
@@ -592,7 +608,7 @@ func (m *NodeExecutionManager) fetchDynamicWorkflowClosure(ctx context.Context, 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
 	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
-	eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
+	eventWriter eventWriter.NodeExecutionEventWriter, pluginRegistry *plugins.Registry) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{
 		Scope: scope,
 		ActiveNodeExecutions: scope.MustNewGauge("active_node_executions",
@@ -624,5 +640,6 @@ func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 		eventPublisher:      eventPublisher,
 		dbEventWriter:       eventWriter,
 		cloudEventPublisher: cloudEventPublisher,
+		pluginRegistry:      pluginRegistry,
 	}
 }

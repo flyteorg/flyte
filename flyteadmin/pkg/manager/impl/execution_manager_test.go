@@ -80,8 +80,8 @@ var mockPublisher notificationMocks.MockPublisher
 var mockExecutionRemoteURL = dataMocks.NewMockRemoteURL()
 var requestedAt = time.Now()
 var testCluster = "C1"
-var outputURI = "output uri"
-
+var outputURI = "s3://bucket/output_uri"
+var inputURI = "s3://bucket/inputs"
 var resourceDefaults = runtimeInterfaces.TaskResourceSet{
 	CPU:    resource.MustParse("200m"),
 	Memory: resource.MustParse("200Gi"),
@@ -3596,20 +3596,16 @@ func TestGetExecutionData(t *testing.T) {
 			LaunchPlanID: uint(1),
 			WorkflowID:   uint(2),
 			StartedAt:    &startedAt,
-			InputsURI:    shared.Inputs,
+			InputsURI:    storage.DataReference(inputURI),
 		}, nil
 	}
 	mockExecutionRemoteURL := dataMocks.NewMockRemoteURL()
 	mockExecutionRemoteURL.(*dataMocks.MockRemoteURL).GetCallback = func(
 		ctx context.Context, uri string) (admin.UrlBlob, error) {
-		if uri == outputURI {
+		switch uri {
+		case inputURI, outputURI:
 			return admin.UrlBlob{
-				Url:   "outputs",
-				Bytes: 200,
-			}, nil
-		} else if strings.HasSuffix(uri, shared.Inputs) {
-			return admin.UrlBlob{
-				Url:   "inputs",
+				Url:   uri,
 				Bytes: 200,
 			}, nil
 		}
@@ -3629,7 +3625,7 @@ func TestGetExecutionData(t *testing.T) {
 	}
 	mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).ReadProtobufCb = func(
 		ctx context.Context, reference storage.DataReference, msg proto.Message) error {
-		if reference.String() == "inputs" {
+		if reference.String() == inputURI {
 			marshalled, _ := proto.Marshal(fullInputs)
 			_ = proto.Unmarshal(marshalled, msg)
 			return nil
@@ -3645,17 +3641,19 @@ func TestGetExecutionData(t *testing.T) {
 	r := plugins.NewRegistry()
 	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
 	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), mockStorage, mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+
 	dataResponse, err := execManager.GetExecutionData(context.Background(), admin.WorkflowExecutionGetDataRequest{
 		Id: &executionIdentifier,
 	})
-	assert.Nil(t, err)
+
+	assert.NoError(t, err)
 	assert.True(t, proto.Equal(&admin.WorkflowExecutionGetDataResponse{
 		Outputs: &admin.UrlBlob{
-			Url:   "outputs",
+			Url:   outputURI,
 			Bytes: 200,
 		},
 		Inputs: &admin.UrlBlob{
-			Url:   "inputs",
+			Url:   inputURI,
 			Bytes: 200,
 		},
 		FullInputs:  fullInputs,
