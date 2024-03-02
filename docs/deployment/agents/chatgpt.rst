@@ -96,7 +96,7 @@ You have to set the Databricks token to the Flyte configuration.
 
         apiVersion: v1
         data:
-          flyte_databricks_access_token: <BASE64_ENCODED_OPENAI_API_TOKEN>
+          flyte_openai_access_token: <BASE64_ENCODED_OPENAI_API_TOKEN>
         kind: Secret
         metadata:
           annotations:
