@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -314,30 +315,41 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 
 	objectStore := plugins.Get[util.ObjectStore](m.pluginRegistry, plugins.PluginIDObjectStore)
 	id := request.GetId().GetNodeExecutionId().GetExecutionId()
-	inputs, inputURLBlob, err := util.GetInputs(ctx,
-		m.urlData,
-		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient,
-		id.Project,
-		id.Domain,
-		taskExecution.InputUri,
-		objectStore)
+	var inputs *core.LiteralMap
+	var inputURLBlob *admin.UrlBlob
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		var err error
+		inputs, inputURLBlob, err = util.GetInputs(groupCtx,
+			m.urlData,
+			m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient,
+			id.Project,
+			id.Domain,
+			taskExecution.InputUri,
+			objectStore)
+		return err
+	})
+
+	var outputs *core.LiteralMap
+	var outputURLBlob *admin.UrlBlob
+	group.Go(func() error {
+		var err error
+		outputs, outputURLBlob, err = util.GetOutputs(groupCtx,
+			m.urlData,
+			m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient,
+			taskExecution.Closure,
+			id.Project,
+			id.Domain,
+			objectStore)
+		return err
+	})
+
+	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}
-
-	outputs, outputURLBlob, err := util.GetOutputs(ctx,
-		m.urlData,
-		m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient,
-		taskExecution.Closure,
-		id.Project,
-		id.Domain,
-		objectStore)
-	if err != nil {
-		return nil, err
-	}
-
 	response := &admin.TaskExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
