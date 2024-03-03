@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/prometheus/client_golang/prometheus"
+	"golang.org/x/sync/errgroup"
 	"google.golang.org/grpc/codes"
 
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
@@ -520,14 +521,26 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, nodeExecution.InputUri)
-	if err != nil {
-		return nil, err
-	}
+	var inputs *core.LiteralMap
+	var inputURLBlob *admin.UrlBlob
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		var err error
+		inputs, inputURLBlob, err = util.GetInputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, nodeExecution.InputUri)
+		return err
+	})
 
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, nodeExecution.Closure)
+	var outputs *core.LiteralMap
+	var outputURLBlob *admin.UrlBlob
+	group.Go(func() error {
+		var err error
+		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, nodeExecution.Closure)
+		return err
+	})
+
+	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}

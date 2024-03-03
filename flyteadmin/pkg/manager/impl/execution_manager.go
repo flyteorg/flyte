@@ -920,35 +920,34 @@ func (m *ExecutionManager) launchExecution(
 	}
 
 	// Overlap the blob store reads and writes
-	getClosureGroup, getClosureGroupCtx := errgroup.WithContext(ctx)
+	group, groupCtx := errgroup.WithContext(ctx)
 	var closure *admin.WorkflowClosure
-	getClosureGroup.Go(func() error {
+	group.Go(func() error {
 		var err error
-		closure, err = util.FetchAndGetWorkflowClosure(getClosureGroupCtx, m.storageClient, workflowModel.RemoteClosureIdentifier)
+		closure, err = util.FetchAndGetWorkflowClosure(groupCtx, m.storageClient, workflowModel.RemoteClosureIdentifier)
 		if err != nil {
 			logger.Debugf(ctx, "Failed to get workflow with id %+v with err %v", launchPlan.Spec.WorkflowId, err)
 		}
 		return err
 	})
 
-	offloadInputsGroup, offloadInputsGroupCtx := errgroup.WithContext(ctx)
 	var inputsURI storage.DataReference
-	offloadInputsGroup.Go(func() error {
+	group.Go(func() error {
 		var err error
-		inputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, executionInputs,
+		inputsURI, err = common.OffloadLiteralMap(groupCtx, m.storageClient, executionInputs,
 			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.Inputs)
 		return err
 	})
 
 	var userInputsURI storage.DataReference
-	offloadInputsGroup.Go(func() error {
+	group.Go(func() error {
 		var err error
-		userInputsURI, err = common.OffloadLiteralMap(offloadInputsGroupCtx, m.storageClient, request.Inputs,
+		userInputsURI, err = common.OffloadLiteralMap(groupCtx, m.storageClient, request.Inputs,
 			workflowExecutionID.Project, workflowExecutionID.Domain, workflowExecutionID.Name, shared.UserInputs)
 		return err
 	})
 
-	err = getClosureGroup.Wait()
+	err = group.Wait()
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -1056,11 +1055,6 @@ func (m *ExecutionManager) launchExecution(
 		notificationsSettings = requestSpec.GetNotifications().Notifications
 	} else if requestSpec.GetDisableAll() {
 		notificationsSettings = make([]*admin.Notification, 0)
-	}
-
-	err = offloadInputsGroup.Wait()
-	if err != nil {
-		return nil, nil, nil, err
 	}
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
@@ -1595,16 +1589,31 @@ func (m *ExecutionManager) GetExecutionData(
 			return nil, err
 		}
 	}
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, executionModel.InputsURI.String())
+
+	var inputs *core.LiteralMap
+	var inputURLBlob *admin.UrlBlob
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		var err error
+		inputs, inputURLBlob, err = util.GetInputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, executionModel.InputsURI.String())
+		return err
+	})
+
+	var outputs *core.LiteralMap
+	var outputURLBlob *admin.UrlBlob
+	group.Go(func() error {
+		var err error
+		outputs, outputURLBlob, err = util.GetOutputs(groupCtx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+			m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
+		return err
+	})
+
+	err = group.Wait()
 	if err != nil {
 		return nil, err
 	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
-	if err != nil {
-		return nil, err
-	}
+
 	response := &admin.WorkflowExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
