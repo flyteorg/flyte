@@ -1,5 +1,11 @@
 FROM condaforge/mambaforge:latest
 
+ARG USER_UID
+ARG USER_GID
+
+RUN groupadd --gid "${USER_GID}" flyte \
+    && useradd --uid "${USER_UID}" --gid "${USER_GID}" -m flyte
+
 RUN conda install -c conda-forge conda-lock
 RUN --mount=type=bind,source=monodocs-environment.lock.yaml,target=monodocs-environment.lock.yaml \
     conda-lock install -n monodocs-env monodocs-environment.lock.yaml
@@ -11,4 +17,5 @@ RUN python -m pip install sphinx-autobuild
 RUN python -m pip install ./flyteidl
 
 WORKDIR docs
+USER flyte
 ENTRYPOINT ["conda", "run", "--no-capture-output", "-n", "monodocs-env"]
