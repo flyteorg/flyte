@@ -11,7 +11,7 @@
     <h3 align="center">
         <a href="https://flytectl.rtfd.io">Documentation</a>
         <span> · </span>
-        <a href="https://docs.flyte.org/projects/flytectl/en/stable/contribute.html">Contribution Guide</a>
+        <a href="https://docs.flyte.org/en/latest/flytectl/contribute.html">Contribution Guide</a>
     </h3>
 </html>
 

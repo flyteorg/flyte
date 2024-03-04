@@ -18,12 +18,12 @@ import (
 const (
 	updateLPShort = "Updates launch plan status"
 	updateLPLong  = `
-Activates a ` + "`launch plan <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#activating-a-schedule>`__" + ` which activates the scheduled job associated with it:
+Activates a ` + "`launch plan <https://docs.flyte.org/en/latest/user_guide/productionizing/schedules.html#activating-a-schedule>`__" + ` which activates the scheduled job associated with it:
 ::
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --activate
 
-Deactivates a ` + "`launch plan <https://docs.flyte.org/projects/cookbook/en/latest/auto/core/scheduled_workflows/lp_schedules.html#deactivating-a-schedule>`__" + ` which deschedules any scheduled job associated with it:
+Deactivates a ` + "`launch plan <https://docs.flyte.org/en/latest/user_guide/productionizing/schedules.html#deactivating-a-schedule>`__" + ` which deschedules any scheduled job associated with it:
 ::
 
  flytectl update launchplan -p flytesnacks -d development core.control_flow.merge_sort.merge_sort --version v1 --deactivate

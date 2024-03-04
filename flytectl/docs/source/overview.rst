@@ -53,7 +53,7 @@ on the command-line. The following configuration can be used for the setup:
 Basic Configuration
 --------------------
 
-The full list of available configurable options can be found by running ``flytectl --help``, or `here <https://docs.flyte.org/projects/flytectl/en/stable/gen/flytectl.html#synopsis>`__.
+The full list of available configurable options can be found by running ``flytectl --help``, or `here <https://docs.flyte.org/en/latest/flytectl/gen/flytectl.html#synopsis>`__.
 
 .. NOTE::
 

@@ -79,7 +79,7 @@ brews:
 
     # Your app's homepage.
     # Default is empty.
-    homepage: "https://docs.flyte.org/projects/flytectl"
+    homepage: "https://docs.flyte.org/en/latest/flytectl/docs_index.html"
 
     # Your app's description.
     # Default is empty.
