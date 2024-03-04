@@ -1,0 +1,12 @@
+FROM condaforge/mambaforge:latest
+
+ARG USER_UID
+ARG USER_GID
+
+RUN groupadd --gid "${USER_GID}" flyte \
+    && useradd --uid "${USER_UID}" --gid "${USER_GID}" -m flyte
+
+RUN conda install -c conda-forge conda-lock
+WORKDIR flyte
+USER flyte
+ENTRYPOINT ["conda", "run", "--no-capture-output", "conda-lock"]
