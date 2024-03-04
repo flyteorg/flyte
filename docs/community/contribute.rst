@@ -157,8 +157,8 @@ To build the Flyte docs locally you will need the following prerequisites:
 
 * Install `conda-lock <https://github.com/conda/conda-lock>`__.
 * In the ``flyteorg/flyte`` root directory you can run:
-    * ``make dev-docs-build`` to build the documentation locally. The build will be in the ``docs/_build/html`` directory.
-    * Alternatively, you can use ``make dev-docs`` to build the documentation with live reload. Open the browser to ``http://localhost:8000`` to see the documentation.
+    * ``make dev-docs`` to build the documentation locally. The build will be in the ``docs/_build/html`` directory. See `the script <https://github.com/flyteorg/flyte/blob/master/script/local_build_docs.sh>`__ for additional environment variables that can be set.
+        * For example, to use the local flytekit source code instead of the source code from the flyteorg/flytekit repo, run ``export FLYTEKIT_LOCAL_PATH=/path/to/flytekit`` before running ``make dev-docs``.
 
 ``flyteidl``
 ************
