@@ -330,7 +330,7 @@ ingress:
   # host Hostname to bind to ingress resources
   host: ""
   # separateGrpcIngress Create a separate ingress resource for GRPC if true. Required for certain ingress controllers like nginx.
-  separateGrpcIngress: false
+  separateGrpcIngress: true
   # commonAnnotations Add common annotations to all ingress resources
   commonAnnotations: {}
   # httpAnnotations Add annotations to http ingress resource
