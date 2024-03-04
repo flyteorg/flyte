@@ -8,4 +8,5 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin
 message ClusterAssignment {
   reserved 1, 2;
   string cluster_pool_name = 3;
+  string execution_cluster_label_name = 4;
 }
