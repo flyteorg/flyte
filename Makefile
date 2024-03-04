@@ -92,25 +92,20 @@ $(TMP_BUILD_DIR):
 	mkdir $@
 
 $(TMP_BUILD_DIR)/conda-lock-image: Dockerfile.conda-lock | $(TMP_BUILD_DIR)
-	docker buildx build --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f Dockerfile.conda-lock .
+	docker buildx build --load --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-conda-lock:latest -f Dockerfile.conda-lock .
 	touch $(TMP_BUILD_DIR)/conda-lock-image
 
 monodocs-environment.lock.yaml: monodocs-environment.yaml $(TMP_BUILD_DIR)/conda-lock-image
 	docker run --rm --pull never -v ./:/flyte flyte-conda-lock:latest lock --file monodocs-environment.yaml --lockfile monodocs-environment.lock.yaml --channel conda-forge
 
 $(TMP_BUILD_DIR)/dev-docs-image: Dockerfile.docs monodocs-environment.lock.yaml | $(TMP_BUILD_DIR)
-	docker buildx build --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f Dockerfile.docs .
+	docker buildx build --load --build-arg USER_UID=$$(id -u) --build-arg USER_GID=$$(id -g) -t flyte-dev-docs:latest -f Dockerfile.docs .
 	touch $(TMP_BUILD_DIR)/dev-docs-image
 
 # Build docs in docker container for local development
-.PHONY: dev-docs-build
-dev-docs-build: $(TMP_BUILD_DIR)/dev-docs-image
-	docker run --rm --pull never -v ./docs:/docs flyte-dev-docs:latest sphinx-build -M html . _build
-
-# Build docs in docker container for local development with hot-reload
 .PHONY: dev-docs
 dev-docs: $(TMP_BUILD_DIR)/dev-docs-image
-	docker run --rm --pull never -p 8000:8000 -v ./docs:/docs flyte-dev-docs:latest sphinx-autobuild --host 0.0.0.0 --re-ignore '_build|_src|_tags|api|examples|flytectl|flytekit|flytesnacks|protos|tests' . ./_build/html
+	bash script/local_build_docs.sh
 
 .PHONY: help
 help: SHELL := /bin/sh
