@@ -64,6 +64,7 @@ jobs:
       - name: Setup Graphviz
         uses: ts-graphviz/setup-graphviz@v1
       - name: Build the documentation
+        working-directory: ${{ github.workspace }}/flyte
         shell: bash -el {0}
         run: |
           conda activate monodocs-env
