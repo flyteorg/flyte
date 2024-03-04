@@ -93,16 +93,6 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 		}
 		return nil, fmt.Errorf("invalid cluster target %s", spec.TargetID)
 	}
-	resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
-		Project:      spec.Project,
-		Domain:       spec.Domain,
-		Workflow:     spec.Workflow,
-		LaunchPlan:   spec.LaunchPlan,
-		ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
-	})
-	if err != nil && !errors.IsDoesNotExistError(err) {
-		return nil, err
-	}
 
 	var weightedRandomList random.WeightedRandomList
 
@@ -110,8 +100,20 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 
 	if spec.ClusterAssignment != nil && spec.ClusterAssignment.ExecutionClusterLabelName != "" {
 		label = spec.ClusterAssignment.ExecutionClusterLabelName
-	} else if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
-		label = resource.Attributes.GetExecutionClusterLabel().Value
+	} else {
+		resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
+			Project:      spec.Project,
+			Domain:       spec.Domain,
+			Workflow:     spec.Workflow,
+			LaunchPlan:   spec.LaunchPlan,
+			ResourceType: admin.MatchableResource_EXECUTION_CLUSTER_LABEL,
+		})
+		if err != nil && !errors.IsDoesNotExistError(err) {
+			return nil, err
+		}
+		if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
+			label = resource.Attributes.GetExecutionClusterLabel().Value
+		}
 	}
 
 	if label != "" {
