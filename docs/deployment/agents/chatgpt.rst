@@ -137,4 +137,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For Chatgpt agent on the Flyte cluster, see `Chatgpt agent <https://docs.flyte.org/en/latest/flytesnacks/examples/airflow_agent/index.html>`_.
+For Chatgpt agent on the Flyte cluster, see `Chatgpt agent <https://docs.flyte.org/en/latest/flytesnacks/examples/chatgpt_agent/index.html>`_.
