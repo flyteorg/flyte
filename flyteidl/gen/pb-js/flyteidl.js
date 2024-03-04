@@ -25609,6 +25609,7 @@
                  * @memberof flyteidl.admin
                  * @interface IClusterAssignment
                  * @property {string|null} [clusterPoolName] ClusterAssignment clusterPoolName
+                 * @property {string|null} [executionClusterLabelName] ClusterAssignment executionClusterLabelName
                  */
     
                 /**
@@ -25633,6 +25634,14 @@
                  * @instance
                  */
                 ClusterAssignment.prototype.clusterPoolName = "";
+    
+                /**
+                 * ClusterAssignment executionClusterLabelName.
+                 * @member {string} executionClusterLabelName
+                 * @memberof flyteidl.admin.ClusterAssignment
+                 * @instance
+                 */
+                ClusterAssignment.prototype.executionClusterLabelName = "";
     
                 /**
                  * Creates a new ClusterAssignment instance using the specified properties.
@@ -25660,6 +25669,8 @@
                         writer = $Writer.create();
                     if (message.clusterPoolName != null && message.hasOwnProperty("clusterPoolName"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.clusterPoolName);
+                    if (message.executionClusterLabelName != null && message.hasOwnProperty("executionClusterLabelName"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.executionClusterLabelName);
                     return writer;
                 };
     
@@ -25684,6 +25695,9 @@
                         case 3:
                             message.clusterPoolName = reader.string();
                             break;
+                        case 4:
+                            message.executionClusterLabelName = reader.string();
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -25706,6 +25720,9 @@
                     if (message.clusterPoolName != null && message.hasOwnProperty("clusterPoolName"))
                         if (!$util.isString(message.clusterPoolName))
                             return "clusterPoolName: string expected";
+                    if (message.executionClusterLabelName != null && message.hasOwnProperty("executionClusterLabelName"))
+                        if (!$util.isString(message.executionClusterLabelName))
+                            return "executionClusterLabelName: string expected";
                     return null;
                 };
     

@@ -1,6 +1,7 @@
 package executioncluster
 
 import (
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	"k8s.io/client-go/dynamic"
 	restclient "k8s.io/client-go/rest"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -11,12 +12,13 @@ import (
 
 // Spec to determine the execution target
 type ExecutionTargetSpec struct {
-	TargetID    string
-	ExecutionID string
-	Project     string
-	Domain      string
-	Workflow    string
-	LaunchPlan  string
+	TargetID          string
+	ExecutionID       string
+	Project           string
+	Domain            string
+	Workflow          string
+	LaunchPlan        string
+	ClusterAssignment *admin.ClusterAssignment
 }
 
 // Client object of the target execution cluster
