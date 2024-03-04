@@ -55,6 +55,7 @@ jobs:
         working-directory: ${{ github.workspace }}/flytekit
         run: |
           conda activate monodocs-env
+          export SETUPTOOLS_SCM_PRETEND_VERSION="2.0.0"
           pip install -e .
           conda info
           conda list
