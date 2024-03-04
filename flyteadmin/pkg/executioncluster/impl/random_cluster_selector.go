@@ -106,24 +106,22 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 
 	var weightedRandomList random.WeightedRandomList
 
-	if spec.ClusterAssignment != nil && spec.ClusterAssignment.ExecutionClusterLabelName != "" {
-		label := spec.ClusterAssignment.ExecutionClusterLabelName
+	var label string
 
+	if spec.ClusterAssignment != nil && spec.ClusterAssignment.ExecutionClusterLabelName != "" {
+		label = spec.ClusterAssignment.ExecutionClusterLabelName
+	} else if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
+		label = resource.Attributes.GetExecutionClusterLabel().Value
+	}
+
+	if label != "" {
 		if _, ok := s.labelWeightedRandomMap[label]; ok {
 			weightedRandomList = s.labelWeightedRandomMap[label]
+		} else {
+			logger.Debugf(ctx, "No cluster mapping found for the label %s", label)
 		}
 	} else {
-		if resource != nil && resource.Attributes.GetExecutionClusterLabel() != nil {
-			label := resource.Attributes.GetExecutionClusterLabel().Value
-
-			if _, ok := s.labelWeightedRandomMap[label]; ok {
-				weightedRandomList = s.labelWeightedRandomMap[label]
-			} else {
-				logger.Debugf(ctx, "No cluster mapping found for the label %s", label)
-			}
-		} else {
-			logger.Debugf(ctx, "No override found for the spec %v", spec)
-		}
+		logger.Debugf(ctx, "No override found for the spec %v", spec)
 	}
 
 	if weightedRandomList == nil {
