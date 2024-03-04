@@ -1052,7 +1052,7 @@ spec:
         secret:
           secretName: flyte-secret-auth
 ---
-# Source: flyte-core/templates/common/ingress-separateGrpc.yaml
+# Source: flyte-core/templates/common/ingress-grpc.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
