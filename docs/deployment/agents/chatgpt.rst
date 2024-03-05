@@ -67,7 +67,7 @@ Specify agent configuration
                 supportedTaskTypes:
                 - chatgpt
 
-Add the OPENAI API token
+Add the OpenAI API token
 -------------------------------
 
 You have to set the Databricks token to the Flyte configuration.
