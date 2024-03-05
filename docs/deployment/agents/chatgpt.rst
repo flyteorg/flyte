@@ -72,7 +72,7 @@ Add the OpenAI API token
 
 You have to set the Databricks token to the Flyte configuration.
 
-1. Install flyteagent pod using helm
+1. Install flyteagent pod using helm:
   
 .. code-block::
   
