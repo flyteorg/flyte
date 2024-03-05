@@ -11,9 +11,9 @@ Several bug fixes, including:
 - [Split flyte-binary services into http and grpc in helm charts](https://github.com/flyteorg/flyte/pull/3518)
 
 ### Database Migrations
-One of the improvements planned requires us to clean up our database migrations. We have done so in this release so you should see a series of new migrations. 
-These should have zero impact if you are otherwise up-to-date on migrations (which is why they are all labeled `noop`) but please be aware that it will add a minute or so to the 
-init container/command that runs the migrations in the default Helm charts. Notably, because these should be a no-op, they also do not come with any rollback commands. 
+One of the improvements planned requires us to clean up our database migrations. We have done so in this release so you should see a series of new migrations.
+These should have zero impact if you are otherwise up-to-date on migrations (which is why they are all labeled `noop`) but please be aware that it will add a minute or so to the
+init container/command that runs the migrations in the default Helm charts. Notably, because these should be a no-op, they also do not come with any rollback commands.
 If you experience any issues, please let us know.
 
 ## Flytekit
@@ -21,7 +21,7 @@ If you experience any issues, please let us know.
 Python 3.11 is now officially supported.
 
 ### Revamped Data subsystem
-The data persistence layer was completely revamped. We now rely exclusively on [fsspec](https://filesystem-spec.readthedocs.io/en/latest/) to handle IO. 
+The data persistence layer was completely revamped. We now rely exclusively on [fsspec](https://filesystem-spec.readthedocs.io/en/latest/) to handle IO.
 
 Most users will benefit from a more performant IO subsystem, in other words,
 no change is needed in user code.
@@ -46,14 +46,14 @@ def copy_file(ff: FlyteFile) -> FlyteFile:
 This feature is marked as experimental. We'd love feedback on the API!
 
 ### Limited support for partial tasks
-We can use [functools.partial](https://docs.python.org/3/library/functools.html#functools.partial) to "freeze" 
+We can use [functools.partial](https://docs.python.org/3/library/functools.html#functools.partial) to "freeze"
 some task arguments. Let's take a look at an example where we partially fix the parameter for a task:
 
 ```
 @task
 def t1(a: int, b: str) -> str:
     return f"{a} -> {b}"
-    
+
 t1_fixed_b = functools.partial(t1, b="hello")
 
 @workflow
@@ -63,7 +63,7 @@ def wf(a: int) -> str:
 
 Notice how calls to `t1_fixed_b` do not need to specify the `b` parameter.
 
-This also works for [MapTasks](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/map_task.html#sphx-glr-auto-core-control-flow-map-task-py) in a limited capacity. For example:
+This also works for [Map Tasks](https://docs.flyte.org/en/latest/user_guide/advanced_composition/map_tasks.html) in a limited capacity. For example:
 
 ```
 from flytekit import task, workflow, partial, map_task
@@ -78,7 +78,7 @@ def wf(y: List[float]):
    return map_task(partial_t1)(y=y)
 ```
 
-We are currently seeking feedback on this feature, and as a result, it is labeled as experimental for now. 
+We are currently seeking feedback on this feature, and as a result, it is labeled as experimental for now.
 
 Also worth mentioning that fixing parameters of type list is not currently supported. For example, if we try to register this workflow:
 
@@ -107,5 +107,5 @@ Map tasks do not support partial tasks with lists as inputs.
 
 ## Flyteconsole
 
-Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/projects/cookbook/en/latest/auto/core/control_flow/waiting_for_external_inputs.html#waiting-for-external-inputs). 
+Multiple bug fixes around [waiting for external inputs](https://docs.flyte.org/en/latest/user_guide/advanced_composition/waiting_for_external_inputs.html).
 Better support for dataclasses in the launch form.

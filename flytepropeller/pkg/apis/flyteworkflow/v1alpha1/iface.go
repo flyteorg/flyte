@@ -442,6 +442,7 @@ type ExecutableNode interface {
 	GetActiveDeadline() *time.Duration
 	IsInterruptible() *bool
 	GetName() string
+	GetContainerImage() string
 }
 
 // ExecutableWorkflowStatus is an interface for the Workflow p. This is the mutable portion for a Workflow

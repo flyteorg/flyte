@@ -23,7 +23,27 @@ var (
 			Name:       "artifactName",
 		},
 	}
+	key = &Key{
+		Identifier: core.Identifier{
+			Project: "project",
+			Domain:  "domain",
+			Name:    "name",
+			Version: "1.0.0",
+		},
+		CacheVersion: "1.0.0",
+		TypedInterface: core.TypedInterface{
+			Inputs:  nil,
+			Outputs: nil,
+		},
+	}
 )
+
+func TestNewPutFailureStatus(t *testing.T) {
+	status := NewPutFailureStatus(key)
+
+	assert.Equal(t, status.GetCacheStatus(), core.CatalogCacheStatus_CACHE_PUT_FAILURE)
+	assert.EqualValues(t, status.GetMetadata().GetDatasetId(), &key.Identifier)
+}
 
 func TestStatus(t *testing.T) {
 	status := NewStatus(cacheStatus, &catalogMetadata)

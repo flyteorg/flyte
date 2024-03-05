@@ -54,11 +54,17 @@ func ValidateLaunchPlan(ctx context.Context,
 	if err := validateSchedule(request, expectedInputs); err != nil {
 		return err
 	}
+
 	// Augment default inputs with the unbound workflow inputs.
 	request.Spec.DefaultInputs = expectedInputs
 	if request.Spec.EntityMetadata != nil {
 		if err := validateNotifications(request.Spec.EntityMetadata.Notifications); err != nil {
 			return err
+		}
+		if request.GetSpec().GetEntityMetadata().GetLaunchConditions() != nil {
+			return errors.NewFlyteAdminErrorf(
+				codes.InvalidArgument,
+				"Launch condition must be empty, found %v", request.GetSpec().GetEntityMetadata().GetLaunchConditions())
 		}
 	}
 	return nil
@@ -66,7 +72,7 @@ func ValidateLaunchPlan(ctx context.Context,
 
 func validateSchedule(request admin.LaunchPlanCreateRequest, expectedInputs *core.ParameterMap) error {
 	schedule := request.GetSpec().GetEntityMetadata().GetSchedule()
-	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil {
+	if schedule.GetCronExpression() != "" || schedule.GetRate() != nil || schedule.GetCronSchedule() != nil {
 		for key, value := range expectedInputs.Parameters {
 			if value.GetRequired() && key != schedule.GetKickoffTimeInputArg() {
 				return errors.NewFlyteAdminErrorf(
