@@ -35,6 +35,7 @@ If you are using a managed deployment of Flyte, you will need to contact your de
 :hidden:
 
 airflow
+chatgpt
 databricks
 bigquery
 mmcloud
