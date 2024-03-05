@@ -70,8 +70,6 @@ Specify agent configuration
 Add the OpenAI API token
 -------------------------------
 
-You have to set the OpenAI API token to the Flyte configuration.
-
 1. Install flyteagent pod using helm:
   
 .. code-block::
@@ -79,7 +77,7 @@ You have to set the OpenAI API token to the Flyte configuration.
   helm repo add flyteorg https://flyteorg.github.io/flyte
   helm install flyteagent flyteorg/flyteagent --namespace flyte
 
-2. Get the base64 value of your OPENAI API token:
+2. Get the base64 value of your OpenAI API token:
 
 .. code-block::
 
@@ -130,7 +128,7 @@ Upgrade the Flyte Helm release
   .. group-tab:: Flyte core
 
     .. code-block:: bash
-
+｀｀
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
