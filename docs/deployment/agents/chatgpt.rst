@@ -79,7 +79,7 @@ You have to set the Databricks token to the Flyte configuration.
   helm repo add flyteorg https://flyteorg.github.io/flyte
   helm install flyteagent flyteorg/flyteagent --namespace flyte
 
-2. Get the base64 value of your OPENAI API token.
+2. Get the base64 value of your OPENAI API token:
 
 .. code-block::
 
