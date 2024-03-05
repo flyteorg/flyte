@@ -2,6 +2,7 @@ package webapi
 
 import (
 	"context"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"time"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
@@ -15,7 +16,7 @@ func launch(ctx context.Context, p webapi.AsyncPlugin, tCtx core.TaskExecutionCo
 	rMeta, r, err := p.Create(ctx, tCtx)
 	if err != nil {
 		logger.Errorf(ctx, "Failed to create resource. Error: %v", err)
-		return nil, core.PhaseInfo{}, err
+		return state, core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, err.Error(), nil), nil
 	}
 
 	// If the plugin also returned the created resource, check to see if it's already in a terminal state.
