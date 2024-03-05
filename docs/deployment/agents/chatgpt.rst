@@ -4,7 +4,7 @@ ChatGPT agent
 =================
 
 This guide provides an overview of how to set up the ChatGPT agent in your Flyte deployment.
-Please note that you have to setup the openai api key in the agent server to to run the Chatgpt tasks.
+Please note that you have to set up the OpenAI API key in the agent server to to run ChatGPT tasks.
 
 Specify agent configuration
 ----------------------------
