@@ -230,4 +230,4 @@ replace (
 	sigs.k8s.io/controller-runtime => sigs.k8s.io/controller-runtime v0.16.2
 )
 
-replace github.com/flyteorg/stow => github.com/pingsutw/stow v0.3.6-0.20240305214807-012584999e92
+replace github.com/flyteorg/stow => github.com/pingsutw/stow v0.3.6-0.20240305225123-f9af3a975dd4
