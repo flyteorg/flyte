@@ -49,13 +49,13 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 	// If it doesn't exist, then proceed as normal.
 
 	if len(req.Project) == 0 || len(req.Domain) == 0 {
-		logger.Infof(ctx, "project and domain are required parameters")
+		logger.Infof(ctx, "project and domain are required parameters. Project [%v]. Domain [%v]", req.Project, req.Domain)
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "project and domain are required parameters")
 	}
 
 	// At least one of the hash or manually given prefix must be provided.
 	if len(req.FilenameRoot) == 0 && len(req.ContentMd5) == 0 {
-		logger.Infof(ctx, "content_md5 or filename_root is a required parameter")
+		logger.Infof(ctx, "content_md5 or filename_root is a required parameter. FilenameRoot [%v], ContentMD5 [%v]", req.FilenameRoot, req.ContentMd5)
 		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument,
 			"content_md5 or filename_root is a required parameter")
 	}
@@ -90,8 +90,7 @@ func (s Service) CreateUploadLocation(ctx context.Context, req *service.CreateUp
 					logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 					return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 				}
-			}
-			if len(metadata.ContentMD5()) != 0 && base64Digest != metadata.ContentMD5() {
+			} else if base64Digest != metadata.ContentMD5() {
 				logger.Errorf(ctx, "File already exists at location [%v] but hashes do not match", knownLocation)
 				return nil, errors.NewFlyteAdminErrorf(codes.AlreadyExists, "file already exists at location [%v], specify a matching hash if you wish to rewrite", knownLocation)
 			}

@@ -34,6 +34,9 @@ type Metadata interface {
 	Exists() bool
 	Size() int64
 	Etag() string
+	// ContentMD5 retrieves the value of a special metadata tag added by the system that
+	// contains the MD5 of the uploaded file. If there is no metadata attached
+	// or that `FlyteContentMD5` key isn't set, ContentMD5 will return empty.
 	ContentMD5() string
 }
 
