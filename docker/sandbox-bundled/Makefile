@@ -47,7 +47,7 @@ manifests: dep_update
 		kustomize/complete-agent > manifests/complete-agent.yaml
 
 .PHONY: build
-build: create_builder flyte dep_update manifests
+build: flyte dep_update manifests
 	docker buildx build --builder flyte-sandbox --allow security.insecure --load \
 		--tag flyte-sandbox:latest .
 
