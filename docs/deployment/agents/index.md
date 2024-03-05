@@ -17,7 +17,7 @@ If you are using a managed deployment of Flyte, you will need to contact your de
 
 * - {ref}`Airflow Agent <deployment-agent-setup-airflow>`
   - Configuring your Flyte deployment for the Airflow agent
-* - {ref}`ChatGPT Agent <deployment-agent-setup-databricks>`
+* - {ref}`ChatGPT Agent <deployment-agent-setup-chatgpt>`
   - Configuring your Flyte deployment for the ChatGPT agent.
 * - {ref}`Databricks Agent <deployment-agent-setup-databricks>`
   - Configuring your Flyte deployment for the Databricks agent.
