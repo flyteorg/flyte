@@ -14,6 +14,13 @@ In addition to migration capabilities, Flyte users can seamlessly integrate Airf
 By combining the robust Airflow ecosystem with Flyte's capabilities such as scalability, versioning, and reproducibility, users can run more complex data and machine learning workflows with ease.
 For more information, see the [Airflow agent documentation](https://docs.flyte.org/en/latest/flytesnacks/examples/airflow_agent/index.html).
 
+# For Current Flyte Users
+Even if you're already utilizing Flyte and have no intentions of migrating from Airflow,
+you can still incorporate Airflow tasks into your Flyte workflows. For instance, Airflow offers support
+for Google Cloud [Dataproc Operators](https://airflow.apache.org/docs/apache-airflow-providers-google/stable/operators/cloud/dataproc.html),
+facilitating the execution of Spark jobs on Google Cloud Dataproc clusters. Therefore, rather than developing a custom plugin in Flyte, you can seamlessly integrate
+Airflow's Dataproc operators into your Flyte workflows to execute Spark jobs
+
 ## Prerequisites
 
 - Install `flytekitplugins-airflow` in your Python environment.
@@ -29,7 +36,7 @@ any Airflow sensor or operator in a Flyte workflow.
 
 ```python
 from flytekit import task, workflow
-from airflow.operators.bash import BashOperator
+from airflow.sensors.filesystem import FileSensor
 
 @task
 def say_hello() -> str:
@@ -38,7 +45,7 @@ def say_hello() -> str:
 @workflow
 def airflow_wf():
     flyte_task = say_hello()
-    airflow_task = HttpOperator(endpoint="http://example.com/update/")
+    airflow_task = FileSensor(task_id="sensor", filepath="/")
     airflow_task >> flyte_task
 
 if __name__ == "__main__":
@@ -58,7 +65,7 @@ export AIRFLOW_CONN_MY_PROD_DATABASE='my-conn-type://login:password@host:port/sc
 Although Airflow doesn't support local execution, you can run your workflow that contains Airflow tasks locally, which is helpful for testing and debugging your tasks before moving to production.
 
 ```bash
-pyflyte run workflows.py airflow_wf
+AIRFLOW_CONN_FS_DEFAULT="/" pyflyte run workflows.py airflow_wf
 ```
 
 :::{warning}
