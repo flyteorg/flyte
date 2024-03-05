@@ -52,7 +52,7 @@ type Config struct {
 
 	// Container here is misleading, it refers to a Bucket (AWS S3) like blobstore entity. In some terms it could be a table
 	InitContainer string `json:"container" pflag:",Initial container (in s3 a bucket) to create -if it doesn't exist-.'"`
-	// By default if this is not enabled, multiple containers are not supported by the storage layer. Only the configured `container` InitContainer will be allowed to requests data from. But, if enabled then data will be loaded to written to any
+	// By default, if this is not enabled, multiple containers are not supported by the storage layer. Only the configured `container` InitContainer will be allowed to requests data from. But, if enabled then data will be loaded to written to any
 	// container specified in the DataReference.
 	MultiContainerEnabled bool `json:"enable-multicontainer" pflag:",If this is true, then the container argument is overlooked and redundant. This config will automatically open new connections to new containers/buckets as they are encountered"`
 	// Caching is recommended to improve the performance of underlying systems. It caches the metadata and resolving
