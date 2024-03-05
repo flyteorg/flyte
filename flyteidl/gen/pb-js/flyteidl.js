@@ -284,11 +284,11 @@
                     if (!writer)
                         writer = $Writer.create();
                     if (message.partitionKey != null && message.hasOwnProperty("partitionKey"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.partitionKey);
+                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.partitionKey);
                     if (message.bindToTimePartition != null && message.hasOwnProperty("bindToTimePartition"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).bool(message.bindToTimePartition);
+                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.bindToTimePartition);
                     if (message.timeTransform != null && message.hasOwnProperty("timeTransform"))
-                        $root.flyteidl.core.TimeTransform.encode(message.timeTransform, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                        $root.flyteidl.core.TimeTransform.encode(message.timeTransform, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
                     return writer;
                 };
     
@@ -310,13 +310,13 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 1:
+                        case 5:
                             message.partitionKey = reader.string();
                             break;
-                        case 2:
+                        case 6:
                             message.bindToTimePartition = reader.bool();
                             break;
-                        case 3:
+                        case 7:
                             message.timeTransform = $root.flyteidl.core.TimeTransform.decode(reader, reader.uint32());
                             break;
                         default:

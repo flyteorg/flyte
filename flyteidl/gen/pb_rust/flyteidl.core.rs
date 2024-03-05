@@ -731,10 +731,10 @@ pub struct ArtifactKey {
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactBindingData {
     /// This is only relevant in the time partition case
-    #[prost(message, optional, tag="3")]
+    #[prost(message, optional, tag="7")]
     pub time_transform: ::core::option::Option<TimeTransform>,
     /// These two fields are only relevant in the partition value case
-    #[prost(oneof="artifact_binding_data::PartitionData", tags="1, 2")]
+    #[prost(oneof="artifact_binding_data::PartitionData", tags="5, 6")]
     pub partition_data: ::core::option::Option<artifact_binding_data::PartitionData>,
 }
 /// Nested message and enum types in `ArtifactBindingData`.
@@ -743,9 +743,9 @@ pub mod artifact_binding_data {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PartitionData {
-        #[prost(string, tag="1")]
+        #[prost(string, tag="5")]
         PartitionKey(::prost::alloc::string::String),
-        #[prost(bool, tag="2")]
+        #[prost(bool, tag="6")]
         BindToTimePartition(bool),
     }
 }

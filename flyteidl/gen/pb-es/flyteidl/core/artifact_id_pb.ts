@@ -136,13 +136,13 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
    */
   partitionData: {
     /**
-     * @generated from field: string partition_key = 1;
+     * @generated from field: string partition_key = 5;
      */
     value: string;
     case: "partitionKey";
   } | {
     /**
-     * @generated from field: bool bind_to_time_partition = 2;
+     * @generated from field: bool bind_to_time_partition = 6;
      */
     value: boolean;
     case: "bindToTimePartition";
@@ -151,7 +151,7 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
   /**
    * This is only relevant in the time partition case
    *
-   * @generated from field: flyteidl.core.TimeTransform time_transform = 3;
+   * @generated from field: flyteidl.core.TimeTransform time_transform = 7;
    */
   timeTransform?: TimeTransform;
 
@@ -163,9 +163,9 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.ArtifactBindingData";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "partition_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "partition_data" },
-    { no: 2, name: "bind_to_time_partition", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "partition_data" },
-    { no: 3, name: "time_transform", kind: "message", T: TimeTransform },
+    { no: 5, name: "partition_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "partition_data" },
+    { no: 6, name: "bind_to_time_partition", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "partition_data" },
+    { no: 7, name: "time_transform", kind: "message", T: TimeTransform },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArtifactBindingData {

@@ -18,14 +18,15 @@ message ArtifactKey {
 
 // Only valid for triggers
 message ArtifactBindingData {
+  reserved 1 to 4;
   // These two fields are only relevant in the partition value case
   oneof partition_data {
-    string partition_key = 1;
-    bool bind_to_time_partition = 2;
+    string partition_key = 5;
+    bool bind_to_time_partition = 6;
   }
 
   // This is only relevant in the time partition case
-  TimeTransform time_transform = 3;
+  TimeTransform time_transform = 7;
 }
 
 enum Granularity {
