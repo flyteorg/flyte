@@ -29,7 +29,11 @@ While agents can be written in any programming language, we currently only suppo
 
 ```
 
-## Async agent interface specification
+## Steps
+
+### 1. Implement required methods
+
+#### Async agent interface specification
 
 To create a new async agent, extend the [`AsyncAgentBase`](https://github.com/flyteorg/flytekit/blob/master/flytekit/extend/backend/base_agent.py#L127) class and implement `create`, `get`, and `delete` methods. These methods must be idempotent.
 
@@ -76,7 +80,7 @@ AgentRegistry.register(BigQueryAgent())
 
 For an example implementation, see the [BigQuery agent](https://github.com/flyteorg/flytekit/blob/master/plugins/flytekit-bigquery/flytekitplugins/bigquery/agent.py#L43).
 
-## Sync agent interface specification
+#### Sync agent interface specification
 
 To create a new sync agent, extend the [`SyncAgentBase`](https://github.com/flyteorg/flytekit/blob/master/flytekit/extend/backend/base_agent.py#L107) class and implement a `do` method. This method must be idempotent.
 
@@ -98,3 +102,77 @@ class OpenAIAgent(SyncAgentBase):
 
 AgentRegistry.register(OpenAIAgent())
 ```
+
+### 2. Test the agent locally
+
+See "Testing agents locally<testing_agents_locally>" to test your agent locally.
+
+### 3. Build a new Docker image
+
+The following is a sample Dockerfile for building an image for a Flyte agent:
+
+```Dockerfile
+FROM python:3.9-slim-buster
+
+MAINTAINER Flyte Team <users@flyte.org>
+LABEL org.opencontainers.image.source=https://github.com/flyteorg/flytekit
+
+WORKDIR /root
+ENV PYTHONPATH /root
+
+# flytekit will autoload the agent if package is installed.
+RUN pip install flytekitplugins-bigquery
+CMD pyflyte serve agent --port 8000
+```
+
+:::{note}
+For flytekit versions `<=v1.10.2`, use `pyflyte serve`.
+For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
+:::
+
+### 4. Update FlyteAgent
+
+1. Update the FlyteAgent deployment's [image](https://github.com/flyteorg/flyte/blob/master/charts/flyteagent/templates/agent/deployment.yaml#L35)
+2. Update the FlytePropeller configmap.
+
+```YAML
+ tasks:
+   task-plugins:
+     enabled-plugins:
+       - agent-service
+     default-for-task-types:
+       - bigquery_query_job_task: agent-service
+       - custom_task: agent-service
+
+ plugins:
+   agent-service:
+     supportedTaskTypes:
+       - bigquery_query_job_task
+       - default_task
+       - custom_task
+     # By default, all requests will be sent to the default agent.
+     defaultAgent:
+       endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
+       insecure: true
+       timeouts:
+         GetTask: 200ms
+       defaultTimeout: 50ms
+     agents:
+       custom_agent:
+         endpoint: "dns:///custom-flyteagent.flyte.svc.cluster.local:8000"
+         insecure: false
+         defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
+         timeouts:
+           GetTask: 100ms
+         defaultTimeout: 20ms
+     agentForTaskTypes:
+       # It will override the default agent for custom_task, which means propeller will send the request to this agent.
+       - custom_task: custom_agent
+ ```
+
+3. Restart the FlytePropeller
+
+```
+kubectl rollout restart deployment flytepropeller -n flyte
+```
+
