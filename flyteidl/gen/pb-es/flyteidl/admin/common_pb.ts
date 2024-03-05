@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, protoInt64 } from "@bufbuild/protobuf";
+import { Message, proto3 } from "@bufbuild/protobuf";
 import { Identifier, ResourceType } from "../core/identifier_pb.js";
 import { WorkflowExecution_Phase } from "../core/execution_pb.js";
 import { KeyValuePair } from "../core/literals_pb.js";
@@ -1058,56 +1058,6 @@ export class Notification extends Message<Notification> {
 
   static equals(a: Notification | PlainMessage<Notification> | undefined, b: Notification | PlainMessage<Notification> | undefined): boolean {
     return proto3.util.equals(Notification, a, b);
-  }
-}
-
-/**
- * Represents a string url and associated metadata used throughout the platform.
- *
- * @generated from message flyteidl.admin.UrlBlob
- * @deprecated
- */
-export class UrlBlob extends Message<UrlBlob> {
-  /**
-   * Actual url value.
-   *
-   * @generated from field: string url = 1;
-   */
-  url = "";
-
-  /**
-   * Represents the size of the file accessible at the above url.
-   *
-   * @generated from field: int64 bytes = 2;
-   */
-  bytes = protoInt64.zero;
-
-  constructor(data?: PartialMessage<UrlBlob>) {
-    super();
-    proto3.util.initPartial(data, this);
-  }
-
-  static readonly runtime: typeof proto3 = proto3;
-  static readonly typeName = "flyteidl.admin.UrlBlob";
-  static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "url", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
-  ]);
-
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): UrlBlob {
-    return new UrlBlob().fromBinary(bytes, options);
-  }
-
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): UrlBlob {
-    return new UrlBlob().fromJson(jsonValue, options);
-  }
-
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): UrlBlob {
-    return new UrlBlob().fromJsonString(jsonString, options);
-  }
-
-  static equals(a: UrlBlob | PlainMessage<UrlBlob> | undefined, b: UrlBlob | PlainMessage<UrlBlob> | undefined): boolean {
-    return proto3.util.equals(UrlBlob, a, b);
   }
 }
 

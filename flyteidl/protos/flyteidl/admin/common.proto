@@ -262,17 +262,6 @@ message Notification {
 
 }
 
-// Represents a string url and associated metadata used throughout the platform.
-message UrlBlob {
-    option deprecated = true;
-
-    // Actual url value.
-    string url = 1;
-
-    // Represents the size of the file accessible at the above url.
-    int64 bytes = 2;
-}
-
 // Label values to be applied to an execution resource.
 // In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 // to specify how to merge labels defined at registration and execution time.

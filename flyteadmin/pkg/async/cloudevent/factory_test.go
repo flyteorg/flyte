@@ -9,7 +9,6 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	dataMocks "github.com/flyteorg/flyte/flyteadmin/pkg/data/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/mocks"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
@@ -42,16 +41,15 @@ func TestGetCloudEventPublisher(t *testing.T) {
 
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
 
 	t.Run("local publisher", func(t *testing.T) {
 		cfg.Type = common.Local
-		assert.NotNil(t, NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope()))
+		assert.NotNil(t, NewCloudEventsPublisher(context.Background(), db, mockStore, cfg, remoteCfg, promutils.NewTestScope()))
 	})
 
 	t.Run("disable cloud event publisher", func(t *testing.T) {
 		cfg.Enable = false
-		assert.NotNil(t, NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope()))
+		assert.NotNil(t, NewCloudEventsPublisher(context.Background(), db, mockStore, cfg, remoteCfg, promutils.NewTestScope()))
 	})
 }
 
@@ -64,9 +62,8 @@ func TestInvalidAwsConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
 
-	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
+	NewCloudEventsPublisher(context.Background(), db, mockStore, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
 }
 
@@ -79,9 +76,8 @@ func TestInvalidGcpConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
 
-	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
+	NewCloudEventsPublisher(context.Background(), db, mockStore, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
 }
 
@@ -95,10 +91,9 @@ func TestInvalidKafkaConfig(t *testing.T) {
 	}
 	db := mocks.NewMockRepository()
 	mockStore := getMockStore()
-	url := dataMocks.NewMockRemoteURL()
 
-	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
+	NewCloudEventsPublisher(context.Background(), db, mockStore, cfg, remoteCfg, promutils.NewTestScope())
 	cfg.KafkaConfig = runtimeInterfaces.KafkaConfig{Version: "2.1.0"}
-	NewCloudEventsPublisher(context.Background(), db, mockStore, url, cfg, remoteCfg, promutils.NewTestScope())
+	NewCloudEventsPublisher(context.Background(), db, mockStore, cfg, remoteCfg, promutils.NewTestScope())
 	t.Errorf("did not panic")
 }

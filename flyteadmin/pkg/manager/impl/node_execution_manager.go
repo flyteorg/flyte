@@ -13,7 +13,6 @@ import (
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/interfaces"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/shared"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
@@ -51,7 +50,6 @@ type NodeExecutionManager struct {
 	storagePrefix       []string
 	storageClient       *storage.DataStore
 	metrics             nodeExecutionMetrics
-	urlData             dataInterfaces.RemoteURLInterface
 	eventPublisher      notificationInterfaces.Publisher
 	cloudEventPublisher cloudeventInterfaces.Publisher
 	dbEventWriter       eventWriter.NodeExecutionEventWriter
@@ -520,21 +518,11 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, nodeExecution.InputUri)
-	if err != nil {
-		return nil, err
-	}
-
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	inputs := util.GetInputs(ctx, m.storageClient, nodeExecution.InputUri)
+	outputs := util.GetOutputs(ctx, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, nodeExecution.Closure)
-	if err != nil {
-		return nil, err
-	}
 
 	response := &admin.NodeExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 		FlyteUrls:   common.FlyteURLsFromNodeExecutionID(*request.Id, nodeExecution.GetClosure() != nil && nodeExecution.GetClosure().GetDeckUri() != ""),
@@ -553,10 +541,8 @@ func (m *NodeExecutionManager) GetNodeExecutionData(
 		}
 	}
 
-	m.metrics.NodeExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	if response.Outputs.Bytes > 0 {
-		m.metrics.NodeExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
-	} else if response.FullOutputs != nil {
+	m.metrics.NodeExecutionInputBytes.Observe(float64(proto.Size(response.FullInputs)))
+	if response.FullOutputs != nil {
 		m.metrics.NodeExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}
 
@@ -579,7 +565,7 @@ func (m *NodeExecutionManager) fetchDynamicWorkflowClosure(ctx context.Context, 
 }
 
 func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
-	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	storagePrefix []string, storageClient *storage.DataStore, scope promutils.Scope,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.NodeExecutionEventWriter) interfaces.NodeExecutionInterface {
 	metrics := nodeExecutionMetrics{
@@ -609,7 +595,6 @@ func NewNodeExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 		storagePrefix:       storagePrefix,
 		storageClient:       storageClient,
 		metrics:             metrics,
-		urlData:             urlData,
 		eventPublisher:      eventPublisher,
 		dbEventWriter:       eventWriter,
 		cloudEventPublisher: cloudEventPublisher,

@@ -28309,133 +28309,6 @@
                 return Notification;
             })();
     
-            admin.UrlBlob = (function() {
-    
-                /**
-                 * Properties of an UrlBlob.
-                 * @memberof flyteidl.admin
-                 * @interface IUrlBlob
-                 * @property {string|null} [url] UrlBlob url
-                 * @property {Long|null} [bytes] UrlBlob bytes
-                 */
-    
-                /**
-                 * Constructs a new UrlBlob.
-                 * @memberof flyteidl.admin
-                 * @classdesc Represents an UrlBlob.
-                 * @implements IUrlBlob
-                 * @constructor
-                 * @param {flyteidl.admin.IUrlBlob=} [properties] Properties to set
-                 */
-                function UrlBlob(properties) {
-                    if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
-                            if (properties[keys[i]] != null)
-                                this[keys[i]] = properties[keys[i]];
-                }
-    
-                /**
-                 * UrlBlob url.
-                 * @member {string} url
-                 * @memberof flyteidl.admin.UrlBlob
-                 * @instance
-                 */
-                UrlBlob.prototype.url = "";
-    
-                /**
-                 * UrlBlob bytes.
-                 * @member {Long} bytes
-                 * @memberof flyteidl.admin.UrlBlob
-                 * @instance
-                 */
-                UrlBlob.prototype.bytes = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
-    
-                /**
-                 * Creates a new UrlBlob instance using the specified properties.
-                 * @function create
-                 * @memberof flyteidl.admin.UrlBlob
-                 * @static
-                 * @param {flyteidl.admin.IUrlBlob=} [properties] Properties to set
-                 * @returns {flyteidl.admin.UrlBlob} UrlBlob instance
-                 */
-                UrlBlob.create = function create(properties) {
-                    return new UrlBlob(properties);
-                };
-    
-                /**
-                 * Encodes the specified UrlBlob message. Does not implicitly {@link flyteidl.admin.UrlBlob.verify|verify} messages.
-                 * @function encode
-                 * @memberof flyteidl.admin.UrlBlob
-                 * @static
-                 * @param {flyteidl.admin.IUrlBlob} message UrlBlob message or plain object to encode
-                 * @param {$protobuf.Writer} [writer] Writer to encode to
-                 * @returns {$protobuf.Writer} Writer
-                 */
-                UrlBlob.encode = function encode(message, writer) {
-                    if (!writer)
-                        writer = $Writer.create();
-                    if (message.url != null && message.hasOwnProperty("url"))
-                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.url);
-                    if (message.bytes != null && message.hasOwnProperty("bytes"))
-                        writer.uint32(/* id 2, wireType 0 =*/16).int64(message.bytes);
-                    return writer;
-                };
-    
-                /**
-                 * Decodes an UrlBlob message from the specified reader or buffer.
-                 * @function decode
-                 * @memberof flyteidl.admin.UrlBlob
-                 * @static
-                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
-                 * @param {number} [length] Message length if known beforehand
-                 * @returns {flyteidl.admin.UrlBlob} UrlBlob
-                 * @throws {Error} If the payload is not a reader or valid buffer
-                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
-                 */
-                UrlBlob.decode = function decode(reader, length) {
-                    if (!(reader instanceof $Reader))
-                        reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.UrlBlob();
-                    while (reader.pos < end) {
-                        var tag = reader.uint32();
-                        switch (tag >>> 3) {
-                        case 1:
-                            message.url = reader.string();
-                            break;
-                        case 2:
-                            message.bytes = reader.int64();
-                            break;
-                        default:
-                            reader.skipType(tag & 7);
-                            break;
-                        }
-                    }
-                    return message;
-                };
-    
-                /**
-                 * Verifies an UrlBlob message.
-                 * @function verify
-                 * @memberof flyteidl.admin.UrlBlob
-                 * @static
-                 * @param {Object.<string,*>} message Plain object to verify
-                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
-                 */
-                UrlBlob.verify = function verify(message) {
-                    if (typeof message !== "object" || message === null)
-                        return "object expected";
-                    if (message.url != null && message.hasOwnProperty("url"))
-                        if (!$util.isString(message.url))
-                            return "url: string expected";
-                    if (message.bytes != null && message.hasOwnProperty("bytes"))
-                        if (!$util.isInteger(message.bytes) && !(message.bytes && $util.isInteger(message.bytes.low) && $util.isInteger(message.bytes.high)))
-                            return "bytes: integer|Long expected";
-                    return null;
-                };
-    
-                return UrlBlob;
-            })();
-    
             admin.Labels = (function() {
     
                 /**
@@ -34075,8 +33948,6 @@
                  * Properties of a WorkflowExecutionGetDataResponse.
                  * @memberof flyteidl.admin
                  * @interface IWorkflowExecutionGetDataResponse
-                 * @property {flyteidl.admin.IUrlBlob|null} [outputs] WorkflowExecutionGetDataResponse outputs
-                 * @property {flyteidl.admin.IUrlBlob|null} [inputs] WorkflowExecutionGetDataResponse inputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullInputs] WorkflowExecutionGetDataResponse fullInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] WorkflowExecutionGetDataResponse fullOutputs
                  */
@@ -34095,22 +33966,6 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
-    
-                /**
-                 * WorkflowExecutionGetDataResponse outputs.
-                 * @member {flyteidl.admin.IUrlBlob|null|undefined} outputs
-                 * @memberof flyteidl.admin.WorkflowExecutionGetDataResponse
-                 * @instance
-                 */
-                WorkflowExecutionGetDataResponse.prototype.outputs = null;
-    
-                /**
-                 * WorkflowExecutionGetDataResponse inputs.
-                 * @member {flyteidl.admin.IUrlBlob|null|undefined} inputs
-                 * @memberof flyteidl.admin.WorkflowExecutionGetDataResponse
-                 * @instance
-                 */
-                WorkflowExecutionGetDataResponse.prototype.inputs = null;
     
                 /**
                  * WorkflowExecutionGetDataResponse fullInputs.
@@ -34152,10 +34007,6 @@
                 WorkflowExecutionGetDataResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.outputs != null && message.hasOwnProperty("outputs"))
-                        $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.inputs != null && message.hasOwnProperty("inputs"))
-                        $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.fullInputs != null && message.hasOwnProperty("fullInputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
@@ -34181,12 +34032,6 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 1:
-                            message.outputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.inputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
-                            break;
                         case 3:
                             message.fullInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
@@ -34212,16 +34057,6 @@
                 WorkflowExecutionGetDataResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.outputs != null && message.hasOwnProperty("outputs")) {
-                        var error = $root.flyteidl.admin.UrlBlob.verify(message.outputs);
-                        if (error)
-                            return "outputs." + error;
-                    }
-                    if (message.inputs != null && message.hasOwnProperty("inputs")) {
-                        var error = $root.flyteidl.admin.UrlBlob.verify(message.inputs);
-                        if (error)
-                            return "inputs." + error;
-                    }
                     if (message.fullInputs != null && message.hasOwnProperty("fullInputs")) {
                         var error = $root.flyteidl.core.LiteralMap.verify(message.fullInputs);
                         if (error)
@@ -41120,8 +40955,6 @@
                  * Properties of a NodeExecutionGetDataResponse.
                  * @memberof flyteidl.admin
                  * @interface INodeExecutionGetDataResponse
-                 * @property {flyteidl.admin.IUrlBlob|null} [inputs] NodeExecutionGetDataResponse inputs
-                 * @property {flyteidl.admin.IUrlBlob|null} [outputs] NodeExecutionGetDataResponse outputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullInputs] NodeExecutionGetDataResponse fullInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] NodeExecutionGetDataResponse fullOutputs
                  * @property {flyteidl.admin.IDynamicWorkflowNodeMetadata|null} [dynamicWorkflow] NodeExecutionGetDataResponse dynamicWorkflow
@@ -41142,22 +40975,6 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
-    
-                /**
-                 * NodeExecutionGetDataResponse inputs.
-                 * @member {flyteidl.admin.IUrlBlob|null|undefined} inputs
-                 * @memberof flyteidl.admin.NodeExecutionGetDataResponse
-                 * @instance
-                 */
-                NodeExecutionGetDataResponse.prototype.inputs = null;
-    
-                /**
-                 * NodeExecutionGetDataResponse outputs.
-                 * @member {flyteidl.admin.IUrlBlob|null|undefined} outputs
-                 * @memberof flyteidl.admin.NodeExecutionGetDataResponse
-                 * @instance
-                 */
-                NodeExecutionGetDataResponse.prototype.outputs = null;
     
                 /**
                  * NodeExecutionGetDataResponse fullInputs.
@@ -41215,10 +41032,6 @@
                 NodeExecutionGetDataResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.inputs != null && message.hasOwnProperty("inputs"))
-                        $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.outputs != null && message.hasOwnProperty("outputs"))
-                        $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.fullInputs != null && message.hasOwnProperty("fullInputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
@@ -41248,12 +41061,6 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 1:
-                            message.inputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.outputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
-                            break;
                         case 3:
                             message.fullInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
@@ -41285,16 +41092,6 @@
                 NodeExecutionGetDataResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.inputs != null && message.hasOwnProperty("inputs")) {
-                        var error = $root.flyteidl.admin.UrlBlob.verify(message.inputs);
-                        if (error)
-                            return "inputs." + error;
-                    }
-                    if (message.outputs != null && message.hasOwnProperty("outputs")) {
-                        var error = $root.flyteidl.admin.UrlBlob.verify(message.outputs);
-                        if (error)
-                            return "outputs." + error;
-                    }
                     if (message.fullInputs != null && message.hasOwnProperty("fullInputs")) {
                         var error = $root.flyteidl.core.LiteralMap.verify(message.fullInputs);
                         if (error)
@@ -47345,8 +47142,6 @@
                  * Properties of a TaskExecutionGetDataResponse.
                  * @memberof flyteidl.admin
                  * @interface ITaskExecutionGetDataResponse
-                 * @property {flyteidl.admin.IUrlBlob|null} [inputs] TaskExecutionGetDataResponse inputs
-                 * @property {flyteidl.admin.IUrlBlob|null} [outputs] TaskExecutionGetDataResponse outputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullInputs] TaskExecutionGetDataResponse fullInputs
                  * @property {flyteidl.core.ILiteralMap|null} [fullOutputs] TaskExecutionGetDataResponse fullOutputs
                  * @property {flyteidl.admin.IFlyteURLs|null} [flyteUrls] TaskExecutionGetDataResponse flyteUrls
@@ -47366,22 +47161,6 @@
                             if (properties[keys[i]] != null)
                                 this[keys[i]] = properties[keys[i]];
                 }
-    
-                /**
-                 * TaskExecutionGetDataResponse inputs.
-                 * @member {flyteidl.admin.IUrlBlob|null|undefined} inputs
-                 * @memberof flyteidl.admin.TaskExecutionGetDataResponse
-                 * @instance
-                 */
-                TaskExecutionGetDataResponse.prototype.inputs = null;
-    
-                /**
-                 * TaskExecutionGetDataResponse outputs.
-                 * @member {flyteidl.admin.IUrlBlob|null|undefined} outputs
-                 * @memberof flyteidl.admin.TaskExecutionGetDataResponse
-                 * @instance
-                 */
-                TaskExecutionGetDataResponse.prototype.outputs = null;
     
                 /**
                  * TaskExecutionGetDataResponse fullInputs.
@@ -47431,10 +47210,6 @@
                 TaskExecutionGetDataResponse.encode = function encode(message, writer) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.inputs != null && message.hasOwnProperty("inputs"))
-                        $root.flyteidl.admin.UrlBlob.encode(message.inputs, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-                    if (message.outputs != null && message.hasOwnProperty("outputs"))
-                        $root.flyteidl.admin.UrlBlob.encode(message.outputs, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
                     if (message.fullInputs != null && message.hasOwnProperty("fullInputs"))
                         $root.flyteidl.core.LiteralMap.encode(message.fullInputs, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
                     if (message.fullOutputs != null && message.hasOwnProperty("fullOutputs"))
@@ -47462,12 +47237,6 @@
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
-                        case 1:
-                            message.inputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
-                            break;
-                        case 2:
-                            message.outputs = $root.flyteidl.admin.UrlBlob.decode(reader, reader.uint32());
-                            break;
                         case 3:
                             message.fullInputs = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
                             break;
@@ -47496,16 +47265,6 @@
                 TaskExecutionGetDataResponse.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (message.inputs != null && message.hasOwnProperty("inputs")) {
-                        var error = $root.flyteidl.admin.UrlBlob.verify(message.inputs);
-                        if (error)
-                            return "inputs." + error;
-                    }
-                    if (message.outputs != null && message.hasOwnProperty("outputs")) {
-                        var error = $root.flyteidl.admin.UrlBlob.verify(message.outputs);
-                        if (error)
-                            return "outputs." + error;
-                    }
                     if (message.fullInputs != null && message.hasOwnProperty("fullInputs")) {
                         var error = $root.flyteidl.core.LiteralMap.verify(message.fullInputs);
                         if (error)

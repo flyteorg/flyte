@@ -15,7 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
@@ -118,7 +117,6 @@ type CloudEventWrappedPublisher struct {
 	sender           interfaces.Sender
 	systemMetrics    implementations.EventPublisherSystemMetrics
 	storageClient    *storage.DataStore
-	urlData          dataInterfaces.RemoteURLInterface
 	remoteDataConfig runtimeInterfaces.RemoteDataConfig
 }
 
@@ -471,15 +469,16 @@ func NewCloudEventsPublisher(sender interfaces.Sender, scope promutils.Scope, ev
 	}
 }
 
-func NewCloudEventsWrappedPublisher(
-	db repositoryInterfaces.Repository, sender interfaces.Sender, scope promutils.Scope, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, remoteDataConfig runtimeInterfaces.RemoteDataConfig) interfaces.Publisher {
-
+func NewCloudEventsWrappedPublisher(db repositoryInterfaces.Repository,
+	sender interfaces.Sender,
+	scope promutils.Scope,
+	storageClient *storage.DataStore,
+	remoteDataConfig runtimeInterfaces.RemoteDataConfig) interfaces.Publisher {
 	return &CloudEventWrappedPublisher{
 		db:               db,
 		sender:           sender,
 		systemMetrics:    implementations.NewEventPublisherSystemMetrics(scope.NewSubScope("cloudevents_publisher")),
 		storageClient:    storageClient,
-		urlData:          urlData,
 		remoteDataConfig: remoteDataConfig,
 	}
 }

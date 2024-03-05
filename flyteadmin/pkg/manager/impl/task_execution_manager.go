@@ -12,7 +12,6 @@ import (
 	cloudeventInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/util"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/validation"
@@ -49,7 +48,6 @@ type TaskExecutionManager struct {
 	config               runtimeInterfaces.Configuration
 	storageClient        *storage.DataStore
 	metrics              taskExecutionMetrics
-	urlData              dataInterfaces.RemoteURLInterface
 	notificationClient   notificationInterfaces.Publisher
 	cloudEventsPublisher cloudeventInterfaces.Publisher
 }
@@ -310,36 +308,25 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 		return nil, err
 	}
 
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, taskExecution.InputUri)
-	if err != nil {
-		return nil, err
-	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	inputs := util.GetInputs(ctx, m.storageClient, taskExecution.InputUri)
+	outputs := util.GetOutputs(ctx, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, taskExecution.Closure)
-	if err != nil {
-		return nil, err
-	}
 
 	response := &admin.TaskExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 		FlyteUrls:   common.FlyteURLsFromTaskExecutionID(*request.Id, false),
 	}
 
-	m.metrics.TaskExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	if response.Outputs.Bytes > 0 {
-		m.metrics.TaskExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
-	} else if response.FullOutputs != nil {
+	m.metrics.TaskExecutionInputBytes.Observe(float64(proto.Size(response.FullInputs)))
+	if response.FullOutputs != nil {
 		m.metrics.TaskExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}
 	return response, nil
 }
 
 func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfaces.Configuration,
-	storageClient *storage.DataStore, scope promutils.Scope, urlData dataInterfaces.RemoteURLInterface,
+	storageClient *storage.DataStore, scope promutils.Scope,
 	publisher notificationInterfaces.Publisher, cloudEventsPublisher cloudeventInterfaces.Publisher) interfaces.TaskExecutionInterface {
 
 	metrics := taskExecutionMetrics{
@@ -370,7 +357,6 @@ func NewTaskExecutionManager(db repoInterfaces.Repository, config runtimeInterfa
 		config:               config,
 		storageClient:        storageClient,
 		metrics:              metrics,
-		urlData:              urlData,
 		notificationClient:   publisher,
 		cloudEventsPublisher: cloudEventsPublisher,
 	}

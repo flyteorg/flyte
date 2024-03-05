@@ -6,7 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 import { Identifier, NodeExecutionIdentifier, TaskExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
-import { FlyteURLs, Sort, UrlBlob } from "./common_pb.js";
+import { FlyteURLs, Sort } from "./common_pb.js";
 import { ExecutionError, NodeExecution_Phase } from "../core/execution_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { CatalogCacheStatus, CatalogMetadata } from "../core/catalog_pb.js";
@@ -774,24 +774,6 @@ export class NodeExecutionGetDataRequest extends Message<NodeExecutionGetDataReq
  */
 export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataResponse> {
   /**
-   * Signed url to fetch a core.LiteralMap of node execution inputs.
-   * Deprecated: Please use full_inputs instead.
-   *
-   * @generated from field: flyteidl.admin.UrlBlob inputs = 1 [deprecated = true];
-   * @deprecated
-   */
-  inputs?: UrlBlob;
-
-  /**
-   * Signed url to fetch a core.LiteralMap of node execution outputs.
-   * Deprecated: Please use full_outputs instead.
-   *
-   * @generated from field: flyteidl.admin.UrlBlob outputs = 2 [deprecated = true];
-   * @deprecated
-   */
-  outputs?: UrlBlob;
-
-  /**
    * Full_inputs will only be populated if they are under a configured size threshold.
    *
    * @generated from field: flyteidl.core.LiteralMap full_inputs = 3;
@@ -825,8 +807,6 @@ export class NodeExecutionGetDataResponse extends Message<NodeExecutionGetDataRe
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.NodeExecutionGetDataResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "inputs", kind: "message", T: UrlBlob },
-    { no: 2, name: "outputs", kind: "message", T: UrlBlob },
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
     { no: 16, name: "dynamic_workflow", kind: "message", T: DynamicWorkflowNodeMetadata },

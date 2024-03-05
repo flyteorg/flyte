@@ -189,14 +189,6 @@ class Notification(_message.Message):
     slack: SlackNotification
     def __init__(self, phases: _Optional[_Iterable[_Union[_execution_pb2.WorkflowExecution.Phase, str]]] = ..., email: _Optional[_Union[EmailNotification, _Mapping]] = ..., pager_duty: _Optional[_Union[PagerDutyNotification, _Mapping]] = ..., slack: _Optional[_Union[SlackNotification, _Mapping]] = ...) -> None: ...
 
-class UrlBlob(_message.Message):
-    __slots__ = ["url", "bytes"]
-    URL_FIELD_NUMBER: _ClassVar[int]
-    BYTES_FIELD_NUMBER: _ClassVar[int]
-    url: str
-    bytes: int
-    def __init__(self, url: _Optional[str] = ..., bytes: _Optional[int] = ...) -> None: ...
-
 class Labels(_message.Message):
     __slots__ = ["values"]
     class ValuesEntry(_message.Message):

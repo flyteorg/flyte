@@ -102,15 +102,11 @@ class TaskExecutionGetDataRequest(_message.Message):
     def __init__(self, id: _Optional[_Union[_identifier_pb2.TaskExecutionIdentifier, _Mapping]] = ...) -> None: ...
 
 class TaskExecutionGetDataResponse(_message.Message):
-    __slots__ = ["inputs", "outputs", "full_inputs", "full_outputs", "flyte_urls"]
-    INPUTS_FIELD_NUMBER: _ClassVar[int]
-    OUTPUTS_FIELD_NUMBER: _ClassVar[int]
+    __slots__ = ["full_inputs", "full_outputs", "flyte_urls"]
     FULL_INPUTS_FIELD_NUMBER: _ClassVar[int]
     FULL_OUTPUTS_FIELD_NUMBER: _ClassVar[int]
     FLYTE_URLS_FIELD_NUMBER: _ClassVar[int]
-    inputs: _common_pb2.UrlBlob
-    outputs: _common_pb2.UrlBlob
     full_inputs: _literals_pb2.LiteralMap
     full_outputs: _literals_pb2.LiteralMap
     flyte_urls: _common_pb2.FlyteURLs
-    def __init__(self, inputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., outputs: _Optional[_Union[_common_pb2.UrlBlob, _Mapping]] = ..., full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...
+    def __init__(self, full_inputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., full_outputs: _Optional[_Union[_literals_pb2.LiteralMap, _Mapping]] = ..., flyte_urls: _Optional[_Union[_common_pb2.FlyteURLs, _Mapping]] = ...) -> None: ...

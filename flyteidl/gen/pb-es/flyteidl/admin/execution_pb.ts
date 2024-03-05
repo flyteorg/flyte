@@ -8,7 +8,7 @@ import { BoolValue, Duration, Message, proto3, Timestamp } from "@bufbuild/proto
 import { LiteralMap } from "../core/literals_pb.js";
 import { Identifier, NodeExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { ExecutionError, QualityOfService, WorkflowExecution_Phase } from "../core/execution_pb.js";
-import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig, UrlBlob } from "./common_pb.js";
+import { Annotations, AuthRole, Envs, Labels, Notification, RawOutputDataConfig } from "./common_pb.js";
 import { ArtifactID } from "../core/artifact_id_pb.js";
 import { SecurityContext } from "../core/security_pb.js";
 import { ClusterAssignment } from "./cluster_assignment_pb.js";
@@ -1294,24 +1294,6 @@ export class WorkflowExecutionGetDataRequest extends Message<WorkflowExecutionGe
  */
 export class WorkflowExecutionGetDataResponse extends Message<WorkflowExecutionGetDataResponse> {
   /**
-   * Signed url to fetch a core.LiteralMap of execution outputs.
-   * Deprecated: Please use full_outputs instead.
-   *
-   * @generated from field: flyteidl.admin.UrlBlob outputs = 1 [deprecated = true];
-   * @deprecated
-   */
-  outputs?: UrlBlob;
-
-  /**
-   * Signed url to fetch a core.LiteralMap of execution inputs.
-   * Deprecated: Please use full_inputs instead.
-   *
-   * @generated from field: flyteidl.admin.UrlBlob inputs = 2 [deprecated = true];
-   * @deprecated
-   */
-  inputs?: UrlBlob;
-
-  /**
    * Full_inputs will only be populated if they are under a configured size threshold.
    *
    * @generated from field: flyteidl.core.LiteralMap full_inputs = 3;
@@ -1333,8 +1315,6 @@ export class WorkflowExecutionGetDataResponse extends Message<WorkflowExecutionG
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.WorkflowExecutionGetDataResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "outputs", kind: "message", T: UrlBlob },
-    { no: 2, name: "inputs", kind: "message", T: UrlBlob },
     { no: 3, name: "full_inputs", kind: "message", T: LiteralMap },
     { no: 4, name: "full_outputs", kind: "message", T: LiteralMap },
   ]);

@@ -16,7 +16,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/cloudevent/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	runtimeInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -25,7 +24,12 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/storage"
 )
 
-func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Repository, storageClient *storage.DataStore, urlData dataInterfaces.RemoteURLInterface, cloudEventsConfig runtimeInterfaces.CloudEventsConfig, remoteDataConfig runtimeInterfaces.RemoteDataConfig, scope promutils.Scope) interfaces.Publisher {
+func NewCloudEventsPublisher(ctx context.Context,
+	db repositoryInterfaces.Repository,
+	storageClient *storage.DataStore,
+	cloudEventsConfig runtimeInterfaces.CloudEventsConfig,
+	remoteDataConfig runtimeInterfaces.RemoteDataConfig,
+	scope promutils.Scope) interfaces.Publisher {
 	if !cloudEventsConfig.Enable {
 		logger.Infof(ctx, "CloudEvents are disabled, config is [+%v]", cloudEventsConfig)
 		return implementations.NewNoopPublish()
@@ -106,7 +110,7 @@ func NewCloudEventsPublisher(ctx context.Context, db repositoryInterfaces.Reposi
 	}
 
 	if cloudEventsConfig.CloudEventVersion == runtimeInterfaces.CloudEventVersionv2 {
-		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, urlData, remoteDataConfig)
+		return cloudEventImplementations.NewCloudEventsWrappedPublisher(db, sender, scope, storageClient, remoteDataConfig)
 	}
 
 	return cloudEventImplementations.NewCloudEventsPublisher(sender, scope, cloudEventsConfig.EventsPublisherConfig.EventTypes)

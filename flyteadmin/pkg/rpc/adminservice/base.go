@@ -11,7 +11,6 @@ import (
 	eventWriter "github.com/flyteorg/flyte/flyteadmin/pkg/async/events/implementations"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule"
-	"github.com/flyteorg/flyte/flyteadmin/pkg/data"
 	executionCluster "github.com/flyteorg/flyte/flyteadmin/pkg/executioncluster/impl"
 	manager "github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
@@ -114,18 +113,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	launchPlanManager := manager.NewLaunchPlanManager(
 		repo, configuration, eventScheduler, adminScope.NewSubScope("launch_plan_manager"))
 
-	// Configure admin-specific remote data handler (separate from storage)
-	remoteDataConfig := configuration.ApplicationConfiguration().GetRemoteDataConfig()
-	urlData := data.GetRemoteDataHandler(data.RemoteDataHandlerConfig{
-		CloudProvider:            remoteDataConfig.Scheme,
-		SignedURLDurationMinutes: remoteDataConfig.SignedURL.DurationMinutes,
-		SigningPrincipal:         remoteDataConfig.SignedURL.SigningPrincipal,
-		Region:                   remoteDataConfig.Region,
-		Retries:                  defaultRetries,
-		RemoteDataStoreClient:    dataStorageClient,
-	}).GetRemoteURLInterface()
-
-	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, repo, dataStorageClient, urlData, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), *configuration.ApplicationConfiguration().GetRemoteDataConfig(), adminScope)
+	cloudEventPublisher := cloudevent.NewCloudEventsPublisher(ctx, repo, dataStorageClient, *configuration.ApplicationConfiguration().GetCloudEventsConfig(), *configuration.ApplicationConfiguration().GetRemoteDataConfig(), adminScope)
 
 	workflowManager := manager.NewWorkflowManager(
 		repo, configuration, workflowengineImpl.NewCompiler(), dataStorageClient, applicationConfiguration.GetMetadataStoragePrefix(),
@@ -140,7 +128,7 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 
 	executionManager := manager.NewExecutionManager(repo, pluginRegistry, configuration, dataStorageClient,
 		adminScope.NewSubScope("execution_manager"), adminScope.NewSubScope("user_execution_metrics"),
-		publisher, urlData, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
+		publisher, workflowManager, namedEntityManager, eventPublisher, cloudEventPublisher, executionEventWriter)
 	versionManager := manager.NewVersionManager()
 
 	scheduledWorkflowExecutor := workflowScheduler.GetWorkflowExecutor(executionManager, launchPlanManager)
@@ -156,9 +144,9 @@ func NewAdminServer(ctx context.Context, pluginRegistry *plugins.Registry, confi
 	}()
 
 	nodeExecutionManager := manager.NewNodeExecutionManager(repo, configuration, applicationConfiguration.GetMetadataStoragePrefix(), dataStorageClient,
-		adminScope.NewSubScope("node_execution_manager"), urlData, eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
+		adminScope.NewSubScope("node_execution_manager"), eventPublisher, cloudEventPublisher, nodeExecutionEventWriter)
 	taskExecutionManager := manager.NewTaskExecutionManager(repo, configuration, dataStorageClient,
-		adminScope.NewSubScope("task_execution_manager"), urlData, eventPublisher, cloudEventPublisher)
+		adminScope.NewSubScope("task_execution_manager"), eventPublisher, cloudEventPublisher)
 
 	logger.Info(ctx, "Initializing a new AdminService")
 	return &AdminService{

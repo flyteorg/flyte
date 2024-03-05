@@ -19,7 +19,6 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications"
 	notificationInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/notifications/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
-	dataInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/data/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/executions"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/resources"
@@ -82,7 +81,6 @@ type ExecutionManager struct {
 	systemMetrics             executionSystemMetrics
 	userMetrics               executionUserMetrics
 	notificationClient        notificationInterfaces.Publisher
-	urlData                   dataInterfaces.RemoteURLInterface
 	workflowManager           interfaces.WorkflowInterface
 	namedEntityManager        interfaces.NamedEntityInterface
 	resourceManager           interfaces.ResourceInterface
@@ -1511,27 +1509,16 @@ func (m *ExecutionManager) GetExecutionData(
 			return nil, err
 		}
 	}
-	inputs, inputURLBlob, err := util.GetInputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
-		m.storageClient, executionModel.InputsURI.String())
-	if err != nil {
-		return nil, err
-	}
-	outputs, outputURLBlob, err := util.GetOutputs(ctx, m.urlData, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
+	inputs := util.GetInputs(ctx, m.storageClient, executionModel.InputsURI.String())
+	outputs := util.GetOutputs(ctx, m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 		m.storageClient, util.ToExecutionClosureInterface(execution.Closure))
-	if err != nil {
-		return nil, err
-	}
 	response := &admin.WorkflowExecutionGetDataResponse{
-		Inputs:      inputURLBlob,
-		Outputs:     outputURLBlob,
 		FullInputs:  inputs,
 		FullOutputs: outputs,
 	}
 
-	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(response.Inputs.Bytes))
-	if response.Outputs.Bytes > 0 {
-		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(response.Outputs.Bytes))
-	} else if response.FullOutputs != nil {
+	m.userMetrics.WorkflowExecutionInputBytes.Observe(float64(proto.Size(response.FullInputs)))
+	if response.FullOutputs != nil {
 		m.userMetrics.WorkflowExecutionOutputBytes.Observe(float64(proto.Size(response.FullOutputs)))
 	}
 	return response, nil
@@ -1754,7 +1741,7 @@ func newExecutionSystemMetrics(scope promutils.Scope) executionSystemMetrics {
 
 func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plugins.Registry, config runtimeInterfaces.Configuration,
 	storageClient *storage.DataStore, systemScope promutils.Scope, userScope promutils.Scope,
-	publisher notificationInterfaces.Publisher, urlData dataInterfaces.RemoteURLInterface,
+	publisher notificationInterfaces.Publisher,
 	workflowManager interfaces.WorkflowInterface, namedEntityManager interfaces.NamedEntityInterface,
 	eventPublisher notificationInterfaces.Publisher, cloudEventPublisher cloudeventInterfaces.Publisher,
 	eventWriter eventWriter.WorkflowExecutionEventWriter) interfaces.ExecutionInterface {
@@ -1782,7 +1769,6 @@ func NewExecutionManager(db repositoryInterfaces.Repository, pluginRegistry *plu
 		systemMetrics:             systemMetrics,
 		userMetrics:               userMetrics,
 		notificationClient:        publisher,
-		urlData:                   urlData,
 		workflowManager:           workflowManager,
 		namedEntityManager:        namedEntityManager,
 		resourceManager:           resourceManager,

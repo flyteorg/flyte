@@ -5560,14 +5560,6 @@
     "adminNodeExecutionGetDataResponse": {
       "type": "object",
       "properties": {
-        "inputs": {
-          "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of node execution inputs.\nDeprecated: Please use full_inputs instead."
-        },
-        "outputs": {
-          "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of node execution outputs.\nDeprecated: Please use full_outputs instead."
-        },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Full_inputs will only be populated if they are under a configured size threshold."
@@ -6078,14 +6070,6 @@
     "adminTaskExecutionGetDataResponse": {
       "type": "object",
       "properties": {
-        "inputs": {
-          "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of task execution inputs.\nDeprecated: Please use full_inputs instead."
-        },
-        "outputs": {
-          "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of task execution outputs.\nDeprecated: Please use full_outputs instead."
-        },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Full_inputs will only be populated if they are under a configured size threshold."
@@ -6182,21 +6166,6 @@
         }
       },
       "description": "Represents a structure that encapsulates the user-configured specification of the task."
-    },
-    "adminUrlBlob": {
-      "type": "object",
-      "properties": {
-        "url": {
-          "type": "string",
-          "description": "Actual url value."
-        },
-        "bytes": {
-          "type": "string",
-          "format": "int64",
-          "description": "Represents the size of the file accessible at the above url."
-        }
-      },
-      "description": "Represents a string url and associated metadata used throughout the platform."
     },
     "adminVersion": {
       "type": "object",
@@ -6354,14 +6323,6 @@
     "adminWorkflowExecutionGetDataResponse": {
       "type": "object",
       "properties": {
-        "outputs": {
-          "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of execution outputs.\nDeprecated: Please use full_outputs instead."
-        },
-        "inputs": {
-          "$ref": "#/definitions/adminUrlBlob",
-          "description": "Signed url to fetch a core.LiteralMap of execution inputs.\nDeprecated: Please use full_inputs instead."
-        },
         "full_inputs": {
           "$ref": "#/definitions/coreLiteralMap",
           "description": "Full_inputs will only be populated if they are under a configured size threshold."

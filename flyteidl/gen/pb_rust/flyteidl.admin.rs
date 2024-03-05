@@ -702,17 +702,6 @@ pub mod notification {
         Slack(super::SlackNotification),
     }
 }
-/// Represents a string url and associated metadata used throughout the platform.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct UrlBlob {
-    /// Actual url value.
-    #[prost(string, tag="1")]
-    pub url: ::prost::alloc::string::String,
-    /// Represents the size of the file accessible at the above url.
-    #[prost(int64, tag="2")]
-    pub bytes: i64,
-}
 /// Label values to be applied to an execution resource.
 /// In the future a mode (e.g. OVERRIDE, APPEND, etc) can be defined
 /// to specify how to merge labels defined at registration and execution time.
@@ -1460,16 +1449,6 @@ pub struct WorkflowExecutionGetDataRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct WorkflowExecutionGetDataResponse {
-    /// Signed url to fetch a core.LiteralMap of execution outputs.
-    /// Deprecated: Please use full_outputs instead.
-    #[deprecated]
-    #[prost(message, optional, tag="1")]
-    pub outputs: ::core::option::Option<UrlBlob>,
-    /// Signed url to fetch a core.LiteralMap of execution inputs.
-    /// Deprecated: Please use full_inputs instead.
-    #[deprecated]
-    #[prost(message, optional, tag="2")]
-    pub inputs: ::core::option::Option<UrlBlob>,
     /// Full_inputs will only be populated if they are under a configured size threshold.
     #[prost(message, optional, tag="3")]
     pub full_inputs: ::core::option::Option<super::core::LiteralMap>,
@@ -2383,16 +2362,6 @@ pub struct NodeExecutionGetDataRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct NodeExecutionGetDataResponse {
-    /// Signed url to fetch a core.LiteralMap of node execution inputs.
-    /// Deprecated: Please use full_inputs instead.
-    #[deprecated]
-    #[prost(message, optional, tag="1")]
-    pub inputs: ::core::option::Option<UrlBlob>,
-    /// Signed url to fetch a core.LiteralMap of node execution outputs.
-    /// Deprecated: Please use full_outputs instead.
-    #[deprecated]
-    #[prost(message, optional, tag="2")]
-    pub outputs: ::core::option::Option<UrlBlob>,
     /// Full_inputs will only be populated if they are under a configured size threshold.
     #[prost(message, optional, tag="3")]
     pub full_inputs: ::core::option::Option<super::core::LiteralMap>,
@@ -3053,16 +3022,6 @@ pub struct TaskExecutionGetDataRequest {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TaskExecutionGetDataResponse {
-    /// Signed url to fetch a core.LiteralMap of task execution inputs.
-    /// Deprecated: Please use full_inputs instead.
-    #[deprecated]
-    #[prost(message, optional, tag="1")]
-    pub inputs: ::core::option::Option<UrlBlob>,
-    /// Signed url to fetch a core.LiteralMap of task execution outputs.
-    /// Deprecated: Please use full_outputs instead.
-    #[deprecated]
-    #[prost(message, optional, tag="2")]
-    pub outputs: ::core::option::Option<UrlBlob>,
     /// Full_inputs will only be populated if they are under a configured size threshold.
     #[prost(message, optional, tag="3")]
     pub full_inputs: ::core::option::Option<super::core::LiteralMap>,
