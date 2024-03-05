@@ -100,4 +100,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For Snowflake agent on the Flyte cluster, see `Snowflake agent <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_integration/snowflake_agent.html>`_.
+For Snowflake agent on the Flyte cluster, see `Snowflake agent <https://docs.flyte.org/en/latest/flytesnacks/examples/snowflake_agent/index.html>`_.
