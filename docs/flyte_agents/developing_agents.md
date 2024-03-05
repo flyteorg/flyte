@@ -105,7 +105,7 @@ AgentRegistry.register(OpenAIAgent())
 
 ### 2. Test the agent locally
 
-See "Testing agents locally<testing_agents_locally>" to test your agent locally.
+See {doc}`"Testing agents locally" <testing_agents_locally>` to test your agent locally.
 
 ### 3. Build a new Docker image
 
