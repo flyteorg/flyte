@@ -1,6 +1,6 @@
 .. _deployment-agent-setup-chatgpt:
 
-Chatgpt agent
+ChatGPT agent
 =================
 
 This guide provides an overview of how to set up the Chatgpt agent in your Flyte deployment.
