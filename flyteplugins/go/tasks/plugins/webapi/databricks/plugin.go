@@ -6,6 +6,7 @@ import (
 	"encoding/gob"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"time"
@@ -26,20 +27,20 @@ import (
 )
 
 const (
-	ErrSystem       errors.ErrorCode = "System"
-	post            string           = "POST"
-	get             string           = "GET"
-	databricksAPI   string           = "/api/2.1/jobs/runs"
-	newCluster      string           = "new_cluster"
-	dockerImage     string           = "docker_image"
-	sparkConfig     string           = "spark_conf"
-	sparkPythonTask string           = "spark_python_task"
-	pythonFile      string           = "python_file"
-	parameters      string           = "parameters"
-	url             string           = "url"
+	create          string = "create"
+	get             string = "get"
+	cancel          string = "cancel"
+	databricksAPI   string = "/api/2.1/jobs/runs"
+	newCluster      string = "new_cluster"
+	dockerImage     string = "docker_image"
+	sparkConfig     string = "spark_conf"
+	sparkPythonTask string = "spark_python_task"
+	pythonFile      string = "python_file"
+	parameters      string = "parameters"
+	url             string = "url"
 )
 
-// for mocking/testing purposes, and we'll override this method
+// HTTPClient for mocking/testing purposes, and we'll override this method
 type HTTPClient interface {
 	Do(req *http.Request) (*http.Response, error)
 }
@@ -127,60 +128,41 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	}
 	databricksJob[sparkPythonTask] = map[string]interface{}{pythonFile: p.cfg.EntrypointFile, parameters: modifiedArgs}
 
-	req, err := buildRequest(post, databricksJob, p.cfg.databricksEndpoint,
-		p.cfg.DatabricksInstance, token, "", false)
+	data, err := p.sendRequest(create, databricksJob, token, "")
 	if err != nil {
 		return nil, nil, err
 	}
 
-	resp, err := p.client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer resp.Body.Close()
-	data, err := buildResponse(resp)
-	if err != nil {
-		return nil, nil, err
-	}
-	if data["run_id"] == "" {
-		return nil, nil, pluginErrors.Wrapf(pluginErrors.RuntimeFailure, err,
-			"Unable to fetch statementHandle from http response")
+	if _, ok := data["run_id"]; !ok {
+		return nil, nil, errors.Errorf("CorruptedPluginState", "can't get the run_id")
 	}
 	runID := fmt.Sprintf("%.0f", data["run_id"])
 
-	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token},
-		ResourceWrapper{StatusCode: resp.StatusCode}, nil
+	return ResourceMetaWrapper{runID, p.cfg.DatabricksInstance, token}, nil, nil
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	req, err := buildRequest(get, nil, p.cfg.databricksEndpoint,
-		p.cfg.DatabricksInstance, exec.Token, exec.RunID, false)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to build databricks job request [%v]", err)
-		return nil, err
-	}
-	resp, err := p.client.Do(req)
-	logger.Debugf(ctx, "Get databricks job response", "resp", resp)
-	if err != nil {
-		logger.Errorf(ctx, "Failed to get databricks job status [%v]", resp)
-		return nil, err
-	}
-	defer resp.Body.Close()
-	data, err := buildResponse(resp)
+	res, err := p.sendRequest(get, nil, exec.Token, exec.RunID)
 	if err != nil {
 		return nil, err
 	}
-	if data == nil || data["state"] == nil {
+	if _, ok := res["state"]; !ok {
 		return nil, errors.Errorf("CorruptedPluginState", "can't get the job state")
 	}
-	jobState := data["state"].(map[string]interface{})
+	jobState := res["state"].(map[string]interface{})
+	jobID := fmt.Sprintf("%.0f", res["job_id"])
 	message := fmt.Sprintf("%s", jobState["state_message"])
-	jobID := fmt.Sprintf("%.0f", data["job_id"])
 	lifeCycleState := fmt.Sprintf("%s", jobState["life_cycle_state"])
-	resultState := fmt.Sprintf("%s", jobState["result_state"])
+	var resultState string
+	if _, ok := jobState["result_state"]; !ok {
+		// The result_state is not available until the job is finished.
+		// https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runresultstate
+		resultState = ""
+	} else {
+		resultState = fmt.Sprintf("%s", jobState["result_state"])
+	}
 	return ResourceWrapper{
-		StatusCode:     resp.StatusCode,
 		JobID:          jobID,
 		LifeCycleState: lifeCycleState,
 		ResultState:    resultState,
@@ -193,63 +175,111 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	req, err := buildRequest(post, nil, p.cfg.databricksEndpoint,
-		p.cfg.DatabricksInstance, exec.Token, exec.RunID, true)
+	_, err := p.sendRequest(cancel, nil, exec.Token, exec.RunID)
 	if err != nil {
 		return err
 	}
-	resp, err := p.client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-	logger.Infof(ctx, "Deleted query execution [%v]", resp)
+	logger.Info(ctx, "Deleted Databricks job execution.")
 
 	return nil
+}
+
+func (p Plugin) sendRequest(method string, databricksJob map[string]interface{}, token string, runID string) (map[string]interface{}, error) {
+	var databricksURL string
+	// for mocking/testing purposes
+	if p.cfg.databricksEndpoint == "" {
+		databricksURL = fmt.Sprintf("https://%v%v", p.cfg.DatabricksInstance, databricksAPI)
+	} else {
+		databricksURL = fmt.Sprintf("%v%v", p.cfg.databricksEndpoint, databricksAPI)
+	}
+
+	// build the request spec
+	var body io.Reader
+	var httpMethod string
+	switch method {
+	case create:
+		databricksURL += "/submit"
+		mJSON, err := json.Marshal(databricksJob)
+		if err != nil {
+			return nil, fmt.Errorf("failed to marshal the job request: %v", err)
+		}
+		body = bytes.NewBuffer(mJSON)
+		httpMethod = http.MethodPost
+	case get:
+		databricksURL += "/get?run_id=" + runID
+		httpMethod = http.MethodGet
+	case cancel:
+		databricksURL += "/cancel"
+		body = bytes.NewBuffer([]byte(fmt.Sprintf("{ \"run_id\": %v }", runID)))
+		httpMethod = http.MethodPost
+	}
+
+	req, err := http.NewRequest(httpMethod, databricksURL, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	req.Header.Add("Content-Type", "application/json")
+
+	// Send the request
+	resp, err := p.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to send request to Databricks platform with err: [%v]", err)
+	}
+	defer resp.Body.Close()
+
+	// Parse the response body
+	responseBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	var data map[string]interface{}
+	err = json.Unmarshal(responseBody, &data)
+	if err != nil {
+		return nil, fmt.Errorf("failed to parse response with err: [%v]", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		message := ""
+		if v, ok := data["message"]; ok {
+			message = v.(string)
+		}
+		return nil, fmt.Errorf("failed to %v Databricks job with error [%v]", method, message)
+	}
+	return data, nil
 }
 
 func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase core.PhaseInfo, err error) {
 	exec := taskCtx.ResourceMeta().(ResourceMetaWrapper)
 	resource := taskCtx.Resource().(ResourceWrapper)
 	message := resource.Message
-	statusCode := resource.StatusCode
 	jobID := resource.JobID
 	lifeCycleState := resource.LifeCycleState
 	resultState := resource.ResultState
 
-	if statusCode == 0 {
-		return core.PhaseInfoUndefined, errors.Errorf(ErrSystem, "No Status field set.")
-	}
-
 	taskInfo := createTaskInfo(exec.RunID, jobID, exec.DatabricksInstance)
-	switch statusCode {
-	// Job response format. https://docs.databricks.com/dev-tools/api/latest/jobs.html#operation/JobsRunsSubmit
-	case http.StatusAccepted:
-		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
-	case http.StatusOK:
-		if lifeCycleState == "TERMINATED" || lifeCycleState == "TERMINATING" || lifeCycleState == "INTERNAL_ERROR" {
-			if resultState == "SUCCESS" {
-				if err := writeOutput(ctx, taskCtx); err != nil {
-					pluginsCore.PhaseInfoFailure(string(rune(statusCode)), "failed to write output", taskInfo)
-				}
-				return pluginsCore.PhaseInfoSuccess(taskInfo), nil
+	switch lifeCycleState {
+	// Job response format. https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runlifecyclestate
+	case "PENDING":
+		return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
+	case "RUNNING":
+		fallthrough
+	case "TERMINATING":
+		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
+	case "TERMINATED":
+		if resultState == "SUCCESS" {
+			// Result state details. https://docs.databricks.com/en/workflows/jobs/jobs-2.0-api.html#runresultstate
+			if err := writeOutput(ctx, taskCtx); err != nil {
+				return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), "failed to write output", taskInfo), nil
 			}
-			return pluginsCore.PhaseInfoFailure(string(rune(statusCode)), message, taskInfo), nil
+			return core.PhaseInfoSuccess(taskInfo), nil
 		}
-
-		if lifeCycleState == "PENDING" {
-			return core.PhaseInfoInitializing(time.Now(), core.DefaultPhaseVersion, message, taskInfo), nil
-		}
-
-		return core.PhaseInfoRunning(pluginsCore.DefaultPhaseVersion, taskInfo), nil
-	case http.StatusBadRequest:
-		fallthrough
-	case http.StatusInternalServerError:
-		fallthrough
-	case http.StatusUnauthorized:
-		return pluginsCore.PhaseInfoFailure(string(rune(statusCode)), message, taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, message, taskInfo), nil
+	case "SKIPPED":
+		return core.PhaseInfoFailure(string(rune(http.StatusConflict)), message, taskInfo), nil
+	case "INTERNAL_ERROR":
+		return core.PhaseInfoFailure(string(rune(http.StatusInternalServerError)), message, taskInfo), nil
 	}
-	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", statusCode)
+	return core.PhaseInfoUndefined, pluginErrors.Errorf(pluginsCore.SystemErrorCode, "unknown execution phase [%v].", lifeCycleState)
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
@@ -264,66 +294,6 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
 
 	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
 	return taskCtx.OutputWriter().Put(ctx, outputReader)
-}
-
-func buildRequest(
-	method string,
-	databricksJob map[string]interface{},
-	databricksEndpoint string,
-	databricksInstance string,
-	token string,
-	runID string,
-	isCancel bool,
-) (*http.Request, error) {
-	var databricksURL string
-	// for mocking/testing purposes
-	if databricksEndpoint == "" {
-		databricksURL = fmt.Sprintf("https://%v%v", databricksInstance, databricksAPI)
-	} else {
-		databricksURL = fmt.Sprintf("%v%v", databricksEndpoint, databricksAPI)
-	}
-
-	var data []byte
-	var req *http.Request
-	var err error
-	if isCancel {
-		databricksURL += "/cancel"
-		data = []byte(fmt.Sprintf("{ \"run_id\": %v }", runID))
-	} else if method == post {
-		databricksURL += "/submit"
-		mJSON, err := json.Marshal(databricksJob)
-		if err != nil {
-			return nil, err
-		}
-		data = []byte(string(mJSON))
-	} else {
-		databricksURL += "/get?run_id=" + runID
-	}
-
-	if data == nil {
-		req, err = http.NewRequest(method, databricksURL, nil)
-	} else {
-		req, err = http.NewRequest(method, databricksURL, bytes.NewBuffer(data))
-	}
-	if err != nil {
-		return nil, err
-	}
-	req.Header.Add("Authorization", "Bearer "+token)
-	req.Header.Add("Content-Type", "application/json")
-	return req, nil
-}
-
-func buildResponse(response *http.Response) (map[string]interface{}, error) {
-	responseBody, err := ioutil.ReadAll(response.Body)
-	if err != nil {
-		return nil, err
-	}
-	var data map[string]interface{}
-	err = json.Unmarshal(responseBody, &data)
-	if err != nil {
-		return nil, err
-	}
-	return data, nil
 }
 
 func createTaskInfo(runID, jobID, databricksInstance string) *core.TaskInfo {
