@@ -85,7 +85,7 @@ You have to set the Databricks token to the Flyte configuration.
 
   echo -n "<OPENAI_API_TOKEN>" | base64
 
-3. Edit the flyteagent secret
+3. Edit the flyteagent secret:
   
       .. code-block:: bash
     
