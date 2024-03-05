@@ -56,12 +56,13 @@ type SignedURLProperties struct {
 	ExpiresIn time.Duration
 	// ContentMD5 defines the expected hash of the generated file. It's strongly recommended setting it.
 	ContentMD5 string
-	// Metadata defines the metadata that will be added to the signed URL.
-	Metadata map[string]string
+	// AddContentMD5Metadata Add ContentMD5 to the metadata of signed URL if true.
+	AddContentMD5Metadata bool
 }
 
 type SignedURLResponse struct {
-	URL url.URL
+	URL                    url.URL
+	RequiredRequestHeaders map[string]string
 }
 
 //go:generate mockery -name RawStore -case=underscore

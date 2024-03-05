@@ -749,9 +749,9 @@
           "type": "string",
           "title": "If present, data proxy will use this string in lieu of the md5 hash in the path. When the filename is also included\nthis makes the upload location deterministic. The native url will still be prefixed by the upload location prefix\nin data proxy config. This option is useful when uploading multiple files.\n+optional"
         },
-        "add_metadata": {
+        "add_content_md5_metadata": {
           "type": "boolean",
-          "description": "If true, the data proxy will add extra header (x-ams-meta-, x-goog-meta, etc) to the signed URL and\nit will force clients to add metadata to the object."
+          "description": "If true, the data proxy will add content_md5 to the metadata to the signed URL and\nit will force clients to add this metadata to the object."
         }
       },
       "description": "CreateUploadLocationRequest specified request for the CreateUploadLocation API.\nThe implementation in data proxy service will create the s3 location with some server side configured prefixes,\nand then:\n  - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR\n  - project/domain/filename_root (if present)/filename (if present)."

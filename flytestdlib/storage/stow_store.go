@@ -359,23 +359,24 @@ func (s *StowStore) CreateSignedURL(ctx context.Context, reference DataReference
 		return SignedURLResponse{}, err
 	}
 
-	urlStr, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
-		ExpiresIn:  properties.ExpiresIn,
-		ContentMD5: properties.ContentMD5,
-		Metadata:   properties.Metadata,
+	res, err := c.PreSignRequest(ctx, properties.Scope, key, stow.PresignRequestParams{
+		ExpiresIn:             properties.ExpiresIn,
+		ContentMD5:            properties.ContentMD5,
+		AddContentMD5Metadata: properties.AddContentMD5Metadata,
 	})
 
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
 
-	urlVal, err := url.Parse(urlStr)
+	urlVal, err := url.Parse(res.Url)
 	if err != nil {
 		return SignedURLResponse{}, err
 	}
 
 	return SignedURLResponse{
-		URL: *urlVal,
+		URL:                    *urlVal,
+		RequiredRequestHeaders: res.RequiredRequestHeaders,
 	}, nil
 }
 

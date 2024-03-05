@@ -59,9 +59,9 @@ message CreateUploadLocationRequest {
   // +optional
   string filename_root = 6;
 
-  // If true, the data proxy will add extra header (x-ams-meta-, x-goog-meta, etc) to the signed URL and
-  // it will force clients to add metadata to the object.
-  bool add_metadata = 7;
+  // If true, the data proxy will add content_md5 to the metadata to the signed URL and
+  // it will force clients to add this metadata to the object.
+  bool add_content_md5_metadata = 7;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.

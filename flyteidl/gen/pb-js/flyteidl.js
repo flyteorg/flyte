@@ -53198,7 +53198,7 @@
                  * @property {google.protobuf.IDuration|null} [expiresIn] CreateUploadLocationRequest expiresIn
                  * @property {Uint8Array|null} [contentMd5] CreateUploadLocationRequest contentMd5
                  * @property {string|null} [filenameRoot] CreateUploadLocationRequest filenameRoot
-                 * @property {boolean|null} [addMetadata] CreateUploadLocationRequest addMetadata
+                 * @property {boolean|null} [addContentMd5Metadata] CreateUploadLocationRequest addContentMd5Metadata
                  */
     
                 /**
@@ -53265,12 +53265,12 @@
                 CreateUploadLocationRequest.prototype.filenameRoot = "";
     
                 /**
-                 * CreateUploadLocationRequest addMetadata.
-                 * @member {boolean} addMetadata
+                 * CreateUploadLocationRequest addContentMd5Metadata.
+                 * @member {boolean} addContentMd5Metadata
                  * @memberof flyteidl.service.CreateUploadLocationRequest
                  * @instance
                  */
-                CreateUploadLocationRequest.prototype.addMetadata = false;
+                CreateUploadLocationRequest.prototype.addContentMd5Metadata = false;
     
                 /**
                  * Creates a new CreateUploadLocationRequest instance using the specified properties.
@@ -53308,8 +53308,8 @@
                         writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.contentMd5);
                     if (message.filenameRoot != null && message.hasOwnProperty("filenameRoot"))
                         writer.uint32(/* id 6, wireType 2 =*/50).string(message.filenameRoot);
-                    if (message.addMetadata != null && message.hasOwnProperty("addMetadata"))
-                        writer.uint32(/* id 7, wireType 0 =*/56).bool(message.addMetadata);
+                    if (message.addContentMd5Metadata != null && message.hasOwnProperty("addContentMd5Metadata"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).bool(message.addContentMd5Metadata);
                     return writer;
                 };
     
@@ -53350,7 +53350,7 @@
                             message.filenameRoot = reader.string();
                             break;
                         case 7:
-                            message.addMetadata = reader.bool();
+                            message.addContentMd5Metadata = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -53391,9 +53391,9 @@
                     if (message.filenameRoot != null && message.hasOwnProperty("filenameRoot"))
                         if (!$util.isString(message.filenameRoot))
                             return "filenameRoot: string expected";
-                    if (message.addMetadata != null && message.hasOwnProperty("addMetadata"))
-                        if (typeof message.addMetadata !== "boolean")
-                            return "addMetadata: boolean expected";
+                    if (message.addContentMd5Metadata != null && message.hasOwnProperty("addContentMd5Metadata"))
+                        if (typeof message.addContentMd5Metadata !== "boolean")
+                            return "addContentMd5Metadata: boolean expected";
                     return null;
                 };
     

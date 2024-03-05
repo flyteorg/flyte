@@ -22696,8 +22696,8 @@ export namespace flyteidl {
             /** CreateUploadLocationRequest filenameRoot */
             filenameRoot?: (string|null);
 
-            /** CreateUploadLocationRequest addMetadata */
-            addMetadata?: (boolean|null);
+            /** CreateUploadLocationRequest addContentMd5Metadata */
+            addContentMd5Metadata?: (boolean|null);
         }
 
         /** Represents a CreateUploadLocationRequest. */
@@ -22727,8 +22727,8 @@ export namespace flyteidl {
             /** CreateUploadLocationRequest filenameRoot. */
             public filenameRoot: string;
 
-            /** CreateUploadLocationRequest addMetadata. */
-            public addMetadata: boolean;
+            /** CreateUploadLocationRequest addContentMd5Metadata. */
+            public addContentMd5Metadata: boolean;
 
             /**
              * Creates a new CreateUploadLocationRequest instance using the specified properties.
