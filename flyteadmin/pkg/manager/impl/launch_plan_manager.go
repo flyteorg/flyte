@@ -90,9 +90,10 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 		if bytes.Equal(existingLaunchPlanModel.Digest, launchPlanDigest) {
 			return nil, errors.NewLaunchPlanExistsIdenticalStructureError(ctx, &request)
 		}
-		existingLaunchPlan, err2 := transformers.FromLaunchPlanModel(existingLaunchPlanModel)
-		if err2 != nil {
-			return nil, err2
+		existingLaunchPlan, transformerErr := transformers.FromLaunchPlanModel(existingLaunchPlanModel)
+		if transformerErr != nil {
+			logger.Errorf(ctx, "failed to transform launch plan from launch plan model")
+			return nil, transformerErr
 		}
 		// A launch plan exists with different structure
 		return nil, errors.NewLaunchPlanExistsDifferentStructureError(ctx, &request, existingLaunchPlan.Spec, launchPlan.Spec)

@@ -94,9 +94,10 @@ func (t *TaskManager) CreateTask(
 		if bytes.Equal(taskDigest, existingTaskModel.Digest) {
 			return nil, errors.NewTaskExistsIdenticalStructureError(ctx, &request)
 		}
-		existingTask, err2 := transformers.FromTaskModel(*existingTaskModel)
-		if err2 != nil {
-			return nil, err2
+		existingTask, transformerErr := transformers.FromTaskModel(*existingTaskModel)
+		if transformerErr != nil {
+			logger.Errorf(ctx, "failed to transform task from task model")
+			return nil, transformerErr
 		}
 		return nil, errors.NewTaskExistsDifferentStructureError(ctx, &request, existingTask.Closure.GetCompiledTask(), compiledTask)
 	}

@@ -3,9 +3,11 @@ package errors
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/wI2L/jsondiff"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -52,6 +54,27 @@ func TestNewIncompatibleClusterError(t *testing.T) {
 	assert.True(t, ok)
 	_, ok = details.GetReason().(*admin.EventFailureReason_IncompatibleCluster)
 	assert.True(t, ok)
+}
+
+func TestJsonDifferError(t *testing.T) {
+	oldSpec := map[string]int{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+		"four":  4,
+		"five":  5,
+	}
+	newSpec := map[string]int{
+		"five":  5,
+		"four":  0,
+		"three": 3,
+		"two":   2,
+		"one":   1,
+	}
+	diff, _ := jsondiff.Compare(oldSpec, newSpec)
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
+	rs := compareJsons(diff, rdiff)
+	assert.Equal(t, "\t\t- /four: 4 -> 0", strings.Join(rs, "\n"))
 }
 
 func TestNewTaskExistsDifferentStructureError(t *testing.T) {

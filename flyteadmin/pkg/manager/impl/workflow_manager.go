@@ -168,9 +168,10 @@ func (w *WorkflowManager) CreateWorkflow(
 		if bytes.Equal(workflowDigest, existingWorkflowModel.Digest) {
 			return nil, errors.NewWorkflowExistsIdenticalStructureError(ctx, &request)
 		}
-		existingWorkflow, err2 := transformers.FromWorkflowModel(existingWorkflowModel)
-		if err2 != nil {
-			return nil, err2
+		existingWorkflow, transformerErr := transformers.FromWorkflowModel(existingWorkflowModel)
+		if transformerErr != nil {
+			logger.Errorf(ctx, "failed to transform workflow from workflow model")
+			return nil, transformerErr
 		}
 		// A workflow exists with different structure
 		return nil, errors.NewWorkflowExistsDifferentStructureError(ctx, &request, existingWorkflow.Closure.GetCompiledWorkflow(), workflowClosure.GetCompiledWorkflow())
