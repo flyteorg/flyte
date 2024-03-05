@@ -71,9 +71,9 @@ Add the OpenAI API token
 -------------------------------
 
 1. Install flyteagent pod using helm:
-  
+
 .. code-block::
-  
+
   helm repo add flyteorg https://flyteorg.github.io/flyte
   helm install flyteagent flyteorg/flyteagent --namespace flyte
 
@@ -84,11 +84,11 @@ Add the OpenAI API token
   echo -n "<OPENAI_API_TOKEN>" | base64
 
 3. Edit the flyteagent secret:
-  
+
       .. code-block:: bash
-    
+
         kubectl edit secret flyteagent -n flyte
-    
+
       .. code-block:: yaml
         :emphasize-lines: 3
 
@@ -128,7 +128,7 @@ Upgrade the Flyte Helm release
   .. group-tab:: Flyte core
 
     .. code-block:: bash
-｀｀
+
       helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
