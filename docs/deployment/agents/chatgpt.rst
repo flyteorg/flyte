@@ -41,7 +41,7 @@ Specify agent configuration
 
     .. group-tab:: Flyte core
 
-      Create a file named ``values-override.yaml`` and add the following configuration to it.
+      Create a file named ``values-override.yaml`` and add the following configuration to it:
 
       .. code-block:: yaml
 
