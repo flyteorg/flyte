@@ -155,16 +155,16 @@ For flytekit versions `>v1.10.2`, use `pyflyte serve agent`.
        endpoint: "dns:///flyteagent.flyte.svc.cluster.local:8000"
        insecure: true
        timeouts:
-         GetTask: 200ms
-       defaultTimeout: 50ms
+         GetTask: 5s
+       defaultTimeout: 10s
      agents:
        custom_agent:
          endpoint: "dns:///custom-flyteagent.flyte.svc.cluster.local:8000"
          insecure: false
          defaultServiceConfig: '{"loadBalancingConfig": [{"round_robin":{}}]}'
          timeouts:
-           GetTask: 100ms
-         defaultTimeout: 20ms
+           GetTask: 5s
+         defaultTimeout: 10s
      agentForTaskTypes:
        # It will override the default agent for custom_task, which means propeller will send the request to this agent.
        - custom_task: custom_agent
