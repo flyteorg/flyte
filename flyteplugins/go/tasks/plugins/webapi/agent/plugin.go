@@ -91,7 +91,6 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	logger.Infof(ctx, "AgentRegistry AgentRegistry AgentRegistry: %v", agentRegistry)
 	agent, isSync := getFinalAgent(&taskCategory, p.cfg)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
@@ -321,11 +320,7 @@ func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
 		cs := createAgentClientSets(ctx)
 		agentRegistry = createAgentRegistry(ctx, cs)
-		if d, ok := agentRegistry["airflow"]; ok {
-			logger.Infof(ctx, "tset: %v", d[0].AgentDeployment)
-		}
-		logger.Infof(ctx, "agentRegistry: %v", agentRegistry)
-	}, time.Duration(5)*time.Second, ctx.Done())
+	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
@@ -351,8 +346,6 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 }
 
 func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
-	logger.Infof(context.Background(), "taskCategory.Name [%v] taskCategory.Version [%v]", taskCategory.Name, taskCategory.Version)
-	logger.Infof(context.Background(), "agentRegistry [%v]", agentRegistry)
 	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}

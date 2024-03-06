@@ -73,6 +73,7 @@ type Config struct {
 	// SupportedTaskTypes is a list of task types that are supported by this plugin.
 	SupportedTaskTypes []string `json:"supportedTaskTypes" pflag:"-,Defines a list of task types that are supported by this plugin."`
 
+	// PollInterval is the interval at which the plugin should poll the agent for metadata updates
 	PollInterval config.Duration `json:"pollInterval" pflag:",The interval at which the plugin should poll the agent for metadata updates."`
 }
 
