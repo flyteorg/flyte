@@ -18,6 +18,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	mocks2 "github.com/flyteorg/flyte/flytestdlib/cache/mocks"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/contextutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -27,6 +28,9 @@ import (
 
 func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 	ctx := context.TODO()
+	adminConfig := defaultAdminConfig
+	adminConfig.CacheResyncDuration = config.Duration{Duration: time.Millisecond}
+
 	id := &core.WorkflowExecutionIdentifier{
 		Name:    "n",
 		Domain:  "d",
@@ -39,7 +43,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 
 	t.Run("happy", func(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Millisecond, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		assert.NoError(t, err)
 		mockClient.On("GetExecution",
 			ctx,
@@ -66,7 +70,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			mock.MatchedBy(func(o *admin.WorkflowExecutionGetRequest) bool { return true }),
 		).Return(nil, status.Error(codes.NotFound, ""))
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Millisecond, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		assert.NoError(t, err)
 
 		assert.NoError(t, exec.Initialize(ctx))
@@ -112,7 +116,7 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 			mock.MatchedBy(func(o *admin.WorkflowExecutionGetRequest) bool { return true }),
 		).Return(nil, status.Error(codes.Canceled, ""))
 
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Millisecond, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		assert.NoError(t, err)
 
 		assert.NoError(t, exec.Initialize(ctx))
@@ -147,6 +151,8 @@ func TestAdminLaunchPlanExecutor_GetStatus(t *testing.T) {
 
 func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 	ctx := context.TODO()
+	adminConfig := defaultAdminConfig
+	adminConfig.CacheResyncDuration = config.Duration{Duration: time.Second}
 	id := &core.WorkflowExecutionIdentifier{
 		Name:    "n",
 		Domain:  "d",
@@ -158,7 +164,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 	t.Run("happy", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool {
@@ -203,7 +209,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				Name:    "orig",
 			},
 		}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("RecoverExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionRecoverRequest) bool {
@@ -239,7 +245,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 				Name:    "orig",
 			},
 		}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		assert.NoError(t, err)
 
 		recoveryErr := status.Error(codes.NotFound, "foo")
@@ -281,7 +287,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 	t.Run("notFound", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool { return true }),
@@ -309,7 +315,7 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 	t.Run("other", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("CreateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionCreateRequest) bool { return true }),
@@ -337,6 +343,8 @@ func TestAdminLaunchPlanExecutor_Launch(t *testing.T) {
 
 func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	ctx := context.TODO()
+	adminConfig := defaultAdminConfig
+	adminConfig.CacheResyncDuration = config.Duration{Duration: time.Second}
 	id := &core.WorkflowExecutionIdentifier{
 		Name:    "n",
 		Domain:  "d",
@@ -349,7 +357,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	t.Run("happy", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("TerminateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
@@ -362,7 +370,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	t.Run("notFound", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("TerminateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
@@ -375,7 +383,7 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 	t.Run("other", func(t *testing.T) {
 
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		mockClient.On("TerminateExecution",
 			ctx,
 			mock.MatchedBy(func(o *admin.ExecutionTerminateRequest) bool { return o.Id == id && o.Cause == reason }),
@@ -389,6 +397,8 @@ func TestAdminLaunchPlanExecutor_Kill(t *testing.T) {
 
 func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 	ctx := context.TODO()
+	adminConfig := defaultAdminConfig
+	adminConfig.CacheResyncDuration = config.Duration{Duration: time.Second}
 	id := &core.Identifier{
 		ResourceType: core.ResourceType_LAUNCH_PLAN,
 		Name:         "n",
@@ -401,7 +411,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 
 	t.Run("launch plan found", func(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		assert.NoError(t, err)
 		mockClient.OnGetLaunchPlanMatch(
 			ctx,
@@ -414,7 +424,7 @@ func TestNewAdminLaunchPlanExecutor_GetLaunchPlan(t *testing.T) {
 
 	t.Run("launch plan not found", func(t *testing.T) {
 		mockClient := &mocks.AdminServiceClient{}
-		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Second, defaultAdminConfig, promutils.NewTestScope(), memStore)
+		exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), memStore)
 		assert.NoError(t, err)
 		mockClient.OnGetLaunchPlanMatch(
 			ctx,
@@ -442,6 +452,9 @@ type test struct {
 
 func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 	ctx := context.TODO()
+
+	adminConfig := defaultAdminConfig
+	adminConfig.CacheResyncDuration = config.Duration{Duration: time.Millisecond}
 
 	mockExecutionRespWithOutputs := &admin.Execution{
 		Closure: &admin.ExecutionClosure{
@@ -554,7 +567,7 @@ func TestAdminLaunchPlanExecutorScenarios(t *testing.T) {
 				ComposedProtobufStore: pbStore,
 				ReferenceConstructor:  &storageMocks.ReferenceConstructor{},
 			}
-			exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, time.Millisecond, defaultAdminConfig, promutils.NewTestScope(), storageClient)
+			exec, err := NewAdminLaunchPlanExecutor(ctx, mockClient, adminConfig, promutils.NewTestScope(), storageClient)
 			assert.NoError(t, err)
 
 			iwMock := &mocks2.ItemWrapper{}

@@ -340,7 +340,7 @@ func New(ctx context.Context, cfg *config.Config, kubeClientset kubernetes.Inter
 
 	var launchPlanActor launchplan.FlyteAdmin
 	if cfg.EnableAdminLauncher {
-		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient, cfg.DownstreamEval.Duration,
+		launchPlanActor, err = launchplan.NewAdminLaunchPlanExecutor(ctx, adminClient,
 			launchplan.GetAdminConfig(), scope.NewSubScope("admin_launcher"), store)
 		if err != nil {
 			logger.Errorf(ctx, "failed to create Admin workflow Launcher, err: %v", err.Error())
