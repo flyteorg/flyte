@@ -43,7 +43,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 
 	newPhase, err := p.Status(ctx, newPluginContext(cacheItem.ResourceMeta, cacheItem.Resource, "", tCtx))
 	if err != nil {
-		return state, core.PhaseInfoRetryableFailure(errors.TaskFailedWithError, err.Error(), nil), nil
+		return nil, core.PhaseInfoUndefined, err
 	}
 
 	newPluginPhase, err := ToPluginPhase(newPhase.Phase())
