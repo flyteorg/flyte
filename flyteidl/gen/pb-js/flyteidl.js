@@ -13801,6 +13801,7 @@
                  * @property {flyteidl.core.TaskLog.MessageFormat|null} [messageFormat] TaskLog messageFormat
                  * @property {google.protobuf.IDuration|null} [ttl] TaskLog ttl
                  * @property {boolean|null} [ShowWhilePending] TaskLog ShowWhilePending
+                 * @property {boolean|null} [HideOnceFinished] TaskLog HideOnceFinished
                  */
     
                 /**
@@ -13859,6 +13860,14 @@
                 TaskLog.prototype.ShowWhilePending = false;
     
                 /**
+                 * TaskLog HideOnceFinished.
+                 * @member {boolean} HideOnceFinished
+                 * @memberof flyteidl.core.TaskLog
+                 * @instance
+                 */
+                TaskLog.prototype.HideOnceFinished = false;
+    
+                /**
                  * Creates a new TaskLog instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.core.TaskLog
@@ -13892,6 +13901,8 @@
                         $root.google.protobuf.Duration.encode(message.ttl, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
                     if (message.ShowWhilePending != null && message.hasOwnProperty("ShowWhilePending"))
                         writer.uint32(/* id 5, wireType 0 =*/40).bool(message.ShowWhilePending);
+                    if (message.HideOnceFinished != null && message.hasOwnProperty("HideOnceFinished"))
+                        writer.uint32(/* id 6, wireType 0 =*/48).bool(message.HideOnceFinished);
                     return writer;
                 };
     
@@ -13927,6 +13938,9 @@
                             break;
                         case 5:
                             message.ShowWhilePending = reader.bool();
+                            break;
+                        case 6:
+                            message.HideOnceFinished = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -13970,6 +13984,9 @@
                     if (message.ShowWhilePending != null && message.hasOwnProperty("ShowWhilePending"))
                         if (typeof message.ShowWhilePending !== "boolean")
                             return "ShowWhilePending: boolean expected";
+                    if (message.HideOnceFinished != null && message.hasOwnProperty("HideOnceFinished"))
+                        if (typeof message.HideOnceFinished !== "boolean")
+                            return "HideOnceFinished: boolean expected";
                     return null;
                 };
     
