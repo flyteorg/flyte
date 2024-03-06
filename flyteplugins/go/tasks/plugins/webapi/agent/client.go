@@ -122,15 +122,17 @@ func createAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
 				// we should not panic here, as we want to continue to support old agent settings
-				logger.Infof(finalCtx, "list agent method not implemented for agent: [%v]", agentDeployment.Endpoint)
+				logger.Warningf(finalCtx, "list agent method not implemented for agent: [%v]", agentDeployment.Endpoint)
 				continue
 			}
 
 			if !ok {
 				logger.Warningf(finalCtx, "failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment.Endpoint, err)
+				continue
 			}
 
 			logger.Warningf(finalCtx, "failed to list agent: [%v] with error: [%v]", agentDeployment.Endpoint, err)
+			continue
 		}
 
 		for _, agent := range res.GetAgents() {
