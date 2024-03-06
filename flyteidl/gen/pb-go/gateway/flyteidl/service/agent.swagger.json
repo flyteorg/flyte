@@ -1724,6 +1724,9 @@
         },
         "ttl": {
           "type": "string"
+        },
+        "ShowWhilePending": {
+          "type": "boolean"
         }
       },
       "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"

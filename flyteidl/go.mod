@@ -7,9 +7,11 @@ toolchain go1.21.3
 require (
 	github.com/flyteorg/flyte/flytestdlib v0.0.0-00010101000000-000000000000
 	github.com/go-test/deep v1.0.7
+	github.com/golang/glog v1.1.0
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
+	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.7.0
 	github.com/jinzhu/copier v0.3.5
 	github.com/mitchellh/mapstructure v1.5.0
