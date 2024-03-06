@@ -145,12 +145,18 @@ func createAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
 				agentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 			}
-			//logger.Infof(finalCtx, "[%v] ", agent)
-			//logger.Infof(context.Background(), "[%v] is a sync agent: [%v]", agent.Name, agent.IsSync)
-			//logger.Infof(context.Background(), "[%v] supports task category: [%v]", agent.Name, supportedTaskCategories)
+		}
+		// If the agent doesn't implement the metadata service, we construct the registry based on the configuration
+		for taskType, agentDeploymentID := range cfg.AgentForTaskTypes {
+			agentDeployment, ok := cfg.AgentDeployments[agentDeploymentID]
+			if ok {
+				agent := &Agent{AgentDeployment: agentDeployment, IsSync: false}
+				agentRegistry[taskType] = map[int32]*Agent{defaultTaskTypeVersion: agent}
+			}
 		}
 	}
-	logger.Infof(ctx, "agentRegistry: [%v] ", agentRegistry)
+	supportedTaskTypes := append(maps.Keys(agentRegistry))
+	logger.Debugf(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
 	return agentRegistry
 }
 

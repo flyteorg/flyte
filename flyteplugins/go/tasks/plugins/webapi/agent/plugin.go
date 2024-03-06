@@ -24,12 +24,12 @@ import (
 )
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+var agentRegistry Registry
 
 type Plugin struct {
-	metricScope   promutils.Scope
-	cfg           *Config
-	cs            *ClientSet
-	agentRegistry Registry
+	metricScope promutils.Scope
+	cfg         *Config
+	cs          *ClientSet
 }
 
 type ResourceWrapper struct {
@@ -91,7 +91,8 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
+	logger.Infof(ctx, "AgentRegistry AgentRegistry AgentRegistry: %v", agentRegistry)
+	agent, isSync := getFinalAgent(&taskCategory, p.cfg)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
@@ -187,7 +188,7 @@ func (p Plugin) ExecuteTaskSync(
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -220,7 +221,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -319,9 +320,11 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
 		cs := createAgentClientSets(ctx)
-		agentRegistry := createAgentRegistry(ctx, cs)
-		p.agentRegistry = agentRegistry
-
+		agentRegistry = createAgentRegistry(ctx, cs)
+		if d, ok := agentRegistry["airflow"]; ok {
+			logger.Infof(ctx, "tset: %v", d[0].AgentDeployment)
+		}
+		logger.Infof(ctx, "agentRegistry: %v", agentRegistry)
 	}, time.Duration(5)*time.Second, ctx.Done())
 }
 
@@ -347,7 +350,9 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
+func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+	logger.Infof(context.Background(), "taskCategory.Name [%v] taskCategory.Version [%v]", taskCategory.Name, taskCategory.Version)
+	logger.Infof(context.Background(), "agentRegistry [%v]", agentRegistry)
 	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
@@ -373,17 +378,15 @@ func newAgentPlugin() webapi.PluginEntry {
 	cs := createAgentClientSets(ctx)
 	agentRegistry := createAgentRegistry(ctx, cs)
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			plugin := &Plugin{
-				metricScope:   iCtx.MetricsScope(),
-				cfg:           cfg,
-				cs:            cs,
-				agentRegistry: agentRegistry,
+				metricScope: iCtx.MetricsScope(),
+				cfg:         cfg,
+				cs:          cs,
 			}
 			plugin.watchAgents(ctx)
 			return plugin, nil
