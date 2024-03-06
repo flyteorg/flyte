@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
+	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flytestdlib/cache"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
@@ -43,7 +44,7 @@ func monitor(ctx context.Context, tCtx core.TaskExecutionContext, p Client, cach
 
 	newPhase, err := p.Status(ctx, newPluginContext(cacheItem.ResourceMeta, cacheItem.Resource, "", tCtx))
 	if err != nil {
-		return nil, core.PhaseInfoUndefined, err
+		return state, core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, err.Error(), &core.TaskInfo{}), nil
 	}
 
 	newPluginPhase, err := ToPluginPhase(newPhase.Phase())

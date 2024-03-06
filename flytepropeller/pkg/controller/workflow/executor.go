@@ -271,7 +271,7 @@ func (c *workflowExecutor) IdempotentReportEvent(ctx context.Context, e *event.W
 }
 
 func (c *workflowExecutor) TransitionToPhase(ctx context.Context, execID *core.WorkflowExecutionIdentifier, wStatus v1alpha1.ExecutableWorkflowStatus, toStatus Status) error {
-	if true || wStatus.GetPhase() != toStatus.TransitionToPhase {
+	if wStatus.GetPhase() != toStatus.TransitionToPhase {
 		logger.Debugf(ctx, "Transitioning/Recording event for workflow state transition [%s] -> [%s]", wStatus.GetPhase().String(), toStatus.TransitionToPhase.String())
 
 		wfEvent := &event.WorkflowExecutionEvent{
