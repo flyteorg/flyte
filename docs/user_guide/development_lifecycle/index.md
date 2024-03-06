@@ -8,7 +8,6 @@ You will gain an understanding of concepts like caching, the Flyte remote API, A
 :name: development_lifecycle_toc
 :hidden:
 
-agents
 private_images
 caching
 cache_serializing
@@ -20,4 +19,5 @@ running_workflows
 running_launch_plans
 inspecting_executions
 debugging_executions
+migrating_from_airflow_to_flyte
 ```

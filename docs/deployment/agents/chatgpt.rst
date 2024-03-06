@@ -1,19 +1,10 @@
-.. _deployment-agent-setup-bigquery:
+.. _deployment-agent-setup-chatgpt:
 
-Google BigQuery agent
-======================
+ChatGPT agent
+=================
 
-This guide provides an overview of setting up BigQuery agent in your Flyte deployment.
-Please note that the BigQuery agent requires Flyte deployment in the GCP cloud;
-it is not compatible with demo/AWS/Azure.
-
-Set up the GCP Flyte cluster
-----------------------------
-
-* Ensure you have a functional Flyte cluster running in `GCP <https://docs.flyte.org/en/latest/deployment/gcp/index.html#deployment-gcp>`__.
-* Create a service account for BigQuery. For more details, refer to: https://cloud.google.com/bigquery/docs/quickstarts/quickstart-client-libraries.
-* Verify that you have the correct kubeconfig and have selected the appropriate Kubernetes context.
-* Confirm that you have the correct Flytectl configuration at ``~/.flyte/config.yaml``.
+This guide provides an overview of how to set up the ChatGPT agent in your Flyte deployment.
+Please note that you have to set up the OpenAI API key in the agent server to to run ChatGPT tasks.
 
 Specify agent configuration
 ----------------------------
@@ -30,7 +21,7 @@ Specify agent configuration
 
       .. code-block:: yaml
         :emphasize-lines: 7,11,16
-  
+
         tasks:
           task-plugins:
             enabled-plugins:
@@ -41,16 +32,16 @@ Specify agent configuration
             default-for-task-types:
               - container: container
               - container_array: k8s-array
-              - bigquery_query_job_task: agent-service
-        
+              - chatgpt: agent-service
+
         plugins:
           agent-service:
             supportedTaskTypes:
-            - bigquery_query_job_task
+            - chatgpt
 
     .. group-tab:: Flyte core
 
-      Create a file named ``values-override.yaml`` and add the following configuration to it.
+      Create a file named ``values-override.yaml`` and add the following configuration to it:
 
       .. code-block:: yaml
 
@@ -70,13 +61,54 @@ Specify agent configuration
                   container: container
                   sidecar: sidecar
                   container_array: k8s-array
-                  bigquery_query_job_task: agent-service
+                  chatgpt: agent-service
             plugins:
               agent-service:
                 supportedTaskTypes:
-                - bigquery_query_job_task
+                - chatgpt
 
-Ensure that the propeller has the correct service account for BigQuery.
+Add the OpenAI API token
+-------------------------------
+
+1. Install flyteagent pod using helm:
+
+.. code-block::
+
+  helm repo add flyteorg https://flyteorg.github.io/flyte
+  helm install flyteagent flyteorg/flyteagent --namespace flyte
+
+2. Get the base64 value of your OpenAI API token:
+
+.. code-block::
+
+  echo -n "<OPENAI_API_TOKEN>" | base64
+
+3. Edit the flyteagent secret:
+
+      .. code-block:: bash
+
+        kubectl edit secret flyteagent -n flyte
+
+      .. code-block:: yaml
+        :emphasize-lines: 3
+
+        apiVersion: v1
+        data:
+          flyte_openai_access_token: <BASE64_ENCODED_OPENAI_API_TOKEN>
+        kind: Secret
+        metadata:
+          annotations:
+            meta.helm.sh/release-name: flyteagent
+            meta.helm.sh/release-namespace: flyte
+          creationTimestamp: "2023-10-04T04:09:03Z"
+          labels:
+            app.kubernetes.io/managed-by: Helm
+          name: flyteagent
+          namespace: flyte
+          resourceVersion: "753"
+          uid: 5ac1e1b6-2a4c-4e26-9001-d4ba72c39e54
+        type: Opaque
+
 
 Upgrade the Flyte Helm release
 ------------------------------
@@ -103,4 +135,4 @@ Upgrade the Flyte Helm release
 
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-For BigQuery agent on the Flyte cluster, see `BigQuery agent <https://docs.flyte.org/en/latest/flytesnacks/examples/bigquery_agent/index.html>`_.
+For ChatGPT agent on the Flyte cluster, see `ChatGPT agent <https://docs.flyte.org/en/latest/flytesnacks/examples/chatgpt_agent/index.html>`_.
