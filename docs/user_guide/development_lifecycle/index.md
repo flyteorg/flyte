@@ -20,4 +20,5 @@ running_workflows
 running_launch_plans
 inspecting_executions
 debugging_executions
+migrating_from_airflow_to_flyte
 ```
