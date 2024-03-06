@@ -8,7 +8,6 @@ You will gain an understanding of concepts like caching, the Flyte remote API, A
 :name: development_lifecycle_toc
 :hidden:
 
-agents
 private_images
 caching
 cache_serializing
