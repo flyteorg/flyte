@@ -3,8 +3,6 @@ package agent
 import (
 	"context"
 	"crypto/x509"
-	"fmt"
-
 	"golang.org/x/exp/maps"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -98,7 +96,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
+func createAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	agentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
@@ -116,7 +114,7 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 	for _, agentDeployment := range agentDeployments {
 		client := cs.agentMetadataClients[agentDeployment.Endpoint]
 
-		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployment)
+		finalCtx, cancel := getFinalContext(ctx, "ListAgents", agentDeployment)
 		defer cancel()
 
 		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
@@ -124,15 +122,15 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 			grpcStatus, ok := status.FromError(err)
 			if grpcStatus.Code() == codes.Unimplemented {
 				// we should not panic here, as we want to continue to support old agent settings
-				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
+				logger.Infof(finalCtx, "list agent method not implemented for agent: [%v]", agentDeployment.Endpoint)
 				continue
 			}
 
 			if !ok {
-				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment, err)
+				logger.Warningf(finalCtx, "failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment.Endpoint, err)
 			}
 
-			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployment, err)
+			logger.Warningf(finalCtx, "failed to list agent: [%v] with error: [%v]", agentDeployment.Endpoint, err)
 		}
 
 		for _, agent := range res.GetAgents() {
@@ -147,15 +145,16 @@ func initializeAgentRegistry(cs *ClientSet) (Registry, error) {
 				agent := &Agent{AgentDeployment: agentDeployment, IsSync: agent.IsSync}
 				agentRegistry[supportedCategory.GetName()] = map[int32]*Agent{supportedCategory.GetVersion(): agent}
 			}
-			logger.Infof(context.Background(), "[%v] is a sync agent: [%v]", agent.Name, agent.IsSync)
-			logger.Infof(context.Background(), "[%v] supports task category: [%v]", agent.Name, supportedTaskCategories)
+			//logger.Infof(finalCtx, "[%v] ", agent)
+			//logger.Infof(context.Background(), "[%v] is a sync agent: [%v]", agent.Name, agent.IsSync)
+			//logger.Infof(context.Background(), "[%v] supports task category: [%v]", agent.Name, supportedTaskCategories)
 		}
 	}
-
-	return agentRegistry, nil
+	logger.Infof(ctx, "agentRegistry: [%v] ", agentRegistry)
+	return agentRegistry
 }
 
-func initializeClients(ctx context.Context) (*ClientSet, error) {
+func createAgentClientSets(ctx context.Context) *ClientSet {
 	asyncAgentClients := make(map[string]service.AsyncAgentServiceClient)
 	syncAgentClients := make(map[string]service.SyncAgentServiceClient)
 	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
@@ -170,7 +169,7 @@ func initializeClients(ctx context.Context) (*ClientSet, error) {
 	for _, agentService := range agentDeployments {
 		conn, err := getGrpcConnection(ctx, agentService)
 		if err != nil {
-			return nil, err
+			logger.Warningf(ctx, "failed to create connection to agent: [%v] with error: [%v]", agentService, err)
 		}
 		syncAgentClients[agentService.Endpoint] = service.NewSyncAgentServiceClient(conn)
 		asyncAgentClients[agentService.Endpoint] = service.NewAsyncAgentServiceClient(conn)
@@ -181,5 +180,5 @@ func initializeClients(ctx context.Context) (*ClientSet, error) {
 		syncAgentClients:     syncAgentClients,
 		asyncAgentClients:    asyncAgentClients,
 		agentMetadataClients: agentMetadataClients,
-	}, nil
+	}
 }

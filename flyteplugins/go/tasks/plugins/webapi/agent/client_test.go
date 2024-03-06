@@ -20,8 +20,7 @@ func TestInitializeClients(t *testing.T) {
 	ctx := context.Background()
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	cs, err := initializeClients(ctx)
-	assert.NoError(t, err)
+	cs := createAgentClientSets(ctx)
 	assert.NotNil(t, cs)
 	_, ok := cs.syncAgentClients["y"]
 	assert.True(t, ok)
