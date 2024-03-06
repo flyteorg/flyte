@@ -3,7 +3,6 @@ package launchplan
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"golang.org/x/time/rate"
@@ -311,14 +310,14 @@ func (a *adminLaunchPlanExecutor) syncItem(ctx context.Context, batch cache.Batc
 }
 
 func NewAdminLaunchPlanExecutor(_ context.Context, client service.AdminServiceClient,
-	syncPeriod time.Duration, cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore) (FlyteAdmin, error) {
+	cfg *AdminConfig, scope promutils.Scope, store *storage.DataStore) (FlyteAdmin, error) {
 	exec := &adminLaunchPlanExecutor{
 		adminClient: client,
 		store:       store,
 	}
 
 	rateLimiter := &workqueue.BucketRateLimiter{Limiter: rate.NewLimiter(rate.Limit(cfg.TPS), cfg.Burst)}
-	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, syncPeriod, cfg.Workers, cfg.MaxCacheSize, scope)
+	c, err := cache.NewAutoRefreshCache("admin-launcher", exec.syncItem, rateLimiter, cfg.CacheResyncDuration.Duration, cfg.Workers, cfg.MaxCacheSize, scope)
 	if err != nil {
 		return nil, err
 	}
