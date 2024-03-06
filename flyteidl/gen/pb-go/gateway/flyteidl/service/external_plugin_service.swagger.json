@@ -1,12 +1,13 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "flyteidl/service/agent.proto",
+    "title": "flyteidl/service/external_plugin_service.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
+  "tags": [
+    {
+      "name": "ExternalPluginService"
+    }
   ],
   "consumes": [
     "application/json"
@@ -14,51 +15,7 @@
   "produces": [
     "application/json"
   ],
-  "paths": {
-    "/api/v1/agent/{name}": {
-      "get": {
-        "summary": "Send a task create request to the agent server.",
-        "operationId": "GetAgent",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminGetAgentResponse"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "name",
-            "description": "The name of the agent.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AgentMetadataService"
-        ]
-      }
-    },
-    "/api/v1/agents": {
-      "get": {
-        "summary": "Get job status.",
-        "operationId": "ListAgents",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminListAgentsResponse"
-            }
-          }
-        },
-        "tags": [
-          "AgentMetadataService"
-        ]
-      }
-    }
-  },
+  "paths": {},
   "definitions": {
     "BlobTypeBlobDimensionality": {
       "type": "string",
@@ -207,153 +164,18 @@
         }
       }
     },
-    "TaskLogMessageFormat": {
-      "type": "string",
-      "enum": [
-        "UNKNOWN",
-        "CSV",
-        "JSON"
-      ],
-      "default": "UNKNOWN"
-    },
-    "adminAgent": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Name is the developer-assigned name of the agent."
-        },
-        "supported_task_types": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "SupportedTaskTypes are the types of the tasks that the agent can handle."
-        }
-      },
-      "description": "A message containing the agent metadata."
-    },
-    "adminCreateTaskResponse": {
-      "type": "object",
-      "properties": {
-        "resource_meta": {
-          "type": "string",
-          "format": "byte"
-        },
-        "resource": {
-          "$ref": "#/definitions/adminResource"
-        }
-      },
-      "description": "Represents a create response structure."
-    },
-    "adminDeleteTaskResponse": {
-      "type": "object",
-      "description": "Response to delete a task."
-    },
-    "adminGetAgentResponse": {
-      "type": "object",
-      "properties": {
-        "agent": {
-          "$ref": "#/definitions/adminAgent"
-        }
-      },
-      "description": "A response containing an agent."
-    },
-    "adminGetTaskLogsResponse": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "The execution log results."
-        },
-        "token": {
-          "type": "string",
-          "description": "In the case of multiple pages of results, the server-provided token can be used to fetch the next page\nin a query. If there are no more results, this value will be empty."
-        }
-      },
-      "description": "A response containing the logs for a task execution."
-    },
-    "adminGetTaskMetricsResponse": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/coreExecutionMetricResult"
-          },
-          "description": "The execution metric results."
-        }
-      },
-      "description": "A response containing a list of metrics for a task execution."
-    },
-    "adminGetTaskResponse": {
-      "type": "object",
-      "properties": {
-        "resource": {
-          "$ref": "#/definitions/adminResource"
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "title": "log information for the task execution"
-        }
-      },
-      "description": "Response to get an individual task resource."
-    },
-    "adminListAgentsResponse": {
-      "type": "object",
-      "properties": {
-        "agents": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/adminAgent"
-          }
-        }
-      },
-      "description": "A response containing a list of agents."
-    },
-    "adminResource": {
-      "type": "object",
-      "properties": {
-        "state": {
-          "$ref": "#/definitions/flyteidladminState",
-          "description": "The state of the execution is used to control its visibility in the UI/CLI."
-        },
-        "outputs": {
-          "$ref": "#/definitions/coreLiteralMap",
-          "title": "The outputs of the execution. It's typically used by sql task. Agent service will create a\nStructured dataset pointing to the query result table.\n+optional"
-        },
-        "message": {
-          "type": "string",
-          "description": "A descriptive message for the current state. e.g. waiting for cluster."
-        },
-        "log_links": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/coreTaskLog"
-          },
-          "description": "log information for the task execution."
-        }
-      }
-    },
     "coreArtifactBindingData": {
       "type": "object",
       "properties": {
-        "index": {
-          "type": "integer",
-          "format": "int64"
-        },
         "partition_key": {
-          "type": "string",
-          "title": "These two fields are only relevant in the partition value case"
-        },
-        "transform": {
           "type": "string"
+        },
+        "bind_to_time_partition": {
+          "type": "boolean"
+        },
+        "time_transform": {
+          "$ref": "#/definitions/coreTimeTransform",
+          "title": "This is only relevant in the time partition case"
         }
       },
       "title": "Only valid for triggers"
@@ -368,7 +190,12 @@
           "type": "string"
         },
         "partitions": {
-          "$ref": "#/definitions/corePartitions"
+          "$ref": "#/definitions/corePartitions",
+          "description": "Think of a partition as a tag on an Artifact, except it's a key-value pair.\nDifferent partitions naturally have different versions (execution ids)."
+        },
+        "time_partition": {
+          "$ref": "#/definitions/coreTimePartition",
+          "description": "There is no such thing as an empty time partition - if it's not set, then there is no time partition."
         }
       }
     },
@@ -383,6 +210,9 @@
           "type": "string"
         },
         "name": {
+          "type": "string"
+        },
+        "org": {
           "type": "string"
         }
       }
@@ -472,20 +302,23 @@
         "env": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coreKeyValuePair"
+            "type": "object",
+            "$ref": "#/definitions/flyteidlcoreKeyValuePair"
           },
           "description": "Environment variables will be set as the container is starting up."
         },
         "config": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/coreKeyValuePair"
+            "type": "object",
+            "$ref": "#/definitions/flyteidlcoreKeyValuePair"
           },
           "description": "Allows extra configs to be available for the container.\nTODO: elaborate on how configs will become available.\nDeprecated, please use TaskTemplate.config instead."
         },
         "ports": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/coreContainerPort"
           },
           "title": "Ports to open in the container. This feature is not supported by all execution engines. (e.g. supported on K8s but\nnot supported on AWS Batch)\nOnly K8s"
@@ -515,7 +348,6 @@
       "properties": {
         "enabled": {
           "type": "boolean",
-          "format": "boolean",
           "title": "Flag enables DataLoading Config. If this is not set, data loading will not be used!"
         },
         "input_path": {
@@ -536,19 +368,6 @@
       },
       "description": "This configuration allows executing raw containers in Flyte using the Flyte CoPilot system.\nFlyte CoPilot, eliminates the needs of flytekit or sdk inside the container. Any inputs required by the users container are side-loaded in the input_path\nAny outputs generated by the user container - within output_path are automatically uploaded."
     },
-    "coreEnumType": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Predefined set of enum values."
-        }
-      },
-      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
-    },
     "coreError": {
       "type": "object",
       "properties": {
@@ -562,20 +381,6 @@
         }
       },
       "description": "Represents an error thrown from a node."
-    },
-    "coreExecutionMetricResult": {
-      "type": "object",
-      "properties": {
-        "metric": {
-          "type": "string",
-          "description": "The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG."
-        },
-        "data": {
-          "$ref": "#/definitions/protobufStruct",
-          "title": "The result data in prometheus range query result format\nhttps://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.\nThis may include multiple time series, differentiated by their metric labels.\nStart time is greater of (execution attempt start, 48h ago)\nEnd time is lesser of (execution attempt end, now)"
-        }
-      },
-      "description": "ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task."
     },
     "coreExtendedResources": {
       "type": "object",
@@ -595,8 +400,7 @@
           "description": "This can be any arbitrary string, and should be informed by the labels or taints\nassociated with the nodes in question. Default cloud provider labels typically\nuse the following values: `nvidia-tesla-t4`, `nvidia-tesla-a100`, etc."
         },
         "unpartitioned": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "partition_size": {
           "type": "string",
@@ -604,6 +408,18 @@
         }
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
+    },
+    "coreGranularity": {
+      "type": "string",
+      "enum": [
+        "UNSET",
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "MONTH"
+      ],
+      "default": "UNSET",
+      "title": "- DAY: default"
     },
     "coreIOStrategy": {
       "type": "object",
@@ -641,6 +457,10 @@
         "version": {
           "type": "string",
           "description": "Specific version of the resource."
+        },
+        "org": {
+          "type": "string",
+          "description": "Optional, org key applied to the resource."
         }
       },
       "description": "Encapsulation of fields that uniquely identifies a Flyte resource."
@@ -703,7 +523,7 @@
           "description": "Contains additional metadata for building a kubernetes pod."
         },
         "pod_spec": {
-          "$ref": "#/definitions/protobufStruct",
+          "type": "object",
           "title": "Defines the primary pod spec created when a task is executed.\nThis should be a JSON-marshalled pod spec, which can be defined in\n- go, using: https://github.com/kubernetes/api/blob/release-1.21/core/v1/types.go#L2936\n- python: using https://github.com/kubernetes-client/python/blob/release-19.0/kubernetes/client/models/v1_pod_spec.py"
         },
         "data_config": {
@@ -713,31 +533,26 @@
       },
       "description": "Defines a pod spec and additional pod metadata that is created when a task is executed."
     },
-    "coreKeyValuePair": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "required."
-        },
-        "value": {
-          "type": "string",
-          "description": "+optional."
-        }
-      },
-      "description": "A generic key value pair."
-    },
     "coreLabelValue": {
       "type": "object",
       "properties": {
         "static_value": {
-          "type": "string"
+          "type": "string",
+          "title": "The string static value is for use in the Partitions object"
+        },
+        "time_value": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time value is for use in the TimePartition case"
         },
         "triggered_binding": {
           "$ref": "#/definitions/coreArtifactBindingData"
         },
         "input_binding": {
           "$ref": "#/definitions/coreInputBindingData"
+        },
+        "runtime_binding": {
+          "$ref": "#/definitions/coreRuntimeBinding"
         }
       }
     },
@@ -776,6 +591,7 @@
         "literals": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/coreLiteral"
           }
         }
@@ -818,7 +634,7 @@
           "description": "A blob might have specialized implementation details depending on associated metadata."
         },
         "enum_type": {
-          "$ref": "#/definitions/coreEnumType",
+          "$ref": "#/definitions/flyteidlcoreEnumType",
           "description": "Defines an enum with pre-defined string values."
         },
         "structured_dataset_type": {
@@ -830,7 +646,7 @@
           "description": "Defines an union type with pre-defined LiteralTypes."
         },
         "metadata": {
-          "$ref": "#/definitions/protobufStruct",
+          "type": "object",
           "description": "This field contains type metadata that is descriptive of the type, but is NOT considered in type-checking.  This might be used by\nconsumers to identify special behavior or display extended information for the type."
         },
         "annotation": {
@@ -843,18 +659,6 @@
         }
       },
       "description": "Defines a strong type to allow type checking between interfaces."
-    },
-    "coreNodeExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "node_id": {
-          "type": "string"
-        },
-        "execution_id": {
-          "$ref": "#/definitions/coreWorkflowExecutionIdentifier"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte node execution entity."
     },
     "coreOAuth2Client": {
       "type": "object",
@@ -930,8 +734,7 @@
           "type": "string"
         },
         "boolean": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "datetime": {
           "type": "string",
@@ -961,6 +764,7 @@
         "requests": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/ResourcesResourceEntry"
           },
           "description": "The desired set of resources requested. ResourceNames must be unique within the list."
@@ -968,6 +772,7 @@
         "limits": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/ResourcesResourceEntry"
           },
           "description": "Defines a set of bounds (e.g. min/max) within which the task can reliably run. ResourceNames must be unique\nwithin the list."
@@ -985,6 +790,9 @@
         }
       },
       "description": "Retry strategy associated with an executable unit."
+    },
+    "coreRuntimeBinding": {
+      "type": "object"
     },
     "coreRuntimeMetadata": {
       "type": "object",
@@ -1017,7 +825,7 @@
           "$ref": "#/definitions/coreBinary"
         },
         "schema": {
-          "$ref": "#/definitions/coreSchema"
+          "$ref": "#/definitions/flyteidlcoreSchema"
         },
         "none_type": {
           "$ref": "#/definitions/coreVoid"
@@ -1026,7 +834,7 @@
           "$ref": "#/definitions/coreError"
         },
         "generic": {
-          "$ref": "#/definitions/protobufStruct"
+          "type": "object"
         },
         "structured_dataset": {
           "$ref": "#/definitions/coreStructuredDataset"
@@ -1036,24 +844,13 @@
         }
       }
     },
-    "coreSchema": {
-      "type": "object",
-      "properties": {
-        "uri": {
-          "type": "string"
-        },
-        "type": {
-          "$ref": "#/definitions/coreSchemaType"
-        }
-      },
-      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
-    },
     "coreSchemaType": {
       "type": "object",
       "properties": {
         "columns": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/SchemaTypeSchemaColumn"
           },
           "description": "A list of ordered columns this schema comprises of."
@@ -1093,6 +890,7 @@
         "secrets": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/coreSecret"
           },
           "description": "secrets indicate the list of secrets the task needs in order to proceed. Secrets will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
@@ -1100,6 +898,7 @@
         "tokens": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/coreOAuth2TokenRequest"
           },
           "description": "tokens indicate the list of token requests the task needs in order to proceed. Tokens will be mounted/passed to the\npod as it starts. If the plugin responsible for kicking of the task will not run it on a flyte cluster (e.g. AWS\nBatch), it's the responsibility of the plugin to fetch the secret (which means propeller identity will need access\nto the secret) and to pass it to the remote execution engine."
@@ -1164,6 +963,7 @@
         "columns": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/StructuredDatasetTypeDatasetColumn"
           },
           "description": "A list of ordered columns this schema comprises of."
@@ -1183,50 +983,11 @@
         }
       }
     },
-    "coreTaskExecutionIdentifier": {
-      "type": "object",
-      "properties": {
-        "task_id": {
-          "$ref": "#/definitions/coreIdentifier"
-        },
-        "node_execution_id": {
-          "$ref": "#/definitions/coreNodeExecutionIdentifier"
-        },
-        "retry_attempt": {
-          "type": "integer",
-          "format": "int64"
-        }
-      },
-      "description": "Encapsulation of fields that identify a Flyte task execution entity."
-    },
-    "coreTaskLog": {
-      "type": "object",
-      "properties": {
-        "uri": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "message_format": {
-          "$ref": "#/definitions/TaskLogMessageFormat"
-        },
-        "ttl": {
-          "type": "string"
-        },
-        "ShowWhilePending": {
-          "type": "boolean",
-          "format": "boolean"
-        }
-      },
-      "title": "Log information for the task that is specific to a log sink\nWhen our log story is flushed out, we may have more metadata here like log link expiry"
-    },
     "coreTaskMetadata": {
       "type": "object",
       "properties": {
         "discoverable": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Indicates whether the system should attempt to lookup this task's output to avoid duplication of work."
         },
         "runtime": {
@@ -1250,17 +1011,14 @@
           "description": "If set, this indicates that this task is deprecated.  This will enable owners of tasks to notify consumers\nof the ending of support for a given task."
         },
         "interruptible": {
-          "type": "boolean",
-          "format": "boolean"
+          "type": "boolean"
         },
         "cache_serializable": {
           "type": "boolean",
-          "format": "boolean",
           "title": "Indicates whether the system should attempt to execute discoverable instances in serial to avoid duplicate work"
         },
         "generates_deck": {
           "type": "boolean",
-          "format": "boolean",
           "description": "Indicates whether the task will generate a Deck URI when it finishes executing."
         },
         "tags": {
@@ -1304,7 +1062,7 @@
           "description": "A strongly typed interface for the task. This enables others to use this task within a workflow and guarantees\ncompile-time validation of the workflow to avoid costly runtime failures."
         },
         "custom": {
-          "$ref": "#/definitions/protobufStruct",
+          "type": "object",
           "description": "Custom data about the task. This is extensible to allow various plugins in the system."
         },
         "container": {
@@ -1339,11 +1097,33 @@
       },
       "description": "A Task structure that uniquely identifies a task in the system\nTasks are registered as a first step in the system."
     },
+    "coreTimePartition": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "$ref": "#/definitions/coreLabelValue"
+        },
+        "granularity": {
+          "$ref": "#/definitions/coreGranularity"
+        }
+      }
+    },
+    "coreTimeTransform": {
+      "type": "object",
+      "properties": {
+        "transform": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/flyteidlcoreOperator"
+        }
+      }
+    },
     "coreTypeAnnotation": {
       "type": "object",
       "properties": {
         "annotations": {
-          "$ref": "#/definitions/protobufStruct",
+          "type": "object",
           "description": "A arbitrary JSON payload to describe a type."
         }
       },
@@ -1396,6 +1176,7 @@
         "variants": {
           "type": "array",
           "items": {
+            "type": "object",
             "$ref": "#/definitions/coreLiteralType"
           },
           "description": "Predefined set of variants in union."
@@ -1441,25 +1222,54 @@
       "type": "object",
       "description": "Used to denote a nil/null/None assignment to a scalar value. The underlying LiteralType for Void is intentionally\nundefined since it can be assigned to a scalar of any LiteralType."
     },
-    "coreWorkflowExecutionIdentifier": {
+    "flyteidlcoreEnumType": {
       "type": "object",
       "properties": {
-        "project": {
-          "type": "string",
-          "description": "Name of the project the resource belongs to."
-        },
-        "domain": {
-          "type": "string",
-          "description": "Name of the domain the resource belongs to.\nA domain can be considered as a subset within a specific project."
-        },
-        "name": {
-          "type": "string",
-          "description": "User or system provided value for the resource."
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Predefined set of enum values."
         }
       },
-      "title": "Encapsulation of fields that uniquely identifies a Flyte workflow execution"
+      "description": "Enables declaring enum types, with predefined string values\nFor len(values) \u003e 0, the first value in the ordered list is regarded as the default value. If you wish\nTo provide no defaults, make the first value as undefined."
     },
-    "flyteidladminState": {
+    "flyteidlcoreKeyValuePair": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "required."
+        },
+        "value": {
+          "type": "string",
+          "description": "+optional."
+        }
+      },
+      "description": "A generic key value pair."
+    },
+    "flyteidlcoreOperator": {
+      "type": "string",
+      "enum": [
+        "MINUS",
+        "PLUS"
+      ],
+      "default": "MINUS"
+    },
+    "flyteidlcoreSchema": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/coreSchemaType"
+        }
+      },
+      "description": "A strongly typed schema that defines the interface of data retrieved from the underlying storage medium."
+    },
+    "flyteidlserviceState": {
       "type": "string",
       "enum": [
         "RETRYABLE_FAILURE",
@@ -1471,57 +1281,44 @@
       "default": "RETRYABLE_FAILURE",
       "description": "The state of the execution is used to control its visibility in the UI/CLI."
     },
-    "flyteidladminTaskExecutionMetadata": {
+    "flyteidlserviceTaskCreateResponse": {
       "type": "object",
       "properties": {
-        "task_execution_id": {
-          "$ref": "#/definitions/coreTaskExecutionIdentifier",
-          "title": "ID of the task execution"
-        },
-        "namespace": {
-          "type": "string",
-          "title": "k8s namespace where the task is executed in"
-        },
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Labels attached to the task execution"
-        },
-        "annotations": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Annotations attached to the task execution"
-        },
-        "k8s_service_account": {
-          "type": "string",
-          "title": "k8s service account associated with the task execution"
-        },
-        "environment_variables": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Environment variables attached to the task execution"
+        "job_id": {
+          "type": "string"
         }
       },
-      "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."
+      "description": "Represents a create response structure."
     },
-    "protobufListValue": {
+    "googlerpcStatus": {
       "type": "object",
       "properties": {
-        "values": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Repeated field of dynamically typed values."
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n`path/google.protobuf.Duration`). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme `http`, `https`, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, `https` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com. As of May 2023, there are no widely used type server\nimplementations and no plans to implement one.\n\nSchemes other than `http`, `https` (or the empty scheme) might be\nused with implementation specific semantics."
         }
       },
-      "description": "`ListValue` is a wrapper around a repeated field of values.\n\nThe JSON representation for `ListValue` is JSON array."
+      "additionalProperties": {},
+      "description": "`Any` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n    // or ...\n    if (any.isSameTypeAs(Foo.getDefaultInstance())) {\n      foo = any.unpack(Foo.getDefaultInstance());\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := anypb.New(foo)\n     if err != nil {\n       ...\n     }\n     ...\n     foo := \u0026pb.Foo{}\n     if err := any.UnmarshalTo(foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\nJSON\n====\nThe JSON representation of an `Any` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field `@type` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n`value` which holds the custom JSON in addition to the `@type`\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
     },
     "protobufNullValue": {
       "type": "string",
@@ -1529,52 +1326,25 @@
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
-    "protobufStruct": {
+    "serviceTaskDeleteResponse": {
+      "type": "object",
+      "description": "Response to delete a task."
+    },
+    "serviceTaskGetResponse": {
       "type": "object",
       "properties": {
-        "fields": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/protobufValue"
-          },
-          "description": "Unordered map of dynamically typed values."
+        "state": {
+          "$ref": "#/definitions/flyteidlserviceState",
+          "description": "The state of the execution is used to control its visibility in the UI/CLI."
+        },
+        "outputs": {
+          "$ref": "#/definitions/coreLiteralMap",
+          "title": "The outputs of the execution. It's typically used by sql task. Flyteplugins service will create a\nStructured dataset pointing to the query result table.\n+optional"
         }
       },
-      "description": "`Struct` represents a structured data value, consisting of fields\nwhich map to dynamically typed values. In some languages, `Struct`\nmight be supported by a native representation. For example, in\nscripting languages like JS a struct is represented as an\nobject. The details of that representation are described together\nwith the proto support for the language.\n\nThe JSON representation for `Struct` is JSON object."
-    },
-    "protobufValue": {
-      "type": "object",
-      "properties": {
-        "null_value": {
-          "$ref": "#/definitions/protobufNullValue",
-          "description": "Represents a null value."
-        },
-        "number_value": {
-          "type": "number",
-          "format": "double",
-          "description": "Represents a double value."
-        },
-        "string_value": {
-          "type": "string",
-          "description": "Represents a string value."
-        },
-        "bool_value": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Represents a boolean value."
-        },
-        "struct_value": {
-          "$ref": "#/definitions/protobufStruct",
-          "description": "Represents a structured value."
-        },
-        "list_value": {
-          "$ref": "#/definitions/protobufListValue",
-          "description": "Represents a repeated `Value`."
-        }
-      },
-      "description": "`Value` represents a dynamically typed value which can be either\nnull, a number, a string, a boolean, a recursive struct value, or a\nlist of values. A producer of value is expected to set one of that\nvariants, absence of any variant indicates an error.\n\nThe JSON representation for `Value` is JSON value."
+      "description": "Response to get an individual task state."
     }
   }
 }

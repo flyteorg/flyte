@@ -427,6 +427,11 @@ export class TaskLog extends Message<TaskLog> {
    */
   ttl?: Duration;
 
+  /**
+   * @generated from field: bool ShowWhilePending = 5;
+   */
+  ShowWhilePending = false;
+
   constructor(data?: PartialMessage<TaskLog>) {
     super();
     proto3.util.initPartial(data, this);
@@ -439,6 +444,7 @@ export class TaskLog extends Message<TaskLog> {
     { no: 2, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "message_format", kind: "enum", T: proto3.getEnumType(TaskLog_MessageFormat) },
     { no: 4, name: "ttl", kind: "message", T: Duration },
+    { no: 5, name: "ShowWhilePending", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskLog {
