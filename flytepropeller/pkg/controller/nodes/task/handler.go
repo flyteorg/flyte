@@ -383,12 +383,9 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 		}()
 		childCtx := context.WithValue(ctx, pluginContextKey, p.GetID())
 		trns, err = p.Handle(childCtx, tCtx)
-		logger.Info(ctx, "@@@ invokePlugin->trns:[%v]", trns)
-		logger.Info(ctx, "@@@ invokePlugin->err:[%v]", err)
 		return
 	}()
 	if err != nil {
-		// todo: how to send log to flyteconsole?
 		logger.Warnf(ctx, "Runtime error from plugin [%s]. Error: %s", p.GetID(), err.Error())
 		return nil, regErrors.Wrapf(err, "failed to execute handle for plugin [%s]", p.GetID())
 	}
@@ -418,7 +415,7 @@ func (t Handler) invokePlugin(ctx context.Context, p pluginCore.Plugin, tCtx *ta
 			t.metrics.pluginQueueLatency.Observe(ctx, ts.LastPhaseUpdatedAt, time.Now())
 		}
 	}
-	logger.Infof(ctx, "@@@ pluginTrns.pInfo.Phase():[%v], ts.PluginPhase:[%v]", pluginTrns.pInfo.Phase(), ts.PluginPhase)
+
 	if pluginTrns.pInfo.Phase() == ts.PluginPhase {
 		if pluginTrns.pInfo.Version() == ts.PluginPhaseVersion {
 			logger.Debugf(ctx, "p+Version previously seen .. no event will be sent")
@@ -572,16 +569,7 @@ func (t Handler) Handle(ctx context.Context, nCtx interfaces.NodeExecutionContex
 
 		var err error
 		pluginTrns, err = t.invokePlugin(ctx, p, tCtx, ts)
-		logger.Infof(ctx, "@@@ pluginTrns:[%v], err:[%v]", pluginTrns, err)
-		// logger.Infof(ctx, "@@@ node task handler->pluginTrns.pInfo.Phase(): [%v]", pluginTrns.pInfo.Phase())
-		// logger.Infof(ctx, "@@@ node task handler->pluginTrns:[%v]", pluginTrns)
-		// logger.Infof(ctx, "@@@ node task handler->err:[%v]", err)
 		if err != nil {
-			// logger.Infof(ctx, "@@@ pluginTrns.pInfo.Phase(): [%v]", pluginTrns.pInfo.Phase())
-			logger.Infof(ctx, "@@@ pluginTrns:[%v]", pluginTrns)
-
-			// return pluginTrns.FinalTransition(ctx)
-			// , errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
 			return handler.UnknownTransition, errors.Wrapf(errors.RuntimeExecutionError, nCtx.NodeID(), err, "failed during plugin execution")
 		}
 		if pluginTrns.IsPreviouslyObserved() {
