@@ -6,6 +6,7 @@ set -eo pipefail
 # - DEV_DOCS_WATCH: If set, the docs will be built and served using sphinx-autobuild for live updates
 # - FLYTEKIT_LOCAL_PATH: If set, the local path to flytekit will be used instead of the source code from the flyteorg/flytekit repo
 # - FLYTECTL_LOCAL_PATH: If set, the local path to flytectl will be used instead of the source code from the flyteorg/flytectl repo
+# - FLYTESNACKS_LOCAL_PATH: If set, the local path to flytesnacks will be used instead of the source code from the flyteorg/flytesnacks repo
 #
 # Example usages:
 #   ./script/local_build_docs.sh
@@ -32,7 +33,12 @@ if [ -n "$FLYTECTL_LOCAL_PATH" ]; then
   DOCKER_ENV+=("--env" "FLYTECTL_LOCAL_PATH=/flytectl")
 fi
 
-DOCKER_CMD=("docker" "run" "--rm" "--pull" "never" "${DOCKER_ENV[@]}" "${DOCKER_PORT_MAPPING[@]}" "${DOCKER_VOLUME_MAPPING[@]}" "flyte-dev-docs:latest" "${BUILD_CMD[@]}")
+if [ -n "$FLYTESNACKS_LOCAL_PATH" ]; then
+  DOCKER_VOLUME_MAPPING+=("-v" "$FLYTESNACKS_LOCAL_PATH:/flytesnacks")
+  DOCKER_ENV+=("--env" "FLYTESNACKS_LOCAL_PATH=/flytesnacks")
+fi
+
+DOCKER_CMD=("docker" "run" "--platform" "linux/amd64" "--rm" "--pull" "never" "${DOCKER_ENV[@]}" "${DOCKER_PORT_MAPPING[@]}" "${DOCKER_VOLUME_MAPPING[@]}" "flyte-dev-docs:latest" "${BUILD_CMD[@]}")
 
 echo "${DOCKER_CMD[*]}"
 
