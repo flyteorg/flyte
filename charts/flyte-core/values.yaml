@@ -626,7 +626,8 @@ configmap:
     # Refer to the [server config](https://pkg.go.dev/github.com/lyft/flyteadmin@v0.3.37/pkg/config#ServerConfig).
     server:
       httpPort: 8088
-      grpcPort: 8089
+      grpc:
+        port: 8089
       security:
         # -- Controls whether to serve requests over SSL/TLS.
         secure: false
