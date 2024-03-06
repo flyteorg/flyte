@@ -200,9 +200,10 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
 	for _, templateURI := range p.TemplateURIs {
 		taskLogs = append(taskLogs, &core.TaskLog{
-			Uri:           replaceAll(templateURI, templateVars),
-			Name:          p.DisplayName + input.LogName,
-			MessageFormat: p.MessageFormat,
+			Uri:              replaceAll(templateURI, templateVars),
+			Name:             p.DisplayName + input.LogName,
+			MessageFormat:    p.MessageFormat,
+			ShowWhilePending: p.ShowWhilePending,
 		})
 	}
 

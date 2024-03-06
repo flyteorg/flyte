@@ -46,7 +46,7 @@ func GetLogsForContainerInPod(ctx context.Context, logPlugin tasklog.Plugin, tas
 			PodUID:               string(pod.GetUID()),
 			Namespace:            pod.Namespace,
 			ContainerName:        pod.Spec.Containers[index].Name,
-			ContainerID:          pod.Status.ContainerStatuses[index].ContainerID,
+			ContainerID:          containerID,
 			LogName:              nameSuffix,
 			PodRFC3339StartTime:  time.Unix(startTime, 0).Format(time.RFC3339),
 			PodRFC3339FinishTime: time.Unix(finishTime, 0).Format(time.RFC3339),
