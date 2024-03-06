@@ -1752,6 +1752,8 @@ func (m *ExecutionManager) GetExecutionData(
 		}
 	}
 
+	cluster := execution.GetSpec().GetMetadata().GetSystemMetadata().GetExecutionCluster()
+
 	id := request.GetId()
 	objectStore := plugins.Get[util.ObjectStore](m.pluginRegistry, plugins.PluginIDObjectStore)
 	var inputs *core.LiteralMap
@@ -1763,6 +1765,7 @@ func (m *ExecutionManager) GetExecutionData(
 			m.urlData,
 			m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 			m.storageClient,
+			cluster,
 			id.Project,
 			id.Domain,
 			executionModel.InputsURI.String(),
@@ -1779,6 +1782,7 @@ func (m *ExecutionManager) GetExecutionData(
 			m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 			m.storageClient,
 			util.ToExecutionClosureInterface(execution.Closure),
+			cluster,
 			id.Project,
 			id.Domain,
 			objectStore)

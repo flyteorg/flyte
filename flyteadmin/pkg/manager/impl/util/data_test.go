@@ -24,7 +24,10 @@ var testLiteralMap = &core.LiteralMap{
 	},
 }
 
-const testOutputsURI = "s3://bucket/bar/outputs.pb"
+const (
+	testOutputsURI = "s3://bucket/bar/outputs.pb"
+	clusterName    = "foo-cluster"
+)
 
 type objectStoreMock struct {
 	mock.Mock
@@ -149,7 +152,7 @@ func TestGetInputs(t *testing.T) {
 	t.Run("should sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: true}
 
-		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, project, domain, inputsURI, nil)
+		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, "", project, domain, inputsURI, nil)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
@@ -159,7 +162,7 @@ func TestGetInputs(t *testing.T) {
 	t.Run("should not sign URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
 
-		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, project, domain, inputsURI, nil)
+		fullInputs, inputURLBlob, err := GetInputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, "", project, domain, inputsURI, nil)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
@@ -172,6 +175,7 @@ func TestGetInputs(t *testing.T) {
 		bts, _ := proto.Marshal(testLiteralMap)
 		store.
 			On("GetObject", GetObjectRequest{
+				Cluster: clusterName,
 				Project: project,
 				Domain:  domain,
 				Prefix:  "/foo/bar",
@@ -182,7 +186,7 @@ func TestGetInputs(t *testing.T) {
 		ctx := context.TODO()
 		inputURI := "s3://wrong/foo/bar"
 
-		fullInputs, inputURLBlob, err := GetInputs(ctx, mockRemoteURL, &remoteDataConfig, mockStorage, project, domain, inputURI, store)
+		fullInputs, inputURLBlob, err := GetInputs(ctx, mockRemoteURL, &remoteDataConfig, mockStorage, clusterName, project, domain, inputURI, store)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullInputs, testLiteralMap))
@@ -222,7 +226,7 @@ func TestGetOutputs(t *testing.T) {
 	t.Run("offloaded outputs with signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: true}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, project, domain, nil)
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, "", project, domain, nil)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
@@ -232,7 +236,7 @@ func TestGetOutputs(t *testing.T) {
 	t.Run("offloaded outputs without signed URL", func(t *testing.T) {
 		remoteDataConfig.SignedURL = interfaces.SignedURL{Enabled: false}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, project, domain, nil)
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, "", project, domain, nil)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
@@ -245,6 +249,7 @@ func TestGetOutputs(t *testing.T) {
 		bts, _ := proto.Marshal(testLiteralMap)
 		store.
 			On("GetObject", GetObjectRequest{
+				Cluster: clusterName,
 				Project: project,
 				Domain:  domain,
 				Prefix:  "/foo/bar",
@@ -257,7 +262,7 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, testClosure, project, domain, store)
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, testClosure, clusterName, project, domain, store)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))
@@ -286,7 +291,7 @@ func TestGetOutputs(t *testing.T) {
 			},
 		}
 
-		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, project, domain, nil)
+		fullOutputs, outputURLBlob, err := GetOutputs(context.TODO(), mockRemoteURL, &remoteDataConfig, mockStorage, closure, "", project, domain, nil)
 
 		assert.NoError(t, err)
 		assert.True(t, proto.Equal(fullOutputs, testLiteralMap))

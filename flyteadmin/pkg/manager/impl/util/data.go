@@ -23,6 +23,7 @@ const (
 )
 
 type GetObjectRequest struct {
+	Cluster string
 	Project string
 	Domain  string
 	Prefix  string
@@ -50,7 +51,7 @@ func GetInputs(ctx context.Context,
 	urlData dataInterfaces.RemoteURLInterface,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
 	storageClient *storage.DataStore,
-	project, domain, inputURI string,
+	cluster, project, domain, inputURI string,
 	objectStore ObjectStore,
 ) (*core.LiteralMap, *admin.UrlBlob, error) {
 	var inputsURLBlob admin.UrlBlob
@@ -69,11 +70,10 @@ func GetInputs(ctx context.Context,
 	}
 
 	if shouldFetchData(remoteDataConfig, inputsURLBlob) {
-		base := string(storageClient.GetBaseContainerFQN(ctx))
-		if strings.HasPrefix(inputURI, base) {
+		if IsLocalURI(ctx, storageClient, inputURI) {
 			err = storageClient.ReadProtobuf(ctx, storage.DataReference(inputURI), &fullInputs)
 		} else {
-			err = readFromDataPlane(ctx, objectStore, project, domain, inputURI, &fullInputs)
+			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, inputURI, &fullInputs)
 		}
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
@@ -126,7 +126,7 @@ func GetOutputs(ctx context.Context,
 	remoteDataConfig *runtimeInterfaces.RemoteDataConfig,
 	storageClient *storage.DataStore,
 	closure ExecutionClosure,
-	project, domain string,
+	cluster, project, domain string,
 	objectStore ObjectStore,
 ) (*core.LiteralMap, *admin.UrlBlob, error) {
 	var outputsURLBlob admin.UrlBlob
@@ -150,11 +150,10 @@ func GetOutputs(ctx context.Context,
 			logger.Debugf(ctx, "execution closure contains output data that exceeds max data size for responses")
 		}
 	} else if shouldFetchOutputData(remoteDataConfig, outputsURLBlob, closure.GetOutputUri()) {
-		base := string(storageClient.GetBaseContainerFQN(ctx))
-		if strings.HasPrefix(closure.GetOutputUri(), base) {
+		if IsLocalURI(ctx, storageClient, closure.GetOutputUri()) {
 			err = storageClient.ReadProtobuf(ctx, storage.DataReference(closure.GetOutputUri()), fullOutputs)
 		} else {
-			err = readFromDataPlane(ctx, objectStore, project, domain, closure.GetOutputUri(), fullOutputs)
+			err = readFromDataPlane(ctx, objectStore, cluster, project, domain, closure.GetOutputUri(), fullOutputs)
 		}
 		if err != nil {
 			// If we fail to read the protobuf from the remote store, we shouldn't fail the request altogether.
@@ -166,9 +165,14 @@ func GetOutputs(ctx context.Context,
 	return fullOutputs, &outputsURLBlob, nil
 }
 
+func IsLocalURI(ctx context.Context, store *storage.DataStore, uri string) bool {
+	base := store.GetBaseContainerFQN(ctx)
+	return strings.HasPrefix(uri, string(base))
+}
+
 func readFromDataPlane(ctx context.Context,
 	objectStore ObjectStore,
-	project, domain, reference string,
+	cluster, project, domain, reference string,
 	msg proto.Message,
 ) error {
 	if objectStore == nil {
@@ -181,6 +185,7 @@ func readFromDataPlane(ctx context.Context,
 	}
 
 	out, err := objectStore.GetObject(ctx, GetObjectRequest{
+		Cluster: cluster,
 		Prefix:  refURL.Path,
 		Project: project,
 		Domain:  domain,

@@ -298,18 +298,41 @@ func (m *TaskExecutionManager) ListTaskExecutions(
 	}, nil
 }
 
-func (m *TaskExecutionManager) GetTaskExecutionData(
-	ctx context.Context, request admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
+func (m *TaskExecutionManager) GetTaskExecutionData(ctx context.Context,
+	request admin.TaskExecutionGetDataRequest) (*admin.TaskExecutionGetDataResponse, error) {
 	if err := validation.ValidateTaskExecutionIdentifier(request.Id); err != nil {
 		logger.Debugf(ctx, "Invalid identifier [%+v]: %v", request.Id, err)
 	}
 	ctx = getTaskExecutionContext(ctx, request.Id)
-	taskExecution, err := m.GetTaskExecution(ctx, admin.TaskExecutionGetRequest{
-		Id: request.Id,
+	group, groupCtx := errgroup.WithContext(ctx)
+	var taskExecution *admin.TaskExecution
+	group.Go(func() error {
+		var err error
+		taskExecution, err = m.GetTaskExecution(ctx, admin.TaskExecutionGetRequest{Id: request.Id})
+		if err != nil {
+			logger.Errorf(ctx, "Failed to get task execution with id [%+v] with err %v", request.Id, err)
+		}
+		return err
 	})
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get task execution with id [%+v] with err %v",
-			request.Id, err)
+
+	cluster := ""
+	group.Go(func() error {
+		// when fetching remote S3 URIs, we need a cluster name to send to Union dataproxy to get the correct tunnel
+		execModel, err := util.GetExecutionModel(ctx, m.db, *request.GetId().GetNodeExecutionId().GetExecutionId())
+		if err != nil {
+			logger.Errorf(ctx, "failed to fetch execution model: %v", err)
+			return err
+		}
+		execution, err := transformers.FromExecutionModel(ctx, *execModel, transformers.DefaultExecutionTransformerOptions)
+		if err != nil {
+			logger.Errorf(ctx, "failed to transform execution model [%+v] to proto object with err: %v", execModel.Name, err)
+			return err
+		}
+		cluster = execution.GetSpec().GetMetadata().GetSystemMetadata().GetExecutionCluster()
+		return nil
+	})
+
+	if err := group.Wait(); err != nil {
 		return nil, err
 	}
 
@@ -317,13 +340,14 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 	id := request.GetId().GetNodeExecutionId().GetExecutionId()
 	var inputs *core.LiteralMap
 	var inputURLBlob *admin.UrlBlob
-	group, groupCtx := errgroup.WithContext(ctx)
+	group, groupCtx = errgroup.WithContext(ctx)
 	group.Go(func() error {
 		var err error
 		inputs, inputURLBlob, err = util.GetInputs(groupCtx,
 			m.urlData,
 			m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 			m.storageClient,
+			cluster,
 			id.Project,
 			id.Domain,
 			taskExecution.InputUri,
@@ -340,16 +364,17 @@ func (m *TaskExecutionManager) GetTaskExecutionData(
 			m.config.ApplicationConfiguration().GetRemoteDataConfig(),
 			m.storageClient,
 			taskExecution.Closure,
+			cluster,
 			id.Project,
 			id.Domain,
 			objectStore)
 		return err
 	})
 
-	err = group.Wait()
-	if err != nil {
+	if err := group.Wait(); err != nil {
 		return nil, err
 	}
+
 	response := &admin.TaskExecutionGetDataResponse{
 		Inputs:      inputURLBlob,
 		Outputs:     outputURLBlob,
