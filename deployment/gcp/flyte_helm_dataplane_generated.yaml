@@ -137,7 +137,7 @@ data:
           rate: 100
           type: bucket
         type: batch
-      rawoutput-prefix: gs://<BUCKETNAME>/
+      rawoutput-prefix: gs://<RAW_DATA_BUCKET_NAME>/
       workers: 40
       workflow-reeval-duration: 30s
     webhook:
@@ -173,7 +173,7 @@ data:
           json: ""
           project_id: <PROJECT-ID>
           scopes: https://www.googleapis.com/auth/cloud-platform
-      container: "<BUCKETNAME>"
+      container: "<METADATA_BUCKET_NAME>"
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -435,7 +435,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "20a71f9f307180510d3819f93c59265686f346e4468706c510450b8c8c0d205"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -516,7 +516,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b1
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "20a71f9f307180510d3819f93c59265686f346e4468706c510450b8c8c0d205"
     spec:
       securityContext: 
         fsGroup: 65534

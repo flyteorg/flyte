@@ -162,7 +162,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -356,7 +356,7 @@ data:
   storage.yaml: | 
     storage:
       type: s3
-      container: "<BUCKET_NAME>"
+      container: "<METADATA_BUCKET_NAME>"
       connection:
         auth-type: iam
         region: <AWS_REGION>
@@ -553,7 +553,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "b4ef4165bf685d7192588d47908b2f286a1ce3b34abc3778dff4b7fce7c95e6"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -871,7 +871,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "c2a15ce5dc2fa465986d6006f93450723da58166b3ad5ee35a91cb37d5c39da"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -973,7 +973,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "b4ef4165bf685d7192588d47908b2f286a1ce3b34abc3778dff4b7fce7c95e6"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
