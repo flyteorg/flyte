@@ -79,8 +79,9 @@ func Test_launch(t *testing.T) {
 
 		plgn := newPluginWithProperties(webapi.PluginConfig{})
 		plgn.OnCreate(ctx, tCtx).Return("", nil, fmt.Errorf("error creating"))
-		_, _, err := launch(ctx, plgn, tCtx, c, &s)
-		assert.Error(t, err)
+		_, phase, err := launch(ctx, plgn, tCtx, c, &s)
+		assert.Nil(t, err)
+		assert.Equal(t, core.PhaseRetryableFailure, phase.Phase())
 	})
 
 	t.Run("Failed to cache", func(t *testing.T) {
