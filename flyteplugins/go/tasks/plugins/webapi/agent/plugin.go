@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+
 	"golang.org/x/exp/maps"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -250,7 +252,7 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 
 	switch resource.Phase {
 	case flyteIdl.TaskExecution_QUEUED:
-		return core.PhaseInfoQueuedWithTaskInfo(core.DefaultPhaseVersion, resource.Message, taskInfo), nil
+		return core.PhaseInfoQueuedWithTaskInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_WAITING_FOR_RESOURCES:
 		return core.PhaseInfoWaitingForResourcesInfo(time.Now(), core.DefaultPhaseVersion, resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_INITIALIZING:
