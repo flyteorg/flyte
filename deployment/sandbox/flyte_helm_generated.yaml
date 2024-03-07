@@ -326,7 +326,7 @@ data:
           region: us-east-1
       signedUrl:
         stowConfigOverride:
-          endpoint: http://localhost:30084
+          endpoint: http://minio.flyte.svc.cluster.local:9000
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -512,7 +512,7 @@ data:
           region: us-east-1
       signedUrl:
         stowConfigOverride:
-          endpoint: http://localhost:30084
+          endpoint: http://minio.flyte.svc.cluster.local:9000
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -674,7 +674,7 @@ data:
           region: us-east-1
       signedUrl:
         stowConfigOverride:
-          endpoint: http://localhost:30084
+          endpoint: http://minio.flyte.svc.cluster.local:9000
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -6684,7 +6684,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "45f0232531c0d1494809cf83387a95b2fc802019ea095de7a24ccd4f8de86ec"
+        configChecksum: "8702cc3d688d44938e6974b267f70fb01ce7fec4780de86b8f2e65f9446c711"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -6984,7 +6984,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8feeaa7f7ec6506426db0d3e3cda6bc3ac0049a7eeba49d6cce62b3e1c7c424"
+        configChecksum: "ccdd0d27618b8053a8ae11046fd2b84b9a397144dd81c7113f398cddf001397"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -7075,7 +7075,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "45f0232531c0d1494809cf83387a95b2fc802019ea095de7a24ccd4f8de86ec"
+        configChecksum: "8702cc3d688d44938e6974b267f70fb01ce7fec4780de86b8f2e65f9446c711"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -7170,7 +7170,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "fa64b9672600e5eeed8ca407828a7490b17dadfe16c273e2aacfb52d9b5b085"
+        configChecksum: "a82c947246fac99ad98c86bc01cdd99569b2ea11f25d3e1361cd40d145bed87"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7244,7 +7244,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b1
       annotations:
-        configChecksum: "fa64b9672600e5eeed8ca407828a7490b17dadfe16c273e2aacfb52d9b5b085"
+        configChecksum: "a82c947246fac99ad98c86bc01cdd99569b2ea11f25d3e1361cd40d145bed87"
     spec:
       securityContext: 
         fsGroup: 65534
