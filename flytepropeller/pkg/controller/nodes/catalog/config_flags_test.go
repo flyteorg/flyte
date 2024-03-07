@@ -127,6 +127,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_cache-endpoint", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("cache-endpoint", testValue)
+			if vString, err := cmdFlags.GetString("cache-endpoint"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.CacheEndpoint)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_insecure", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -163,6 +177,62 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("use-admin-auth", testValue)
 			if vBool, err := cmdFlags.GetBool("use-admin-auth"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.UseAdminAuth)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_max-retries", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("max-retries", testValue)
+			if vInt, err := cmdFlags.GetInt("max-retries"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.MaxRetries)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_max-per-retry-timeout", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := defaultConfig.MaxPerRetryTimeout.String()
+
+			cmdFlags.Set("max-per-retry-timeout", testValue)
+			if vString, err := cmdFlags.GetString("max-per-retry-timeout"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.MaxPerRetryTimeout)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_backoff-scalar", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("backoff-scalar", testValue)
+			if vInt, err := cmdFlags.GetInt("backoff-scalar"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vInt), &actual.BackOffScalar)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_inline-cache", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("inline-cache", testValue)
+			if vBool, err := cmdFlags.GetBool("inline-cache"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.InlineCache)
 
 			} else {
 				assert.FailNow(t, err.Error())

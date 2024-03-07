@@ -669,3 +669,31 @@ func TestCacheIgnoreInputVars(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, hashDupe, hash)
 }
+
+func TestHashIdentifierExceptVersion(t *testing.T) {
+	identifier := core.Identifier{
+		Project: "project_1",
+		Domain:  "domain_1",
+		Name:    "name_1",
+		Version: "0",
+		Org:     "org_1",
+	}
+
+	identifierDiffVersion := core.Identifier{
+		Project: "project_1",
+		Domain:  "domain_1",
+		Name:    "name_1",
+		Version: "1",
+		Org:     "org_1",
+	}
+
+	expectedHashIdentifier := "+UmrGhEwHv3FesdpA4gliBluF3FUXz4tshmuOlw1FSk="
+
+	hashedIdentifier, err := HashIdentifierExceptVersion(context.TODO(), identifier)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedHashIdentifier, hashedIdentifier)
+
+	hashedIdentifierDiffVersion, err := HashIdentifierExceptVersion(context.TODO(), identifierDiffVersion)
+	assert.NoError(t, err)
+	assert.Equal(t, expectedHashIdentifier, hashedIdentifierDiffVersion)
+}

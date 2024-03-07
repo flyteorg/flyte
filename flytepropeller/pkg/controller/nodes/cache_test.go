@@ -228,7 +228,7 @@ func TestCheckCatalogCache(t *testing.T) {
 			assert.NoError(t, err)
 
 			nodeExecutor := &nodeExecutor{
-				catalog: catalogClient,
+				cache:   catalogClient,
 				metrics: metrics,
 			}
 			nCtx := setupCacheableNodeExecutionContext(dataStore, nil)
@@ -345,7 +345,7 @@ func TestGetOrExtendCatalogReservation(t *testing.T) {
 			)
 
 			nodeExecutor := &nodeExecutor{
-				catalog: catalogClient,
+				cache:   catalogClient,
 				metrics: metrics,
 			}
 			nCtx := setupCacheableNodeExecutionContext(nil, &core.TaskTemplate{})
@@ -401,7 +401,7 @@ func TestReleaseCatalogReservation(t *testing.T) {
 			catalogClient.OnReleaseReservationMatch(mock.Anything, mock.Anything, mock.Anything).Return(test.releaseError)
 
 			nodeExecutor := &nodeExecutor{
-				catalog: catalogClient,
+				cache:   catalogClient,
 				metrics: metrics,
 			}
 			nCtx := setupCacheableNodeExecutionContext(nil, &core.TaskTemplate{})
@@ -483,7 +483,7 @@ func TestWriteCatalogCache(t *testing.T) {
 			assert.NoError(t, err)
 
 			nodeExecutor := &nodeExecutor{
-				catalog: catalogClient,
+				cache:   catalogClient,
 				metrics: metrics,
 			}
 			nCtx := setupCacheableNodeExecutionContext(dataStore, &core.TaskTemplate{})

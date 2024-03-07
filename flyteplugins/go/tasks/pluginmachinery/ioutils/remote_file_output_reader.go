@@ -12,19 +12,21 @@ import (
 )
 
 type RemoteFileOutputReader struct {
-	outPath        io.OutputFilePaths
+	OutPath        io.OutputFilePaths
 	store          storage.ComposedProtobufStore
 	maxPayloadSize int64
 }
 
+var _ io.OutputReader = RemoteFileOutputReader{}
+
 func (r RemoteFileOutputReader) IsError(ctx context.Context) (bool, error) {
-	metadata, err := r.store.Head(ctx, r.outPath.GetErrorPath())
+	metadata, err := r.store.Head(ctx, r.OutPath.GetErrorPath())
 	if err != nil {
-		return false, errors.Wrapf(err, "failed to read error file @[%s]", r.outPath.GetErrorPath())
+		return false, errors.Wrapf(err, "failed to read error file @[%s]", r.OutPath.GetErrorPath())
 	}
 	if metadata.Exists() {
 		if metadata.Size() > r.maxPayloadSize {
-			return false, errors.Wrapf(err, "error file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetErrorPath(), metadata.Size(), r.maxPayloadSize)
+			return false, errors.Wrapf(err, "error file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.OutPath.GetErrorPath(), metadata.Size(), r.maxPayloadSize)
 		}
 		return true, nil
 	}
@@ -33,7 +35,7 @@ func (r RemoteFileOutputReader) IsError(ctx context.Context) (bool, error) {
 
 func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionError, error) {
 	errorDoc := &core.ErrorDocument{}
-	err := r.store.ReadProtobuf(ctx, r.outPath.GetErrorPath(), errorDoc)
+	err := r.store.ReadProtobuf(ctx, r.OutPath.GetErrorPath(), errorDoc)
 	if err != nil {
 		if storage.IsNotFound(err) {
 			return io.ExecutionError{
@@ -45,7 +47,7 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 				},
 			}, nil
 		}
-		return io.ExecutionError{}, errors.Wrapf(err, "failed to read error data from task @[%s]", r.outPath.GetErrorPath())
+		return io.ExecutionError{}, errors.Wrapf(err, "failed to read error data from task @[%s]", r.OutPath.GetErrorPath())
 	}
 
 	if errorDoc.Error == nil {
@@ -53,7 +55,7 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 			IsRecoverable: true,
 			ExecutionError: &core.ExecutionError{
 				Code:    "ErrorFileBadFormat",
-				Message: fmt.Sprintf("error not formatted correctly, nil error @path [%s]", r.outPath.GetErrorPath()),
+				Message: fmt.Sprintf("error not formatted correctly, nil error @path [%s]", r.OutPath.GetErrorPath()),
 				Kind:    core.ExecutionError_SYSTEM,
 			},
 		}, nil
@@ -75,13 +77,13 @@ func (r RemoteFileOutputReader) ReadError(ctx context.Context) (io.ExecutionErro
 }
 
 func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
-	md, err := r.store.Head(ctx, r.outPath.GetOutputPath())
+	md, err := r.store.Head(ctx, r.OutPath.GetOutputPath())
 	if err != nil {
 		return false, err
 	}
 	if md.Exists() {
 		if md.Size() > r.maxPayloadSize {
-			return false, errors.Errorf("output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.outPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
+			return false, errors.Errorf("output file @[%s] is too large [%d] bytes, max allowed [%d] bytes", r.OutPath.GetOutputPath(), md.Size(), r.maxPayloadSize)
 		}
 		return true, nil
 	}
@@ -91,9 +93,9 @@ func (r RemoteFileOutputReader) Exists(ctx context.Context) (bool, error) {
 func (r RemoteFileOutputReader) Read(ctx context.Context) (*core.LiteralMap, *io.ExecutionError, error) {
 
 	d := &core.LiteralMap{}
-	if err := r.store.ReadProtobuf(ctx, r.outPath.GetOutputPath(), d); err != nil {
+	if err := r.store.ReadProtobuf(ctx, r.OutPath.GetOutputPath(), d); err != nil {
 		// TODO change flytestdlib to return protobuf unmarshal errors separately. As this can indicate malformed output and we should catch that
-		return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %v", r.outPath.GetOutputPath(), err)
+		return nil, nil, fmt.Errorf("failed to read data from dataDir [%v]. Error: %v", r.OutPath.GetOutputPath(), err)
 	}
 
 	if d.Literals == nil {
@@ -101,7 +103,7 @@ func (r RemoteFileOutputReader) Read(ctx context.Context) (*core.LiteralMap, *io
 			IsRecoverable: true,
 			ExecutionError: &core.ExecutionError{
 				Code:    "No outputs produced",
-				Message: fmt.Sprintf("outputs not found at [%s]", r.outPath.GetOutputPath()),
+				Message: fmt.Sprintf("outputs not found at [%s]", r.OutPath.GetOutputPath()),
 			},
 		}, nil
 	}
@@ -114,7 +116,7 @@ func (r RemoteFileOutputReader) IsFile(ctx context.Context) bool {
 }
 
 func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
-	md, err := r.store.Head(ctx, r.outPath.GetDeckPath())
+	md, err := r.store.Head(ctx, r.OutPath.GetDeckPath())
 	if err != nil {
 		return false, err
 	}
@@ -124,7 +126,7 @@ func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
 
 func NewRemoteFileOutputReader(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {
 	return RemoteFileOutputReader{
-		outPath:        outPaths,
+		OutPath:        outPaths,
 		store:          store,
 		maxPayloadSize: maxDatasetSize,
 	}

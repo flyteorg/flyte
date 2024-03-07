@@ -18,15 +18,18 @@ import (
 )
 
 const (
-	AdminClientTracer       = "admin-client"
-	AdminGormTracer         = "admin-gorm"
-	AdminServerTracer       = "admin-server"
-	BlobstoreClientTracer   = "blobstore-client"
-	DataCatalogClientTracer = "datacatalog-client"
-	DataCatalogGormTracer   = "datacatalog-gorm"
-	DataCatalogServerTracer = "datacatalog-server"
-	FlytePropellerTracer    = "flytepropeller"
-	K8sClientTracer         = "k8s-client"
+	AdminClientTracer        = "admin-client"
+	AdminGormTracer          = "admin-gorm"
+	AdminServerTracer        = "admin-server"
+	BlobstoreClientTracer    = "blobstore-client"
+	DataCatalogClientTracer  = "datacatalog-client"
+	DataCatalogGormTracer    = "datacatalog-gorm"
+	DataCatalogServerTracer  = "datacatalog-server"
+	CacheServiceClientTracer = "cacheservice-client"
+	CacheServiceGormTracer   = "cacheservice-gorm"
+	CacheServiceServerTracer = "cacheservice-server"
+	FlytePropellerTracer     = "flytepropeller"
+	K8sClientTracer          = "k8s-client"
 )
 
 var tracerProviders = make(map[string]*trace.TracerProvider)

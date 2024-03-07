@@ -61,7 +61,7 @@ func TestReadOrigin(t *testing.T) {
 		}, nil)
 
 		r := RemoteFileOutputReader{
-			outPath:        opath,
+			OutPath:        opath,
 			store:          store,
 			maxPayloadSize: 0,
 		}
@@ -93,7 +93,7 @@ func TestReadOrigin(t *testing.T) {
 		}).Return(nil)
 
 		r := RemoteFileOutputReader{
-			outPath:        opath,
+			OutPath:        opath,
 			store:          store,
 			maxPayloadSize: 0,
 		}

@@ -176,12 +176,12 @@ func TestGetArtifactMetadataForSource(t *testing.T) {
 	}{
 		{"nil TaskExec", args{}, nil},
 		{"TaskExec", args{tID}, map[string]string{
-			execTaskAttemptKey: strconv.Itoa(int(tID.RetryAttempt)),
-			execProjectKey:     tID.NodeExecutionId.ExecutionId.Project,
-			execDomainKey:      tID.NodeExecutionId.ExecutionId.Domain,
-			execNodeIDKey:      tID.NodeExecutionId.NodeId,
-			execNameKey:        tID.NodeExecutionId.ExecutionId.Name,
-			execOrgKey:         tID.NodeExecutionId.ExecutionId.Org,
+			ExecTaskAttemptKey: strconv.Itoa(int(tID.RetryAttempt)),
+			ExecProjectKey:     tID.NodeExecutionId.ExecutionId.Project,
+			ExecDomainKey:      tID.NodeExecutionId.ExecutionId.Domain,
+			ExecNodeIDKey:      tID.NodeExecutionId.NodeId,
+			ExecNameKey:        tID.NodeExecutionId.ExecutionId.Name,
+			ExecOrgKey:         tID.NodeExecutionId.ExecutionId.Org,
 		}},
 	}
 	for _, tt := range tests {
@@ -250,7 +250,7 @@ func TestGetSourceFromMetadata(t *testing.T) {
 			},
 			RetryAttempt: 0,
 		}},
-		// In legacy only taskVersionKey is available
+		// In legacy only TaskVersionKey is available
 		{"legacy", args{datasetMd: GetDatasetMetadataForSource(&tID).KeyMap, currentID: currentTaskID}, &core.TaskExecutionIdentifier{
 			TaskId: &core.Identifier{
 				ResourceType: core.ResourceType_TASK,

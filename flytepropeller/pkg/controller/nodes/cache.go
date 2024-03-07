@@ -118,10 +118,10 @@ func updatePhaseCacheInfo(phaseInfo handler.PhaseInfo, cacheStatus *catalog.Stat
 func (n *nodeExecutor) CheckCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Entry, error) {
 	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
-		return catalog.Entry{}, errors.Wrapf(err, "failed to initialize the catalogKey")
+		return catalog.Entry{}, errors.Wrapf(err, "failed to initialize the cacheKey")
 	}
 
-	entry, err := n.catalog.Get(ctx, catalogKey)
+	entry, err := n.cache.Get(ctx, catalogKey)
 	if err != nil {
 		causeErr := errors.Cause(err)
 		if taskStatus, ok := status.FromError(causeErr); ok && taskStatus.Code() == codes.NotFound {
@@ -185,7 +185,7 @@ func (n *nodeExecutor) GetOrExtendCatalogReservation(ctx context.Context, nCtx i
 			errors.Wrapf(err, "failed to initialize the cache reservation ownerID")
 	}
 
-	reservation, err := n.catalog.GetOrExtendReservation(ctx, catalogKey, ownerID, heartbeatInterval)
+	reservation, err := n.cache.GetOrExtendReservation(ctx, catalogKey, ownerID, heartbeatInterval)
 	if err != nil {
 		n.metrics.reservationGetFailureCount.Inc(ctx)
 		logger.Errorf(ctx, "Catalog Failure: reservation get or extend failed. err: %v", err.Error())
@@ -222,7 +222,7 @@ func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx inter
 			errors.Wrapf(err, "failed to initialize the cache reservation ownerID")
 	}
 
-	err = n.catalog.ReleaseReservation(ctx, catalogKey, ownerID)
+	err = n.cache.ReleaseReservation(ctx, catalogKey, ownerID)
 	if err != nil {
 		n.metrics.reservationReleaseFailureCount.Inc(ctx)
 		logger.Errorf(ctx, "Catalog Failure: release reservation failed. err: %v", err.Error())
@@ -238,9 +238,8 @@ func (n *nodeExecutor) ReleaseCatalogReservation(ctx context.Context, nCtx inter
 func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.NodeExecutionContext, cacheHandler interfaces.CacheableNodeHandler) (catalog.Status, error) {
 	catalogKey, err := getCatalogKeyWithOverrides(ctx, nCtx, cacheHandler)
 	if err != nil {
-		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), errors.Wrapf(err, "failed to initialize the catalogKey")
+		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), errors.Wrapf(err, "failed to initialize the cacheKey")
 	}
-
 	iface := catalogKey.TypedInterface
 	if iface.Outputs != nil && len(iface.Outputs.Variables) == 0 {
 		return catalog.NewStatus(core.CatalogCacheStatus_CACHE_DISABLED, nil), nil
@@ -265,9 +264,9 @@ func (n *nodeExecutor) WriteCatalogCache(ctx context.Context, nCtx interfaces.No
 	// ignores discovery write failures
 	var status catalog.Status
 	if nCtx.ExecutionContext().GetExecutionConfig().OverwriteCache {
-		status, err = n.catalog.Update(ctx, catalogKey, outputReader, metadata)
+		status, err = n.cache.Update(ctx, catalogKey, outputReader, metadata)
 	} else {
-		status, err = n.catalog.Put(ctx, catalogKey, outputReader, metadata)
+		status, err = n.cache.Put(ctx, catalogKey, outputReader, metadata)
 	}
 	if err != nil {
 		n.metrics.catalogPutFailureCount.Inc(ctx)
