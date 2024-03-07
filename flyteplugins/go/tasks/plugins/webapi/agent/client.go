@@ -157,7 +157,7 @@ func createAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 			}
 		}
 	}
-	logger.Debugf(context.Background(), "AgentDeployment service supports task types: %v", maps.Keys(agentRegistry))
+	logger.Debugf(ctx, "AgentDeployment service supports task types: %v", maps.Keys(agentRegistry))
 	return agentRegistry
 }
 
