@@ -96,7 +96,7 @@ func getFinalContext(ctx context.Context, operation string, agent *Deployment) (
 	return context.WithTimeout(ctx, timeout)
 }
 
-func createAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
+func updateAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	agentRegistry := make(Registry)
 	cfg := GetConfig()
 	var agentDeployments []*Deployment
@@ -161,11 +161,7 @@ func createAgentRegistry(ctx context.Context, cs *ClientSet) Registry {
 	return agentRegistry
 }
 
-func createAgentClientSets(ctx context.Context) *ClientSet {
-	asyncAgentClients := make(map[string]service.AsyncAgentServiceClient)
-	syncAgentClients := make(map[string]service.SyncAgentServiceClient)
-	agentMetadataClients := make(map[string]service.AgentMetadataServiceClient)
-
+func updateAgentClientSets(ctx context.Context, clientSet *ClientSet) {
 	var agentDeployments []*Deployment
 	cfg := GetConfig()
 
@@ -174,18 +170,15 @@ func createAgentClientSets(ctx context.Context) *ClientSet {
 	}
 	agentDeployments = append(agentDeployments, maps.Values(cfg.AgentDeployments)...)
 	for _, agentService := range agentDeployments {
+		if _, ok := clientSet.agentMetadataClients[agentService.Endpoint]; ok {
+			continue
+		}
 		conn, err := getGrpcConnection(ctx, agentService)
 		if err != nil {
 			logger.Warningf(ctx, "failed to create connection to agent: [%v] with error: [%v]", agentService, err)
 		}
-		syncAgentClients[agentService.Endpoint] = service.NewSyncAgentServiceClient(conn)
-		asyncAgentClients[agentService.Endpoint] = service.NewAsyncAgentServiceClient(conn)
-		agentMetadataClients[agentService.Endpoint] = service.NewAgentMetadataServiceClient(conn)
-	}
-
-	return &ClientSet{
-		syncAgentClients:     syncAgentClients,
-		asyncAgentClients:    asyncAgentClients,
-		agentMetadataClients: agentMetadataClients,
+		clientSet.syncAgentClients[agentService.Endpoint] = service.NewSyncAgentServiceClient(conn)
+		clientSet.asyncAgentClients[agentService.Endpoint] = service.NewAsyncAgentServiceClient(conn)
+		clientSet.agentMetadataClients[agentService.Endpoint] = service.NewAgentMetadataServiceClient(conn)
 	}
 }

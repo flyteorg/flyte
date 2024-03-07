@@ -318,8 +318,8 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 
 func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
-		cs := createAgentClientSets(ctx)
-		agentRegistry = createAgentRegistry(ctx, cs)
+		updateAgentClientSets(ctx, p.cs)
+		agentRegistry = updateAgentRegistry(ctx, p.cs)
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -368,8 +368,14 @@ func newAgentPlugin() webapi.PluginEntry {
 	ctx := context.Background()
 	cfg := GetConfig()
 
-	cs := createAgentClientSets(ctx)
-	agentRegistry := createAgentRegistry(ctx, cs)
+	clientSet := &ClientSet{
+		asyncAgentClients:    make(map[string]service.AsyncAgentServiceClient),
+		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
+		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
+	}
+
+	updateAgentClientSets(ctx, clientSet)
+	agentRegistry := updateAgentRegistry(ctx, clientSet)
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
@@ -379,7 +385,7 @@ func newAgentPlugin() webapi.PluginEntry {
 			plugin := &Plugin{
 				metricScope: iCtx.MetricsScope(),
 				cfg:         cfg,
-				cs:          cs,
+				cs:          clientSet,
 			}
 			plugin.watchAgents(ctx)
 			return plugin, nil

@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,8 +21,12 @@ func TestInitializeClients(t *testing.T) {
 	ctx := context.Background()
 	err := SetConfig(&cfg)
 	assert.NoError(t, err)
-	cs := createAgentClientSets(ctx)
-	assert.NotNil(t, cs)
+	cs := &ClientSet{
+		asyncAgentClients:    make(map[string]service.AsyncAgentServiceClient),
+		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
+		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
+	}
+	updateAgentClientSets(ctx, cs)
 	_, ok := cs.syncAgentClients["y"]
 	assert.True(t, ok)
 	_, ok = cs.asyncAgentClients["x"]
