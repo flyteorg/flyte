@@ -166,7 +166,12 @@ func isWholeNumber(quantity resource.Quantity) bool {
 func resourceListToQuantity(resources corev1.ResourceList) map[core.Resources_ResourceName]resource.Quantity {
 	var requestedToQuantity = make(map[core.Resources_ResourceName]resource.Quantity)
 	for name, quantity := range resources {
-		resourceName := core.Resources_ResourceName(core.Resources_ResourceName_value[strings.ToUpper(name.String())])
+		var resourceName = core.Resources_UNKNOWN
+		if name == "ephemeral-storage" {
+			resourceName = core.Resources_ResourceName(core.Resources_ResourceName_value["EPHEMERAL_STORAGE"])
+		} else {
+			resourceName = core.Resources_ResourceName(core.Resources_ResourceName_value[strings.ToUpper(name.String())])
+		}
 		requestedToQuantity[resourceName] = quantity
 	}
 	return requestedToQuantity
