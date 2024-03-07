@@ -169,8 +169,8 @@ func resourceListToQuantity(resources corev1.ResourceList) map[core.Resources_Re
 		// The name to refer to ephemeral storage defined in k8s (https://github.com/kubernetes/api/blob/05aa4bceed70af2652698a28fb144ee22b2dd2ba/core/v1/types.go#L5988)
 		// is different from the name defined in Flyte's proto (https://github.com/flyteorg/flyte/blob/fd42f65660069d9c164cda2de579d3a89cac5b0f/flyteidl/protos/flyteidl/core/tasks.proto#L25).
 		// This is a workaround to handle the conversion.
-		if name == "ephemeral-storage" {
-			name = "EPHEMERAL_STORAGE"
+		if name == corev1.ResourceEphemeralStorage {
+			name = corev1.ResourceName(core.Resources_EPHEMERAL_STORAGE.String())
 		}
 		resourceName := core.Resources_ResourceName(core.Resources_ResourceName_value[strings.ToUpper(name.String())])
 		requestedToQuantity[resourceName] = quantity
