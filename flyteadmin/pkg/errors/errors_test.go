@@ -56,7 +56,7 @@ func TestNewIncompatibleClusterError(t *testing.T) {
 	assert.True(t, ok)
 }
 
-func TestJsonDifferError(t *testing.T) {
+func TestJsonDifferHasDiffError(t *testing.T) {
 	oldSpec := map[string]int{
 		"one":   1,
 		"two":   2,
@@ -75,6 +75,27 @@ func TestJsonDifferError(t *testing.T) {
 	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
 	rs := compareJsons(diff, rdiff)
 	assert.Equal(t, "\t\t- /four: 4 -> 0", strings.Join(rs, "\n"))
+}
+
+func TestJsonDifferNoDiffError(t *testing.T) {
+	oldSpec := map[string]int{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+		"four":  4,
+		"five":  5,
+	}
+	newSpec := map[string]int{
+		"five":  5,
+		"four":  4,
+		"three": 3,
+		"two":   2,
+		"one":   1,
+	}
+	diff, _ := jsondiff.Compare(oldSpec, newSpec)
+	rdiff, _ := jsondiff.Compare(newSpec, oldSpec)
+	rs := compareJsons(diff, rdiff)
+	assert.Equal(t, "", strings.Join(rs, "\n"))
 }
 
 func TestNewTaskExistsDifferentStructureError(t *testing.T) {
