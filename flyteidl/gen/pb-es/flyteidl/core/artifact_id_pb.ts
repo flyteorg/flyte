@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
  * @generated from enum flyteidl.core.Granularity
@@ -16,34 +16,34 @@ export enum Granularity {
   UNSET = 0,
 
   /**
-   * @generated from enum value: MINUTE = 1;
+   * @generated from enum value: MINUTE = 5;
    */
-  MINUTE = 1,
+  MINUTE = 5,
 
   /**
-   * @generated from enum value: HOUR = 2;
+   * @generated from enum value: HOUR = 6;
    */
-  HOUR = 2,
+  HOUR = 6,
 
   /**
    * default
    *
-   * @generated from enum value: DAY = 3;
+   * @generated from enum value: DAY = 7;
    */
-  DAY = 3,
+  DAY = 7,
 
   /**
-   * @generated from enum value: MONTH = 4;
+   * @generated from enum value: MONTH = 8;
    */
-  MONTH = 4,
+  MONTH = 8,
 }
 // Retrieve enum metadata with: proto3.getEnumType(Granularity)
 proto3.util.setEnumType(Granularity, "flyteidl.core.Granularity", [
   { no: 0, name: "UNSET" },
-  { no: 1, name: "MINUTE" },
-  { no: 2, name: "HOUR" },
-  { no: 3, name: "DAY" },
-  { no: 4, name: "MONTH" },
+  { no: 5, name: "MINUTE" },
+  { no: 6, name: "HOUR" },
+  { no: 7, name: "DAY" },
+  { no: 8, name: "MONTH" },
 ]);
 
 /**
@@ -190,9 +190,9 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
  */
 export class TimeTransform extends Message<TimeTransform> {
   /**
-   * @generated from field: string transform = 1;
+   * @generated from field: google.protobuf.Duration transform = 1;
    */
-  transform = "";
+  transform?: Duration;
 
   /**
    * @generated from field: flyteidl.core.Operator op = 2;
@@ -207,7 +207,7 @@ export class TimeTransform extends Message<TimeTransform> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.TimeTransform";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "transform", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "transform", kind: "message", T: Duration },
     { no: 2, name: "op", kind: "enum", T: proto3.getEnumType(Operator) },
   ]);
 

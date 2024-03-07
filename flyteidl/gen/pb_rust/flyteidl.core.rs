@@ -752,8 +752,8 @@ pub mod artifact_binding_data {
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct TimeTransform {
-    #[prost(string, tag="1")]
-    pub transform: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="1")]
+    pub transform: ::core::option::Option<::prost_types::Duration>,
     #[prost(enumeration="Operator", tag="2")]
     pub op: i32,
 }
@@ -861,11 +861,11 @@ pub mod artifact_query {
 #[repr(i32)]
 pub enum Granularity {
     Unset = 0,
-    Minute = 1,
-    Hour = 2,
+    Minute = 5,
+    Hour = 6,
     /// default
-    Day = 3,
-    Month = 4,
+    Day = 7,
+    Month = 8,
 }
 impl Granularity {
     /// String value of the enum field names used in the ProtoBuf definition.

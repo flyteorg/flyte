@@ -1,4 +1,5 @@
 from google.protobuf import timestamp_pb2 as _timestamp_pb2
+from google.protobuf import duration_pb2 as _duration_pb2
 from flyteidl.core import identifier_pb2 as _identifier_pb2
 from google.protobuf.internal import containers as _containers
 from google.protobuf.internal import enum_type_wrapper as _enum_type_wrapper
@@ -54,9 +55,9 @@ class TimeTransform(_message.Message):
     __slots__ = ["transform", "op"]
     TRANSFORM_FIELD_NUMBER: _ClassVar[int]
     OP_FIELD_NUMBER: _ClassVar[int]
-    transform: str
+    transform: _duration_pb2.Duration
     op: Operator
-    def __init__(self, transform: _Optional[str] = ..., op: _Optional[_Union[Operator, str]] = ...) -> None: ...
+    def __init__(self, transform: _Optional[_Union[_duration_pb2.Duration, _Mapping]] = ..., op: _Optional[_Union[Operator, str]] = ...) -> None: ...
 
 class InputBindingData(_message.Message):
     __slots__ = ["var"]

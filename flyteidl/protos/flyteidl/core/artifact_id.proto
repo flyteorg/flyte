@@ -5,6 +5,7 @@ package flyteidl.core;
 option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core";
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "flyteidl/core/identifier.proto";
 
 
@@ -31,10 +32,11 @@ message ArtifactBindingData {
 
 enum Granularity {
   UNSET = 0;
-  MINUTE = 1;
-  HOUR = 2;
-  DAY = 3; // default
-  MONTH = 4;
+  reserved 1 to 4;
+  MINUTE = 5;
+  HOUR = 6;
+  DAY = 7; // default
+  MONTH = 8;
 }
 
 enum Operator {
@@ -43,7 +45,7 @@ enum Operator {
 }
 
 message TimeTransform {
-  string transform = 1;
+  google.protobuf.Duration transform = 1;
   Operator op = 2;
 }
 
