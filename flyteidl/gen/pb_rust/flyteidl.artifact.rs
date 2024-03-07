@@ -59,6 +59,73 @@ pub struct ArtifactSource {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Card {
+    #[prost(string, tag="1")]
+    pub uri: ::prost::alloc::string::String,
+    #[prost(enumeration="card::CardType", tag="2")]
+    pub r#type: i32,
+    #[prost(string, tag="3")]
+    pub body: ::prost::alloc::string::String,
+    #[prost(enumeration="card::TextType", tag="4")]
+    pub text_type: i32,
+}
+/// Nested message and enum types in `Card`.
+pub mod card {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum CardType {
+        Unknown = 0,
+        Model = 1,
+        Dataset = 2,
+    }
+    impl CardType {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                CardType::Unknown => "UNKNOWN",
+                CardType::Model => "MODEL",
+                CardType::Dataset => "DATASET",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "UNKNOWN" => Some(Self::Unknown),
+                "MODEL" => Some(Self::Model),
+                "DATASET" => Some(Self::Dataset),
+                _ => None,
+            }
+        }
+    }
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum TextType {
+        Markdown = 0,
+    }
+    impl TextType {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                TextType::Markdown => "MARKDOWN",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "MARKDOWN" => Some(Self::Markdown),
+                _ => None,
+            }
+        }
+    }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactSpec {
     #[prost(message, optional, tag="1")]
     pub value: ::core::option::Option<super::core::Literal>,
@@ -72,6 +139,8 @@ pub struct ArtifactSpec {
     /// Additional user metadata
     #[prost(message, optional, tag="4")]
     pub user_metadata: ::core::option::Option<::prost_types::Struct>,
+    #[prost(message, optional, tag="5")]
+    pub card: ::core::option::Option<Card>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -133,6 +202,8 @@ pub struct SearchArtifactsRequest {
     pub token: ::prost::alloc::string::String,
     #[prost(int32, tag="8")]
     pub limit: i32,
+    #[prost(enumeration="super::core::Granularity", tag="9")]
+    pub granularity: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -299,5 +370,17 @@ pub struct ListUsageRequest {
 pub struct ListUsageResponse {
     #[prost(message, repeated, tag="1")]
     pub executions: ::prost::alloc::vec::Vec<super::core::WorkflowExecutionIdentifier>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetCardRequest {
+    #[prost(message, optional, tag="1")]
+    pub artifact_id: ::core::option::Option<super::core::ArtifactId>,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct GetCardResponse {
+    #[prost(message, optional, tag="1")]
+    pub card: ::core::option::Option<Card>,
 }
 // @@protoc_insertion_point(module)

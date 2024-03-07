@@ -75,17 +75,43 @@ class ArtifactSource(_message.Message):
     principal: str
     def __init__(self, workflow_execution: _Optional[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]] = ..., node_id: _Optional[str] = ..., task_id: _Optional[_Union[_identifier_pb2.Identifier, _Mapping]] = ..., retry_attempt: _Optional[int] = ..., principal: _Optional[str] = ...) -> None: ...
 
+class Card(_message.Message):
+    __slots__ = ["uri", "type", "body", "text_type"]
+    class CardType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        UNKNOWN: _ClassVar[Card.CardType]
+        MODEL: _ClassVar[Card.CardType]
+        DATASET: _ClassVar[Card.CardType]
+    UNKNOWN: Card.CardType
+    MODEL: Card.CardType
+    DATASET: Card.CardType
+    class TextType(int, metaclass=_enum_type_wrapper.EnumTypeWrapper):
+        __slots__ = []
+        MARKDOWN: _ClassVar[Card.TextType]
+    MARKDOWN: Card.TextType
+    URI_FIELD_NUMBER: _ClassVar[int]
+    TYPE_FIELD_NUMBER: _ClassVar[int]
+    BODY_FIELD_NUMBER: _ClassVar[int]
+    TEXT_TYPE_FIELD_NUMBER: _ClassVar[int]
+    uri: str
+    type: Card.CardType
+    body: str
+    text_type: Card.TextType
+    def __init__(self, uri: _Optional[str] = ..., type: _Optional[_Union[Card.CardType, str]] = ..., body: _Optional[str] = ..., text_type: _Optional[_Union[Card.TextType, str]] = ...) -> None: ...
+
 class ArtifactSpec(_message.Message):
-    __slots__ = ["value", "type", "short_description", "user_metadata"]
+    __slots__ = ["value", "type", "short_description", "user_metadata", "card"]
     VALUE_FIELD_NUMBER: _ClassVar[int]
     TYPE_FIELD_NUMBER: _ClassVar[int]
     SHORT_DESCRIPTION_FIELD_NUMBER: _ClassVar[int]
     USER_METADATA_FIELD_NUMBER: _ClassVar[int]
+    CARD_FIELD_NUMBER: _ClassVar[int]
     value: _literals_pb2.Literal
     type: _types_pb2.LiteralType
     short_description: str
     user_metadata: _struct_pb2.Struct
-    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ...) -> None: ...
+    card: Card
+    def __init__(self, value: _Optional[_Union[_literals_pb2.Literal, _Mapping]] = ..., type: _Optional[_Union[_types_pb2.LiteralType, _Mapping]] = ..., short_description: _Optional[str] = ..., user_metadata: _Optional[_Union[_struct_pb2.Struct, _Mapping]] = ..., card: _Optional[_Union[Card, _Mapping]] = ...) -> None: ...
 
 class Trigger(_message.Message):
     __slots__ = ["trigger", "trigger_inputs"]
@@ -124,7 +150,7 @@ class SearchOptions(_message.Message):
     def __init__(self, strict_partitions: bool = ..., latest_by_key: bool = ...) -> None: ...
 
 class SearchArtifactsRequest(_message.Message):
-    __slots__ = ["artifact_key", "partitions", "time_partition_value", "principal", "version", "options", "token", "limit"]
+    __slots__ = ["artifact_key", "partitions", "time_partition_value", "principal", "version", "options", "token", "limit", "granularity"]
     ARTIFACT_KEY_FIELD_NUMBER: _ClassVar[int]
     PARTITIONS_FIELD_NUMBER: _ClassVar[int]
     TIME_PARTITION_VALUE_FIELD_NUMBER: _ClassVar[int]
@@ -133,6 +159,7 @@ class SearchArtifactsRequest(_message.Message):
     OPTIONS_FIELD_NUMBER: _ClassVar[int]
     TOKEN_FIELD_NUMBER: _ClassVar[int]
     LIMIT_FIELD_NUMBER: _ClassVar[int]
+    GRANULARITY_FIELD_NUMBER: _ClassVar[int]
     artifact_key: _artifact_id_pb2.ArtifactKey
     partitions: _artifact_id_pb2.Partitions
     time_partition_value: _timestamp_pb2.Timestamp
@@ -141,7 +168,8 @@ class SearchArtifactsRequest(_message.Message):
     options: SearchOptions
     token: str
     limit: int
-    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., time_partition_value: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., principal: _Optional[str] = ..., version: _Optional[str] = ..., options: _Optional[_Union[SearchOptions, _Mapping]] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ...) -> None: ...
+    granularity: _artifact_id_pb2.Granularity
+    def __init__(self, artifact_key: _Optional[_Union[_artifact_id_pb2.ArtifactKey, _Mapping]] = ..., partitions: _Optional[_Union[_artifact_id_pb2.Partitions, _Mapping]] = ..., time_partition_value: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ..., principal: _Optional[str] = ..., version: _Optional[str] = ..., options: _Optional[_Union[SearchOptions, _Mapping]] = ..., token: _Optional[str] = ..., limit: _Optional[int] = ..., granularity: _Optional[_Union[_artifact_id_pb2.Granularity, str]] = ...) -> None: ...
 
 class SearchArtifactsResponse(_message.Message):
     __slots__ = ["artifacts", "token"]
@@ -274,3 +302,15 @@ class ListUsageResponse(_message.Message):
     EXECUTIONS_FIELD_NUMBER: _ClassVar[int]
     executions: _containers.RepeatedCompositeFieldContainer[_identifier_pb2.WorkflowExecutionIdentifier]
     def __init__(self, executions: _Optional[_Iterable[_Union[_identifier_pb2.WorkflowExecutionIdentifier, _Mapping]]] = ...) -> None: ...
+
+class GetCardRequest(_message.Message):
+    __slots__ = ["artifact_id"]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    artifact_id: _artifact_id_pb2.ArtifactID
+    def __init__(self, artifact_id: _Optional[_Union[_artifact_id_pb2.ArtifactID, _Mapping]] = ...) -> None: ...
+
+class GetCardResponse(_message.Message):
+    __slots__ = ["card"]
+    CARD_FIELD_NUMBER: _ClassVar[int]
+    card: Card
+    def __init__(self, card: _Optional[_Union[Card, _Mapping]] = ...) -> None: ...

@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
-import { ArtifactID, ArtifactKey, ArtifactQuery, Partitions } from "../core/artifact_id_pb.js";
+import { ArtifactID, ArtifactKey, ArtifactQuery, Granularity, Partitions } from "../core/artifact_id_pb.js";
 import { Identifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { Literal } from "../core/literals_pb.js";
 import { LiteralType } from "../core/types_pb.js";
@@ -255,6 +255,101 @@ export class ArtifactSource extends Message<ArtifactSource> {
 }
 
 /**
+ * @generated from message flyteidl.artifact.Card
+ */
+export class Card extends Message<Card> {
+  /**
+   * @generated from field: string uri = 1;
+   */
+  uri = "";
+
+  /**
+   * @generated from field: flyteidl.artifact.Card.CardType type = 2;
+   */
+  type = Card_CardType.UNKNOWN;
+
+  /**
+   * @generated from field: string body = 3;
+   */
+  body = "";
+
+  /**
+   * @generated from field: flyteidl.artifact.Card.TextType text_type = 4;
+   */
+  textType = Card_TextType.MARKDOWN;
+
+  constructor(data?: PartialMessage<Card>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.Card";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "uri", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "type", kind: "enum", T: proto3.getEnumType(Card_CardType) },
+    { no: 3, name: "body", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "text_type", kind: "enum", T: proto3.getEnumType(Card_TextType) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Card {
+    return new Card().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Card {
+    return new Card().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Card {
+    return new Card().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: Card | PlainMessage<Card> | undefined, b: Card | PlainMessage<Card> | undefined): boolean {
+    return proto3.util.equals(Card, a, b);
+  }
+}
+
+/**
+ * @generated from enum flyteidl.artifact.Card.CardType
+ */
+export enum Card_CardType {
+  /**
+   * @generated from enum value: UNKNOWN = 0;
+   */
+  UNKNOWN = 0,
+
+  /**
+   * @generated from enum value: MODEL = 1;
+   */
+  MODEL = 1,
+
+  /**
+   * @generated from enum value: DATASET = 2;
+   */
+  DATASET = 2,
+}
+// Retrieve enum metadata with: proto3.getEnumType(Card_CardType)
+proto3.util.setEnumType(Card_CardType, "flyteidl.artifact.Card.CardType", [
+  { no: 0, name: "UNKNOWN" },
+  { no: 1, name: "MODEL" },
+  { no: 2, name: "DATASET" },
+]);
+
+/**
+ * @generated from enum flyteidl.artifact.Card.TextType
+ */
+export enum Card_TextType {
+  /**
+   * @generated from enum value: MARKDOWN = 0;
+   */
+  MARKDOWN = 0,
+}
+// Retrieve enum metadata with: proto3.getEnumType(Card_TextType)
+proto3.util.setEnumType(Card_TextType, "flyteidl.artifact.Card.TextType", [
+  { no: 0, name: "MARKDOWN" },
+]);
+
+/**
  * @generated from message flyteidl.artifact.ArtifactSpec
  */
 export class ArtifactSpec extends Message<ArtifactSpec> {
@@ -284,6 +379,11 @@ export class ArtifactSpec extends Message<ArtifactSpec> {
    */
   userMetadata?: Struct;
 
+  /**
+   * @generated from field: flyteidl.artifact.Card card = 5;
+   */
+  card?: Card;
+
   constructor(data?: PartialMessage<ArtifactSpec>) {
     super();
     proto3.util.initPartial(data, this);
@@ -296,6 +396,7 @@ export class ArtifactSpec extends Message<ArtifactSpec> {
     { no: 2, name: "type", kind: "message", T: LiteralType },
     { no: 3, name: "short_description", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "user_metadata", kind: "message", T: Struct },
+    { no: 5, name: "card", kind: "message", T: Card },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArtifactSpec {
@@ -571,6 +672,11 @@ export class SearchArtifactsRequest extends Message<SearchArtifactsRequest> {
    */
   limit = 0;
 
+  /**
+   * @generated from field: flyteidl.core.Granularity granularity = 9;
+   */
+  granularity = Granularity.UNSET;
+
   constructor(data?: PartialMessage<SearchArtifactsRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -587,6 +693,7 @@ export class SearchArtifactsRequest extends Message<SearchArtifactsRequest> {
     { no: 6, name: "options", kind: "message", T: SearchOptions },
     { no: 7, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 8, name: "limit", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 9, name: "granularity", kind: "enum", T: proto3.getEnumType(Granularity) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SearchArtifactsRequest {
@@ -1419,6 +1526,80 @@ export class ListUsageResponse extends Message<ListUsageResponse> {
 
   static equals(a: ListUsageResponse | PlainMessage<ListUsageResponse> | undefined, b: ListUsageResponse | PlainMessage<ListUsageResponse> | undefined): boolean {
     return proto3.util.equals(ListUsageResponse, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.artifact.GetCardRequest
+ */
+export class GetCardRequest extends Message<GetCardRequest> {
+  /**
+   * @generated from field: flyteidl.core.ArtifactID artifact_id = 1;
+   */
+  artifactId?: ArtifactID;
+
+  constructor(data?: PartialMessage<GetCardRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.GetCardRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "artifact_id", kind: "message", T: ArtifactID },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetCardRequest {
+    return new GetCardRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetCardRequest {
+    return new GetCardRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetCardRequest {
+    return new GetCardRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetCardRequest | PlainMessage<GetCardRequest> | undefined, b: GetCardRequest | PlainMessage<GetCardRequest> | undefined): boolean {
+    return proto3.util.equals(GetCardRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.artifact.GetCardResponse
+ */
+export class GetCardResponse extends Message<GetCardResponse> {
+  /**
+   * @generated from field: flyteidl.artifact.Card card = 1;
+   */
+  card?: Card;
+
+  constructor(data?: PartialMessage<GetCardResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.artifact.GetCardResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "card", kind: "message", T: Card },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetCardResponse {
+    return new GetCardResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetCardResponse {
+    return new GetCardResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetCardResponse {
+    return new GetCardResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetCardResponse | PlainMessage<GetCardResponse> | undefined, b: GetCardResponse | PlainMessage<GetCardResponse> | undefined): boolean {
+    return proto3.util.equals(GetCardResponse, a, b);
   }
 }
 

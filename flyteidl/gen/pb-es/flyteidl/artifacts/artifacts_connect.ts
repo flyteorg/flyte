@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { ActivateTriggerRequest, ActivateTriggerResponse, AddTagRequest, AddTagResponse, CreateArtifactRequest, CreateArtifactResponse, CreateTriggerRequest, CreateTriggerResponse, DeactivateAllTriggersRequest, DeactivateAllTriggersResponse, DeactivateTriggerRequest, DeactivateTriggerResponse, ExecutionInputsRequest, ExecutionInputsResponse, FindByWorkflowExecRequest, GetArtifactRequest, GetArtifactResponse, ListUsageRequest, ListUsageResponse, RegisterConsumerRequest, RegisterProducerRequest, RegisterResponse, SearchArtifactsRequest, SearchArtifactsResponse } from "./artifacts_pb.js";
+import { ActivateTriggerRequest, ActivateTriggerResponse, AddTagRequest, AddTagResponse, CreateArtifactRequest, CreateArtifactResponse, CreateTriggerRequest, CreateTriggerResponse, DeactivateAllTriggersRequest, DeactivateAllTriggersResponse, DeactivateTriggerRequest, DeactivateTriggerResponse, ExecutionInputsRequest, ExecutionInputsResponse, FindByWorkflowExecRequest, GetArtifactRequest, GetArtifactResponse, GetCardRequest, GetCardResponse, ListUsageRequest, ListUsageResponse, RegisterConsumerRequest, RegisterProducerRequest, RegisterResponse, SearchArtifactsRequest, SearchArtifactsResponse } from "./artifacts_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -73,6 +73,15 @@ export const ArtifactRegistry = {
       name: "DeactivateAllTriggers",
       I: DeactivateAllTriggersRequest,
       O: DeactivateAllTriggersResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * @generated from rpc flyteidl.artifact.ArtifactRegistry.GetCard
+     */
+    getCard: {
+      name: "GetCard",
+      I: GetCardRequest,
+      O: GetCardResponse,
       kind: MethodKind.Unary,
     },
     /**

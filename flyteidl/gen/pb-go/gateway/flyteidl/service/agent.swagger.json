@@ -374,8 +374,8 @@
         "bind_to_time_partition": {
           "type": "boolean"
         },
-        "transform": {
-          "type": "string",
+        "time_transform": {
+          "$ref": "#/definitions/coreTimeTransform",
           "title": "This is only relevant in the time partition case"
         }
       },
@@ -624,6 +624,18 @@
       },
       "description": "Metadata associated with the GPU accelerator to allocate to a task. Contains\ninformation about device type, and for multi-instance GPUs, the partition size to\nuse."
     },
+    "coreGranularity": {
+      "type": "string",
+      "enum": [
+        "UNSET",
+        "MINUTE",
+        "HOUR",
+        "DAY",
+        "MONTH"
+      ],
+      "default": "UNSET",
+      "title": "- DAY: default"
+    },
     "coreIOStrategy": {
       "type": "object",
       "properties": {
@@ -753,6 +765,9 @@
         },
         "input_binding": {
           "$ref": "#/definitions/coreInputBindingData"
+        },
+        "runtime_binding": {
+          "$ref": "#/definitions/coreRuntimeBinding"
         }
       }
     },
@@ -1002,6 +1017,9 @@
         }
       },
       "description": "Retry strategy associated with an executable unit."
+    },
+    "coreRuntimeBinding": {
+      "type": "object"
     },
     "coreRuntimeMetadata": {
       "type": "object",
@@ -1360,6 +1378,20 @@
       "properties": {
         "value": {
           "$ref": "#/definitions/coreLabelValue"
+        },
+        "granularity": {
+          "$ref": "#/definitions/coreGranularity"
+        }
+      }
+    },
+    "coreTimeTransform": {
+      "type": "object",
+      "properties": {
+        "transform": {
+          "type": "string"
+        },
+        "op": {
+          "$ref": "#/definitions/flyteidlcoreOperator"
         }
       }
     },
@@ -1565,6 +1597,14 @@
         }
       },
       "description": "A generic key value pair."
+    },
+    "flyteidlcoreOperator": {
+      "type": "string",
+      "enum": [
+        "MINUS",
+        "PLUS"
+      ],
+      "default": "MINUS"
     },
     "flyteidlcoreSchema": {
       "type": "object",

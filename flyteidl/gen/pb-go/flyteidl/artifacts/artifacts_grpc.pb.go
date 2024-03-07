@@ -26,6 +26,7 @@ const (
 	ArtifactRegistry_ActivateTrigger_FullMethodName       = "/flyteidl.artifact.ArtifactRegistry/ActivateTrigger"
 	ArtifactRegistry_DeactivateTrigger_FullMethodName     = "/flyteidl.artifact.ArtifactRegistry/DeactivateTrigger"
 	ArtifactRegistry_DeactivateAllTriggers_FullMethodName = "/flyteidl.artifact.ArtifactRegistry/DeactivateAllTriggers"
+	ArtifactRegistry_GetCard_FullMethodName               = "/flyteidl.artifact.ArtifactRegistry/GetCard"
 	ArtifactRegistry_AddTag_FullMethodName                = "/flyteidl.artifact.ArtifactRegistry/AddTag"
 	ArtifactRegistry_RegisterProducer_FullMethodName      = "/flyteidl.artifact.ArtifactRegistry/RegisterProducer"
 	ArtifactRegistry_RegisterConsumer_FullMethodName      = "/flyteidl.artifact.ArtifactRegistry/RegisterConsumer"
@@ -45,6 +46,7 @@ type ArtifactRegistryClient interface {
 	ActivateTrigger(ctx context.Context, in *ActivateTriggerRequest, opts ...grpc.CallOption) (*ActivateTriggerResponse, error)
 	DeactivateTrigger(ctx context.Context, in *DeactivateTriggerRequest, opts ...grpc.CallOption) (*DeactivateTriggerResponse, error)
 	DeactivateAllTriggers(ctx context.Context, in *DeactivateAllTriggersRequest, opts ...grpc.CallOption) (*DeactivateAllTriggersResponse, error)
+	GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error)
 	AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error)
 	RegisterProducer(ctx context.Context, in *RegisterProducerRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	RegisterConsumer(ctx context.Context, in *RegisterConsumerRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -124,6 +126,15 @@ func (c *artifactRegistryClient) DeactivateAllTriggers(ctx context.Context, in *
 	return out, nil
 }
 
+func (c *artifactRegistryClient) GetCard(ctx context.Context, in *GetCardRequest, opts ...grpc.CallOption) (*GetCardResponse, error) {
+	out := new(GetCardResponse)
+	err := c.cc.Invoke(ctx, ArtifactRegistry_GetCard_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *artifactRegistryClient) AddTag(ctx context.Context, in *AddTagRequest, opts ...grpc.CallOption) (*AddTagResponse, error) {
 	out := new(AddTagResponse)
 	err := c.cc.Invoke(ctx, ArtifactRegistry_AddTag_FullMethodName, in, out, opts...)
@@ -189,6 +200,7 @@ type ArtifactRegistryServer interface {
 	ActivateTrigger(context.Context, *ActivateTriggerRequest) (*ActivateTriggerResponse, error)
 	DeactivateTrigger(context.Context, *DeactivateTriggerRequest) (*DeactivateTriggerResponse, error)
 	DeactivateAllTriggers(context.Context, *DeactivateAllTriggersRequest) (*DeactivateAllTriggersResponse, error)
+	GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error)
 	AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error)
 	RegisterProducer(context.Context, *RegisterProducerRequest) (*RegisterResponse, error)
 	RegisterConsumer(context.Context, *RegisterConsumerRequest) (*RegisterResponse, error)
@@ -221,6 +233,9 @@ func (UnimplementedArtifactRegistryServer) DeactivateTrigger(context.Context, *D
 }
 func (UnimplementedArtifactRegistryServer) DeactivateAllTriggers(context.Context, *DeactivateAllTriggersRequest) (*DeactivateAllTriggersResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeactivateAllTriggers not implemented")
+}
+func (UnimplementedArtifactRegistryServer) GetCard(context.Context, *GetCardRequest) (*GetCardResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCard not implemented")
 }
 func (UnimplementedArtifactRegistryServer) AddTag(context.Context, *AddTagRequest) (*AddTagResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTag not implemented")
@@ -378,6 +393,24 @@ func _ArtifactRegistry_DeactivateAllTriggers_Handler(srv interface{}, ctx contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArtifactRegistry_GetCard_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCardRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArtifactRegistryServer).GetCard(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArtifactRegistry_GetCard_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArtifactRegistryServer).GetCard(ctx, req.(*GetCardRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ArtifactRegistry_AddTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddTagRequest)
 	if err := dec(in); err != nil {
@@ -520,6 +553,10 @@ var ArtifactRegistry_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeactivateAllTriggers",
 			Handler:    _ArtifactRegistry_DeactivateAllTriggers_Handler,
+		},
+		{
+			MethodName: "GetCard",
+			Handler:    _ArtifactRegistry_GetCard_Handler,
 		},
 		{
 			MethodName: "AddTag",

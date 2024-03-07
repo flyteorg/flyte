@@ -49,6 +49,11 @@ class ArtifactRegistryStub(object):
                 request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateAllTriggersRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateAllTriggersResponse.FromString,
                 )
+        self.GetCard = channel.unary_unary(
+                '/flyteidl.artifact.ArtifactRegistry/GetCard',
+                request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetCardRequest.SerializeToString,
+                response_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetCardResponse.FromString,
+                )
         self.AddTag = channel.unary_unary(
                 '/flyteidl.artifact.ArtifactRegistry/AddTag',
                 request_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.AddTagRequest.SerializeToString,
@@ -121,6 +126,12 @@ class ArtifactRegistryServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def DeactivateAllTriggers(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def GetCard(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -199,6 +210,11 @@ def add_ArtifactRegistryServicer_to_server(servicer, server):
                     servicer.DeactivateAllTriggers,
                     request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateAllTriggersRequest.FromString,
                     response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateAllTriggersResponse.SerializeToString,
+            ),
+            'GetCard': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetCard,
+                    request_deserializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetCardRequest.FromString,
+                    response_serializer=flyteidl_dot_artifacts_dot_artifacts__pb2.GetCardResponse.SerializeToString,
             ),
             'AddTag': grpc.unary_unary_rpc_method_handler(
                     servicer.AddTag,
@@ -356,6 +372,23 @@ class ArtifactRegistry(object):
         return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/DeactivateAllTriggers',
             flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateAllTriggersRequest.SerializeToString,
             flyteidl_dot_artifacts_dot_artifacts__pb2.DeactivateAllTriggersResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def GetCard(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.artifact.ArtifactRegistry/GetCard',
+            flyteidl_dot_artifacts_dot_artifacts__pb2.GetCardRequest.SerializeToString,
+            flyteidl_dot_artifacts_dot_artifacts__pb2.GetCardResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
