@@ -343,7 +343,7 @@ The resultant Pod is as follows:
           image: a.b.c/image:v1
           command: cmd
           args: []
-          // remaining container configuration omitted
+          # remaining container configuration omitted
 
 Notice how options follow the same merging rules, i.e. lists append and maps override.
 
@@ -450,4 +450,4 @@ The resultant pod for that task is as follows:
           image: a.b.c/image:v1
           command: cmd
           args: []
-          // remaining container configuration omitted
+          # remaining container configuration omitted
