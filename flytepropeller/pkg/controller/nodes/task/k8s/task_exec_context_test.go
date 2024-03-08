@@ -86,6 +86,25 @@ func Test_newTaskExecutionMetadata(t *testing.T) {
 		assert.Equal(t, 2, len(actual.GetLabels()))
 		assert.Equal(t, "test-exec-identity", actual.GetLabels()[executionIdentityVariable])
 	})
+	t.Run("Inject exec identity K8s label sanitation", func(t *testing.T) {
+
+		existingMetadata := &mocks.TaskExecutionMetadata{}
+		existingAnnotations := map[string]string{}
+		existingMetadata.OnGetAnnotations().Return(existingAnnotations)
+
+		existingMetadata.OnGetSecurityContext().Return(core.SecurityContext{RunAs: &core.Identity{ExecutionIdentity: "name@company.com"}})
+
+		existingLabels := map[string]string{
+			"existingLabel": "existingLabelValue",
+		}
+		existingMetadata.OnGetLabels().Return(existingLabels)
+
+		actual, err := newTaskExecutionMetadata(existingMetadata, &core.TaskTemplate{})
+		assert.NoError(t, err)
+
+		assert.Equal(t, 2, len(actual.GetLabels()))
+		assert.Equal(t, "name-company-com", actual.GetLabels()[executionIdentityVariable])
+	})
 }
 
 func Test_newTaskExecutionContext(t *testing.T) {
