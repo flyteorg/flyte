@@ -7,6 +7,7 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"sync"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -25,6 +26,7 @@ import (
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 var agentRegistry Registry
+var mu sync.RWMutex
 
 type Plugin struct {
 	metricScope promutils.Scope
@@ -318,8 +320,10 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 
 func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
+		mu.Lock()
 		updateAgentClientSets(ctx, p.cs)
 		agentRegistry = updateAgentRegistry(ctx, p.cs)
+		mu.Unlock()
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -346,9 +350,11 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 }
 
 func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+	mu.RLock()
 	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
+	mu.RUnlock()
 	return &cfg.DefaultAgent, false
 }
 
@@ -373,9 +379,10 @@ func newAgentPlugin() webapi.PluginEntry {
 		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
 		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
 	}
-
+	mu.Lock()
 	updateAgentClientSets(ctx, clientSet)
 	agentRegistry := updateAgentRegistry(ctx, clientSet)
+	mu.Unlock()
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
