@@ -61,8 +61,8 @@ func newTaskExecutionMetadata(tCtx pluginsCore.TaskExecutionMetadata, taskTmpl *
 
 	id := tCtx.GetSecurityContext().RunAs.ExecutionIdentity
 	if len(id) > 0 {
-		sanitizedId := k8sUtils.SanitizeLabelValue(id)
-		injectLabels[executionIdentityVariable] = sanitizedId
+		sanitizedID := k8sUtils.SanitizeLabelValue(id)
+		injectLabels[executionIdentityVariable] = sanitizedID
 	}
 
 	return TaskExecutionMetadata{
