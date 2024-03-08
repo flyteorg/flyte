@@ -141,8 +141,8 @@ func (_m Executor_Launch) Return(_a0 error) *Executor_Launch {
 	return &Executor_Launch{Call: _m.Call.Return(_a0)}
 }
 
-func (_m *Executor) OnLaunch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) *Executor_Launch {
-	c_call := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs)
+func (_m *Executor) OnLaunch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap, parentWorkflowID string) *Executor_Launch {
+	c_call := _m.On("Launch", ctx, launchCtx, executionID, launchPlanRef, inputs, parentWorkflowID)
 	return &Executor_Launch{Call: c_call}
 }
 
@@ -151,13 +151,13 @@ func (_m *Executor) OnLaunchMatch(matchers ...interface{}) *Executor_Launch {
 	return &Executor_Launch{Call: c_call}
 }
 
-// Launch provides a mock function with given fields: ctx, launchCtx, executionID, launchPlanRef, inputs
-func (_m *Executor) Launch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap) error {
-	ret := _m.Called(ctx, launchCtx, executionID, launchPlanRef, inputs)
+// Launch provides a mock function with given fields: ctx, launchCtx, executionID, launchPlanRef, inputs, parentWorkflowID
+func (_m *Executor) Launch(ctx context.Context, launchCtx launchplan.LaunchContext, executionID *core.WorkflowExecutionIdentifier, launchPlanRef *core.Identifier, inputs *core.LiteralMap, parentWorkflowID string) error {
+	ret := _m.Called(ctx, launchCtx, executionID, launchPlanRef, inputs, parentWorkflowID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, launchplan.LaunchContext, *core.WorkflowExecutionIdentifier, *core.Identifier, *core.LiteralMap) error); ok {
-		r0 = rf(ctx, launchCtx, executionID, launchPlanRef, inputs)
+	if rf, ok := ret.Get(0).(func(context.Context, launchplan.LaunchContext, *core.WorkflowExecutionIdentifier, *core.Identifier, *core.LiteralMap, string) error); ok {
+		r0 = rf(ctx, launchCtx, executionID, launchPlanRef, inputs, parentWorkflowID)
 	} else {
 		r0 = ret.Error(0)
 	}
