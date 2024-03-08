@@ -37,7 +37,9 @@ func TestFailFastWorkflowLauncher(t *testing.T) {
 			Domain:  "d",
 			Name:    "n",
 		}, &core.Identifier{},
-			nil)
+			nil,
+			"",
+		)
 		assert.Error(t, err)
 	})
 
