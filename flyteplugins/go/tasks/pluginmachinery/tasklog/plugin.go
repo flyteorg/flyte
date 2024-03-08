@@ -63,4 +63,5 @@ type TemplateLogPlugin struct {
 	// Deprecated: Please, do not use
 	DeprecatedScheme TemplateScheme `json:"scheme" pflag:",Templating scheme to use. Supported values are Pod and TaskExecution."`
 	ShowWhilePending bool           `json:"showWhilePending" pflag:",If true, the log link will be shown even if the task is in a pending state."`
+	HideOnceFinished bool           `json:"hideOnceFinished" pflag:",If true, the log link will be hidden once the task has finished."`
 }
