@@ -6,6 +6,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/testutil"
 	"github.com/stretchr/testify/assert"
 
@@ -114,23 +115,22 @@ func TestLabeledStopWatch(t *testing.T) {
 		assert.NotNil(t, s)
 
 		ctx := context.TODO()
-		/*const header = `
-			# HELP testscope_stopwatch:s2_m some desc
-			# TYPE testscope_stopwatch:s2_m summary
-		`*/
+		const header = `
+			# HELP testscope_stopwatch:s2_unlabeled_m some desc
+			# TYPE testscope_stopwatch:s2_unlabeled_m summary
+		`
 
 		w := s.Start(ctx)
 		w.Stop()
-		// promutils.StopWatch does not implement prometheus.Collector
-		/*var expected = `
-			testscope_stopwatch:s2_m{quantile="0.5"} 0
-			testscope_stopwatch:s2_m{quantile="0.9"} 0
-			testscope_stopwatch:s2_m{quantile="0.99"} 0
-			testscope_stopwatch:s2_m_sum 0
-			testscope_stopwatch:s2_m_count 1
+		var expected = `
+			testscope_stopwatch:s2_unlabeled_m{quantile="0.5"} 0
+			testscope_stopwatch:s2_unlabeled_m{quantile="0.9"} 0
+			testscope_stopwatch:s2_unlabeled_m{quantile="0.99"} 0
+			testscope_stopwatch:s2_unlabeled_m_sum 0
+			testscope_stopwatch:s2_unlabeled_m_count 1
 		`
-		err := testutil.CollectAndCompare(s.StopWatch, strings.NewReader(header+expected))
-		assert.NoError(t, err)*/
+		err := testutil.CollectAndCompare(s.StopWatch.Observer.(prometheus.Summary), strings.NewReader(header+expected))
+		assert.NoError(t, err)
 	})
 
 	t.Run("AdditionalLabels", func(t *testing.T) {

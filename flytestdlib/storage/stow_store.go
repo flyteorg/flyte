@@ -89,17 +89,21 @@ type stowMetrics struct {
 	BadReference labeled.Counter
 	BadContainer labeled.Counter
 
-	HeadFailure labeled.Counter
-	HeadLatency labeled.StopWatch
+	HeadFailure     labeled.Counter
+	HeadLatency     labeled.StopWatch
+	HeadLatencyHist labeled.HistogramStopWatch
 
-	ReadFailure     labeled.Counter
-	ReadOpenLatency labeled.StopWatch
+	ReadFailure         labeled.Counter
+	ReadOpenLatency     labeled.StopWatch
+	ReadOpenLatencyHist labeled.HistogramStopWatch
 
-	WriteFailure labeled.Counter
-	WriteLatency labeled.StopWatch
+	WriteFailure     labeled.Counter
+	WriteLatency     labeled.StopWatch
+	WriteLatencyHist labeled.HistogramStopWatch
 
-	DeleteFailure labeled.Counter
-	DeleteLatency labeled.StopWatch
+	DeleteFailure     labeled.Counter
+	DeleteLatency     labeled.StopWatch
+	DeleteLatencyHist labeled.HistogramStopWatch
 }
 
 // StowMetadata that will be returned
@@ -212,8 +216,12 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 		return nil, err
 	}
 
-	t := s.metrics.HeadLatency.Start(ctx)
+	t1 := s.metrics.HeadLatency.Start(ctx)
+	t2 := s.metrics.HeadLatencyHist.Start(ctx)
 	item, err := container.Item(k)
+	t1.Stop()
+	t2.Stop()
+
 	if err == nil {
 		if _, err = item.Metadata(); err != nil {
 			// Err will be caught below
@@ -222,7 +230,6 @@ func (s *StowStore) Head(ctx context.Context, reference DataReference) (Metadata
 		} else if etag, err := item.ETag(); err != nil {
 			// Err will be caught below
 		} else {
-			t.Stop()
 			return StowMetadata{
 				exists: true,
 				size:   size,
@@ -251,13 +258,16 @@ func (s *StowStore) ReadRaw(ctx context.Context, reference DataReference) (io.Re
 		return nil, err
 	}
 
-	t := s.metrics.ReadOpenLatency.Start(ctx)
+	t1 := s.metrics.ReadOpenLatency.Start(ctx)
+	t2 := s.metrics.ReadOpenLatencyHist.Start(ctx)
 	item, err := container.Item(k)
+	t1.Stop()
+	t2.Stop()
+
 	if err != nil {
 		incFailureCounterForError(ctx, s.metrics.ReadFailure, err)
 		return nil, err
 	}
-	t.Stop()
 
 	sizeBytes, err := item.Size()
 	if err != nil {
@@ -285,8 +295,12 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 		return err
 	}
 
-	t := s.metrics.WriteLatency.Start(ctx)
+	t1 := s.metrics.WriteLatency.Start(ctx)
+	t2 := s.metrics.WriteLatencyHist.Start(ctx)
 	_, err = container.Put(k, raw, size, opts.Metadata)
+	t1.Stop()
+	t2.Stop()
+
 	if err != nil {
 		// If this error is due to the bucket not existing, first attempt to create it and retry the getContainer call.
 		if IsNotFound(err) || awsBucketIsNotFound(err) {
@@ -300,8 +314,6 @@ func (s *StowStore) WriteRaw(ctx context.Context, reference DataReference, size 
 			return errs.Wrapf(err, "Failed to write data [%vb] to path [%v].", size, k)
 		}
 	}
-
-	t.Stop()
 
 	return nil
 }
@@ -319,8 +331,8 @@ func (s *StowStore) Delete(ctx context.Context, reference DataReference) error {
 		return err
 	}
 
-	t := s.metrics.DeleteLatency.Start(ctx)
-	defer t.Stop()
+	defer s.metrics.DeleteLatency.Start(ctx).Stop()
+	defer s.metrics.DeleteLatencyHist.Start(ctx).Stop()
 
 	if err := container.RemoveItem(k); err != nil {
 		incFailureCounterForError(ctx, s.metrics.DeleteFailure, err)
@@ -417,17 +429,21 @@ func newStowMetrics(scope promutils.Scope) *stowMetrics {
 		BadReference: labeled.NewCounter("bad_key", "Indicates the provided storage reference/key is incorrectly formatted", scope, labeled.EmitUnlabeledMetric),
 		BadContainer: labeled.NewCounter("bad_container", "Indicates request for a container that has not been initialized", scope, labeled.EmitUnlabeledMetric),
 
-		HeadFailure: labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", scope, labeled.EmitUnlabeledMetric),
-		HeadLatency: labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		HeadFailure:     labeled.NewCounter("head_failure", "Indicates failure in HEAD for a given reference", scope, labeled.EmitUnlabeledMetric),
+		HeadLatency:     labeled.NewStopWatch("head", "Indicates time to fetch metadata using the Head API", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		HeadLatencyHist: labeled.NewHistogramStopWatch("head", "Indicates time to fetch metadata using the Head API", scope, labeled.EmitUnlabeledMetric),
 
-		ReadFailure:     labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
-		ReadOpenLatency: labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ReadFailure:         labeled.NewCounter("read_failure", "Indicates failure in GET for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		ReadOpenLatency:     labeled.NewStopWatch("read_open", "Indicates time to first byte when reading", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		ReadOpenLatencyHist: labeled.NewHistogramStopWatch("read_open", "Indicates time to first byte when reading", scope, labeled.EmitUnlabeledMetric),
 
-		WriteFailure: labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
-		WriteLatency: labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		WriteFailure:     labeled.NewCounter("write_failure", "Indicates failure in storing/PUT for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		WriteLatency:     labeled.NewStopWatch("write", "Time to write an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		WriteLatencyHist: labeled.NewHistogramStopWatch("write", "Time to write an object irrespective of size", scope, labeled.EmitUnlabeledMetric),
 
-		DeleteFailure: labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
-		DeleteLatency: labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		DeleteFailure:     labeled.NewCounter("delete_failure", "Indicates failure in removing/DELETE for a given reference", scope, labeled.EmitUnlabeledMetric, failureTypeOption),
+		DeleteLatency:     labeled.NewStopWatch("delete", "Time to delete an object irrespective of size", time.Millisecond, scope, labeled.EmitUnlabeledMetric),
+		DeleteLatencyHist: labeled.NewHistogramStopWatch("delete", "Time to delete an object irrespective of size", scope, labeled.EmitUnlabeledMetric),
 	}
 }
 

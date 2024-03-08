@@ -165,3 +165,43 @@ func TestStopWatchVec_WithLabelValues(t *testing.T) {
 	assert.NotNil(t, i.start)
 	i.Stop()
 }
+
+func TestHistogramStopWatch_Start(t *testing.T) {
+	scope := NewTestScope()
+	stopwatch, err := scope.NewHistogramStopWatch("yt"+rand.String(3), "timer")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, stopwatch.outputScale)
+	timer := stopwatch.Start()
+	assert.Equal(t, time.Second, timer.outputScale)
+	assert.NotNil(t, timer.start)
+}
+
+func TestHistogramStopWatch_Observe(t *testing.T) {
+	scope := NewTestScope()
+	stopwatch, err := scope.NewHistogramStopWatch("yt"+rand.String(3), "timer")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, stopwatch.outputScale)
+	stopwatch.Observe(time.Now(), time.Now().Add(time.Second))
+}
+
+func TestHistogramStopWatch_Time(t *testing.T) {
+	scope := NewTestScope()
+	stopwatch, err := scope.NewHistogramStopWatch("yt"+rand.String(3), "timer")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, stopwatch.outputScale)
+	stopwatch.Time(func() {
+	})
+}
+
+func TestHistogramStopWatchVec_WithLabelValues(t *testing.T) {
+	scope := NewTestScope()
+	vec, err := scope.NewHistogramStopWatchVec("yt"+rand.String(3), "timer", "workflow", "label")
+	assert.NoError(t, err)
+	assert.Equal(t, time.Second, vec.outputScale)
+	stopwatch := vec.WithLabelValues("my_wf", "something")
+	assert.NotNil(t, stopwatch)
+	i := stopwatch.Start()
+	assert.Equal(t, time.Second, i.outputScale)
+	assert.NotNil(t, i.start)
+	i.Stop()
+}
