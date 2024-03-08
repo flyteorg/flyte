@@ -241,19 +241,19 @@ The resultant Pod using the above default PodTemplate and K8s Plugin configurati
       name: example-pod
       namespace: flytesnacks-development
       labels:
-        - foo // maintained initial value
-        - bar // value appended by k8s plugin configuration
+        - foo # maintained initial value
+        - bar # value appended by k8s plugin configuration
       annotations:
-        - foo: overridden-value // value overridden by k8s plugin configuration
-        - bar: initial-value // maintained initial value
-        - baz: non-overridden-value // value added by k8s plugin configuration
+        - foo: overridden-value # value overridden by k8s plugin configuration
+        - bar: initial-value # maintained initial value
+        - baz: non-overridden-value # value added by k8s plugin configuration
     spec:
       containers:
         - name: ax9kd5xb4p8r45bpdv7v-n0-0
           image: ghcr.io/flyteorg/flytecookbook:core-bfee7e549ad749bfb55922e130f4330a0ebc25b0
           terminationMessagePath: "/dev/foo"
-          // remaining container configuration omitted
-      hostNetwork: true // overridden by the k8s plugin configuration
+          # remaining container configuration omitted
+      hostNetwork: true # overridden by the k8s plugin configuration
 
 The last step in constructing a Pod is to apply any task-specific configuration.
 These options follow the same rules as merging the default PodTemplate and K8s
