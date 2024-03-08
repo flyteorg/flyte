@@ -17,7 +17,7 @@ kernelspec:
 
 +++ {"lines_to_next_cell": 0}
 
-(map_task)=
+(nested_parallelization)=
 
 # Nested Parallelization
 
@@ -103,14 +103,28 @@ def multi_wf(l: typing.List[int], chunk: int) -> typing.List[int]:
 
 This shows a top-level workflow which uses 2 levels of dynamic workflows to process a list through some simple addition tasks and then flatten it again. Here is a visual representation of the execution in a Flyte console:
 
-:::{figure} https://github.com/flyteorg/static-resources/blob/main/flytesnacks/user_guide/flyte_nested_parallelization.png?raw=true
+:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/nested_parallel_top_level.png?raw=true
 :alt: Nested Parallelization UI View
+:class: with-shadow
+:::
+
+For each node in that top-level we can see 2 sub-workflows being run in parallel. 
+
+:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/nested_parallel_inner_dynamic.png?raw=true
+:alt: Inner Dynamic
+:class: with-shadow
+:::
+
+Finally, drilling into each sub-workflow, we'll see both those tasks being executed in series.
+
+:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/nested_parallel_subworkflow.png?raw=true
+:alt: Sub-Workflow
 :class: with-shadow
 :::
 
 ## Mixed Parallelism
 
-This example is similar to the above but instead of using a dynamic to loop through a 2 task workflow in series, we're using that workflow to call a map task which processes both inputs in parallel.
+This example is similar to the above but instead of using a dynamic to parallelize a 2-task serial workflow, we're using that workflow to call a map task which processes both inputs in parallel. This workflow has one fewer layers of parallelism so the outputs won't be the same, but it does still demonstrate how you can mix these different approaches to achieving concurrency.
 
 ```python
 """
@@ -160,11 +174,17 @@ def multi_wf(l: typing.List[int], chunk: int) -> typing.List[int]:
 ```
 +++ {"lines_to_next_cell": 0}
 
-## Concurrency vs Max Parallelism
+While the top-level dynamic will be exactly the same as the previous example, here you can see the inner map task nodes as well as links in the sidebar.
 
-Should we document this distinction or is it going away soon?
+:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/nested_parallel_inner_map.png?raw=true
+:alt: Inner Map Task
+:class: with-shadow
+:::
 
 ## Design Considerations
 
 You can nest even further if needed, or incorporate map tasks if your inputs are all the same type. The design of your workflow should of course be informed by the actual data you're processing. For example if you have a big library of music that you'd like to extract the lyrics for, the first level can loop through all the albums and the second level can go through each song. 
 
+If you're just churning through an enormous list of the same input, it's typically best to keep the code simple and let the scheduler handle optmizing the execution. Additionally, unless you need the features of a dynamic workflow like mixing and matching inputs and outputs, it's usually most efficient to use a map task. This has the added benefit of keeping the UI clean.
+
+You can also choose to limit the scale of parallel execution at a couple levels. The `max_parallelism` attribute can be applied at the workflow level and will limit the number of parallel tasks being executed, this is set to 25 by default. Within map tasks specifically, you can indicate a `concurrency` argument which will limit the number of mapped tasks within running at any given time. 
