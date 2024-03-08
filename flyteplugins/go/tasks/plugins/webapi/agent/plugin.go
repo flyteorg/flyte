@@ -379,10 +379,8 @@ func newAgentPlugin() webapi.PluginEntry {
 		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
 		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
 	}
-	mu.Lock()
 	updateAgentClientSets(ctx, clientSet)
 	agentRegistry := updateAgentRegistry(ctx, clientSet)
-	mu.Unlock()
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
 
 	return webapi.PluginEntry{
