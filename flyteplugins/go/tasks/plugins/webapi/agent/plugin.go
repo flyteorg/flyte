@@ -321,9 +321,9 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 func (p Plugin) watchAgents(ctx context.Context) {
 	go wait.Until(func() {
 		mu.Lock()
+		defer mu.Unlock()
 		updateAgentClientSets(ctx, p.cs)
 		agentRegistry = updateAgentRegistry(ctx, p.cs)
-		mu.Unlock()
 	}, p.cfg.PollInterval.Duration, ctx.Done())
 }
 
@@ -351,10 +351,10 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 
 func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
 	mu.RLock()
+	defer mu.RUnlock()
 	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
-	mu.RUnlock()
 	return &cfg.DefaultAgent, false
 }
 
