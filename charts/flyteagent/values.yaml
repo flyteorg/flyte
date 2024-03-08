@@ -61,7 +61,8 @@ podSecurityContext: {}
 readinessProbe:
   grpc:
     port: 8000
-  initialDelaySeconds: 5
+  initialDelaySeconds: 1
+  periodSeconds: 3
 # -- Security context for container
 securityContext:
   allowPrivilegeEscalation: false

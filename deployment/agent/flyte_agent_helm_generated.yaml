@@ -90,7 +90,8 @@ spec:
         readinessProbe:
           grpc:
             port: 8000
-          initialDelaySeconds: 5
+          initialDelaySeconds: 1
+          periodSeconds: 3
         securityContext:
             allowPrivilegeEscalation: false
         resources:
