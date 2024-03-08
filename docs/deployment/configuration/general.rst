@@ -202,10 +202,10 @@ An example PodTemplate is shown:
     template:
       metadata:
         labels:
-          - foo
+          foo: from-pod-template
         annotations:
-          - foo: initial-value
-          - bar: initial-value
+          foo: initial-value
+          bar: initial-value
       spec:
         containers:
           - name: default
@@ -221,10 +221,10 @@ Pod Labels, Annotations, and enables the host networking.
     plugins:
        k8s:
         default-labels:
-          - bar
+          bar: from-default-label
         default-annotations:
-          - foo: overridden-value
-          - baz: non-overridden-value
+          foo: overridden-value
+          baz: non-overridden-value
         enable-host-networking-pod: true
 
 To construct a Pod, FlytePropeller initializes a Pod definition using the default
@@ -241,12 +241,12 @@ The resultant Pod using the above default PodTemplate and K8s Plugin configurati
       name: example-pod
       namespace: flytesnacks-development
       labels:
-        - foo # maintained initial value
-        - bar # value appended by k8s plugin configuration
+        foo: from-pod-template # maintained initial value
+        bar: from-default-label # value appended by k8s plugin configuration
       annotations:
-        - foo: overridden-value # value overridden by k8s plugin configuration
-        - bar: initial-value # maintained initial value
-        - baz: non-overridden-value # value added by k8s plugin configuration
+        foo: overridden-value # value overridden by k8s plugin configuration
+        bar: initial-value # maintained initial value
+        baz: non-overridden-value # value added by k8s plugin configuration
     spec:
       containers:
         - name: ax9kd5xb4p8r45bpdv7v-n0-0
@@ -280,8 +280,8 @@ of the task. For example:
     template:
       metadata:
         annotations:
-          - annotation_1: initial-value
-          - bar: initial-value
+          annotation_1: initial-value
+          bar: initial-value
       spec:
         containers:
           - name: default
@@ -328,12 +328,12 @@ The resultant Pod is as follows:
       name: example-pod
       namespace: flytesnacks-development
       labels:
-        - label_1: value-1  # from Compile-time value
-        - label_2: value-2  # from Compile-time value
+        label_1: value-1  # from Compile-time value
+        label_2: value-2  # from Compile-time value
       annotations:
-        - annotation_1: value-1  # value overridden by Compile-time PodTemplate
-        - annotation_2: value-2  # from Compile-time PodTemplate
-        - bar: initial-value  # from Runtime PodTemplate
+        annotation_1: value-1  # value overridden by Compile-time PodTemplate
+        annotation_2: value-2  # from Compile-time PodTemplate
+        bar: initial-value  # from Runtime PodTemplate
     spec:
       containers:
         - name: default
@@ -398,12 +398,12 @@ And a Runtime PodTemplate:
     template:
       metadata:
         labels:
-          - label_1: value-runtime
-          - label_2: value-runtime
-          - label_3: value-runtime
+          label_1: value-runtime
+          label_2: value-runtime
+          label_3: value-runtime
         annotations:
-          - foo: value-runtime
-          - bar: value-runtime
+          foo: value-runtime
+          bar: value-runtime
       spec:
         containers:
           - name: default
@@ -418,10 +418,10 @@ And the following K8s Plugin Configuration:
     plugins:
        k8s:
         default-labels:
-          - label_1: value-plugin
+          label_1: value-plugin
         default-annotations:
-          - annotation_1: value-plugin
-          - baz: value-plugin
+          annotation_1: value-plugin
+          baz: value-plugin
 
 The resultant pod for that task is as follows:
 
@@ -433,14 +433,14 @@ The resultant pod for that task is as follows:
       name: example-pod
       namespace: flytesnacks-development
       labels:
-        - label_1: value-plugin
-        - label_2: value-compile
+        label_1: value-plugin
+        label_2: value-compile
       annotations:
-        - annotation_1: value-plugin
-        - annotation_2: value-compile
-        - foo: value-runtime
-        - bar: value-runtime
-        - baz: value-plugin
+        annotation_1: value-plugin
+        annotation_2: value-compile
+        foo: value-runtime
+        bar: value-runtime
+        baz: value-plugin
     spec:
       containers:
         - name: default
