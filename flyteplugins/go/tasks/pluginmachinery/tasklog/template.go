@@ -204,6 +204,7 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			Name:             p.DisplayName + input.LogName,
 			MessageFormat:    p.MessageFormat,
 			ShowWhilePending: p.ShowWhilePending,
+			HideOnceFinished: p.HideOnceFinished,
 		})
 	}
 
