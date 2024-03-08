@@ -157,7 +157,7 @@ of the plugin.
 
 _New in Flyte 1.7.0_
 
-{ref}`Flyte Agent Service <extend-agent-service>` allows you to write backend
+The {ref}`Flyte Agent service <flyte_agents_guide>` allows you to write backend
 plugins in Python.
 
 ### Summary
