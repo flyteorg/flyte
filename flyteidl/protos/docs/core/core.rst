@@ -2206,7 +2206,7 @@ Sql represents a generic sql workload with a statement and dialect.
    :header: "Field", "Type", "Label", "Description"
    :widths: auto
 
-   "statement", ":ref:`ref_string`", "", "The actual query to run, the query can have templated parameters. We use Flyte's Golang templating format for Query templating. Refer to the templating documentation. https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py For example, insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet select * from my_table where ds = '{{ .Inputs.ds }}'"
+   "statement", ":ref:`ref_string`", "", "The actual query to run, the query can have templated parameters. We use Flyte's Golang templating format for Query templating. For example, insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet select * from my_table where ds = '{{ .Inputs.ds }}'"
    "dialect", ":ref:`ref_flyteidl.core.Sql.Dialect`", "", ""
 
 
