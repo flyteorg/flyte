@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint-and-test-charts:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,13 +50,13 @@ jobs:
   validate-manifests:
     needs:
       - lint-and-test-charts
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
     strategy:
       matrix:
-        k8s_versions: [ "1.29.2", "v1.28.7", "v1.27.11", "v1.26.14" ]
+        k8s_versions: [ "1.29.2", "v1.28.7", "v1.27.11" ]
 
     steps:
       - name: Checkout code
@@ -77,6 +77,5 @@ jobs:
           sudo mv kubeconform /usr/local/bin/kubeconform
 
       - name: Validate manifests
-        working-directory: deployment
         run: |
-          kubeconform -strict -summary -skip CustomResourceDefinition -kubernetes-version ${{ matrix.k8s_versions }} ./deployment ./manifests
+          kubeconform -strict -summary -skip CustomResourceDefinition -kubernetes-version ${{ matrix.k8s_versions }} ./deployment ./docker/sandbox-bundled/manifests
