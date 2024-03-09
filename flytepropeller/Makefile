@@ -1,12 +1,7 @@
 export REPOSITORY=flytepropeller
-include boilerplate/flyte/docker_build/Makefile
-include boilerplate/flyte/golang_test_targets/Makefile
-include boilerplate/flyte/end2end/Makefile
-
-.PHONY: update_boilerplate
-update_boilerplate:
-	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
-	@boilerplate/update.sh
+include ../boilerplate/flyte/docker_build/Makefile
+include ../boilerplate/flyte/golang_test_targets/Makefile
+include ../boilerplate/flyte/end2end/Makefile
 
 .PHONY: linux_compile
 linux_compile: export CGO_ENABLED ?= 0
@@ -52,14 +47,7 @@ server:
 manager:
 	@go run ./cmd/manager/main.go --alsologtostderr --propeller.kube-config=$(HOME)/.kube/config
 
-clean:
-	rm -rf bin
-
 # Generate golden files. Add test packages that generate golden files here.
 golden:
 	go test ./cmd/kubectl-flyte/cmd -update
 	go test ./pkg/compiler/test -update
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

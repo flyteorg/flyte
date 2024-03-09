@@ -23,6 +23,7 @@ RUN GRPC_HEALTH_PROBE_VERSION=v0.4.11 && \
 
 WORKDIR /go/src/github.com/flyteorg/datacatalog
 
+COPY boilerplate ../boilerplate
 COPY datacatalog .
 COPY flyteadmin ../flyteadmin
 COPY flytecopilot ../flytecopilot

@@ -10,16 +10,14 @@ import (
 	"testing"
 	"time"
 
-	"k8s.io/apimachinery/pkg/util/json"
-
-	"github.com/flyteorg/flyte/flytestdlib/config"
-
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
+	"k8s.io/apimachinery/pkg/util/json"
 
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/cache"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/oauth"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/admin/tokenorchestrator"
+	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
 func TestFetchFromAuthFlow(t *testing.T) {

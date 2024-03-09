@@ -22,13 +22,13 @@ func (_m RateLimiter_Wait) Return(_a0 error) *RateLimiter_Wait {
 }
 
 func (_m *RateLimiter) OnWait(ctx context.Context) *RateLimiter_Wait {
-	c := _m.On("Wait", ctx)
-	return &RateLimiter_Wait{Call: c}
+	c_call := _m.On("Wait", ctx)
+	return &RateLimiter_Wait{Call: c_call}
 }
 
 func (_m *RateLimiter) OnWaitMatch(matchers ...interface{}) *RateLimiter_Wait {
-	c := _m.On("Wait", matchers...)
-	return &RateLimiter_Wait{Call: c}
+	c_call := _m.On("Wait", matchers...)
+	return &RateLimiter_Wait{Call: c_call}
 }
 
 // Wait provides a mock function with given fields: ctx

@@ -1,14 +1,6 @@
 export REPOSITORY=flytecopilot
-include boilerplate/flyte/docker_build/Makefile
-include boilerplate/flyte/golang_test_targets/Makefile
-
-.PHONY: update_boilerplate
-update_boilerplate:
-	@curl https://raw.githubusercontent.com/flyteorg/boilerplate/master/boilerplate/update.sh -o boilerplate/update.sh
-	@boilerplate/update.sh
-
-clean:
-	rm -rf bin
+include ../boilerplate/flyte/docker_build/Makefile
+include ../boilerplate/flyte/golang_test_targets/Makefile
 
 .PHONY: linux_compile
 linux_compile: export CGO_ENABLED ?= 0
@@ -24,7 +16,3 @@ compile:
 cross_compile:
 	@mkdir -p ./artifacts/cross
 	GOOS=linux GOARCH=amd64 go build -o ./artifacts/flyte-copilot .
-
-.PHONY: go-tidy
-go-tidy:
-	go mod tidy

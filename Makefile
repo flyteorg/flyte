@@ -11,6 +11,8 @@ GIT_HASH := $(shell git rev-parse --short HEAD)
 TIMESTAMP := $(shell date '+%Y-%m-%d')
 PACKAGE ?=github.com/flyteorg/flytestdlib
 LD_FLAGS="-s -w -X $(PACKAGE)/version.Version=$(GIT_VERSION) -X $(PACKAGE)/version.Build=$(GIT_HASH) -X $(PACKAGE)/version.BuildTime=$(TIMESTAMP)"
+COMPONENTS := datacatalog flyteadmin flytecopilot flyteidl flyteplugins flytepropeller flytestdlib
+
 
 .PHONY: cmd/single/dist
 cmd/single/dist: export FLYTECONSOLE_VERSION ?= latest
@@ -25,10 +27,6 @@ compile: cmd/single/dist
 .PHONY: linux_compile
 linux_compile: cmd/single/dist
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0  go build -tags console -v -o /artifacts/flyte -ldflags=$(LD_FLAGS) ./cmd/
-
-.PHONY: update_boilerplate
-update_boilerplate:
-	@boilerplate/update.sh
 
 .PHONY: kustomize
 kustomize:
@@ -106,13 +104,39 @@ build_native_flyte:
 	--build-arg FLYTECONSOLE_VERSION=$(FLYTECONSOLE_VERSION) \
 	--tag flyte-binary:native .
 
-.PHONY: go-tidy
-go-tidy:
+go-tidy-all:  ## Run go mod tidy in all components
 	go mod tidy
-	make -C datacatalog go-tidy
-	make -C flyteadmin go-tidy
-	make -C flyteidl go-tidy
-	make -C flytepropeller go-tidy
-	make -C flyteplugins go-tidy
-	make -C flytestdlib go-tidy
-	make -C flytecopilot go-tidy
+	$(MAKE) $(addsuffix -go-tidy,$(COMPONENTS))
+
+generate-all:  ## Run `make generate` on all components
+	$(MAKE) $(addsuffix -generate,$(COMPONENTS))
+
+lint-all:  ## Lint all components
+	$(MAKE) $(addsuffix -lint,$(COMPONENTS))
+
+test_unit-all:  ## Run `make test_unit` on all components
+	$(MAKE) $(addsuffix -test_unit,$(COMPONENTS))
+
+$(COMPONENTS:%=%-go-tidy):
+	make -C $(@:-go-tidy=) go-tidy
+
+$(COMPONENTS:%=%-goimports):
+	make -C $(@:-goimports=) goimports
+
+$(COMPONENTS:%=%-generate):
+	make -C $(@:-generate=) generate
+
+$(COMPONENTS:%=%-lint):
+	make -C $(@:-lint=) lint
+
+$(COMPONENTS:%=%-test_unit):
+	make -C $(@:-test_unit=) test_unit
+
+.PHONY: build-component-image
+build-component-image:  ## Build a component image
+# Check if COMPONENT is set and contained in COMPONENTS
+ifndef COMPONENT
+	$(error COMPONENT environment variable is not set)
+endif
+	@echo "Building $(COMPONENT) image"
+	@docker buildx build -f Dockerfile.$(COMPONENT) .
