@@ -56,7 +56,7 @@ jobs:
         shell: bash
     strategy:
       matrix:
-        k8s_versions: [ "1.29.2", "v1.28.7", "v1.27.11" ]
+        k8s_versions: [ "1.29.2", "1.28.7", "1.27.11" ]
 
     steps:
       - name: Checkout code
