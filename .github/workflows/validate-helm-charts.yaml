@@ -7,7 +7,7 @@ on:
 
 jobs:
   lint-and-test-charts:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
   validate-manifests:
     needs:
       - lint-and-test-charts
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     defaults:
       run:
         shell: bash
