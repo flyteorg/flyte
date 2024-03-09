@@ -32,6 +32,34 @@ func TestAggregateActiveValues(t *testing.T) {
 	assert.Equal(t, uint32(16), tasks)
 }
 
+// Test removal on an empty ExecutionStatsHolder
+func TestRemoveTerminatedExecutionsEmpty(t *testing.T) {
+	esh, err := NewExecutionStatsHolder()
+	assert.NoError(t, err)
+
+	err = esh.RemoveTerminatedExecutions(context.TODO(), map[string]bool{})
+	assert.NoError(t, err)
+
+	err = esh.RemoveTerminatedExecutions(context.TODO(), map[string]bool{"exec1": true})
+	assert.NoError(t, err)
+}
+
+// Test removal of a subset of entries from ExcutionStatsHolder
+func TestRemoveTerminatedExecutionsSubset(t *testing.T) {
+	esh, err := NewExecutionStatsHolder()
+	assert.NoError(t, err)
+
+	esh.AddOrUpdateEntry("exec1", SingleExecutionStats{ActiveNodeCount: 5, ActiveTaskCount: 10})
+	esh.AddOrUpdateEntry("exec2", SingleExecutionStats{ActiveNodeCount: 3, ActiveTaskCount: 6})
+
+	err = esh.RemoveTerminatedExecutions(context.TODO(), map[string]bool{"exec2": true})
+	assert.NoError(t, err)
+
+	assert.Equal(t, 1, len(esh.executions))
+	assert.Equal(t, uint32(3), esh.executions["exec2"].ActiveNodeCount)
+	assert.Equal(t, uint32(6), esh.executions["exec2"].ActiveTaskCount)
+}
+
 func TestConcurrentAccess(t *testing.T) {
 	esh, err := NewExecutionStatsHolder()
 	assert.NoError(t, err)

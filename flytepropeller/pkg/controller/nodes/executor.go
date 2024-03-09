@@ -182,7 +182,7 @@ func (c *recursiveNodeExecutor) RecursiveNodeHandler(ctx context.Context, execCo
 	nodeStatus := nl.GetNodeExecutionStatus(ctx, currentNode.GetID())
 	nodePhase := nodeStatus.GetPhase()
 
-	if nodePhase == v1alpha1.NodePhaseRunning {
+	if nodePhase == v1alpha1.NodePhaseRunning && execContext != nil {
 		execContext.IncrementNodeExecutionCount()
 		if currentNode.GetKind() == v1alpha1.NodeKindTask {
 			execContext.IncrementTaskExecutionCount()
@@ -296,7 +296,7 @@ func (c *recursiveNodeExecutor) handleDownstream(ctx context.Context, execContex
 			}), nil
 		}
 
-		logger.Infof(ctx, "F3 starting node id %v, ", downstreamNode.GetID())
+		logger.Debugf(ctx, "downstream handler starting node id %v, ", downstreamNode.GetID())
 		state, err := c.RecursiveNodeHandler(ctx, execContext, dag, nl, downstreamNode)
 		if err != nil {
 			return interfaces.NodeStatusUndefined, err
