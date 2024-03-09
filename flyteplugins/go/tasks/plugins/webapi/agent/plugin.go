@@ -5,6 +5,9 @@ import (
 	"encoding/gob"
 	"fmt"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/service"
+	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
+	"k8s.io/apimachinery/pkg/util/wait"
+	"sync"
 	"time"
 
 	"golang.org/x/exp/maps"
@@ -12,7 +15,6 @@ import (
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	pluginErrors "github.com/flyteorg/flyte/flyteplugins/go/tasks/errors"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
 	flyteIO "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
@@ -23,12 +25,13 @@ import (
 )
 
 type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
+var agentRegistry Registry
+var mu sync.RWMutex
 
 type Plugin struct {
-	metricScope   promutils.Scope
-	cfg           *Config
-	cs            *ClientSet
-	agentRegistry Registry
+	metricScope promutils.Scope
+	cfg         *Config
+	cs          *ClientSet
 }
 
 type ResourceWrapper struct {
@@ -90,7 +93,7 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
 	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
-	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
+	agent, isSync := getFinalAgent(&taskCategory, p.cfg)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
@@ -186,7 +189,7 @@ func (p Plugin) ExecuteTaskSync(
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -219,7 +222,7 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
-	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg)
 
 	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
@@ -315,6 +318,15 @@ func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (ser
 	return client, nil
 }
 
+func (p Plugin) watchAgents(ctx context.Context) {
+	go wait.Until(func() {
+		mu.Lock()
+		defer mu.Unlock()
+		updateAgentClientSets(ctx, p.cs)
+		agentRegistry = updateAgentRegistry(ctx, p.cs)
+	}, p.cfg.PollInterval.Duration, ctx.Done())
+}
+
 func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
@@ -337,11 +349,12 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *fly
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
+func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config) (*Deployment, bool) {
+	mu.RLock()
+	defer mu.RUnlock()
 	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
 		return agent.AgentDeployment, agent.IsSync
 	}
-
 	return &cfg.DefaultAgent, false
 }
 
@@ -358,31 +371,29 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 }
 
 func newAgentPlugin() webapi.PluginEntry {
-	cs, err := initializeClients(context.Background())
-	if err != nil {
-		// We should wait for all agents to be up and running before starting the server
-		panic(fmt.Sprintf("failed to initialize clients with error: %v", err))
-	}
-
-	agentRegistry, err := initializeAgentRegistry(cs)
-	if err != nil {
-		panic(fmt.Sprintf("failed to initialize agent registry with error: %v", err))
-	}
-
+	ctx := context.Background()
 	cfg := GetConfig()
+
+	clientSet := &ClientSet{
+		asyncAgentClients:    make(map[string]service.AsyncAgentServiceClient),
+		syncAgentClients:     make(map[string]service.SyncAgentServiceClient),
+		agentMetadataClients: make(map[string]service.AgentMetadataServiceClient),
+	}
+	updateAgentClientSets(ctx, clientSet)
+	agentRegistry := updateAgentRegistry(ctx, clientSet)
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
-			return &Plugin{
-				metricScope:   iCtx.MetricsScope(),
-				cfg:           cfg,
-				cs:            cs,
-				agentRegistry: agentRegistry,
-			}, nil
+			plugin := &Plugin{
+				metricScope: iCtx.MetricsScope(),
+				cfg:         cfg,
+				cs:          clientSet,
+			}
+			plugin.watchAgents(ctx)
+			return plugin, nil
 		},
 	}
 }
@@ -390,6 +401,5 @@ func newAgentPlugin() webapi.PluginEntry {
 func RegisterAgentPlugin() {
 	gob.Register(ResourceMetaWrapper{})
 	gob.Register(ResourceWrapper{})
-
 	pluginmachinery.PluginRegistry().RegisterRemotePlugin(newAgentPlugin())
 }
