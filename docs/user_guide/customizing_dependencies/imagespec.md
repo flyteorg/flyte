@@ -160,3 +160,17 @@ If you only want to build the image without registering the workflow, you can us
 ```
 pyflyte build --remote image_spec.py wf
 ```
+
++++
+
+If you want to overwrite an existing image, you can use the `FLYTE_FORCE_PUSH_IMAGE_SPEC=True` command.
+
+```
+FLYTE_FORCE_PUSH_IMAGE_SPEC=True pyflyte run --remote image_spec.py wf
+```
+
+or
+
+```
+image = ImageSpec(registry="ghcr.io/flyteorg", packages=["pandas"]).force_push()
+```
