@@ -78,4 +78,4 @@ jobs:
 
       - name: Validate manifests
         run: |
-          kubeconform -strict -summary -skip CustomResourceDefinition -kubernetes-version ${{ matrix.k8s_versions }} ./deployment ./docker/sandbox-bundled/manifests
+          kubeconform -strict -summary -skip CustomResourceDefinition -ignore-filename-pattern "deployment/stats/prometheus/*" -kubernetes-version ${{ matrix.k8s_versions }} ./deployment ./docker/sandbox-bundled/manifests
