@@ -194,14 +194,16 @@ common:
 #
 
 storage:
-  # -- Sets the storage type. Supported values are sandbox, s3, gcs and custom.
-  type: gcs
+  # -- Sets the storage type. Supported values are s3/minio/local/mem/stow.
+  type: stow
+  stow:
+    kind: google
+    config:
+      json: ""
+      project_id: "{{ .Values.userSettings.googleProjectId }}"
+      scopes: https://www.googleapis.com/auth/cloud-platform
   # -- bucketName defines the storage bucket flyte will use. Required for all types except for sandbox.
-  bucketName: "{{ .Values.userSettings.bucketName }}"
-  # -- settings for storage type s3
-  gcs:
-    # -- GCP project ID. Required for storage type gcs.
-    projectId: "{{ .Values.userSettings.googleProjectId }}"
+  container: "{{ .Values.userSettings.bucketName }}"
 
 db:
   datacatalog:
