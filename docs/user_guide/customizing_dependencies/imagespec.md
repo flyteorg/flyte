@@ -171,6 +171,6 @@ FLYTE_FORCE_PUSH_IMAGE_SPEC=True pyflyte run --remote image_spec.py wf
 
 or
 
-```
+```python
 image = ImageSpec(registry="ghcr.io/flyteorg", packages=["pandas"]).force_push()
 ```
