@@ -2,7 +2,7 @@ apiVersion: v2
 name: flyte-core
 description: A Helm chart for Flyte core
 type: application
-version: v0.1.10 # VERSION
+version: v0.1.11 # VERSION
 dependencies:
   - name: flyteagent
     condition: flyteagent.enabled
