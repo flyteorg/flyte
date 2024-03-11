@@ -66,7 +66,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.3 // indirect
 	github.com/flyteorg/flyte/flyteidl v0.0.0-00010101000000-000000000000 // indirect
 	github.com/flyteorg/flyte/flyteplugins v0.0.0-00010101000000-000000000000 // indirect
-	github.com/flyteorg/stow v0.3.8 // indirect
+	github.com/flyteorg/stow v0.3.9 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-gormigrate/gormigrate/v2 v2.1.1 // indirect
