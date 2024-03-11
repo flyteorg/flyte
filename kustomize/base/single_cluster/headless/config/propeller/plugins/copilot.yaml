@@ -1,6 +1,0 @@
-plugins:
-  k8s:
-    co-pilot:
-      name: "flyte-copilot-"
-      image: "cr.flyte.org/flyteorg/flytecopilot:v0.0.15"
-      start-timeout: "30s"

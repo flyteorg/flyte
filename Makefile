@@ -30,10 +30,6 @@ linux_compile: cmd/single/dist
 update_boilerplate:
 	@boilerplate/update.sh
 
-.PHONY: kustomize
-kustomize:
-	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
-
 .PHONY: helm
 helm: ## Generate K8s Manifest from Helm Charts.
 	bash script/generate_helm.sh
