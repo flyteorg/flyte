@@ -792,8 +792,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
-          # -- Uncomment to enable agent service
-          # - agent-service
+          - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar

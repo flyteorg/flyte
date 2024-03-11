@@ -533,6 +533,7 @@ data:
         - container
         - sidecar
         - k8s-array
+        - agent-service
   k8s.yaml: | 
     plugins:
       k8s:
@@ -1420,7 +1421,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "9bc27a186f548894dceed907e428e5ff148a7bc709218fa0d828cade4598f1f"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1501,7 +1502,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b1
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "9bc27a186f548894dceed907e428e5ff148a7bc709218fa0d828cade4598f1f"
     spec:
       securityContext: 
         fsGroup: 65534
