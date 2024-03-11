@@ -1,21 +1,3 @@
----
-jupytext:
-  cell_metadata_filter: all
-  formats: md:myst
-  main_language: python
-  notebook_metadata_filter: all
-  text_representation:
-    extension: .md
-    format_name: myst
-    format_version: 0.13
-    jupytext_version: 1.16.1
-kernelspec:
-  display_name: Python 3
-  language: python
-  name: python3
----
-
-
 (nested_parallelization)=
 
 # Nested parallelization
@@ -26,13 +8,13 @@ kernelspec:
 
 For exceptionally large or complicated workflows that can't be adequately implemented as dynamic workflows or map tasks, it can be beneficial to have multiple levels of workflow parallelization.
 
-Nested parallelization enables:
-1. Better code organization
-2. Better code reuse
-3. Better testing
-4. Better debugging
-5. Better monitoring - each subworkflow can be run independently and monitored independently
-6. Better performance and scale - each subworkflow is executed as a separate workflow and thus can land on different flytepropeller workers and shards. This allows for better parallelism and scale.
+This is useful for multiple reasons:
+- Better code organization
+- Better code reuse
+- Better testing
+- Better debugging
+- Better monitoring, since each subworkflow can be run independently and monitored independently
+- Better performance and scale, since each subworkflow is executed as a separate workflow and thus can be distributed among different flytepropeller workers and shards. This allows for better parallelism and scale.
 
 ## Nested dynamic workflows
 
