@@ -1514,8 +1514,6 @@ type Sql struct {
 
 	// The actual query to run, the query can have templated parameters.
 	// We use Flyte's Golang templating format for Query templating.
-	// Refer to the templating documentation.
-	// https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py
 	// For example,
 	// insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
 	// select *
