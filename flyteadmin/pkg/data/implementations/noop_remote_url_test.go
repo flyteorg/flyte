@@ -14,6 +14,10 @@ const noopFileSize = int64(1256)
 
 type MockMetadata struct{}
 
+func (m MockMetadata) ContentMD5() string {
+	return ""
+}
+
 func (m MockMetadata) Exists() bool {
 	return true
 }
