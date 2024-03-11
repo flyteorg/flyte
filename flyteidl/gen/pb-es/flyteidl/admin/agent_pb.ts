@@ -4,8 +4,9 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { Duration, Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
+import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
 import { TaskExecutionIdentifier } from "../core/identifier_pb.js";
+import { TaskNodeOverrides } from "../core/workflow_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
 import { TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
@@ -15,6 +16,7 @@ import { ExecutionMetricResult } from "../core/metrics_pb.js";
  * The state of the execution is used to control its visibility in the UI/CLI.
  *
  * @generated from enum flyteidl.admin.State
+ * @deprecated
  */
 export enum State {
   /**
@@ -99,6 +101,39 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
    */
   environmentVariables: { [key: string]: string } = {};
 
+  /**
+   * Represents the maximum number of attempts allowed for a task.
+   * If a task fails, it can be retried up to this maximum number of attempts.
+   *
+   * @generated from field: int32 max_attempts = 7;
+   */
+  maxAttempts = 0;
+
+  /**
+   * Indicates whether the task execution can be interrupted.
+   * If set to true, the task can be stopped before completion.
+   *
+   * @generated from field: bool interruptible = 8;
+   */
+  interruptible = false;
+
+  /**
+   * Specifies the threshold for failure count at which the interruptible property
+   * will take effect. If the number of consecutive task failures exceeds this threshold,
+   * interruptible behavior will be activated.
+   *
+   * @generated from field: int32 interruptible_failure_threshold = 9;
+   */
+  interruptibleFailureThreshold = 0;
+
+  /**
+   * Overrides for specific properties of the task node.
+   * These overrides can be used to customize the behavior of the task node.
+   *
+   * @generated from field: flyteidl.core.TaskNodeOverrides overrides = 10;
+   */
+  overrides?: TaskNodeOverrides;
+
   constructor(data?: PartialMessage<TaskExecutionMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -113,6 +148,10 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
     { no: 4, name: "annotations", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
     { no: 5, name: "k8s_service_account", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 6, name: "environment_variables", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 9 /* ScalarType.STRING */} },
+    { no: 7, name: "max_attempts", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 8, name: "interruptible", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 9, name: "interruptible_failure_threshold", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 10, name: "overrides", kind: "message", T: TaskNodeOverrides },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionMetadata {
@@ -206,24 +245,11 @@ export class CreateTaskRequest extends Message<CreateTaskRequest> {
  */
 export class CreateTaskResponse extends Message<CreateTaskResponse> {
   /**
-   * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
-   * Resource is for synchronous task execution.
+   * ResourceMeta is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
    *
-   * @generated from oneof flyteidl.admin.CreateTaskResponse.res
+   * @generated from field: bytes resource_meta = 1;
    */
-  res: {
-    /**
-     * @generated from field: bytes resource_meta = 1;
-     */
-    value: Uint8Array;
-    case: "resourceMeta";
-  } | {
-    /**
-     * @generated from field: flyteidl.admin.Resource resource = 2;
-     */
-    value: Resource;
-    case: "resource";
-  } | { case: undefined; value?: undefined } = { case: undefined };
+  resourceMeta = new Uint8Array(0);
 
   constructor(data?: PartialMessage<CreateTaskResponse>) {
     super();
@@ -233,8 +259,7 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.CreateTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */, oneof: "res" },
-    { no: 2, name: "resource", kind: "message", T: Resource, oneof: "res" },
+    { no: 1, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateTaskResponse {
@@ -255,6 +280,209 @@ export class CreateTaskResponse extends Message<CreateTaskResponse> {
 }
 
 /**
+ * @generated from message flyteidl.admin.CreateRequestHeader
+ */
+export class CreateRequestHeader extends Message<CreateRequestHeader> {
+  /**
+   * Template of the task that encapsulates all the metadata of the task.
+   *
+   * @generated from field: flyteidl.core.TaskTemplate template = 1;
+   */
+  template?: TaskTemplate;
+
+  /**
+   * Prefix for where task output data will be written. (e.g. s3://my-bucket/randomstring)
+   *
+   * @generated from field: string output_prefix = 2;
+   */
+  outputPrefix = "";
+
+  /**
+   * subset of runtime task execution metadata.
+   *
+   * @generated from field: flyteidl.admin.TaskExecutionMetadata task_execution_metadata = 3;
+   */
+  taskExecutionMetadata?: TaskExecutionMetadata;
+
+  /**
+   * MaxDatasetSizeBytes is the maximum size of the dataset that can be generated by the task.
+   *
+   * @generated from field: int64 max_dataset_size_bytes = 4;
+   */
+  maxDatasetSizeBytes = protoInt64.zero;
+
+  constructor(data?: PartialMessage<CreateRequestHeader>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.CreateRequestHeader";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "template", kind: "message", T: TaskTemplate },
+    { no: 2, name: "output_prefix", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "task_execution_metadata", kind: "message", T: TaskExecutionMetadata },
+    { no: 4, name: "max_dataset_size_bytes", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateRequestHeader {
+    return new CreateRequestHeader().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateRequestHeader {
+    return new CreateRequestHeader().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateRequestHeader {
+    return new CreateRequestHeader().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CreateRequestHeader | PlainMessage<CreateRequestHeader> | undefined, b: CreateRequestHeader | PlainMessage<CreateRequestHeader> | undefined): boolean {
+    return proto3.util.equals(CreateRequestHeader, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.ExecuteTaskSyncRequest
+ */
+export class ExecuteTaskSyncRequest extends Message<ExecuteTaskSyncRequest> {
+  /**
+   * @generated from oneof flyteidl.admin.ExecuteTaskSyncRequest.part
+   */
+  part: {
+    /**
+     * @generated from field: flyteidl.admin.CreateRequestHeader header = 1;
+     */
+    value: CreateRequestHeader;
+    case: "header";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.LiteralMap inputs = 2;
+     */
+    value: LiteralMap;
+    case: "inputs";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ExecuteTaskSyncRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecuteTaskSyncRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "header", kind: "message", T: CreateRequestHeader, oneof: "part" },
+    { no: 2, name: "inputs", kind: "message", T: LiteralMap, oneof: "part" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecuteTaskSyncRequest {
+    return new ExecuteTaskSyncRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecuteTaskSyncRequest {
+    return new ExecuteTaskSyncRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecuteTaskSyncRequest {
+    return new ExecuteTaskSyncRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecuteTaskSyncRequest | PlainMessage<ExecuteTaskSyncRequest> | undefined, b: ExecuteTaskSyncRequest | PlainMessage<ExecuteTaskSyncRequest> | undefined): boolean {
+    return proto3.util.equals(ExecuteTaskSyncRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.ExecuteTaskSyncResponseHeader
+ */
+export class ExecuteTaskSyncResponseHeader extends Message<ExecuteTaskSyncResponseHeader> {
+  /**
+   * @generated from field: flyteidl.admin.Resource resource = 1;
+   */
+  resource?: Resource;
+
+  constructor(data?: PartialMessage<ExecuteTaskSyncResponseHeader>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecuteTaskSyncResponseHeader";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "resource", kind: "message", T: Resource },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecuteTaskSyncResponseHeader {
+    return new ExecuteTaskSyncResponseHeader().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecuteTaskSyncResponseHeader {
+    return new ExecuteTaskSyncResponseHeader().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecuteTaskSyncResponseHeader {
+    return new ExecuteTaskSyncResponseHeader().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecuteTaskSyncResponseHeader | PlainMessage<ExecuteTaskSyncResponseHeader> | undefined, b: ExecuteTaskSyncResponseHeader | PlainMessage<ExecuteTaskSyncResponseHeader> | undefined): boolean {
+    return proto3.util.equals(ExecuteTaskSyncResponseHeader, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.ExecuteTaskSyncResponse
+ */
+export class ExecuteTaskSyncResponse extends Message<ExecuteTaskSyncResponse> {
+  /**
+   * Metadata is created by the agent. It could be a string (jobId) or a dict (more complex metadata).
+   * Resource is for synchronous task execution.
+   *
+   * @generated from oneof flyteidl.admin.ExecuteTaskSyncResponse.res
+   */
+  res: {
+    /**
+     * @generated from field: flyteidl.admin.ExecuteTaskSyncResponseHeader header = 1;
+     */
+    value: ExecuteTaskSyncResponseHeader;
+    case: "header";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.LiteralMap outputs = 2;
+     */
+    value: LiteralMap;
+    case: "outputs";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<ExecuteTaskSyncResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecuteTaskSyncResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "header", kind: "message", T: ExecuteTaskSyncResponseHeader, oneof: "res" },
+    { no: 2, name: "outputs", kind: "message", T: LiteralMap, oneof: "res" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecuteTaskSyncResponse {
+    return new ExecuteTaskSyncResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecuteTaskSyncResponse {
+    return new ExecuteTaskSyncResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecuteTaskSyncResponse {
+    return new ExecuteTaskSyncResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecuteTaskSyncResponse | PlainMessage<ExecuteTaskSyncResponse> | undefined, b: ExecuteTaskSyncResponse | PlainMessage<ExecuteTaskSyncResponse> | undefined): boolean {
+    return proto3.util.equals(ExecuteTaskSyncResponse, a, b);
+  }
+}
+
+/**
  * A message used to fetch a job resource from flyte agent server.
  *
  * @generated from message flyteidl.admin.GetTaskRequest
@@ -263,7 +491,8 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: string task_type = 1;
+   * @generated from field: string task_type = 1 [deprecated = true];
+   * @deprecated
    */
   taskType = "";
 
@@ -273,6 +502,13 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
    * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta = new Uint8Array(0);
+
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskCategory task_category = 3;
+   */
+  taskCategory?: TaskCategory;
 
   constructor(data?: PartialMessage<GetTaskRequest>) {
     super();
@@ -284,6 +520,7 @@ export class GetTaskRequest extends Message<GetTaskRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 3, name: "task_category", kind: "message", T: TaskCategory },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskRequest {
@@ -314,13 +551,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
    */
   resource?: Resource;
 
-  /**
-   * log information for the task execution
-   *
-   * @generated from field: repeated flyteidl.core.TaskLog log_links = 2;
-   */
-  logLinks: TaskLog[] = [];
-
   constructor(data?: PartialMessage<GetTaskResponse>) {
     super();
     proto3.util.initPartial(data, this);
@@ -330,7 +560,6 @@ export class GetTaskResponse extends Message<GetTaskResponse> {
   static readonly typeName = "flyteidl.admin.GetTaskResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "resource", kind: "message", T: Resource },
-    { no: 2, name: "log_links", kind: "message", T: TaskLog, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskResponse {
@@ -392,6 +621,13 @@ export class Resource extends Message<Resource> {
    */
   phase = TaskExecution_Phase.UNDEFINED;
 
+  /**
+   * Custom data specific to the agent.
+   *
+   * @generated from field: google.protobuf.Struct custom_info = 6;
+   */
+  customInfo?: Struct;
+
   constructor(data?: PartialMessage<Resource>) {
     super();
     proto3.util.initPartial(data, this);
@@ -405,6 +641,7 @@ export class Resource extends Message<Resource> {
     { no: 3, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "log_links", kind: "message", T: TaskLog, repeated: true },
     { no: 5, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
+    { no: 6, name: "custom_info", kind: "message", T: Struct },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Resource {
@@ -433,7 +670,8 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: string task_type = 1;
+   * @generated from field: string task_type = 1 [deprecated = true];
+   * @deprecated
    */
   taskType = "";
 
@@ -443,6 +681,13 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
    * @generated from field: bytes resource_meta = 2;
    */
   resourceMeta = new Uint8Array(0);
+
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskCategory task_category = 3;
+   */
+  taskCategory?: TaskCategory;
 
   constructor(data?: PartialMessage<DeleteTaskRequest>) {
     super();
@@ -454,6 +699,7 @@ export class DeleteTaskRequest extends Message<DeleteTaskRequest> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "task_type", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
+    { no: 3, name: "task_category", kind: "message", T: TaskCategory },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteTaskRequest {
@@ -522,9 +768,28 @@ export class Agent extends Message<Agent> {
   /**
    * SupportedTaskTypes are the types of the tasks that the agent can handle.
    *
-   * @generated from field: repeated string supported_task_types = 2;
+   * @generated from field: repeated string supported_task_types = 2 [deprecated = true];
+   * @deprecated
    */
   supportedTaskTypes: string[] = [];
+
+  /**
+   * IsSync indicates whether this agent is a sync agent. Sync agents are expected to return their
+   * results synchronously when called by propeller. Given that sync agents can affect the performance
+   * of the system, it's important to enforce strict timeout policies.
+   * An Async agent, on the other hand, is required to be able to identify jobs by an
+   * identifier and query for job statuses as jobs progress.
+   *
+   * @generated from field: bool is_sync = 3;
+   */
+  isSync = false;
+
+  /**
+   * Supported_task_categories are the categories of the tasks that the agent can handle.
+   *
+   * @generated from field: repeated flyteidl.admin.TaskCategory supported_task_categories = 4;
+   */
+  supportedTaskCategories: TaskCategory[] = [];
 
   constructor(data?: PartialMessage<Agent>) {
     super();
@@ -536,6 +801,8 @@ export class Agent extends Message<Agent> {
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "supported_task_types", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 3, name: "is_sync", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 4, name: "supported_task_categories", kind: "message", T: TaskCategory, repeated: true },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Agent {
@@ -552,6 +819,53 @@ export class Agent extends Message<Agent> {
 
   static equals(a: Agent | PlainMessage<Agent> | undefined, b: Agent | PlainMessage<Agent> | undefined): boolean {
     return proto3.util.equals(Agent, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.TaskCategory
+ */
+export class TaskCategory extends Message<TaskCategory> {
+  /**
+   * The name of the task type.
+   *
+   * @generated from field: string name = 1;
+   */
+  name = "";
+
+  /**
+   * The version of the task type.
+   *
+   * @generated from field: int32 version = 2;
+   */
+  version = 0;
+
+  constructor(data?: PartialMessage<TaskCategory>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.TaskCategory";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "version", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskCategory {
+    return new TaskCategory().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TaskCategory {
+    return new TaskCategory().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TaskCategory {
+    return new TaskCategory().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TaskCategory | PlainMessage<TaskCategory> | undefined, b: TaskCategory | PlainMessage<TaskCategory> | undefined): boolean {
+    return proto3.util.equals(TaskCategory, a, b);
   }
 }
 
@@ -716,7 +1030,8 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: string task_type = 1;
+   * @generated from field: string task_type = 1 [deprecated = true];
+   * @deprecated
    */
   taskType = "";
 
@@ -756,6 +1071,13 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
    */
   step?: Duration;
 
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskCategory task_category = 7;
+   */
+  taskCategory?: TaskCategory;
+
   constructor(data?: PartialMessage<GetTaskMetricsRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -770,6 +1092,7 @@ export class GetTaskMetricsRequest extends Message<GetTaskMetricsRequest> {
     { no: 4, name: "start_time", kind: "message", T: Timestamp },
     { no: 5, name: "end_time", kind: "message", T: Timestamp },
     { no: 6, name: "step", kind: "message", T: Duration },
+    { no: 7, name: "task_category", kind: "message", T: TaskCategory },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskMetricsRequest {
@@ -839,7 +1162,8 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
   /**
    * A predefined yet extensible Task type identifier.
    *
-   * @generated from field: string task_type = 1;
+   * @generated from field: string task_type = 1 [deprecated = true];
+   * @deprecated
    */
   taskType = "";
 
@@ -865,6 +1189,13 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
    */
   token = "";
 
+  /**
+   * A predefined yet extensible Task type identifier.
+   *
+   * @generated from field: flyteidl.admin.TaskCategory task_category = 5;
+   */
+  taskCategory?: TaskCategory;
+
   constructor(data?: PartialMessage<GetTaskLogsRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -877,6 +1208,7 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
     { no: 2, name: "resource_meta", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 3, name: "lines", kind: "scalar", T: 4 /* ScalarType.UINT64 */ },
     { no: 4, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "task_category", kind: "message", T: TaskCategory },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskLogsRequest {
@@ -897,11 +1229,49 @@ export class GetTaskLogsRequest extends Message<GetTaskLogsRequest> {
 }
 
 /**
- * A response containing the logs for a task execution.
- *
- * @generated from message flyteidl.admin.GetTaskLogsResponse
+ * @generated from message flyteidl.admin.GetTaskLogsResponseHeader
  */
-export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
+export class GetTaskLogsResponseHeader extends Message<GetTaskLogsResponseHeader> {
+  /**
+   * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
+   * in a query. If there are no more results, this value will be empty.
+   *
+   * @generated from field: string token = 1;
+   */
+  token = "";
+
+  constructor(data?: PartialMessage<GetTaskLogsResponseHeader>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.GetTaskLogsResponseHeader";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskLogsResponseHeader {
+    return new GetTaskLogsResponseHeader().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTaskLogsResponseHeader {
+    return new GetTaskLogsResponseHeader().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTaskLogsResponseHeader {
+    return new GetTaskLogsResponseHeader().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTaskLogsResponseHeader | PlainMessage<GetTaskLogsResponseHeader> | undefined, b: GetTaskLogsResponseHeader | PlainMessage<GetTaskLogsResponseHeader> | undefined): boolean {
+    return proto3.util.equals(GetTaskLogsResponseHeader, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.GetTaskLogsResponseBody
+ */
+export class GetTaskLogsResponseBody extends Message<GetTaskLogsResponseBody> {
   /**
    * The execution log results.
    *
@@ -909,13 +1279,56 @@ export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
    */
   results: string[] = [];
 
+  constructor(data?: PartialMessage<GetTaskLogsResponseBody>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.GetTaskLogsResponseBody";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "results", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskLogsResponseBody {
+    return new GetTaskLogsResponseBody().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): GetTaskLogsResponseBody {
+    return new GetTaskLogsResponseBody().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): GetTaskLogsResponseBody {
+    return new GetTaskLogsResponseBody().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: GetTaskLogsResponseBody | PlainMessage<GetTaskLogsResponseBody> | undefined, b: GetTaskLogsResponseBody | PlainMessage<GetTaskLogsResponseBody> | undefined): boolean {
+    return proto3.util.equals(GetTaskLogsResponseBody, a, b);
+  }
+}
+
+/**
+ * A response containing the logs for a task execution.
+ *
+ * @generated from message flyteidl.admin.GetTaskLogsResponse
+ */
+export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
   /**
-   * In the case of multiple pages of results, the server-provided token can be used to fetch the next page
-   * in a query. If there are no more results, this value will be empty.
-   *
-   * @generated from field: string token = 2;
+   * @generated from oneof flyteidl.admin.GetTaskLogsResponse.part
    */
-  token = "";
+  part: {
+    /**
+     * @generated from field: flyteidl.admin.GetTaskLogsResponseHeader header = 1;
+     */
+    value: GetTaskLogsResponseHeader;
+    case: "header";
+  } | {
+    /**
+     * @generated from field: flyteidl.admin.GetTaskLogsResponseBody body = 2;
+     */
+    value: GetTaskLogsResponseBody;
+    case: "body";
+  } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<GetTaskLogsResponse>) {
     super();
@@ -925,8 +1338,8 @@ export class GetTaskLogsResponse extends Message<GetTaskLogsResponse> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.admin.GetTaskLogsResponse";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "results", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
-    { no: 2, name: "token", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "header", kind: "message", T: GetTaskLogsResponseHeader, oneof: "part" },
+    { no: 2, name: "body", kind: "message", T: GetTaskLogsResponseBody, oneof: "part" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): GetTaskLogsResponse {
