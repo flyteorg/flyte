@@ -278,6 +278,11 @@ func TestResourceListToQuantity(t *testing.T) {
 	gpuQuantity := gpuResources[core.Resources_CPU]
 	val = gpuQuantity.Value()
 	assert.Equal(t, val, int64(2))
+
+	ephemeralStorageResources := resourceListToQuantity(corev1.ResourceList{corev1.ResourceEphemeralStorage: resource.MustParse("500Mi")})
+	ephemeralStorageQuantity := ephemeralStorageResources[core.Resources_EPHEMERAL_STORAGE]
+	val = ephemeralStorageQuantity.Value()
+	assert.Equal(t, val, int64(524288000))
 }
 
 func TestRequestedResourcesToQuantity(t *testing.T) {
