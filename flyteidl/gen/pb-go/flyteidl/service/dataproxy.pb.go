@@ -184,6 +184,7 @@ type CreateUploadLocationRequest struct {
 	FilenameRoot string `protobuf:"bytes,6,opt,name=filename_root,json=filenameRoot,proto3" json:"filename_root,omitempty"`
 	// If true, the data proxy will add content_md5 to the metadata to the signed URL and
 	// it will force clients to add this metadata to the object.
+	// This make sure dataproxy is backward compatible with the old flytekit.
 	AddContentMd5Metadata bool `protobuf:"varint,7,opt,name=add_content_md5_metadata,json=addContentMd5Metadata,proto3" json:"add_content_md5_metadata,omitempty"`
 }
 

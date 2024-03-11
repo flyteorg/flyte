@@ -127,6 +127,7 @@ pub struct CreateUploadLocationRequest {
     pub filename_root: ::prost::alloc::string::String,
     /// If true, the data proxy will add content_md5 to the metadata to the signed URL and
     /// it will force clients to add this metadata to the object.
+    /// This make sure dataproxy is backward compatible with the old flytekit.
     #[prost(bool, tag="7")]
     pub add_content_md5_metadata: bool,
 }
