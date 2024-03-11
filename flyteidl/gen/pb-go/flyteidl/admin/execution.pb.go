@@ -1952,6 +1952,190 @@ func (x *WorkflowExecutionGetMetricsResponse) GetSpan() *core.Span {
 	return nil
 }
 
+// Request to count executions with the given project, domain and optionally-assigned org.
+type ExecutionCountRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Name of the project the execution belongs to.
+	// +required
+	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
+	// Name of the domain the execution belongs to.
+	// A domain can be considered as a subset within a specific project.
+	// +required
+	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
+	// Optional, org filter applied to list project requests.
+	Org string `protobuf:"bytes,3,opt,name=org,proto3" json:"org,omitempty"`
+	// Indicates a list of filters passed as string.
+	// +optional
+	Filters string `protobuf:"bytes,4,opt,name=filters,proto3" json:"filters,omitempty"`
+}
+
+func (x *ExecutionCountRequest) Reset() {
+	*x = ExecutionCountRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_execution_proto_msgTypes[23]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExecutionCountRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecutionCountRequest) ProtoMessage() {}
+
+func (x *ExecutionCountRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_execution_proto_msgTypes[23]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecutionCountRequest.ProtoReflect.Descriptor instead.
+func (*ExecutionCountRequest) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_execution_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ExecutionCountRequest) GetProject() string {
+	if x != nil {
+		return x.Project
+	}
+	return ""
+}
+
+func (x *ExecutionCountRequest) GetDomain() string {
+	if x != nil {
+		return x.Domain
+	}
+	return ""
+}
+
+func (x *ExecutionCountRequest) GetOrg() string {
+	if x != nil {
+		return x.Org
+	}
+	return ""
+}
+
+func (x *ExecutionCountRequest) GetFilters() string {
+	if x != nil {
+		return x.Filters
+	}
+	return ""
+}
+
+type ExecutionCountByPhase struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Phase core.WorkflowExecution_Phase `protobuf:"varint,1,opt,name=phase,proto3,enum=flyteidl.core.WorkflowExecution_Phase" json:"phase,omitempty"`
+	Count int64                        `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+}
+
+func (x *ExecutionCountByPhase) Reset() {
+	*x = ExecutionCountByPhase{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_execution_proto_msgTypes[24]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExecutionCountByPhase) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecutionCountByPhase) ProtoMessage() {}
+
+func (x *ExecutionCountByPhase) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_execution_proto_msgTypes[24]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecutionCountByPhase.ProtoReflect.Descriptor instead.
+func (*ExecutionCountByPhase) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_execution_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *ExecutionCountByPhase) GetPhase() core.WorkflowExecution_Phase {
+	if x != nil {
+		return x.Phase
+	}
+	return core.WorkflowExecution_Phase(0)
+}
+
+func (x *ExecutionCountByPhase) GetCount() int64 {
+	if x != nil {
+		return x.Count
+	}
+	return 0
+}
+
+// Counts of executions by phases
+type ExecutionCountResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Map of workflow execution phase to workflow count
+	ExecutionCount []*ExecutionCountByPhase `protobuf:"bytes,1,rep,name=ExecutionCount,proto3" json:"ExecutionCount,omitempty"`
+}
+
+func (x *ExecutionCountResponse) Reset() {
+	*x = ExecutionCountResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_flyteidl_admin_execution_proto_msgTypes[25]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ExecutionCountResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ExecutionCountResponse) ProtoMessage() {}
+
+func (x *ExecutionCountResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_flyteidl_admin_execution_proto_msgTypes[25]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ExecutionCountResponse.ProtoReflect.Descriptor instead.
+func (*ExecutionCountResponse) Descriptor() ([]byte, []int) {
+	return file_flyteidl_admin_execution_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *ExecutionCountResponse) GetExecutionCount() []*ExecutionCountByPhase {
+	if x != nil {
+		return x.ExecutionCount
+	}
+	return nil
+}
+
 var File_flyteidl_admin_execution_proto protoreflect.FileDescriptor
 
 var file_flyteidl_admin_execution_proto_rawDesc = []byte{
@@ -2293,24 +2477,44 @@ var file_flyteidl_admin_execution_proto_rawDesc = []byte{
 	0x6e, 0x47, 0x65, 0x74, 0x4d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
 	0x6e, 0x73, 0x65, 0x12, 0x27, 0x0a, 0x04, 0x73, 0x70, 0x61, 0x6e, 0x18, 0x01, 0x20, 0x01, 0x28,
 	0x0b, 0x32, 0x13, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72,
-	0x65, 0x2e, 0x53, 0x70, 0x61, 0x6e, 0x52, 0x04, 0x73, 0x70, 0x61, 0x6e, 0x2a, 0x3e, 0x0a, 0x0e,
-	0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x14,
-	0x0a, 0x10, 0x45, 0x58, 0x45, 0x43, 0x55, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x43, 0x54, 0x49,
-	0x56, 0x45, 0x10, 0x00, 0x12, 0x16, 0x0a, 0x12, 0x45, 0x58, 0x45, 0x43, 0x55, 0x54, 0x49, 0x4f,
-	0x4e, 0x5f, 0x41, 0x52, 0x43, 0x48, 0x49, 0x56, 0x45, 0x44, 0x10, 0x01, 0x42, 0xba, 0x01, 0x0a,
-	0x12, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64,
-	0x6d, 0x69, 0x6e, 0x42, 0x0e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72,
-	0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
-	0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65,
-	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62,
-	0x2d, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x61, 0x64, 0x6d,
-	0x69, 0x6e, 0xa2, 0x02, 0x03, 0x46, 0x41, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65,
-	0x69, 0x64, 0x6c, 0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79,
-	0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d,
-	0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69,
-	0x64, 0x6c, 0x3a, 0x3a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f,
-	0x33,
+	0x65, 0x2e, 0x53, 0x70, 0x61, 0x6e, 0x52, 0x04, 0x73, 0x70, 0x61, 0x6e, 0x22, 0x75, 0x0a, 0x15,
+	0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x12,
+	0x16, 0x0a, 0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x12, 0x10, 0x0a, 0x03, 0x6f, 0x72, 0x67, 0x18, 0x03,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6f, 0x72, 0x67, 0x12, 0x18, 0x0a, 0x07, 0x66, 0x69, 0x6c,
+	0x74, 0x65, 0x72, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x66, 0x69, 0x6c, 0x74,
+	0x65, 0x72, 0x73, 0x22, 0x6b, 0x0a, 0x15, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e,
+	0x43, 0x6f, 0x75, 0x6e, 0x74, 0x42, 0x79, 0x50, 0x68, 0x61, 0x73, 0x65, 0x12, 0x3c, 0x0a, 0x05,
+	0x70, 0x68, 0x61, 0x73, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x26, 0x2e, 0x66, 0x6c,
+	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x63, 0x6f, 0x72, 0x65, 0x2e, 0x57, 0x6f, 0x72, 0x6b,
+	0x66, 0x6c, 0x6f, 0x77, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x2e, 0x50, 0x68,
+	0x61, 0x73, 0x65, 0x52, 0x05, 0x70, 0x68, 0x61, 0x73, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x63, 0x6f,
+	0x75, 0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x05, 0x63, 0x6f, 0x75, 0x6e, 0x74,
+	0x22, 0x67, 0x0a, 0x16, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75,
+	0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x4d, 0x0a, 0x0e, 0x45, 0x78,
+	0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x03,
+	0x28, 0x0b, 0x32, 0x25, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64,
+	0x6d, 0x69, 0x6e, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75,
+	0x6e, 0x74, 0x42, 0x79, 0x50, 0x68, 0x61, 0x73, 0x65, 0x52, 0x0e, 0x45, 0x78, 0x65, 0x63, 0x75,
+	0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x2a, 0x3e, 0x0a, 0x0e, 0x45, 0x78, 0x65,
+	0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x14, 0x0a, 0x10, 0x45,
+	0x58, 0x45, 0x43, 0x55, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41, 0x43, 0x54, 0x49, 0x56, 0x45, 0x10,
+	0x00, 0x12, 0x16, 0x0a, 0x12, 0x45, 0x58, 0x45, 0x43, 0x55, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x41,
+	0x52, 0x43, 0x48, 0x49, 0x56, 0x45, 0x44, 0x10, 0x01, 0x42, 0xba, 0x01, 0x0a, 0x12, 0x63, 0x6f,
+	0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e,
+	0x42, 0x0e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f,
+	0x50, 0x01, 0x5a, 0x3b, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66,
+	0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c,
+	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f,
+	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0xa2,
+	0x02, 0x03, 0x46, 0x41, 0x58, 0xaa, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c,
+	0x2e, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xca, 0x02, 0x0e, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
+	0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0xe2, 0x02, 0x1a, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69,
+	0x64, 0x6c, 0x5c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61,
+	0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x0f, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a,
+	0x3a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -2326,7 +2530,7 @@ func file_flyteidl_admin_execution_proto_rawDescGZIP() []byte {
 }
 
 var file_flyteidl_admin_execution_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_flyteidl_admin_execution_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
+var file_flyteidl_admin_execution_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_flyteidl_admin_execution_proto_goTypes = []interface{}{
 	(ExecutionState)(0),                         // 0: flyteidl.admin.ExecutionState
 	(ExecutionMetadata_ExecutionMode)(0),        // 1: flyteidl.admin.ExecutionMetadata.ExecutionMode
@@ -2353,91 +2557,96 @@ var file_flyteidl_admin_execution_proto_goTypes = []interface{}{
 	(*ExecutionUpdateResponse)(nil),             // 22: flyteidl.admin.ExecutionUpdateResponse
 	(*WorkflowExecutionGetMetricsRequest)(nil),  // 23: flyteidl.admin.WorkflowExecutionGetMetricsRequest
 	(*WorkflowExecutionGetMetricsResponse)(nil), // 24: flyteidl.admin.WorkflowExecutionGetMetricsResponse
-	(*core.LiteralMap)(nil),                     // 25: flyteidl.core.LiteralMap
-	(*core.WorkflowExecutionIdentifier)(nil),    // 26: flyteidl.core.WorkflowExecutionIdentifier
-	(*core.ExecutionError)(nil),                 // 27: flyteidl.core.ExecutionError
-	(core.WorkflowExecution_Phase)(0),           // 28: flyteidl.core.WorkflowExecution.Phase
-	(*timestamppb.Timestamp)(nil),               // 29: google.protobuf.Timestamp
-	(*durationpb.Duration)(nil),                 // 30: google.protobuf.Duration
-	(*Notification)(nil),                        // 31: flyteidl.admin.Notification
-	(*core.Identifier)(nil),                     // 32: flyteidl.core.Identifier
-	(*core.NodeExecutionIdentifier)(nil),        // 33: flyteidl.core.NodeExecutionIdentifier
-	(*core.ArtifactID)(nil),                     // 34: flyteidl.core.ArtifactID
-	(*Labels)(nil),                              // 35: flyteidl.admin.Labels
-	(*Annotations)(nil),                         // 36: flyteidl.admin.Annotations
-	(*core.SecurityContext)(nil),                // 37: flyteidl.core.SecurityContext
-	(*AuthRole)(nil),                            // 38: flyteidl.admin.AuthRole
-	(*core.QualityOfService)(nil),               // 39: flyteidl.core.QualityOfService
-	(*RawOutputDataConfig)(nil),                 // 40: flyteidl.admin.RawOutputDataConfig
-	(*ClusterAssignment)(nil),                   // 41: flyteidl.admin.ClusterAssignment
-	(*wrapperspb.BoolValue)(nil),                // 42: google.protobuf.BoolValue
-	(*Envs)(nil),                                // 43: flyteidl.admin.Envs
-	(*UrlBlob)(nil),                             // 44: flyteidl.admin.UrlBlob
-	(*core.Span)(nil),                           // 45: flyteidl.core.Span
+	(*ExecutionCountRequest)(nil),               // 25: flyteidl.admin.ExecutionCountRequest
+	(*ExecutionCountByPhase)(nil),               // 26: flyteidl.admin.ExecutionCountByPhase
+	(*ExecutionCountResponse)(nil),              // 27: flyteidl.admin.ExecutionCountResponse
+	(*core.LiteralMap)(nil),                     // 28: flyteidl.core.LiteralMap
+	(*core.WorkflowExecutionIdentifier)(nil),    // 29: flyteidl.core.WorkflowExecutionIdentifier
+	(*core.ExecutionError)(nil),                 // 30: flyteidl.core.ExecutionError
+	(core.WorkflowExecution_Phase)(0),           // 31: flyteidl.core.WorkflowExecution.Phase
+	(*timestamppb.Timestamp)(nil),               // 32: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),                 // 33: google.protobuf.Duration
+	(*Notification)(nil),                        // 34: flyteidl.admin.Notification
+	(*core.Identifier)(nil),                     // 35: flyteidl.core.Identifier
+	(*core.NodeExecutionIdentifier)(nil),        // 36: flyteidl.core.NodeExecutionIdentifier
+	(*core.ArtifactID)(nil),                     // 37: flyteidl.core.ArtifactID
+	(*Labels)(nil),                              // 38: flyteidl.admin.Labels
+	(*Annotations)(nil),                         // 39: flyteidl.admin.Annotations
+	(*core.SecurityContext)(nil),                // 40: flyteidl.core.SecurityContext
+	(*AuthRole)(nil),                            // 41: flyteidl.admin.AuthRole
+	(*core.QualityOfService)(nil),               // 42: flyteidl.core.QualityOfService
+	(*RawOutputDataConfig)(nil),                 // 43: flyteidl.admin.RawOutputDataConfig
+	(*ClusterAssignment)(nil),                   // 44: flyteidl.admin.ClusterAssignment
+	(*wrapperspb.BoolValue)(nil),                // 45: google.protobuf.BoolValue
+	(*Envs)(nil),                                // 46: flyteidl.admin.Envs
+	(*UrlBlob)(nil),                             // 47: flyteidl.admin.UrlBlob
+	(*core.Span)(nil),                           // 48: flyteidl.core.Span
 }
 var file_flyteidl_admin_execution_proto_depIdxs = []int32{
 	15, // 0: flyteidl.admin.ExecutionCreateRequest.spec:type_name -> flyteidl.admin.ExecutionSpec
-	25, // 1: flyteidl.admin.ExecutionCreateRequest.inputs:type_name -> flyteidl.core.LiteralMap
-	26, // 2: flyteidl.admin.ExecutionRelaunchRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
-	26, // 3: flyteidl.admin.ExecutionRecoverRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	28, // 1: flyteidl.admin.ExecutionCreateRequest.inputs:type_name -> flyteidl.core.LiteralMap
+	29, // 2: flyteidl.admin.ExecutionRelaunchRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	29, // 3: flyteidl.admin.ExecutionRecoverRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
 	13, // 4: flyteidl.admin.ExecutionRecoverRequest.metadata:type_name -> flyteidl.admin.ExecutionMetadata
-	26, // 5: flyteidl.admin.ExecutionCreateResponse.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
-	26, // 6: flyteidl.admin.WorkflowExecutionGetRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
-	26, // 7: flyteidl.admin.Execution.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	29, // 5: flyteidl.admin.ExecutionCreateResponse.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	29, // 6: flyteidl.admin.WorkflowExecutionGetRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	29, // 7: flyteidl.admin.Execution.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
 	15, // 8: flyteidl.admin.Execution.spec:type_name -> flyteidl.admin.ExecutionSpec
 	11, // 9: flyteidl.admin.Execution.closure:type_name -> flyteidl.admin.ExecutionClosure
 	7,  // 10: flyteidl.admin.ExecutionList.executions:type_name -> flyteidl.admin.Execution
-	25, // 11: flyteidl.admin.LiteralMapBlob.values:type_name -> flyteidl.core.LiteralMap
+	28, // 11: flyteidl.admin.LiteralMapBlob.values:type_name -> flyteidl.core.LiteralMap
 	9,  // 12: flyteidl.admin.ExecutionClosure.outputs:type_name -> flyteidl.admin.LiteralMapBlob
-	27, // 13: flyteidl.admin.ExecutionClosure.error:type_name -> flyteidl.core.ExecutionError
+	30, // 13: flyteidl.admin.ExecutionClosure.error:type_name -> flyteidl.core.ExecutionError
 	10, // 14: flyteidl.admin.ExecutionClosure.abort_metadata:type_name -> flyteidl.admin.AbortMetadata
-	25, // 15: flyteidl.admin.ExecutionClosure.output_data:type_name -> flyteidl.core.LiteralMap
-	25, // 16: flyteidl.admin.ExecutionClosure.computed_inputs:type_name -> flyteidl.core.LiteralMap
-	28, // 17: flyteidl.admin.ExecutionClosure.phase:type_name -> flyteidl.core.WorkflowExecution.Phase
-	29, // 18: flyteidl.admin.ExecutionClosure.started_at:type_name -> google.protobuf.Timestamp
-	30, // 19: flyteidl.admin.ExecutionClosure.duration:type_name -> google.protobuf.Duration
-	29, // 20: flyteidl.admin.ExecutionClosure.created_at:type_name -> google.protobuf.Timestamp
-	29, // 21: flyteidl.admin.ExecutionClosure.updated_at:type_name -> google.protobuf.Timestamp
-	31, // 22: flyteidl.admin.ExecutionClosure.notifications:type_name -> flyteidl.admin.Notification
-	32, // 23: flyteidl.admin.ExecutionClosure.workflow_id:type_name -> flyteidl.core.Identifier
+	28, // 15: flyteidl.admin.ExecutionClosure.output_data:type_name -> flyteidl.core.LiteralMap
+	28, // 16: flyteidl.admin.ExecutionClosure.computed_inputs:type_name -> flyteidl.core.LiteralMap
+	31, // 17: flyteidl.admin.ExecutionClosure.phase:type_name -> flyteidl.core.WorkflowExecution.Phase
+	32, // 18: flyteidl.admin.ExecutionClosure.started_at:type_name -> google.protobuf.Timestamp
+	33, // 19: flyteidl.admin.ExecutionClosure.duration:type_name -> google.protobuf.Duration
+	32, // 20: flyteidl.admin.ExecutionClosure.created_at:type_name -> google.protobuf.Timestamp
+	32, // 21: flyteidl.admin.ExecutionClosure.updated_at:type_name -> google.protobuf.Timestamp
+	34, // 22: flyteidl.admin.ExecutionClosure.notifications:type_name -> flyteidl.admin.Notification
+	35, // 23: flyteidl.admin.ExecutionClosure.workflow_id:type_name -> flyteidl.core.Identifier
 	21, // 24: flyteidl.admin.ExecutionClosure.state_change_details:type_name -> flyteidl.admin.ExecutionStateChangeDetails
 	1,  // 25: flyteidl.admin.ExecutionMetadata.mode:type_name -> flyteidl.admin.ExecutionMetadata.ExecutionMode
-	29, // 26: flyteidl.admin.ExecutionMetadata.scheduled_at:type_name -> google.protobuf.Timestamp
-	33, // 27: flyteidl.admin.ExecutionMetadata.parent_node_execution:type_name -> flyteidl.core.NodeExecutionIdentifier
-	26, // 28: flyteidl.admin.ExecutionMetadata.reference_execution:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	32, // 26: flyteidl.admin.ExecutionMetadata.scheduled_at:type_name -> google.protobuf.Timestamp
+	36, // 27: flyteidl.admin.ExecutionMetadata.parent_node_execution:type_name -> flyteidl.core.NodeExecutionIdentifier
+	29, // 28: flyteidl.admin.ExecutionMetadata.reference_execution:type_name -> flyteidl.core.WorkflowExecutionIdentifier
 	12, // 29: flyteidl.admin.ExecutionMetadata.system_metadata:type_name -> flyteidl.admin.SystemMetadata
-	34, // 30: flyteidl.admin.ExecutionMetadata.artifact_ids:type_name -> flyteidl.core.ArtifactID
-	31, // 31: flyteidl.admin.NotificationList.notifications:type_name -> flyteidl.admin.Notification
-	32, // 32: flyteidl.admin.ExecutionSpec.launch_plan:type_name -> flyteidl.core.Identifier
-	25, // 33: flyteidl.admin.ExecutionSpec.inputs:type_name -> flyteidl.core.LiteralMap
+	37, // 30: flyteidl.admin.ExecutionMetadata.artifact_ids:type_name -> flyteidl.core.ArtifactID
+	34, // 31: flyteidl.admin.NotificationList.notifications:type_name -> flyteidl.admin.Notification
+	35, // 32: flyteidl.admin.ExecutionSpec.launch_plan:type_name -> flyteidl.core.Identifier
+	28, // 33: flyteidl.admin.ExecutionSpec.inputs:type_name -> flyteidl.core.LiteralMap
 	13, // 34: flyteidl.admin.ExecutionSpec.metadata:type_name -> flyteidl.admin.ExecutionMetadata
 	14, // 35: flyteidl.admin.ExecutionSpec.notifications:type_name -> flyteidl.admin.NotificationList
-	35, // 36: flyteidl.admin.ExecutionSpec.labels:type_name -> flyteidl.admin.Labels
-	36, // 37: flyteidl.admin.ExecutionSpec.annotations:type_name -> flyteidl.admin.Annotations
-	37, // 38: flyteidl.admin.ExecutionSpec.security_context:type_name -> flyteidl.core.SecurityContext
-	38, // 39: flyteidl.admin.ExecutionSpec.auth_role:type_name -> flyteidl.admin.AuthRole
-	39, // 40: flyteidl.admin.ExecutionSpec.quality_of_service:type_name -> flyteidl.core.QualityOfService
-	40, // 41: flyteidl.admin.ExecutionSpec.raw_output_data_config:type_name -> flyteidl.admin.RawOutputDataConfig
-	41, // 42: flyteidl.admin.ExecutionSpec.cluster_assignment:type_name -> flyteidl.admin.ClusterAssignment
-	42, // 43: flyteidl.admin.ExecutionSpec.interruptible:type_name -> google.protobuf.BoolValue
-	43, // 44: flyteidl.admin.ExecutionSpec.envs:type_name -> flyteidl.admin.Envs
-	26, // 45: flyteidl.admin.ExecutionTerminateRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
-	26, // 46: flyteidl.admin.WorkflowExecutionGetDataRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
-	44, // 47: flyteidl.admin.WorkflowExecutionGetDataResponse.outputs:type_name -> flyteidl.admin.UrlBlob
-	44, // 48: flyteidl.admin.WorkflowExecutionGetDataResponse.inputs:type_name -> flyteidl.admin.UrlBlob
-	25, // 49: flyteidl.admin.WorkflowExecutionGetDataResponse.full_inputs:type_name -> flyteidl.core.LiteralMap
-	25, // 50: flyteidl.admin.WorkflowExecutionGetDataResponse.full_outputs:type_name -> flyteidl.core.LiteralMap
-	26, // 51: flyteidl.admin.ExecutionUpdateRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	38, // 36: flyteidl.admin.ExecutionSpec.labels:type_name -> flyteidl.admin.Labels
+	39, // 37: flyteidl.admin.ExecutionSpec.annotations:type_name -> flyteidl.admin.Annotations
+	40, // 38: flyteidl.admin.ExecutionSpec.security_context:type_name -> flyteidl.core.SecurityContext
+	41, // 39: flyteidl.admin.ExecutionSpec.auth_role:type_name -> flyteidl.admin.AuthRole
+	42, // 40: flyteidl.admin.ExecutionSpec.quality_of_service:type_name -> flyteidl.core.QualityOfService
+	43, // 41: flyteidl.admin.ExecutionSpec.raw_output_data_config:type_name -> flyteidl.admin.RawOutputDataConfig
+	44, // 42: flyteidl.admin.ExecutionSpec.cluster_assignment:type_name -> flyteidl.admin.ClusterAssignment
+	45, // 43: flyteidl.admin.ExecutionSpec.interruptible:type_name -> google.protobuf.BoolValue
+	46, // 44: flyteidl.admin.ExecutionSpec.envs:type_name -> flyteidl.admin.Envs
+	29, // 45: flyteidl.admin.ExecutionTerminateRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	29, // 46: flyteidl.admin.WorkflowExecutionGetDataRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	47, // 47: flyteidl.admin.WorkflowExecutionGetDataResponse.outputs:type_name -> flyteidl.admin.UrlBlob
+	47, // 48: flyteidl.admin.WorkflowExecutionGetDataResponse.inputs:type_name -> flyteidl.admin.UrlBlob
+	28, // 49: flyteidl.admin.WorkflowExecutionGetDataResponse.full_inputs:type_name -> flyteidl.core.LiteralMap
+	28, // 50: flyteidl.admin.WorkflowExecutionGetDataResponse.full_outputs:type_name -> flyteidl.core.LiteralMap
+	29, // 51: flyteidl.admin.ExecutionUpdateRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
 	0,  // 52: flyteidl.admin.ExecutionUpdateRequest.state:type_name -> flyteidl.admin.ExecutionState
 	0,  // 53: flyteidl.admin.ExecutionStateChangeDetails.state:type_name -> flyteidl.admin.ExecutionState
-	29, // 54: flyteidl.admin.ExecutionStateChangeDetails.occurred_at:type_name -> google.protobuf.Timestamp
-	26, // 55: flyteidl.admin.WorkflowExecutionGetMetricsRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
-	45, // 56: flyteidl.admin.WorkflowExecutionGetMetricsResponse.span:type_name -> flyteidl.core.Span
-	57, // [57:57] is the sub-list for method output_type
-	57, // [57:57] is the sub-list for method input_type
-	57, // [57:57] is the sub-list for extension type_name
-	57, // [57:57] is the sub-list for extension extendee
-	0,  // [0:57] is the sub-list for field type_name
+	32, // 54: flyteidl.admin.ExecutionStateChangeDetails.occurred_at:type_name -> google.protobuf.Timestamp
+	29, // 55: flyteidl.admin.WorkflowExecutionGetMetricsRequest.id:type_name -> flyteidl.core.WorkflowExecutionIdentifier
+	48, // 56: flyteidl.admin.WorkflowExecutionGetMetricsResponse.span:type_name -> flyteidl.core.Span
+	31, // 57: flyteidl.admin.ExecutionCountByPhase.phase:type_name -> flyteidl.core.WorkflowExecution.Phase
+	26, // 58: flyteidl.admin.ExecutionCountResponse.ExecutionCount:type_name -> flyteidl.admin.ExecutionCountByPhase
+	59, // [59:59] is the sub-list for method output_type
+	59, // [59:59] is the sub-list for method input_type
+	59, // [59:59] is the sub-list for extension type_name
+	59, // [59:59] is the sub-list for extension extendee
+	0,  // [0:59] is the sub-list for field type_name
 }
 
 func init() { file_flyteidl_admin_execution_proto_init() }
@@ -2724,6 +2933,42 @@ func file_flyteidl_admin_execution_proto_init() {
 				return nil
 			}
 		}
+		file_flyteidl_admin_execution_proto_msgTypes[23].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ExecutionCountRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl_admin_execution_proto_msgTypes[24].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ExecutionCountByPhase); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_flyteidl_admin_execution_proto_msgTypes[25].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ExecutionCountResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_flyteidl_admin_execution_proto_msgTypes[7].OneofWrappers = []interface{}{
 		(*LiteralMapBlob_Values)(nil),
@@ -2746,7 +2991,7 @@ func file_flyteidl_admin_execution_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_flyteidl_admin_execution_proto_rawDesc,
 			NumEnums:      2,
-			NumMessages:   23,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

@@ -65,8 +65,8 @@ var file_flyteidl_service_admin_proto_rawDesc = []byte{
 	0x6e, 0x5f, 0x65, 0x6e, 0x74, 0x69, 0x74, 0x79, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x63, 0x2d, 0x67, 0x65, 0x6e, 0x2d, 0x6f, 0x70, 0x65, 0x6e, 0x61,
 	0x70, 0x69, 0x76, 0x32, 0x2f, 0x6f, 0x70, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x61, 0x6e, 0x6e,
-	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0x89,
-	0x72, 0x0a, 0x0c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
+	0x6f, 0x74, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x32, 0xdd,
+	0x73, 0x0a, 0x0c, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x12,
 	0xc5, 0x02, 0x0a, 0x0a, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x54, 0x61, 0x73, 0x6b, 0x12, 0x21,
 	0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e,
 	0x54, 0x61, 0x73, 0x6b, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
@@ -978,20 +978,33 @@ var file_flyteidl_service_admin_proto_rawDesc = []byte{
 	0x69, 0x2f, 0x76, 0x31, 0x2f, 0x6d, 0x65, 0x74, 0x72, 0x69, 0x63, 0x73, 0x2f, 0x65, 0x78, 0x65,
 	0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x7b, 0x69, 0x64, 0x2e, 0x70, 0x72, 0x6f, 0x6a,
 	0x65, 0x63, 0x74, 0x7d, 0x2f, 0x7b, 0x69, 0x64, 0x2e, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x7d,
-	0x2f, 0x7b, 0x69, 0x64, 0x2e, 0x6e, 0x61, 0x6d, 0x65, 0x7d, 0x42, 0xc2, 0x01, 0x0a, 0x14, 0x63,
-	0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x73, 0x65, 0x72, 0x76,
-	0x69, 0x63, 0x65, 0x42, 0x0a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x50, 0x72, 0x6f, 0x74, 0x6f, 0x50,
-	0x01, 0x5a, 0x3d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x66, 0x6c,
-	0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x2f, 0x66, 0x6c, 0x79,
-	0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62, 0x2d, 0x67, 0x6f, 0x2f,
-	0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
-	0xa2, 0x02, 0x03, 0x46, 0x53, 0x58, 0xaa, 0x02, 0x10, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64,
-	0x6c, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0xca, 0x02, 0x10, 0x46, 0x6c, 0x79, 0x74,
-	0x65, 0x69, 0x64, 0x6c, 0x5c, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0xe2, 0x02, 0x1c, 0x46,
-	0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x5c,
-	0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea, 0x02, 0x11, 0x46, 0x6c,
-	0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x62,
-	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x2f, 0x7b, 0x69, 0x64, 0x2e, 0x6e, 0x61, 0x6d, 0x65, 0x7d, 0x12, 0xd1, 0x01, 0x0a, 0x12, 0x4c,
+	0x69, 0x73, 0x74, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75, 0x6e,
+	0x74, 0x12, 0x25, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d,
+	0x69, 0x6e, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75, 0x6e,
+	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x69, 0x64, 0x6c, 0x2e, 0x61, 0x64, 0x6d, 0x69, 0x6e, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x75, 0x74,
+	0x69, 0x6f, 0x6e, 0x43, 0x6f, 0x75, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x6c, 0x82, 0xd3, 0xe4, 0x93, 0x02, 0x66, 0x5a, 0x37, 0x12, 0x35, 0x2f, 0x61, 0x70, 0x69,
+	0x2f, 0x76, 0x31, 0x2f, 0x6f, 0x72, 0x67, 0x2f, 0x63, 0x6f, 0x75, 0x6e, 0x74, 0x2f, 0x65, 0x78,
+	0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x7b, 0x6f, 0x72, 0x67, 0x7d, 0x2f, 0x7b,
+	0x70, 0x72, 0x6f, 0x6a, 0x65, 0x63, 0x74, 0x7d, 0x2f, 0x7b, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e,
+	0x7d, 0x12, 0x2b, 0x2f, 0x61, 0x70, 0x69, 0x2f, 0x76, 0x31, 0x2f, 0x63, 0x6f, 0x75, 0x6e, 0x74,
+	0x2f, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x2f, 0x7b, 0x70, 0x72, 0x6f,
+	0x6a, 0x65, 0x63, 0x74, 0x7d, 0x2f, 0x7b, 0x64, 0x6f, 0x6d, 0x61, 0x69, 0x6e, 0x7d, 0x42, 0xc2,
+	0x01, 0x0a, 0x14, 0x63, 0x6f, 0x6d, 0x2e, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e,
+	0x73, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0x42, 0x0a, 0x41, 0x64, 0x6d, 0x69, 0x6e, 0x50, 0x72,
+	0x6f, 0x74, 0x6f, 0x50, 0x01, 0x5a, 0x3d, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f,
+	0x6d, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x6f, 0x72, 0x67, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65,
+	0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x67, 0x65, 0x6e, 0x2f, 0x70, 0x62,
+	0x2d, 0x67, 0x6f, 0x2f, 0x66, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x2f, 0x73, 0x65, 0x72,
+	0x76, 0x69, 0x63, 0x65, 0xa2, 0x02, 0x03, 0x46, 0x53, 0x58, 0xaa, 0x02, 0x10, 0x46, 0x6c, 0x79,
+	0x74, 0x65, 0x69, 0x64, 0x6c, 0x2e, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65, 0xca, 0x02, 0x10,
+	0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x53, 0x65, 0x72, 0x76, 0x69, 0x63, 0x65,
+	0xe2, 0x02, 0x1c, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x5c, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x5c, 0x47, 0x50, 0x42, 0x4d, 0x65, 0x74, 0x61, 0x64, 0x61, 0x74, 0x61, 0xea,
+	0x02, 0x11, 0x46, 0x6c, 0x79, 0x74, 0x65, 0x69, 0x64, 0x6c, 0x3a, 0x3a, 0x53, 0x65, 0x72, 0x76,
+	0x69, 0x63, 0x65, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var file_flyteidl_service_admin_proto_goTypes = []interface{}{
@@ -1041,53 +1054,55 @@ var file_flyteidl_service_admin_proto_goTypes = []interface{}{
 	(*admin.GetVersionRequest)(nil),                     // 43: flyteidl.admin.GetVersionRequest
 	(*admin.DescriptionEntityListRequest)(nil),          // 44: flyteidl.admin.DescriptionEntityListRequest
 	(*admin.WorkflowExecutionGetMetricsRequest)(nil),    // 45: flyteidl.admin.WorkflowExecutionGetMetricsRequest
-	(*admin.TaskCreateResponse)(nil),                    // 46: flyteidl.admin.TaskCreateResponse
-	(*admin.Task)(nil),                                  // 47: flyteidl.admin.Task
-	(*admin.NamedEntityIdentifierList)(nil),             // 48: flyteidl.admin.NamedEntityIdentifierList
-	(*admin.TaskList)(nil),                              // 49: flyteidl.admin.TaskList
-	(*admin.WorkflowCreateResponse)(nil),                // 50: flyteidl.admin.WorkflowCreateResponse
-	(*admin.Workflow)(nil),                              // 51: flyteidl.admin.Workflow
-	(*admin.WorkflowList)(nil),                          // 52: flyteidl.admin.WorkflowList
-	(*admin.LaunchPlanCreateResponse)(nil),              // 53: flyteidl.admin.LaunchPlanCreateResponse
-	(*admin.LaunchPlan)(nil),                            // 54: flyteidl.admin.LaunchPlan
-	(*admin.LaunchPlanList)(nil),                        // 55: flyteidl.admin.LaunchPlanList
-	(*admin.LaunchPlanUpdateResponse)(nil),              // 56: flyteidl.admin.LaunchPlanUpdateResponse
-	(*admin.ExecutionCreateResponse)(nil),               // 57: flyteidl.admin.ExecutionCreateResponse
-	(*admin.Execution)(nil),                             // 58: flyteidl.admin.Execution
-	(*admin.ExecutionUpdateResponse)(nil),               // 59: flyteidl.admin.ExecutionUpdateResponse
-	(*admin.WorkflowExecutionGetDataResponse)(nil),      // 60: flyteidl.admin.WorkflowExecutionGetDataResponse
-	(*admin.ExecutionList)(nil),                         // 61: flyteidl.admin.ExecutionList
-	(*admin.ExecutionTerminateResponse)(nil),            // 62: flyteidl.admin.ExecutionTerminateResponse
-	(*admin.NodeExecution)(nil),                         // 63: flyteidl.admin.NodeExecution
-	(*admin.DynamicNodeWorkflowResponse)(nil),           // 64: flyteidl.admin.DynamicNodeWorkflowResponse
-	(*admin.NodeExecutionList)(nil),                     // 65: flyteidl.admin.NodeExecutionList
-	(*admin.NodeExecutionGetDataResponse)(nil),          // 66: flyteidl.admin.NodeExecutionGetDataResponse
-	(*admin.ProjectRegisterResponse)(nil),               // 67: flyteidl.admin.ProjectRegisterResponse
-	(*admin.ProjectUpdateResponse)(nil),                 // 68: flyteidl.admin.ProjectUpdateResponse
-	(*admin.Projects)(nil),                              // 69: flyteidl.admin.Projects
-	(*admin.WorkflowExecutionEventResponse)(nil),        // 70: flyteidl.admin.WorkflowExecutionEventResponse
-	(*admin.NodeExecutionEventResponse)(nil),            // 71: flyteidl.admin.NodeExecutionEventResponse
-	(*admin.TaskExecutionEventResponse)(nil),            // 72: flyteidl.admin.TaskExecutionEventResponse
-	(*admin.TaskExecution)(nil),                         // 73: flyteidl.admin.TaskExecution
-	(*admin.TaskExecutionList)(nil),                     // 74: flyteidl.admin.TaskExecutionList
-	(*admin.TaskExecutionGetDataResponse)(nil),          // 75: flyteidl.admin.TaskExecutionGetDataResponse
-	(*admin.ProjectDomainAttributesUpdateResponse)(nil), // 76: flyteidl.admin.ProjectDomainAttributesUpdateResponse
-	(*admin.ProjectDomainAttributesGetResponse)(nil),    // 77: flyteidl.admin.ProjectDomainAttributesGetResponse
-	(*admin.ProjectDomainAttributesDeleteResponse)(nil), // 78: flyteidl.admin.ProjectDomainAttributesDeleteResponse
-	(*admin.ProjectAttributesUpdateResponse)(nil),       // 79: flyteidl.admin.ProjectAttributesUpdateResponse
-	(*admin.ProjectAttributesGetResponse)(nil),          // 80: flyteidl.admin.ProjectAttributesGetResponse
-	(*admin.ProjectAttributesDeleteResponse)(nil),       // 81: flyteidl.admin.ProjectAttributesDeleteResponse
-	(*admin.WorkflowAttributesUpdateResponse)(nil),      // 82: flyteidl.admin.WorkflowAttributesUpdateResponse
-	(*admin.WorkflowAttributesGetResponse)(nil),         // 83: flyteidl.admin.WorkflowAttributesGetResponse
-	(*admin.WorkflowAttributesDeleteResponse)(nil),      // 84: flyteidl.admin.WorkflowAttributesDeleteResponse
-	(*admin.ListMatchableAttributesResponse)(nil),       // 85: flyteidl.admin.ListMatchableAttributesResponse
-	(*admin.NamedEntityList)(nil),                       // 86: flyteidl.admin.NamedEntityList
-	(*admin.NamedEntity)(nil),                           // 87: flyteidl.admin.NamedEntity
-	(*admin.NamedEntityUpdateResponse)(nil),             // 88: flyteidl.admin.NamedEntityUpdateResponse
-	(*admin.GetVersionResponse)(nil),                    // 89: flyteidl.admin.GetVersionResponse
-	(*admin.DescriptionEntity)(nil),                     // 90: flyteidl.admin.DescriptionEntity
-	(*admin.DescriptionEntityList)(nil),                 // 91: flyteidl.admin.DescriptionEntityList
-	(*admin.WorkflowExecutionGetMetricsResponse)(nil),   // 92: flyteidl.admin.WorkflowExecutionGetMetricsResponse
+	(*admin.ExecutionCountRequest)(nil),                 // 46: flyteidl.admin.ExecutionCountRequest
+	(*admin.TaskCreateResponse)(nil),                    // 47: flyteidl.admin.TaskCreateResponse
+	(*admin.Task)(nil),                                  // 48: flyteidl.admin.Task
+	(*admin.NamedEntityIdentifierList)(nil),             // 49: flyteidl.admin.NamedEntityIdentifierList
+	(*admin.TaskList)(nil),                              // 50: flyteidl.admin.TaskList
+	(*admin.WorkflowCreateResponse)(nil),                // 51: flyteidl.admin.WorkflowCreateResponse
+	(*admin.Workflow)(nil),                              // 52: flyteidl.admin.Workflow
+	(*admin.WorkflowList)(nil),                          // 53: flyteidl.admin.WorkflowList
+	(*admin.LaunchPlanCreateResponse)(nil),              // 54: flyteidl.admin.LaunchPlanCreateResponse
+	(*admin.LaunchPlan)(nil),                            // 55: flyteidl.admin.LaunchPlan
+	(*admin.LaunchPlanList)(nil),                        // 56: flyteidl.admin.LaunchPlanList
+	(*admin.LaunchPlanUpdateResponse)(nil),              // 57: flyteidl.admin.LaunchPlanUpdateResponse
+	(*admin.ExecutionCreateResponse)(nil),               // 58: flyteidl.admin.ExecutionCreateResponse
+	(*admin.Execution)(nil),                             // 59: flyteidl.admin.Execution
+	(*admin.ExecutionUpdateResponse)(nil),               // 60: flyteidl.admin.ExecutionUpdateResponse
+	(*admin.WorkflowExecutionGetDataResponse)(nil),      // 61: flyteidl.admin.WorkflowExecutionGetDataResponse
+	(*admin.ExecutionList)(nil),                         // 62: flyteidl.admin.ExecutionList
+	(*admin.ExecutionTerminateResponse)(nil),            // 63: flyteidl.admin.ExecutionTerminateResponse
+	(*admin.NodeExecution)(nil),                         // 64: flyteidl.admin.NodeExecution
+	(*admin.DynamicNodeWorkflowResponse)(nil),           // 65: flyteidl.admin.DynamicNodeWorkflowResponse
+	(*admin.NodeExecutionList)(nil),                     // 66: flyteidl.admin.NodeExecutionList
+	(*admin.NodeExecutionGetDataResponse)(nil),          // 67: flyteidl.admin.NodeExecutionGetDataResponse
+	(*admin.ProjectRegisterResponse)(nil),               // 68: flyteidl.admin.ProjectRegisterResponse
+	(*admin.ProjectUpdateResponse)(nil),                 // 69: flyteidl.admin.ProjectUpdateResponse
+	(*admin.Projects)(nil),                              // 70: flyteidl.admin.Projects
+	(*admin.WorkflowExecutionEventResponse)(nil),        // 71: flyteidl.admin.WorkflowExecutionEventResponse
+	(*admin.NodeExecutionEventResponse)(nil),            // 72: flyteidl.admin.NodeExecutionEventResponse
+	(*admin.TaskExecutionEventResponse)(nil),            // 73: flyteidl.admin.TaskExecutionEventResponse
+	(*admin.TaskExecution)(nil),                         // 74: flyteidl.admin.TaskExecution
+	(*admin.TaskExecutionList)(nil),                     // 75: flyteidl.admin.TaskExecutionList
+	(*admin.TaskExecutionGetDataResponse)(nil),          // 76: flyteidl.admin.TaskExecutionGetDataResponse
+	(*admin.ProjectDomainAttributesUpdateResponse)(nil), // 77: flyteidl.admin.ProjectDomainAttributesUpdateResponse
+	(*admin.ProjectDomainAttributesGetResponse)(nil),    // 78: flyteidl.admin.ProjectDomainAttributesGetResponse
+	(*admin.ProjectDomainAttributesDeleteResponse)(nil), // 79: flyteidl.admin.ProjectDomainAttributesDeleteResponse
+	(*admin.ProjectAttributesUpdateResponse)(nil),       // 80: flyteidl.admin.ProjectAttributesUpdateResponse
+	(*admin.ProjectAttributesGetResponse)(nil),          // 81: flyteidl.admin.ProjectAttributesGetResponse
+	(*admin.ProjectAttributesDeleteResponse)(nil),       // 82: flyteidl.admin.ProjectAttributesDeleteResponse
+	(*admin.WorkflowAttributesUpdateResponse)(nil),      // 83: flyteidl.admin.WorkflowAttributesUpdateResponse
+	(*admin.WorkflowAttributesGetResponse)(nil),         // 84: flyteidl.admin.WorkflowAttributesGetResponse
+	(*admin.WorkflowAttributesDeleteResponse)(nil),      // 85: flyteidl.admin.WorkflowAttributesDeleteResponse
+	(*admin.ListMatchableAttributesResponse)(nil),       // 86: flyteidl.admin.ListMatchableAttributesResponse
+	(*admin.NamedEntityList)(nil),                       // 87: flyteidl.admin.NamedEntityList
+	(*admin.NamedEntity)(nil),                           // 88: flyteidl.admin.NamedEntity
+	(*admin.NamedEntityUpdateResponse)(nil),             // 89: flyteidl.admin.NamedEntityUpdateResponse
+	(*admin.GetVersionResponse)(nil),                    // 90: flyteidl.admin.GetVersionResponse
+	(*admin.DescriptionEntity)(nil),                     // 91: flyteidl.admin.DescriptionEntity
+	(*admin.DescriptionEntityList)(nil),                 // 92: flyteidl.admin.DescriptionEntityList
+	(*admin.WorkflowExecutionGetMetricsResponse)(nil),   // 93: flyteidl.admin.WorkflowExecutionGetMetricsResponse
+	(*admin.ExecutionCountResponse)(nil),                // 94: flyteidl.admin.ExecutionCountResponse
 }
 var file_flyteidl_service_admin_proto_depIdxs = []int32{
 	0,  // 0: flyteidl.service.AdminService.CreateTask:input_type -> flyteidl.admin.TaskCreateRequest
@@ -1144,62 +1159,64 @@ var file_flyteidl_service_admin_proto_depIdxs = []int32{
 	1,  // 51: flyteidl.service.AdminService.GetDescriptionEntity:input_type -> flyteidl.admin.ObjectGetRequest
 	44, // 52: flyteidl.service.AdminService.ListDescriptionEntities:input_type -> flyteidl.admin.DescriptionEntityListRequest
 	45, // 53: flyteidl.service.AdminService.GetExecutionMetrics:input_type -> flyteidl.admin.WorkflowExecutionGetMetricsRequest
-	46, // 54: flyteidl.service.AdminService.CreateTask:output_type -> flyteidl.admin.TaskCreateResponse
-	47, // 55: flyteidl.service.AdminService.GetTask:output_type -> flyteidl.admin.Task
-	48, // 56: flyteidl.service.AdminService.ListTaskIds:output_type -> flyteidl.admin.NamedEntityIdentifierList
-	49, // 57: flyteidl.service.AdminService.ListTasks:output_type -> flyteidl.admin.TaskList
-	50, // 58: flyteidl.service.AdminService.CreateWorkflow:output_type -> flyteidl.admin.WorkflowCreateResponse
-	51, // 59: flyteidl.service.AdminService.GetWorkflow:output_type -> flyteidl.admin.Workflow
-	48, // 60: flyteidl.service.AdminService.ListWorkflowIds:output_type -> flyteidl.admin.NamedEntityIdentifierList
-	52, // 61: flyteidl.service.AdminService.ListWorkflows:output_type -> flyteidl.admin.WorkflowList
-	53, // 62: flyteidl.service.AdminService.CreateLaunchPlan:output_type -> flyteidl.admin.LaunchPlanCreateResponse
-	54, // 63: flyteidl.service.AdminService.GetLaunchPlan:output_type -> flyteidl.admin.LaunchPlan
-	54, // 64: flyteidl.service.AdminService.GetActiveLaunchPlan:output_type -> flyteidl.admin.LaunchPlan
-	55, // 65: flyteidl.service.AdminService.ListActiveLaunchPlans:output_type -> flyteidl.admin.LaunchPlanList
-	48, // 66: flyteidl.service.AdminService.ListLaunchPlanIds:output_type -> flyteidl.admin.NamedEntityIdentifierList
-	55, // 67: flyteidl.service.AdminService.ListLaunchPlans:output_type -> flyteidl.admin.LaunchPlanList
-	56, // 68: flyteidl.service.AdminService.UpdateLaunchPlan:output_type -> flyteidl.admin.LaunchPlanUpdateResponse
-	57, // 69: flyteidl.service.AdminService.CreateExecution:output_type -> flyteidl.admin.ExecutionCreateResponse
-	57, // 70: flyteidl.service.AdminService.RelaunchExecution:output_type -> flyteidl.admin.ExecutionCreateResponse
-	57, // 71: flyteidl.service.AdminService.RecoverExecution:output_type -> flyteidl.admin.ExecutionCreateResponse
-	58, // 72: flyteidl.service.AdminService.GetExecution:output_type -> flyteidl.admin.Execution
-	59, // 73: flyteidl.service.AdminService.UpdateExecution:output_type -> flyteidl.admin.ExecutionUpdateResponse
-	60, // 74: flyteidl.service.AdminService.GetExecutionData:output_type -> flyteidl.admin.WorkflowExecutionGetDataResponse
-	61, // 75: flyteidl.service.AdminService.ListExecutions:output_type -> flyteidl.admin.ExecutionList
-	62, // 76: flyteidl.service.AdminService.TerminateExecution:output_type -> flyteidl.admin.ExecutionTerminateResponse
-	63, // 77: flyteidl.service.AdminService.GetNodeExecution:output_type -> flyteidl.admin.NodeExecution
-	64, // 78: flyteidl.service.AdminService.GetDynamicNodeWorkflow:output_type -> flyteidl.admin.DynamicNodeWorkflowResponse
-	65, // 79: flyteidl.service.AdminService.ListNodeExecutions:output_type -> flyteidl.admin.NodeExecutionList
-	65, // 80: flyteidl.service.AdminService.ListNodeExecutionsForTask:output_type -> flyteidl.admin.NodeExecutionList
-	66, // 81: flyteidl.service.AdminService.GetNodeExecutionData:output_type -> flyteidl.admin.NodeExecutionGetDataResponse
-	67, // 82: flyteidl.service.AdminService.RegisterProject:output_type -> flyteidl.admin.ProjectRegisterResponse
-	68, // 83: flyteidl.service.AdminService.UpdateProject:output_type -> flyteidl.admin.ProjectUpdateResponse
-	69, // 84: flyteidl.service.AdminService.ListProjects:output_type -> flyteidl.admin.Projects
-	70, // 85: flyteidl.service.AdminService.CreateWorkflowEvent:output_type -> flyteidl.admin.WorkflowExecutionEventResponse
-	71, // 86: flyteidl.service.AdminService.CreateNodeEvent:output_type -> flyteidl.admin.NodeExecutionEventResponse
-	72, // 87: flyteidl.service.AdminService.CreateTaskEvent:output_type -> flyteidl.admin.TaskExecutionEventResponse
-	73, // 88: flyteidl.service.AdminService.GetTaskExecution:output_type -> flyteidl.admin.TaskExecution
-	74, // 89: flyteidl.service.AdminService.ListTaskExecutions:output_type -> flyteidl.admin.TaskExecutionList
-	75, // 90: flyteidl.service.AdminService.GetTaskExecutionData:output_type -> flyteidl.admin.TaskExecutionGetDataResponse
-	76, // 91: flyteidl.service.AdminService.UpdateProjectDomainAttributes:output_type -> flyteidl.admin.ProjectDomainAttributesUpdateResponse
-	77, // 92: flyteidl.service.AdminService.GetProjectDomainAttributes:output_type -> flyteidl.admin.ProjectDomainAttributesGetResponse
-	78, // 93: flyteidl.service.AdminService.DeleteProjectDomainAttributes:output_type -> flyteidl.admin.ProjectDomainAttributesDeleteResponse
-	79, // 94: flyteidl.service.AdminService.UpdateProjectAttributes:output_type -> flyteidl.admin.ProjectAttributesUpdateResponse
-	80, // 95: flyteidl.service.AdminService.GetProjectAttributes:output_type -> flyteidl.admin.ProjectAttributesGetResponse
-	81, // 96: flyteidl.service.AdminService.DeleteProjectAttributes:output_type -> flyteidl.admin.ProjectAttributesDeleteResponse
-	82, // 97: flyteidl.service.AdminService.UpdateWorkflowAttributes:output_type -> flyteidl.admin.WorkflowAttributesUpdateResponse
-	83, // 98: flyteidl.service.AdminService.GetWorkflowAttributes:output_type -> flyteidl.admin.WorkflowAttributesGetResponse
-	84, // 99: flyteidl.service.AdminService.DeleteWorkflowAttributes:output_type -> flyteidl.admin.WorkflowAttributesDeleteResponse
-	85, // 100: flyteidl.service.AdminService.ListMatchableAttributes:output_type -> flyteidl.admin.ListMatchableAttributesResponse
-	86, // 101: flyteidl.service.AdminService.ListNamedEntities:output_type -> flyteidl.admin.NamedEntityList
-	87, // 102: flyteidl.service.AdminService.GetNamedEntity:output_type -> flyteidl.admin.NamedEntity
-	88, // 103: flyteidl.service.AdminService.UpdateNamedEntity:output_type -> flyteidl.admin.NamedEntityUpdateResponse
-	89, // 104: flyteidl.service.AdminService.GetVersion:output_type -> flyteidl.admin.GetVersionResponse
-	90, // 105: flyteidl.service.AdminService.GetDescriptionEntity:output_type -> flyteidl.admin.DescriptionEntity
-	91, // 106: flyteidl.service.AdminService.ListDescriptionEntities:output_type -> flyteidl.admin.DescriptionEntityList
-	92, // 107: flyteidl.service.AdminService.GetExecutionMetrics:output_type -> flyteidl.admin.WorkflowExecutionGetMetricsResponse
-	54, // [54:108] is the sub-list for method output_type
-	0,  // [0:54] is the sub-list for method input_type
+	46, // 54: flyteidl.service.AdminService.ListExecutionCount:input_type -> flyteidl.admin.ExecutionCountRequest
+	47, // 55: flyteidl.service.AdminService.CreateTask:output_type -> flyteidl.admin.TaskCreateResponse
+	48, // 56: flyteidl.service.AdminService.GetTask:output_type -> flyteidl.admin.Task
+	49, // 57: flyteidl.service.AdminService.ListTaskIds:output_type -> flyteidl.admin.NamedEntityIdentifierList
+	50, // 58: flyteidl.service.AdminService.ListTasks:output_type -> flyteidl.admin.TaskList
+	51, // 59: flyteidl.service.AdminService.CreateWorkflow:output_type -> flyteidl.admin.WorkflowCreateResponse
+	52, // 60: flyteidl.service.AdminService.GetWorkflow:output_type -> flyteidl.admin.Workflow
+	49, // 61: flyteidl.service.AdminService.ListWorkflowIds:output_type -> flyteidl.admin.NamedEntityIdentifierList
+	53, // 62: flyteidl.service.AdminService.ListWorkflows:output_type -> flyteidl.admin.WorkflowList
+	54, // 63: flyteidl.service.AdminService.CreateLaunchPlan:output_type -> flyteidl.admin.LaunchPlanCreateResponse
+	55, // 64: flyteidl.service.AdminService.GetLaunchPlan:output_type -> flyteidl.admin.LaunchPlan
+	55, // 65: flyteidl.service.AdminService.GetActiveLaunchPlan:output_type -> flyteidl.admin.LaunchPlan
+	56, // 66: flyteidl.service.AdminService.ListActiveLaunchPlans:output_type -> flyteidl.admin.LaunchPlanList
+	49, // 67: flyteidl.service.AdminService.ListLaunchPlanIds:output_type -> flyteidl.admin.NamedEntityIdentifierList
+	56, // 68: flyteidl.service.AdminService.ListLaunchPlans:output_type -> flyteidl.admin.LaunchPlanList
+	57, // 69: flyteidl.service.AdminService.UpdateLaunchPlan:output_type -> flyteidl.admin.LaunchPlanUpdateResponse
+	58, // 70: flyteidl.service.AdminService.CreateExecution:output_type -> flyteidl.admin.ExecutionCreateResponse
+	58, // 71: flyteidl.service.AdminService.RelaunchExecution:output_type -> flyteidl.admin.ExecutionCreateResponse
+	58, // 72: flyteidl.service.AdminService.RecoverExecution:output_type -> flyteidl.admin.ExecutionCreateResponse
+	59, // 73: flyteidl.service.AdminService.GetExecution:output_type -> flyteidl.admin.Execution
+	60, // 74: flyteidl.service.AdminService.UpdateExecution:output_type -> flyteidl.admin.ExecutionUpdateResponse
+	61, // 75: flyteidl.service.AdminService.GetExecutionData:output_type -> flyteidl.admin.WorkflowExecutionGetDataResponse
+	62, // 76: flyteidl.service.AdminService.ListExecutions:output_type -> flyteidl.admin.ExecutionList
+	63, // 77: flyteidl.service.AdminService.TerminateExecution:output_type -> flyteidl.admin.ExecutionTerminateResponse
+	64, // 78: flyteidl.service.AdminService.GetNodeExecution:output_type -> flyteidl.admin.NodeExecution
+	65, // 79: flyteidl.service.AdminService.GetDynamicNodeWorkflow:output_type -> flyteidl.admin.DynamicNodeWorkflowResponse
+	66, // 80: flyteidl.service.AdminService.ListNodeExecutions:output_type -> flyteidl.admin.NodeExecutionList
+	66, // 81: flyteidl.service.AdminService.ListNodeExecutionsForTask:output_type -> flyteidl.admin.NodeExecutionList
+	67, // 82: flyteidl.service.AdminService.GetNodeExecutionData:output_type -> flyteidl.admin.NodeExecutionGetDataResponse
+	68, // 83: flyteidl.service.AdminService.RegisterProject:output_type -> flyteidl.admin.ProjectRegisterResponse
+	69, // 84: flyteidl.service.AdminService.UpdateProject:output_type -> flyteidl.admin.ProjectUpdateResponse
+	70, // 85: flyteidl.service.AdminService.ListProjects:output_type -> flyteidl.admin.Projects
+	71, // 86: flyteidl.service.AdminService.CreateWorkflowEvent:output_type -> flyteidl.admin.WorkflowExecutionEventResponse
+	72, // 87: flyteidl.service.AdminService.CreateNodeEvent:output_type -> flyteidl.admin.NodeExecutionEventResponse
+	73, // 88: flyteidl.service.AdminService.CreateTaskEvent:output_type -> flyteidl.admin.TaskExecutionEventResponse
+	74, // 89: flyteidl.service.AdminService.GetTaskExecution:output_type -> flyteidl.admin.TaskExecution
+	75, // 90: flyteidl.service.AdminService.ListTaskExecutions:output_type -> flyteidl.admin.TaskExecutionList
+	76, // 91: flyteidl.service.AdminService.GetTaskExecutionData:output_type -> flyteidl.admin.TaskExecutionGetDataResponse
+	77, // 92: flyteidl.service.AdminService.UpdateProjectDomainAttributes:output_type -> flyteidl.admin.ProjectDomainAttributesUpdateResponse
+	78, // 93: flyteidl.service.AdminService.GetProjectDomainAttributes:output_type -> flyteidl.admin.ProjectDomainAttributesGetResponse
+	79, // 94: flyteidl.service.AdminService.DeleteProjectDomainAttributes:output_type -> flyteidl.admin.ProjectDomainAttributesDeleteResponse
+	80, // 95: flyteidl.service.AdminService.UpdateProjectAttributes:output_type -> flyteidl.admin.ProjectAttributesUpdateResponse
+	81, // 96: flyteidl.service.AdminService.GetProjectAttributes:output_type -> flyteidl.admin.ProjectAttributesGetResponse
+	82, // 97: flyteidl.service.AdminService.DeleteProjectAttributes:output_type -> flyteidl.admin.ProjectAttributesDeleteResponse
+	83, // 98: flyteidl.service.AdminService.UpdateWorkflowAttributes:output_type -> flyteidl.admin.WorkflowAttributesUpdateResponse
+	84, // 99: flyteidl.service.AdminService.GetWorkflowAttributes:output_type -> flyteidl.admin.WorkflowAttributesGetResponse
+	85, // 100: flyteidl.service.AdminService.DeleteWorkflowAttributes:output_type -> flyteidl.admin.WorkflowAttributesDeleteResponse
+	86, // 101: flyteidl.service.AdminService.ListMatchableAttributes:output_type -> flyteidl.admin.ListMatchableAttributesResponse
+	87, // 102: flyteidl.service.AdminService.ListNamedEntities:output_type -> flyteidl.admin.NamedEntityList
+	88, // 103: flyteidl.service.AdminService.GetNamedEntity:output_type -> flyteidl.admin.NamedEntity
+	89, // 104: flyteidl.service.AdminService.UpdateNamedEntity:output_type -> flyteidl.admin.NamedEntityUpdateResponse
+	90, // 105: flyteidl.service.AdminService.GetVersion:output_type -> flyteidl.admin.GetVersionResponse
+	91, // 106: flyteidl.service.AdminService.GetDescriptionEntity:output_type -> flyteidl.admin.DescriptionEntity
+	92, // 107: flyteidl.service.AdminService.ListDescriptionEntities:output_type -> flyteidl.admin.DescriptionEntityList
+	93, // 108: flyteidl.service.AdminService.GetExecutionMetrics:output_type -> flyteidl.admin.WorkflowExecutionGetMetricsResponse
+	94, // 109: flyteidl.service.AdminService.ListExecutionCount:output_type -> flyteidl.admin.ExecutionCountResponse
+	55, // [55:110] is the sub-list for method output_type
+	0,  // [0:55] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name

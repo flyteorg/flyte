@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { BoolValue, Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
+import { BoolValue, Duration, Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 import { LiteralMap } from "../core/literals_pb.js";
 import { Identifier, NodeExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { ExecutionError, QualityOfService, WorkflowExecution_Phase } from "../core/execution_pb.js";
@@ -1577,6 +1577,159 @@ export class WorkflowExecutionGetMetricsResponse extends Message<WorkflowExecuti
 
   static equals(a: WorkflowExecutionGetMetricsResponse | PlainMessage<WorkflowExecutionGetMetricsResponse> | undefined, b: WorkflowExecutionGetMetricsResponse | PlainMessage<WorkflowExecutionGetMetricsResponse> | undefined): boolean {
     return proto3.util.equals(WorkflowExecutionGetMetricsResponse, a, b);
+  }
+}
+
+/**
+ * Request to count executions with the given project, domain and optionally-assigned org.
+ *
+ * @generated from message flyteidl.admin.ExecutionCountRequest
+ */
+export class ExecutionCountRequest extends Message<ExecutionCountRequest> {
+  /**
+   * Name of the project the execution belongs to.
+   * +required
+   *
+   * @generated from field: string project = 1;
+   */
+  project = "";
+
+  /**
+   * Name of the domain the execution belongs to.
+   * A domain can be considered as a subset within a specific project.
+   * +required
+   *
+   * @generated from field: string domain = 2;
+   */
+  domain = "";
+
+  /**
+   * Optional, org filter applied to list project requests.
+   *
+   * @generated from field: string org = 3;
+   */
+  org = "";
+
+  /**
+   * Indicates a list of filters passed as string.
+   * +optional
+   *
+   * @generated from field: string filters = 4;
+   */
+  filters = "";
+
+  constructor(data?: PartialMessage<ExecutionCountRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionCountRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "filters", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCountRequest {
+    return new ExecutionCountRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionCountRequest {
+    return new ExecutionCountRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionCountRequest {
+    return new ExecutionCountRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionCountRequest | PlainMessage<ExecutionCountRequest> | undefined, b: ExecutionCountRequest | PlainMessage<ExecutionCountRequest> | undefined): boolean {
+    return proto3.util.equals(ExecutionCountRequest, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.admin.ExecutionCountByPhase
+ */
+export class ExecutionCountByPhase extends Message<ExecutionCountByPhase> {
+  /**
+   * @generated from field: flyteidl.core.WorkflowExecution.Phase phase = 1;
+   */
+  phase = WorkflowExecution_Phase.UNDEFINED;
+
+  /**
+   * @generated from field: int64 count = 2;
+   */
+  count = protoInt64.zero;
+
+  constructor(data?: PartialMessage<ExecutionCountByPhase>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionCountByPhase";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "phase", kind: "enum", T: proto3.getEnumType(WorkflowExecution_Phase) },
+    { no: 2, name: "count", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCountByPhase {
+    return new ExecutionCountByPhase().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionCountByPhase {
+    return new ExecutionCountByPhase().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionCountByPhase {
+    return new ExecutionCountByPhase().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionCountByPhase | PlainMessage<ExecutionCountByPhase> | undefined, b: ExecutionCountByPhase | PlainMessage<ExecutionCountByPhase> | undefined): boolean {
+    return proto3.util.equals(ExecutionCountByPhase, a, b);
+  }
+}
+
+/**
+ * Counts of executions by phases
+ *
+ * @generated from message flyteidl.admin.ExecutionCountResponse
+ */
+export class ExecutionCountResponse extends Message<ExecutionCountResponse> {
+  /**
+   * Map of workflow execution phase to workflow count
+   *
+   * @generated from field: repeated flyteidl.admin.ExecutionCountByPhase ExecutionCount = 1;
+   */
+  ExecutionCount: ExecutionCountByPhase[] = [];
+
+  constructor(data?: PartialMessage<ExecutionCountResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionCountResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "ExecutionCount", kind: "message", T: ExecutionCountByPhase, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCountResponse {
+    return new ExecutionCountResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionCountResponse {
+    return new ExecutionCountResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionCountResponse {
+    return new ExecutionCountResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionCountResponse | PlainMessage<ExecutionCountResponse> | undefined, b: ExecutionCountResponse | PlainMessage<ExecutionCountResponse> | undefined): boolean {
+    return proto3.util.equals(ExecutionCountResponse, a, b);
   }
 }
 

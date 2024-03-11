@@ -1524,6 +1524,43 @@ pub struct WorkflowExecutionGetMetricsResponse {
     #[prost(message, optional, tag="1")]
     pub span: ::core::option::Option<super::core::Span>,
 }
+/// Request to count executions with the given project, domain and optionally-assigned org.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionCountRequest {
+    /// Name of the project the execution belongs to.
+    /// +required
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    /// Name of the domain the execution belongs to.
+    /// A domain can be considered as a subset within a specific project.
+    /// +required
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    /// Optional, org filter applied to list project requests.
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
+    /// Indicates a list of filters passed as string.
+    /// +optional
+    #[prost(string, tag="4")]
+    pub filters: ::prost::alloc::string::String,
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionCountByPhase {
+    #[prost(enumeration="super::core::workflow_execution::Phase", tag="1")]
+    pub phase: i32,
+    #[prost(int64, tag="2")]
+    pub count: i64,
+}
+/// Counts of executions by phases
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionCountResponse {
+    /// Map of workflow execution phase to workflow count
+    #[prost(message, repeated, tag="1")]
+    pub execution_count: ::prost::alloc::vec::Vec<ExecutionCountByPhase>,
+}
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

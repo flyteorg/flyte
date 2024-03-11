@@ -35181,6 +35181,427 @@
                 return WorkflowExecutionGetMetricsResponse;
             })();
     
+            admin.ExecutionCountRequest = (function() {
+    
+                /**
+                 * Properties of an ExecutionCountRequest.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionCountRequest
+                 * @property {string|null} [project] ExecutionCountRequest project
+                 * @property {string|null} [domain] ExecutionCountRequest domain
+                 * @property {string|null} [org] ExecutionCountRequest org
+                 * @property {string|null} [filters] ExecutionCountRequest filters
+                 */
+    
+                /**
+                 * Constructs a new ExecutionCountRequest.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionCountRequest.
+                 * @implements IExecutionCountRequest
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionCountRequest=} [properties] Properties to set
+                 */
+                function ExecutionCountRequest(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionCountRequest project.
+                 * @member {string} project
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @instance
+                 */
+                ExecutionCountRequest.prototype.project = "";
+    
+                /**
+                 * ExecutionCountRequest domain.
+                 * @member {string} domain
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @instance
+                 */
+                ExecutionCountRequest.prototype.domain = "";
+    
+                /**
+                 * ExecutionCountRequest org.
+                 * @member {string} org
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @instance
+                 */
+                ExecutionCountRequest.prototype.org = "";
+    
+                /**
+                 * ExecutionCountRequest filters.
+                 * @member {string} filters
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @instance
+                 */
+                ExecutionCountRequest.prototype.filters = "";
+    
+                /**
+                 * Creates a new ExecutionCountRequest instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @static
+                 * @param {flyteidl.admin.IExecutionCountRequest=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionCountRequest} ExecutionCountRequest instance
+                 */
+                ExecutionCountRequest.create = function create(properties) {
+                    return new ExecutionCountRequest(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionCountRequest message. Does not implicitly {@link flyteidl.admin.ExecutionCountRequest.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @static
+                 * @param {flyteidl.admin.IExecutionCountRequest} message ExecutionCountRequest message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionCountRequest.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        writer.uint32(/* id 1, wireType 2 =*/10).string(message.project);
+                    if (message.domain != null && message.hasOwnProperty("domain"))
+                        writer.uint32(/* id 2, wireType 2 =*/18).string(message.domain);
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        writer.uint32(/* id 3, wireType 2 =*/26).string(message.org);
+                    if (message.filters != null && message.hasOwnProperty("filters"))
+                        writer.uint32(/* id 4, wireType 2 =*/34).string(message.filters);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionCountRequest message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionCountRequest} ExecutionCountRequest
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionCountRequest.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionCountRequest();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.project = reader.string();
+                            break;
+                        case 2:
+                            message.domain = reader.string();
+                            break;
+                        case 3:
+                            message.org = reader.string();
+                            break;
+                        case 4:
+                            message.filters = reader.string();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionCountRequest message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionCountRequest
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionCountRequest.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.project != null && message.hasOwnProperty("project"))
+                        if (!$util.isString(message.project))
+                            return "project: string expected";
+                    if (message.domain != null && message.hasOwnProperty("domain"))
+                        if (!$util.isString(message.domain))
+                            return "domain: string expected";
+                    if (message.org != null && message.hasOwnProperty("org"))
+                        if (!$util.isString(message.org))
+                            return "org: string expected";
+                    if (message.filters != null && message.hasOwnProperty("filters"))
+                        if (!$util.isString(message.filters))
+                            return "filters: string expected";
+                    return null;
+                };
+    
+                return ExecutionCountRequest;
+            })();
+    
+            admin.ExecutionCountByPhase = (function() {
+    
+                /**
+                 * Properties of an ExecutionCountByPhase.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionCountByPhase
+                 * @property {flyteidl.core.WorkflowExecution.Phase|null} [phase] ExecutionCountByPhase phase
+                 * @property {Long|null} [count] ExecutionCountByPhase count
+                 */
+    
+                /**
+                 * Constructs a new ExecutionCountByPhase.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionCountByPhase.
+                 * @implements IExecutionCountByPhase
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionCountByPhase=} [properties] Properties to set
+                 */
+                function ExecutionCountByPhase(properties) {
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionCountByPhase phase.
+                 * @member {flyteidl.core.WorkflowExecution.Phase} phase
+                 * @memberof flyteidl.admin.ExecutionCountByPhase
+                 * @instance
+                 */
+                ExecutionCountByPhase.prototype.phase = 0;
+    
+                /**
+                 * ExecutionCountByPhase count.
+                 * @member {Long} count
+                 * @memberof flyteidl.admin.ExecutionCountByPhase
+                 * @instance
+                 */
+                ExecutionCountByPhase.prototype.count = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+    
+                /**
+                 * Creates a new ExecutionCountByPhase instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionCountByPhase
+                 * @static
+                 * @param {flyteidl.admin.IExecutionCountByPhase=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionCountByPhase} ExecutionCountByPhase instance
+                 */
+                ExecutionCountByPhase.create = function create(properties) {
+                    return new ExecutionCountByPhase(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionCountByPhase message. Does not implicitly {@link flyteidl.admin.ExecutionCountByPhase.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionCountByPhase
+                 * @static
+                 * @param {flyteidl.admin.IExecutionCountByPhase} message ExecutionCountByPhase message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionCountByPhase.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        writer.uint32(/* id 1, wireType 0 =*/8).int32(message.phase);
+                    if (message.count != null && message.hasOwnProperty("count"))
+                        writer.uint32(/* id 2, wireType 0 =*/16).int64(message.count);
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionCountByPhase message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionCountByPhase
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionCountByPhase} ExecutionCountByPhase
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionCountByPhase.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionCountByPhase();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            message.phase = reader.int32();
+                            break;
+                        case 2:
+                            message.count = reader.int64();
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionCountByPhase message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionCountByPhase
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionCountByPhase.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.phase != null && message.hasOwnProperty("phase"))
+                        switch (message.phase) {
+                        default:
+                            return "phase: enum value expected";
+                        case 0:
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                            break;
+                        }
+                    if (message.count != null && message.hasOwnProperty("count"))
+                        if (!$util.isInteger(message.count) && !(message.count && $util.isInteger(message.count.low) && $util.isInteger(message.count.high)))
+                            return "count: integer|Long expected";
+                    return null;
+                };
+    
+                return ExecutionCountByPhase;
+            })();
+    
+            admin.ExecutionCountResponse = (function() {
+    
+                /**
+                 * Properties of an ExecutionCountResponse.
+                 * @memberof flyteidl.admin
+                 * @interface IExecutionCountResponse
+                 * @property {Array.<flyteidl.admin.IExecutionCountByPhase>|null} [ExecutionCount] ExecutionCountResponse ExecutionCount
+                 */
+    
+                /**
+                 * Constructs a new ExecutionCountResponse.
+                 * @memberof flyteidl.admin
+                 * @classdesc Represents an ExecutionCountResponse.
+                 * @implements IExecutionCountResponse
+                 * @constructor
+                 * @param {flyteidl.admin.IExecutionCountResponse=} [properties] Properties to set
+                 */
+                function ExecutionCountResponse(properties) {
+                    this.ExecutionCount = [];
+                    if (properties)
+                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            if (properties[keys[i]] != null)
+                                this[keys[i]] = properties[keys[i]];
+                }
+    
+                /**
+                 * ExecutionCountResponse ExecutionCount.
+                 * @member {Array.<flyteidl.admin.IExecutionCountByPhase>} ExecutionCount
+                 * @memberof flyteidl.admin.ExecutionCountResponse
+                 * @instance
+                 */
+                ExecutionCountResponse.prototype.ExecutionCount = $util.emptyArray;
+    
+                /**
+                 * Creates a new ExecutionCountResponse instance using the specified properties.
+                 * @function create
+                 * @memberof flyteidl.admin.ExecutionCountResponse
+                 * @static
+                 * @param {flyteidl.admin.IExecutionCountResponse=} [properties] Properties to set
+                 * @returns {flyteidl.admin.ExecutionCountResponse} ExecutionCountResponse instance
+                 */
+                ExecutionCountResponse.create = function create(properties) {
+                    return new ExecutionCountResponse(properties);
+                };
+    
+                /**
+                 * Encodes the specified ExecutionCountResponse message. Does not implicitly {@link flyteidl.admin.ExecutionCountResponse.verify|verify} messages.
+                 * @function encode
+                 * @memberof flyteidl.admin.ExecutionCountResponse
+                 * @static
+                 * @param {flyteidl.admin.IExecutionCountResponse} message ExecutionCountResponse message or plain object to encode
+                 * @param {$protobuf.Writer} [writer] Writer to encode to
+                 * @returns {$protobuf.Writer} Writer
+                 */
+                ExecutionCountResponse.encode = function encode(message, writer) {
+                    if (!writer)
+                        writer = $Writer.create();
+                    if (message.ExecutionCount != null && message.ExecutionCount.length)
+                        for (var i = 0; i < message.ExecutionCount.length; ++i)
+                            $root.flyteidl.admin.ExecutionCountByPhase.encode(message.ExecutionCount[i], writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+                    return writer;
+                };
+    
+                /**
+                 * Decodes an ExecutionCountResponse message from the specified reader or buffer.
+                 * @function decode
+                 * @memberof flyteidl.admin.ExecutionCountResponse
+                 * @static
+                 * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+                 * @param {number} [length] Message length if known beforehand
+                 * @returns {flyteidl.admin.ExecutionCountResponse} ExecutionCountResponse
+                 * @throws {Error} If the payload is not a reader or valid buffer
+                 * @throws {$protobuf.util.ProtocolError} If required fields are missing
+                 */
+                ExecutionCountResponse.decode = function decode(reader, length) {
+                    if (!(reader instanceof $Reader))
+                        reader = $Reader.create(reader);
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.admin.ExecutionCountResponse();
+                    while (reader.pos < end) {
+                        var tag = reader.uint32();
+                        switch (tag >>> 3) {
+                        case 1:
+                            if (!(message.ExecutionCount && message.ExecutionCount.length))
+                                message.ExecutionCount = [];
+                            message.ExecutionCount.push($root.flyteidl.admin.ExecutionCountByPhase.decode(reader, reader.uint32()));
+                            break;
+                        default:
+                            reader.skipType(tag & 7);
+                            break;
+                        }
+                    }
+                    return message;
+                };
+    
+                /**
+                 * Verifies an ExecutionCountResponse message.
+                 * @function verify
+                 * @memberof flyteidl.admin.ExecutionCountResponse
+                 * @static
+                 * @param {Object.<string,*>} message Plain object to verify
+                 * @returns {string|null} `null` if valid, otherwise the reason why it is not
+                 */
+                ExecutionCountResponse.verify = function verify(message) {
+                    if (typeof message !== "object" || message === null)
+                        return "object expected";
+                    if (message.ExecutionCount != null && message.hasOwnProperty("ExecutionCount")) {
+                        if (!Array.isArray(message.ExecutionCount))
+                            return "ExecutionCount: array expected";
+                        for (var i = 0; i < message.ExecutionCount.length; ++i) {
+                            var error = $root.flyteidl.admin.ExecutionCountByPhase.verify(message.ExecutionCount[i]);
+                            if (error)
+                                return "ExecutionCount." + error;
+                        }
+                    }
+                    return null;
+                };
+    
+                return ExecutionCountResponse;
+            })();
+    
             admin.LaunchPlanCreateRequest = (function() {
     
                 /**
@@ -52153,6 +52574,39 @@
                  * @instance
                  * @param {flyteidl.admin.IWorkflowExecutionGetMetricsRequest} request WorkflowExecutionGetMetricsRequest message or plain object
                  * @returns {Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>} Promise
+                 * @variation 2
+                 */
+    
+                /**
+                 * Callback as used by {@link flyteidl.service.AdminService#listExecutionCount}.
+                 * @memberof flyteidl.service.AdminService
+                 * @typedef ListExecutionCountCallback
+                 * @type {function}
+                 * @param {Error|null} error Error, if any
+                 * @param {flyteidl.admin.ExecutionCountResponse} [response] ExecutionCountResponse
+                 */
+    
+                /**
+                 * Calls ListExecutionCount.
+                 * @function listExecutionCount
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IExecutionCountRequest} request ExecutionCountRequest message or plain object
+                 * @param {flyteidl.service.AdminService.ListExecutionCountCallback} callback Node-style callback called with the error, if any, and ExecutionCountResponse
+                 * @returns {undefined}
+                 * @variation 1
+                 */
+                Object.defineProperty(AdminService.prototype.listExecutionCount = function listExecutionCount(request, callback) {
+                    return this.rpcCall(listExecutionCount, $root.flyteidl.admin.ExecutionCountRequest, $root.flyteidl.admin.ExecutionCountResponse, request, callback);
+                }, "name", { value: "ListExecutionCount" });
+    
+                /**
+                 * Calls ListExecutionCount.
+                 * @function listExecutionCount
+                 * @memberof flyteidl.service.AdminService
+                 * @instance
+                 * @param {flyteidl.admin.IExecutionCountRequest} request ExecutionCountRequest message or plain object
+                 * @returns {Promise<flyteidl.admin.ExecutionCountResponse>} Promise
                  * @variation 2
                  */
     

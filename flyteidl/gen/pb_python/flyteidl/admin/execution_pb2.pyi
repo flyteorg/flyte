@@ -291,3 +291,29 @@ class WorkflowExecutionGetMetricsResponse(_message.Message):
     SPAN_FIELD_NUMBER: _ClassVar[int]
     span: _metrics_pb2.Span
     def __init__(self, span: _Optional[_Union[_metrics_pb2.Span, _Mapping]] = ...) -> None: ...
+
+class ExecutionCountRequest(_message.Message):
+    __slots__ = ["project", "domain", "org", "filters"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    FILTERS_FIELD_NUMBER: _ClassVar[int]
+    project: str
+    domain: str
+    org: str
+    filters: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., org: _Optional[str] = ..., filters: _Optional[str] = ...) -> None: ...
+
+class ExecutionCountByPhase(_message.Message):
+    __slots__ = ["phase", "count"]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    phase: _execution_pb2.WorkflowExecution.Phase
+    count: int
+    def __init__(self, phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., count: _Optional[int] = ...) -> None: ...
+
+class ExecutionCountResponse(_message.Message):
+    __slots__ = ["ExecutionCount"]
+    EXECUTIONCOUNT_FIELD_NUMBER: _ClassVar[int]
+    ExecutionCount: _containers.RepeatedCompositeFieldContainer[ExecutionCountByPhase]
+    def __init__(self, ExecutionCount: _Optional[_Iterable[_Union[ExecutionCountByPhase, _Mapping]]] = ...) -> None: ...
