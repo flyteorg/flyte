@@ -14,8 +14,8 @@ import (
 
 // Execution primary key
 type ExecutionKey struct {
-	Project string `gorm:"primary_key;column:execution_project" valid:"length(0|255)"`
-	Domain  string `gorm:"primary_key;column:execution_domain" valid:"length(0|255)"`
+	Project string `gorm:"primary_key;column:execution_project;index:execution_project_domain_phase_created_at_state_idx,priority:1" valid:"length(0|255)"`
+	Domain  string `gorm:"primary_key;column:execution_domain;index:execution_project_domain_phase_created_at_state_idx,priority:2" valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;column:execution_name" valid:"length(0|255)"`
 }
 
@@ -26,13 +26,13 @@ type Execution struct {
 	LaunchPlanID uint   `gorm:"index"`
 	WorkflowID   uint   `gorm:"index"`
 	TaskID       uint   `gorm:"index"`
-	Phase        string `valid:"length(0|255)"`
+	Phase        string `gorm:"index:execution_project_domain_phase_created_at_state_idx,priority:3" valid:"length(0|255)"`
 	Closure      []byte
 	Spec         []byte `gorm:"not null"`
 	StartedAt    *time.Time
 	// Corresponds to the CreatedAt field in the Execution closure.
 	// Prefixed with Execution to avoid clashes with gorm.Model CreatedAt
-	ExecutionCreatedAt *time.Time `gorm:"index:idx_executions_created_at"`
+	ExecutionCreatedAt *time.Time `gorm:"index:idx_executions_created_at;index:execution_project_domain_phase_created_at_state_idx,priority:4"`
 	// Corresponds to the UpdatedAt field in the Execution closure
 	// Prefixed with Execution to avoid clashes with gorm.Model UpdatedAt
 	ExecutionUpdatedAt *time.Time
@@ -60,7 +60,7 @@ type Execution struct {
 	// This is also stored in the spec but promoted as a column for filtering.
 	User string `gorm:"index" valid:"length(0|255)"`
 	// GORM doesn't save the zero value for ints, so we use a pointer for the State field
-	State *int32 `gorm:"index;default:0"`
+	State *int32 `gorm:"index;default:0;index:execution_project_domain_phase_created_at_state_idx,priority:5"`
 	// The resource type of the entity used to launch the execution, one of 'launch_plan' or 'task'
 	LaunchEntity string
 	// Tags associated with the execution
