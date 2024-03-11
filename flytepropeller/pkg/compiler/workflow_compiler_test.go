@@ -2,10 +2,10 @@ package compiler
 
 import (
 	"fmt"
-	"github.com/golang/protobuf/proto"
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
