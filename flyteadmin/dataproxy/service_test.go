@@ -422,17 +422,3 @@ func TestService_Error(t *testing.T) {
 		assert.Error(t, err, "no task executions")
 	})
 }
-
-func TestGetExtraHeader(t *testing.T) {
-	reference := storage.DataReference("s3://bucket/key")
-	headers := getExtraHeaders(reference, "md5", true)
-	assert.Equal(t, map[string]string{"Content-MD5": "md5", "Content-Length": "3", "x-amz-meta-flyteContentMD5": "md5"}, headers)
-
-	reference = "gs://bucket/key"
-	headers = getExtraHeaders(reference, "md5", true)
-	assert.Equal(t, map[string]string{"Content-MD5": "md5", "Content-Length": "3", "x-goog-meta-flyteContentMD5": "md5"}, headers)
-
-	reference = "abfs://bucket/key"
-	headers = getExtraHeaders(reference, "md5", true)
-	assert.Equal(t, map[string]string{"Content-MD5": "md5", "Content-Length": "3", "x-ms-meta-flyteContentMD5": "md5", "x-ms-blob-type": "BlockBlob"}, headers)
-}
