@@ -28,10 +28,8 @@ import (
 	"github.com/flyteorg/stow/swift"
 )
 
-const (
-	FailureTypeLabel contextutils.Key = "failure_type"
-	FlyteContentMD5                   = "flyteContentMD5"
-)
+const FailureTypeLabel contextutils.Key = "failure_type"
+const FlyteContentMD5 = "flyteContentMD5"
 
 var fQNFn = map[string]func(string) DataReference{
 	s3.Kind: func(bucket string) DataReference {
