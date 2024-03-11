@@ -94,7 +94,7 @@ Here is a visual representation of the execution of nested dynamic workflows in 
 
 In each level2 node at the top level, two core workflows are run in parallel:
 
-:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/nested_parallel_inner_dynamic.png?raw=true
+:::{figure} https://raw.githubusercontent.com/flyteorg/static-resources/main/flytesnacks/user_guide/nested_parallel_inner_dynamic_anno.png?raw=true
 :alt: Inner dynamic workflow
 :class: with-shadow
 :::
