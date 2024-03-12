@@ -105,7 +105,7 @@ clusterResourceTemplates:
       kind: Namespace
       metadata:
         name: '{{ namespace }}'
-    # This block performs the automated annotation of KSAs across all project-domain namespaces. #Make sure to bind the KSA to the GSA after deployment
+    # This block performs the automated annotation of KSAs across all project-domain namespaces. Make sure to bind the KSA to the GSA after KSAs are created: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#authenticating_to
     002_serviceaccount.yaml: |
       apiVersion: v1
       kind: ServiceAccount
@@ -119,8 +119,9 @@ clusterResourceTemplates:
 serviceAccount:
   # create Create ServiceAccount for Flyte
   create: true
+  #Automates annotation of default flyte-binary KSA. Make sure to bind the KSA to the GSA: https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity#authenticating_to
   annotations:
-    iam.gke.io/gcp-service-account: <FLYTE_IAM_SA_EMAIL> #Make sure to bind the KSA to the GSA
+    iam.gke.io/gcp-service-account: <FLYTE_IAM_SA_EMAIL> 
 # rbac Configure Kubernetes RBAC for Flyte
 rbac:
   # create Create ClusterRole and ClusterRoleBinding resources
