@@ -53330,6 +53330,7 @@
                  * @property {string|null} [signedUrl] CreateUploadLocationResponse signedUrl
                  * @property {string|null} [nativeUrl] CreateUploadLocationResponse nativeUrl
                  * @property {google.protobuf.ITimestamp|null} [expiresAt] CreateUploadLocationResponse expiresAt
+                 * @property {Object.<string,string>|null} [headers] CreateUploadLocationResponse headers
                  */
     
                 /**
@@ -53341,6 +53342,7 @@
                  * @param {flyteidl.service.ICreateUploadLocationResponse=} [properties] Properties to set
                  */
                 function CreateUploadLocationResponse(properties) {
+                    this.headers = {};
                     if (properties)
                         for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null)
@@ -53372,6 +53374,14 @@
                 CreateUploadLocationResponse.prototype.expiresAt = null;
     
                 /**
+                 * CreateUploadLocationResponse headers.
+                 * @member {Object.<string,string>} headers
+                 * @memberof flyteidl.service.CreateUploadLocationResponse
+                 * @instance
+                 */
+                CreateUploadLocationResponse.prototype.headers = $util.emptyObject;
+    
+                /**
                  * Creates a new CreateUploadLocationResponse instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.service.CreateUploadLocationResponse
@@ -53401,6 +53411,9 @@
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.nativeUrl);
                     if (message.expiresAt != null && message.hasOwnProperty("expiresAt"))
                         $root.google.protobuf.Timestamp.encode(message.expiresAt, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+                    if (message.headers != null && message.hasOwnProperty("headers"))
+                        for (var keys = Object.keys(message.headers), i = 0; i < keys.length; ++i)
+                            writer.uint32(/* id 4, wireType 2 =*/34).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]).uint32(/* id 2, wireType 2 =*/18).string(message.headers[keys[i]]).ldelim();
                     return writer;
                 };
     
@@ -53418,7 +53431,7 @@
                 CreateUploadLocationResponse.decode = function decode(reader, length) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateUploadLocationResponse();
+                    var end = length === undefined ? reader.len : reader.pos + length, message = new $root.flyteidl.service.CreateUploadLocationResponse(), key;
                     while (reader.pos < end) {
                         var tag = reader.uint32();
                         switch (tag >>> 3) {
@@ -53430,6 +53443,14 @@
                             break;
                         case 3:
                             message.expiresAt = $root.google.protobuf.Timestamp.decode(reader, reader.uint32());
+                            break;
+                        case 4:
+                            reader.skip().pos++;
+                            if (message.headers === $util.emptyObject)
+                                message.headers = {};
+                            key = reader.string();
+                            reader.pos++;
+                            message.headers[key] = reader.string();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -53461,6 +53482,14 @@
                         if (error)
                             return "expiresAt." + error;
                     }
+                    if (message.headers != null && message.hasOwnProperty("headers")) {
+                        if (!$util.isObject(message.headers))
+                            return "headers: object expected";
+                        var key = Object.keys(message.headers);
+                        for (var i = 0; i < key.length; ++i)
+                            if (!$util.isString(message.headers[key[i]]))
+                                return "headers: string{k:string} expected";
+                    }
                     return null;
                 };
     
@@ -53479,6 +53508,7 @@
                  * @property {google.protobuf.IDuration|null} [expiresIn] CreateUploadLocationRequest expiresIn
                  * @property {Uint8Array|null} [contentMd5] CreateUploadLocationRequest contentMd5
                  * @property {string|null} [filenameRoot] CreateUploadLocationRequest filenameRoot
+                 * @property {boolean|null} [addContentMd5Metadata] CreateUploadLocationRequest addContentMd5Metadata
                  */
     
                 /**
@@ -53545,6 +53575,14 @@
                 CreateUploadLocationRequest.prototype.filenameRoot = "";
     
                 /**
+                 * CreateUploadLocationRequest addContentMd5Metadata.
+                 * @member {boolean} addContentMd5Metadata
+                 * @memberof flyteidl.service.CreateUploadLocationRequest
+                 * @instance
+                 */
+                CreateUploadLocationRequest.prototype.addContentMd5Metadata = false;
+    
+                /**
                  * Creates a new CreateUploadLocationRequest instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.service.CreateUploadLocationRequest
@@ -53580,6 +53618,8 @@
                         writer.uint32(/* id 5, wireType 2 =*/42).bytes(message.contentMd5);
                     if (message.filenameRoot != null && message.hasOwnProperty("filenameRoot"))
                         writer.uint32(/* id 6, wireType 2 =*/50).string(message.filenameRoot);
+                    if (message.addContentMd5Metadata != null && message.hasOwnProperty("addContentMd5Metadata"))
+                        writer.uint32(/* id 7, wireType 0 =*/56).bool(message.addContentMd5Metadata);
                     return writer;
                 };
     
@@ -53618,6 +53658,9 @@
                             break;
                         case 6:
                             message.filenameRoot = reader.string();
+                            break;
+                        case 7:
+                            message.addContentMd5Metadata = reader.bool();
                             break;
                         default:
                             reader.skipType(tag & 7);
@@ -53658,6 +53701,9 @@
                     if (message.filenameRoot != null && message.hasOwnProperty("filenameRoot"))
                         if (!$util.isString(message.filenameRoot))
                             return "filenameRoot: string expected";
+                    if (message.addContentMd5Metadata != null && message.hasOwnProperty("addContentMd5Metadata"))
+                        if (typeof message.addContentMd5Metadata !== "boolean")
+                            return "addContentMd5Metadata: boolean expected";
                     return null;
                 };
     
