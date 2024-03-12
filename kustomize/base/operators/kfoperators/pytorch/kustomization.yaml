@@ -1,4 +1,0 @@
-bases:
-  - ../namespace
-  - github.com/kubeflow/manifests/pytorch-job/pytorch-job-crds/base?ref=v1.0-branch
-  - github.com/kubeflow/manifests/pytorch-job/pytorch-operator/base?ref=v1.0-branch

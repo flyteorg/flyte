@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
+	"google.golang.org/protobuf/encoding/protojson"
 	"net"
 	"net/http"
 	"strings"
@@ -204,6 +205,19 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	var gwmuxOptions = make([]runtime.ServeMuxOption, 0)
 	// This option means that http requests are served with protobufs, instead of json. We always want this.
 	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/octet-stream", &runtime.ProtoMarshaller{}))
+	// grpc-gateway v2 switched the marshaller used to encode JSON messages in 2.5.0. This changed the
+	// default encoding from snake_case (the v1 behavior) to lowerCamelCase, which is the case recommended
+	// by protobuf. However the protobuf docs do mention that JSON printers may provide a way to use
+	// the proto names as field names instead. This option in grpc-gateway v2 does just that,
+	// by setting a custom marshaler. We are enabling this narrowly however, by applying it only for
+	// the application/json content type.
+	gwmuxOptions = append(gwmuxOptions, runtime.WithMarshalerOption("application/json", &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames: true,
+			EmitUnpopulated: true,
+			EmitDefaultValues: true,
+		},
+	}))
 
 	// This option sets subject in the user info response
 	gwmuxOptions = append(gwmuxOptions, runtime.WithForwardResponseOption(auth.GetUserInfoForwardResponseHandler()))

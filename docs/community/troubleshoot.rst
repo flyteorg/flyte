@@ -14,7 +14,7 @@ Before getting started, collect the following information from the underlying in
 
 .. prompt:: bash $
 
- $ kubectl describe pod <PodName> -n <namespace>
+ kubectl describe pod <PodName> -n <namespace>
 
 Where <PodName> will typically correspond to the node execution string that you can find in the UI.
 
@@ -23,7 +23,7 @@ Where <PodName> will typically correspond to the node execution string that you 
 
 .. prompt:: bash $
 
- $ kubectl logs pods -n <namespace>
+ kubectl logs pods -n <namespace>
 
 Where <namespace> will typically correspond to the Flyte <project>-<domain>, e.g. flytesnacks-development.
 
@@ -70,7 +70,7 @@ This issue is more common on MacOS devices. Make sure that your Docker daemon ha
 
 .. prompt:: bash $
 
- $ flytectl demo start --env HTTP_PROXY=<your-proxy-IP>
+ flytectl demo start --env HTTP_PROXY=<your-proxy-IP>
 
 - If you're building a custom Docker image, make sure to use a tag other than ``latest``. Otherwise, the Kubernetes default pull policy will be changed from ``IfNotPresent`` to ``Always``, forcing an image pull with every Pod deployment.
 
@@ -85,14 +85,14 @@ Issues running workloads
 
 .. prompt:: bash $
 
- $ export FLYTECTL_CONFIG=~/.flyte/config-sandbox.yaml
+ export FLYTECTL_CONFIG=~/.flyte/config-sandbox.yaml
 
 ``ModuleNotFoundError``
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 - If you're using a custom container image and using Docker, make sure your ``Dockerfile`` is located at the same level of the ``flyte`` directory and that there is an empty ``__init__.py`` file in your project's folder :
 
-.. prompt:: bash $
+.. prompt::
 
  myflyteapp
  ├── Dockerfile
@@ -111,11 +111,11 @@ Issues running workloads
 
 .. prompt:: bash $
 
- $ kubectl describe sa <my-flyte-sa> -n <flyte-namespace>
+ kubectl describe sa <my-flyte-sa> -n <flyte-namespace>
 
 Example output:
 
-.. prompt:: bash $
+.. prompt::
 
  Name:                <my-flyte-sa>
  Namespace:           flyte
@@ -130,6 +130,24 @@ Example output:
 
 .. prompt:: bash $
 
- $ kubectl annotate serviceaccount -n <flyte-namespace> <http://eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>
+ kubectl annotate serviceaccount -n <flyte-namespace> <http://eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>eks.amazonaws.com/role-arn=arn:aws:iam::xxxx:role/<flyte-iam-role>
 
 - Refer to this community-maintained `guides <https://github.com/davidmirror-ops/flyte-the-hard-way/blob/main/docs/03-roles-service-accounts.md>`_ for further information about Flyte deployment on EKS
+
+``FlyteScopedUserException: 'JavaPackage' object is not callable`` when running a Spark task
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Please add ``spark`` to the list of `enabled-plugins` in the config yaml file. For example,
+
+.. code-block:: yaml
+
+  tasks:
+    task-plugins:
+      enabled-plugins:
+        - container
+        - sidecar
+        - K8S-ARRAY
+        - spark
+      default-for-task-types:
+        - container: container
+        - container_array: K8S-ARRAY

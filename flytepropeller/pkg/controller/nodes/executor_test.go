@@ -2541,6 +2541,10 @@ func init() {
 
 type existsMetadata struct{}
 
+func (e existsMetadata) ContentMD5() string {
+	return ""
+}
+
 func (e existsMetadata) Exists() bool {
 	return false
 }

@@ -18,21 +18,40 @@ message ArtifactKey {
 
 // Only valid for triggers
 message ArtifactBindingData {
-  uint32 index = 1;
-
+  reserved 1 to 4;
   // These two fields are only relevant in the partition value case
   oneof partition_data {
-    string partition_key = 2;
-    bool bind_to_time_partition = 3;
+    string partition_key = 5;
+    bool bind_to_time_partition = 6;
   }
 
   // This is only relevant in the time partition case
-  string transform = 4;
+  TimeTransform time_transform = 7;
+}
+
+enum Granularity {
+  UNSET = 0;
+  MINUTE = 1;
+  HOUR = 2;
+  DAY = 3; // default
+  MONTH = 4;
+}
+
+enum Operator {
+  MINUS = 0;
+  PLUS = 1;
+}
+
+message TimeTransform {
+  string transform = 1;
+  Operator op = 2;
 }
 
 message InputBindingData {
   string var = 1;
 }
+
+message RuntimeBinding {}
 
 message LabelValue {
   oneof value {
@@ -43,6 +62,7 @@ message LabelValue {
     google.protobuf.Timestamp time_value = 2;
     ArtifactBindingData triggered_binding = 3;
     InputBindingData input_binding = 4;
+    RuntimeBinding runtime_binding = 5;
   }
 }
 
@@ -52,6 +72,7 @@ message Partitions {
 
 message TimePartition {
   LabelValue value = 1;
+  Granularity granularity = 2;
 }
 
 message ArtifactID {
