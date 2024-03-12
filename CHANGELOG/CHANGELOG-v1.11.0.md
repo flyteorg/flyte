@@ -9,7 +9,8 @@ We're excited to announce the release of Flyte v1.11.0! This version brings a ho
 - **Tracing and Observability:** The introduction of opentelemetry BlobstoreClientTracer in flyteadmin enhances observability, allowing for better monitoring and troubleshooting.
 - **Security Enhancements:** Added securityContext configuration to Flyte-core charts, strengthening the security posture of Flyte deployments.
 - **Documentation Overhaul:** Continuous improvements and updates have been made to the documentation, fixing broken links and updating content for better clarity and usability.
-- **Operational Improvements:** Enhancements such as adding a service account for V1 Ray Jobs, caching console assets in a single binary, and conditional mounting of secrets improve the operational efficiency of Flyte.
+- **Operational Improvements:** This release introduces enhancements such as adding a service account for V1 Ray Jobs, caching console assets in a single binary, and conditional mounting of secrets to improve the operational efficiency of Flyte. Additionally, we are removing `kustomize` from our deployment process to simplify the configuration and management of Flyte instances, making it easier for users to maintain and streamline their deployment workflows.
+
 
 ## Bug Fixes
 
