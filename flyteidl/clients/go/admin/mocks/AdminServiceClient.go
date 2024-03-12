@@ -689,6 +689,54 @@ func (_m *AdminServiceClient) GetExecution(ctx context.Context, in *admin.Workfl
 	return r0, r1
 }
 
+type AdminServiceClient_GetExecutionCount struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetExecutionCount) Return(_a0 *admin.ExecutionCountResponse, _a1 error) *AdminServiceClient_GetExecutionCount {
+	return &AdminServiceClient_GetExecutionCount{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) *AdminServiceClient_GetExecutionCount {
+	c_call := _m.On("GetExecutionCount", ctx, in, opts)
+	return &AdminServiceClient_GetExecutionCount{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetExecutionCountMatch(matchers ...interface{}) *AdminServiceClient_GetExecutionCount {
+	c_call := _m.On("GetExecutionCount", matchers...)
+	return &AdminServiceClient_GetExecutionCount{Call: c_call}
+}
+
+// GetExecutionCount provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) (*admin.ExecutionCountResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ExecutionCountResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionCountRequest, ...grpc.CallOption) *admin.ExecutionCountResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionCountResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionCountRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetExecutionData struct {
 	*mock.Call
 }
@@ -1449,54 +1497,6 @@ func (_m *AdminServiceClient) ListDescriptionEntities(ctx context.Context, in *a
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.DescriptionEntityListRequest, ...grpc.CallOption) error); ok {
-		r1 = rf(ctx, in, opts...)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type AdminServiceClient_ListExecutionCount struct {
-	*mock.Call
-}
-
-func (_m AdminServiceClient_ListExecutionCount) Return(_a0 *admin.ExecutionCountResponse, _a1 error) *AdminServiceClient_ListExecutionCount {
-	return &AdminServiceClient_ListExecutionCount{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AdminServiceClient) OnListExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) *AdminServiceClient_ListExecutionCount {
-	c_call := _m.On("ListExecutionCount", ctx, in, opts)
-	return &AdminServiceClient_ListExecutionCount{Call: c_call}
-}
-
-func (_m *AdminServiceClient) OnListExecutionCountMatch(matchers ...interface{}) *AdminServiceClient_ListExecutionCount {
-	c_call := _m.On("ListExecutionCount", matchers...)
-	return &AdminServiceClient_ListExecutionCount{Call: c_call}
-}
-
-// ListExecutionCount provides a mock function with given fields: ctx, in, opts
-func (_m *AdminServiceClient) ListExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) (*admin.ExecutionCountResponse, error) {
-	_va := make([]interface{}, len(opts))
-	for _i := range opts {
-		_va[_i] = opts[_i]
-	}
-	var _ca []interface{}
-	_ca = append(_ca, ctx, in)
-	_ca = append(_ca, _va...)
-	ret := _m.Called(_ca...)
-
-	var r0 *admin.ExecutionCountResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionCountRequest, ...grpc.CallOption) *admin.ExecutionCountResponse); ok {
-		r0 = rf(ctx, in, opts...)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ExecutionCountResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionCountRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

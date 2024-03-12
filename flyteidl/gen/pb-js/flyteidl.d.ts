@@ -21949,18 +21949,18 @@ export namespace flyteidl {
             public getExecutionMetrics(request: flyteidl.admin.IWorkflowExecutionGetMetricsRequest): Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>;
 
             /**
-             * Calls ListExecutionCount.
+             * Calls GetExecutionCount.
              * @param request ExecutionCountRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and ExecutionCountResponse
              */
-            public listExecutionCount(request: flyteidl.admin.IExecutionCountRequest, callback: flyteidl.service.AdminService.ListExecutionCountCallback): void;
+            public getExecutionCount(request: flyteidl.admin.IExecutionCountRequest, callback: flyteidl.service.AdminService.GetExecutionCountCallback): void;
 
             /**
-             * Calls ListExecutionCount.
+             * Calls GetExecutionCount.
              * @param request ExecutionCountRequest message or plain object
              * @returns Promise
              */
-            public listExecutionCount(request: flyteidl.admin.IExecutionCountRequest): Promise<flyteidl.admin.ExecutionCountResponse>;
+            public getExecutionCount(request: flyteidl.admin.IExecutionCountRequest): Promise<flyteidl.admin.ExecutionCountResponse>;
         }
 
         namespace AdminService {
@@ -22344,11 +22344,11 @@ export namespace flyteidl {
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
 
             /**
-             * Callback as used by {@link flyteidl.service.AdminService#listExecutionCount}.
+             * Callback as used by {@link flyteidl.service.AdminService#getExecutionCount}.
              * @param error Error, if any
              * @param [response] ExecutionCountResponse
              */
-            type ListExecutionCountCallback = (error: (Error|null), response?: flyteidl.admin.ExecutionCountResponse) => void;
+            type GetExecutionCountCallback = (error: (Error|null), response?: flyteidl.admin.ExecutionCountResponse) => void;
         }
 
         /** Represents a SyncAgentService */

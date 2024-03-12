@@ -1604,7 +1604,8 @@ export class ExecutionCountRequest extends Message<ExecutionCountRequest> {
   domain = "";
 
   /**
-   * Optional, org filter applied to list project requests.
+   * org filter applied to execution count request.
+   * +optional
    *
    * @generated from field: string org = 3;
    */
@@ -1650,15 +1651,21 @@ export class ExecutionCountRequest extends Message<ExecutionCountRequest> {
 }
 
 /**
+ * Execution count of a phase.
+ *
  * @generated from message flyteidl.admin.ExecutionCountByPhase
  */
 export class ExecutionCountByPhase extends Message<ExecutionCountByPhase> {
   /**
+   * execution phase.
+   *
    * @generated from field: flyteidl.core.WorkflowExecution.Phase phase = 1;
    */
   phase = WorkflowExecution_Phase.UNDEFINED;
 
   /**
+   * Count of the executions in corresponding phase.
+   *
    * @generated from field: int64 count = 2;
    */
   count = protoInt64.zero;
@@ -1693,13 +1700,13 @@ export class ExecutionCountByPhase extends Message<ExecutionCountByPhase> {
 }
 
 /**
- * Counts of executions by phases
+ * Execution count response.
  *
  * @generated from message flyteidl.admin.ExecutionCountResponse
  */
 export class ExecutionCountResponse extends Message<ExecutionCountResponse> {
   /**
-   * Map of workflow execution phase to workflow count
+   * Count of the executions in all phases.
    *
    * @generated from field: repeated flyteidl.admin.ExecutionCountByPhase ExecutionCount = 1;
    */

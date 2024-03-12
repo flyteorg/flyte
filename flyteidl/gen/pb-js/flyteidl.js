@@ -52578,31 +52578,31 @@
                  */
     
                 /**
-                 * Callback as used by {@link flyteidl.service.AdminService#listExecutionCount}.
+                 * Callback as used by {@link flyteidl.service.AdminService#getExecutionCount}.
                  * @memberof flyteidl.service.AdminService
-                 * @typedef ListExecutionCountCallback
+                 * @typedef GetExecutionCountCallback
                  * @type {function}
                  * @param {Error|null} error Error, if any
                  * @param {flyteidl.admin.ExecutionCountResponse} [response] ExecutionCountResponse
                  */
     
                 /**
-                 * Calls ListExecutionCount.
-                 * @function listExecutionCount
+                 * Calls GetExecutionCount.
+                 * @function getExecutionCount
                  * @memberof flyteidl.service.AdminService
                  * @instance
                  * @param {flyteidl.admin.IExecutionCountRequest} request ExecutionCountRequest message or plain object
-                 * @param {flyteidl.service.AdminService.ListExecutionCountCallback} callback Node-style callback called with the error, if any, and ExecutionCountResponse
+                 * @param {flyteidl.service.AdminService.GetExecutionCountCallback} callback Node-style callback called with the error, if any, and ExecutionCountResponse
                  * @returns {undefined}
                  * @variation 1
                  */
-                Object.defineProperty(AdminService.prototype.listExecutionCount = function listExecutionCount(request, callback) {
-                    return this.rpcCall(listExecutionCount, $root.flyteidl.admin.ExecutionCountRequest, $root.flyteidl.admin.ExecutionCountResponse, request, callback);
-                }, "name", { value: "ListExecutionCount" });
+                Object.defineProperty(AdminService.prototype.getExecutionCount = function getExecutionCount(request, callback) {
+                    return this.rpcCall(getExecutionCount, $root.flyteidl.admin.ExecutionCountRequest, $root.flyteidl.admin.ExecutionCountResponse, request, callback);
+                }, "name", { value: "GetExecutionCount" });
     
                 /**
-                 * Calls ListExecutionCount.
-                 * @function listExecutionCount
+                 * Calls GetExecutionCount.
+                 * @function getExecutionCount
                  * @memberof flyteidl.service.AdminService
                  * @instance
                  * @param {flyteidl.admin.IExecutionCountRequest} request ExecutionCountRequest message or plain object

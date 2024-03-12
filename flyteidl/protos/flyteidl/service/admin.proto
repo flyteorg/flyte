@@ -648,13 +648,9 @@ service AdminService {
   };
 
   // Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
-  rpc ListExecutionCount (flyteidl.admin.ExecutionCountRequest) returns (flyteidl.admin.ExecutionCountResponse) {
+  rpc GetExecutionCount (flyteidl.admin.ExecutionCountRequest) returns (flyteidl.admin.ExecutionCountResponse) {
     option (google.api.http) = {
       get: "/api/v1/count/executions/{project}/{domain}"
-      // Additional bindings in closed source PR only.
-      additional_bindings {
-        get: "/api/v1/org/count/executions/{org}/{project}/{domain}"
-      }
     };
   }
 }

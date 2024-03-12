@@ -300,8 +300,8 @@ class AdminServiceStub(object):
                 request_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.FromString,
                 )
-        self.ListExecutionCount = channel.unary_unary(
-                '/flyteidl.service.AdminService/ListExecutionCount',
+        self.GetExecutionCount = channel.unary_unary(
+                '/flyteidl.service.AdminService/GetExecutionCount',
                 request_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCountRequest.SerializeToString,
                 response_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCountResponse.FromString,
                 )
@@ -695,7 +695,7 @@ class AdminServiceServicer(object):
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ListExecutionCount(self, request, context):
+    def GetExecutionCount(self, request, context):
         """Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
@@ -975,8 +975,8 @@ def add_AdminServiceServicer_to_server(servicer, server):
                     request_deserializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_execution__pb2.WorkflowExecutionGetMetricsResponse.SerializeToString,
             ),
-            'ListExecutionCount': grpc.unary_unary_rpc_method_handler(
-                    servicer.ListExecutionCount,
+            'GetExecutionCount': grpc.unary_unary_rpc_method_handler(
+                    servicer.GetExecutionCount,
                     request_deserializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCountRequest.FromString,
                     response_serializer=flyteidl_dot_admin_dot_execution__pb2.ExecutionCountResponse.SerializeToString,
             ),
@@ -1911,7 +1911,7 @@ class AdminService(object):
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 
     @staticmethod
-    def ListExecutionCount(request,
+    def GetExecutionCount(request,
             target,
             options=(),
             channel_credentials=None,
@@ -1921,7 +1921,7 @@ class AdminService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/ListExecutionCount',
+        return grpc.experimental.unary_unary(request, target, '/flyteidl.service.AdminService/GetExecutionCount',
             flyteidl_dot_admin_dot_execution__pb2.ExecutionCountRequest.SerializeToString,
             flyteidl_dot_admin_dot_execution__pb2.ExecutionCountResponse.FromString,
             options, channel_credentials,

@@ -311,7 +311,7 @@
     "/api/v1/count/executions/{project}/{domain}": {
       "get": {
         "summary": "Fetch the count of :ref:`ref_flyteidl.admin.Execution`.",
-        "operationId": "AdminService_ListExecutionCount",
+        "operationId": "AdminService_GetExecutionCount",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -343,7 +343,7 @@
           },
           {
             "name": "org",
-            "description": "Optional, org filter applied to list project requests.",
+            "description": "org filter applied to execution count request.\n+optional",
             "in": "query",
             "required": false,
             "type": "string"
@@ -2360,59 +2360,6 @@
           {
             "name": "unique_parent_id",
             "description": "Unique identifier of the parent node in the execution\n+optional",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
-    "/api/v1/org/count/executions/{org}/{project}/{domain}": {
-      "get": {
-        "summary": "Fetch the count of :ref:`ref_flyteidl.admin.Execution`.",
-        "operationId": "AdminService_ListExecutionCount2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminExecutionCountResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org",
-            "description": "Optional, org filter applied to list project requests.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "project",
-            "description": "Name of the project the execution belongs to.\n+required",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "domain",
-            "description": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "filters",
-            "description": "Indicates a list of filters passed as string.\n+optional",
             "in": "query",
             "required": false,
             "type": "string"
@@ -4874,13 +4821,16 @@
       "type": "object",
       "properties": {
         "phase": {
-          "$ref": "#/definitions/coreWorkflowExecutionPhase"
+          "$ref": "#/definitions/coreWorkflowExecutionPhase",
+          "description": "execution phase."
         },
         "count": {
           "type": "string",
-          "format": "int64"
+          "format": "int64",
+          "description": "Count of the executions in corresponding phase."
         }
-      }
+      },
+      "description": "Execution count of a phase."
     },
     "adminExecutionCountResponse": {
       "type": "object",
@@ -4891,10 +4841,10 @@
             "type": "object",
             "$ref": "#/definitions/adminExecutionCountByPhase"
           },
-          "title": "Map of workflow execution phase to workflow count"
+          "description": "Count of the executions in all phases."
         }
       },
-      "title": "Counts of executions by phases"
+      "description": "Execution count response."
     },
     "adminExecutionCreateRequest": {
       "type": "object",

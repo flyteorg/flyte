@@ -74,7 +74,7 @@ const (
 	AdminService_GetDescriptionEntity_FullMethodName          = "/flyteidl.service.AdminService/GetDescriptionEntity"
 	AdminService_ListDescriptionEntities_FullMethodName       = "/flyteidl.service.AdminService/ListDescriptionEntities"
 	AdminService_GetExecutionMetrics_FullMethodName           = "/flyteidl.service.AdminService/GetExecutionMetrics"
-	AdminService_ListExecutionCount_FullMethodName            = "/flyteidl.service.AdminService/ListExecutionCount"
+	AdminService_GetExecutionCount_FullMethodName             = "/flyteidl.service.AdminService/GetExecutionCount"
 )
 
 // AdminServiceClient is the client API for AdminService service.
@@ -195,7 +195,7 @@ type AdminServiceClient interface {
 	// Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionMetrics(ctx context.Context, in *admin.WorkflowExecutionGetMetricsRequest, opts ...grpc.CallOption) (*admin.WorkflowExecutionGetMetricsResponse, error)
 	// Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
-	ListExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) (*admin.ExecutionCountResponse, error)
+	GetExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) (*admin.ExecutionCountResponse, error)
 }
 
 type adminServiceClient struct {
@@ -692,9 +692,9 @@ func (c *adminServiceClient) GetExecutionMetrics(ctx context.Context, in *admin.
 	return out, nil
 }
 
-func (c *adminServiceClient) ListExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) (*admin.ExecutionCountResponse, error) {
+func (c *adminServiceClient) GetExecutionCount(ctx context.Context, in *admin.ExecutionCountRequest, opts ...grpc.CallOption) (*admin.ExecutionCountResponse, error) {
 	out := new(admin.ExecutionCountResponse)
-	err := c.cc.Invoke(ctx, AdminService_ListExecutionCount_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, AdminService_GetExecutionCount_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -819,7 +819,7 @@ type AdminServiceServer interface {
 	// Fetches runtime metrics for a :ref:`ref_flyteidl.admin.Execution`.
 	GetExecutionMetrics(context.Context, *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error)
 	// Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
-	ListExecutionCount(context.Context, *admin.ExecutionCountRequest) (*admin.ExecutionCountResponse, error)
+	GetExecutionCount(context.Context, *admin.ExecutionCountRequest) (*admin.ExecutionCountResponse, error)
 }
 
 // UnimplementedAdminServiceServer should be embedded to have forward compatible implementations.
@@ -988,8 +988,8 @@ func (UnimplementedAdminServiceServer) ListDescriptionEntities(context.Context, 
 func (UnimplementedAdminServiceServer) GetExecutionMetrics(context.Context, *admin.WorkflowExecutionGetMetricsRequest) (*admin.WorkflowExecutionGetMetricsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetExecutionMetrics not implemented")
 }
-func (UnimplementedAdminServiceServer) ListExecutionCount(context.Context, *admin.ExecutionCountRequest) (*admin.ExecutionCountResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ListExecutionCount not implemented")
+func (UnimplementedAdminServiceServer) GetExecutionCount(context.Context, *admin.ExecutionCountRequest) (*admin.ExecutionCountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetExecutionCount not implemented")
 }
 
 // UnsafeAdminServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -1975,20 +1975,20 @@ func _AdminService_GetExecutionMetrics_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AdminService_ListExecutionCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _AdminService_GetExecutionCount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(admin.ExecutionCountRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AdminServiceServer).ListExecutionCount(ctx, in)
+		return srv.(AdminServiceServer).GetExecutionCount(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: AdminService_ListExecutionCount_FullMethodName,
+		FullMethod: AdminService_GetExecutionCount_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).ListExecutionCount(ctx, req.(*admin.ExecutionCountRequest))
+		return srv.(AdminServiceServer).GetExecutionCount(ctx, req.(*admin.ExecutionCountRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -2217,8 +2217,8 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AdminService_GetExecutionMetrics_Handler,
 		},
 		{
-			MethodName: "ListExecutionCount",
-			Handler:    _AdminService_ListExecutionCount_Handler,
+			MethodName: "GetExecutionCount",
+			Handler:    _AdminService_GetExecutionCount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

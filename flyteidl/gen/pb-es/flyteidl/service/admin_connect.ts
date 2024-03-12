@@ -630,10 +630,10 @@ export const AdminService = {
     /**
      * Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
      *
-     * @generated from rpc flyteidl.service.AdminService.ListExecutionCount
+     * @generated from rpc flyteidl.service.AdminService.GetExecutionCount
      */
-    listExecutionCount: {
-      name: "ListExecutionCount",
+    getExecutionCount: {
+      name: "GetExecutionCount",
       I: ExecutionCountRequest,
       O: ExecutionCountResponse,
       kind: MethodKind.Unary,

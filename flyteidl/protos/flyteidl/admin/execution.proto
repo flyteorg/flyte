@@ -430,7 +430,8 @@ message ExecutionCountRequest {
     // +required
     string domain = 2;
 
-    // Optional, org filter applied to list project requests.
+    // org filter applied to execution count request.
+    // +optional
     string org = 3;
 
     // Indicates a list of filters passed as string.
@@ -438,14 +439,17 @@ message ExecutionCountRequest {
     string filters = 4;
 }
 
+// Execution count of a phase.
 message ExecutionCountByPhase {
+    // execution phase.
     core.WorkflowExecution.Phase phase = 1;
 
+    // Count of the executions in corresponding phase.
     int64 count = 2;
 }
 
-// Counts of executions by phases
+// Execution count response.
 message ExecutionCountResponse {
-    // Map of workflow execution phase to workflow count
+    // Count of the executions in all phases.
     repeated ExecutionCountByPhase ExecutionCount = 1;
 }

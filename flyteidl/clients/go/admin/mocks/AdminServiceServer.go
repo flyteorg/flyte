@@ -589,6 +589,47 @@ func (_m *AdminServiceServer) GetExecution(_a0 context.Context, _a1 *admin.Workf
 	return r0, r1
 }
 
+type AdminServiceServer_GetExecutionCount struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetExecutionCount) Return(_a0 *admin.ExecutionCountResponse, _a1 error) *AdminServiceServer_GetExecutionCount {
+	return &AdminServiceServer_GetExecutionCount{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetExecutionCount(_a0 context.Context, _a1 *admin.ExecutionCountRequest) *AdminServiceServer_GetExecutionCount {
+	c_call := _m.On("GetExecutionCount", _a0, _a1)
+	return &AdminServiceServer_GetExecutionCount{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetExecutionCountMatch(matchers ...interface{}) *AdminServiceServer_GetExecutionCount {
+	c_call := _m.On("GetExecutionCount", matchers...)
+	return &AdminServiceServer_GetExecutionCount{Call: c_call}
+}
+
+// GetExecutionCount provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetExecutionCount(_a0 context.Context, _a1 *admin.ExecutionCountRequest) (*admin.ExecutionCountResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ExecutionCountResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionCountRequest) *admin.ExecutionCountResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionCountResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionCountRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_GetExecutionData struct {
 	*mock.Call
 }
@@ -1237,47 +1278,6 @@ func (_m *AdminServiceServer) ListDescriptionEntities(_a0 context.Context, _a1 *
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.DescriptionEntityListRequest) error); ok {
-		r1 = rf(_a0, _a1)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-type AdminServiceServer_ListExecutionCount struct {
-	*mock.Call
-}
-
-func (_m AdminServiceServer_ListExecutionCount) Return(_a0 *admin.ExecutionCountResponse, _a1 error) *AdminServiceServer_ListExecutionCount {
-	return &AdminServiceServer_ListExecutionCount{Call: _m.Call.Return(_a0, _a1)}
-}
-
-func (_m *AdminServiceServer) OnListExecutionCount(_a0 context.Context, _a1 *admin.ExecutionCountRequest) *AdminServiceServer_ListExecutionCount {
-	c_call := _m.On("ListExecutionCount", _a0, _a1)
-	return &AdminServiceServer_ListExecutionCount{Call: c_call}
-}
-
-func (_m *AdminServiceServer) OnListExecutionCountMatch(matchers ...interface{}) *AdminServiceServer_ListExecutionCount {
-	c_call := _m.On("ListExecutionCount", matchers...)
-	return &AdminServiceServer_ListExecutionCount{Call: c_call}
-}
-
-// ListExecutionCount provides a mock function with given fields: _a0, _a1
-func (_m *AdminServiceServer) ListExecutionCount(_a0 context.Context, _a1 *admin.ExecutionCountRequest) (*admin.ExecutionCountResponse, error) {
-	ret := _m.Called(_a0, _a1)
-
-	var r0 *admin.ExecutionCountResponse
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionCountRequest) *admin.ExecutionCountResponse); ok {
-		r0 = rf(_a0, _a1)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*admin.ExecutionCountResponse)
-		}
-	}
-
-	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionCountRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

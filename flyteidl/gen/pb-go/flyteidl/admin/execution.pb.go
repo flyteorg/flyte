@@ -1965,7 +1965,8 @@ type ExecutionCountRequest struct {
 	// A domain can be considered as a subset within a specific project.
 	// +required
 	Domain string `protobuf:"bytes,2,opt,name=domain,proto3" json:"domain,omitempty"`
-	// Optional, org filter applied to list project requests.
+	// org filter applied to execution count request.
+	// +optional
 	Org string `protobuf:"bytes,3,opt,name=org,proto3" json:"org,omitempty"`
 	// Indicates a list of filters passed as string.
 	// +optional
@@ -2032,13 +2033,16 @@ func (x *ExecutionCountRequest) GetFilters() string {
 	return ""
 }
 
+// Execution count of a phase.
 type ExecutionCountByPhase struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	// execution phase.
 	Phase core.WorkflowExecution_Phase `protobuf:"varint,1,opt,name=phase,proto3,enum=flyteidl.core.WorkflowExecution_Phase" json:"phase,omitempty"`
-	Count int64                        `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
+	// Count of the executions in corresponding phase.
+	Count int64 `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
 }
 
 func (x *ExecutionCountByPhase) Reset() {
@@ -2087,13 +2091,13 @@ func (x *ExecutionCountByPhase) GetCount() int64 {
 	return 0
 }
 
-// Counts of executions by phases
+// Execution count response.
 type ExecutionCountResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// Map of workflow execution phase to workflow count
+	// Count of the executions in all phases.
 	ExecutionCount []*ExecutionCountByPhase `protobuf:"bytes,1,rep,name=ExecutionCount,proto3" json:"ExecutionCount,omitempty"`
 }
 

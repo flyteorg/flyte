@@ -1537,7 +1537,8 @@ pub struct ExecutionCountRequest {
     /// +required
     #[prost(string, tag="2")]
     pub domain: ::prost::alloc::string::String,
-    /// Optional, org filter applied to list project requests.
+    /// org filter applied to execution count request.
+    /// +optional
     #[prost(string, tag="3")]
     pub org: ::prost::alloc::string::String,
     /// Indicates a list of filters passed as string.
@@ -1545,19 +1546,22 @@ pub struct ExecutionCountRequest {
     #[prost(string, tag="4")]
     pub filters: ::prost::alloc::string::String,
 }
+/// Execution count of a phase.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionCountByPhase {
+    /// execution phase.
     #[prost(enumeration="super::core::workflow_execution::Phase", tag="1")]
     pub phase: i32,
+    /// Count of the executions in corresponding phase.
     #[prost(int64, tag="2")]
     pub count: i64,
 }
-/// Counts of executions by phases
+/// Execution count response.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ExecutionCountResponse {
-    /// Map of workflow execution phase to workflow count
+    /// Count of the executions in all phases.
     #[prost(message, repeated, tag="1")]
     pub execution_count: ::prost::alloc::vec::Vec<ExecutionCountByPhase>,
 }
