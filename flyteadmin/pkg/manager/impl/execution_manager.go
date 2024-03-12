@@ -1453,6 +1453,22 @@ func (m *ExecutionManager) GetExecution(
 		return nil, transformerErr
 	}
 
+	// replace OverwriteCache data in execution spec with data from launch plan spec, this will help to correct overwrite cache label in UI
+	executionSpec := execution.Spec
+	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *executionSpec.LaunchPlan)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get launch plan model for execution %+v with err %v", execution, err)
+		return nil, err
+	}
+	launchPlan, err := transformers.FromLaunchPlanModel(launchPlanModel)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
+		return nil, err
+	}
+	logger.Debugf(ctx, "Before update: launchPlan %v, launchPlan.Spec %v, launchPlan.Spec.GetOverwriteCache() %v", launchPlan, launchPlan.Spec, launchPlan.Spec.GetOverwriteCache())
+	executionSpec.OverwriteCache = executionSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
+	logger.Debugf(ctx, "After update: executionSpec %v, executionSpec.OverwriteCache %v", executionSpec, executionSpec.OverwriteCache)
+
 	return execution, nil
 }
 
