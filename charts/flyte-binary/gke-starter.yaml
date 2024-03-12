@@ -35,7 +35,7 @@ configuration:
       stackdriver:
         enabled: true
         templateUri: |
-          https://console.cloud.google.com/logs/query;query=resource.labels.pod_name={{.podName}}&timestamp>{{.podRFC3339StartTime}}
+          "https://console.cloud.google.com/logs/query;query=resource.labels.namespace_name%3D%22{{`{{.namespace}}`}}%22%0Aresource.labels.pod_name%3D%22{{`{{.podName}}`}}%22%0Aresource.labels.container_name%3D%22{{`{{.containerName}}`}}%22?project={{.GcpProjectId}}&angularJsUrl=%2Flogs%2Fviewer%3Fproject%3D{{.GcpProjectId}}"
   # auth Specify configuration for Flyte authentication
   auth:
     # enabled Enable Flyte authentication
@@ -79,9 +79,6 @@ configuration:
     plugins:
       k8s:
         inject-finalizer: true
-        default-env-vars:
-          - AWS_METADATA_SERVICE_TIMEOUT: 5
-          - AWS_METADATA_SERVICE_NUM_ATTEMPTS: 20
     # Configuration for the Datacatalog engine, used when caching is enabled
     # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html  
     storage:
@@ -108,7 +105,7 @@ clusterResourceTemplates:
       kind: Namespace
       metadata:
         name: '{{ namespace }}'
-    # This block performs the automated annotation of KSAs across all project-domain namespaces
+    # This block performs the automated annotation of KSAs across all project-domain namespaces. #Make sure to bind the KSA to the GSA after deployment
     002_serviceaccount.yaml: |
       apiVersion: v1
       kind: ServiceAccount
@@ -116,4 +113,25 @@ clusterResourceTemplates:
         name: default
         namespace: '{{ namespace }}'
         annotations:
-          iam.gke.io/gcp-service-account: '{{ defaultIamServiceAccount }}'
+          iam.gke.io/gcp-service-account: '{{ defaultIamServiceAccount }}' 
+
+# serviceAccount Configure Flyte ServiceAccount
+serviceAccount:
+  # create Create ServiceAccount for Flyte
+  create: true
+  annotations:
+    iam.gke.io/gcp-service-account: <FLYTE_IAM_SA_EMAIL> #Make sure to bind the KSA to the GSA
+# rbac Configure Kubernetes RBAC for Flyte
+rbac:
+  # create Create ClusterRole and ClusterRoleBinding resources
+  create: true
+  # extraRules Add additional rules to the ClusterRole
+  extraRules: 
+   - apiGroups:
+      - ""
+     resources:
+      - serviceaccounts
+     verbs:
+      - create
+      - get
+      - patch
