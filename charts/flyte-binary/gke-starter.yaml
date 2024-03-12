@@ -35,7 +35,7 @@ configuration:
       stackdriver:
         enabled: true
         templateUri: |
-          "https://console.cloud.google.com/logs/query;query=resource.labels.namespace_name%3D%22{{`{{.namespace}}`}}%22%0Aresource.labels.pod_name%3D%22{{`{{.podName}}`}}%22%0Aresource.labels.container_name%3D%22{{`{{.containerName}}`}}%22?project={{.GcpProjectId}}&angularJsUrl=%2Flogs%2Fviewer%3Fproject%3D{{.GcpProjectId}}"
+          "https://console.cloud.google.com/logs/query;query=resource.labels.namespace_name%3D%22{{.namespace}}%22%0Aresource.labels.pod_name%3D%22{{.podName}}%22%0Aresource.labels.container_name%3D%22{{.containerName}}%22?project=<GCP_PROJECT_ID>&angularJsUrl=%2Flogs%2Fviewer%3Fproject%3D<GCP_PROJECT_ID>"
   # auth Specify configuration for Flyte authentication
   auth:
     # enabled Enable Flyte authentication
