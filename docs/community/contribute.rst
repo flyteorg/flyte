@@ -151,7 +151,7 @@ To understand how the below components interact with each other, refer to :ref:`
 
     * - `Repo <https://github.com/flyteorg/flyte>`__
     * - **Purpose**: Deployment, Documentation, and Issues
-    * - **Languages**: Kustomize & RST
+    * - **Languages**: RST
 
 To build the Flyte docs locally you will need the following prerequisites:
 

@@ -170,7 +170,7 @@ apply.
 
 .. note::
     The template values, for example, ``projectQuotaCpu`` or ``projectQuotaMemory`` are free-form strings.
-    Ensure that they match the template placeholders in your `template file <https://github.com/flyteorg/flyte/blob/master/kustomize/base/single_cluster/headless/config/clusterresource-templates/ab_project-resource-quota.yaml>`__
+    Ensure that they match the template placeholders in your values file (e.g. `values-eks.yaml <https://github.com/flyteorg/flyte/blob/1e3d515550cb338c2edb3919d79c6fa1f0da5a19/charts/flyte-core/values-eks.yaml#L366-L388>`__)
     for your changes to take effect and custom values to be substituted.
 
 You can view all custom cluster-resource-attributes by visiting ``protocol://<host/api/v1/matchable_attributes?resource_type=1>``

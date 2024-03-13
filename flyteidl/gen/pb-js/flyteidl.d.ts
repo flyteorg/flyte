@@ -22747,6 +22747,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt */
             expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers */
+            headers?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateUploadLocationResponse. */
@@ -22766,6 +22769,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt. */
             public expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers. */
+            public headers: { [k: string]: string };
 
             /**
              * Creates a new CreateUploadLocationResponse instance using the specified properties.
@@ -22820,6 +22826,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationRequest filenameRoot */
             filenameRoot?: (string|null);
+
+            /** CreateUploadLocationRequest addContentMd5Metadata */
+            addContentMd5Metadata?: (boolean|null);
         }
 
         /** Represents a CreateUploadLocationRequest. */
@@ -22848,6 +22857,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationRequest filenameRoot. */
             public filenameRoot: string;
+
+            /** CreateUploadLocationRequest addContentMd5Metadata. */
+            public addContentMd5Metadata: boolean;
 
             /**
              * Creates a new CreateUploadLocationRequest instance using the specified properties.
