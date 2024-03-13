@@ -5,9 +5,8 @@ import (
 	"net/url"
 	"time"
 
-	"k8s.io/client-go/tools/metrics"
-
 	"github.com/prometheus/client_golang/prometheus"
+	"k8s.io/client-go/tools/metrics"
 )
 
 func init() {
@@ -43,7 +42,7 @@ func newRequestMetricsProvider() requestMetricsProvider {
 			Buckets: latencyBuckets,
 		},
 		[]string{"verb"})
-	prometheus.Register(requestLatency)
+	prometheus.MustRegister(requestLatency)
 	requestResult := prometheus.NewCounterVec(
 		prometheus.CounterOpts{
 			Name: "k8s_client_request_total",
@@ -51,7 +50,7 @@ func newRequestMetricsProvider() requestMetricsProvider {
 		},
 		[]string{"code", "method"},
 	)
-	prometheus.Register(requestResult)
+	prometheus.MustRegister(requestResult)
 	return requestMetricsProvider{
 		requestLatency,
 		requestResult,
@@ -74,7 +73,7 @@ func newRateLimiterMetricsAdapter() rateLimiterMetricsProvider {
 			Buckets: latencyBuckets,
 		},
 		[]string{"verb"})
-	prometheus.Register(rateLimiterLatency)
+	prometheus.MustRegister(rateLimiterLatency)
 	return rateLimiterMetricsProvider{
 		rateLimiterLatency,
 	}
