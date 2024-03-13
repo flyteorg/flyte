@@ -12,6 +12,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/otelutils"
 	"github.com/flyteorg/flyte/flytestdlib/profutils"
+	_ "github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
 var pluginRegistryStore = plugins.NewAtomicRegistry(plugins.NewRegistry())
