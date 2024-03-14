@@ -3,7 +3,6 @@ package validation
 import (
 	"context"
 
-
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc/codes"
 

@@ -7,12 +7,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/proto"
-	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
-	"google.golang.org/grpc/codes"
+	"google.golang.org/protobuf/types/known/anypb"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
+	artifactMocks "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts/mocks"
 	scheduleInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/async/schedule/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
@@ -26,8 +24,14 @@ import (
 	runtimeMocks "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/mocks"
 	"github.com/flyteorg/flyte/flyteidl/clients/go/coreutils"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
+	"github.com/golang/protobuf/proto"
+	"github.com/golang/protobuf/ptypes"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/grpc/codes"
 )
 
 var active = int32(admin.LaunchPlanState_ACTIVE)
@@ -394,6 +398,362 @@ func makeLaunchPlanRepoGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFu
 			},
 		}, nil
 	}
+}
+
+func makeActiveLaunchPlanModelGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFunc {
+	return func(input interfaces.Identifier) (models.LaunchPlan, error) {
+
+		closureBytes, _ := proto.Marshal(&admin.LaunchPlanClosure{
+			State: admin.LaunchPlanState_ACTIVE,
+		})
+
+		return models.LaunchPlan{
+			BaseModel: models.BaseModel{
+				CreatedAt: testutils.MockCreatedAtValue,
+			},
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			State:   &active,
+			Closure: closureBytes,
+		}, nil
+	}
+}
+
+func makeSchedLaunchPlanRepoGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFunc {
+	return func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		specBytes, _ := proto.Marshal(&admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				Schedule: &admin.Schedule{
+					ScheduleExpression: &admin.Schedule_Rate{
+						Rate: &admin.FixedRate{
+							Value: 2,
+							Unit:  admin.FixedRateUnit_HOUR,
+						},
+					},
+				},
+			},
+		})
+		assert.Equal(t, project, input.Project)
+		assert.Equal(t, domain, input.Domain)
+		assert.Equal(t, name, input.Name)
+		assert.Equal(t, version, input.Version)
+		return models.LaunchPlan{
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			Spec: specBytes,
+		}, nil
+	}
+}
+
+func makeArtifactTriggerLaunchPlanRepoGetCallback(t *testing.T) repositoryMocks.GetLaunchPlanFunc {
+	return func(input interfaces.Identifier) (models.LaunchPlan, error) {
+		trigger := &artifactsIdl.Trigger{
+			Trigger: &core.ArtifactID{
+				ArtifactKey:   nil,
+				Version:       "",
+				Partitions:    nil,
+				TimePartition: nil,
+			},
+		}
+		a, err := anypb.New(trigger)
+		assert.NoError(t, err)
+		specBytes, _ := proto.Marshal(&admin.LaunchPlanSpec{
+			EntityMetadata: &admin.LaunchPlanMetadata{
+				LaunchConditions: a,
+			},
+		})
+		x := models.LaunchConditionTypeARTIFACT
+		return models.LaunchPlan{
+			LaunchPlanKey: models.LaunchPlanKey{
+				Project: input.Project,
+				Domain:  input.Domain,
+				Name:    input.Name,
+				Version: input.Version,
+			},
+			Spec:                specBytes,
+			LaunchConditionType: &x,
+		}, nil
+	}
+}
+
+func TestUpdateTrigger(t *testing.T) {
+	client := artifactMocks.ArtifactRegistryClient{}
+	registry := artifacts.ArtifactRegistry{
+		Client: &client,
+	}
+	repository := getMockRepositoryForLpTest()
+	mockScheduler := mocks.NewMockEventScheduler()
+
+	client.On("ActivateTrigger", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		req := args.Get(1).(*artifactsIdl.ActivateTriggerRequest)
+		assert.Equal(t, "2", req.TriggerId.Version)
+	}).Return(&artifactsIdl.ActivateTriggerResponse{}, nil)
+
+	client.On("DeactivateTrigger", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		req := args.Get(1).(*artifactsIdl.DeactivateTriggerRequest)
+		assert.Equal(t, "1", req.TriggerId.Version)
+	}).Return(&artifactsIdl.DeactivateTriggerResponse{}, nil)
+
+	x := models.LaunchConditionTypeARTIFACT
+	oldLP := models.LaunchPlan{
+		LaunchPlanKey: models.LaunchPlanKey{
+			Project: "proj",
+			Domain:  "dev",
+			Name:    "triggered-launch-plan",
+			Version: "1",
+			Org:     "sample-tenant",
+		},
+		Spec:                nil,
+		WorkflowID:          0,
+		Closure:             nil,
+		State:               nil,
+		Digest:              nil,
+		ScheduleType:        "",
+		LaunchConditionType: &x,
+	}
+	newLP := models.LaunchPlan{
+		LaunchPlanKey: models.LaunchPlanKey{
+			Project: "proj",
+			Domain:  "dev",
+			Name:    "triggered-launch-plan",
+			Version: "2",
+			Org:     "sample-tenant",
+		},
+		Spec:                nil,
+		WorkflowID:          0,
+		Closure:             nil,
+		State:               nil,
+		Digest:              nil,
+		ScheduleType:        "",
+		LaunchConditionType: &x,
+	}
+	lpManager := NewLaunchPlanManager(repository, getMockConfigForLpTest(), mockScheduler, mockScope.NewTestScope(), &registry)
+	err := lpManager.(*LaunchPlanManager).updateTriggers(
+		context.Background(),
+		newLP, &oldLP)
+	assert.Nil(t, err)
+}
+
+func TestEnableLaunchPlanSched(t *testing.T) {
+	repository := getMockRepositoryForLpTest()
+	client := artifactMocks.ArtifactRegistryClient{}
+	registry := artifacts.ArtifactRegistry{
+		Client: &client,
+	}
+	mockScheduler := mocks.NewMockEventScheduler()
+	scheduleExpression := admin.Schedule{
+		ScheduleExpression: &admin.Schedule_Rate{
+			Rate: &admin.FixedRate{
+				Value: 2,
+				Unit:  admin.FixedRateUnit_HOUR,
+			},
+		},
+	}
+	mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(
+		func(ctx context.Context, input scheduleInterfaces.AddScheduleInput) error {
+			assert.True(t, proto.Equal(&launchPlanNamedIdentifier, &input.Identifier))
+			assert.True(t, proto.Equal(&scheduleExpression, &input.ScheduleExpression))
+			assert.Equal(t, "{\"time\":<time>,\"kickoff_time_arg\":\"\",\"payload\":"+
+				"\"Cgdwcm9qZWN0EgZkb21haW4aBG5hbWU=\"}",
+				*input.Payload)
+			return nil
+		})
+	lpGetFunc := makeSchedLaunchPlanRepoGetCallback(t)
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(lpGetFunc)
+	closureBytes, _ := proto.Marshal(&admin.LaunchPlanClosure{
+		State: admin.LaunchPlanState_ACTIVE,
+	})
+	listFunc := func(input interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
+		return interfaces.LaunchPlanCollectionOutput{
+			LaunchPlans: []models.LaunchPlan{
+				{
+					BaseModel: models.BaseModel{
+						CreatedAt: testutils.MockCreatedAtValue,
+					},
+					LaunchPlanKey: models.LaunchPlanKey{
+						Project: project,
+						Domain:  domain,
+						Name:    name,
+						Version: "old version",
+					},
+					State:   &active,
+					Closure: closureBytes,
+				},
+			},
+		}, nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(listFunc)
+
+	enableFunc := func(toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error {
+		assert.Equal(t, project, toEnable.Project)
+		assert.Equal(t, domain, toEnable.Domain)
+		assert.Equal(t, name, toEnable.Name)
+		assert.Equal(t, version, toEnable.Version)
+		assert.Equal(t, active, *toEnable.State)
+
+		assert.Equal(t, project, toDisable.Project)
+		assert.Equal(t, domain, toDisable.Domain)
+		assert.Equal(t, name, toDisable.Name)
+		assert.Equal(t, "old version", toDisable.Version)
+		assert.Equal(t, inactive, *toDisable.State)
+		var closure admin.LaunchPlanClosure
+		err := proto.Unmarshal(toDisable.Closure, &closure)
+		assert.NoError(t, err)
+		return nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetSetActiveCallback(enableFunc)
+	mockConfig := getMockConfigForLpTest()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
+
+	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry)
+	_, err := lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
+		Id:    &launchPlanIdentifier,
+		State: admin.LaunchPlanState_ACTIVE,
+	})
+	assert.NoError(t, err)
+	client.AssertNotCalled(t, "ActivateTrigger", mock.Anything, mock.Anything)
+	client.AssertNotCalled(t, "DeactivateTrigger", mock.Anything, mock.Anything)
+}
+
+func getFakeLaunchPlanManagerWithRegistryClient(t *testing.T, oldModel, newModel models.LaunchPlan, addScheduleFunc mocks.AddScheduleFunc, client *artifactMocks.ArtifactRegistryClient) *LaunchPlanManager {
+
+	repository := getMockRepositoryForLpTest()
+	registry := artifacts.ArtifactRegistry{
+		Client: client,
+	}
+	mockScheduler := mocks.NewMockEventScheduler()
+	if addScheduleFunc != nil {
+		mockScheduler.(*mocks.MockEventScheduler).SetAddScheduleFunc(addScheduleFunc)
+	}
+
+	// Get needs to return the new model
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(func(_ interfaces.Identifier) (models.LaunchPlan, error) {
+		return newModel, nil
+	})
+	// List returns the old model
+	listFunc := func(_ interfaces.ListResourceInput) (interfaces.LaunchPlanCollectionOutput, error) {
+		return interfaces.LaunchPlanCollectionOutput{
+			LaunchPlans: []models.LaunchPlan{
+				oldModel,
+			},
+		}, nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetListCallback(listFunc)
+
+	enableFunc := func(toEnable models.LaunchPlan, toDisable *models.LaunchPlan) error {
+		assert.Equal(t, newModel.Project, toEnable.Project)
+		assert.Equal(t, newModel.Domain, toEnable.Domain)
+		assert.Equal(t, newModel.Name, toEnable.Name)
+		assert.Equal(t, newModel.Version, toEnable.Version)
+		assert.Equal(t, active, *toEnable.State)
+
+		assert.Equal(t, oldModel.Project, toDisable.Project)
+		assert.Equal(t, oldModel.Domain, toDisable.Domain)
+		assert.Equal(t, oldModel.Name, toDisable.Name)
+		assert.Equal(t, oldModel.Version, toDisable.Version)
+		assert.Equal(t, inactive, *toDisable.State)
+		var closure admin.LaunchPlanClosure
+		err := proto.Unmarshal(toDisable.Closure, &closure)
+		assert.NoError(t, err)
+		return nil
+	}
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetSetActiveCallback(enableFunc)
+	mockConfig := getMockConfigForLpTest()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
+
+	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry).(*LaunchPlanManager)
+
+	return lpManager
+}
+
+func TestDisableArtfActivateNothing(t *testing.T) {
+	makerWithArtifact := makeArtifactTriggerLaunchPlanRepoGetCallback(t)
+	oldID := interfaces.Identifier{
+		Project: "p",
+		Domain:  "dd",
+		Name:    "name1",
+		Version: "oldversion",
+		Org:     "",
+	}
+	oldModel, err := makerWithArtifact(oldID)
+	assert.NoError(t, err)
+
+	plainMaker := makeActiveLaunchPlanModelGetCallback(t)
+	newID := interfaces.Identifier{
+		Project: "p",
+		Domain:  "dd",
+		Name:    "name1",
+		Version: "newversion",
+		Org:     "",
+	}
+	newModel, err := plainMaker(newID)
+	assert.NoError(t, err)
+
+	client := artifactMocks.ArtifactRegistryClient{}
+
+	lpManager := getFakeLaunchPlanManagerWithRegistryClient(t, oldModel, newModel, nil, &client)
+	// Set the mock to return
+	client.OnDeactivateTriggerMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		lpID := args.Get(1).(*artifactsIdl.DeactivateTriggerRequest).TriggerId
+		assert.Equal(t, "oldversion", lpID.Version)
+	}).Return(&artifactsIdl.DeactivateTriggerResponse{}, nil)
+
+	_, err = lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
+		Id:    &launchPlanIdentifier,
+		State: admin.LaunchPlanState_ACTIVE,
+	})
+	assert.NoError(t, err)
+	client.AssertNotCalled(t, "ActivateTrigger", mock.Anything, mock.Anything)
+	client.AssertCalled(t, "DeactivateTrigger", mock.Anything, mock.Anything)
+}
+
+func TestEnableLaunchPlanArtifact(t *testing.T) {
+	makerWithArtifact := makeArtifactTriggerLaunchPlanRepoGetCallback(t)
+	newID := interfaces.Identifier{
+		Project: "project",
+		Domain:  "domain",
+		Name:    "name",
+		Version: "version",
+		Org:     "",
+	}
+	newModel, err := makerWithArtifact(newID)
+	assert.NoError(t, err)
+
+	plainMaker := makeActiveLaunchPlanModelGetCallback(t)
+	oldID := interfaces.Identifier{
+		Project: "p",
+		Domain:  "dd",
+		Name:    "name1",
+		Version: "oldversion",
+		Org:     "",
+	}
+	oldModel, err := plainMaker(oldID)
+	assert.NoError(t, err)
+
+	client := artifactMocks.ArtifactRegistryClient{}
+	lpManager := getFakeLaunchPlanManagerWithRegistryClient(t, oldModel, newModel, nil, &client)
+
+	// Set the mock to return
+	client.OnActivateTriggerMatch(mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		lpID := args.Get(1).(*artifactsIdl.ActivateTriggerRequest).TriggerId
+		assert.Equal(t, "version", lpID.Version)
+	}).Return(&artifactsIdl.ActivateTriggerResponse{}, nil)
+	// Make the call to trigger everything
+	_, err = lpManager.UpdateLaunchPlan(context.Background(), admin.LaunchPlanUpdateRequest{
+		Id:    &launchPlanIdentifier,
+		State: admin.LaunchPlanState_ACTIVE,
+	})
+	assert.NoError(t, err)
+	client.AssertCalled(t, "ActivateTrigger", mock.Anything, mock.Anything)
+	client.AssertNotCalled(t, "DeactivateTrigger", mock.Anything, mock.Anything)
 }
 
 func TestEnableSchedule(t *testing.T) {
