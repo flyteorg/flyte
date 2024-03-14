@@ -40,7 +40,7 @@ jobs:
           go-version: ${{ inputs.go-version }}
       - name: Integration
         env:
-          USE_LOCAL_SANDBOX: False
+          USE_LOCAL_SANDBOX: ${{ false }}
         run: |
           # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
           sudo rm -rf /usr/share/dotnet
