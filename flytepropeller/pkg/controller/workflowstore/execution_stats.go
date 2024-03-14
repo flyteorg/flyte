@@ -114,14 +114,14 @@ func NewExecutionStatsHolder() (*ExecutionStatsHolder, error) {
 }
 
 // AddOrUpdateEntry adds or updates an entry in the executions map.
-func (esh *ExecutionStatsHolder) AddOrUpdateEntry(executionId string, executionStats SingleExecutionStats) error {
+func (esh *ExecutionStatsHolder) AddOrUpdateEntry(executionID string, executionStats SingleExecutionStats) error {
 	if esh == nil || esh.executions == nil {
 		return fmt.Errorf("ExecutionStatsHolder is not initialized")
 	}
 
 	esh.mu.Lock()
 	defer esh.mu.Unlock()
-	esh.executions[executionId] = executionStats
+	esh.executions[executionID] = executionStats
 
 	return nil
 }
@@ -159,10 +159,10 @@ func (esh *ExecutionStatsHolder) RemoveTerminatedExecutions(ctx context.Context,
 	// Acquire the mutex and remove all terminated or deleted workflows.
 	esh.mu.Lock()
 	defer esh.mu.Unlock()
-	for execId := range esh.executions {
-		if !workflows[execId] {
-			logger.Debugf(ctx, "Deleting active execution entry for execId: %s", execId)
-			delete(esh.executions, execId)
+	for execID := range esh.executions {
+		if !workflows[execID] {
+			logger.Debugf(ctx, "Deleting active execution entry for execId: %s", execID)
+			delete(esh.executions, execID)
 		}
 	}
 	return nil

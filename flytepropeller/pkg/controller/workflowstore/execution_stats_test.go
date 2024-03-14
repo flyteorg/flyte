@@ -20,10 +20,25 @@ func TestAddOrUpdateEntry(t *testing.T) {
 	assert.Equal(t, uint32(10), esh.executions["exec1"].ActiveTaskCount)
 }
 
-func TestAggregateActiveValues(t *testing.T) {
-	esh, _ := NewExecutionStatsHolder()
-	esh.AddOrUpdateEntry("exec1", SingleExecutionStats{ActiveNodeCount: 5, ActiveTaskCount: 10})
+func createDefaultExecutionStatsHolder() (*ExecutionStatsHolder, error) {
+	esh, err := NewExecutionStatsHolder()
+	if err != nil {
+		return nil, err
+	}
+	err = esh.AddOrUpdateEntry("exec1", SingleExecutionStats{ActiveNodeCount: 5, ActiveTaskCount: 10})
+	if err != nil {
+		return nil, err
+	}
 	esh.AddOrUpdateEntry("exec2", SingleExecutionStats{ActiveNodeCount: 3, ActiveTaskCount: 6})
+	if err != nil {
+		return nil, err
+	}
+	return esh, nil
+}
+
+func TestAggregateActiveValues(t *testing.T) {
+	esh, err := createDefaultExecutionStatsHolder()
+	assert.NoError(t, err)
 
 	flows, nodes, tasks, err := esh.AggregateActiveValues()
 	assert.NoError(t, err)
@@ -46,11 +61,8 @@ func TestRemoveTerminatedExecutionsEmpty(t *testing.T) {
 
 // Test removal of a subset of entries from ExcutionStatsHolder
 func TestRemoveTerminatedExecutionsSubset(t *testing.T) {
-	esh, err := NewExecutionStatsHolder()
+	esh, err := createDefaultExecutionStatsHolder()
 	assert.NoError(t, err)
-
-	esh.AddOrUpdateEntry("exec1", SingleExecutionStats{ActiveNodeCount: 5, ActiveTaskCount: 10})
-	esh.AddOrUpdateEntry("exec2", SingleExecutionStats{ActiveNodeCount: 3, ActiveTaskCount: 6})
 
 	err = esh.RemoveTerminatedExecutions(context.TODO(), map[string]bool{"exec2": true})
 	assert.NoError(t, err)
@@ -73,8 +85,8 @@ func TestConcurrentAccess(t *testing.T) {
 		wg.Add(1)
 		go func(id int) {
 			defer wg.Done()
-			execId := fmt.Sprintf("exec%d", id)
-			esh.AddOrUpdateEntry(execId, SingleExecutionStats{ActiveNodeCount: uint32(id), ActiveTaskCount: uint32(id * 2)})
+			execID := fmt.Sprintf("exec%d", id)
+			esh.AddOrUpdateEntry(execID, SingleExecutionStats{ActiveNodeCount: uint32(id), ActiveTaskCount: uint32(id * 2)})
 		}(i)
 	}
 
