@@ -249,16 +249,6 @@ func TestDecorateEnvVars(t *testing.T) {
 		"k": "value",
 	}
 
-	var emptyConfigMaps []string
-	envVarConfigMaps := []string{
-		"test-cm-1",
-	}
-
-	var emptySecrets []string
-	envVarSecrets := []string{
-		"test-secret-1",
-	}
-
 	originalEnvVal := os.Getenv("value")
 	err := os.Setenv("value", "v")
 	if err != nil {
@@ -268,22 +258,6 @@ func TestDecorateEnvVars(t *testing.T) {
 
 	expected := append(defaultEnv, GetContextEnvVars(ctx)...)
 	expected = append(expected, GetExecutionEnvVars(mockTaskExecutionIdentifier{})...)
-
-	expectedPlusCMs := append(expected, v12.EnvVar{
-		ValueFrom: &v12.EnvVarSource{
-			ConfigMapKeyRef: &v12.ConfigMapKeySelector{
-				Key: envVarConfigMaps[0],
-			},
-		},
-	})
-
-	expectedPlusSecrets := append(expected, v12.EnvVar{
-		ValueFrom: &v12.EnvVarSource{
-			SecretKeyRef: &v12.SecretKeySelector{
-				Key: envVarSecrets[0],
-			},
-		},
-	})
 
 	aggregated := append(expected, v12.EnvVar{Name: "k", Value: "v"})
 	type args struct {
@@ -296,26 +270,20 @@ func TestDecorateEnvVars(t *testing.T) {
 		additionEnvVar        map[string]string
 		additionEnvVarFromEnv map[string]string
 		executionEnvVar       map[string]string
-		configMapEnvNames     []string
-		secretEnvNames        []string
 		want                  []v12.EnvVar
 	}{
-		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, emptyConfigMaps, emptySecrets, expected},
-		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, emptyEnvVar, emptyEnvVar, emptyConfigMaps, emptySecrets, aggregated},
-		{"from-env", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, envVarsFromEnv, emptyEnvVar, emptyConfigMaps, emptySecrets, aggregated},
-		{"from-execution-metadata", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, additionalEnv, emptyConfigMaps, emptySecrets, aggregated},
-		{"with-from-configmap", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, envVarConfigMaps, emptySecrets, expectedPlusCMs},
-		{"with-from-secret", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, emptyConfigMaps, envVarSecrets, expectedPlusSecrets},
+		{"no-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, emptyEnvVar, expected},
+		{"with-additional", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, additionalEnv, emptyEnvVar, emptyEnvVar, aggregated},
+		{"from-env", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, envVarsFromEnv, emptyEnvVar, aggregated},
+		{"from-execution-metadata", args{envVars: defaultEnv, id: mockTaskExecutionIdentifier{}}, emptyEnvVar, emptyEnvVar, additionalEnv, aggregated},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.NoError(t, config.SetK8sPluginConfig(&config.K8sPluginConfig{
-				DefaultEnvVars:               tt.additionEnvVar,
-				DefaultEnvVarsFromEnv:        tt.additionEnvVarFromEnv,
-				DefaultEnvVarsFromConfigMaps: tt.configMapEnvNames,
-				DefaultEnvVarsFromSecrets:    tt.secretEnvNames,
+				DefaultEnvVars:        tt.additionEnvVar,
+				DefaultEnvVarsFromEnv: tt.additionEnvVarFromEnv,
 			}))
-			if got := DecorateEnvVars(ctx, tt.args.envVars, tt.executionEnvVar, tt.args.id); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := DecorateEnvVars(ctx, tt.args.envVars, tt.executionEnvVar, tt.args.id); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("DecorateEnvVars() = %v, want %v", got, tt.want)
 			}
 		})
