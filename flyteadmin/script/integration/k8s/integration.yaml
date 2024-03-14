@@ -417,6 +417,9 @@ spec:
         - name: flyteadmin
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent
+          env:
+            - name: USE_LOCAL_SANDBOX
+              value: "False"
           securityContext:
             privileged: true
           readinessProbe:
