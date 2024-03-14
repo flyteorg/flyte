@@ -181,8 +181,7 @@ jobs:
         with:
           repository: flyteorg/flytesnacks
           path: flytesnacks
-          # TODO: Enable this once refactored version produces a release tag
-          # ref: ${{ env.FLYTESNACKS_VERSION }}
+          ref: ${{ env.FLYTESNACKS_VERSION }}
       - name: Register specific tests
         run: |
           flytekit_version=$(pip show flytekit | grep -i version | awk '{ print $2 }')
