@@ -156,7 +156,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.12"
       - uses: unionai/flytectl-setup-action@v0.0.1
       - name: Setup sandbox
         run: |
@@ -191,7 +191,7 @@ jobs:
                   register \
                   --project flytesnacks \
                   --domain development \
-                  --image cr.flyte.org/flyteorg/flytekit:py3.11-latest \
+                  --image cr.flyte.org/flyteorg/flytekit:py3.12-latest \
                   --version ${{ env.FLYTESNACKS_VERSION }} \
                   flytesnacks/$line;
           done < flytesnacks/flyte_tests.txt
