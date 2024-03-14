@@ -650,8 +650,8 @@ data:
         - FLYTE_AWS_ENDPOINT: http://minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
         - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-        default-env-vars-from-configmaps: []
-        default-env-vars-from-secrets: []
+        default-env-from-configmaps: []
+        default-env-from-secrets: []
         default-memory: 200Mi
   logger.yaml: | 
     logger:
