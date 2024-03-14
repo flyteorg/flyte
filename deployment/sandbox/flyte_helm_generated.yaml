@@ -7172,11 +7172,7 @@ spec:
   template:
     metadata:
       annotations:
-<<<<<<< HEAD
-        configChecksum: "3f87b4e38dcccebef4f630a9af22718ca79bf6e283b44a6368359b6698a4d2f"
-=======
         configChecksum: "ecefcb1d6df38b32a9ec77d91de63cd40da935a3239b70a5bb0396435878c80"
->>>>>>> origin/master
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
