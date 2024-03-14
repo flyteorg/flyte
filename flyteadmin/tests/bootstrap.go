@@ -25,6 +25,7 @@ const sandboxEnv = "USE_LOCAL_SANDBOX"
 var adminScope = promutils.NewScope("flyteadmin")
 
 func getDbConfigWithEnv() *database.DbConfig {
+	fmt.Printf("USE_LOCAL_SANDBOX: %s\n", os.Getenv(sandboxEnv))
 	if os.Getenv(sandboxEnv) == "False" {
 		return getDbConfig()
 	} else {
