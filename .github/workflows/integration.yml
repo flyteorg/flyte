@@ -39,6 +39,8 @@ jobs:
         with:
           go-version: ${{ inputs.go-version }}
       - name: Integration
+        env:
+          ADMIN_DB_CONFIG: CI
         run: |
           # attempt to clean up some unneeded data: https://github.com/actions/virtual-environments/issues/2840#issuecomment-790492173
           sudo rm -rf /usr/share/dotnet
