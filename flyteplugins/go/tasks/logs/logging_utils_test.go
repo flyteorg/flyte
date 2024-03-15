@@ -566,3 +566,147 @@ func TestGetLogsForContainerInPod_Flyteinteractive(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
+	tests := []struct {
+		name             string
+		config           *LogConfig
+		template         *core.TaskTemplate
+		expectedTaskLogs []*core.TaskLog
+	}{
+		{
+			"Generic Dynamic Log Links enabled but no task template",
+			&LogConfig{
+				GenericDynamicLogLinksEnabled: true,
+			},
+			nil,
+			nil,
+		},
+		{
+			"Generic Dynamic Log Links enabled and empty task template",
+			&LogConfig{
+				GenericDynamicLogLinksEnabled: true,
+			},
+			&core.TaskTemplate{},
+			nil,
+		},
+		{
+			"Generic Dynamic Log Links enabled and simple config present in TaskTemplate",
+			&LogConfig{
+				GenericDynamicLogLinksEnabled: true,
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type":                 "vscode",
+					"port":                      "65535",
+					"generic_dynamic_log_links": `{"links": [{"display_name": "vscode", "template_uri": "vscode://def.com:{{ .taskConfig.port }}/{{ .podName }}"}]}`,
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "vscode://def.com:65535/my-pod",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "vscode",
+				},
+			},
+		},
+		{
+			"Generic Dynamic Log Links disabled and simple config present in TaskTemplate - Notice how we can mix and match parameters defined in the task template, i.e. using {{ .taskConfig.port }} also works",
+			&LogConfig{},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type":                 "vscode",
+					"port":                      "65535",
+					"generic_dynamic_log_links": `{"links": [{"display_name": "vscode", "template_uri": "vscode://def.com:{{ .taskConfig.port }}/{{ .podName }}"}]}`,
+				},
+			},
+			nil,
+		},
+		{
+			"Generic Dynamic Log Links - multiple dynamic options",
+			&LogConfig{
+				GenericDynamicLogLinksEnabled: true,
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"vscode": tasklog.TemplateLogPlugin{
+						DisplayName: "vscode link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"https://abc.com:{{ .taskConfig.port }}/{{ .taskConfig.route }}",
+						},
+					},
+				},
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type":                 "vscode",
+					"port":                      "65535",
+					"route":                     "a-route",
+					"generic_dynamic_log_links": `{"links": [{"display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "https://abc.com:65535/a-route",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "vscode link my-Suffix",
+				},
+				{
+					Uri:           "coming://from/other/place",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "Other logs",
+				},
+			},
+		},
+		{
+			"Generic Dynamic Log Links disabled and K8s enabled and generic dynamic log links config present in TaskTemplate",
+			&LogConfig{
+				IsKubernetesEnabled:           true,
+				KubernetesTemplateURI:         "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				GenericDynamicLogLinksEnabled: false,
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type":                 "abc",
+					"generic_dynamic_log_links": `{"links": [{"display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "https://k8s.com/my-namespace/my-pod/ContainerName/ContainerID",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "Kubernetes Logs my-Suffix",
+				},
+			},
+		},
+		{
+			"Generic Dynamic Log Links enabled and K8s enabled and generic dynamic log links config present in TaskTemplate",
+			&LogConfig{
+				IsKubernetesEnabled:           true,
+				KubernetesTemplateURI:         "https://k8s.com/{{ .namespace }}/{{ .podName }}/{{ .containerName }}/{{ .containerId }}",
+				GenericDynamicLogLinksEnabled: true,
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type":                 "abc",
+					"generic_dynamic_log_links": `{"links": [{"display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "https://k8s.com/my-namespace/my-pod/ContainerName/ContainerID",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "Kubernetes Logs my-Suffix",
+				},
+				{
+					Uri:           "coming://from/other/place",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "Other logs",
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assertTestSucceeded(t, tt.config, tt.template, tt.expectedTaskLogs, "")
+		})
+	}
+}

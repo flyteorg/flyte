@@ -267,6 +267,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.mixed.generic-dynamic-log-links-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.mixed.generic-dynamic-log-links-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.mixed.generic-dynamic-log-links-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.Mixed.GenericDynamicLogLinksEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_logs.user.cloudwatch-enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -415,6 +429,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.user.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.user.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.User.StackDriverTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.user.generic-dynamic-log-links-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.user.generic-dynamic-log-links-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.user.generic-dynamic-log-links-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.User.GenericDynamicLogLinksEnabled)
 
 			} else {
 				assert.FailNow(t, err.Error())
@@ -575,6 +603,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			}
 		})
 	})
+	t.Run("Test_logs.system.generic-dynamic-log-links-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.system.generic-dynamic-log-links-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.system.generic-dynamic-log-links-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.System.GenericDynamicLogLinksEnabled)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
 	t.Run("Test_logs.all-user.cloudwatch-enabled", func(t *testing.T) {
 
 		t.Run("Override", func(t *testing.T) {
@@ -723,6 +765,20 @@ func TestConfig_SetFlags(t *testing.T) {
 			cmdFlags.Set("logs.all-user.stackdriver-template-uri", testValue)
 			if vString, err := cmdFlags.GetString("logs.all-user.stackdriver-template-uri"); err == nil {
 				testDecodeJson_Config(t, fmt.Sprintf("%v", vString), &actual.LogConfig.AllUser.StackDriverTemplateURI)
+
+			} else {
+				assert.FailNow(t, err.Error())
+			}
+		})
+	})
+	t.Run("Test_logs.all-user.generic-dynamic-log-links-enabled", func(t *testing.T) {
+
+		t.Run("Override", func(t *testing.T) {
+			testValue := "1"
+
+			cmdFlags.Set("logs.all-user.generic-dynamic-log-links-enabled", testValue)
+			if vBool, err := cmdFlags.GetBool("logs.all-user.generic-dynamic-log-links-enabled"); err == nil {
+				testDecodeJson_Config(t, fmt.Sprintf("%v", vBool), &actual.LogConfig.AllUser.GenericDynamicLogLinksEnabled)
 
 			} else {
 				assert.FailNow(t, err.Error())

@@ -479,6 +479,34 @@ func TestTemplateLogPlugin(t *testing.T) {
 			},
 		},
 		{
+			"generic dynamic log link",
+			TemplateLogPlugin{
+				Name:                "Generic",
+				DynamicTemplateURIs: []string{""},
+				MessageFormat:       core.TaskLog_JSON,
+			},
+			args{
+				input: Input{
+					PodName: "my-pod-name",
+					TaskTemplate: &core.TaskTemplate{
+						Config: map[string]string{
+							"link_type":                 "abc",
+							"generic_dynamic_log_links": `{"links": [{"display_name": "A name", "template_uri": "abc://def.com:1234/{{ .podName }}"}]}`,
+						},
+					},
+				},
+			},
+			Output{
+				TaskLogs: []*core.TaskLog{
+					{
+						Uri:           "abc://def.com:1234/my-pod-name",
+						MessageFormat: core.TaskLog_JSON,
+						Name:          "A name",
+					},
+				},
+			},
+		},
+		{
 			"flyteinteractive - no link_type in task template",
 			TemplateLogPlugin{
 				Name:                "vscode",

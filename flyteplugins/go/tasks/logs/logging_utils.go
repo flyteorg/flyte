@@ -123,6 +123,12 @@ func InitializeLogPlugins(cfg *LogConfig) (tasklog.Plugin, error) {
 			})
 	}
 
+	// The generic dynamic log link is special. We're going to use the string `Generic` to signal that we're using it.
+	// TODO: decide if it's worth doing this in a different way.
+	if cfg.GenericDynamicLogLinksEnabled {
+		dynamicPlugins = append(dynamicPlugins, tasklog.TemplateLogPlugin{Name: "Generic", DynamicTemplateURIs: []string{""}, MessageFormat: core.TaskLog_JSON})
+	}
+
 	plugins = append(plugins, cfg.Templates...)
 	return templateLogPluginCollection{plugins: plugins, dynamicPlugins: dynamicPlugins}, nil
 }

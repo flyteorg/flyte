@@ -1,6 +1,7 @@
 package tasklog
 
 import (
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -195,6 +196,33 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 	return strings.Split(linkType, ",")
 }
 
+type GenericDynamicLogLink struct {
+	DisplayName string      `json:"display_name"`
+	TemplateURI TemplateURI `json:"template_uri"`
+}
+
+type GenericDynamicLogLinks struct {
+	Links []GenericDynamicLogLink `json:"links"`
+}
+
+func taskTemplateHasGenericDynamicLogLinksEnabled(taskTemplate *core.TaskTemplate) []GenericDynamicLogLink {
+	if taskTemplate == nil {
+		return nil
+	}
+	config := taskTemplate.GetConfig()
+	if config == nil {
+		return nil
+	}
+
+	data := []byte(config["generic_dynamic_log_links"])
+	dynamicLogLinks := GenericDynamicLogLinks{}
+	err := json.Unmarshal(data, &dynamicLogLinks)
+	if err != nil {
+		return nil
+	}
+	return dynamicLogLinks.Links
+}
+
 func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 	templateVars := input.templateVars()
 	taskLogs := make([]*core.TaskLog, 0, len(p.TemplateURIs))
@@ -206,21 +234,42 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 		})
 	}
 
+	genericDynamicLogLinks := taskTemplateHasGenericDynamicLogLinksEnabled(input.TaskTemplate)
 	for _, dynamicLogLinkType := range getDynamicLogLinkTypes(input.TaskTemplate) {
 		for _, dynamicTemplateURI := range p.DynamicTemplateURIs {
-			if p.Name == dynamicLogLinkType {
-				for _, match := range taskConfigVarRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
-					if len(match) > 1 {
-						if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {
-							templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
+			// In case there's a generic dynamic log link we should go over the configured dynamic log links
+			// in the task template and generate a link for each of them.
+			if p.Name == "Generic" {
+				// Go through all generic dynamic logs and confirm if there's a match
+				for _, genericDynamicLogLink := range genericDynamicLogLinks {
+					for _, match := range taskConfigVarRegex.FindAllStringSubmatch(genericDynamicLogLink.TemplateURI, -1) {
+						if len(match) > 1 {
+							if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {
+								templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
+							}
 						}
 					}
+					taskLogs = append(taskLogs, &core.TaskLog{
+						Uri:           replaceAll(genericDynamicLogLink.TemplateURI, templateVars),
+						Name:          genericDynamicLogLink.DisplayName,
+						MessageFormat: core.TaskLog_JSON,
+					})
 				}
-				taskLogs = append(taskLogs, &core.TaskLog{
-					Uri:           replaceAll(dynamicTemplateURI, templateVars),
-					Name:          p.DisplayName + input.LogName,
-					MessageFormat: p.MessageFormat,
-				})
+			} else if p.Name == dynamicLogLinkType {
+				if p.Name == dynamicLogLinkType {
+					for _, match := range taskConfigVarRegex.FindAllStringSubmatch(dynamicTemplateURI, -1) {
+						if len(match) > 1 {
+							if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {
+								templateVars = append(templateVars, TemplateVar{MustCreateDynamicLogRegex(match[1]), value})
+							}
+						}
+					}
+					taskLogs = append(taskLogs, &core.TaskLog{
+						Uri:           replaceAll(dynamicTemplateURI, templateVars),
+						Name:          p.DisplayName + input.LogName,
+						MessageFormat: p.MessageFormat,
+					})
+				}
 			}
 		}
 	}
