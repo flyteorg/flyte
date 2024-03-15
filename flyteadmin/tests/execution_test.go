@@ -157,7 +157,7 @@ func populateWorkflowExecutionsForTestingOnly() {
 		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2),
 		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2),
 	}
-	db, err := repositories.GetDB(context.Background(), getDbConfigWithEnv(), getLoggerConfig())
+	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)

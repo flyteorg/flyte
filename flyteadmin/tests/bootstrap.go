@@ -24,7 +24,7 @@ const integrationTestConfigEnvVar = "USE_INTEGRATION_TEST_CONFIG"
 
 var adminScope = promutils.NewScope("flyteadmin")
 
-func getDbConfigWithEnv() *database.DbConfig {
+func getDbConfig() *database.DbConfig {
 	if os.Getenv(integrationTestConfigEnvVar) == "True" {
 		return getIntegrationDbConfig()
 	} else {
@@ -87,7 +87,7 @@ func truncateAllTablesForTestingOnly() {
 	TruncateAdminTags := fmt.Sprintf("TRUNCATE TABLE admin_tags;")
 	TruncateExecutionAdminTags := fmt.Sprintf("TRUNCATE TABLE execution_admin_tags;")
 	ctx := context.Background()
-	db, err := repositories.GetDB(ctx, getDbConfigWithEnv(), getLoggerConfig())
+	db, err := repositories.GetDB(ctx, getDbConfig(), getLoggerConfig())
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)
 	}
@@ -120,7 +120,7 @@ func truncateAllTablesForTestingOnly() {
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {
 	InsertExecution := fmt.Sprintf(insertExecutionQueryStr, project, domain, name, "UNDEFINED", 1, 2)
-	db, err := repositories.GetDB(context.Background(), getDbConfigWithEnv(), getLoggerConfig())
+	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {
 		logger.Fatalf(ctx, "Failed to open DB connection due to %v", err)
