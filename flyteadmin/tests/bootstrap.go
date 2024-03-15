@@ -20,12 +20,12 @@ const insertExecutionQueryStr = `INSERT INTO "executions" ` +
 	`("execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id") ` +
 	`VALUES ('%s', '%s', '%s', '%s', '%d', '%d')`
 
-const sandboxEnv = "USE_LOCAL_SANDBOX"
+const integrationTestConfigEnvVar = "USE_INTEGRATION_TEST_CONFIG"
 
 var adminScope = promutils.NewScope("flyteadmin")
 
 func getDbConfigWithEnv() *database.DbConfig {
-	if os.Getenv(sandboxEnv) == "False" {
+	if os.Getenv(integrationTestConfigEnvVar) == "True" {
 		return getDbConfig()
 	} else {
 		return getSandboxDbConfig()

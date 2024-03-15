@@ -418,8 +418,8 @@ spec:
           image: flyteadmin:test
           imagePullPolicy: IfNotPresent
           env:
-            - name: USE_LOCAL_SANDBOX
-              value: "False"
+            - name: USE_INTEGRATION_TEST_CONFIG
+              value: "True"
           securityContext:
             privileged: true
           readinessProbe:
