@@ -680,7 +680,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(workqueue_adds_total{name=~"flyte:propeller.*"}[5m])) by (name)',
+                            expr='rate(flyte:propeller:all:main_adds[5m])',
                             refId="A",
                         ),
                     ],
@@ -691,7 +691,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(workqueue_depth{name=~"flyte:propeller.*"}) by (name)',
+                            expr='flyte:propeller:all:main_depth',
                             refId="A",
                         ),
                     ],
@@ -702,7 +702,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(rate(workqueue_retries_total{name=~"flyte:propeller.*"}[5m])) by (name)',
+                            expr='rate(flyte:propeller:all:main_retries[5m])',
                             refId="A",
                         ),
                     ],
@@ -713,7 +713,7 @@ class FlytePropeller(object):
                     dataSource=DATASOURCE,
                     targets=[
                         Target(
-                            expr='sum(workqueue_unfinished_work_seconds{name=~"flyte:propeller.*"}) by (name)',
+                            expr='flyte:propeller:all:main_unfinished_work_s',
                             refId="A",
                         ),
                     ],

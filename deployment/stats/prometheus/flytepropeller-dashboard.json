@@ -1518,7 +1518,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(workqueue_adds_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
+              "expr": "rate(flyte:propeller:all:main_adds[5m])",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1526,7 +1526,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(workqueue_adds_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
+              "query": "rate(flyte:propeller:all:main_adds[5m])",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1645,7 +1645,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(workqueue_depth{name=~\"flyte:propeller.*\"}) by (name)",
+              "expr": "flyte:propeller:all:main_depth",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1653,7 +1653,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(workqueue_depth{name=~\"flyte:propeller.*\"}) by (name)",
+              "query": "flyte:propeller:all:main_depth",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1772,7 +1772,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(rate(workqueue_retries_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
+              "expr": "rate(flyte:propeller:all:main_retries[5m])",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1780,7 +1780,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(rate(workqueue_retries_total{name=~\"flyte:propeller.*\"}[5m])) by (name)",
+              "query": "rate(flyte:propeller:all:main_retries[5m])",
               "refId": "A",
               "step": 10,
               "target": ""
@@ -1899,7 +1899,7 @@
           "targets": [
             {
               "datasource": null,
-              "expr": "sum(workqueue_unfinished_work_seconds{name=~\"flyte:propeller.*\"}) by (name)",
+              "expr": "flyte:propeller:all:main_unfinished_work_s",
               "format": "time_series",
               "hide": false,
               "instant": false,
@@ -1907,7 +1907,7 @@
               "intervalFactor": 2,
               "legendFormat": "",
               "metric": "",
-              "query": "sum(workqueue_unfinished_work_seconds{name=~\"flyte:propeller.*\"}) by (name)",
+              "query": "flyte:propeller:all:main_unfinished_work_s",
               "refId": "A",
               "step": 10,
               "target": ""
