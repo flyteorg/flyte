@@ -82,6 +82,12 @@ func TestMetricsScope(t *testing.T) {
 		assert.Panics(t, func() {
 			_ = s.MustNewHistogramVec("xhv", description)
 		})
+		buckets := []float64{1.0, 2.0, 3.0, 4.0, 5.0, 6.0}
+		mvo := s.MustNewHistogramVecWithOptions("xho", description, HistogramOptions{Buckets: buckets})
+		assert.NotNil(t, mvo)
+		assert.Panics(t, func() {
+			_ = s.MustNewHistogramVecWithOptions("xho", description, HistogramOptions{Buckets: buckets})
+		})
 	})
 
 	t.Run("Summary", func(t *testing.T) {
