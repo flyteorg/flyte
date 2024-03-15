@@ -168,10 +168,6 @@ service DataProxyService {
     option (google.api.http) = {
       post: "/api/v1/dataproxy/artifact_urn"
       body: "*"
-      additional_bindings {
-        post: "/api/v1/org/dataproxy/artifact_urn/{org}"
-        body: "*"
-      }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Creates a write-only http location that is accessible for tasks at runtime."
