@@ -132,13 +132,13 @@ func DecorateEnvVars(ctx context.Context, envVars []v1.EnvVar, taskEnvironmentVa
 
 	for _, secretName := range config.GetK8sPluginConfig().DefaultEnvFromSecrets {
 		optional := true
-		secretRef := v1.SecretEnvSource{v1.LocalObjectReference{Name: secretName}, &optional}
+		secretRef := v1.SecretEnvSource{LocalObjectReference: v1.LocalObjectReference{Name: secretName}, Optional: &optional}
 		envFroms = append(envFroms, v1.EnvFromSource{SecretRef: &secretRef})
 	}
 
 	for _, cmName := range config.GetK8sPluginConfig().DefaultEnvFromConfigMaps {
 		optional := true
-		cmRef := v1.ConfigMapEnvSource{v1.LocalObjectReference{Name: cmName}, &optional}
+		cmRef := v1.ConfigMapEnvSource{LocalObjectReference: v1.LocalObjectReference{Name: cmName}, Optional: &optional}
 		envFroms = append(envFroms, v1.EnvFromSource{ConfigMapRef: &cmRef})
 	}
 
