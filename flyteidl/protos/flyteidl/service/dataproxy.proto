@@ -63,6 +63,10 @@ message CreateUploadLocationRequest {
   // it will force clients to add this metadata to the object.
   // This make sure dataproxy is backward compatible with the old flytekit.
   bool add_content_md5_metadata = 7;
+
+
+  // Optional, org key applied to the resource.
+  string org = 8;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
@@ -164,6 +168,10 @@ service DataProxyService {
     option (google.api.http) = {
       post: "/api/v1/dataproxy/artifact_urn"
       body: "*"
+      additional_bindings {
+        post: "/api/v1/org/dataproxy/artifact_urn/{org}"
+        body: "*"
+      }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Creates a write-only http location that is accessible for tasks at runtime."
