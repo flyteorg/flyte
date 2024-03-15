@@ -5,8 +5,9 @@ on:
     branches:
       - master
     paths:
-      - deployment
-      - docker/sandbox-bundled/manifests
+      - "charts/**"
+      - "deployment/**"
+      - "docker/sandbox-bundled/manifests/**"
 
 jobs:
   lint-and-test-charts:
