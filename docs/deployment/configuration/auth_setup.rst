@@ -345,9 +345,13 @@ Apply OIDC Configuration
          
          secrets:
            adminOauthClientCredentials:
-          # -- If enabled is true, helm will create and manage `flyte-secret-auth` and populate it with `clientSecret`.
-          # If enabled is false, it's up to the user to create `flyte-secret-auth`
+             # If enabled is true, helm will mount `flyte-secret-auth`.
+             # If enabled is false, helm will not mount `flyte-secret-auth`.
+             # If create is true, helm will create the `flyte-secret-auth`.
+             # If create is false, it's up to the user to create `flyte-secret-auth` as described in
+             # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
              enabled: true
+             create: true
            # Use the non-encoded version of the random password 
              clientSecret: "<your-random-password>" 
              clientId: flytepropeller
@@ -597,7 +601,8 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
    
          secrets:
            adminOauthClientCredentials:
-             enabled: true # see the section "Disable Helm secret management" if you require to do so
+             enabled: true
+             create: true # see the section "Disable Helm secret management" if you require to do so
              # Replace with the client_secret provided by your IdP for flytepropeller.
              clientSecret: <client_secret>
              # Replace with the client_id provided by provided by your IdP for flytepropeller.
@@ -617,6 +622,7 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
          secrets:
          adminOauthClientCredentials:
             enabled: true
+            create: true
             clientSecret: <client secret>
             clientId: <client id>
          ---
@@ -673,7 +679,8 @@ Alternatively, you can instruct Helm not to create and manage the secret for ``f
 
    secrets:
      adminOauthClientCredentials:
-       enabled: false #set to false
+       enabled: true # mount the flyte-secret-auth secret to the flytepropeller.
+       create: false # set to false
        # Replace with the client_id provided by provided by your IdP for flytepropeller.
        clientId: <client_id> 
 
