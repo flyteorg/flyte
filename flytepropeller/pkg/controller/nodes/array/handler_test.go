@@ -624,7 +624,7 @@ func TestHandleArrayNodePhaseExecuting(t *testing.T) {
 			eventRecorder := newBufferedEventRecorder()
 
 			nodeSpec := arrayNodeSpec
-			nodeSpec.ArrayNode.Parallelism = uint32(test.parallelism)
+			nodeSpec.ArrayNode.Parallelism = int64(test.parallelism)
 			nodeSpec.ArrayNode.MinSuccessRatio = test.minSuccessRatio
 
 			nCtx := createNodeExecutionContext(dataStore, eventRecorder, nil, literalMap, &arrayNodeSpec, arrayNodeState)

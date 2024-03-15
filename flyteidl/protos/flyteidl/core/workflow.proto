@@ -118,7 +118,7 @@ message ArrayNode {
     // point. Note that this is an optimistic restriction and that, due to network partitioning or
     // other failures, the actual number of currently running instances might be more. This has to
     // be a positive number if assigned. Default value is size.
-    uint32 parallelism = 2;
+    int64 parallelism = 2;
 
     oneof success_criteria {
         // min_successes is an absolute number of the minimum number of successful completions of
