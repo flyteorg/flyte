@@ -196,17 +196,17 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 	return strings.Split(linkType, ",")
 }
 
-type GenericDynamicLogLink struct {
+type genericDynamicLogLink struct {
 	Name string `json:"name"`
 	DisplayName string      `json:"display_name"`
 	TemplateURI TemplateURI `json:"template_uri"`
 }
 
-type GenericDynamicLogLinks struct {
-	Links []GenericDynamicLogLink `json:"links"`
+type genericDynamicLogLinks struct {
+	Links []genericDynamicLogLink `json:"links"`
 }
 
-func taskTemplateHasGenericDynamicLogLinksEnabled(taskTemplate *core.TaskTemplate) []GenericDynamicLogLink {
+func taskTemplateHasGenericDynamicLogLinksEnabled(taskTemplate *core.TaskTemplate) []genericDynamicLogLink {
 	if taskTemplate == nil {
 		return nil
 	}
@@ -216,7 +216,7 @@ func taskTemplateHasGenericDynamicLogLinksEnabled(taskTemplate *core.TaskTemplat
 	}
 
 	data := []byte(config["generic_dynamic_log_links"])
-	dynamicLogLinks := GenericDynamicLogLinks{}
+	dynamicLogLinks := genericDynamicLogLinks{}
 	err := json.Unmarshal(data, &dynamicLogLinks)
 	if err != nil {
 		return nil
