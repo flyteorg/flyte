@@ -727,6 +727,39 @@ func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
 				},
 			},
 		},
+		{
+			"Multiple Generic Dynamic Log Links defined in task template - one defined as a Generic Dynamic Log Link and a regular Dynamic Log Link",
+			&LogConfig{
+				GenericDynamicLogLinksEnabled: true,
+				DynamicLogLinks: map[string]tasklog.TemplateLogPlugin{
+					"abc": tasklog.TemplateLogPlugin{
+						DisplayName: "abc link",
+						TemplateURIs: []tasklog.TemplateURI{
+							"coming://from/abc",
+						},
+					},
+				},
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					// Notice that only defg is defined as a generic dynamic log link
+					"link_type":                 "abc,defg",
+					"generic_dynamic_log_links": `{"links": [{"name": "defg", "display_name": "defg logs", "template_uri": "coming://from/defg"}]}`,
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "coming://from/abc",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "abc link my-Suffix",
+				},
+				{
+					Uri:           "coming://from/defg",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "defg logs",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

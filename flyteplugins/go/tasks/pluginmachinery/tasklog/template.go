@@ -241,7 +241,6 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			// In case there's a generic dynamic log link we should go over the configured dynamic log links
 			// in the task template and generate a link for each of them.
 			if p.Name == "Generic" {
-				// Go through all generic dynamic logs and confirm if there's a match
 				for _, genericDynamicLogLink := range genericDynamicLogLinks {
 					if dynamicLogLinkType != genericDynamicLogLink.Name {
 						continue
