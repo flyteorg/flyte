@@ -2820,6 +2820,7 @@ func TestGetExecution(t *testing.T) {
 			LaunchPlanID: uint(1),
 			WorkflowID:   uint(2),
 			StartedAt:    &startedAt,
+			// TODO: Input uri
 		}, nil
 	}
 	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetGetCallback(executionGetFunc)
@@ -2857,7 +2858,6 @@ func TestGetExecutionOverwriteCache(t *testing.T) {
 			LaunchPlanID: uint(1),
 			WorkflowID:   uint(2),
 			StartedAt:    &startedAt,
-			// TODO: Input uri
 		}, nil
 	}
 
