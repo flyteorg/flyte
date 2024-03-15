@@ -114,6 +114,12 @@ type SummaryOptions struct {
 	Objectives map[float64]float64
 }
 
+// A HistogramOptions represent buckets to specify for a histogram vector when creating a new prometheus histogram
+type HistogramOptions struct {
+	// Buckets is a list of pre-determined buckets for the histogram
+	Buckets []float64
+}
+
 // A Scope represents a prefix in Prometheus. It is nestable, thus every metric that is published does not need to
 // provide a prefix, but just the name of the metric. As long as the Scope is used to create a new instance of the metric
 // The prefix (or scope) is automatically set.
@@ -153,6 +159,12 @@ type Scope interface {
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
 	NewHistogramVec(name, description string, labelNames ...string) (*prometheus.HistogramVec, error)
 	MustNewHistogramVec(name, description string, labelNames ...string) *prometheus.HistogramVec
+
+	// NewHistogramVecWithOptions creates new prometheus.HistogramVec metric with the prefix as the CurrentScope
+	// with a custom set of options, such as of buckets.
+	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
+	NewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) (*prometheus.HistogramVec, error)
+	MustNewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) *prometheus.HistogramVec
 
 	// NewCounter creates new prometheus.Counter metric with the prefix as the CurrentScope
 	// Refer to https://prometheus.io/docs/concepts/metric_types/ for more information
@@ -307,6 +319,25 @@ func (m metricsScope) NewHistogramVec(name, description string, labelNames ...st
 
 func (m metricsScope) MustNewHistogramVec(name, description string, labelNames ...string) *prometheus.HistogramVec {
 	h, err := m.NewHistogramVec(name, description, labelNames...)
+	panicIfError(err)
+	return h
+}
+
+func (m metricsScope) NewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) (*prometheus.HistogramVec, error) {
+	h := prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name:    m.NewScopedMetricName(name),
+			Help:    description,
+			Buckets: options.Buckets,
+		},
+		labelNames,
+	)
+
+	return h, prometheus.Register(h)
+}
+
+func (m metricsScope) MustNewHistogramVecWithOptions(name, description string, options HistogramOptions, labelNames ...string) *prometheus.HistogramVec {
+	h, err := m.NewHistogramVecWithOptions(name, description, options, labelNames...)
 	panicIfError(err)
 	return h
 }
