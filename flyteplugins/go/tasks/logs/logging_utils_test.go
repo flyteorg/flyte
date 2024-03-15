@@ -599,7 +599,7 @@ func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
 				Config: map[string]string{
 					"link_type":                 "vscode",
 					"port":                      "65535",
-					"generic_dynamic_log_links": `{"links": [{"display_name": "vscode", "template_uri": "vscode://def.com:{{ .taskConfig.port }}/{{ .podName }}"}]}`,
+					"generic_dynamic_log_links": `{"links": [{"name": "vscode", "display_name": "vscode", "template_uri": "vscode://def.com:{{ .taskConfig.port }}/{{ .podName }}"}]}`,
 				},
 			},
 			[]*core.TaskLog{
@@ -617,7 +617,7 @@ func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
 				Config: map[string]string{
 					"link_type":                 "vscode",
 					"port":                      "65535",
-					"generic_dynamic_log_links": `{"links": [{"display_name": "vscode", "template_uri": "vscode://def.com:{{ .taskConfig.port }}/{{ .podName }}"}]}`,
+					"generic_dynamic_log_links": `{"links": [{"name": "vscode", "display_name": "vscode", "template_uri": "vscode://def.com:{{ .taskConfig.port }}/{{ .podName }}"}]}`,
 				},
 			},
 			nil,
@@ -640,7 +640,7 @@ func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
 					"link_type":                 "vscode",
 					"port":                      "65535",
 					"route":                     "a-route",
-					"generic_dynamic_log_links": `{"links": [{"display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
+					"generic_dynamic_log_links": `{"links": [{"name": "vscode", "display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
 				},
 			},
 			[]*core.TaskLog{
@@ -687,7 +687,7 @@ func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
 			&core.TaskTemplate{
 				Config: map[string]string{
 					"link_type":                 "abc",
-					"generic_dynamic_log_links": `{"links": [{"display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
+					"generic_dynamic_log_links": `{"links": [{"name": "abc", "display_name": "Other logs", "template_uri": "coming://from/other/place"}]}`,
 				},
 			},
 			[]*core.TaskLog{
@@ -700,6 +700,30 @@ func TestGetLogsForContainerInPod_GenericDynamicLogLinks(t *testing.T) {
 					Uri:           "coming://from/other/place",
 					MessageFormat: core.TaskLog_JSON,
 					Name:          "Other logs",
+				},
+			},
+		},
+		{
+			"Multiple Generic Dynamic Log Links defined in task template",
+			&LogConfig{
+				GenericDynamicLogLinksEnabled: true,
+			},
+			&core.TaskTemplate{
+				Config: map[string]string{
+					"link_type":                 "abc,defg",
+					"generic_dynamic_log_links": `{"links": [{"name": "abc", "display_name": "Other logs", "template_uri": "coming://from/abc"},{"name": "defg", "display_name": "defg logs", "template_uri": "coming://from/defg"}]}`,
+				},
+			},
+			[]*core.TaskLog{
+				{
+					Uri:           "coming://from/abc",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "Other logs",
+				},
+				{
+					Uri:           "coming://from/defg",
+					MessageFormat: core.TaskLog_JSON,
+					Name:          "defg logs",
 				},
 			},
 		},

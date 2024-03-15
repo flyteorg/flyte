@@ -197,6 +197,7 @@ func getDynamicLogLinkTypes(taskTemplate *core.TaskTemplate) []string {
 }
 
 type GenericDynamicLogLink struct {
+	Name string `json:"name"`
 	DisplayName string      `json:"display_name"`
 	TemplateURI TemplateURI `json:"template_uri"`
 }
@@ -242,6 +243,9 @@ func (p TemplateLogPlugin) GetTaskLogs(input Input) (Output, error) {
 			if p.Name == "Generic" {
 				// Go through all generic dynamic logs and confirm if there's a match
 				for _, genericDynamicLogLink := range genericDynamicLogLinks {
+					if dynamicLogLinkType != genericDynamicLogLink.Name {
+						continue
+					}
 					for _, match := range taskConfigVarRegex.FindAllStringSubmatch(genericDynamicLogLink.TemplateURI, -1) {
 						if len(match) > 1 {
 							if value, found := input.TaskTemplate.GetConfig()[match[1]]; found {

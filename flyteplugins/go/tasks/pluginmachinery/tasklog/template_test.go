@@ -491,7 +491,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 					TaskTemplate: &core.TaskTemplate{
 						Config: map[string]string{
 							"link_type":                 "abc",
-							"generic_dynamic_log_links": `{"links": [{"display_name": "A name", "template_uri": "abc://def.com:1234/{{ .podName }}"}]}`,
+							"generic_dynamic_log_links": `{"links": [{"name": "abc", "display_name": "A name", "template_uri": "abc://def.com:1234/{{ .podName }}"}]}`,
 						},
 					},
 				},
