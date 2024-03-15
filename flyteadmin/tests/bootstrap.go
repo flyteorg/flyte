@@ -26,13 +26,13 @@ var adminScope = promutils.NewScope("flyteadmin")
 
 func getDbConfigWithEnv() *database.DbConfig {
 	if os.Getenv(integrationTestConfigEnvVar) == "True" {
-		return getDbConfig()
+		return getIntegrationDbConfig()
 	} else {
 		return getSandboxDbConfig()
 	}
 }
 
-func getDbConfig() *database.DbConfig {
+func getIntegrationDbConfig() *database.DbConfig {
 	return &database.DbConfig{
 		Postgres: database.PostgresConfig{
 			Host:   "postgres",
