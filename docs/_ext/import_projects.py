@@ -142,7 +142,12 @@ def import_projects(app: Sphinx, config: Config):
         else:
             local_dir = srcdir / import_projects_config.clone_dir / project.dest
             shutil.rmtree(local_dir, ignore_errors=True)
-            repo = Repo.clone_from(project.source, local_dir)
+            if "flytekit" in project.source:
+                repo = Repo.clone_from(project.source, local_dir, branch="sagemaker-agent")
+            elif "flytesnacks" in project.source:
+                repo = Repo.clone_from(project.source, local_dir, branch="add-sagemaker-agent")
+            else:
+                repo = Repo.clone_from(project.source, local_dir)
             show_repo_tags = True
 
         local_docs_path = local_dir / project.docs_path

@@ -29,7 +29,6 @@ dependencies:
 
   # Packages for Plugin docs
   # Package name                Plugin needing it
-  - retry                       # aws sagemaker
   - botocore                    # fsspec
   - fsspec                      # fsspec
   - google-cloud-bigquery       # bigquery
@@ -75,6 +74,7 @@ dependencies:
     - whylabs-client              # whylogs
     - ray==2.6.3
     - duckdb
+    - aioboto3==11.1.1            # aws sagemaker inference
 
 platforms:
   - linux-64
