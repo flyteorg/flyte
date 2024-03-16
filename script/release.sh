@@ -3,13 +3,10 @@
 set -ex
 
 FLYTEKIT_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flytekit/releases/latest" | jq -r .tag_name | sed 's/^v//')
-FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
-
-# bump latest release of flyte component in kustomize
-grep -rlZ "newTag:[^P]*# FLYTEADMIN_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTEADMIN_TAG/newTag: ${VERSION} # FLYTEADMIN_TAG/g" {}
-grep -rlZ "newTag:[^P]*# DATACATALOG_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# DATACATALOG_TAG/newTag: ${VERSION} # DATACATALOG_TAG/g" {}
-grep -rlZ "newTag:[^P]*# FLYTECONSOLE_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTECONSOLE_TAG/newTag: ${FLYTECONSOLE_TAG} # FLYTECONSOLE_TAG/g" {}
-grep -rlZ "newTag:[^P]*# FLYTEPROPELLER_TAG" ./kustomize/overlays | xargs -I {} sed -i "s/newTag:[^P]*# FLYTEPROPELLER_TAG/newTag: ${VERSION} # FLYTEPROPELLER_TAG/g" {}
+# The flyteconsole revamp is not released yet (we need "schedules" to be present before we can release it). In the meantime
+# we are using the latest release (v1.10.3) as the tag for flyteconsole.
+# FLYTECONSOLE_TAG=$(curl --silent "https://api.github.com/repos/flyteorg/flyteconsole/releases/latest" | jq -r .tag_name)
+FLYTECONSOLE_TAG=v1.10.3
 
 # bump latest release of flyte component in helm
 sed -i "s,tag:[^P]*# FLYTEADMIN_TAG,tag: ${VERSION} # FLYTEADMIN_TAG," ./charts/flyte/values.yaml

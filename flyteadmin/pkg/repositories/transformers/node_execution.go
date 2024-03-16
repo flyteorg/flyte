@@ -284,7 +284,7 @@ func UpdateNodeExecutionModel(
 
 	// In the case of dynamic nodes reporting DYNAMIC_RUNNING, the IsParent and IsDynamic bits will be set for this event.
 	// Update the node execution metadata accordingly.
-	if request.Event.IsParent || request.Event.IsDynamic {
+	if request.Event.IsParent || request.Event.IsDynamic || request.Event.IsArray {
 		var nodeExecutionMetadata admin.NodeExecutionMetaData
 		if len(nodeExecutionModel.NodeExecutionMetadata) > 0 {
 			if err := proto.Unmarshal(nodeExecutionModel.NodeExecutionMetadata, &nodeExecutionMetadata); err != nil {

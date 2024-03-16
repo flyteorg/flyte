@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -110,7 +111,7 @@ func ExampleCompileWorkflow_basic() {
 
 	// Output:
 	// Needed Tasks: [task_123], Needed Workflows []
-	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo" "];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "FirstNode()" [label="execution",style="dashed"];"FirstNode()" -> "end-node(end)" [label="execution",style="dashed"];}
+	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo""];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "FirstNode()" [label="execution",style="dashed"];"FirstNode()" -> "end-node(end)" [label="execution",style="dashed"];}
 	// Compile Errors: <nil>
 }
 
@@ -149,7 +150,8 @@ func TestCompileWorkflowWithFailureNode(t *testing.T) {
 	subWorkflows := make([]*core.WorkflowTemplate, 0)
 	reqs, err := GetRequirements(inputWorkflow, subWorkflows)
 	assert.Nil(t, err)
-	assert.Equal(t, reqs.taskIds, []common.Identifier{{Name: "cleanup"}, {Name: "task_123"}})
+	assert.True(t, proto.Equal(&reqs.taskIds[0], &[]common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[0]))
+	assert.True(t, proto.Equal(&reqs.taskIds[1], &[]common.Identifier{{Name: "cleanup"}, {Name: "task_123"}}[1]))
 
 	// Replace with logic to satisfy the requirements
 	workflows := make([]common.InterfaceProvider, 0)
@@ -301,7 +303,7 @@ func ExampleCompileWorkflow_inputsOutputsBinding() {
 
 	// Output:
 	// Needed Tasks: [task_123], Needed Graphs []
-	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo" "];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "node_1()" [label="wf_input",style="solid"];"node_1()" -> "node_2()" [label="x",style="solid"];"static" -> "node_1()" [label=""];"node_2()" -> "end-node(end)" [label="n2_output",style="solid"];"static" -> "node_2()" [label=""];}
+	// Compiled Workflow in GraphViz: digraph G {rankdir=TB;workflow[label="Workflow Id: name:"repo""];node[style=filled];"start-node(start)" [shape=Msquare];"start-node(start)" -> "node_1()" [label="wf_input",style="solid"];"node_1()" -> "node_2()" [label="x",style="solid"];"static" -> "node_1()" [label=""];"node_2()" -> "end-node(end)" [label="n2_output",style="solid"];"static" -> "node_2()" [label=""];}
 }
 
 func ExampleCompileWorkflow_compileErrors() {
@@ -344,7 +346,7 @@ func ExampleCompileWorkflow_compileErrors() {
 	// Output:
 	// Needed Tasks: [task_123], Needed Workflows []
 	// Compile Errors: Collected Errors: 1
-	// 	Error 0: Code: TaskReferenceNotFound, Node Id: start-node, Description: Referenced Task [name:"task_123" ] not found.
+	// 	Error 0: Code: TaskReferenceNotFound, Node Id: start-node, Description: Referenced Task [name:"task_123"] not found.
 }
 
 func newIntegerPrimitive(value int64) *core.Primitive {

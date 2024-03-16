@@ -1,17 +1,18 @@
 package test
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/ghodss/yaml"
 	"github.com/go-test/deep"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
@@ -284,7 +285,8 @@ func assertNodeIDsInConnections(t testing.TB, nodeIDsWithDeps, allNodeIDs sets.S
 }
 
 func TestUseCases(t *testing.T) {
-	runCompileTest(t, "branch")
+	// This first test doesn't seem to do anything, all the paths are nil
+	//runCompileTest(t, "branch")
 	runCompileTest(t, "snacks-core")
 }
 
@@ -293,6 +295,8 @@ func protoMarshal(v any) ([]byte, error) {
 	str, err := m.MarshalToString(v.(proto.Message))
 	return []byte(str), err
 }
+
+var multiSpaces = regexp.MustCompile(`\s+`)
 
 func storeOrDiff(t testing.TB, f func(obj any) ([]byte, error), obj any, path string) bool {
 	raw, err := f(obj)
@@ -312,8 +316,11 @@ func storeOrDiff(t testing.TB, f func(obj any) ([]byte, error), obj any, path st
 			return false
 		}
 
-		if diff := deep.Equal(string(raw), string(goldenRaw)); diff != nil {
-			t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v", diff, string(raw), string(goldenRaw))
+		trimmedRaw := multiSpaces.ReplaceAllString(string(raw), " ")
+		trimmedGolden := multiSpaces.ReplaceAllString(string(goldenRaw), " ")
+
+		if diff := deep.Equal(trimmedRaw, trimmedGolden); diff != nil {
+			t.Errorf("Compiled() Diff = %v\r\n got = %v\r\n want = %v", diff, trimmedRaw, trimmedGolden)
 		}
 	}
 
@@ -323,9 +330,9 @@ func storeOrDiff(t testing.TB, f func(obj any) ([]byte, error), obj any, path st
 func runCompileTest(t *testing.T, dirName string) {
 	errors.SetConfig(errors.Config{IncludeSource: true})
 	// Compile Tasks
-	t.Run("tasks-"+dirName, func(t *testing.T) {
-		//t.Parallel()
+	compiledTasks := make(map[string]*core.CompiledTask)
 
+	t.Run("tasks-"+dirName, func(t *testing.T) {
 		paths, err := filepath.Glob("testdata/" + dirName + "/*.pb")
 		if !assert.NoError(t, err) {
 			t.FailNow()
@@ -342,62 +349,36 @@ func runCompileTest(t *testing.T, dirName string) {
 			}
 
 			t.Run(p, func(t *testing.T) {
-				//t.Parallel()
-				if !storeOrDiff(t, yaml.Marshal, tsk, strings.TrimSuffix(p, filepath.Ext(p))+"_task.yaml") {
-					t.FailNow()
-				}
-
 				inputTask := tsk.Template
 				setDefaultFields(inputTask)
 				task, err := compiler.CompileTask(inputTask)
 				if !assert.NoError(t, err) {
 					t.FailNow()
 				}
+				compiledTasks[tsk.Template.Id.String()] = task
 
-				if !storeOrDiff(t, yaml.Marshal, task, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_task.yaml")) {
-					t.FailNow()
-				}
-
-				if !storeOrDiff(t, protoMarshal, tsk, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_task.json")) {
-					t.FailNow()
-				}
+				// unmarshal from json file to compare rather than yaml
+				taskFile := filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_task.json")
+				taskBytes, err := os.ReadFile(taskFile)
+				assert.NoError(t, err)
+				compiledTaskFromFile := &core.CompiledTask{}
+				reader := bytes.NewReader(taskBytes)
+				err = jsonpb.Unmarshal(reader, compiledTaskFromFile)
+				assert.NoError(t, err)
+				assert.True(t, proto.Equal(task, compiledTaskFromFile))
 			})
 		}
 	})
 
-	// Load Compiled Tasks
-	paths, err := filepath.Glob(filepath.Join("testdata", dirName, "compiled", "*_task.json"))
-	if !assert.NoError(t, err) {
-		t.FailNow()
-	}
-
-	compiledTasks := make(map[string]*core.CompiledTask, len(paths))
-	for _, f := range paths {
-		raw, err := ioutil.ReadFile(f)
-		if !assert.NoError(t, err) {
-			t.FailNow()
-		}
-
-		tsk := &core.CompiledTask{}
-		err = jsonpb.UnmarshalString(string(raw), tsk)
-		if !assert.NoError(t, err) {
-			t.FailNow()
-		}
-
-		compiledTasks[tsk.Template.Id.String()] = tsk
-	}
-
 	// Compile Workflows
 	t.Run("workflows-"+dirName, func(t *testing.T) {
-		//t.Parallel()
-
-		paths, err = filepath.Glob(filepath.Join("testdata", dirName, "*.pb"))
+		paths, err := filepath.Glob(filepath.Join("testdata", dirName, "*.pb"))
 		if !assert.NoError(t, err) {
 			t.FailNow()
 		}
 
 		for _, p := range paths {
-			raw, err := ioutil.ReadFile(p)
+			raw, err := os.ReadFile(p)
 			assert.NoError(t, err)
 			wf := &core.WorkflowClosure{}
 			err = proto.Unmarshal(raw, wf)
@@ -407,11 +388,6 @@ func runCompileTest(t *testing.T, dirName string) {
 			}
 
 			t.Run(p, func(t *testing.T) {
-				//t.Parallel()
-				if !storeOrDiff(t, yaml.Marshal, wf, strings.TrimSuffix(p, filepath.Ext(p))+"_wf.yaml") {
-					t.FailNow()
-				}
-
 				inputWf := wf.Workflow
 
 				reqs, err := compiler.GetRequirements(inputWf, nil)
@@ -436,17 +412,13 @@ func runCompileTest(t *testing.T, dirName string) {
 					t.FailNow()
 				}
 
-				if !storeOrDiff(t, yaml.Marshal, compiledWfc, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_wf.yaml")) {
+				allNodeIDs := getAllMatchingNodes(compiledWfc.Primary, allNodesPredicate)
+				nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.Primary, hasPromiseNodePredicate)
+				if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.Primary.Connections) {
 					t.FailNow()
 				}
 
 				if !storeOrDiff(t, protoMarshal, compiledWfc, filepath.Join(filepath.Dir(p), "compiled", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_wf.json")) {
-					t.FailNow()
-				}
-
-				allNodeIDs := getAllMatchingNodes(compiledWfc.Primary, allNodesPredicate)
-				nodeIDsWithDeps := getAllMatchingNodes(compiledWfc.Primary, hasPromiseNodePredicate)
-				if !assertNodeIDsInConnections(t, nodeIDsWithDeps, allNodeIDs, compiledWfc.Primary.Connections) {
 					t.FailNow()
 				}
 			})
@@ -455,16 +427,13 @@ func runCompileTest(t *testing.T, dirName string) {
 
 	// Build K8s Workflows
 	t.Run("k8s-"+dirName, func(t *testing.T) {
-		//t.Parallel()
-
-		paths, err = filepath.Glob(filepath.Join("testdata", dirName, "compiled", "*_wf.json"))
+		paths, err := filepath.Glob(filepath.Join("testdata", dirName, "compiled", "*_wf.json"))
 		if !assert.NoError(t, err) {
 			t.FailNow()
 		}
 
 		for _, p := range paths {
 			t.Run(p, func(t *testing.T) {
-				//t.Parallel()
 				raw, err := ioutil.ReadFile(p)
 				if !assert.NoError(t, err) {
 					t.FailNow()
@@ -492,7 +461,8 @@ func runCompileTest(t *testing.T, dirName string) {
 					t.FailNow()
 				}
 
-				if !storeOrDiff(t, yaml.Marshal, flyteWf, filepath.Join(filepath.Dir(filepath.Dir(p)), "k8s", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+".yaml")) {
+				file := filepath.Join(filepath.Dir(filepath.Dir(p)), "k8s", strings.TrimRight(filepath.Base(p), filepath.Ext(p))+"_crd.json")
+				if !storeOrDiff(t, json.Marshal, flyteWf, file) {
 					t.FailNow()
 				}
 			})

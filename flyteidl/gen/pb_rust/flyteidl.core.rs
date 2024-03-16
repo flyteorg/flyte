@@ -259,9 +259,9 @@ pub struct OutputReference {
 // @workflow
 // def wf():
 //      o = t1()
-//      t2(o.a\["b"][0\])
+//      t2(o.a["b"][0])
 // ```
-// the output reference t2 binds to has a list of PromiseAttribute ["a", "b", 0]
+// the output reference t2 binds to has a list of PromiseAttribute \["a", "b", 0\]
 
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -723,18 +723,18 @@ pub struct ArtifactKey {
     pub domain: ::prost::alloc::string::String,
     #[prost(string, tag="3")]
     pub name: ::prost::alloc::string::String,
+    #[prost(string, tag="4")]
+    pub org: ::prost::alloc::string::String,
 }
 /// Only valid for triggers
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
 pub struct ArtifactBindingData {
-    #[prost(uint32, tag="1")]
-    pub index: u32,
     /// This is only relevant in the time partition case
-    #[prost(string, tag="4")]
-    pub transform: ::prost::alloc::string::String,
+    #[prost(message, optional, tag="7")]
+    pub time_transform: ::core::option::Option<TimeTransform>,
     /// These two fields are only relevant in the partition value case
-    #[prost(oneof="artifact_binding_data::PartitionData", tags="2, 3")]
+    #[prost(oneof="artifact_binding_data::PartitionData", tags="5, 6")]
     pub partition_data: ::core::option::Option<artifact_binding_data::PartitionData>,
 }
 /// Nested message and enum types in `ArtifactBindingData`.
@@ -743,11 +743,19 @@ pub mod artifact_binding_data {
     #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Oneof)]
     pub enum PartitionData {
-        #[prost(string, tag="2")]
+        #[prost(string, tag="5")]
         PartitionKey(::prost::alloc::string::String),
-        #[prost(bool, tag="3")]
+        #[prost(bool, tag="6")]
         BindToTimePartition(bool),
     }
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct TimeTransform {
+    #[prost(string, tag="1")]
+    pub transform: ::prost::alloc::string::String,
+    #[prost(enumeration="Operator", tag="2")]
+    pub op: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -757,8 +765,12 @@ pub struct InputBindingData {
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RuntimeBinding {
+}
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
 pub struct LabelValue {
-    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4")]
+    #[prost(oneof="label_value::Value", tags="1, 2, 3, 4, 5")]
     pub value: ::core::option::Option<label_value::Value>,
 }
 /// Nested message and enum types in `LabelValue`.
@@ -776,6 +788,8 @@ pub mod label_value {
         TriggeredBinding(super::ArtifactBindingData),
         #[prost(message, tag="4")]
         InputBinding(super::InputBindingData),
+        #[prost(message, tag="5")]
+        RuntimeBinding(super::RuntimeBinding),
     }
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
@@ -789,6 +803,8 @@ pub struct Partitions {
 pub struct TimePartition {
     #[prost(message, optional, tag="1")]
     pub value: ::core::option::Option<LabelValue>,
+    #[prost(enumeration="Granularity", tag="2")]
+    pub granularity: i32,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -839,6 +855,68 @@ pub mod artifact_query {
         /// artifacts, or a partition value derived from a triggering artifact.
         #[prost(message, tag="4")]
         Binding(super::ArtifactBindingData),
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Granularity {
+    Unset = 0,
+    Minute = 1,
+    Hour = 2,
+    /// default
+    Day = 3,
+    Month = 4,
+}
+impl Granularity {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Granularity::Unset => "UNSET",
+            Granularity::Minute => "MINUTE",
+            Granularity::Hour => "HOUR",
+            Granularity::Day => "DAY",
+            Granularity::Month => "MONTH",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "UNSET" => Some(Self::Unset),
+            "MINUTE" => Some(Self::Minute),
+            "HOUR" => Some(Self::Hour),
+            "DAY" => Some(Self::Day),
+            "MONTH" => Some(Self::Month),
+            _ => None,
+        }
+    }
+}
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+#[repr(i32)]
+pub enum Operator {
+    Minus = 0,
+    Plus = 1,
+}
+impl Operator {
+    /// String value of the enum field names used in the ProtoBuf definition.
+    ///
+    /// The values are not transformed in any way and thus are considered stable
+    /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+    pub fn as_str_name(&self) -> &'static str {
+        match self {
+            Operator::Minus => "MINUS",
+            Operator::Plus => "PLUS",
+        }
+    }
+    /// Creates an enum from field names used in the ProtoBuf definition.
+    pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+        match value {
+            "MINUS" => Some(Self::Minus),
+            "PLUS" => Some(Self::Plus),
+            _ => None,
+        }
     }
 }
 /// Defines a strongly typed variable.
@@ -1651,8 +1729,6 @@ pub struct K8sObjectMetadata {
 pub struct Sql {
     /// The actual query to run, the query can have templated parameters.
     /// We use Flyte's Golang templating format for Query templating.
-    /// Refer to the templating documentation.
-    /// <https://docs.flyte.org/projects/cookbook/en/latest/auto/integrations/external_services/hive/hive.html#sphx-glr-auto-integrations-external-services-hive-hive-py>
     /// For example,
     /// insert overwrite directory '{{ .rawOutputDataPrefix }}' stored as parquet
     /// select *
@@ -1696,6 +1772,147 @@ pub mod sql {
                 "ANSI" => Some(Self::Ansi),
                 "HIVE" => Some(Self::Hive),
                 "OTHER" => Some(Self::Other),
+                _ => None,
+            }
+        }
+    }
+}
+/// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
+/// Each expression results in a boolean result.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ComparisonExpression {
+    #[prost(enumeration="comparison_expression::Operator", tag="1")]
+    pub operator: i32,
+    #[prost(message, optional, tag="2")]
+    pub left_value: ::core::option::Option<Operand>,
+    #[prost(message, optional, tag="3")]
+    pub right_value: ::core::option::Option<Operand>,
+}
+/// Nested message and enum types in `ComparisonExpression`.
+pub mod comparison_expression {
+    /// Binary Operator for each expression
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Operator {
+        Eq = 0,
+        Neq = 1,
+        /// Greater Than
+        Gt = 2,
+        Gte = 3,
+        /// Less Than
+        Lt = 4,
+        Lte = 5,
+    }
+    impl Operator {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Operator::Eq => "EQ",
+                Operator::Neq => "NEQ",
+                Operator::Gt => "GT",
+                Operator::Gte => "GTE",
+                Operator::Lt => "LT",
+                Operator::Lte => "LTE",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "EQ" => Some(Self::Eq),
+                "NEQ" => Some(Self::Neq),
+                "GT" => Some(Self::Gt),
+                "GTE" => Some(Self::Gte),
+                "LT" => Some(Self::Lt),
+                "LTE" => Some(Self::Lte),
+                _ => None,
+            }
+        }
+    }
+}
+/// Defines an operand to a comparison expression.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Operand {
+    #[prost(oneof="operand::Val", tags="1, 2, 3")]
+    pub val: ::core::option::Option<operand::Val>,
+}
+/// Nested message and enum types in `Operand`.
+pub mod operand {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Val {
+        /// Can be a constant
+        #[prost(message, tag="1")]
+        Primitive(super::Primitive),
+        /// Or one of this node's input variables
+        #[prost(string, tag="2")]
+        Var(::prost::alloc::string::String),
+        /// Replace the primitive field
+        #[prost(message, tag="3")]
+        Scalar(super::Scalar),
+    }
+}
+/// Defines a boolean expression tree. It can be a simple or a conjunction expression.
+/// Multiple expressions can be combined using a conjunction or a disjunction to result in a final boolean result.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct BooleanExpression {
+    #[prost(oneof="boolean_expression::Expr", tags="1, 2")]
+    pub expr: ::core::option::Option<boolean_expression::Expr>,
+}
+/// Nested message and enum types in `BooleanExpression`.
+pub mod boolean_expression {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Expr {
+        #[prost(message, tag="1")]
+        Conjunction(::prost::alloc::boxed::Box<super::ConjunctionExpression>),
+        #[prost(message, tag="2")]
+        Comparison(super::ComparisonExpression),
+    }
+}
+/// Defines a conjunction expression of two boolean expressions.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ConjunctionExpression {
+    #[prost(enumeration="conjunction_expression::LogicalOperator", tag="1")]
+    pub operator: i32,
+    #[prost(message, optional, boxed, tag="2")]
+    pub left_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
+    #[prost(message, optional, boxed, tag="3")]
+    pub right_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
+}
+/// Nested message and enum types in `ConjunctionExpression`.
+pub mod conjunction_expression {
+    /// Nested conditions. They can be conjoined using AND / OR
+    /// Order of evaluation is not important as the operators are Commutative
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum LogicalOperator {
+        /// Conjunction
+        And = 0,
+        Or = 1,
+    }
+    impl LogicalOperator {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                LogicalOperator::And => "AND",
+                LogicalOperator::Or => "OR",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "AND" => Some(Self::And),
+                "OR" => Some(Self::Or),
                 _ => None,
             }
         }
@@ -2030,199 +2247,6 @@ pub mod quality_of_service {
         Spec(super::QualityOfServiceSpec),
     }
 }
-/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
-/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
-/// precise definitions.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Span {
-    /// start_time defines the instance this span began.
-    #[prost(message, optional, tag="1")]
-    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// end_time defines the instance this span completed.
-    #[prost(message, optional, tag="2")]
-    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
-    /// spans defines a collection of Spans that breakdown this execution.
-    #[prost(message, repeated, tag="7")]
-    pub spans: ::prost::alloc::vec::Vec<Span>,
-    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
-    pub id: ::core::option::Option<span::Id>,
-}
-/// Nested message and enum types in `Span`.
-pub mod span {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Id {
-        /// workflow_id is the id of the workflow execution this Span represents.
-        #[prost(message, tag="3")]
-        WorkflowId(super::WorkflowExecutionIdentifier),
-        /// node_id is the id of the node execution this Span represents.
-        #[prost(message, tag="4")]
-        NodeId(super::NodeExecutionIdentifier),
-        /// task_id is the id of the task execution this Span represents.
-        #[prost(message, tag="5")]
-        TaskId(super::TaskExecutionIdentifier),
-        /// operation_id is the id of a unique operation that this Span represents.
-        #[prost(string, tag="6")]
-        OperationId(::prost::alloc::string::String),
-    }
-}
-/// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ExecutionMetricResult {
-    /// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
-    #[prost(string, tag="1")]
-    pub metric: ::prost::alloc::string::String,
-    /// The result data in prometheus range query result format
-    /// <https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.>
-    /// This may include multiple time series, differentiated by their metric labels.
-    /// Start time is greater of (execution attempt start, 48h ago)
-    /// End time is lesser of (execution attempt end, now)
-    #[prost(message, optional, tag="2")]
-    pub data: ::core::option::Option<::prost_types::Struct>,
-}
-/// Defines a 2-level tree where the root is a comparison operator and Operands are primitives or known variables.
-/// Each expression results in a boolean result.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ComparisonExpression {
-    #[prost(enumeration="comparison_expression::Operator", tag="1")]
-    pub operator: i32,
-    #[prost(message, optional, tag="2")]
-    pub left_value: ::core::option::Option<Operand>,
-    #[prost(message, optional, tag="3")]
-    pub right_value: ::core::option::Option<Operand>,
-}
-/// Nested message and enum types in `ComparisonExpression`.
-pub mod comparison_expression {
-    /// Binary Operator for each expression
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum Operator {
-        Eq = 0,
-        Neq = 1,
-        /// Greater Than
-        Gt = 2,
-        Gte = 3,
-        /// Less Than
-        Lt = 4,
-        Lte = 5,
-    }
-    impl Operator {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                Operator::Eq => "EQ",
-                Operator::Neq => "NEQ",
-                Operator::Gt => "GT",
-                Operator::Gte => "GTE",
-                Operator::Lt => "LT",
-                Operator::Lte => "LTE",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "EQ" => Some(Self::Eq),
-                "NEQ" => Some(Self::Neq),
-                "GT" => Some(Self::Gt),
-                "GTE" => Some(Self::Gte),
-                "LT" => Some(Self::Lt),
-                "LTE" => Some(Self::Lte),
-                _ => None,
-            }
-        }
-    }
-}
-/// Defines an operand to a comparison expression.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct Operand {
-    #[prost(oneof="operand::Val", tags="1, 2, 3")]
-    pub val: ::core::option::Option<operand::Val>,
-}
-/// Nested message and enum types in `Operand`.
-pub mod operand {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Val {
-        /// Can be a constant
-        #[prost(message, tag="1")]
-        Primitive(super::Primitive),
-        /// Or one of this node's input variables
-        #[prost(string, tag="2")]
-        Var(::prost::alloc::string::String),
-        /// Replace the primitive field
-        #[prost(message, tag="3")]
-        Scalar(super::Scalar),
-    }
-}
-/// Defines a boolean expression tree. It can be a simple or a conjunction expression.
-/// Multiple expressions can be combined using a conjunction or a disjunction to result in a final boolean result.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct BooleanExpression {
-    #[prost(oneof="boolean_expression::Expr", tags="1, 2")]
-    pub expr: ::core::option::Option<boolean_expression::Expr>,
-}
-/// Nested message and enum types in `BooleanExpression`.
-pub mod boolean_expression {
-    #[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Oneof)]
-    pub enum Expr {
-        #[prost(message, tag="1")]
-        Conjunction(::prost::alloc::boxed::Box<super::ConjunctionExpression>),
-        #[prost(message, tag="2")]
-        Comparison(super::ComparisonExpression),
-    }
-}
-/// Defines a conjunction expression of two boolean expressions.
-#[allow(clippy::derive_partial_eq_without_eq)]
-#[derive(Clone, PartialEq, ::prost::Message)]
-pub struct ConjunctionExpression {
-    #[prost(enumeration="conjunction_expression::LogicalOperator", tag="1")]
-    pub operator: i32,
-    #[prost(message, optional, boxed, tag="2")]
-    pub left_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
-    #[prost(message, optional, boxed, tag="3")]
-    pub right_expression: ::core::option::Option<::prost::alloc::boxed::Box<BooleanExpression>>,
-}
-/// Nested message and enum types in `ConjunctionExpression`.
-pub mod conjunction_expression {
-    /// Nested conditions. They can be conjoined using AND / OR
-    /// Order of evaluation is not important as the operators are Commutative
-    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
-    #[repr(i32)]
-    pub enum LogicalOperator {
-        /// Conjunction
-        And = 0,
-        Or = 1,
-    }
-    impl LogicalOperator {
-        /// String value of the enum field names used in the ProtoBuf definition.
-        ///
-        /// The values are not transformed in any way and thus are considered stable
-        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
-        pub fn as_str_name(&self) -> &'static str {
-            match self {
-                LogicalOperator::And => "AND",
-                LogicalOperator::Or => "OR",
-            }
-        }
-        /// Creates an enum from field names used in the ProtoBuf definition.
-        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
-            match value {
-                "AND" => Some(Self::And),
-                "OR" => Some(Self::Or),
-                _ => None,
-            }
-        }
-    }
-}
 /// Defines a condition and the execution unit that should be executed if the condition is satisfied.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2415,6 +2439,15 @@ pub struct NodeMetadata {
     /// Identify whether node is interruptible
     #[prost(oneof="node_metadata::InterruptibleValue", tags="6")]
     pub interruptible_value: ::core::option::Option<node_metadata::InterruptibleValue>,
+    /// Identify whether a node should have it's outputs cached.
+    #[prost(oneof="node_metadata::CacheableValue", tags="7")]
+    pub cacheable_value: ::core::option::Option<node_metadata::CacheableValue>,
+    /// The version of the cache to use.
+    #[prost(oneof="node_metadata::CacheVersionValue", tags="8")]
+    pub cache_version_value: ::core::option::Option<node_metadata::CacheVersionValue>,
+    /// Identify whether caching operations involving this node should be serialized.
+    #[prost(oneof="node_metadata::CacheSerializableValue", tags="9")]
+    pub cache_serializable_value: ::core::option::Option<node_metadata::CacheSerializableValue>,
 }
 /// Nested message and enum types in `NodeMetadata`.
 pub mod node_metadata {
@@ -2424,6 +2457,27 @@ pub mod node_metadata {
     pub enum InterruptibleValue {
         #[prost(bool, tag="6")]
         Interruptible(bool),
+    }
+    /// Identify whether a node should have it's outputs cached.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CacheableValue {
+        #[prost(bool, tag="7")]
+        Cacheable(bool),
+    }
+    /// The version of the cache to use.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CacheVersionValue {
+        #[prost(string, tag="8")]
+        CacheVersion(::prost::alloc::string::String),
+    }
+    /// Identify whether caching operations involving this node should be serialized.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum CacheSerializableValue {
+        #[prost(bool, tag="9")]
+        CacheSerializable(bool),
     }
 }
 /// Links a variable to an alias.
@@ -2602,6 +2656,75 @@ pub struct TaskNodeOverrides {
     /// v1.ResourceRequirements, to allocate to a task.
     #[prost(message, optional, tag="2")]
     pub extended_resources: ::core::option::Option<ExtendedResources>,
+    /// Override for the image used by task pods.
+    #[prost(string, tag="3")]
+    pub container_image: ::prost::alloc::string::String,
+}
+/// A structure that uniquely identifies a launch plan in the system.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct LaunchPlanTemplate {
+    /// A globally unique identifier for the launch plan.
+    #[prost(message, optional, tag="1")]
+    pub id: ::core::option::Option<Identifier>,
+    /// The input and output interface for the launch plan
+    #[prost(message, optional, tag="2")]
+    pub interface: ::core::option::Option<TypedInterface>,
+    /// A collection of input literals that are fixed for the launch plan
+    #[prost(message, optional, tag="3")]
+    pub fixed_inputs: ::core::option::Option<LiteralMap>,
+}
+/// Span represents a duration trace of Flyte execution. The id field denotes a Flyte execution entity or an operation
+/// which uniquely identifies the Span. The spans attribute allows this Span to be further broken down into more
+/// precise definitions.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct Span {
+    /// start_time defines the instance this span began.
+    #[prost(message, optional, tag="1")]
+    pub start_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// end_time defines the instance this span completed.
+    #[prost(message, optional, tag="2")]
+    pub end_time: ::core::option::Option<::prost_types::Timestamp>,
+    /// spans defines a collection of Spans that breakdown this execution.
+    #[prost(message, repeated, tag="7")]
+    pub spans: ::prost::alloc::vec::Vec<Span>,
+    #[prost(oneof="span::Id", tags="3, 4, 5, 6")]
+    pub id: ::core::option::Option<span::Id>,
+}
+/// Nested message and enum types in `Span`.
+pub mod span {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Id {
+        /// workflow_id is the id of the workflow execution this Span represents.
+        #[prost(message, tag="3")]
+        WorkflowId(super::WorkflowExecutionIdentifier),
+        /// node_id is the id of the node execution this Span represents.
+        #[prost(message, tag="4")]
+        NodeId(super::NodeExecutionIdentifier),
+        /// task_id is the id of the task execution this Span represents.
+        #[prost(message, tag="5")]
+        TaskId(super::TaskExecutionIdentifier),
+        /// operation_id is the id of a unique operation that this Span represents.
+        #[prost(string, tag="6")]
+        OperationId(::prost::alloc::string::String),
+    }
+}
+/// ExecutionMetrics is a collection of metrics that are collected during the execution of a Flyte task.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionMetricResult {
+    /// The metric this data represents. e.g. EXECUTION_METRIC_USED_CPU_AVG or EXECUTION_METRIC_USED_MEMORY_BYTES_AVG.
+    #[prost(string, tag="1")]
+    pub metric: ::prost::alloc::string::String,
+    /// The result data in prometheus range query result format
+    /// <https://prometheus.io/docs/prometheus/latest/querying/api/#expression-query-result-formats.>
+    /// This may include multiple time series, differentiated by their metric labels.
+    /// Start time is greater of (execution attempt start, 48h ago)
+    /// End time is lesser of (execution attempt end, now)
+    #[prost(message, optional, tag="2")]
+    pub data: ::core::option::Option<::prost_types::Struct>,
 }
 /// Adjacency list for the workflow. This is created as part of the compilation process. Every process after the compilation
 /// step uses this created ConnectionSet
@@ -2635,6 +2758,14 @@ pub struct CompiledWorkflow {
     #[prost(message, optional, tag="2")]
     pub connections: ::core::option::Option<ConnectionSet>,
 }
+/// Output of the compilation step. This object represents one LaunchPlan. We store more metadata at this layer
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CompiledLaunchPlan {
+    /// Completely contained LaunchPlan Template
+    #[prost(message, optional, tag="1")]
+    pub template: ::core::option::Option<LaunchPlanTemplate>,
+}
 /// Output of the Compilation step. This object represent one Task. We store more metadata at this layer
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]
@@ -2663,6 +2794,10 @@ pub struct CompiledWorkflowClosure {
     /// +required (at least 1)
     #[prost(message, repeated, tag="3")]
     pub tasks: ::prost::alloc::vec::Vec<CompiledTask>,
+    /// A collection of launch plans that are compiled. Guaranteed that there will only exist one and only one launch plan
+    /// with a given id, i.e., every launch plan has a unique id.
+    #[prost(message, repeated, tag="4")]
+    pub launch_plans: ::prost::alloc::vec::Vec<CompiledLaunchPlan>,
 }
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

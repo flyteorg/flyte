@@ -27,9 +27,10 @@ import (
 )
 
 type metadata struct {
-	exists bool
-	size   int64
-	etag   string
+	exists     bool
+	size       int64
+	etag       string
+	contentMD5 string
 }
 
 func (m metadata) Exists() bool {
@@ -42,6 +43,10 @@ func (m metadata) Size() int64 {
 
 func (m metadata) Etag() string {
 	return m.etag
+}
+
+func (m metadata) ContentMD5() string {
+	return m.contentMD5
 }
 
 func createSampleContainerTask() *core2.Container {
@@ -94,6 +99,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 		},
 	})
 	overrides.OnGetExtendedResources().Return(nil)
+	overrides.OnGetContainerImage().Return("")
 
 	tMeta := &mocks.TaskExecutionMetadata{}
 	tMeta.OnGetTaskExecutionID().Return(tID)
@@ -126,7 +132,7 @@ func getMockTaskExecutionContext(ctx context.Context, parallelism int) *mocks.Ta
 	matchedBy := mock.MatchedBy(func(s storage.DataReference) bool {
 		return true
 	})
-	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0, ""}, nil)
+	composedProtobufStore.On("Head", mock.Anything, matchedBy).Return(metadata{true, 0, "", ""}, nil)
 	dataStore := &storage.DataStore{
 		ComposedProtobufStore: composedProtobufStore,
 		ReferenceConstructor:  &storage.URLPathConstructor{},
@@ -300,7 +306,7 @@ func TestCheckSubTasksState(t *testing.T) {
 		// validate results
 		assert.Nil(t, err)
 		p, _ := newState.GetPhase()
-		assert.Equal(t, arrayCore.PhaseWaitingForResources.String(), p.String())
+		assert.Equal(t, arrayCore.PhaseCheckingSubTaskExecutions.String(), p.String())
 		resourceManager.AssertNumberOfCalls(t, "AllocateResource", subtaskCount)
 		for _, subtaskPhaseIndex := range newState.GetArrayStatus().Detailed.GetItems() {
 			assert.Equal(t, core.PhaseWaitingForResources, core.Phases[subtaskPhaseIndex])

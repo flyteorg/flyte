@@ -8,7 +8,7 @@ and single tasks running on AWS Batch.
 
 .. note::
 
-   For single [non-map] task use, please take note of 
+   For single [non-map] task use, please take note of
    the additional code when updating the flytepropeller config.
 
 AWS Batch simplifies the process for developers, scientists and engineers to run
@@ -21,7 +21,7 @@ optimizing AWS Batch job queues for load distribution and priority coordination.
 Set up AWS Batch
 ----------------
 
-Follow the guide `Running batch jobs 
+Follow the guide `Running batch jobs
 at scale for less <https://aws.amazon.com/getting-started/hands-on/run-batch-jobs-at-scale-with-ec2-spot/>`__.
 
 By the end of this step, your AWS Account should have a configured compute environment
@@ -30,7 +30,7 @@ and one or more AWS Batch Job Queues.
 Modify users' AWS IAM role trust policy document
 ------------------------------------------------
 
-Follow the guide `AWS Batch Execution 
+Follow the guide `AWS Batch Execution
 IAM role <https://docs.aws.amazon.com/batch/latest/userguide/execution-IAM-role.html>`__.
 
 When running workflows in Flyte, users can specify a Kubernetes service account and/or an IAM Role to run as.
@@ -40,11 +40,11 @@ to allow elastic container service (ECS) to assume the role.
 Modify system's AWS IAM role policies
 -------------------------------------
 
-Follow the guide `Granting a user permissions to pass a 
+Follow the guide `Granting a user permissions to pass a
 role to an AWS service <https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_passrole.html>`__.
 
 The best practice for granting permissions to Flyte components is by utilizing OIDC,
-as described in the 
+as described in the
 `OIDC documentation <https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html>`__.
 This approach entails assigning an IAM Role to each service account being used.
 To proceed, identify the IAM Role associated with the flytepropeller's Kubernetes service account,
@@ -113,7 +113,7 @@ with distinct attributes and matching logic based on project/domain/workflowName
          - default
 
 These settings can also be dynamically altered through ``flytectl`` (or FlyteAdmin API).
-Learn about the :ref:`core concept here <divedeep-admin-matchable-resources>`.
+Learn about the :ref:`core concept here <deployment-customizable-resources-execution-queues>`.
 For guidance on how to dynamically update these configurations, refer to the :ref:`Flytectl docs <flytectl:flytectl_update_execution-queue-attribute>`.
 
 Update FlytePropeller's configuration
@@ -145,10 +145,10 @@ These configurations reside within FlytePropeller's configMap. Modify the config
 
 .. note::
 
-  To register the `map task 
-  <https://docs.flyte.org/projects/cookbook/en/latest/auto_examples/control_flow/map_task.html>`__ on Flyte,
+  To register the `map task
+  <https://docs.flyte.org/en/latest/user_guide/advanced_composition/map_tasks.html>`__ on Flyte,
   use the command ``pyflyte register <name-of-the-python-file>``.
-  Launch the execution through the FlyteConsole by selecting the appropriate ``IAM Role`` and entering the full 
+  Launch the execution through the FlyteConsole by selecting the appropriate ``IAM Role`` and entering the full
   ``AWS Arn`` of an IAM Role configured according to the above guide.
 
   Once the task starts executing, you'll find a link for the AWS Array Job in the log links section of the Flyte Console.

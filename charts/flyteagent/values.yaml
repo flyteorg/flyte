@@ -23,7 +23,7 @@ image:
   # -- Docker image for flyteagent deployment
   repository: ghcr.io/flyteorg/flyteagent
   # -- Docker image tag
-  tag: 1.10.2 # FLYTEAGENT_TAG
+  tag: 1.10.8b4 # FLYTEAGENT_TAG
   # -- Docker image pull policy
   pullPolicy: IfNotPresent
 ports:
@@ -54,6 +54,18 @@ serviceAccount:
   annotations: {}
   # -- ImagePullSecrets to automatically assign to the service account
   imagePullSecrets: []
+# -- Security context for pod
+podSecurityContext: {}
+# -- Readiness probe for flyteagent. Use readinessProbe: {} if agent doesn't implement grpc-health-checking service.
+# -- https://kubernetes.io/blog/2022/05/13/grpc-probes-now-in-beta/#trying-the-feature-out
+readinessProbe:
+  grpc:
+    port: 8000
+  initialDelaySeconds: 1
+  periodSeconds: 3
+# -- Security context for container
+securityContext:
+  allowPrivilegeEscalation: false
 # -- Annotations for flyteagent pods
 podAnnotations: {}
 # -- Additional flyteagent pod container environment variables

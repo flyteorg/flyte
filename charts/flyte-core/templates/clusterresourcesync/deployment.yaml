@@ -34,12 +34,18 @@ spec:
           image: "{{ .Values.flyteadmin.image.repository }}:{{ .Values.flyteadmin.image.tag }}"
           imagePullPolicy: "{{ .Values.flyteadmin.image.pullPolicy }}"
           name: sync-cluster-resources
+          {{- with .Values.cluster_resource_manager.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           volumeMounts:
           {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
           {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           {{- else }}
+          {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
           - name: auth
             mountPath: /etc/secrets/
+          {{- end }}
           {{- end }}
           - mountPath: /etc/flyte/clusterresource/templates
             name: resource-templates
@@ -50,9 +56,6 @@ spec:
             name: cluster-secrets
           {{- end }}
       serviceAccountName: {{ .Values.cluster_resource_manager.service_account_name }}
-      {{- if .Values.cluster_resource_manager.resources }}
-      resources: {{- toYaml .Values.cluster_resource_manager.resources | nindent 10 }}
-      {{- end }}
       volumes:  {{- include "databaseSecret.volume" . | nindent 8 }}
         - configMap:
             name: clusterresource-template
@@ -66,8 +69,13 @@ spec:
             secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
+        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
         - name: auth
           secret:
             secretName: flyte-secret-auth
         {{- end }}
+        {{- end }}
+      {{- with .Values.cluster_resource_manager.nodeSelector }}
+      nodeSelector: {{ tpl (toYaml .) $ | nindent 8 }}
+      {{- end }}
   {{- end }}

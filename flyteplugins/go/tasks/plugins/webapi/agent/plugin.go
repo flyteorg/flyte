@@ -2,18 +2,11 @@ package agent
 
 import (
 	"context"
-	"crypto/x509"
 	"encoding/gob"
 	"fmt"
 	"time"
 
 	"golang.org/x/exp/maps"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
-	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/grpclog"
-	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
 	flyteIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
@@ -22,28 +15,26 @@ import (
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/core/template"
-	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
+	flyteIO "github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/io"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/ioutils"
 	"github.com/flyteorg/flyte/flyteplugins/go/tasks/pluginmachinery/webapi"
-	"github.com/flyteorg/flyte/flytestdlib/config"
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
-type GetClientFunc func(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error)
-type GetAgentMetadataClientFunc func(ctx context.Context, agent *Agent, connCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error)
+type Registry map[string]map[int32]*Agent // map[taskTypeName][taskTypeVersion] => Agent
 
 type Plugin struct {
-	metricScope     promutils.Scope
-	cfg             *Config
-	getClient       GetClientFunc
-	connectionCache map[*Agent]*grpc.ClientConn
-	agentRegistry   map[string]*Agent // map[taskType] => Agent
+	metricScope   promutils.Scope
+	cfg           *Config
+	cs            *ClientSet
+	agentRegistry Registry
 }
 
 type ResourceWrapper struct {
-	Phase    flyteIdl.TaskExecution_Phase
-	State    admin.State // This is deprecated.
+	Phase flyteIdl.TaskExecution_Phase
+	// Deprecated: Please Use Phase instead.
+	State    admin.State
 	Outputs  *flyteIdl.LiteralMap
 	Message  string
 	LogLinks []*flyteIdl.TaskLog
@@ -51,9 +42,8 @@ type ResourceWrapper struct {
 
 type ResourceMetaWrapper struct {
 	OutputPrefix      string
-	Token             string
 	AgentResourceMeta []byte
-	TaskType          string
+	TaskCategory      admin.TaskCategory
 }
 
 func (p Plugin) GetConfig() webapi.PluginConfig {
@@ -92,70 +82,125 @@ func (p Plugin) Create(ctx context.Context, taskCtx webapi.TaskExecutionContextR
 			return nil, nil, err
 		}
 		taskTemplate.GetContainer().Args = modifiedArgs
+		defer func() {
+			// Restore unrendered template for subsequent renders.
+			taskTemplate.GetContainer().Args = argTemplate
+		}()
 	}
 	outputPrefix := taskCtx.OutputWriter().GetOutputPrefixPath().String()
 
-	agent := getFinalAgent(taskTemplate.Type, p.cfg, p.agentRegistry)
-
-	client, err := p.getClient(ctx, agent, p.connectionCache)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to connect to agent with error: %v", err)
-	}
+	taskCategory := admin.TaskCategory{Name: taskTemplate.Type, Version: taskTemplate.TaskTypeVersion}
+	agent, isSync := getFinalAgent(&taskCategory, p.cfg, p.agentRegistry)
 
 	finalCtx, cancel := getFinalContext(ctx, "CreateTask", agent)
 	defer cancel()
 
 	taskExecutionMetadata := buildTaskExecutionMetadata(taskCtx.TaskExecutionMetadata())
-	res, err := client.CreateTask(finalCtx, &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata})
+
+	if isSync {
+		client, err := p.getSyncAgentClient(ctx, agent)
+		if err != nil {
+			return nil, nil, err
+		}
+		header := &admin.CreateRequestHeader{Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+		return p.ExecuteTaskSync(finalCtx, client, header, inputs)
+	}
+
+	// Use async agent client
+	client, err := p.getAsyncAgentClient(ctx, agent)
+	if err != nil {
+		return nil, nil, err
+	}
+	request := &admin.CreateTaskRequest{Inputs: inputs, Template: taskTemplate, OutputPrefix: outputPrefix, TaskExecutionMetadata: &taskExecutionMetadata}
+	res, err := client.CreateTask(finalCtx, request)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	// Restore unrendered template for subsequent renders.
-	if taskTemplate.GetContainer() != nil {
-		taskTemplate.GetContainer().Args = argTemplate
-	}
-
-	// If the agent returned a resource, we assume this is a synchronous task.
-	// The state should be a terminal state, for example, SUCCEEDED, PERMANENT_FAILURE, or RETRYABLE_FAILURE.
-	if res.GetResource() != nil {
-		logger.Infof(ctx, "Agent is executing a synchronous task.")
-		return nil,
-			ResourceWrapper{
-				Phase:    res.GetResource().Phase,
-				State:    res.GetResource().State,
-				Outputs:  res.GetResource().Outputs,
-				Message:  res.GetResource().Message,
-				LogLinks: res.GetResource().LogLinks,
-			}, nil
-	}
-
-	logger.Infof(ctx, "Agent is executing an asynchronous task.")
 	return ResourceMetaWrapper{
 		OutputPrefix:      outputPrefix,
 		AgentResourceMeta: res.GetResourceMeta(),
-		Token:             "",
-		TaskType:          taskTemplate.Type,
+		TaskCategory:      taskCategory,
 	}, nil, nil
+}
+
+func (p Plugin) ExecuteTaskSync(
+	ctx context.Context,
+	client service.SyncAgentServiceClient,
+	header *admin.CreateRequestHeader,
+	inputs *flyteIdl.LiteralMap,
+) (webapi.ResourceMeta, webapi.Resource, error) {
+	stream, err := client.ExecuteTaskSync(ctx)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	headerProto := &admin.ExecuteTaskSyncRequest{
+		Part: &admin.ExecuteTaskSyncRequest_Header{
+			Header: header,
+		},
+	}
+
+	err = stream.Send(headerProto)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to send headerProto with error: %w", err)
+	}
+	inputsProto := &admin.ExecuteTaskSyncRequest{
+		Part: &admin.ExecuteTaskSyncRequest_Inputs{
+			Inputs: inputs,
+		},
+	}
+	err = stream.Send(inputsProto)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to send inputsProto with error: %w", err)
+	}
+
+	in, err := stream.Recv()
+	if err != nil {
+		return nil, nil, err
+	}
+	if in.GetHeader() == nil {
+		return nil, nil, fmt.Errorf("expected header in the response, but got none")
+	}
+	// TODO: Read the streaming output from the agent, and merge it into the final output.
+	// For now, Propeller assumes that the output is always in the header.
+	resource := in.GetHeader().GetResource()
+
+	if err := stream.CloseSend(); err != nil {
+		return nil, nil, err
+	}
+
+	if err != nil {
+		logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
+		return nil, nil, err
+	}
+
+	return nil, ResourceWrapper{
+		Phase:    resource.Phase,
+		Outputs:  resource.Outputs,
+		Message:  resource.Message,
+		LogLinks: resource.LogLinks,
+	}, err
 }
 
 func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest webapi.Resource, err error) {
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
 
-	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
+	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
-		return nil, fmt.Errorf("failed to find agent with error: %v", err)
+		return nil, err
 	}
-
-	client, err := p.getClient(ctx, agent, p.connectionCache)
-	if err != nil {
-		return nil, fmt.Errorf("failed to connect to agent with error: %v", err)
-	}
-
 	finalCtx, cancel := getFinalContext(ctx, "GetTask", agent)
 	defer cancel()
 
-	res, err := client.GetTask(finalCtx, &admin.GetTaskRequest{TaskType: metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	request := &admin.GetTaskRequest{
+		TaskType:     metadata.TaskCategory.Name,
+		TaskCategory: &metadata.TaskCategory,
+		ResourceMeta: metadata.AgentResourceMeta,
+	}
+	res, err := client.GetTask(finalCtx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +210,7 @@ func (p Plugin) Get(ctx context.Context, taskCtx webapi.GetContext) (latest weba
 		State:    res.Resource.State,
 		Outputs:  res.Resource.Outputs,
 		Message:  res.Resource.Message,
-		LogLinks: res.LogLinks,
+		LogLinks: res.Resource.LogLinks,
 	}, nil
 }
 
@@ -174,18 +219,21 @@ func (p Plugin) Delete(ctx context.Context, taskCtx webapi.DeleteContext) error 
 		return nil
 	}
 	metadata := taskCtx.ResourceMeta().(ResourceMetaWrapper)
+	agent, _ := getFinalAgent(&metadata.TaskCategory, p.cfg, p.agentRegistry)
 
-	agent := getFinalAgent(metadata.TaskType, p.cfg, p.agentRegistry)
-
-	client, err := p.getClient(ctx, agent, p.connectionCache)
+	client, err := p.getAsyncAgentClient(ctx, agent)
 	if err != nil {
-		return fmt.Errorf("failed to connect to agent with error: %v", err)
+		return err
 	}
-
 	finalCtx, cancel := getFinalContext(ctx, "DeleteTask", agent)
 	defer cancel()
 
-	_, err = client.DeleteTask(finalCtx, &admin.DeleteTaskRequest{TaskType: metadata.TaskType, ResourceMeta: metadata.AgentResourceMeta})
+	request := &admin.DeleteTaskRequest{
+		TaskType:     metadata.TaskCategory.Name,
+		TaskCategory: &metadata.TaskCategory,
+		ResourceMeta: metadata.AgentResourceMeta,
+	}
+	_, err = client.DeleteTask(finalCtx, request)
 	return err
 }
 
@@ -203,16 +251,16 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case flyteIdl.TaskExecution_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case flyteIdl.TaskExecution_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource)
+		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
 		}
 		return core.PhaseInfoSuccess(taskInfo), nil
 	case flyteIdl.TaskExecution_ABORTED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job with aborted phase.\n"+resource.Message, taskInfo), nil
 	case flyteIdl.TaskExecution_FAILED:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	}
 
 	// The default phase is undefined.
@@ -227,11 +275,11 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	case admin.State_RUNNING:
 		return core.PhaseInfoRunning(core.DefaultPhaseVersion, taskInfo), nil
 	case admin.State_PERMANENT_FAILURE:
-		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	case admin.State_RETRYABLE_FAILURE:
-		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job", taskInfo), nil
+		return core.PhaseInfoRetryableFailure(pluginErrors.TaskFailedWithError, "failed to run the job.\n"+resource.Message, taskInfo), nil
 	case admin.State_SUCCEEDED:
-		err = writeOutput(ctx, taskCtx, resource)
+		err = writeOutput(ctx, taskCtx, resource.Outputs)
 		if err != nil {
 			logger.Errorf(ctx, "Failed to write output with err %s", err.Error())
 			return core.PhaseInfoUndefined, err
@@ -241,7 +289,33 @@ func (p Plugin) Status(ctx context.Context, taskCtx webapi.StatusContext) (phase
 	return core.PhaseInfoUndefined, pluginErrors.Errorf(core.SystemErrorCode, "unknown execution state [%v].", resource.State)
 }
 
-func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource ResourceWrapper) error {
+func (p Plugin) getSyncAgentClient(ctx context.Context, agent *Deployment) (service.SyncAgentServiceClient, error) {
+	client, ok := p.cs.syncAgentClients[agent.Endpoint]
+	if !ok {
+		conn, err := getGrpcConnection(ctx, agent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+		}
+		client = service.NewSyncAgentServiceClient(conn)
+		p.cs.syncAgentClients[agent.Endpoint] = client
+	}
+	return client, nil
+}
+
+func (p Plugin) getAsyncAgentClient(ctx context.Context, agent *Deployment) (service.AsyncAgentServiceClient, error) {
+	client, ok := p.cs.asyncAgentClients[agent.Endpoint]
+	if !ok {
+		conn, err := getGrpcConnection(ctx, agent)
+		if err != nil {
+			return nil, fmt.Errorf("failed to get grpc connection with error: %v", err)
+		}
+		client = service.NewAsyncAgentServiceClient(conn)
+		p.cs.asyncAgentClients[agent.Endpoint] = client
+	}
+	return client, nil
+}
+
+func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, outputs *flyteIdl.LiteralMap) error {
 	taskTemplate, err := taskCtx.TaskReader().Read(ctx)
 	if err != nil {
 		return err
@@ -252,88 +326,23 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext, resource Res
 		return nil
 	}
 
-	var opReader io.OutputReader
-	if resource.Outputs != nil {
-		logger.Debugf(ctx, "Agent returned an output.")
-		opReader = ioutils.NewInMemoryOutputReader(resource.Outputs, nil, nil)
+	var opReader flyteIO.OutputReader
+	if outputs != nil {
+		logger.Debugf(ctx, "AgentDeployment returned an output.")
+		opReader = ioutils.NewInMemoryOutputReader(outputs, nil, nil)
 	} else {
-		logger.Debugf(ctx, "Agent didn't return any output, assuming file based outputs.")
+		logger.Debugf(ctx, "AgentDeployment didn't return any output, assuming file based outputs.")
 		opReader = ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
 	}
 	return taskCtx.OutputWriter().Put(ctx, opReader)
 }
 
-func getFinalAgent(taskType string, cfg *Config, agentRegistry map[string]*Agent) *Agent {
-	if agent, exists := agentRegistry[taskType]; exists {
-		return agent
+func getFinalAgent(taskCategory *admin.TaskCategory, cfg *Config, agentRegistry Registry) (*Deployment, bool) {
+	if agent, exists := agentRegistry[taskCategory.Name][taskCategory.Version]; exists {
+		return agent.AgentDeployment, agent.IsSync
 	}
 
-	return &cfg.DefaultAgent
-}
-
-func getGrpcConnection(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (*grpc.ClientConn, error) {
-	conn, ok := connectionCache[agent]
-	if ok {
-		return conn, nil
-	}
-	var opts []grpc.DialOption
-
-	if agent.Insecure {
-		opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	} else {
-		pool, err := x509.SystemCertPool()
-		if err != nil {
-			return nil, err
-		}
-
-		creds := credentials.NewClientTLSFromCert(pool, "")
-		opts = append(opts, grpc.WithTransportCredentials(creds))
-	}
-
-	if len(agent.DefaultServiceConfig) != 0 {
-		opts = append(opts, grpc.WithDefaultServiceConfig(agent.DefaultServiceConfig))
-	}
-
-	var err error
-	conn, err = grpc.Dial(agent.Endpoint, opts...)
-	if err != nil {
-		return nil, err
-	}
-	connectionCache[agent] = conn
-	defer func() {
-		if err != nil {
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
-			}
-			return
-		}
-		go func() {
-			<-ctx.Done()
-			if cerr := conn.Close(); cerr != nil {
-				grpclog.Infof("Failed to close conn to %s: %v", agent, cerr)
-			}
-		}()
-	}()
-
-	return conn, nil
-}
-
-func getClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AsyncAgentServiceClient, error) {
-	conn, err := getGrpcConnection(ctx, agent, connectionCache)
-	if err != nil {
-		return nil, err
-	}
-
-	return service.NewAsyncAgentServiceClient(conn), nil
-}
-
-func getAgentMetadataClientFunc(ctx context.Context, agent *Agent, connectionCache map[*Agent]*grpc.ClientConn) (service.AgentMetadataServiceClient, error) {
-	conn, err := getGrpcConnection(ctx, agent, connectionCache)
-	if err != nil {
-		return nil, err
-	}
-
-	return service.NewAgentMetadataServiceClient(conn), nil
+	return &cfg.DefaultAgent, false
 }
 
 func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata) admin.TaskExecutionMetadata {
@@ -348,95 +357,31 @@ func buildTaskExecutionMetadata(taskExecutionMetadata core.TaskExecutionMetadata
 	}
 }
 
-func getFinalTimeout(operation string, agent *Agent) config.Duration {
-	if t, exists := agent.Timeouts[operation]; exists {
-		return t
-	}
-
-	return agent.DefaultTimeout
-}
-
-func getFinalContext(ctx context.Context, operation string, agent *Agent) (context.Context, context.CancelFunc) {
-	timeout := getFinalTimeout(operation, agent).Duration
-	if timeout == 0 {
-		return ctx, func() {}
-	}
-
-	return context.WithTimeout(ctx, timeout)
-}
-
-func initializeAgentRegistry(cfg *Config, connectionCache map[*Agent]*grpc.ClientConn, getAgentMetadataClientFunc GetAgentMetadataClientFunc) (map[string]*Agent, error) {
-	agentRegistry := make(map[string]*Agent)
-	var agentDeployments []*Agent
-
-	// Ensure that the old configuration is backward compatible
-	for taskType, agentID := range cfg.AgentForTaskTypes {
-		agentRegistry[taskType] = cfg.Agents[agentID]
-	}
-
-	if len(cfg.DefaultAgent.Endpoint) != 0 {
-		agentDeployments = append(agentDeployments, &cfg.DefaultAgent)
-	}
-	agentDeployments = append(agentDeployments, maps.Values(cfg.Agents)...)
-	for _, agentDeployment := range agentDeployments {
-		client, err := getAgentMetadataClientFunc(context.Background(), agentDeployment, connectionCache)
-		if err != nil {
-			return nil, fmt.Errorf("failed to connect to agent [%v] with error: [%v]", agentDeployment, err)
-		}
-
-		finalCtx, cancel := getFinalContext(context.Background(), "ListAgents", agentDeployment)
-		defer cancel()
-
-		res, err := client.ListAgents(finalCtx, &admin.ListAgentsRequest{})
-		if err != nil {
-			grpcStatus, ok := status.FromError(err)
-			if grpcStatus.Code() == codes.Unimplemented {
-				// we should not panic here, as we want to continue to support old agent settings
-				logger.Infof(context.Background(), "list agent method not implemented for agent: [%v]", agentDeployment)
-				continue
-			}
-
-			if !ok {
-				return nil, fmt.Errorf("failed to list agent: [%v] with a non-gRPC error: [%v]", agentDeployment, err)
-			}
-
-			return nil, fmt.Errorf("failed to list agent: [%v] with error: [%v]", agentDeployment, err)
-		}
-
-		agents := res.GetAgents()
-		for _, agent := range agents {
-			supportedTaskTypes := agent.SupportedTaskTypes
-			for _, supportedTaskType := range supportedTaskTypes {
-				agentRegistry[supportedTaskType] = agentDeployment
-			}
-		}
-	}
-
-	return agentRegistry, nil
-}
-
 func newAgentPlugin() webapi.PluginEntry {
-	cfg := GetConfig()
-	connectionCache := make(map[*Agent]*grpc.ClientConn)
-	agentRegistry, err := initializeAgentRegistry(cfg, connectionCache, getAgentMetadataClientFunc)
+	cs, err := initializeClients(context.Background())
 	if err != nil {
 		// We should wait for all agents to be up and running before starting the server
-		panic(err)
+		panic(fmt.Sprintf("failed to initialize clients with error: %v", err))
 	}
 
+	agentRegistry, err := initializeAgentRegistry(cs)
+	if err != nil {
+		panic(fmt.Sprintf("failed to initialize agent registry with error: %v", err))
+	}
+
+	cfg := GetConfig()
 	supportedTaskTypes := append(maps.Keys(agentRegistry), cfg.SupportedTaskTypes...)
-	logger.Infof(context.Background(), "Agent supports task types: %v", supportedTaskTypes)
+	logger.Infof(context.Background(), "AgentDeployment service supports task types: %v", supportedTaskTypes)
 
 	return webapi.PluginEntry{
 		ID:                 "agent-service",
 		SupportedTaskTypes: supportedTaskTypes,
 		PluginLoader: func(ctx context.Context, iCtx webapi.PluginSetupContext) (webapi.AsyncPlugin, error) {
 			return &Plugin{
-				metricScope:     iCtx.MetricsScope(),
-				cfg:             cfg,
-				getClient:       getClientFunc,
-				connectionCache: connectionCache,
-				agentRegistry:   agentRegistry,
+				metricScope:   iCtx.MetricsScope(),
+				cfg:           cfg,
+				cs:            cs,
+				agentRegistry: agentRegistry,
 			}, nil
 		},
 	}

@@ -669,6 +669,7 @@ configmap:
           - container
           - sidecar
           - k8s-array
+          - agent-service
         default-for-task-types:
           container: container
           sidecar: sidecar
