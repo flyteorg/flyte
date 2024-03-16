@@ -45,7 +45,12 @@ jobs:
           ct lint \
           --target-branch ${{ github.event.repository.default_branch }} \
           --validate-maintainers=false \
-          --check-version-increment=false
+          --check-version-increment=false \
+          --chart-repos spark-operator=https://kubeflow.github.io/spark-operator \
+          --chart-repos dask=https://helm.dask.org \
+          --chart-repos bitnami=https://charts.bitnami.com/bitnami \
+          --chart-repos twuni=https://helm.twun.io \
+          --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard
 
       - name: Create KinD cluster
         if: steps.charts-changed.outputs.changed == 'true'
