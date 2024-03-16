@@ -85,7 +85,7 @@ func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.renew-deadline"), defaultConfig.LeaderElection.RenewDeadline.String(), "Duration that the acting master will retry refreshing leadership before giving up.")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "leader-election.retry-period"), defaultConfig.LeaderElection.RetryPeriod.String(), "Duration the LeaderElector clients should wait between tries of actions.")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "publish-k8s-events"), defaultConfig.PublishK8sEvents, "Enable events publishing to K8s events API.")
-	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "max-output-size-bytes"), defaultConfig.MaxDatasetSizeBytes, "deprecated")
+	cmdFlags.Int64(fmt.Sprintf("%v%v", prefix, "max-output-size-bytes"), defaultConfig.MaxDatasetSizeBytes, "Deprecated! Use storage.limits.maxDownloadMBs instead")
 	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "enable-grpc-latency-metrics"), defaultConfig.EnableGrpcLatencyMetrics, "Enable grpc latency metrics. Note Histograms metrics can be expensive on Prometheus servers.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "kube-client-config.burst"), defaultConfig.KubeConfig.Burst, "Max burst rate for throttle. 0 defaults to 10")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "kube-client-config.timeout"), defaultConfig.KubeConfig.Timeout.String(), "Max duration allowed for every request to KubeAPI before giving up. 0 implies no timeout.")

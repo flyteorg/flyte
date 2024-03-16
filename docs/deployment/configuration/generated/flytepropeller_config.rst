@@ -4166,13 +4166,13 @@ Enable events publishing to K8s events API.
 max-output-size-bytes (int64)
 ------------------------------------------------------------------------------------------------------------------------
 
-deprecated
+Deprecated! Use storage.limits.maxDownloadMBs instead
 
 **Default Value**: 
 
 .. code-block:: yaml
 
-  "0"
+  "-1"
   
 
 enable-grpc-latency-metrics (bool)
