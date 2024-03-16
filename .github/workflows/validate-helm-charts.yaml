@@ -8,9 +8,6 @@ on:
       - "charts/**"
       - "deployment/**"
       - "docker/sandbox-bundled/manifests/**"
-  push:
-    branches:
-      - fix-helm-ci
 
 jobs:
   lint-and-test-charts:
@@ -53,8 +50,7 @@ jobs:
           --chart-repos dask=https://helm.dask.org \
           --chart-repos bitnami=https://charts.bitnami.com/bitnami \
           --chart-repos twuni=https://helm.twun.io \
-          --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard \
-          --all
+          --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard
 
 #      TODO: Prepare dependencies (e.g. db) for testing. Currently `ct install` fails because no database & object store, etc
 #      - name: Create KinD cluster
