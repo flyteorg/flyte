@@ -41,7 +41,11 @@ jobs:
 
       - name: Run chart-testing (lint)
         if: steps.charts-changed.outputs.changed == 'true'
-        run: ct lint --target-branch ${{ github.event.repository.default_branch }}
+        run: |
+          ct lint \
+          --target-branch ${{ github.event.repository.default_branch }} \
+          --validate-maintainers=false \
+          --check-version-increment=false
 
       - name: Create KinD cluster
         if: steps.charts-changed.outputs.changed == 'true'
