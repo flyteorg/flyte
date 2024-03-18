@@ -606,7 +606,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	// launch plan spec OverwriteCache will take precedence over request spec OverwriteCache
+	// If either launch plan spec OverwriteCacheor or request spec OverwriteCache is true, we will set OverwriteCache as true in request spec
 	requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
 
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
@@ -992,8 +992,8 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
-	// launch plan spec OverwriteCache will take precedence over request spec OverwriteCache
-    requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
+	// If either launch plan spec OverwriteCacheor or request spec OverwriteCache is true, then we will set OverwriteCache as true in request spec
+	requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
@@ -1460,7 +1460,7 @@ func (m *ExecutionManager) GetExecution(
 	}
 
 	executionSpec := execution.Spec
-	// launch plan spec OverwriteCache will take precedence over execution spec OverwriteCache
+	// If either launch plan spec OverwriteCacheor or execution spec OverwriteCache is true, we will set OverwriteCache as true in execution spec
 	// GetLaunchPlanModel func for task resource type will throw error due to identifier format difference and missing entity so we exclude task type here, also no need to overwrite OverwriteCache for task type
 	if executionSpec.LaunchPlan != nil && executionSpec.LaunchPlan.ResourceType != core.ResourceType_TASK {
 		launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *executionSpec.LaunchPlan)
