@@ -164,6 +164,7 @@ require (
 	github.com/ray-project/kuberay/ray-operator v1.1.0-rc.1 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
+	github.com/samber/lo v1.47.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sendgrid/sendgrid-go v3.10.0+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
