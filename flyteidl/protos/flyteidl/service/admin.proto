@@ -401,7 +401,7 @@ service AdminService {
       get: "/api/v1/projects/{id}"
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
-      description: "Fetch a registered projects."
+      description: "Fetch a registered project."
     };
   }
 

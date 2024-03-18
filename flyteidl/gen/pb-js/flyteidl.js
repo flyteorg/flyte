@@ -43019,7 +43019,6 @@
                  * @memberof flyteidl.admin
                  * @interface IProjectGetRequest
                  * @property {string|null} [id] ProjectGetRequest id
-                 * @property {string|null} [org] ProjectGetRequest org
                  */
     
                 /**
@@ -43044,14 +43043,6 @@
                  * @instance
                  */
                 ProjectGetRequest.prototype.id = "";
-    
-                /**
-                 * ProjectGetRequest org.
-                 * @member {string} org
-                 * @memberof flyteidl.admin.ProjectGetRequest
-                 * @instance
-                 */
-                ProjectGetRequest.prototype.org = "";
     
                 /**
                  * Creates a new ProjectGetRequest instance using the specified properties.
@@ -43079,8 +43070,6 @@
                         writer = $Writer.create();
                     if (message.id != null && message.hasOwnProperty("id"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.id);
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        writer.uint32(/* id 5, wireType 2 =*/42).string(message.org);
                     return writer;
                 };
     
@@ -43105,9 +43094,6 @@
                         case 1:
                             message.id = reader.string();
                             break;
-                        case 5:
-                            message.org = reader.string();
-                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -43130,9 +43116,6 @@
                     if (message.id != null && message.hasOwnProperty("id"))
                         if (!$util.isString(message.id))
                             return "id: string expected";
-                    if (message.org != null && message.hasOwnProperty("org"))
-                        if (!$util.isString(message.org))
-                            return "org: string expected";
                     return null;
                 };
     

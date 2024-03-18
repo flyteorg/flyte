@@ -417,18 +417,12 @@ export class ProjectUpdateResponse extends Message<ProjectUpdateResponse> {
  */
 export class ProjectGetRequest extends Message<ProjectGetRequest> {
   /**
+   * Indicates a unique project.
    * +required
    *
    * @generated from field: string id = 1;
    */
   id = "";
-
-  /**
-   * Optional, org filter applied to get project requests.
-   *
-   * @generated from field: string org = 5;
-   */
-  org = "";
 
   constructor(data?: PartialMessage<ProjectGetRequest>) {
     super();
@@ -439,7 +433,6 @@ export class ProjectGetRequest extends Message<ProjectGetRequest> {
   static readonly typeName = "flyteidl.admin.ProjectGetRequest";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 5, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ProjectGetRequest {

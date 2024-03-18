@@ -2722,7 +2722,7 @@
     "/api/v1/projects/{id}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
-        "description": "Fetch a registered projects.",
+        "description": "Fetch a registered project.",
         "operationId": "AdminService_GetProject",
         "responses": {
           "200": {
@@ -2741,16 +2741,9 @@
         "parameters": [
           {
             "name": "id",
-            "description": "+required",
+            "description": "Indicates a unique project.\n+required",
             "in": "path",
             "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org",
-            "description": "Optional, org filter applied to get project requests.",
-            "in": "query",
-            "required": false,
             "type": "string"
           }
         ],

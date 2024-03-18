@@ -101,9 +101,7 @@ message ProjectUpdateResponse {
 }
 
 message ProjectGetRequest {
+    // Indicates a unique project.
     // +required
     string id = 1;
-
-    // Optional, org filter applied to get project requests.
-    string org = 5;
 }

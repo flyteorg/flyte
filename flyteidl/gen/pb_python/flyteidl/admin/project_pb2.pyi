@@ -78,9 +78,7 @@ class ProjectUpdateResponse(_message.Message):
     def __init__(self) -> None: ...
 
 class ProjectGetRequest(_message.Message):
-    __slots__ = ["id", "org"]
+    __slots__ = ["id"]
     ID_FIELD_NUMBER: _ClassVar[int]
-    ORG_FIELD_NUMBER: _ClassVar[int]
     id: str
-    org: str
-    def __init__(self, id: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
+    def __init__(self, id: _Optional[str] = ...) -> None: ...
