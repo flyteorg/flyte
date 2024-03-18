@@ -42,7 +42,7 @@ spec:
           {{- if not .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment  }}
           {{- include "databaseSecret.volumeMount" . | nindent 10 }}
           {{- else }}
-          {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
+          {{- if .Values.secrets.adminOauthClientCredentials.mount }}
           - name: auth
             mountPath: /etc/secrets/
           {{- end }}
@@ -69,7 +69,7 @@ spec:
             secretName: cluster-credentials
         {{- end }}
         {{- if .Values.cluster_resource_manager.config.cluster_resources.standaloneDeployment }}
-        {{- if .Values.secrets.adminOauthClientCredentials.enabled }}
+        {{- if .Values.secrets.adminOauthClientCredentials.mount }}
         - name: auth
           secret:
             secretName: flyte-secret-auth

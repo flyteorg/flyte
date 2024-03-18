@@ -430,12 +430,12 @@ deployRedoc: false
 
 secrets:
   adminOauthClientCredentials:
-    # If enabled is true, helm will mount `flyte-secret-auth`.
-    # If enabled is false, helm will not mount `flyte-secret-auth`.
+    # If mount is true, helm will mount `flyte-secret-auth`.
+    # If mount is false, helm will not mount `flyte-secret-auth`.
     # If create is true, helm will create the `flyte-secret-auth`.
     # If create is false, it's up to the user to create `flyte-secret-auth` as described in
     # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
-    enabled: true
+    mount: true
     create: true
     clientSecret: foobar
     clientId: flytepropeller
