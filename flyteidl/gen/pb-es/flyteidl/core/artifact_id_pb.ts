@@ -7,6 +7,66 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message, proto3, Timestamp } from "@bufbuild/protobuf";
 
 /**
+ * @generated from enum flyteidl.core.Granularity
+ */
+export enum Granularity {
+  /**
+   * @generated from enum value: UNSET = 0;
+   */
+  UNSET = 0,
+
+  /**
+   * @generated from enum value: MINUTE = 1;
+   */
+  MINUTE = 1,
+
+  /**
+   * @generated from enum value: HOUR = 2;
+   */
+  HOUR = 2,
+
+  /**
+   * default
+   *
+   * @generated from enum value: DAY = 3;
+   */
+  DAY = 3,
+
+  /**
+   * @generated from enum value: MONTH = 4;
+   */
+  MONTH = 4,
+}
+// Retrieve enum metadata with: proto3.getEnumType(Granularity)
+proto3.util.setEnumType(Granularity, "flyteidl.core.Granularity", [
+  { no: 0, name: "UNSET" },
+  { no: 1, name: "MINUTE" },
+  { no: 2, name: "HOUR" },
+  { no: 3, name: "DAY" },
+  { no: 4, name: "MONTH" },
+]);
+
+/**
+ * @generated from enum flyteidl.core.Operator
+ */
+export enum Operator {
+  /**
+   * @generated from enum value: MINUS = 0;
+   */
+  MINUS = 0,
+
+  /**
+   * @generated from enum value: PLUS = 1;
+   */
+  PLUS = 1,
+}
+// Retrieve enum metadata with: proto3.getEnumType(Operator)
+proto3.util.setEnumType(Operator, "flyteidl.core.Operator", [
+  { no: 0, name: "MINUS" },
+  { no: 1, name: "PLUS" },
+]);
+
+/**
  * @generated from message flyteidl.core.ArtifactKey
  */
 export class ArtifactKey extends Message<ArtifactKey> {
@@ -27,6 +87,11 @@ export class ArtifactKey extends Message<ArtifactKey> {
    */
   name = "";
 
+  /**
+   * @generated from field: string org = 4;
+   */
+  org = "";
+
   constructor(data?: PartialMessage<ArtifactKey>) {
     super();
     proto3.util.initPartial(data, this);
@@ -38,6 +103,7 @@ export class ArtifactKey extends Message<ArtifactKey> {
     { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 3, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArtifactKey {
@@ -64,24 +130,19 @@ export class ArtifactKey extends Message<ArtifactKey> {
  */
 export class ArtifactBindingData extends Message<ArtifactBindingData> {
   /**
-   * @generated from field: uint32 index = 1;
-   */
-  index = 0;
-
-  /**
    * These two fields are only relevant in the partition value case
    *
    * @generated from oneof flyteidl.core.ArtifactBindingData.partition_data
    */
   partitionData: {
     /**
-     * @generated from field: string partition_key = 2;
+     * @generated from field: string partition_key = 5;
      */
     value: string;
     case: "partitionKey";
   } | {
     /**
-     * @generated from field: bool bind_to_time_partition = 3;
+     * @generated from field: bool bind_to_time_partition = 6;
      */
     value: boolean;
     case: "bindToTimePartition";
@@ -90,9 +151,9 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
   /**
    * This is only relevant in the time partition case
    *
-   * @generated from field: string transform = 4;
+   * @generated from field: flyteidl.core.TimeTransform time_transform = 7;
    */
-  transform = "";
+  timeTransform?: TimeTransform;
 
   constructor(data?: PartialMessage<ArtifactBindingData>) {
     super();
@@ -102,10 +163,9 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
   static readonly runtime: typeof proto3 = proto3;
   static readonly typeName = "flyteidl.core.ArtifactBindingData";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
-    { no: 1, name: "index", kind: "scalar", T: 13 /* ScalarType.UINT32 */ },
-    { no: 2, name: "partition_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "partition_data" },
-    { no: 3, name: "bind_to_time_partition", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "partition_data" },
-    { no: 4, name: "transform", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "partition_key", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "partition_data" },
+    { no: 6, name: "bind_to_time_partition", kind: "scalar", T: 8 /* ScalarType.BOOL */, oneof: "partition_data" },
+    { no: 7, name: "time_transform", kind: "message", T: TimeTransform },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ArtifactBindingData {
@@ -122,6 +182,49 @@ export class ArtifactBindingData extends Message<ArtifactBindingData> {
 
   static equals(a: ArtifactBindingData | PlainMessage<ArtifactBindingData> | undefined, b: ArtifactBindingData | PlainMessage<ArtifactBindingData> | undefined): boolean {
     return proto3.util.equals(ArtifactBindingData, a, b);
+  }
+}
+
+/**
+ * @generated from message flyteidl.core.TimeTransform
+ */
+export class TimeTransform extends Message<TimeTransform> {
+  /**
+   * @generated from field: string transform = 1;
+   */
+  transform = "";
+
+  /**
+   * @generated from field: flyteidl.core.Operator op = 2;
+   */
+  op = Operator.MINUS;
+
+  constructor(data?: PartialMessage<TimeTransform>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.TimeTransform";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "transform", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "op", kind: "enum", T: proto3.getEnumType(Operator) },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TimeTransform {
+    return new TimeTransform().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): TimeTransform {
+    return new TimeTransform().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): TimeTransform {
+    return new TimeTransform().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: TimeTransform | PlainMessage<TimeTransform> | undefined, b: TimeTransform | PlainMessage<TimeTransform> | undefined): boolean {
+    return proto3.util.equals(TimeTransform, a, b);
   }
 }
 
@@ -163,6 +266,37 @@ export class InputBindingData extends Message<InputBindingData> {
 }
 
 /**
+ * @generated from message flyteidl.core.RuntimeBinding
+ */
+export class RuntimeBinding extends Message<RuntimeBinding> {
+  constructor(data?: PartialMessage<RuntimeBinding>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.RuntimeBinding";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RuntimeBinding {
+    return new RuntimeBinding().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RuntimeBinding {
+    return new RuntimeBinding().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RuntimeBinding {
+    return new RuntimeBinding().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RuntimeBinding | PlainMessage<RuntimeBinding> | undefined, b: RuntimeBinding | PlainMessage<RuntimeBinding> | undefined): boolean {
+    return proto3.util.equals(RuntimeBinding, a, b);
+  }
+}
+
+/**
  * @generated from message flyteidl.core.LabelValue
  */
 export class LabelValue extends Message<LabelValue> {
@@ -197,6 +331,12 @@ export class LabelValue extends Message<LabelValue> {
      */
     value: InputBindingData;
     case: "inputBinding";
+  } | {
+    /**
+     * @generated from field: flyteidl.core.RuntimeBinding runtime_binding = 5;
+     */
+    value: RuntimeBinding;
+    case: "runtimeBinding";
   } | { case: undefined; value?: undefined } = { case: undefined };
 
   constructor(data?: PartialMessage<LabelValue>) {
@@ -211,6 +351,7 @@ export class LabelValue extends Message<LabelValue> {
     { no: 2, name: "time_value", kind: "message", T: Timestamp, oneof: "value" },
     { no: 3, name: "triggered_binding", kind: "message", T: ArtifactBindingData, oneof: "value" },
     { no: 4, name: "input_binding", kind: "message", T: InputBindingData, oneof: "value" },
+    { no: 5, name: "runtime_binding", kind: "message", T: RuntimeBinding, oneof: "value" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): LabelValue {
@@ -276,6 +417,11 @@ export class TimePartition extends Message<TimePartition> {
    */
   value?: LabelValue;
 
+  /**
+   * @generated from field: flyteidl.core.Granularity granularity = 2;
+   */
+  granularity = Granularity.UNSET;
+
   constructor(data?: PartialMessage<TimePartition>) {
     super();
     proto3.util.initPartial(data, this);
@@ -285,6 +431,7 @@ export class TimePartition extends Message<TimePartition> {
   static readonly typeName = "flyteidl.core.TimePartition";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 1, name: "value", kind: "message", T: LabelValue },
+    { no: 2, name: "granularity", kind: "enum", T: proto3.getEnumType(Granularity) },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TimePartition {
