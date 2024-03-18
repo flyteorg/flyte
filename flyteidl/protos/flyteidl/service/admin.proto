@@ -399,9 +399,6 @@ service AdminService {
   rpc GetProject (flyteidl.admin.ProjectGetRequest) returns (flyteidl.admin.Project) {
     option (google.api.http) = {
       get: "/api/v1/projects/{id}"
-      additional_bindings {
-        get: "/api/v1/projects/org/{org}/{id}"
-      }
     };
     option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
       description: "Fetch a registered projects."

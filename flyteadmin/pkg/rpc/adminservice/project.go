@@ -75,9 +75,9 @@ func (m *AdminService) GetProject(ctx context.Context, request *admin.ProjectGet
 		response, err = m.ProjectManager.GetProject(ctx, *request)
 	})
 	if err != nil {
-		return nil, util.TransformAndRecordError(err, &m.Metrics.projectEndpointMetrics.list)
+		return nil, util.TransformAndRecordError(err, &m.Metrics.projectEndpointMetrics.get)
 	}
 
-	m.Metrics.projectEndpointMetrics.list.Success()
+	m.Metrics.projectEndpointMetrics.get.Success()
 	return response, nil
 }

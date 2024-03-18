@@ -2719,46 +2719,6 @@
         ]
       }
     },
-    "/api/v1/projects/org/{org}/{id}": {
-      "get": {
-        "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
-        "description": "Fetch a registered projects.",
-        "operationId": "AdminService_GetProject2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/adminProject"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "org",
-            "description": "Optional, org filter applied to get project requests.",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "id",
-            "description": "+required",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "AdminService"
-        ]
-      }
-    },
     "/api/v1/projects/{id}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
