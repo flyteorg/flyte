@@ -13,8 +13,8 @@
 version: 1
 metadata:
   content_hash:
-    linux-64: 1478815879c9d75411e0d06d340e71bf878ceb4e6ee48e688dbcf53c861e0cfe
-    osx-arm64: 95580d15f7c66863862b1cfb864a0b17584081749a2ab4ff026b85c528094cb1
+    linux-64: 32d4de5273d85a0237eda3bf606d0faaff506dac029d80b303bdf7ed5245ad2a
+    osx-arm64: e58daa2c17c4401600ecf9a4e1039741eb1d186d902acfad0e7f254968ee3732
   channels:
   - url: conda-forge
     used_env_vars: []
@@ -11304,25 +11304,25 @@ package:
   category: main
   optional: false
 - name: pandoc
-  version: 3.1.12.2
+  version: 3.1.12.3
   manager: conda
   platform: linux-64
   dependencies: {}
-  url: https://conda.anaconda.org/conda-forge/linux-64/pandoc-3.1.12.2-ha770c72_0.conda
+  url: https://conda.anaconda.org/conda-forge/linux-64/pandoc-3.1.12.3-ha770c72_0.conda
   hash:
-    md5: 4f04ceee8d953367da7de726af233303
-    sha256: 005dd4d2bf31d64d0e8342bc4410416f08eb730731c33f107c9bb796b6c35e87
+    md5: cdea66892b19a454f939487318b6c517
+    sha256: 26bfcda675fbddd059a8861dc75b9e497980ec6c679ec2a27e7d74042c4b295b
   category: main
   optional: false
 - name: pandoc
-  version: 3.1.12.2
+  version: 3.1.12.3
   manager: conda
   platform: osx-arm64
   dependencies: {}
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/pandoc-3.1.12.2-hce30654_0.conda
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/pandoc-3.1.12.3-hce30654_0.conda
   hash:
-    md5: aee9cbb55e596b9dad2362c0ee9b8aa6
-    sha256: fe0ecd6fece80fe1d4d8363dd3b187b65cb541fb8e3cbf0832e682c75473fe88
+    md5: e14b5833daffe398ea21308cb0559477
+    sha256: 3bdfb8e65c7f7b050c07f5b84669024eaa38aa268195e1a804cbd20f07233fa4
   category: main
   optional: false
 - name: pandocfilters
@@ -13080,6 +13080,50 @@ package:
     sha256: 4790787fe1f4e8da616edca4acf6a4f8ed4e7c6967aa31b920208fc8f95efcca
   category: main
   optional: false
+- name: python-kubernetes
+  version: 29.0.0
+  manager: conda
+  platform: linux-64
+  dependencies:
+    certifi: '>=14.05.14'
+    google-auth: '>=1.0.1'
+    oauthlib: '>=3.2.2'
+    python: '>=3.6'
+    python-dateutil: '>=2.5.3'
+    pyyaml: '>=5.4.1'
+    requests: ''
+    requests-oauthlib: ''
+    six: '>=1.9.0'
+    urllib3: '>=1.24.2,<2.0'
+    websocket-client: '>=0.32.0,!=0.40.0,!=0.41.*,!=0.42.*'
+  url: https://conda.anaconda.org/conda-forge/noarch/python-kubernetes-29.0.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: a94f4c6a1cff1e9837a8b62ae35c673f
+    sha256: 30e268b5e3299ae77f5bc34a2e290e47d5663f72be2ae3451ae7c24936670a74
+  category: main
+  optional: false
+- name: python-kubernetes
+  version: 29.0.0
+  manager: conda
+  platform: osx-arm64
+  dependencies:
+    certifi: '>=14.05.14'
+    google-auth: '>=1.0.1'
+    oauthlib: '>=3.2.2'
+    python: '>=3.6'
+    python-dateutil: '>=2.5.3'
+    pyyaml: '>=5.4.1'
+    requests: ''
+    requests-oauthlib: ''
+    six: '>=1.9.0'
+    urllib3: '>=1.24.2,<2.0'
+    websocket-client: '>=0.32.0,!=0.40.0,!=0.41.*,!=0.42.*'
+  url: https://conda.anaconda.org/conda-forge/noarch/python-kubernetes-29.0.0-pyhd8ed1ab_0.conda
+  hash:
+    md5: a94f4c6a1cff1e9837a8b62ae35c673f
+    sha256: 30e268b5e3299ae77f5bc34a2e290e47d5663f72be2ae3451ae7c24936670a74
+  category: main
+  optional: false
 - name: python-slugify
   version: 8.0.4
   manager: conda
@@ -13623,31 +13667,31 @@ package:
   category: main
   optional: false
 - name: referencing
-  version: 0.33.0
+  version: 0.34.0
   manager: conda
   platform: linux-64
   dependencies:
     attrs: '>=22.2.0'
     python: '>=3.8'
     rpds-py: '>=0.7.0'
-  url: https://conda.anaconda.org/conda-forge/noarch/referencing-0.33.0-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/referencing-0.34.0-pyhd8ed1ab_0.conda
   hash:
-    md5: bc415a1c6cf049166215d6b596e0fcbe
-    sha256: 5707eb9ee2c7cfcc56a5223b24ab3133ff61aaa796931f3b22068e0a43ea6ecf
+    md5: e4492c22e314be5c75db3469e3bbf3d9
+    sha256: 2e631e9e1d49280770573f7acc7441b70181b2dc21948bb1be15eaae80550672
   category: main
   optional: false
 - name: referencing
-  version: 0.33.0
+  version: 0.34.0
   manager: conda
   platform: osx-arm64
   dependencies:
     attrs: '>=22.2.0'
     python: '>=3.8'
     rpds-py: '>=0.7.0'
-  url: https://conda.anaconda.org/conda-forge/noarch/referencing-0.33.0-pyhd8ed1ab_0.conda
+  url: https://conda.anaconda.org/conda-forge/noarch/referencing-0.34.0-pyhd8ed1ab_0.conda
   hash:
-    md5: bc415a1c6cf049166215d6b596e0fcbe
-    sha256: 5707eb9ee2c7cfcc56a5223b24ab3133ff61aaa796931f3b22068e0a43ea6ecf
+    md5: e4492c22e314be5c75db3469e3bbf3d9
+    sha256: 2e631e9e1d49280770573f7acc7441b70181b2dc21948bb1be15eaae80550672
   category: main
   optional: false
 - name: requests

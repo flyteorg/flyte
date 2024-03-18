@@ -37,6 +37,7 @@ dependencies:
   - great-expectations          # greatexpectations
   - datasets                    # huggingface
   - kubernetes                  # k8s-pod
+  - python-kubernetes           # k8s-pod
   - modin                       # modin
   - pandera                     # pandera
   - pydantic                    # vaex, pydantic
