@@ -84,9 +84,10 @@ class ListTableToc(SphinxDirective):
 
 def update_sys_path_for_flytekit(import_project_config: ImportProjectsConfig):
     # create flytekit/_version.py file manually
-    with open(f"{import_project_config.flytekit_api_dir}/flytekit/_version.py", "w") as f:
+    with open(
+        f"{import_project_config.flytekit_api_dir}/flytekit/_version.py", "w"
+    ) as f:
         f.write(f'__version__ = "dev"')
-
 
     # add flytekit to python path
     flytekit_dir = os.path.abspath(import_project_config.flytekit_api_dir)
@@ -142,12 +143,7 @@ def import_projects(app: Sphinx, config: Config):
         else:
             local_dir = srcdir / import_projects_config.clone_dir / project.dest
             shutil.rmtree(local_dir, ignore_errors=True)
-            if "flytekit" in project.source:
-                repo = Repo.clone_from(project.source, local_dir, branch="sagemaker-agent")
-            elif "flytesnacks" in project.source:
-                repo = Repo.clone_from(project.source, local_dir, branch="add-sagemaker-agent")
-            else:
-                repo = Repo.clone_from(project.source, local_dir)
+            repo = Repo.clone_from(project.source, local_dir)
             show_repo_tags = True
 
         local_docs_path = local_dir / project.docs_path
@@ -156,7 +152,7 @@ def import_projects(app: Sphinx, config: Config):
         if repo:
             tags = sorted(
                 [t for t in repo.tags if re.match(VERSION_PATTERN, t.name)],
-                key=lambda t: t.commit.committed_datetime
+                key=lambda t: t.commit.committed_datetime,
             )
             if not tags or import_projects_config.dev_build:
                 # If dev_build is specified or the tags don't exist just use the
@@ -192,7 +188,9 @@ def import_projects(app: Sphinx, config: Config):
     update_sys_path_for_flytekit(import_projects_config)
 
     # add functions to clean up source and docstring refs
-    for i, (patt, repl) in enumerate(import_projects_config.source_regex_mapping.items()):
+    for i, (patt, repl) in enumerate(
+        import_projects_config.source_regex_mapping.items()
+    ):
         app.connect(
             "source-read",
             partial(replace_refs_in_files, patt, repl),
@@ -205,7 +203,9 @@ def import_projects(app: Sphinx, config: Config):
         )
 
 
-def replace_refs_in_files(patt: str, repl: str, app: Sphinx, docname: str, source: List[str]):
+def replace_refs_in_files(
+    patt: str, repl: str, app: Sphinx, docname: str, source: List[str]
+):
     text = source[0]
 
     if re.search(patt, text):
@@ -216,7 +216,14 @@ def replace_refs_in_files(patt: str, repl: str, app: Sphinx, docname: str, sourc
 
 
 def replace_refs_in_docstrings(
-    patt: str, repl: str, app: Sphinx, what: str, name: str, obj: str, options: dict, lines: List[str],
+    patt: str,
+    repl: str,
+    app: Sphinx,
+    what: str,
+    name: str,
+    obj: str,
+    options: dict,
+    lines: List[str],
 ):
     replace = {}
     for i, text in enumerate(lines):
