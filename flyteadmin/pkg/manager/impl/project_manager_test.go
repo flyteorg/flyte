@@ -319,7 +319,7 @@ func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
 	_, err := projectManager.GetProject(context.Background(),
 		*mockedProject)
 
-	assert.Equal(t, errors.New("project "+project+" not found"), err)
+	assert.EqualError(t, err, "project "+project+" not found")
 }
 
 func TestProjectManager_TestGetProject_ErrorDueToEmptyProjectGetRequest(t *testing.T) {
