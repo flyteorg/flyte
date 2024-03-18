@@ -5511,6 +5511,7 @@
     "/api/v1/projects/org/{org}/{id}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch a registered projects.",
         "operationId": "AdminService_GetProject2",
         "responses": {
           "200": {
@@ -5529,50 +5530,17 @@
         "parameters": [
           {
             "name": "org",
-            "description": "Optional, org key applied to the resource.",
+            "description": "Optional, org filter applied to get project requests.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
-            "description": "Globally unique project name.",
+            "description": "+required",
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "name",
-            "description": "Display name.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "labels.values[string][string]",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "state",
-            "description": " - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "ARCHIVED",
-              "SYSTEM_GENERATED"
-            ],
-            "default": "ACTIVE"
           }
         ],
         "tags": [
@@ -5669,6 +5637,7 @@
     "/api/v1/projects/{id}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.Project`",
+        "description": "Fetch a registered projects.",
         "operationId": "AdminService_GetProject",
         "responses": {
           "200": {
@@ -5687,47 +5656,14 @@
         "parameters": [
           {
             "name": "id",
-            "description": "Globally unique project name.",
+            "description": "+required",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
-            "name": "name",
-            "description": "Display name.",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "description",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "labels.values[string]",
-            "description": "This is a request variable of the map type. The query format is \"map_name[key]=value\", e.g. If the map name is Age, the key type is string, and the value type is integer, the query parameter is expressed as Age[\"bob\"]=18",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "state",
-            "description": " - ACTIVE: By default, all projects are considered active.\n - ARCHIVED: Archived projects are no longer visible in the UI and no longer valid.\n - SYSTEM_GENERATED: System generated projects that aren't explicitly created or managed by a user.",
-            "in": "query",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "ACTIVE",
-              "ARCHIVED",
-              "SYSTEM_GENERATED"
-            ],
-            "default": "ACTIVE"
-          },
-          {
             "name": "org",
-            "description": "Optional, org key applied to the resource.",
+            "description": "Optional, org filter applied to get project requests.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -9794,7 +9730,7 @@
     "adminLabels": {
       "type": "object",
       "properties": {
-        "values[string][string]": {
+        "values": {
           "type": "object",
           "additionalProperties": {
             "type": "string"

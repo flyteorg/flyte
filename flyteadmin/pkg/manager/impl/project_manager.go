@@ -127,7 +127,7 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 	return &response, nil
 }
 
-func (m *ProjectManager) GetProject(ctx context.Context, request admin.Project) (*admin.Project, error) {
+func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectGetRequest) (*admin.Project, error) {
 	projectModel, err := m.db.ProjectRepo().Get(ctx, request.Id)
 	if err != nil {
 		return nil, err

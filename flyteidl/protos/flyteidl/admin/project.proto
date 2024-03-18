@@ -99,3 +99,11 @@ message ProjectRegisterResponse {
 // Purposefully empty, may be updated in the future.
 message ProjectUpdateResponse {
 }
+
+message ProjectGetRequest {
+    // +required
+    string id = 1;
+
+    // Optional, org filter applied to get project requests.
+    string org = 5;
+}

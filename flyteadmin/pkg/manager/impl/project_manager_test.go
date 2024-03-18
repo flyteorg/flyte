@@ -281,7 +281,7 @@ func TestProjectManager_UpdateProject_ErrorDueToInvalidProjectName(t *testing.T)
 
 func TestProjectManager_TestGetProject(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
-	mockedProject := &admin.Project{Id: project}
+	mockedProject := &admin.ProjectGetRequest{Id: project}
 	activeState := int32(admin.Project_ACTIVE)
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
 
@@ -308,7 +308,7 @@ func TestProjectManager_TestGetProject(t *testing.T) {
 
 func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
 	mockRepository := repositoryMocks.NewMockRepository()
-	mockedProject := &admin.Project{Id: project}
+	mockedProject := &admin.ProjectGetRequest{Id: project}
 	mockRepository.ProjectRepo().(*repositoryMocks.MockProjectRepo).GetFunction = func(ctx context.Context, projectID string) (models.Project, error) {
 		return models.Project{}, errors.New("project " + projectID + " not found")
 	}

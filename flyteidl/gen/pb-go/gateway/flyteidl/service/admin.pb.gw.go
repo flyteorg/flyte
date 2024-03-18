@@ -7099,7 +7099,7 @@ var (
 )
 
 func request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.Project
+	var protoReq extAdmin.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7132,7 +7132,7 @@ func request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Ma
 }
 
 func local_request_AdminService_GetProject_0(ctx context.Context, marshaler runtime.Marshaler, server extService.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.Project
+	var protoReq extAdmin.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7164,12 +7164,8 @@ func local_request_AdminService_GetProject_0(ctx context.Context, marshaler runt
 
 }
 
-var (
-	filter_AdminService_GetProject_1 = &utilities.DoubleArray{Encoding: map[string]int{"org": 0, "id": 1}, Base: []int{1, 2, 4, 0, 0, 0, 0}, Check: []int{0, 1, 1, 2, 2, 3, 3}}
-)
-
 func request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Marshaler, client extService.AdminServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.Project
+	var protoReq extAdmin.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7197,13 +7193,6 @@ func request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Ma
 	protoReq.Id, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_GetProject_1); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.GetProject(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -7212,7 +7201,7 @@ func request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Ma
 }
 
 func local_request_AdminService_GetProject_1(ctx context.Context, marshaler runtime.Marshaler, server extService.AdminServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var protoReq extAdmin.Project
+	var protoReq extAdmin.ProjectGetRequest
 	var metadata runtime.ServerMetadata
 
 	var (
@@ -7240,13 +7229,6 @@ func local_request_AdminService_GetProject_1(ctx context.Context, marshaler runt
 	protoReq.Id, err = runtime.String(val)
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
-	}
-
-	if err := req.ParseForm(); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
-	}
-	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_AdminService_GetProject_1); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := server.GetProject(ctx, &protoReq)

@@ -843,7 +843,7 @@ func (_m AdminServiceServer_GetProject) Return(_a0 *admin.Project, _a1 error) *A
 	return &AdminServiceServer_GetProject{Call: _m.Call.Return(_a0, _a1)}
 }
 
-func (_m *AdminServiceServer) OnGetProject(_a0 context.Context, _a1 *admin.Project) *AdminServiceServer_GetProject {
+func (_m *AdminServiceServer) OnGetProject(_a0 context.Context, _a1 *admin.ProjectGetRequest) *AdminServiceServer_GetProject {
 	c_call := _m.On("GetProject", _a0, _a1)
 	return &AdminServiceServer_GetProject{Call: c_call}
 }
@@ -854,11 +854,11 @@ func (_m *AdminServiceServer) OnGetProjectMatch(matchers ...interface{}) *AdminS
 }
 
 // GetProject provides a mock function with given fields: _a0, _a1
-func (_m *AdminServiceServer) GetProject(_a0 context.Context, _a1 *admin.Project) (*admin.Project, error) {
+func (_m *AdminServiceServer) GetProject(_a0 context.Context, _a1 *admin.ProjectGetRequest) (*admin.Project, error) {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 *admin.Project
-	if rf, ok := ret.Get(0).(func(context.Context, *admin.Project) *admin.Project); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ProjectGetRequest) *admin.Project); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
@@ -867,7 +867,7 @@ func (_m *AdminServiceServer) GetProject(_a0 context.Context, _a1 *admin.Project
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, *admin.Project) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectGetRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

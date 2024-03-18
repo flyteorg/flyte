@@ -148,7 +148,7 @@ type AdminServiceClient interface {
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) (*admin.ProjectUpdateResponse, error)
 	// Fetches a :ref:`ref_flyteidl.admin.Project`
-	GetProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) (*admin.Project, error)
+	GetProject(ctx context.Context, in *admin.ProjectGetRequest, opts ...grpc.CallOption) (*admin.Project, error)
 	// Fetches a list of :ref:`ref_flyteidl.admin.Project`
 	ListProjects(ctx context.Context, in *admin.ProjectListRequest, opts ...grpc.CallOption) (*admin.Projects, error)
 	// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
@@ -476,7 +476,7 @@ func (c *adminServiceClient) UpdateProject(ctx context.Context, in *admin.Projec
 	return out, nil
 }
 
-func (c *adminServiceClient) GetProject(ctx context.Context, in *admin.Project, opts ...grpc.CallOption) (*admin.Project, error) {
+func (c *adminServiceClient) GetProject(ctx context.Context, in *admin.ProjectGetRequest, opts ...grpc.CallOption) (*admin.Project, error) {
 	out := new(admin.Project)
 	err := c.cc.Invoke(ctx, AdminService_GetProject_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -772,7 +772,7 @@ type AdminServiceServer interface {
 	// it will be ignored in the handler as domains cannot be updated via this API.
 	UpdateProject(context.Context, *admin.Project) (*admin.ProjectUpdateResponse, error)
 	// Fetches a :ref:`ref_flyteidl.admin.Project`
-	GetProject(context.Context, *admin.Project) (*admin.Project, error)
+	GetProject(context.Context, *admin.ProjectGetRequest) (*admin.Project, error)
 	// Fetches a list of :ref:`ref_flyteidl.admin.Project`
 	ListProjects(context.Context, *admin.ProjectListRequest) (*admin.Projects, error)
 	// Indicates a :ref:`ref_flyteidl.event.WorkflowExecutionEvent` has occurred.
@@ -916,7 +916,7 @@ func (UnimplementedAdminServiceServer) RegisterProject(context.Context, *admin.P
 func (UnimplementedAdminServiceServer) UpdateProject(context.Context, *admin.Project) (*admin.ProjectUpdateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateProject not implemented")
 }
-func (UnimplementedAdminServiceServer) GetProject(context.Context, *admin.Project) (*admin.Project, error) {
+func (UnimplementedAdminServiceServer) GetProject(context.Context, *admin.ProjectGetRequest) (*admin.Project, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetProject not implemented")
 }
 func (UnimplementedAdminServiceServer) ListProjects(context.Context, *admin.ProjectListRequest) (*admin.Projects, error) {
@@ -1544,7 +1544,7 @@ func _AdminService_UpdateProject_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _AdminService_GetProject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(admin.Project)
+	in := new(admin.ProjectGetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -1556,7 +1556,7 @@ func _AdminService_GetProject_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: AdminService_GetProject_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AdminServiceServer).GetProject(ctx, req.(*admin.Project))
+		return srv.(AdminServiceServer).GetProject(ctx, req.(*admin.ProjectGetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
