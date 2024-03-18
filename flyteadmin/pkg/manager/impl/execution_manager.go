@@ -606,6 +606,9 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
 
+	// launch plan spec OverwriteCache will take precedence over request spec OverwriteCache
+	requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
+
 	executionModel, err := transformers.CreateExecutionModel(transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
 		RequestSpec:         requestSpec,
@@ -988,6 +991,9 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	} else if requestSpec.GetDisableAll() {
 		notificationsSettings = make([]*admin.Notification, 0)
 	}
+
+	// launch plan spec OverwriteCache will take precedence over request spec OverwriteCache
+    requestSpec.OverwriteCache = requestSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
 
 	createExecModelInput := transformers.CreateExecutionModelInput{
 		WorkflowExecutionID: workflowExecutionID,
@@ -1453,22 +1459,22 @@ func (m *ExecutionManager) GetExecution(
 		return nil, transformerErr
 	}
 
-	// replace OverwriteCache data in execution spec with data from launch plan spec, this will help to correct overwrite cache label in UI
 	executionSpec := execution.Spec
-	launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *executionSpec.LaunchPlan)
-	if err != nil {
-		logger.Debugf(ctx, "Failed to get launch plan model for execution %+v with err %v", execution, err)
-		return nil, err
+	// launch plan spec OverwriteCache will take precedence over execution spec OverwriteCache
+	// GetLaunchPlanModel func for task resource type will throw error due to identifier format difference and missing entity so we exclude task type here, also no need to overwrite OverwriteCache for task type
+	if executionSpec.LaunchPlan != nil && executionSpec.LaunchPlan.ResourceType != core.ResourceType_TASK {
+		launchPlanModel, err := util.GetLaunchPlanModel(ctx, m.db, *executionSpec.LaunchPlan)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to get launch plan model for execution %+v with err %v", execution, err)
+			return nil, err
+		}
+		launchPlan, err := transformers.FromLaunchPlanModel(launchPlanModel)
+		if err != nil {
+			logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
+			return nil, err
+		}
+		executionSpec.OverwriteCache = executionSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
 	}
-	launchPlan, err := transformers.FromLaunchPlanModel(launchPlanModel)
-	if err != nil {
-		logger.Debugf(ctx, "Failed to transform launch plan model %+v with err %v", launchPlanModel, err)
-		return nil, err
-	}
-	logger.Debugf(ctx, "Before update: launchPlan %v, launchPlan.Spec %v, launchPlan.Spec.GetOverwriteCache() %v", launchPlan, launchPlan.Spec, launchPlan.Spec.GetOverwriteCache())
-	executionSpec.OverwriteCache = executionSpec.OverwriteCache || launchPlan.Spec.GetOverwriteCache()
-	logger.Debugf(ctx, "After update: executionSpec %v, executionSpec.OverwriteCache %v", executionSpec, executionSpec.OverwriteCache)
-
 	return execution, nil
 }
 
