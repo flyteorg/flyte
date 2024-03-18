@@ -321,3 +321,16 @@ func TestProjectManager_TestGetProject_ErrorDueToProjectNotFound(t *testing.T) {
 
 	assert.Equal(t, errors.New("project "+project+" not found"), err)
 }
+
+func TestProjectManager_TestGetProject_ErrorDueToEmptyProjectGetRequest(t *testing.T) {
+	mockRepository := repositoryMocks.NewMockRepository()
+	mockedProject := &admin.ProjectGetRequest{Id: ""}
+
+	projectManager := NewProjectManager(mockRepository, runtimeMocks.NewMockConfigurationProvider(
+		getMockApplicationConfigForProjectManagerTest(), nil, nil, nil, nil, nil))
+
+	_, err := projectManager.GetProject(context.Background(),
+		*mockedProject)
+
+	assert.EqualError(t, err, "project identifier is required")
+}
