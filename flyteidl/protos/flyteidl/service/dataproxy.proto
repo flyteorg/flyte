@@ -55,6 +55,15 @@ message CreateUploadLocationRequest {
   // in data proxy config. This option is useful when uploading multiple files.
   // +optional
   string filename_root = 6;
+
+  // If true, the data proxy will add content_md5 to the metadata to the signed URL and
+  // it will force clients to add this metadata to the object.
+  // This make sure dataproxy is backward compatible with the old flytekit.
+  bool add_content_md5_metadata = 7;
+
+
+  // Optional, org key applied to the resource.
+  string org = 8;
 }
 
 // CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.

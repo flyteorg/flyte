@@ -152,6 +152,22 @@ export class CreateUploadLocationRequest extends Message<CreateUploadLocationReq
    */
   filenameRoot = "";
 
+  /**
+   * If true, the data proxy will add content_md5 to the metadata to the signed URL and
+   * it will force clients to add this metadata to the object.
+   * This make sure dataproxy is backward compatible with the old flytekit.
+   *
+   * @generated from field: bool add_content_md5_metadata = 7;
+   */
+  addContentMd5Metadata = false;
+
+  /**
+   * Optional, org key applied to the resource.
+   *
+   * @generated from field: string org = 8;
+   */
+  org = "";
+
   constructor(data?: PartialMessage<CreateUploadLocationRequest>) {
     super();
     proto3.util.initPartial(data, this);
@@ -166,6 +182,8 @@ export class CreateUploadLocationRequest extends Message<CreateUploadLocationReq
     { no: 4, name: "expires_in", kind: "message", T: Duration },
     { no: 5, name: "content_md5", kind: "scalar", T: 12 /* ScalarType.BYTES */ },
     { no: 6, name: "filename_root", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 7, name: "add_content_md5_metadata", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 8, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateUploadLocationRequest {
