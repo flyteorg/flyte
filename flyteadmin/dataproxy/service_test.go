@@ -422,3 +422,23 @@ func TestService_Error(t *testing.T) {
 		assert.Error(t, err, "no task executions")
 	})
 }
+
+func TestCreateStorageLocation(t *testing.T) {
+	ctx := context.TODO()
+	dataStore := commonMocks.GetMockStorageClient()
+	expectedStoragePath := storage.DataReference("s3://bucket/prefix/foo/bar/baz")
+	t.Run("no empty parts", func(t *testing.T) {
+		storagePath, err := createStorageLocation(ctx, dataStore, config.DataProxyUploadConfig{
+			StoragePrefix: "prefix",
+		}, "foo", "bar", "baz")
+		assert.NoError(t, err)
+		assert.Equal(t, expectedStoragePath, storagePath)
+	})
+	t.Run("with empty parts", func(t *testing.T) {
+		storagePath, err := createStorageLocation(ctx, dataStore, config.DataProxyUploadConfig{
+			StoragePrefix: "prefix",
+		}, "foo", "bar", "", "baz")
+		assert.NoError(t, err)
+		assert.Equal(t, expectedStoragePath, storagePath)
+	})
+}
