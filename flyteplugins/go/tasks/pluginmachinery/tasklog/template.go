@@ -33,6 +33,7 @@ type templateRegexes struct {
 	PodUnixFinishTime    *regexp.Regexp
 	TaskID               *regexp.Regexp
 	TaskVersion          *regexp.Regexp
+	TaskOrg              *regexp.Regexp
 	TaskProject          *regexp.Regexp
 	TaskDomain           *regexp.Regexp
 	TaskRetryAttempt     *regexp.Regexp
@@ -59,6 +60,7 @@ func initDefaultRegexes() templateRegexes {
 		MustCreateRegex("podUnixFinishTime"),
 		MustCreateRegex("taskID"),
 		MustCreateRegex("taskVersion"),
+		MustCreateRegex("taskOrg"),
 		MustCreateRegex("taskProject"),
 		MustCreateRegex("taskDomain"),
 		MustCreateRegex("taskRetryAttempt"),
@@ -135,6 +137,10 @@ func (input Input) templateVars() []TemplateVar {
 				TemplateVar{
 					defaultRegexes.TaskVersion,
 					taskExecutionIdentifier.TaskId.Version,
+				},
+				TemplateVar{
+					defaultRegexes.TaskOrg,
+					taskExecutionIdentifier.TaskId.Org,
 				},
 				TemplateVar{
 					defaultRegexes.TaskProject,

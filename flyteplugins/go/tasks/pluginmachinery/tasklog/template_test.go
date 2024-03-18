@@ -29,6 +29,7 @@ func dummyTaskExecID() pluginCore.TaskExecutionID {
 			Project:      "my-task-project",
 			Domain:       "my-task-domain",
 			Version:      "1",
+			Org:          "my-task-org",
 		},
 		NodeExecutionId: &core.NodeExecutionIdentifier{
 			ExecutionId: &core.WorkflowExecutionIdentifier{
@@ -145,6 +146,7 @@ func Test_Input_templateVars(t *testing.T) {
 				{defaultRegexes.TaskRetryAttempt, "1"},
 				{defaultRegexes.TaskID, "my-task-name"},
 				{defaultRegexes.TaskVersion, "1"},
+				{defaultRegexes.TaskOrg, "my-task-org"},
 				{defaultRegexes.TaskProject, "my-task-project"},
 				{defaultRegexes.TaskDomain, "my-task-domain"},
 				{defaultRegexes.ExecutionName, "my-execution-name"},
@@ -420,7 +422,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 		{
 			"task-with-task-execution-identifier-with-org",
 			TemplateLogPlugin{
-				TemplateURIs:  []TemplateURI{"https://flyte.corp.net/console/org/{{ .executionOrg }}/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/attempt/{{ .taskRetryAttempt }}/view/logs"},
+				TemplateURIs:  []TemplateURI{"https://flyte.corp.net/console/org/{{ .executionOrg }}/projects/{{ .executionProject }}/domains/{{ .executionDomain }}/executions/{{ .executionName }}/nodeId/{{ .nodeID }}/taskId/{{ .taskID }}/taskOrg/{{ .taskOrg }}/attempt/{{ .taskRetryAttempt }}/view/logs"},
 				MessageFormat: core.TaskLog_JSON,
 			},
 			args{
@@ -441,7 +443,7 @@ func TestTemplateLogPlugin(t *testing.T) {
 			Output{
 				TaskLogs: []*core.TaskLog{
 					{
-						Uri:           "https://flyte.corp.net/console/org/my-execution-org/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0-0-n0/taskId/my-task-name/attempt/1/view/logs",
+						Uri:           "https://flyte.corp.net/console/org/my-execution-org/projects/my-execution-project/domains/my-execution-domain/executions/my-execution-name/nodeId/n0-0-n0/taskId/my-task-name/taskOrg/my-task-org/attempt/1/view/logs",
 						MessageFormat: core.TaskLog_JSON,
 						Name:          "main_logs",
 					},
