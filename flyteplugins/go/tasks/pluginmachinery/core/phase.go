@@ -227,16 +227,6 @@ func PhaseInfoQueued(t time.Time, version uint32, reason string) PhaseInfo {
 }
 
 func PhaseInfoQueuedWithTaskInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
-	if info != nil && info.Logs != nil {
-		logs := info.Logs
-		// Delete the logs for which ShowWhilePending is not true
-		info.Logs = make([]*core.TaskLog, 0, len(logs))
-		for _, l := range logs {
-			if l.ShowWhilePending {
-				info.Logs = append(info.Logs, l)
-			}
-		}
-	}
 	pi := phaseInfo(PhaseQueued, version, nil, info, false)
 	pi.reason = reason
 	return pi
@@ -249,7 +239,6 @@ func PhaseInfoInitializing(t time.Time, version uint32, reason string, info *Tas
 }
 
 func phaseInfoFailed(p Phase, err *core.ExecutionError, info *TaskInfo, cleanupOnFailure bool) PhaseInfo {
-	HideLogsOnceFinished(info)
 	if err == nil {
 		err = &core.ExecutionError{
 			Code:    "Unknown",
@@ -267,30 +256,7 @@ func PhaseInfoRunning(version uint32, info *TaskInfo) PhaseInfo {
 	return phaseInfo(PhaseRunning, version, nil, info, false)
 }
 
-func HideLogsOnceFinished(info *TaskInfo) {
-	if info != nil && info.Logs != nil {
-		logs := info.Logs
-		// Delete the logs for which hideOnceFinished is true
-		info.Logs = make([]*core.TaskLog, 0, len(logs))
-		for _, l := range logs {
-			if !l.HideOnceFinished {
-				info.Logs = append(info.Logs, l)
-			}
-		}
-	}
-}
-
 func PhaseInfoSuccess(info *TaskInfo) PhaseInfo {
-	if info != nil && info.Logs != nil {
-		logs := info.Logs
-		// Delete the logs for which hideOnceFinished is true
-		info.Logs = make([]*core.TaskLog, 0, len(logs))
-		for _, l := range logs {
-			if !l.HideOnceFinished {
-				info.Logs = append(info.Logs, l)
-			}
-		}
-	}
 	return phaseInfo(PhaseSuccess, DefaultPhaseVersion, nil, info, false)
 }
 
