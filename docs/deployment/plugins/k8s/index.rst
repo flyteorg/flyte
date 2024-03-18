@@ -6,23 +6,18 @@ Configure Kubernetes Plugins
 .. tags:: Kubernetes, Integration, Spark, AWS, GCP, Advanced
 
 This guide help you configure the Flyte integrations that spin up resources on Kubernetes.
-The steps are defined in terms of the `deployment method <https://docs.flyte.org/en/latest/deployment/deployment/index.html#flyte-deployment-paths>`_ you used to install Flyte.
+The steps are defined in terms of the `deployment method <https://docs.flyte.org/en/latest/deployment/deployment/index.html#flyte-deployment-paths>`__ you used to install Flyte.
 
 Install the Kubernetes operator
 -------------------------------
+
+Select the integration you need and follow the steps to install the corresponding Kubernetes operator:
 
 .. tabs::
 
   .. group-tab:: PyTorch/TensorFlow/MPI
 
-    First, `install kustomize <https://kubectl.docs.kubernetes.io/installation/kustomize/>`__.
-
-    Build and apply the training-operator.
-  
-    .. code-block:: bash
-  
-      export KUBECONFIG=$KUBECONFIG:~/.kube/config:~/.flyte/k3s/k3s.yaml
-      kustomize build "https://github.com/kubeflow/training-operator.git/manifests/overlays/standalone?ref=v1.5.0" | kubectl apply -f -
+    1. Install the Kubeflow ``training-operator`` using `manifests https://github.com/kubeflow/training-operator?tab=readme-ov-file#installation>`__.
 
     **Optional: Using a gang scheduler**
 
@@ -30,77 +25,37 @@ Install the Kubernetes operator
     due to resource constraints, you can opt for a gang scheduler. This ensures that all worker pods are scheduled
     simultaneously, reducing the likelihood of job failures caused by timeout errors.
     
-    To `enable gang scheduling for the Kubeflow training-operator <https://www.kubeflow.org/docs/components/training/job-scheduling/>`__,
-    you can install the `Kubernetes scheduler plugins <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master>`__
-    or the `Apache YuniKorn scheduler <https://yunikorn.apache.org/>`__.
+    To enable gang scheduling for the ``training-operator``, you can either use the 
+    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/job-scheduling/#running-jobs-with-gang-scheduling>`__
+    or `Apache YuniKorn <https://yunikorn.apache.org/docs/next/user_guide/workloads/run_tf/>`__ as a second scheduler.
 
-    1. Install the `scheduler plugin <https://github.com/kubernetes-sigs/scheduler-plugins/tree/master/manifests/install/charts/as-a-second-scheduler>`_ or
-       `Apache YuniKorn <https://yunikorn.apache.org/docs/next/#install>`_ as a second scheduler.
-    2. Configure the Kubeflow training-operator to use the new scheduler:
+    2. Configure a Flyte ``PodTemplate`` to use a gang scheduler for your Tasks:
+       
+       **K8s scheduler plugins with co-scheduling**
 
-        Create a manifest called ``kustomization.yaml`` with the following content:
+       .. code-block::yaml
 
-        .. code-block:: yaml
+          template:
+            spec:
+              schedulerName: "scheduler-plugins-scheduler"
 
-          apiVersion: kustomize.config.k8s.io/v1beta1
-          kind: Kustomization
+       **Apache Yunikorn**
 
-          resources:
-          - github.com/kubeflow/training-operator/manifests/overlays/standalone
+       .. code-block::yaml
 
-          patchesStrategicMerge:
-          - patch.yaml
-
-        Create a patch file called ``patch.yaml`` with the following content:
-
-        .. code-block:: yaml
-
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            name: training-operator
-          spec:
-            template:
-              spec:
-                containers:
-                - name: training-operator
-                  command:
-                  - /manager
-                  - --gang-scheduler-name=<scheduler-plugins/yunikorn>
-
-        Install the patched kustomization with the following command:
-
-        .. code-block:: bash
-
-          kustomize build path/to/overlay/directory | kubectl apply -f -
-
-       (Only for Apache YuniKorn) To configure gang scheduling with Apache YuniKorn,
-       make sure to set the following annotations in Flyte pod templates:
-
-       - ``template.metadata.annotations.yunikorn.apache.org/task-group-name``
-       - ``template.metadata.annotations.yunikorn.apache.org/task-groups``
-       - ``template.metadata.annotations.yunikorn.apache.org/schedulingPolicyParameters``
-
-       For more configuration details,
-       refer to the `Apache YuniKorn Gang-Scheduling documentation 
-       <https://yunikorn.apache.org/docs/next/user_guide/gang_scheduling>`__.
-
-    3. Use a Flyte pod template with ``template.spec.schedulerName: scheduler-plugins-scheduler``
-       to use the new gang scheduler for your tasks.
-      
-       See :ref:`deployment-configuration-general` for more information on pod templates in Flyte.
+          template:
+            metadata:
+              annotations:
+                yunikorn.apache.org/task-group-name: ""
+                yunikorn.apache.org/task-groups: ""
+                yunikorn.apache.org/schedulingPolicyParameters: ""
+              
+              
+       See :ref:`deployment-configuration-general` for more information about Pod templates in Flyte.
        You can set the scheduler name in the pod template passed to the ``@task`` decorator. However, to prevent the
        two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
        in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
        gang scheduler as well.
-
-
-       For more information on pod templates in Flyte, see :ref:`deployment-configuration-general`.
-       You can set the scheduler name in the pod template passed to the ``@task`` decorator.
-       However, to avoid resource competition between the two different schedulers,
-       it is recommended to set the scheduler name in the pod template in the ``flyte`` namespace,
-       which is applied to all tasks. This allows non-distributed training tasks to be 
-       scheduled by the gang scheduler as well.
 
   .. group-tab:: Ray
     
@@ -114,7 +69,7 @@ Install the Kubernetes operator
   
   .. group-tab:: Spark
   
-    To add the Spark repository, run the following commands:
+    To add the Spark Helm repository, run the following commands:
   
     .. code-block:: bash
   
@@ -128,7 +83,7 @@ Install the Kubernetes operator
   
   .. group-tab:: Dask
   
-    To add the Dask repository, run the following command:
+    To add the Dask Helm repository, run the following command:
   
     .. code-block:: bash
   
@@ -139,19 +94,6 @@ Install the Kubernetes operator
     .. code-block:: bash
   
        helm install dask-operator dask/dask-kubernetes-operator --namespace dask-operator --create-namespace
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Spin up a cluster
 -----------------
