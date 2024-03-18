@@ -547,6 +547,8 @@ flyte:
             - FLYTE_AWS_ACCESS_KEY_ID: minio
             - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
           default-memory: 200Mi
+          default-env-from-configmaps: []
+          default-env-from-secrets: []
 
     # -- Logger configuration
     logger:

@@ -646,6 +646,8 @@ data:
     plugins:
       k8s:
         default-cpus: 100m
+        default-env-from-configmaps: []
+        default-env-from-secrets: []
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
@@ -7170,7 +7172,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "ecefcb1d6df38b32a9ec77d91de63cd40da935a3239b70a5bb0396435878c80"
+        configChecksum: "3500386bee9f0763c6f14460f607cea4e6e24be4224a806c0673db71e13e287"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7244,7 +7246,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0
       annotations:
-        configChecksum: "ecefcb1d6df38b32a9ec77d91de63cd40da935a3239b70a5bb0396435878c80"
+        configChecksum: "3500386bee9f0763c6f14460f607cea4e6e24be4224a806c0673db71e13e287"
     spec:
       securityContext: 
         fsGroup: 65534
