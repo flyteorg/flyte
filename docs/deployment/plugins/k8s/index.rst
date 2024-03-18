@@ -5,360 +5,8 @@ Configure Kubernetes Plugins
 
 .. tags:: Kubernetes, Integration, Spark, AWS, GCP, Advanced
 
-This guide provides an overview of setting up the Kubernetes Operator backend plugin in your Flyte deployment.
-
-Spin up a cluster
------------------
-
-.. tabs::
-
-  .. group-tab:: Flyte binary
-
-    .. tabs::
-
-      .. group-tab:: Demo cluster
-
-        .. tabs::
-
-          .. group-tab:: PyTorch
-
-            Enable the PyTorch plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-            .. code-block:: yaml
-
-              tasks:
-                task-plugins:
-                  default-for-task-types:
-                    container: container
-                    container_array: k8s-array
-                    sidecar: sidecar
-                    pytorch: pytorch
-                  enabled-plugins:
-                  - container
-                  - k8s-array
-                  - sidecar
-                  - pytorch
-
-          .. group-tab:: TensorFlow
-
-            Enable the TensorFlow plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-            .. code-block:: yaml
-
-              tasks:
-                task-plugins:
-                  default-for-task-types:
-                    container: container
-                    container_array: k8s-array
-                    sidecar: sidecar
-                    tensorflow: tensorflow
-                  enabled-plugins:
-                  - container
-                  - k8s-array
-                  - sidecar
-                  - tensorflow
-
-          .. group-tab:: MPI
-
-            Enable the MPI plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-            .. code-block:: yaml
-
-              tasks:
-                task-plugins:
-                  default-for-task-types:
-                    container: container
-                    container_array: k8s-array
-                    sidecar: sidecar
-                    mpi: mpi
-                  enabled-plugins:
-                  - container
-                  - k8s-array
-                  - sidecar
-                  - mpi
-
-          .. group-tab:: Ray
-
-            Enable the Ray plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-            .. code-block:: yaml
-
-              tasks:
-                task-plugins:
-                  default-for-task-types:
-                    container: container
-                    container_array: k8s-array
-                    sidecar: sidecar
-                    ray: ray
-                  enabled-plugins:
-                  - container
-                  - k8s-array
-                  - sidecar
-                  - ray
-
-          .. group-tab:: Spark
-
-            Enable the Spark plugin on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
-
-            .. code-block:: yaml
-
-              tasks:
-                task-plugins:
-                  default-for-task-types:
-                    container: container
-                    container_array: k8s-array
-                    sidecar: sidecar
-                    spark: spark
-                  enabled-plugins:
-                    - container
-                    - sidecar
-                    - k8s-array
-                    - spark
-              plugins:
-                spark:
-                  spark-config-default:
-                    - spark.driver.cores: "1"
-                    - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
-                    - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte:9000"
-                    - spark.hadoop.fs.s3a.access.key: "minio"
-                    - spark.hadoop.fs.s3a.secret.key: "miniostorage"
-                    - spark.hadoop.fs.s3a.path.style.access: "true"
-                    - spark.kubernetes.allocation.batch.size: "50"
-                    - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                    - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                    - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                    - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                    - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                    - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                    - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-              cluster_resources:
-                refreshInterval: 5m
-                customData:
-                  - production:
-                      - projectQuotaCpu:
-                          value: "5"
-                      - projectQuotaMemory:
-                          value: "4000Mi"
-                  - staging:
-                      - projectQuotaCpu:
-                          value: "2"
-                      - projectQuotaMemory:
-                          value: "3000Mi"
-                  - development:
-                      - projectQuotaCpu:
-                          value: "4"
-                      - projectQuotaMemory:
-                          value: "5000Mi"
-                refresh: 5m
-              
-            Also add the following cluster resource templates to the ``~/.flyte/sandbox/cluster-resource-templates`` directory:
-
-            1. ``serviceaccount.yaml``
-
-            .. code-block:: yaml
-
-              apiVersion: v1
-              kind: ServiceAccount
-              metadata:
-                name: default
-                namespace: "{{ namespace }}"
-                annotations:
-                  eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-            
-            2. ``spark_role.yaml``
-
-            .. code-block:: yaml
-
-              apiVersion: rbac.authorization.k8s.io/v1
-              kind: Role
-              metadata:
-                name: spark-role
-                namespace: "{{ namespace }}"
-              rules:
-                - apiGroups:
-                    - ""
-                  resources:
-                    - pods
-                    - services
-                    - configmaps
-                  verbs:
-                    - "*"
-
-            3. ``spark_service_account.yaml``
-
-            .. code-block:: yaml
-
-              apiVersion: v1
-              kind: ServiceAccount
-              metadata:
-                name: spark
-                namespace: "{{ namespace }}"
-                annotations:
-                  eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-            
-            4. ``spark_role_binding.yaml``
-
-            .. code-block:: yaml
-
-              apiVersion: rbac.authorization.k8s.io/v1
-              kind: RoleBinding
-              metadata:
-                name: spark-role-binding
-                namespace: "{{ namespace }}"
-              roleRef:
-                apiGroup: rbac.authorization.k8s.io
-                kind: Role
-                name: spark-role
-              subjects:
-                - kind: ServiceAccount
-                  name: spark
-                  namespace: "{{ namespace }}"
-
-          .. group-tab:: Dask
-
-            Enable the Dask plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-            .. code-block:: yaml
-
-              tasks:
-                task-plugins:
-                  default-for-task-types:
-                    container: container
-                    container_array: k8s-array
-                    sidecar: sidecar
-                    dask: dask
-                  enabled-plugins:
-                  - container
-                  - k8s-array
-                  - sidecar
-                  - dask
-
-        Start the demo cluster by running the following command:
-
-        .. code-block:: bash
-      
-          flytectl demo start
-
-      .. group-tab:: Helm chart
-
-         1. Add the following to your values file under `configmap.inline`:
-
-         .. code-block:: yaml
-
-            tasks:
-              task-plugins:
-                enabled-plugins:
-                  - container
-                  - sidecar
-                  - K8S-ARRAY
-                  - spark
-                  - ray
-                default-for-task-types:
-                  - container: container
-                  - container_array: K8S-ARRAY
-                  - spark: spark
-                  - ray: ray
-
-         2. Install the :ref:`flyte-binary Helm chart <deployment-deployment-cloud-simple>`.
-   
-  .. group-tab:: Flyte core
-   
-    If you have installed Flyte using the `flyte-core Helm chart 
-    <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__, please ensure:
-
-    * You have the correct kubeconfig and have selected the correct Kubernetes context.
-
-    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
-
-.. note::
-
-  Add the Flyte chart repo to Helm if you're installing via the Helm charts.
-
-  .. code-block:: bash
-
-    helm repo add flyteorg https://flyteorg.github.io/flyte
-
-  .. tabs::
-
-    If you have installed Flyte using the `flyte-sandbox Helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
-
-    * You have the correct kubeconfig and have selected the correct Kubernetes context.
-
-    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
-
-      * You have the correct kubeconfig and have selected the correct Kubernetes context.
-      * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
-
-      .. tabs::
-
-        .. group-tab:: Helm chart
-
-          .. tabs::
-
-            .. group-tab:: Spark
-
-              create the following four files and apply them using ``kubectl apply -f <filename>``:
-
-              1. ``serviceaccount.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: v1
-                kind: ServiceAccount
-                metadata:
-                  name: default
-                  namespace: "{{ namespace }}"
-                  annotations:
-                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-
-              2. ``spark_role.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: rbac.authorization.k8s.io/v1
-                kind: Role
-                metadata:
-                  name: spark-role
-                  namespace: "{{ namespace }}"
-                rules:
-                  - apiGroups:
-                      - ""
-                    resources:
-                      - pods
-                      - services
-                      - configmaps
-                    verbs:
-                      - "*"
-
-              3. ``spark_service_account.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: v1
-                kind: ServiceAccount
-                metadata:
-                  name: spark
-                  namespace: "{{ namespace }}"
-                  annotations:
-                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-
-              4. ``spark_role_binding.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: rbac.authorization.k8s.io/v1
-                kind: RoleBinding
-                metadata:
-                  name: spark-role-binding
-                  namespace: "{{ namespace }}"
-                roleRef:
-                  apiGroup: rbac.authorization.k8s.io
-                  kind: Role
-                  name: spark-role
-                subjects:
-                  - kind: ServiceAccount
-                    name: spark
-                    namespace: "{{ namespace }}"
+This guide help you configure the Flyte integrations that spin up resources on Kubernetes.
+The steps are defined in terms of the `deployment method <https://docs.flyte.org/en/latest/deployment/deployment/index.html#flyte-deployment-paths>`_ you used to install Flyte.
 
 Install the Kubernetes operator
 -------------------------------
@@ -491,6 +139,358 @@ Install the Kubernetes operator
     .. code-block:: bash
   
        helm install dask-operator dask/dask-kubernetes-operator --namespace dask-operator --create-namespace
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Spin up a cluster
+-----------------
+
+.. tabs::
+
+  .. group-tab:: Demo cluster
+
+    .. tabs::
+
+      .. group-tab:: PyTorch
+
+        Enable the PyTorch plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
+
+        .. code-block:: yaml
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                pytorch: pytorch
+              enabled-plugins:
+              - container
+              - k8s-array
+              - sidecar
+              - pytorch
+
+      .. group-tab:: TensorFlow
+
+        Enable the TensorFlow plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
+
+        .. code-block:: yaml
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                tensorflow: tensorflow
+              enabled-plugins:
+              - container
+              - k8s-array
+              - sidecar
+              - tensorflow
+
+      .. group-tab:: MPI
+
+        Enable the MPI plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
+
+        .. code-block:: yaml
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                mpi: mpi
+              enabled-plugins:
+              - container
+              - k8s-array
+              - sidecar
+              - mpi
+
+      .. group-tab:: Ray
+
+        Enable the Ray plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
+
+        .. code-block:: yaml
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                ray: ray
+              enabled-plugins:
+              - container
+              - k8s-array
+              - sidecar
+              - ray
+
+      .. group-tab:: Spark
+
+        Enable the Spark plugin on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
+
+        .. code-block:: yaml
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                spark: spark
+              enabled-plugins:
+                - container
+                - sidecar
+                - k8s-array
+                - spark
+          plugins:
+            spark:
+              spark-config-default:
+                - spark.driver.cores: "1"
+                - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+                - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte:9000"
+                - spark.hadoop.fs.s3a.access.key: "minio"
+                - spark.hadoop.fs.s3a.secret.key: "miniostorage"
+                - spark.hadoop.fs.s3a.path.style.access: "true"
+                - spark.kubernetes.allocation.batch.size: "50"
+                - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+              
+        Also add the following cluster resource templates to the ``~/.flyte/sandbox/cluster-resource-templates`` directory:
+
+        1. ``serviceaccount.yaml``
+
+        .. code-block:: yaml
+
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: default
+            namespace: "{{ namespace }}"
+            annotations:
+              eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
+        
+        2. ``spark_role.yaml``
+
+        .. code-block:: yaml
+
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: Role
+          metadata:
+            name: spark-role
+            namespace: "{{ namespace }}"
+          rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+                - services
+                - configmaps
+              verbs:
+                - "*"
+
+        3. ``spark_service_account.yaml``
+
+        .. code-block:: yaml
+
+          apiVersion: v1
+          kind: ServiceAccount
+          metadata:
+            name: spark
+            namespace: "{{ namespace }}"
+            annotations:
+              eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
+        
+        4. ``spark_role_binding.yaml``
+
+        .. code-block:: yaml
+
+          apiVersion: rbac.authorization.k8s.io/v1
+          kind: RoleBinding
+          metadata:
+            name: spark-role-binding
+            namespace: "{{ namespace }}"
+          roleRef:
+            apiGroup: rbac.authorization.k8s.io
+            kind: Role
+            name: spark-role
+          subjects:
+            - kind: ServiceAccount
+              name: spark
+              namespace: "{{ namespace }}"
+
+      .. group-tab:: Dask
+
+        Enable the Dask plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
+
+        .. code-block:: yaml
+
+          tasks:
+            task-plugins:
+              default-for-task-types:
+                container: container
+                container_array: k8s-array
+                sidecar: sidecar
+                dask: dask
+              enabled-plugins:
+              - container
+              - k8s-array
+              - sidecar
+              - dask
+
+    Start the demo cluster by running the following command:
+
+    .. code-block:: bash
+  
+      flytectl demo start
+
+  .. group-tab:: Helm charts
+
+    .. tabs::
+
+      .. group-tab:: flyte-binary 
+
+         1. Add the following to your values file under `configmap.inline`:
+
+         .. code-block:: yaml
+
+            tasks:
+              task-plugins:
+                enabled-plugins:
+                  - container
+                  - sidecar
+                  - K8S-ARRAY
+                  - spark
+                  
+                default-for-task-types:
+                  - container: container
+                  - container_array: K8S-ARRAY
+                  - spark: spark
+                  - ray: ray
+
+         2. Install the :ref:`flyte-binary Helm chart <deployment-deployment-cloud-simple>`.
+
+      .. group-tab:: flyte-core
+
+
+   
+  .. group-tab:: Helm charts
+   
+    If you have installed Flyte using the `flyte-core Helm chart 
+    <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__, please ensure:
+
+    * You have the correct kubeconfig and have selected the correct Kubernetes context.
+
+    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
+
+.. note::
+
+  Add the Flyte chart repo to Helm if you're installing via the Helm charts.
+
+  .. code-block:: bash
+
+    helm repo add flyteorg https://flyteorg.github.io/flyte
+
+  .. tabs::
+
+    If you have installed Flyte using the `flyte-sandbox Helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
+
+    * You have the correct kubeconfig and have selected the correct Kubernetes context.
+
+    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
+
+      * You have the correct kubeconfig and have selected the correct Kubernetes context.
+      * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
+
+      .. tabs::
+
+        .. group-tab:: Helm chart
+
+          .. tabs::
+
+            .. group-tab:: Spark
+
+              create the following four files and apply them using ``kubectl apply -f <filename>``:
+
+              1. ``serviceaccount.yaml``
+
+              .. code-block:: yaml
+
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
+                  name: default
+                  namespace: "{{ namespace }}"
+                  annotations:
+                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
+
+              2. ``spark_role.yaml``
+
+              .. code-block:: yaml
+
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: Role
+                metadata:
+                  name: spark-role
+                  namespace: "{{ namespace }}"
+                rules:
+                  - apiGroups:
+                      - ""
+                    resources:
+                      - pods
+                      - services
+                      - configmaps
+                    verbs:
+                      - "*"
+
+              3. ``spark_service_account.yaml``
+
+              .. code-block:: yaml
+
+                apiVersion: v1
+                kind: ServiceAccount
+                metadata:
+                  name: spark
+                  namespace: "{{ namespace }}"
+                  annotations:
+                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
+
+              4. ``spark_role_binding.yaml``
+
+              .. code-block:: yaml
+
+                apiVersion: rbac.authorization.k8s.io/v1
+                kind: RoleBinding
+                metadata:
+                  name: spark-role-binding
+                  namespace: "{{ namespace }}"
+                roleRef:
+                  apiGroup: rbac.authorization.k8s.io
+                  kind: Role
+                  name: spark-role
+                subjects:
+                  - kind: ServiceAccount
+                    name: spark
+                    namespace: "{{ namespace }}"
+
 
 Specify plugin configuration
 ----------------------------
