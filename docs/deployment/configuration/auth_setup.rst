@@ -350,6 +350,7 @@ Apply OIDC Configuration
              # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
              # If mount is true, helm will mount `flyte-secret-auth`.
              # If mount is false, helm will not mount `flyte-secret-auth`.
+             # Note: Unsupported combination: create.true and mount.false.
              create: true
              mount: true
            # Use the non-encoded version of the random password 
