@@ -51,6 +51,7 @@ func (Config) mustMarshalJSON(v json.Marshaler) string {
 func (cfg Config) GetPFlagSet(prefix string) *pflag.FlagSet {
 	cmdFlags := pflag.NewFlagSet("Config", pflag.ExitOnError)
 	cmdFlags.StringSlice(fmt.Sprintf("%v%v", prefix, "task-plugins.enabled-plugins"), defaultConfig.TaskPlugins.EnabledPlugins, "Plugins enabled currently")
+	cmdFlags.Bool(fmt.Sprintf("%v%v", prefix, "task-plugins.fallback-to-container-handler"), defaultConfig.TaskPlugins.FallbackToContainerHandler, "Fallback to container handler if a task does not have a registered plugin handler. Defaults to true")
 	cmdFlags.Int32(fmt.Sprintf("%v%v", prefix, "max-plugin-phase-versions"), defaultConfig.MaxPluginPhaseVersions, "Maximum number of plugin phase versions allowed for one phase.")
 	cmdFlags.Int(fmt.Sprintf("%v%v", prefix, "backoff.base-second"), defaultConfig.BackOffConfig.BaseSecond, "The number of seconds representing the base duration of the exponential backoff")
 	cmdFlags.String(fmt.Sprintf("%v%v", prefix, "backoff.max-duration"), defaultConfig.BackOffConfig.MaxDuration.String(), "The cap of the backoff duration")

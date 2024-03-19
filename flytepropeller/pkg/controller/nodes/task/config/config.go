@@ -12,13 +12,17 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/logger"
 )
 
-//go:generate pflags Config
+//go:generate pflags Config --default-var=defaultConfig
 
 const SectionKey = "tasks"
 
 var (
 	defaultConfig = &Config{
-		TaskPlugins:            TaskPluginConfig{EnabledPlugins: []string{}, DefaultForTaskTypes: map[string]string{}},
+		TaskPlugins: TaskPluginConfig{
+			EnabledPlugins:             []string{},
+			DefaultForTaskTypes:        map[string]string{},
+			FallbackToContainerHandler: true,
+		},
 		MaxPluginPhaseVersions: 100000,
 		BackOffConfig: BackOffConfig{
 			BaseSecond:  2,
@@ -39,7 +43,8 @@ type Config struct {
 type TaskPluginConfig struct {
 	EnabledPlugins []string `json:"enabled-plugins" pflag:",Plugins enabled currently"`
 	// Maps task types to their plugin handler (by ID).
-	DefaultForTaskTypes map[string]string `json:"default-for-task-types" pflag:"-,"`
+	DefaultForTaskTypes        map[string]string `json:"default-for-task-types" pflag:"-,"`
+	FallbackToContainerHandler bool              `json:"fallback-to-container-handler" pflag:",Fallback to container handler if a task does not have a registered plugin handler. Defaults to true"`
 }
 
 type BackOffConfig struct {
