@@ -357,25 +357,140 @@ Specify plugin configuration
 
               1. Make sure that your Helm values file includes the following configuration:
 
-            .. code-block:: yaml
+                .. code-block:: yaml
 
-              configuration:
-                inline:
-                  tasks:
-                    task-plugins:
-                      enabled-plugins:
-                        - container
-                        - sidecar
-                        - k8s-array
-                        - spark
-                      default-for-task-types:
-                        - container: container
-                        - container_array: k8s-array
-                        - spark: spark
+                  configuration:
+                    inline:
+                      tasks:
+                        task-plugins:
+                          enabled-plugins:
+                            - container
+                            - sidecar
+                            - k8s-array
+                            - spark
+                          default-for-task-types:
+                            - container: container
+                            - container_array: k8s-array
+                            - spark: spark
+                      cluster_resources:
+                        - production:
+                          - defaultIamRole:
+                              value: <FLYTE_IAM_USER_ARN>
+                        - staging:
+                          - defaultIamRole:
+                              value: <FLYTE_IAM_USER_ARN>
+                        - development:
+                          - defaultIamRole:
+                              value: <FLYTE_IAM_USER_ARN>
+                  clusterResourceTemplates:
+                    inline:
+                      #This section automates the creation of the project-domain namespaces
+                      - key: aa_namespace
+                        value: |
+                          apiVersion: v1
+                          kind: Namespace
+                          metadata:
+                            name: {{ namespace }}
+                          spec:
+                            finalizers:
+                            - kubernetes
+                      # This block performs the automated annotation of KSAs across all project-domain namespaces
+                      - key: ab_service_account
+                        value: |
+                          apiVersion: v1
+                          kind: ServiceAccount
+                          metadata:
+                            name: default
+                            namespace: '{{ namespace }}'
+                            annotations:
+                              eks.amazonaws.com/role-arn: '{{ defaultIamRole }}'
+                      - key: ac_spark_role
+                        value: |
+                          apiVersion: rbac.authorization.k8s.io/v1
+                          kind: Role
+                          metadata:
+                            name: spark-role
+                            namespace: "{{ namespace }}"
+                          rules:
+                          - apiGroups: ["*"]
+                            resources:
+                            - pods
+                            verbs:
+                            - '*'
+                          - apiGroups: ["*"]
+                            resources:
+                            - services
+                            verbs:
+                            - '*'
+                          - apiGroups: ["*"]
+                            resources:
+                            - configmaps
+                            verbs:
+                            - '*'
+                          - apiGroups: ["*"]
+                            resources:
+                            - persistentvolumeclaims
+                            verbs:
+                            - "*"                     
+                      - key: ad_spark_service_account
+                        value: |
+                          apiVersion: v1
+                          kind: ServiceAccount
+                          metadata:
+                            name: spark
+                            namespace: "{{ namespace }}"
+                            annotations:
+                              eks.amazonaws.com/role-arn: '{{ defaultIamRole }}'                       
+                      - key: ae_spark_role_binding
+                        value: |
+                          apiVersion: rbac.authorization.k8s.io/v1
+                          kind: RoleBinding
+                          metadata:
+                            name: spark-role-binding
+                            namespace: "{{ namespace }}"
+                          roleRef:
+                            apiGroup: rbac.authorization.k8s.io
+                            kind: Role
+                            name: spark-role
+                          subjects:
+                            - kind: ServiceAccount
+                              name: spark
+                              namespace: "{{ namespace }}"
+
+              2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it, 
+                 set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
+                 or limits will be rejected by the K8s scheduler as described `in the docs <https://kubernetes.io/docs/concepts/policy/resource-quotas/>`__.
+                 The following is a sample configuration you can add to your Helm chart values, adjusting the resources to match your needs:
+
+                 .. code-block:: yaml
+
+                    customData:
+                      - production:
+                          - projectQuotaCpu:
+                              value: "5"
+                          - projectQuotaMemory:
+                              value: "4000Mi"
+                      - staging:
+                          - projectQuotaCpu:
+                              value: "2"
+                          - projectQuotaMemory:
+                              value: "3000Mi"
+                      - development:
+                          - projectQuotaCpu:
+                              value: "4"
+                          - projectQuotaMemory:
+                              value: "3000Mi"
+
+
+              3. Upgrade your Helm release:
+
+                .. code-block:: bash
+
+                  helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>         
 
             .. group-tab:: Flyte core
 
-              Create a file named ``values-override.yaml`` and add the following config to it:
+              1. Make sure that your Helm values file includes the following configuration:
       
               .. code-block:: yaml
       
