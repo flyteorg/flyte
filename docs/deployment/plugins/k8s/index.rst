@@ -59,13 +59,15 @@ Select the integration you need and follow the steps to install the correspondin
 
   .. group-tab:: Ray
     
-    To install the Ray Operator, run the following commands:
+    To add the Kuberay Helm repo, run the following command:
   
     .. code-block:: bash
+
+       helm repo add kuberay https://ray-project.github.io/kuberay-helm/
+      
+    To install the Kuberay operator, run the following command:
   
-        export KUBERAY_VERSION=v0.5.2
-        kubectl create -k "github.com/ray-project/kuberay/manifests/cluster-scope-resources?ref=${KUBERAY_VERSION}&timeout=90s"
-        kubectl apply -k "github.com/ray-project/kuberay/manifests/base?ref=${KUBERAY_VERSION}&timeout=90s"
+        helm install kuberay-operator kuberay/kuberay-operator --version 1.0.0
   
   .. group-tab:: Spark
   
@@ -106,7 +108,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        Add ``pytorch`` to the list of plugins in your Helm values file, and upgrade your Helm release.
+        1. Add ``pytorch`` to the list of plugins in your Helm values file:
 
         .. code-block:: yaml
           :emphasize-lines: 9,13
@@ -125,11 +127,18 @@ Specify plugin configuration
                     - container_array: k8s-array
                     - pytorch: pytorch
 
+        2. Upgrade your Helm release:
+
+        .. code-block:: bash
+
+           helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file> 
+
       .. group-tab:: Flyte core
     
-        Create a file named ``values-override.yaml`` and add the following config to it:
+        1. Add ``pytorch`` to the list of plugins in your Helm values file:
     
         .. code-block:: yaml
+          :emphasize-lines: 9,14
     
           configmap:
             enabled_plugins:
@@ -146,32 +155,46 @@ Specify plugin configuration
                     container_array: k8s-array
                     pytorch: pytorch
    
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file> 
+
   .. group-tab:: TensorFlow
    
     .. tabs::
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart, edit the relevant YAML file.
+        1. Add ``tensorflow`` to the list of plugins in your Helm values file:
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11
+          :emphasize-lines: 9,13
 
-          tasks:
-            task-plugins:
-              enabled-plugins:
-                - container
-                - sidecar
-                - k8s-array
-                - tensorflow
-              default-for-task-types:
-                - container: container
-                - container_array: k8s-array
-                - tensorflow: tensorflow
+          configuration:
+            inline:
+              tasks:
+                task-plugins:
+                  enabled-plugins:
+                    - container
+                    - sidecar
+                    - k8s-array
+                    - tensorflow
+                  default-for-task-types:
+                    - container: container
+                    - container_array: k8s-array
+                    - tensorflow: tensorflow
+
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file> 
 
       .. group-tab:: Flyte core
     
-        Create a file named ``values-override.yaml`` and add the following config to it:
+        1. Add ``tensorflow`` to the list of plugins in your Helm values file:
     
         .. code-block:: yaml
     
@@ -190,32 +213,46 @@ Specify plugin configuration
                     container_array: k8s-array
                     tensorflow: tensorflow
    
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file> 
+
   .. group-tab:: MPI
    
     .. tabs::
 
       .. group-tab:: Flyte binary
 
-        To specify the plugin when using the Helm chart, edit the relevant YAML file.
+        1. Add ``mpi`` to the list of plugins in your Helm values file:
 
         .. code-block:: yaml
-          :emphasize-lines: 7,11
+          :emphasize-lines: 9,13
 
-          tasks:
-            task-plugins:
-              enabled-plugins:
-                - container
-                - sidecar
-                - k8s-array
-                - mpi
-              default-for-task-types:
-                - container: container
-                - container_array: k8s-array
-                - mpi: mpi
+          configuration:
+            inline:
+              tasks:
+                task-plugins:
+                  enabled-plugins:
+                    - container
+                    - sidecar
+                    - k8s-array
+                    - mpi
+                  default-for-task-types:
+                    - container: container
+                    - container_array: k8s-array
+                    - mpi: mpi
+
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>  
 
       .. group-tab:: Flyte core
     
-        Create a file named ``values-override.yaml`` and add the following config to it:
+        1. Add ``mpi`` to the list of plugins in your Helm values file:
     
         .. code-block:: yaml
     
@@ -233,6 +270,12 @@ Specify plugin configuration
                     sidecar: sidecar
                     container_array: k8s-array
                     mpi: mpi
+
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>  
   
   .. group-tab:: Ray
 
@@ -246,18 +289,17 @@ Specify plugin configuration
 
            configuration:
              inline:
-              tasks:
-                task-plugins:
-                  enabled-plugins:
-                    - container
-                    - sidecar
-                    - k8s-array
-                    - ray
-                  default-for-task-types:
-                    - container: container
-                    - container_array: k8s-array
-                    - ray: ray
-
+               tasks:
+                 task-plugins:
+                   enabled-plugins:
+                     - container
+                     - sidecar
+                     - k8s-array
+                     - ray
+                   default-for-task-types:
+                     - container: container
+                     - container_array: k8s-array
+                     - ray: ray
            rbac:
              extraRules:
                - apiGroups:
@@ -271,13 +313,18 @@ Specify plugin configuration
                - patch
                - update
 
-        2. Run a ``helm upgrade`` operation
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file> 
 
       .. group-tab:: Flyte core
     
-        Create a file named ``values-override.yaml`` and add the following config to it:
+        1. Make sure that your Helm values file includes the following configuration:
     
         .. code-block:: yaml
+           :emphasize-lines: 9,14
     
           configmap:
             enabled_plugins:
@@ -294,267 +341,301 @@ Specify plugin configuration
                     container_array: k8s-array
                     ray: ray
    
+        2. Upgrade your Helm release:
+
+          .. code-block:: bash
+
+             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file> 
+
   .. group-tab:: Spark
    
       .. tabs:: 
 
-        .. group-tab:: Flyte binary
+        .. group-tab:: AWS
 
-          To specify the plugin when using the Helm chart, edit the relevant YAML file.
+            .. group-tab:: Flyte binary
 
-        .. group-tab:: Flyte core
+              1. Make sure that your Helm values file includes the following configuration:
 
-          Create a file named ``values-override.yaml`` and add the following config to it:
-   
-          .. code-block:: yaml
-   
-            cluster_resource_manager:
-              enabled: true
-              config:
-                cluster_resources:
-                  refreshInterval: 5m
-                  templatePath: "/etc/flyte/clusterresource/templates"
-                  customData:
-                    - production:
-                        - projectQuotaCpu:
-                            value: "5"
-                        - projectQuotaMemory:
-                            value: "4000Mi"
-                    - staging:
-                        - projectQuotaCpu:
-                            value: "2"
-                        - projectQuotaMemory:
-                            value: "3000Mi"
-                    - development:
-                        - projectQuotaCpu:
-                            value: "4"
-                        - projectQuotaMemory:
-                            value: "3000Mi"
-                  refresh: 5m
-      
-              # -- Resource templates that should be applied
-              templates:
-                # -- Template for namespaces resources
-                - key: aa_namespace
-                  value: |
-                    apiVersion: v1
-                    kind: Namespace
-                    metadata:
-                      name: {{ namespace }}
-                    spec:
-                      finalizers:
-                      - kubernetes
-      
-                - key: ab_project_resource_quota
-                  value: |
-                    apiVersion: v1
-                    kind: ResourceQuota
-                    metadata:
-                      name: project-quota
-                      namespace: {{ namespace }}
-                    spec:
-                      hard:
-                        limits.cpu: {{ projectQuotaCpu }}
-                        limits.memory: {{ projectQuotaMemory }}
-      
-                - key: ac_spark_role
-                  value: |
-                    apiVersion: rbac.authorization.k8s.io/v1beta1
-                    kind: Role
-                    metadata:
-                      name: spark-role
-                      namespace: {{ namespace }}
-                    rules:
-                    - apiGroups: ["*"]
-                      resources:
-                      - pods
-                      verbs:
-                      - '*'
-                    - apiGroups: ["*"]
-                      resources:
-                      - services
-                      verbs:
-                      - '*'
-                    - apiGroups: ["*"]
-                      resources:
-                      - configmaps
-                      verbs:
-                      - '*'
-      
-                - key: ad_spark_service_account
-                  value: |
-                    apiVersion: v1
-                    kind: ServiceAccount
-                    metadata:
-                      name: spark
-                      namespace: {{ namespace }}
-      
-                - key: ae_spark_role_binding
-                  value: |
-                    apiVersion: rbac.authorization.k8s.io/v1beta1
-                    kind: RoleBinding
-                    metadata:
-                      name: spark-role-binding
-                      namespace: {{ namespace }}
-                    roleRef:
-                      apiGroup: rbac.authorization.k8s.io
-                      kind: Role
-                      name: spark-role
-                    subjects:
-                    - kind: ServiceAccount
-                      name: spark
-                      namespace: {{ namespace }}
-      
-            sparkoperator:
-              enabled: true
-              plugin_config:
-                plugins:
-                  spark:
-                    # Edit the Spark configuration as you see fit
-                    spark-config-default:
-                      - spark.driver.cores: "1"
-                      - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-                      - spark.kubernetes.allocation.batch.size: "50"
-                      - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                      - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                      - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                      - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                      - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                      - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                      - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-                      - spark.network.timeout: 600s
-                      - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
-                      - spark.executor.heartbeatInterval: 60s
-            configmap:
-              enabled_plugins:
-                tasks:
-                  task-plugins:
-                    enabled-plugins:
-                      - container
-                      - sidecar
-                      - k8s-array
-                      - spark
-                    default-for-task-types:
-                      container: container
-                      sidecar: sidecar
-                      container_array: k8s-array
-                      spark: spark
+            .. code-block:: yaml
 
-        .. group-tab:: Flyte sandbox
-
-          Create a file named ``values-override.yaml`` and add the following config to it:
-
-          .. note::
-
-            Within the flyte-binary block, the value of inline.storage.signedURL.stowConfigOverride.endpoint should be set to the corresponding node Hostname/IP on the MinIO pod if you are deploying on a Kubernetes cluster.
-
-          .. code-block:: yaml
-
-            flyte-binary:
-              nameOverride: flyte-sandbox
-              enabled: true
               configuration:
-                database:
-                  host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
-                  password: postgres
-                storage:
-                  metadataContainer: my-s3-bucket
-                  userDataContainer: my-s3-bucket
-                  provider: s3
-                  providerConfig:
-                    s3:
-                      disableSSL: true
-                      v2Signing: true
-                      endpoint: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
-                      authType: accesskey
-                      accessKey: minio
-                      secretKey: miniostorage
-                logging:
-                  level: 5
-                  plugins:
-                    kubernetes:
-                      enabled: true
-                      templateUri: |-
-                        http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
                 inline:
-                  task_resources:
-                    defaults:
-                      cpu: 500m
-                      ephemeralStorage: 0
-                      gpu: 0
-                      memory: 1Gi
-                    limits:
-                      cpu: 0
-                      ephemeralStorage: 0
-                      gpu: 0
-                      memory: 0
-                  storage:
-                    signedURL:
-                      stowConfigOverride:
-                        endpoint: http://localhost:30002
-                  plugins:
-                    k8s:
-                      default-env-vars:
-                        - FLYTE_AWS_ENDPOINT: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
-                        - FLYTE_AWS_ACCESS_KEY_ID: minio
-                        - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
-                    spark:
-                      spark-config-default:
-                        - spark.driver.cores: "1"
-                        - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
-                        - spark.hadoop.fs.s3a.endpoint: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
-                        - spark.hadoop.fs.s3a.access.key: "minio"
-                        - spark.hadoop.fs.s3a.secret.key: "miniostorage"
-                        - spark.hadoop.fs.s3a.path.style.access: "true"
-                        - spark.kubernetes.allocation.batch.size: "50"
-                        - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                        - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                        - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                        - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                        - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                        - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                        - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-                inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
-              clusterResourceTemplates:
-                inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'
-              deployment:
-                image:
-                  repository: flyte-binary
-                  tag: sandbox
-                  pullPolicy: Never
-                waitForDB:
-                  image:
-                    repository: bitnami/postgresql
-                    tag: sandbox
-                    pullPolicy: Never
-              rbac:
-                # This is strictly NOT RECOMMENDED in production clusters, and is only for use
-                # within local Flyte sandboxes.
-                # When using cluster resource templates to create additional namespaced roles,
-                # Flyte is required to have a superset of those permissions. To simplify
-                # experimenting with new backend plugins that require additional roles be created
-                # with cluster resource templates (e.g. Spark), we add the following:
-                extraRules:
-                  - apiGroups:
-                    - '*'
-                    resources:
-                    - '*'
-                    verbs:
-                    - '*'
-              enabled_plugins:
-                tasks:
-                  task-plugins:
-                    enabled-plugins:
-                      - container
-                      - sidecar
-                      - k8s-array
-                      - agent-service
-                      - spark
-                    default-for-task-types:
-                      container: container
-                      sidecar: sidecar
-                      container_array: k8s-array
-                      spark: spark
+                  tasks:
+                    task-plugins:
+                      enabled-plugins:
+                        - container
+                        - sidecar
+                        - k8s-array
+                        - spark
+                      default-for-task-types:
+                        - container: container
+                        - container_array: k8s-array
+                        - spark: spark
+
+            .. group-tab:: Flyte core
+
+              Create a file named ``values-override.yaml`` and add the following config to it:
+      
+              .. code-block:: yaml
+      
+                cluster_resource_manager:
+                  enabled: true
+                  config:
+                    cluster_resources:
+                      refreshInterval: 5m
+                      templatePath: "/etc/flyte/clusterresource/templates"
+                      customData:
+                        - production:
+                            - projectQuotaCpu:
+                                value: "5"
+                            - projectQuotaMemory:
+                                value: "4000Mi"
+                        - staging:
+                            - projectQuotaCpu:
+                                value: "2"
+                            - projectQuotaMemory:
+                                value: "3000Mi"
+                        - development:
+                            - projectQuotaCpu:
+                                value: "4"
+                            - projectQuotaMemory:
+                                value: "3000Mi"
+                      refresh: 5m
+          
+                  # -- Resource templates that should be applied
+                  templates:
+                    # -- Template for namespaces resources
+                    - key: aa_namespace
+                      value: |
+                        apiVersion: v1
+                        kind: Namespace
+                        metadata:
+                          name: {{ namespace }}
+                        spec:
+                          finalizers:
+                          - kubernetes
+          
+                    - key: ab_project_resource_quota
+                      value: |
+                        apiVersion: v1
+                        kind: ResourceQuota
+                        metadata:
+                          name: project-quota
+                          namespace: {{ namespace }}
+                        spec:
+                          hard:
+                            limits.cpu: {{ projectQuotaCpu }}
+                            limits.memory: {{ projectQuotaMemory }}
+          
+                    - key: ac_spark_role
+                      value: |
+                        apiVersion: rbac.authorization.k8s.io/v1beta1
+                        kind: Role
+                        metadata:
+                          name: spark-role
+                          namespace: {{ namespace }}
+                        rules:
+                        - apiGroups: ["*"]
+                          resources:
+                          - pods
+                          verbs:
+                          - '*'
+                        - apiGroups: ["*"]
+                          resources:
+                          - services
+                          verbs:
+                          - '*'
+                        - apiGroups: ["*"]
+                          resources:
+                          - configmaps
+                          verbs:
+                          - '*'
+          
+                    - key: ad_spark_service_account
+                      value: |
+                        apiVersion: v1
+                        kind: ServiceAccount
+                        metadata:
+                          name: spark
+                          namespace: {{ namespace }}
+          
+                    - key: ae_spark_role_binding
+                      value: |
+                        apiVersion: rbac.authorization.k8s.io/v1beta1
+                        kind: RoleBinding
+                        metadata:
+                          name: spark-role-binding
+                          namespace: {{ namespace }}
+                        roleRef:
+                          apiGroup: rbac.authorization.k8s.io
+                          kind: Role
+                          name: spark-role
+                        subjects:
+                        - kind: ServiceAccount
+                          name: spark
+                          namespace: {{ namespace }}
+          
+                sparkoperator:
+                  enabled: true
+                  plugin_config:
+                    plugins:
+                      spark:
+                        # Edit the Spark configuration as you see fit
+                        spark-config-default:
+                          - spark.driver.cores: "1"
+                          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+                          - spark.kubernetes.allocation.batch.size: "50"
+                          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                          - spark.network.timeout: 600s
+                          - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                          - spark.executor.heartbeatInterval: 60s
+                configmap:
+                  enabled_plugins:
+                    tasks:
+                      task-plugins:
+                        enabled-plugins:
+                          - container
+                          - sidecar
+                          - k8s-array
+                          - spark
+                        default-for-task-types:
+                          container: container
+                          sidecar: sidecar
+                          container_array: k8s-array
+                          spark: spark
+
+            .. group-tab:: Flyte sandbox
+
+              Create a file named ``values-override.yaml`` and add the following config to it:
+
+              .. note::
+
+                Within the flyte-binary block, the value of inline.storage.signedURL.stowConfigOverride.endpoint should be set to the corresponding node Hostname/IP on the MinIO pod if you are deploying on a Kubernetes cluster.
+
+              .. code-block:: yaml
+
+                flyte-binary:
+                  nameOverride: flyte-sandbox
+                  enabled: true
+                  configuration:
+                    database:
+                      host: '{{ printf "%s-postgresql" .Release.Name | trunc 63 | trimSuffix "-" }}'
+                      password: postgres
+                    storage:
+                      metadataContainer: my-s3-bucket
+                      userDataContainer: my-s3-bucket
+                      provider: s3
+                      providerConfig:
+                        s3:
+                          disableSSL: true
+                          v2Signing: true
+                          endpoint: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
+                          authType: accesskey
+                          accessKey: minio
+                          secretKey: miniostorage
+                    logging:
+                      level: 5
+                      plugins:
+                        kubernetes:
+                          enabled: true
+                          templateUri: |-
+                            http://localhost:30080/kubernetes-dashboard/#/log/{{.namespace }}/{{ .podName }}/pod?namespace={{ .namespace }}
+                    inline:
+                      task_resources:
+                        defaults:
+                          cpu: 500m
+                          ephemeralStorage: 0
+                          gpu: 0
+                          memory: 1Gi
+                        limits:
+                          cpu: 0
+                          ephemeralStorage: 0
+                          gpu: 0
+                          memory: 0
+                      storage:
+                        signedURL:
+                          stowConfigOverride:
+                            endpoint: http://localhost:30002
+                      plugins:
+                        k8s:
+                          default-env-vars:
+                            - FLYTE_AWS_ENDPOINT: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
+                            - FLYTE_AWS_ACCESS_KEY_ID: minio
+                            - FLYTE_AWS_SECRET_ACCESS_KEY: miniostorage
+                        spark:
+                          spark-config-default:
+                            - spark.driver.cores: "1"
+                            - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
+                            - spark.hadoop.fs.s3a.endpoint: http://{{ printf "%s-minio" .Release.Name | trunc 63 | trimSuffix "-" }}.{{ .Release.Namespace }}:9000
+                            - spark.hadoop.fs.s3a.access.key: "minio"
+                            - spark.hadoop.fs.s3a.secret.key: "miniostorage"
+                            - spark.hadoop.fs.s3a.path.style.access: "true"
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                    inlineConfigMap: '{{ include "flyte-sandbox.configuration.inlineConfigMap" . }}'
+                  clusterResourceTemplates:
+                    inlineConfigMap: '{{ include "flyte-sandbox.clusterResourceTemplates.inlineConfigMap" . }}'
+                  deployment:
+                    image:
+                      repository: flyte-binary
+                      tag: sandbox
+                      pullPolicy: Never
+                    waitForDB:
+                      image:
+                        repository: bitnami/postgresql
+                        tag: sandbox
+                        pullPolicy: Never
+                  rbac:
+                    # This is strictly NOT RECOMMENDED in production clusters, and is only for use
+                    # within local Flyte sandboxes.
+                    # When using cluster resource templates to create additional namespaced roles,
+                    # Flyte is required to have a superset of those permissions. To simplify
+                    # experimenting with new backend plugins that require additional roles be created
+                    # with cluster resource templates (e.g. Spark), we add the following:
+                    extraRules:
+                      - apiGroups:
+                        - '*'
+                        resources:
+                        - '*'
+                        verbs:
+                        - '*'
+                  enabled_plugins:
+                    tasks:
+                      task-plugins:
+                        enabled-plugins:
+                          - container
+                          - sidecar
+                          - k8s-array
+                          - agent-service
+                          - spark
+                        default-for-task-types:
+                          container: container
+                          sidecar: sidecar
+                          container_array: k8s-array
+                          spark: spark
+
+        .. group-tab:: GCP
+
+          .. tabs::
+
+             .. group-tab:: flyte-binary
+
+
+
+             .. group-tab:: flyte-core                   
 
   .. group-tab:: Dask
    
