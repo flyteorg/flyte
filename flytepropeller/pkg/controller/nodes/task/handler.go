@@ -337,6 +337,9 @@ func (t Handler) ResolvePlugin(ctx context.Context, ttype string, executionConfi
 		logger.Debugf(ctx, "Plugin [%s] resolved for Handler type [%s]", p.GetID(), ttype)
 		return p, nil
 	}
+	if !t.cfg.TaskPlugins.FallbackToContainerHandler {
+		return nil, fmt.Errorf("no plugin defined for Handler type [%s] and fallback-to-container-handler is set to false", ttype)
+	}
 	if t.defaultPlugin != nil {
 		logger.Warnf(ctx, "No plugin found for Handler-type [%s], defaulting to [%s]", ttype, t.defaultPlugin.GetID())
 		return t.defaultPlugin, nil
