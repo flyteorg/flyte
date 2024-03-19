@@ -332,5 +332,5 @@ func TestProjectManager_TestGetProject_ErrorDueToEmptyProjectGetRequest(t *testi
 	_, err := projectManager.GetProject(context.Background(),
 		*mockedProject)
 
-	assert.EqualError(t, err, "project identifier is required")
+	assert.EqualError(t, err, "missing project_id")
 }

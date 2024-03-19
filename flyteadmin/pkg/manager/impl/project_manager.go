@@ -128,8 +128,8 @@ func (m *ProjectManager) UpdateProject(ctx context.Context, projectUpdate admin.
 }
 
 func (m *ProjectManager) GetProject(ctx context.Context, request admin.ProjectGetRequest) (*admin.Project, error) {
-	if request.Id == "" {
-		return nil, errors.NewFlyteAdminErrorf(codes.InvalidArgument, "project identifier is required")
+	if err := validation.ValidateProjectGetRequest(request); err != nil {
+		return nil, err
 	}
 	projectModel, err := m.db.ProjectRepo().Get(ctx, request.Id)
 	if err != nil {
