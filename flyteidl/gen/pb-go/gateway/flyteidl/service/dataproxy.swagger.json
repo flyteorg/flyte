@@ -153,6 +153,41 @@
           "DataProxyService"
         ]
       }
+    },
+    "/api/v1/org/dataproxy/artifact_urn": {
+      "post": {
+        "summary": "CreateUploadLocation creates a signed url to upload artifacts to for a given project/domain.",
+        "description": "Creates a write-only http location that is accessible for tasks at runtime.",
+        "operationId": "DataProxyService_CreateUploadLocation2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/serviceCreateUploadLocationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "CreateUploadLocationRequest specified request for the CreateUploadLocation API.\nThe implementation in data proxy service will create the s3 location with some server side configured prefixes,\nand then:\n  - project/domain/(a deterministic str representation of the content_md5)/filename (if present); OR\n  - project/domain/filename_root (if present)/filename (if present).",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/serviceCreateUploadLocationRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataProxyService"
+        ]
+      }
     }
   },
   "definitions": {
