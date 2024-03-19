@@ -6,7 +6,7 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/config"
 )
 
-const SectionKey = "cache"
+const SectionKey = "cache-server"
 
 //go:generate pflags Config
 

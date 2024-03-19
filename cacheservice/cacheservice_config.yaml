@@ -1,0 +1,28 @@
+# This is a sample configuration file.
+# Real configuration when running inside K8s (local or otherwise) lives in a ConfigMap
+# Look in the artifacts directory in the flyte repo for what's actually run
+logger:
+  level: 5
+cache-server:
+  grpcPort: 8091
+  httpPort: 8090
+  grpcServerReflection: true
+cacheservice:
+  storage-prefix: "cached_outputs"
+  metrics-scope: "cacheservice"
+  profiler-port: 10254
+  heartbeat-grace-period-multiplier: 3
+  max-reservation-heartbeat: 10s
+storage:
+  connection:
+    access-key: minio
+    auth-type: accesskey
+    disable-ssl: true
+    endpoint: http://localhost:9000
+    region: my-region-here
+    secret-key: miniostorage
+  cache:
+    max_size_mbs: 10
+    target_gc_percent: 100
+  container: my-container
+  type: minio

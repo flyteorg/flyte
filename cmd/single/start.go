@@ -5,6 +5,17 @@ import (
 	"net/http"
 	"os"
 
+	_ "github.com/golang/glog"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+	_ "gorm.io/driver/postgres" // Required to import database driver.
+	"sigs.k8s.io/controller-runtime/pkg/cache"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"sigs.k8s.io/controller-runtime/pkg/metrics"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
+
 	cacheserviceConfig "github.com/flyteorg/flyte/cacheservice/pkg/config"
 	"github.com/flyteorg/flyte/cacheservice/pkg/rpc/cacheservice"
 	datacatalogConfig "github.com/flyteorg/flyte/datacatalog/pkg/config"
@@ -29,16 +40,6 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
 	"github.com/flyteorg/flyte/flytestdlib/storage"
-	_ "github.com/golang/glog"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
-	_ "gorm.io/driver/postgres" // Required to import database driver.
-	"sigs.k8s.io/controller-runtime/pkg/cache"
-	"sigs.k8s.io/controller-runtime/pkg/manager"
-	"sigs.k8s.io/controller-runtime/pkg/metrics"
-	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
-	ctrlWebhook "sigs.k8s.io/controller-runtime/pkg/webhook"
 )
 
 const defaultNamespace = "all"
@@ -205,8 +206,8 @@ var startCmd = &cobra.Command{
 		cfg := GetConfig()
 
 		for _, serviceName := range []string{otelutils.AdminClientTracer, otelutils.AdminGormTracer, otelutils.AdminServerTracer,
-			otelutils.BlobstoreClientTracer, otelutils.DataCatalogClientTracer, otelutils.DataCatalogGormTracer,
-			otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
+			otelutils.BlobstoreClientTracer, otelutils.CacheServiceClientTracer, otelutils.DataCatalogClientTracer,
+			otelutils.DataCatalogGormTracer, otelutils.DataCatalogServerTracer, otelutils.FlytePropellerTracer, otelutils.K8sClientTracer} {
 			if err := otelutils.RegisterTracerProvider(serviceName, otelutils.GetConfig()); err != nil {
 				logger.Errorf(ctx, "Failed to create otel tracer provider. %v", err)
 				return err

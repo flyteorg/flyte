@@ -2,6 +2,7 @@ package entrypoints
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"os"
 
@@ -17,6 +18,26 @@ var (
 	cfgFile        string
 	configAccessor = viper.NewAccessor(config.Options{})
 )
+
+func init() {
+	// See https://gist.github.com/nak3/78a32817a8a3950ae48f239a44cd3663
+	// allows `$ cacheservice --logtostderr` to work
+	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+
+	// Add persistent flags - persistent flags persist through all sub-commands
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./cacheservice_config.yaml)")
+
+	RootCmd.AddCommand(viper.GetConfigCommand())
+
+	// Allow viper to read the value of the flags
+	configAccessor.InitializePflags(RootCmd.PersistentFlags())
+
+	err := flag.CommandLine.Parse([]string{})
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
+	}
+}
 
 func Execute() error {
 	if err := RootCmd.Execute(); err != nil {

@@ -51,7 +51,7 @@ func (s *CacheService) ReleaseReservation(ctx context.Context, request *cacheser
 	return s.CacheManager.ReleaseReservation(ctx, request)
 }
 
-func NewCacheService() *CacheService {
+func NewCacheServiceServer() *CacheService {
 	configProvider := runtime.NewConfigurationProvider()
 	cacheServiceConfig := configProvider.ApplicationConfiguration().GetCacheServiceConfig()
 	cacheServiceScope := promutils.NewScope(cacheServiceConfig.MetricsScope).NewSubScope("cacheservice")
@@ -114,7 +114,7 @@ func newGRPCServer(_ context.Context, cfg *config.Config) *grpc.Server {
 			),
 		),
 	)
-	cacheservice.RegisterCacheServiceServer(grpcServer, NewCacheService())
+	cacheservice.RegisterCacheServiceServer(grpcServer, NewCacheServiceServer())
 
 	healthServer := health.NewServer()
 	healthServer.SetServingStatus("", grpc_health_v1.HealthCheckResponse_SERVING)
