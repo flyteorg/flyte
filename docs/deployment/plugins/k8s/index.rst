@@ -456,7 +456,24 @@ Specify plugin configuration
                             - kind: ServiceAccount
                               name: spark
                               namespace: "{{ namespace }}"
-
+                      plugins:
+                        spark:
+                        # Edit the Spark configuration as you see fit
+                          spark-config-default:
+                            - spark.driver.cores: "1"
+                            - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                            - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                            - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                            - spark.network.timeout: 600s
+                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                            - spark.executor.heartbeatInterval: 60s
+                
               2. (Optional) The Spark operator supports Kubernetes ResourceQuota enforcement. If you plan to use it, 
                  set `per-Task resource requests <https://docs.flyte.org/en/latest/user_guide/productionizing/customizing_task_resources.html#customizing-task-resources>`__ that fit into the quota for each project-namespace. A Task without resource requests
                  or limits will be rejected by the K8s scheduler as described `in the docs <https://kubernetes.io/docs/concepts/policy/resource-quotas/>`__.
@@ -481,6 +498,22 @@ Specify plugin configuration
                           - projectQuotaMemory:
                               value: "3000Mi"
 
+                Plus an additional Cluster Resource template to automate the creation of the ``ResourceQuota``:
+
+                .. code-block:: yaml
+
+                    templates:         
+                      - key: ab_project_resource_quota
+                        value: |
+                          apiVersion: v1
+                          kind: ResourceQuota
+                          metadata:
+                            name: project-quota
+                            namespace: {{ namespace }}
+                          spec:
+                            hard:
+                              limits.cpu: {{ projectQuotaCpu }}
+                              limits.memory: {{ projectQuotaMemory }} 
 
               3. Upgrade your Helm release:
 
@@ -488,36 +521,29 @@ Specify plugin configuration
 
                   helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>         
 
-            .. group-tab:: Flyte core
+            .. group-tab:: flyte-core
 
               1. Make sure that your Helm values file includes the following configuration:
       
               .. code-block:: yaml
       
+                configmap:
+                  enabled_plugins:
+                    tasks:
+                      task-plugins:
+                        enabled-plugins:
+                          - container
+                          - sidecar
+                          - k8s-array
+                          - spark
+                        default-for-task-types:
+                          container: container
+                          sidecar: sidecar
+                          container_array: k8s-array
+                          spark: spark
                 cluster_resource_manager:
-                  enabled: true
-                  config:
-                    cluster_resources:
-                      refreshInterval: 5m
-                      templatePath: "/etc/flyte/clusterresource/templates"
-                      customData:
-                        - production:
-                            - projectQuotaCpu:
-                                value: "5"
-                            - projectQuotaMemory:
-                                value: "4000Mi"
-                        - staging:
-                            - projectQuotaCpu:
-                                value: "2"
-                            - projectQuotaMemory:
-                                value: "3000Mi"
-                        - development:
-                            - projectQuotaCpu:
-                                value: "4"
-                            - projectQuotaMemory:
-                                value: "3000Mi"
-                      refresh: 5m
-          
+                  enabled: true 
+                  standalone_deploy: false
                   # -- Resource templates that should be applied
                   templates:
                     # -- Template for namespaces resources
@@ -530,19 +556,6 @@ Specify plugin configuration
                         spec:
                           finalizers:
                           - kubernetes
-          
-                    - key: ab_project_resource_quota
-                      value: |
-                        apiVersion: v1
-                        kind: ResourceQuota
-                        metadata:
-                          name: project-quota
-                          namespace: {{ namespace }}
-                        spec:
-                          hard:
-                            limits.cpu: {{ projectQuotaCpu }}
-                            limits.memory: {{ projectQuotaMemory }}
-          
                     - key: ac_spark_role
                       value: |
                         apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -566,6 +579,11 @@ Specify plugin configuration
                           - configmaps
                           verbs:
                           - '*'
+                        - apiGroups: ["*"]
+                          resources:
+                          - persistentvolumeclaims
+                          verbs:
+                          - "*"
           
                     - key: ad_spark_service_account
                       value: |
@@ -611,28 +629,15 @@ Specify plugin configuration
                           - spark.network.timeout: 600s
                           - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                           - spark.executor.heartbeatInterval: 60s
-                configmap:
-                  enabled_plugins:
-                    tasks:
-                      task-plugins:
-                        enabled-plugins:
-                          - container
-                          - sidecar
-                          - k8s-array
-                          - spark
-                        default-for-task-types:
-                          container: container
-                          sidecar: sidecar
-                          container_array: k8s-array
-                          spark: spark
+                
 
-            .. group-tab:: Flyte sandbox
+            .. group-tab:: flyte-sandbox (on-prem)
 
               Create a file named ``values-override.yaml`` and add the following config to it:
 
               .. note::
 
-                Within the flyte-binary block, the value of inline.storage.signedURL.stowConfigOverride.endpoint should be set to the corresponding node Hostname/IP on the MinIO pod if you are deploying on a Kubernetes cluster.
+                Within the flyte-binary block, the value of ``inline.storage.signedURL.stowConfigOverride.endpoint`` should be set to the corresponding node Hostname/IP on the MinIO pod if you are deploying on a Kubernetes cluster.
 
               .. code-block:: yaml
 
