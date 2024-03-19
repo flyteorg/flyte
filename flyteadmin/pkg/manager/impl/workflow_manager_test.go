@@ -8,10 +8,12 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
+	artifactMocks "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	commonMocks "github.com/flyteorg/flyte/flyteadmin/pkg/common/mocks"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
@@ -25,6 +27,7 @@ import (
 	workflowengineInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	workflowengineMocks "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	"github.com/flyteorg/flyte/flytepropeller/pkg/compiler"
 	engine "github.com/flyteorg/flyte/flytepropeller/pkg/compiler/common"
@@ -270,6 +273,51 @@ func TestCreateWorkflow_DatabaseError(t *testing.T) {
 	response, err := workflowManager.CreateWorkflow(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, response)
+}
+
+func TestCreateWorkflow_ArtifactBehavior(t *testing.T) {
+	// Test that workflows without artifacts do not call the artifacts service upon registration.
+	repository := getMockRepository(false)
+	workflowCreateFunc := func(input models.Workflow, descriptionEntity *models.DescriptionEntity) error {
+		return nil
+	}
+	client := artifactMocks.ArtifactRegistryClient{}
+	client.On("RegisterProducer", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		req := args.Get(1).(*artifactsIdl.RegisterProducerRequest)
+		id := req.Producers[0].EntityId
+		assert.Equal(t, "project", id.Project)
+		assert.Equal(t, "domain", id.Domain)
+		assert.Equal(t, "name", id.Name)
+		assert.Equal(t, "version", id.Version)
+	}).Return(&artifactsIdl.RegisterResponse{}, nil)
+	registry := artifacts.ArtifactRegistry{
+		Client: &client,
+	}
+
+	repository.WorkflowRepo().(*repositoryMocks.MockWorkflowRepo).SetCreateCallback(workflowCreateFunc)
+	mockConfig := getMockWorkflowConfigProvider()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
+	workflowManager := NewWorkflowManager(
+		repository, mockConfig, getMockWorkflowCompiler(), getMockStorage(), storagePrefix,
+		mockScope.NewTestScope(), &registry)
+
+	request := testutils.GetWorkflowRequest()
+	ctx := context.Background()
+	response, err := workflowManager.CreateWorkflow(ctx, request)
+	assert.NoError(t, err)
+	assert.NotNil(t, response)
+	client.AssertNotCalled(t, "RegisterProducer", mock.Anything, mock.Anything, mock.Anything)
+
+	withArtifact := &core.Variable{
+		Type:              &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+		ArtifactPartialId: testutils.GetArtifactID(),
+	}
+	request.Spec.Template.Interface.Outputs.Variables["bar"] = withArtifact
+
+	// But workflows that do have artifacts do call the service
+	_, err = workflowManager.CreateWorkflow(ctx, request)
+	assert.NoError(t, err)
+	client.AssertCalled(t, "RegisterProducer", mock.Anything, mock.Anything)
 }
 
 func TestGetWorkflow(t *testing.T) {

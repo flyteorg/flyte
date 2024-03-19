@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"google.golang.org/grpc/codes"
@@ -133,17 +132,23 @@ func (t *TaskManager) CreateTask(
 			contextWithRuntimeMeta, common.RuntimeVersionKey, finalizedRequest.Spec.Template.Metadata.Runtime.Version)
 		t.metrics.Registered.Inc(contextWithRuntimeMeta)
 	}
+
 	// TODO: Artifact feature gate, remove when ready
-	if t.artifactRegistry.GetClient() != nil {
-		tIfaceCopy := proto.Clone(finalizedRequest.Spec.Template.Interface).(*core.TypedInterface)
-		go func() {
-			ceCtx := context.TODO()
-			if finalizedRequest.Spec.Template.Interface == nil {
-				logger.Debugf(ceCtx, "Task [%+v] has no interface, skipping registration", finalizedRequest.Id)
-				return
+	if t.config.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		if finalizedRequest.GetSpec().GetTemplate().GetInterface().GetOutputs() != nil {
+			// As optimization, iterate over the outputs, if any, and only register interface with artifacts service
+			// if there are any artifact outputs.
+			for _, outputVar := range finalizedRequest.GetSpec().GetTemplate().GetInterface().GetOutputs().GetVariables() {
+				if outputVar.GetArtifactPartialId() != nil {
+					err = t.artifactRegistry.RegisterArtifactProducer(ctx, finalizedRequest.Id, finalizedRequest.GetSpec().GetTemplate().GetInterface())
+					if err != nil {
+						logger.Errorf(ctx, "Failed RegisterArtifactProducer for task [%+v] with err: %v", request.Id, err)
+						return nil, err
+					}
+					break
+				}
 			}
-			t.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
-		}()
+		}
 	}
 
 	return &admin.TaskCreateResponse{}, nil

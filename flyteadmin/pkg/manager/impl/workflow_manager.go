@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/samber/lo"
@@ -227,18 +226,21 @@ func (w *WorkflowManager) CreateWorkflow(
 
 	// Send the interface definition to Artifact service, this is so that it can statically pick up one dimension of
 	// lineage information
-	tIfaceCopy := proto.Clone(workflowClosure.CompiledWorkflow.Primary.Template.Interface).(*core.TypedInterface)
-	// TODO: Artifact feature gate, remove when ready
-	if w.artifactRegistry.GetClient() != nil {
-		go func() {
-			ceCtx := context.TODO()
-			if workflowClosure.CompiledWorkflow == nil || workflowClosure.CompiledWorkflow.Primary == nil {
-				logger.Debugf(ceCtx, "Insufficient fields to submit workflow interface %v", finalizedRequest.Id)
-				return
-			}
 
-			w.artifactRegistry.RegisterArtifactProducer(ceCtx, finalizedRequest.Id, *tIfaceCopy)
-		}()
+	// TODO: Artifact feature gate, remove when ready
+	if w.config.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		if iFace := workflowClosure.GetCompiledWorkflow().GetPrimary().GetTemplate().GetInterface(); iFace != nil {
+			for _, outputVar := range iFace.GetOutputs().GetVariables() {
+				if outputVar.GetArtifactPartialId() != nil {
+					err = w.artifactRegistry.RegisterArtifactProducer(ctx, finalizedRequest.Id, iFace)
+					if err != nil {
+						logger.Errorf(ctx, "Failed RegisterArtifactProducer for workflow [%+v] with err: %v", request.Id, err)
+						return nil, err
+					}
+					break
+				}
+			}
+		}
 	}
 
 	return &admin.WorkflowCreateResponse{}, nil

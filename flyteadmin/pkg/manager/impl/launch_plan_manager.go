@@ -129,16 +129,20 @@ func (m *LaunchPlanManager) CreateLaunchPlan(
 	}
 	m.metrics.SpecSizeBytes.Observe(float64(len(launchPlanModel.Spec)))
 	m.metrics.ClosureSizeBytes.Observe(float64(len(launchPlanModel.Closure)))
+
 	// TODO: Artifact feature gate, remove when ready
-	if m.artifactRegistry.GetClient() != nil {
-		go func() {
-			ceCtx := context.TODO()
-			if launchPlan.Spec.DefaultInputs == nil {
-				logger.Debugf(ceCtx, "Insufficient fields to submit launchplan interface %v", launchPlan.Id)
-				return
+	if m.config.ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts {
+		// As an optimization, run through the interface, and only send to artifacts service it there are artifacts
+		for _, param := range launchPlan.GetSpec().GetDefaultInputs().GetParameters() {
+			if param.GetArtifactId() != nil || param.GetArtifactQuery() != nil {
+				err = m.artifactRegistry.RegisterArtifactConsumer(ctx, launchPlan.Id, launchPlan.Spec.DefaultInputs)
+				if err != nil {
+					logger.Errorf(ctx, "failed RegisterArtifactConsumer for launch plan [%+v] with err: %v", launchPlan.Id, err)
+					return nil, err
+				}
+				break
 			}
-			m.artifactRegistry.RegisterArtifactConsumer(ceCtx, launchPlan.Id, *launchPlan.Spec.DefaultInputs)
-		}()
+		}
 	}
 
 	return &admin.LaunchPlanCreateResponse{}, nil

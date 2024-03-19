@@ -8,9 +8,11 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"google.golang.org/grpc/codes"
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/artifacts"
+	artifactMocks "github.com/flyteorg/flyte/flyteadmin/pkg/artifacts/mocks"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	adminErrors "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/manager/impl/testutils"
@@ -22,6 +24,7 @@ import (
 	workflowengine "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/interfaces"
 	workflowMocks "github.com/flyteorg/flyte/flyteadmin/pkg/workflowengine/mocks"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
+	artifactsIdl "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/artifacts"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/core"
 	mockScope "github.com/flyteorg/flyte/flytestdlib/promutils"
 	"github.com/flyteorg/flyte/flytestdlib/promutils/labeled"
@@ -145,6 +148,64 @@ func TestCreateTask_DatabaseError(t *testing.T) {
 	response, err := taskManager.CreateTask(context.Background(), request)
 	assert.EqualError(t, err, expectedErr.Error())
 	assert.Nil(t, response)
+}
+
+func TestCreateTask_ArtifactBehavior(t *testing.T) {
+	// Test that tasks that don't produce artifacts do not call the artifacts service at registration
+	mockRepository := getMockTaskRepository()
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetGetCallback(
+		func(input interfaces.Identifier) (models.Task, error) {
+			return models.Task{}, errors.New("foo")
+		})
+	client := artifactMocks.ArtifactRegistryClient{}
+	client.On("RegisterProducer", mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		req := args.Get(1).(*artifactsIdl.RegisterProducerRequest)
+		id := req.Producers[0].EntityId
+		assert.Equal(t, "project", id.Project)
+		assert.Equal(t, "domain", id.Domain)
+		assert.Equal(t, "name", id.Name)
+		assert.Equal(t, "version", id.Version)
+	}).Return(&artifactsIdl.RegisterResponse{}, nil)
+
+	registry := artifacts.ArtifactRegistry{
+		Client: &client,
+	}
+	var createCalled bool
+	mockRepository.TaskRepo().(*repositoryMocks.MockTaskRepo).SetCreateCallback(func(input models.Task, descriptionEntity *models.DescriptionEntity) error {
+		createCalled = true
+		return nil
+	})
+	mockRepository.DescriptionEntityRepo().(*repositoryMocks.MockDescriptionEntityRepo).SetGetCallback(
+		func(input interfaces.GetDescriptionEntityInput) (models.DescriptionEntity, error) {
+			return models.DescriptionEntity{}, adminErrors.NewFlyteAdminErrorf(codes.NotFound, "NotFound")
+		})
+	mockConfig := getMockConfigForTaskTest()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
+	taskManager := NewTaskManager(mockRepository, mockConfig, getMockTaskCompiler(),
+		mockScope.NewTestScope(), &registry)
+	request := testutils.GetValidTaskRequest()
+	response, err := taskManager.CreateTask(context.Background(), request)
+	assert.NoError(t, err)
+	assert.Equal(t, &admin.TaskCreateResponse{}, response)
+	assert.True(t, createCalled)
+	client.AssertNotCalled(t, "RegisterProducer", mock.Anything, mock.Anything, mock.Anything)
+
+	withArtifact := &core.Variable{
+		Type:              &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+		ArtifactPartialId: testutils.GetArtifactID(),
+	}
+	ti := &core.TypedInterface{
+		Outputs: &core.VariableMap{
+			Variables: map[string]*core.Variable{
+				"bar": withArtifact,
+			},
+		},
+	}
+	request.Spec.Template.Interface = ti
+	response, err = taskManager.CreateTask(context.Background(), request)
+	client.AssertCalled(t, "RegisterProducer", mock.Anything, mock.Anything, mock.Anything)
+	assert.NoError(t, err)
+	assert.Equal(t, &admin.TaskCreateResponse{}, response)
 }
 
 func TestGetTask(t *testing.T) {

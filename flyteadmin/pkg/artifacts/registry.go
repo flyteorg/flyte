@@ -21,10 +21,14 @@ type ArtifactRegistry struct {
 	Client artifacts.ArtifactRegistryClient
 }
 
-func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *core.Identifier, ti core.TypedInterface) {
+func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *core.Identifier, ti *core.TypedInterface) error {
 	if a == nil || a.Client == nil {
 		logger.Debugf(ctx, "Artifact Client not configured, skipping registration for task [%+v]", id)
-		return
+		return nil
+	}
+	if ti.GetOutputs() == nil {
+		logger.Infof(ctx, "No outputs for [%+v], skipping registration", id)
+		return nil
 	}
 
 	ap := &artifacts.ArtifactProducer{
@@ -36,26 +40,37 @@ func (a *ArtifactRegistry) RegisterArtifactProducer(ctx context.Context, id *cor
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to register artifact producer for task [%+v] with err: %v", id, err)
+		return err
 	}
 	logger.Debugf(ctx, "Registered artifact producer [%+v]", id)
+
+	return nil
 }
 
-func (a *ArtifactRegistry) RegisterArtifactConsumer(ctx context.Context, id *core.Identifier, pm core.ParameterMap) {
+func (a *ArtifactRegistry) RegisterArtifactConsumer(ctx context.Context, id *core.Identifier, pm *core.ParameterMap) error {
 	if a == nil || a.Client == nil {
 		logger.Debugf(ctx, "Artifact Client not configured, skipping registration for consumer [%+v]", id)
-		return
+		return nil
 	}
+	if pm.GetParameters() == nil {
+		logger.Infof(ctx, "No inputs for [%+v], skipping registration", id)
+		return nil
+	}
+
 	ac := &artifacts.ArtifactConsumer{
 		EntityId: id,
-		Inputs:   &pm,
+		Inputs:   pm,
 	}
 	_, err := a.Client.RegisterConsumer(ctx, &artifacts.RegisterConsumerRequest{
 		Consumers: []*artifacts.ArtifactConsumer{ac},
 	})
 	if err != nil {
 		logger.Errorf(ctx, "Failed to register artifact consumer for entity [%+v] with err: %v", id, err)
+		return err
 	}
 	logger.Debugf(ctx, "Registered artifact consumer [%+v]", id)
+
+	return nil
 }
 
 func (a *ArtifactRegistry) RegisterTrigger(ctx context.Context, plan *admin.LaunchPlan) error {

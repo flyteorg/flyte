@@ -340,6 +340,60 @@ func TestCreateLaunchPlanValidateCreate(t *testing.T) {
 	assert.True(t, proto.Equal(expectedResponse, response))
 }
 
+func TestCreateLaunchPlan_ArtifactBehavior(t *testing.T) {
+	// Test that enabling artifacts feature flag will not call RegisterArtifactConsumer if no artifact queries present.
+	repository := getMockRepositoryForLpTest()
+	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(
+		func(input interfaces.Identifier) (models.LaunchPlan, error) {
+			return models.LaunchPlan{}, errors.New("foo")
+		})
+	client := artifactMocks.ArtifactRegistryClient{}
+	registry := artifacts.ArtifactRegistry{
+		Client: &client,
+	}
+
+	client.On("RegisterConsumer", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
+		req := args.Get(1).(*artifactsIdl.RegisterConsumerRequest)
+		id := req.Consumers[0].EntityId
+		assert.Equal(t, "project", id.Project)
+		assert.Equal(t, "domain", id.Domain)
+		assert.Equal(t, "name", id.Name)
+		assert.Equal(t, "version", id.Version)
+	}).Return(&artifactsIdl.RegisterResponse{}, nil)
+
+	setDefaultWorkflowCallbackForLpTest(repository)
+	mockConfig := getMockConfigForLpTest()
+	mockConfig.(*runtimeMocks.MockConfigurationProvider).ApplicationConfiguration().GetTopLevelConfig().FeatureGates.EnableArtifacts = true
+	lpManager := NewLaunchPlanManager(repository, mockConfig, mockScheduler, mockScope.NewTestScope(), &registry)
+	request := testutils.GetLaunchPlanRequest()
+	response, err := lpManager.CreateLaunchPlan(context.Background(), request)
+	assert.Nil(t, err)
+
+	expectedResponse := &admin.LaunchPlanCreateResponse{}
+	assert.True(t, proto.Equal(expectedResponse, response))
+	client.AssertNotCalled(t, "RegisterConsumer", mock.Anything, mock.Anything, mock.Anything)
+
+	// If the launch plan interface has a query however, then the service should be called.
+	aq := &core.Parameter_ArtifactQuery{
+		ArtifactQuery: &core.ArtifactQuery{
+			Identifier: &core.ArtifactQuery_ArtifactId{
+				ArtifactId: testutils.GetArtifactID(),
+			},
+		},
+	}
+	request.GetSpec().GetDefaultInputs().GetParameters()["foo"] = &core.Parameter{
+		Var: &core.Variable{
+			Type: &core.LiteralType{Type: &core.LiteralType_Simple{Simple: core.SimpleType_STRING}},
+		},
+		Behavior: aq,
+	}
+	response, err = lpManager.CreateLaunchPlan(context.Background(), request)
+	assert.Nil(t, err)
+	expectedResponse = &admin.LaunchPlanCreateResponse{}
+	assert.True(t, proto.Equal(expectedResponse, response))
+	client.AssertCalled(t, "RegisterConsumer", mock.Anything, mock.Anything, mock.Anything)
+}
+
 func TestCreateLaunchPlanNoWorkflowInterface(t *testing.T) {
 	repository := getMockRepositoryForLpTest()
 	repository.LaunchPlanRepo().(*repositoryMocks.MockLaunchPlanRepo).SetGetCallback(
