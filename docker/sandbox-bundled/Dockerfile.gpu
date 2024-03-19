@@ -1,0 +1,81 @@
+# syntax=docker/dockerfile:1.4-labs
+
+FROM --platform=${BUILDPLATFORM} mgoltzsche/podman:minimal AS builder
+
+ARG TARGETARCH
+ENV TARGETARCH "${TARGETARCH}"
+
+WORKDIR /build
+
+COPY images/manifest.txt images/preload ./
+RUN --security=insecure ./preload manifest.txt
+
+FROM --platform=${BUILDPLATFORM} golang:1.19-bullseye AS bootstrap
+
+ARG TARGETARCH
+ENV CGO_ENABLED 0
+ENV GOARCH "${TARGETARCH}"
+ENV GOOS linux
+
+WORKDIR /flyteorg/build
+COPY bootstrap/go.mod bootstrap/go.sum ./
+RUN go mod download
+COPY bootstrap/ ./
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/root/go/pkg/mod \
+    go build -o dist/flyte-sandbox-bootstrap cmd/bootstrap/main.go
+# syntax=docker/dockerfile:1.4-labs
+
+#Following 
+FROM nvidia/cuda:12.1.1-base-ubuntu20.04
+
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN apt-get update && \
+    apt-get -y install gnupg2 curl lsb-release && \
+    apt-get clean
+
+# Install NVIDIA Container Runtime
+RUN curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | apt-key add -
+RUN curl -s -L https://nvidia.github.io/nvidia-container-runtime/ubuntu20.04/nvidia-container-runtime.list | tee /etc/apt/sources.list.d/nvidia-container-runtime.list
+RUN apt-get update && \
+    apt-get -y install nvidia-docker2 && \
+    apt-get clean
+
+# Install crictl
+ENV CRICTL_VERSION="v1.26.0" 
+RUN curl -L https://github.com/kubernetes-sigs/cri-tools/releases/download/$CRICTL_VERSION/crictl-${CRICTL_VERSION}-linux-amd64.tar.gz --output crictl-${CRICTL_VERSION}-linux-amd64.tar.gz
+RUN tar zxvf crictl-$CRICTL_VERSION-linux-amd64.tar.gz -C /usr/local/bin
+RUN rm -f crictl-$CRICTL_VERSION-linux-amd64.tar.gz
+
+# Install k3s
+RUN curl -s -L https://github.com/k3s-io/k3s/releases/download/v1.24.9+k3s1/k3s > /usr/bin/k3s
+RUN chmod u+x /usr/bin/k3s
+RUN echo "alias kubectl='k3s kubectl'" >> /root/.bashrc
+
+# Setup containerd for nvidia
+COPY config.toml.tmpl /var/lib/rancher/k3s/agent/etc/containerd/config.toml.tmpl
+ENV CRI_CONFIG_FILE="/var/lib/rancher/k3s/agent/etc/crictl.yaml"
+
+# ENV that signals this container should have gpu enabled
+ENV FLYTE_GPU "ENABLED"
+
+ARG TARGETARCH
+
+ARG FLYTE_SANDBOX_VERSION
+ENV FLYTE_SANDBOX_VERSION "${FLYTE_SANDBOX_VERSION}"
+
+COPY --from=builder /build/images/ /var/lib/rancher/k3s/agent/images/
+COPY images/tar/${TARGETARCH}/ /var/lib/rancher/k3s/agent/images/
+COPY manifests/ /var/lib/rancher/k3s/server/manifests-staging/
+COPY bin/ /bin/
+
+COPY --from=bootstrap /flyteorg/build/dist/flyte-sandbox-bootstrap /bin/
+
+VOLUME /var/lib/kubelet
+VOLUME /var/lib/rancher/k3s
+VOLUME /var/lib/cni
+VOLUME /var/log
+
+
+ENTRYPOINT [ "/bin/k3d-entrypoint.sh" ]
+CMD [ "server", "--disable=traefik", "--disable=servicelb" ]
