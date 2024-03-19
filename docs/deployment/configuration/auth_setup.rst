@@ -345,13 +345,13 @@ Apply OIDC Configuration
          
          secrets:
            adminOauthClientCredentials:
-             # If mount is true, helm will mount `flyte-secret-auth`.
-             # If mount is false, helm will not mount `flyte-secret-auth`.
              # If create is true, helm will create the `flyte-secret-auth`.
              # If create is false, it's up to the user to create `flyte-secret-auth` as described in
              # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
-             mount: true
+             # If mount is true, helm will mount `flyte-secret-auth`.
+             # If mount is false, helm will not mount `flyte-secret-auth`.
              create: true
+             mount: true
            # Use the non-encoded version of the random password 
              clientSecret: "<your-random-password>" 
              clientId: flytepropeller
@@ -601,8 +601,8 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
    
          secrets:
            adminOauthClientCredentials:
-             mount: true
              create: true # see the section "Disable Helm secret management" if you require to do so
+             mount: true
              # Replace with the client_secret provided by your IdP for flytepropeller.
              clientSecret: <client_secret>
              # Replace with the client_id provided by provided by your IdP for flytepropeller.
@@ -621,8 +621,8 @@ Follow the steps in this section to configure `flyteadmin` to use an external au
 
          secrets:
          adminOauthClientCredentials:
-            mount: true
             create: true
+            mount: true
             clientSecret: <client secret>
             clientId: <client id>
          ---
@@ -679,8 +679,8 @@ Alternatively, you can instruct Helm not to create and manage the secret for ``f
 
    secrets:
      adminOauthClientCredentials:
-       mount: true # mount the flyte-secret-auth secret to the flytepropeller.
        create: false # set to false
+       mount: true # mount the flyte-secret-auth secret to the flytepropeller.
        # Replace with the client_id provided by provided by your IdP for flytepropeller.
        clientId: <client_id> 
 

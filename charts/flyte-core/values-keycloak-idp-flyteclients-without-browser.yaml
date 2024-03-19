@@ -298,13 +298,13 @@ deployRedoc: false
 
 secrets:
   adminOauthClientCredentials:
-    # If mount is true, helm will mount `flyte-secret-auth`.
-    # If mount is false, helm will not mount `flyte-secret-auth`.
     # If create is true, helm will create the `flyte-secret-auth`.
     # If create is false, it's up to the user to create `flyte-secret-auth` as described in
     # https://docs.flyte.org/en/latest/deployment/cluster_config/auth_setup.html#oauth2-authorization-server
-    mount: true
+    # If mount is true, helm will mount `flyte-secret-auth`.
+    # If mount is false, helm will not mount `flyte-secret-auth`.
     create: true
+    mount: true
     clientSecret: "<>" # put the secret for the confidential client flytepropeller defined in the IDP
     clientId: "flytepropeller" #use this client id and secret in the flytectl config with ClientSecret option
 
