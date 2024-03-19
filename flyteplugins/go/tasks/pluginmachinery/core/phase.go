@@ -226,7 +226,7 @@ func PhaseInfoQueued(t time.Time, version uint32, reason string) PhaseInfo {
 	return pi
 }
 
-func PhaseInfoQueuedWithTaskInfo(version uint32, reason string, info *TaskInfo) PhaseInfo {
+func PhaseInfoQueuedWithTaskInfo(t time.Time, version uint32, reason string, info *TaskInfo) PhaseInfo {
 	pi := phaseInfo(PhaseQueued, version, nil, info, false)
 	pi.reason = reason
 	return pi

@@ -372,6 +372,22 @@ func mergeMetadata(existing, latest *event.TaskExecutionMetadata) *event.TaskExe
 	return existing
 }
 
+func filterLogsByPhase(logs []*core.TaskLog, phase core.TaskExecution_Phase) []*core.TaskLog {
+	filteredLogs := make([]*core.TaskLog, 0, len(logs))
+
+	for _, l := range logs {
+		if common.IsTaskExecutionTerminal(phase) && l.HideOnceFinished {
+			continue
+		}
+		if phase == core.TaskExecution_QUEUED && !l.ShowWhilePending {
+			continue
+		}
+		filteredLogs = append(filteredLogs, l)
+
+	}
+	return filteredLogs
+}
+
 func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionEventRequest, taskExecutionModel *models.TaskExecution,
 	inlineEventDataPolicy interfaces.InlineEventDataPolicy, storageClient *storage.DataStore) error {
 	err := handleTaskExecutionInputs(ctx, taskExecutionModel, request, storageClient)
@@ -393,7 +409,11 @@ func UpdateTaskExecutionModel(ctx context.Context, request *admin.TaskExecutionE
 		reportedAt = request.Event.OccurredAt
 	}
 	taskExecutionClosure.UpdatedAt = reportedAt
-	taskExecutionClosure.Logs = mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
+
+	mergedLogs := mergeLogs(taskExecutionClosure.Logs, request.Event.Logs)
+	filteredLogs := filterLogsByPhase(mergedLogs, request.Event.Phase)
+	taskExecutionClosure.Logs = filteredLogs
+
 	if len(request.Event.Reasons) > 0 {
 		for _, reason := range request.Event.Reasons {
 			taskExecutionClosure.Reasons = append(
