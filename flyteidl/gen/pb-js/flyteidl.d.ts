@@ -17812,6 +17812,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectGetRequest. */
+        interface IProjectGetRequest {
+
+            /** ProjectGetRequest id */
+            id?: (string|null);
+        }
+
+        /** Represents a ProjectGetRequest. */
+        class ProjectGetRequest implements IProjectGetRequest {
+
+            /**
+             * Constructs a new ProjectGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectGetRequest);
+
+            /** ProjectGetRequest id. */
+            public id: string;
+
+            /**
+             * Creates a new ProjectGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectGetRequest): flyteidl.admin.ProjectGetRequest;
+
+            /**
+             * Encodes the specified ProjectGetRequest message. Does not implicitly {@link flyteidl.admin.ProjectGetRequest.verify|verify} messages.
+             * @param message ProjectGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectGetRequest;
+
+            /**
+             * Verifies a ProjectGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ProjectAttributes. */
         interface IProjectAttributes {
 
@@ -21433,6 +21485,20 @@ export namespace flyteidl {
             public updateProject(request: flyteidl.admin.IProject): Promise<flyteidl.admin.ProjectUpdateResponse>;
 
             /**
+             * Calls GetProject.
+             * @param request ProjectGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and Project
+             */
+            public getProject(request: flyteidl.admin.IProjectGetRequest, callback: flyteidl.service.AdminService.GetProjectCallback): void;
+
+            /**
+             * Calls GetProject.
+             * @param request ProjectGetRequest message or plain object
+             * @returns Promise
+             */
+            public getProject(request: flyteidl.admin.IProjectGetRequest): Promise<flyteidl.admin.Project>;
+
+            /**
              * Calls ListProjects.
              * @param request ProjectListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and Projects
@@ -21980,6 +22046,13 @@ export namespace flyteidl {
              * @param [response] ProjectUpdateResponse
              */
             type UpdateProjectCallback = (error: (Error|null), response?: flyteidl.admin.ProjectUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getProject}.
+             * @param error Error, if any
+             * @param [response] Project
+             */
+            type GetProjectCallback = (error: (Error|null), response?: flyteidl.admin.Project) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listProjects}.

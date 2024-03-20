@@ -364,3 +364,15 @@ func TestValidateProjectExistsDb(t *testing.T) {
 		assert.Error(t, err)
 	})
 }
+
+func TestValidateProjectGetRequest(t *testing.T) {
+	t.Run("base case", func(t *testing.T) {
+		assert.Nil(t, ValidateProjectGetRequest(admin.ProjectGetRequest{
+			Id: "project-id",
+		}))
+	})
+
+	t.Run("missing project id", func(t *testing.T) {
+		assert.EqualError(t, ValidateProjectGetRequest(admin.ProjectGetRequest{}), "missing project_id")
+	})
+}
