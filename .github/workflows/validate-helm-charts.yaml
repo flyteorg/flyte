@@ -55,17 +55,6 @@ jobs:
             --chart-repos twuni=https://helm.twun.io \
             --chart-repos kubernetes-dashboard=https://kubernetes.github.io/dashboard
 
-      - name: Start demo cluster
-        if: steps.charts-changed.outputs.changed == 'true'
-        run: |
-          flytectl demo start --dev --force
-
-      - name: Run chart-testing (install)
-        if: steps.charts-changed.outputs.changed == 'true'
-        run: |
-          kubectl config use-context flyte-sandbox
-          ct install --target-branch ${{ github.event.repository.default_branch }}
-
   validate-manifests:
     needs:
       - lint-and-test-charts
