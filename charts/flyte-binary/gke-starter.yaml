@@ -79,6 +79,13 @@ configuration:
     plugins:
       k8s:
         inject-finalizer: true
+        gpu-device-node-label: cloud.google.com/gke-accelerator
+        resource-tolerations:
+          - nvidia.com/gpu:
+            - key: "nvidia.com/gpu"
+              operator: "Equal"
+              value: "present"
+              effect: "NoSchedule"
     # Configuration for the Datacatalog engine, used when caching is enabled
     # Learn more: https://docs.flyte.org/en/latest/deployment/configuration/generated/datacatalog_config.html  
     storage:
