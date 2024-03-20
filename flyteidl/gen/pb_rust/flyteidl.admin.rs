@@ -385,8 +385,6 @@ impl State {
 pub struct ClusterAssignment {
     #[prost(string, tag="3")]
     pub cluster_pool_name: ::prost::alloc::string::String,
-    #[prost(string, tag="4")]
-    pub execution_cluster_label_name: ::prost::alloc::string::String,
 }
 /// Encapsulation of fields that identifies a Flyte resource.
 /// A Flyte resource can be a task, workflow or launch plan.

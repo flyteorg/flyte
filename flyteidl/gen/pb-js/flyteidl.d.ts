@@ -10488,9 +10488,6 @@ export namespace flyteidl {
 
             /** ClusterAssignment clusterPoolName */
             clusterPoolName?: (string|null);
-
-            /** ClusterAssignment executionClusterLabelName */
-            executionClusterLabelName?: (string|null);
         }
 
         /** Represents a ClusterAssignment. */
@@ -10504,9 +10501,6 @@ export namespace flyteidl {
 
             /** ClusterAssignment clusterPoolName. */
             public clusterPoolName: string;
-
-            /** ClusterAssignment executionClusterLabelName. */
-            public executionClusterLabelName: string;
 
             /**
              * Creates a new ClusterAssignment instance using the specified properties.
