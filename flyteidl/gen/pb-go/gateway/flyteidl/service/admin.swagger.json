@@ -4522,9 +4522,6 @@
       "properties": {
         "cluster_pool_name": {
           "type": "string"
-        },
-        "execution_cluster_label_name": {
-          "type": "string"
         }
       },
       "description": "Encapsulates specifications for routing an execution onto a specific cluster."

@@ -315,8 +315,8 @@ func TestRandomClusterSelectorGetTargetWithExecutionClusterLabelClusterAssignmen
 		Domain:      "different",
 		Workflow:    testWorkflow,
 		ExecutionID: "e3",
-		ClusterAssignment: &admin.ClusterAssignment{
-			ExecutionClusterLabelName: "one",
+		ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+			Value: "one",
 		},
 	})
 	assert.Nil(t, err)
@@ -331,8 +331,8 @@ func TestRandomClusterSelectorGetTargetWithExecutionClusterLabelClusterAssignmen
 		Domain:      "different",
 		Workflow:    testWorkflow,
 		ExecutionID: "e3",
-		ClusterAssignment: &admin.ClusterAssignment{
-			ExecutionClusterLabelName: "three",
+		ExecutionClusterLabel: &admin.ExecutionClusterLabel{
+			Value: "three",
 		},
 	})
 	assert.Nil(t, err)

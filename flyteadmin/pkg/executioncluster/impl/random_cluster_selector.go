@@ -98,8 +98,8 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 
 	var label string
 
-	if spec.ClusterAssignment != nil && spec.ClusterAssignment.ExecutionClusterLabelName != "" {
-		label = spec.ClusterAssignment.ExecutionClusterLabelName
+	if spec.ExecutionClusterLabel != nil && spec.ExecutionClusterLabel.Value != "" {
+		label = spec.ExecutionClusterLabel.Value
 	} else {
 		resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
 			Project:      spec.Project,

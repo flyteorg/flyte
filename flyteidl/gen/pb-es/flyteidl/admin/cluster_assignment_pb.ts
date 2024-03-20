@@ -17,11 +17,6 @@ export class ClusterAssignment extends Message<ClusterAssignment> {
    */
   clusterPoolName = "";
 
-  /**
-   * @generated from field: string execution_cluster_label_name = 4;
-   */
-  executionClusterLabelName = "";
-
   constructor(data?: PartialMessage<ClusterAssignment>) {
     super();
     proto3.util.initPartial(data, this);
@@ -31,7 +26,6 @@ export class ClusterAssignment extends Message<ClusterAssignment> {
   static readonly typeName = "flyteidl.admin.ClusterAssignment";
   static readonly fields: FieldList = proto3.util.newFieldList(() => [
     { no: 3, name: "cluster_pool_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 4, name: "execution_cluster_label_name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ClusterAssignment {
