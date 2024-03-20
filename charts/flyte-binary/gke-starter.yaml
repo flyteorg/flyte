@@ -80,6 +80,7 @@ configuration:
       k8s:
         inject-finalizer: true
         gpu-device-node-label: cloud.google.com/gke-accelerator
+        gpu-partition-size-node-label: cloud.google.com/gke-gpu-partition-size
         resource-tolerations:
           - nvidia.com/gpu:
             - key: "nvidia.com/gpu"
