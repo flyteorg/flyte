@@ -56,6 +56,47 @@ func (_m *ArtifactManager) CreateArtifact(ctx context.Context, request *datacata
 	return r0, r1
 }
 
+type ArtifactManager_DeleteArtifact struct {
+	*mock.Call
+}
+
+func (_m ArtifactManager_DeleteArtifact) Return(_a0 *datacatalog.DeleteArtifactResponse, _a1 error) *ArtifactManager_DeleteArtifact {
+	return &ArtifactManager_DeleteArtifact{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *ArtifactManager) OnDeleteArtifact(ctx context.Context, request *datacatalog.DeleteArtifactRequest) *ArtifactManager_DeleteArtifact {
+	c_call := _m.On("DeleteArtifact", ctx, request)
+	return &ArtifactManager_DeleteArtifact{Call: c_call}
+}
+
+func (_m *ArtifactManager) OnDeleteArtifactMatch(matchers ...interface{}) *ArtifactManager_DeleteArtifact {
+	c_call := _m.On("DeleteArtifact", matchers...)
+	return &ArtifactManager_DeleteArtifact{Call: c_call}
+}
+
+// DeleteArtifact provides a mock function with given fields: ctx, request
+func (_m *ArtifactManager) DeleteArtifact(ctx context.Context, request *datacatalog.DeleteArtifactRequest) (*datacatalog.DeleteArtifactResponse, error) {
+	ret := _m.Called(ctx, request)
+
+	var r0 *datacatalog.DeleteArtifactResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *datacatalog.DeleteArtifactRequest) *datacatalog.DeleteArtifactResponse); ok {
+		r0 = rf(ctx, request)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*datacatalog.DeleteArtifactResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *datacatalog.DeleteArtifactRequest) error); ok {
+		r1 = rf(ctx, request)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type ArtifactManager_GetArtifact struct {
 	*mock.Call
 }

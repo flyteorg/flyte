@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/flyteorg/flyte/datacatalog/pkg/errors"
+	"github.com/flyteorg/flyte/datacatalog/pkg/manager/impl/validators"
 	"github.com/flyteorg/flyte/datacatalog/pkg/manager/interfaces"
 	"github.com/flyteorg/flyte/datacatalog/pkg/repositories"
 	repo_errors "github.com/flyteorg/flyte/datacatalog/pkg/repositories/errors"
@@ -36,7 +37,7 @@ type reservationManager struct {
 	systemMetrics                  reservationMetrics
 }
 
-// Creates a new reservation manager with the specified properties
+// NewReservationManager creates a new reservation manager with the specified properties
 func NewReservationManager(
 	repo repositories.RepositoryInterface,
 	heartbeatGracePeriodMultiplier time.Duration,
@@ -85,9 +86,15 @@ func NewReservationManager(
 	}
 }
 
-// Attempt to acquire a reservation for the specified artifact. If there is not active reservation, successfully
-// acquire it. If you are the owner of the active reservation, extend it. If another owner, return the existing reservation.
+// GetOrExtendReservation attempts to acquire a reservation for the specified artifact. If there is no active
+// reservation, successfully acquire it. If you are the owner of the active reservation, extend it. If another owner,
+// return the existing reservation.
 func (r *reservationManager) GetOrExtendReservation(ctx context.Context, request *datacatalog.GetOrExtendReservationRequest) (*datacatalog.GetOrExtendReservationResponse, error) {
+	if err := validators.ValidateGetOrExtendReservationRequest(request); err != nil {
+		r.systemMetrics.acquireReservationFailure.Inc(ctx)
+		return nil, err
+	}
+
 	reservationID := request.ReservationId
 
 	// Use minimum of maxHeartbeatInterval and requested heartbeat interval
@@ -186,8 +193,12 @@ func (r *reservationManager) tryAcquireReservation(ctx context.Context, reservat
 	return reservation, nil
 }
 
-// Release an active reservation with the specified owner. If one does not exist, gracefully return.
+// ReleaseReservation releases an active reservation with the specified owner. If one does not exist, gracefully return.
 func (r *reservationManager) ReleaseReservation(ctx context.Context, request *datacatalog.ReleaseReservationRequest) (*datacatalog.ReleaseReservationResponse, error) {
+	if err := validators.ValidateReleaseReservationRequest(request); err != nil {
+		return nil, err
+	}
+
 	repo := r.repo.ReservationRepo()
 	reservationKey := transformers.FromReservationID(request.ReservationId)
 

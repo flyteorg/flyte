@@ -394,6 +394,7 @@ func TestCreateExecution(t *testing.T) {
 		Id: &executionIdentifier,
 	}
 	assert.Nil(t, err)
+
 	assert.True(t, proto.Equal(expectedResponse.Id, response.Id))
 
 	// TODO: Check for offloaded inputs

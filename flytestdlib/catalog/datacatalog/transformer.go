@@ -29,7 +29,7 @@ func getDatasetNameFromTask(taskID core.Identifier) string {
 	return fmt.Sprintf("%s-%s", taskNamespace, taskID.Name)
 }
 
-// Transform the artifact Data into task execution outputs as a literal map
+// GenerateTaskOutputsFromArtifact transforms the artifact Data into task execution outputs as a literal map
 func GenerateTaskOutputsFromArtifact(id core.Identifier, taskInterface core.TypedInterface, artifact *datacatalog.Artifact) (*core.LiteralMap, error) {
 
 	// if there are no outputs in the task, return empty map
@@ -124,9 +124,9 @@ func GenerateArtifactTagName(ctx context.Context, inputs *core.LiteralMap, cache
 	return tag, nil
 }
 
-// Get the DataSetID for a task.
+// GenerateDatasetIDForTask returns the DataSetID for a task.
 // NOTE: the version of the task is a combination of both the discoverable_version and the task signature.
-// This is because the interface may of changed even if the discoverable_version hadn't.
+// This is because the interface may have changed even if the discoverable_version hadn't.
 func GenerateDatasetIDForTask(ctx context.Context, k catalog.Key) (*datacatalog.DatasetID, error) {
 	datasetVersion, err := generateDataSetVersionFromTask(ctx, k.TypedInterface, k.CacheVersion)
 	if err != nil {
@@ -149,6 +149,18 @@ func DatasetIDToIdentifier(id *datacatalog.DatasetID) *core.Identifier {
 	return &core.Identifier{ResourceType: core.ResourceType_DATASET, Name: id.Name, Project: id.Project, Domain: id.Domain, Version: id.Version}
 }
 
+func IdentifierToDatasetID(identifier *core.Identifier) *datacatalog.DatasetID {
+	if identifier == nil {
+		return nil
+	}
+	return &datacatalog.DatasetID{
+		Project: identifier.Project,
+		Name:    identifier.Name,
+		Domain:  identifier.Domain,
+		Version: identifier.Version,
+	}
+}
+
 // With Node-Node relationship this is bound to change. So lets keep it extensible
 const (
 	taskVersionKey     = "task-version"
@@ -159,6 +171,7 @@ const (
 	execTaskAttemptKey = "exec-attempt"
 )
 
+// GetDatasetMetadataForSource returns the dataset metadata for the given task execution.
 // Understanding Catalog Identifiers
 // DatasetID represents the ID of the dataset. For Flyte this represents the ID of the generating task and the version calculated as the hash of the interface & cache version. refer to `GenerateDatasetIDForTask`
 // TaskID is the same as the DatasetID + name: (DataSetID - namespace) + task version which is stored in the metadata
@@ -229,7 +242,7 @@ func GetSourceFromMetadata(datasetMd, artifactMd *datacatalog.Metadata, currentI
 	}, nil
 }
 
-// Given the Catalog Information (returned from a Catalog call), returns the CatalogMetadata that is populated in the event.
+// EventCatalogMetadata returns the CatalogMetadata that is populated in the event, given the Catalog Information (returned from a Catalog call).
 func EventCatalogMetadata(datasetID *datacatalog.DatasetID, tag *datacatalog.Tag, sourceID *core.TaskExecutionIdentifier) *core.CatalogMetadata {
 	md := &core.CatalogMetadata{
 		DatasetId: DatasetIDToIdentifier(datasetID),
@@ -251,7 +264,7 @@ func EventCatalogMetadata(datasetID *datacatalog.DatasetID, tag *datacatalog.Tag
 	return md
 }
 
-// Returns a default value, if the given key is not found in the map, else returns the value in the map
+// GetOrDefault returns a default value, if the given key is not found in the map, else returns the value in the map
 func GetOrDefault(m map[string]string, key, defaultValue string) string {
 	v, ok := m[key]
 	if !ok {

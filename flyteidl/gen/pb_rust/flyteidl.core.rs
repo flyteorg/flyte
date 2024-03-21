@@ -3017,6 +3017,85 @@ pub struct ErrorDocument {
     #[prost(message, optional, tag="1")]
     pub error: ::core::option::Option<ContainerError>,
 }
+/// Error returned if eviction of cached output fails and should be re-tried by the user.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CacheEvictionError {
+    /// Error code to match type of cache eviction error encountered.
+    #[prost(enumeration="cache_eviction_error::Code", tag="1")]
+    pub code: i32,
+    /// More detailed error message explaining the reason for the cache eviction failure.
+    #[prost(string, tag="2")]
+    pub message: ::prost::alloc::string::String,
+    /// ID of the node execution the cache eviction failed for.
+    #[prost(message, optional, tag="3")]
+    pub node_execution_id: ::core::option::Option<NodeExecutionIdentifier>,
+    /// Source of the node execution.
+    #[prost(oneof="cache_eviction_error::Source", tags="4, 5")]
+    pub source: ::core::option::Option<cache_eviction_error::Source>,
+}
+/// Nested message and enum types in `CacheEvictionError`.
+pub mod cache_eviction_error {
+    /// Defines codes for distinguishing between errors encountered during cache eviction.
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
+    #[repr(i32)]
+    pub enum Code {
+        /// Indicates a generic internal error occurred.
+        Internal = 0,
+        /// Indicates no reservation could be acquired before deleting an artifact.
+        ReservationNotAcquired = 1,
+        /// Indicates updating the database entry related to the node execution failed.
+        DatabaseUpdateFailed = 2,
+        /// Indicates deleting the artifact from datacatalog failed.
+        ArtifactDeleteFailed = 3,
+        /// Indicates the reservation previously acquired could not be released for an artifact.
+        ReservationNotReleased = 4,
+    }
+    impl Code {
+        /// String value of the enum field names used in the ProtoBuf definition.
+        ///
+        /// The values are not transformed in any way and thus are considered stable
+        /// (if the ProtoBuf definition does not change) and safe for programmatic use.
+        pub fn as_str_name(&self) -> &'static str {
+            match self {
+                Code::Internal => "INTERNAL",
+                Code::ReservationNotAcquired => "RESERVATION_NOT_ACQUIRED",
+                Code::DatabaseUpdateFailed => "DATABASE_UPDATE_FAILED",
+                Code::ArtifactDeleteFailed => "ARTIFACT_DELETE_FAILED",
+                Code::ReservationNotReleased => "RESERVATION_NOT_RELEASED",
+            }
+        }
+        /// Creates an enum from field names used in the ProtoBuf definition.
+        pub fn from_str_name(value: &str) -> ::core::option::Option<Self> {
+            match value {
+                "INTERNAL" => Some(Self::Internal),
+                "RESERVATION_NOT_ACQUIRED" => Some(Self::ReservationNotAcquired),
+                "DATABASE_UPDATE_FAILED" => Some(Self::DatabaseUpdateFailed),
+                "ARTIFACT_DELETE_FAILED" => Some(Self::ArtifactDeleteFailed),
+                "RESERVATION_NOT_RELEASED" => Some(Self::ReservationNotReleased),
+                _ => None,
+            }
+        }
+    }
+    /// Source of the node execution.
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum Source {
+        /// ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+        #[prost(message, tag="4")]
+        TaskExecutionId(super::TaskExecutionIdentifier),
+        /// ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+        #[prost(message, tag="5")]
+        WorkflowExecutionId(super::WorkflowExecutionIdentifier),
+    }
+}
+/// List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct CacheEvictionErrorList {
+    #[prost(message, repeated, tag="1")]
+    pub errors: ::prost::alloc::vec::Vec<CacheEvictionError>,
+}
 /// Defines an enclosed package of workflow and tasks it references.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

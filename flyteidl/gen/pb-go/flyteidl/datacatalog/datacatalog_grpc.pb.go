@@ -27,6 +27,7 @@ const (
 	DataCatalog_ListArtifacts_FullMethodName          = "/datacatalog.DataCatalog/ListArtifacts"
 	DataCatalog_ListDatasets_FullMethodName           = "/datacatalog.DataCatalog/ListDatasets"
 	DataCatalog_UpdateArtifact_FullMethodName         = "/datacatalog.DataCatalog/UpdateArtifact"
+	DataCatalog_DeleteArtifact_FullMethodName         = "/datacatalog.DataCatalog/DeleteArtifact"
 	DataCatalog_GetOrExtendReservation_FullMethodName = "/datacatalog.DataCatalog/GetOrExtendReservation"
 	DataCatalog_ReleaseReservation_FullMethodName     = "/datacatalog.DataCatalog/ReleaseReservation"
 )
@@ -53,6 +54,8 @@ type DataCatalogClient interface {
 	ListDatasets(ctx context.Context, in *ListDatasetsRequest, opts ...grpc.CallOption) (*ListDatasetsResponse, error)
 	// Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
 	UpdateArtifact(ctx context.Context, in *UpdateArtifactRequest, opts ...grpc.CallOption) (*UpdateArtifactResponse, error)
+	// Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+	DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error)
 	// Attempts to get or extend a reservation for the corresponding artifact. If one already exists
 	// (ie. another entity owns the reservation) then that reservation is retrieved.
 	// Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -150,6 +153,15 @@ func (c *dataCatalogClient) UpdateArtifact(ctx context.Context, in *UpdateArtifa
 	return out, nil
 }
 
+func (c *dataCatalogClient) DeleteArtifact(ctx context.Context, in *DeleteArtifactRequest, opts ...grpc.CallOption) (*DeleteArtifactResponse, error) {
+	out := new(DeleteArtifactResponse)
+	err := c.cc.Invoke(ctx, DataCatalog_DeleteArtifact_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *dataCatalogClient) GetOrExtendReservation(ctx context.Context, in *GetOrExtendReservationRequest, opts ...grpc.CallOption) (*GetOrExtendReservationResponse, error) {
 	out := new(GetOrExtendReservationResponse)
 	err := c.cc.Invoke(ctx, DataCatalog_GetOrExtendReservation_FullMethodName, in, out, opts...)
@@ -190,6 +202,8 @@ type DataCatalogServer interface {
 	ListDatasets(context.Context, *ListDatasetsRequest) (*ListDatasetsResponse, error)
 	// Updates an existing artifact, overwriting the stored artifact data in the underlying blob storage.
 	UpdateArtifact(context.Context, *UpdateArtifactRequest) (*UpdateArtifactResponse, error)
+	// Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+	DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error)
 	// Attempts to get or extend a reservation for the corresponding artifact. If one already exists
 	// (ie. another entity owns the reservation) then that reservation is retrieved.
 	// Once you acquire a reservation, you need to  periodically extend the reservation with an
@@ -234,6 +248,9 @@ func (UnimplementedDataCatalogServer) ListDatasets(context.Context, *ListDataset
 }
 func (UnimplementedDataCatalogServer) UpdateArtifact(context.Context, *UpdateArtifactRequest) (*UpdateArtifactResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateArtifact not implemented")
+}
+func (UnimplementedDataCatalogServer) DeleteArtifact(context.Context, *DeleteArtifactRequest) (*DeleteArtifactResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteArtifact not implemented")
 }
 func (UnimplementedDataCatalogServer) GetOrExtendReservation(context.Context, *GetOrExtendReservationRequest) (*GetOrExtendReservationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrExtendReservation not implemented")
@@ -397,6 +414,24 @@ func _DataCatalog_UpdateArtifact_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataCatalog_DeleteArtifact_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteArtifactRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataCatalogServer).DeleteArtifact(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataCatalog_DeleteArtifact_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataCatalogServer).DeleteArtifact(ctx, req.(*DeleteArtifactRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _DataCatalog_GetOrExtendReservation_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetOrExtendReservationRequest)
 	if err := dec(in); err != nil {
@@ -471,6 +506,10 @@ var DataCatalog_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateArtifact",
 			Handler:    _DataCatalog_UpdateArtifact_Handler,
+		},
+		{
+			MethodName: "DeleteArtifact",
+			Handler:    _DataCatalog_DeleteArtifact_Handler,
 		},
 		{
 			MethodName: "GetOrExtendReservation",

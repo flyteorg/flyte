@@ -592,6 +592,10 @@
       },
       "title": "Dataset properties we can filter by"
     },
+    "datacatalogDeleteArtifactResponse": {
+      "type": "object",
+      "description": "Response message for deleting an Artifact."
+    },
     "datacatalogFilterExpression": {
       "type": "object",
       "properties": {

@@ -225,6 +225,88 @@ RPCs defined in this service must be anonymously accessible.
 
 
 
+.. _ref_flyteidl/service/cache.proto:
+
+flyteidl/service/cache.proto
+==================================================================
+
+
+
+
+
+.. _ref_flyteidl.service.EvictCacheResponse:
+
+EvictCacheResponse
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: EvictCacheResponse type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "errors", ":ref:`ref_flyteidl.core.CacheEvictionErrorList`", "", "List of errors encountered during cache eviction (if any)."
+
+
+
+
+
+
+
+.. _ref_flyteidl.service.EvictTaskExecutionCacheRequest:
+
+EvictTaskExecutionCacheRequest
+------------------------------------------------------------------
+
+
+
+
+
+.. csv-table:: EvictTaskExecutionCacheRequest type fields
+   :header: "Field", "Type", "Label", "Description"
+   :widths: auto
+
+   "task_execution_id", ":ref:`ref_flyteidl.core.TaskExecutionIdentifier`", "", "Identifier of :ref:`ref_flyteidl.admin.TaskExecution` to evict cache for."
+
+
+
+
+
+
+..
+   end messages
+
+
+..
+   end enums
+
+
+..
+   end HasExtensions
+
+
+
+.. _ref_flyteidl.service.CacheService:
+
+CacheService
+------------------------------------------------------------------
+
+CacheService defines an RPC Service for interacting with cached data in Flyte on a high level basis.
+
+.. csv-table:: CacheService service methods
+   :header: "Method Name", "Request Type", "Response Type", "Description"
+   :widths: auto
+
+   "EvictTaskExecutionCache", ":ref:`ref_flyteidl.service.EvictTaskExecutionCacheRequest`", ":ref:`ref_flyteidl.service.EvictCacheResponse`", "Evicts all cached data for the referenced :ref:`ref_flyteidl.admin.TaskExecution`."
+
+..
+   end services
+
+
+
+
 .. _ref_flyteidl/service/dataproxy.proto:
 
 flyteidl/service/dataproxy.proto

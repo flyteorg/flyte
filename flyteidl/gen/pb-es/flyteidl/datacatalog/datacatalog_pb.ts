@@ -741,6 +741,103 @@ export class UpdateArtifactResponse extends Message<UpdateArtifactResponse> {
 
 /**
  *
+ * Request message for deleting an Artifact and its associated ArtifactData.
+ *
+ * @generated from message datacatalog.DeleteArtifactRequest
+ */
+export class DeleteArtifactRequest extends Message<DeleteArtifactRequest> {
+  /**
+   * ID of dataset the artifact is associated with
+   *
+   * @generated from field: datacatalog.DatasetID dataset = 1;
+   */
+  dataset?: DatasetID;
+
+  /**
+   * Either ID of artifact or name of tag of existing artifact
+   *
+   * @generated from oneof datacatalog.DeleteArtifactRequest.query_handle
+   */
+  queryHandle: {
+    /**
+     * @generated from field: string artifact_id = 2;
+     */
+    value: string;
+    case: "artifactId";
+  } | {
+    /**
+     * @generated from field: string tag_name = 3;
+     */
+    value: string;
+    case: "tagName";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<DeleteArtifactRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "datacatalog.DeleteArtifactRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "dataset", kind: "message", T: DatasetID },
+    { no: 2, name: "artifact_id", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "query_handle" },
+    { no: 3, name: "tag_name", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "query_handle" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteArtifactRequest {
+    return new DeleteArtifactRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteArtifactRequest {
+    return new DeleteArtifactRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteArtifactRequest {
+    return new DeleteArtifactRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteArtifactRequest | PlainMessage<DeleteArtifactRequest> | undefined, b: DeleteArtifactRequest | PlainMessage<DeleteArtifactRequest> | undefined): boolean {
+    return proto3.util.equals(DeleteArtifactRequest, a, b);
+  }
+}
+
+/**
+ *
+ * Response message for deleting an Artifact.
+ *
+ * @generated from message datacatalog.DeleteArtifactResponse
+ */
+export class DeleteArtifactResponse extends Message<DeleteArtifactResponse> {
+  constructor(data?: PartialMessage<DeleteArtifactResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "datacatalog.DeleteArtifactResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): DeleteArtifactResponse {
+    return new DeleteArtifactResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): DeleteArtifactResponse {
+    return new DeleteArtifactResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): DeleteArtifactResponse {
+    return new DeleteArtifactResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: DeleteArtifactResponse | PlainMessage<DeleteArtifactResponse> | undefined, b: DeleteArtifactResponse | PlainMessage<DeleteArtifactResponse> | undefined): boolean {
+    return proto3.util.equals(DeleteArtifactResponse, a, b);
+  }
+}
+
+/**
+ *
  * ReservationID message that is composed of several string fields.
  *
  * @generated from message datacatalog.ReservationID

@@ -179,6 +179,36 @@ pub struct UpdateArtifactResponse {
     pub artifact_id: ::prost::alloc::string::String,
 }
 ///
+/// Request message for deleting an Artifact and its associated ArtifactData.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteArtifactRequest {
+    /// ID of dataset the artifact is associated with
+    #[prost(message, optional, tag="1")]
+    pub dataset: ::core::option::Option<DatasetId>,
+    /// Either ID of artifact or name of tag of existing artifact
+    #[prost(oneof="delete_artifact_request::QueryHandle", tags="2, 3")]
+    pub query_handle: ::core::option::Option<delete_artifact_request::QueryHandle>,
+}
+/// Nested message and enum types in `DeleteArtifactRequest`.
+pub mod delete_artifact_request {
+    /// Either ID of artifact or name of tag of existing artifact
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum QueryHandle {
+        #[prost(string, tag="2")]
+        ArtifactId(::prost::alloc::string::String),
+        #[prost(string, tag="3")]
+        TagName(::prost::alloc::string::String),
+    }
+}
+///
+/// Response message for deleting an Artifact.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct DeleteArtifactResponse {
+}
+///
 /// ReservationID message that is composed of several string fields.
 #[allow(clippy::derive_partial_eq_without_eq)]
 #[derive(Clone, PartialEq, ::prost::Message)]

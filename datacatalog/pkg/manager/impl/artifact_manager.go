@@ -45,6 +45,9 @@ type artifactMetrics struct {
 	updateDataFailureCounter labeled.Counter
 	deleteDataSuccessCounter labeled.Counter
 	deleteDataFailureCounter labeled.Counter
+	deleteResponseTime       labeled.StopWatch
+	deleteSuccessCounter     labeled.Counter
+	deleteFailureCounter     labeled.Counter
 }
 
 type artifactManager struct {
@@ -53,7 +56,8 @@ type artifactManager struct {
 	systemMetrics artifactMetrics
 }
 
-// Create an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an offloaded location.
+// CreateArtifact creates an Artifact along with the associated ArtifactData. The ArtifactData will be stored in an
+// offloaded location.
 func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatalog.CreateArtifactRequest) (*datacatalog.CreateArtifactResponse, error) {
 	timer := m.systemMetrics.createResponseTime.Start(ctx)
 	defer timer.Stop()
@@ -129,7 +133,7 @@ func (m *artifactManager) CreateArtifact(ctx context.Context, request *datacatal
 	return &datacatalog.CreateArtifactResponse{}, nil
 }
 
-// Get the Artifact and its associated ArtifactData. The request can query by ArtifactID or TagName.
+// GetArtifact retrieves the Artifact and its associated ArtifactData. The request can query by ArtifactID or TagName.
 func (m *artifactManager) GetArtifact(ctx context.Context, request *datacatalog.GetArtifactRequest) (*datacatalog.GetArtifactResponse, error) {
 	timer := m.systemMetrics.getResponseTime.Start(ctx)
 	defer timer.Stop()
@@ -240,6 +244,8 @@ func (m *artifactManager) getArtifactDataList(ctx context.Context, artifactDataM
 	return artifactDataList, nil
 }
 
+// ListArtifacts returns a paginated list of artifacts matching the provided filter expression, including their
+// associated artifact data.
 func (m *artifactManager) ListArtifacts(ctx context.Context, request *datacatalog.ListArtifactsRequest) (*datacatalog.ListArtifactsResponse, error) {
 	err := validators.ValidateListArtifactRequest(request)
 	if err != nil {
@@ -359,7 +365,7 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 
 		dataLocation, err := m.artifactStore.PutData(ctx, artifact, artifactData)
 		if err != nil {
-			logger.Errorf(ctx, "Failed to store artifact data during update, err: %v", err)
+			logger.Errorf(ctx, "Failed to store artifact data [%v] during update, err: %v", artifactData.Name, err)
 			m.systemMetrics.updateDataFailureCounter.Inc(ctx)
 			m.systemMetrics.updateFailureCounter.Inc(ctx)
 			return nil, err
@@ -416,6 +422,67 @@ func (m *artifactManager) UpdateArtifact(ctx context.Context, request *datacatal
 	}, nil
 }
 
+func (m *artifactManager) deleteArtifact(ctx context.Context, datasetID *datacatalog.DatasetID, queryHandle artifactQueryHandle) error {
+	ctx = contextutils.WithProjectDomain(ctx, datasetID.Project, datasetID.Domain)
+
+	// artifact must already exist, verify first
+	artifactModel, err := m.findArtifact(ctx, datasetID, queryHandle)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to get artifact while trying to delete [%v], err: %v", queryHandle, err)
+		return err
+	}
+
+	// delete all artifact data from the blob storage
+	for _, artifactData := range artifactModel.ArtifactData {
+		if err := m.artifactStore.DeleteData(ctx, artifactData); err != nil {
+			logger.Errorf(ctx, "Failed to delete artifact data [%v] while deleting artifact [%v], err: %v", artifactData.Name, artifactModel.ArtifactID, err)
+			m.systemMetrics.deleteDataFailureCounter.Inc(ctx)
+			return err
+		}
+
+		m.systemMetrics.deleteDataSuccessCounter.Inc(ctx)
+	}
+
+	// delete artifact from DB, also removed associated artifact data entries
+	err = m.repo.ArtifactRepo().Delete(ctx, artifactModel)
+	if err != nil {
+		if errors.IsDoesNotExistError(err) {
+			logger.Warnf(ctx, "Artifact [%v] does not exist, err %v", artifactModel.ArtifactID, err)
+			m.systemMetrics.doesNotExistCounter.Inc(ctx)
+		} else {
+			logger.Errorf(ctx, "Failed to delete artifact [%v], err: %v", artifactModel, err)
+		}
+		return err
+	}
+
+	logger.Debugf(ctx, "Successfully deleted artifact [%v]", artifactModel.ArtifactID)
+	return nil
+}
+
+// DeleteArtifact deletes the given artifact, removing all stored artifact data from the underlying blob storage.
+func (m *artifactManager) DeleteArtifact(ctx context.Context, request *datacatalog.DeleteArtifactRequest) (*datacatalog.DeleteArtifactResponse, error) {
+	ctx = contextutils.WithProjectDomain(ctx, request.Dataset.Project, request.Dataset.Domain)
+
+	timer := m.systemMetrics.deleteResponseTime.Start(ctx)
+	defer timer.Stop()
+
+	err := validators.ValidateDeleteArtifactRequest(request)
+	if err != nil {
+		logger.Warningf(ctx, "Invalid delete artifacts request %v, err: %v", request, err)
+		m.systemMetrics.validationErrorCounter.Inc(ctx)
+		m.systemMetrics.deleteFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	if err := m.deleteArtifact(ctx, request.GetDataset(), request); err != nil {
+		m.systemMetrics.deleteFailureCounter.Inc(ctx)
+		return nil, err
+	}
+
+	m.systemMetrics.deleteSuccessCounter.Inc(ctx)
+	return &datacatalog.DeleteArtifactResponse{}, nil
+}
+
 func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.DataStore, storagePrefix storage.DataReference, artifactScope promutils.Scope) interfaces.ArtifactManager {
 	artifactMetrics := artifactMetrics{
 		scope:                    artifactScope,
@@ -440,6 +507,9 @@ func NewArtifactManager(repo repositories.RepositoryInterface, store *storage.Da
 		updateDataFailureCounter: labeled.NewCounter("update_data_failure_count", "The number of times update artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
 		deleteDataSuccessCounter: labeled.NewCounter("delete_data_success_count", "The number of times delete artifact data succeeded", artifactScope, labeled.EmitUnlabeledMetric),
 		deleteDataFailureCounter: labeled.NewCounter("delete_data_failure_count", "The number of times delete artifact data failed", artifactScope, labeled.EmitUnlabeledMetric),
+		deleteResponseTime:       labeled.NewStopWatch("delete_duration", "The duration of the delete artifact calls.", time.Millisecond, artifactScope, labeled.EmitUnlabeledMetric),
+		deleteSuccessCounter:     labeled.NewCounter("delete_success_count", "The number of times delete artifact succeeded", artifactScope, labeled.EmitUnlabeledMetric),
+		deleteFailureCounter:     labeled.NewCounter("delete_failure_count", "The number of times delete artifact failed", artifactScope, labeled.EmitUnlabeledMetric),
 	}
 
 	return &artifactManager{

@@ -121,6 +121,20 @@ class UpdateArtifactResponse(_message.Message):
     artifact_id: str
     def __init__(self, artifact_id: _Optional[str] = ...) -> None: ...
 
+class DeleteArtifactRequest(_message.Message):
+    __slots__ = ["dataset", "artifact_id", "tag_name"]
+    DATASET_FIELD_NUMBER: _ClassVar[int]
+    ARTIFACT_ID_FIELD_NUMBER: _ClassVar[int]
+    TAG_NAME_FIELD_NUMBER: _ClassVar[int]
+    dataset: DatasetID
+    artifact_id: str
+    tag_name: str
+    def __init__(self, dataset: _Optional[_Union[DatasetID, _Mapping]] = ..., artifact_id: _Optional[str] = ..., tag_name: _Optional[str] = ...) -> None: ...
+
+class DeleteArtifactResponse(_message.Message):
+    __slots__ = []
+    def __init__(self) -> None: ...
+
 class ReservationID(_message.Message):
     __slots__ = ["dataset_id", "tag_name"]
     DATASET_ID_FIELD_NUMBER: _ClassVar[int]

@@ -35,6 +35,26 @@ func (n NOOPCatalog) GetOrExtendReservation(_ context.Context, _ catalog.Key, _ 
 	return nil, nil
 }
 
+func (n NOOPCatalog) GetOrExtendReservationByArtifactTag(_ context.Context, _ *datacatalog.DatasetID, _ string, _ string, _ time.Duration) (*datacatalog.Reservation, error) {
+	return nil, nil
+}
+
 func (n NOOPCatalog) ReleaseReservation(_ context.Context, _ catalog.Key, _ string) error {
+	return nil
+}
+
+func (n NOOPCatalog) ReleaseReservationByArtifactTag(_ context.Context, _ *datacatalog.DatasetID, _ string, _ string) error {
+	return nil
+}
+
+func (n NOOPCatalog) Delete(_ context.Context, _ catalog.Key) error {
+	return nil
+}
+
+func (n NOOPCatalog) DeleteByArtifactTag(_ context.Context, _ *datacatalog.DatasetID, _ string) error {
+	return nil
+}
+
+func (n NOOPCatalog) DeleteByArtifactID(_ context.Context, _ *datacatalog.DatasetID, _ string) error {
 	return nil
 }

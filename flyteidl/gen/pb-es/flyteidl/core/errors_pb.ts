@@ -6,6 +6,7 @@
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
 import { ExecutionError_ErrorKind } from "./execution_pb.js";
+import { NodeExecutionIdentifier, TaskExecutionIdentifier, WorkflowExecutionIdentifier } from "./identifier_pb.js";
 
 /**
  * Error message to propagate detailed errors from container executions to the execution
@@ -134,6 +135,177 @@ export class ErrorDocument extends Message<ErrorDocument> {
 
   static equals(a: ErrorDocument | PlainMessage<ErrorDocument> | undefined, b: ErrorDocument | PlainMessage<ErrorDocument> | undefined): boolean {
     return proto3.util.equals(ErrorDocument, a, b);
+  }
+}
+
+/**
+ * Error returned if eviction of cached output fails and should be re-tried by the user.
+ *
+ * @generated from message flyteidl.core.CacheEvictionError
+ */
+export class CacheEvictionError extends Message<CacheEvictionError> {
+  /**
+   * Error code to match type of cache eviction error encountered.
+   *
+   * @generated from field: flyteidl.core.CacheEvictionError.Code code = 1;
+   */
+  code = CacheEvictionError_Code.INTERNAL;
+
+  /**
+   * More detailed error message explaining the reason for the cache eviction failure.
+   *
+   * @generated from field: string message = 2;
+   */
+  message = "";
+
+  /**
+   * ID of the node execution the cache eviction failed for.
+   *
+   * @generated from field: flyteidl.core.NodeExecutionIdentifier node_execution_id = 3;
+   */
+  nodeExecutionId?: NodeExecutionIdentifier;
+
+  /**
+   * Source of the node execution.
+   *
+   * @generated from oneof flyteidl.core.CacheEvictionError.source
+   */
+  source: {
+    /**
+     * ID of the task execution the cache eviction failed for (if the node execution was part of a task execution).
+     *
+     * @generated from field: flyteidl.core.TaskExecutionIdentifier task_execution_id = 4;
+     */
+    value: TaskExecutionIdentifier;
+    case: "taskExecutionId";
+  } | {
+    /**
+     * ID of the workflow execution the cache eviction failed for (if the node execution was part of a workflow execution).
+     *
+     * @generated from field: flyteidl.core.WorkflowExecutionIdentifier workflow_execution_id = 5;
+     */
+    value: WorkflowExecutionIdentifier;
+    case: "workflowExecutionId";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
+  constructor(data?: PartialMessage<CacheEvictionError>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.CacheEvictionError";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "code", kind: "enum", T: proto3.getEnumType(CacheEvictionError_Code) },
+    { no: 2, name: "message", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "node_execution_id", kind: "message", T: NodeExecutionIdentifier },
+    { no: 4, name: "task_execution_id", kind: "message", T: TaskExecutionIdentifier, oneof: "source" },
+    { no: 5, name: "workflow_execution_id", kind: "message", T: WorkflowExecutionIdentifier, oneof: "source" },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CacheEvictionError {
+    return new CacheEvictionError().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CacheEvictionError {
+    return new CacheEvictionError().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CacheEvictionError {
+    return new CacheEvictionError().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CacheEvictionError | PlainMessage<CacheEvictionError> | undefined, b: CacheEvictionError | PlainMessage<CacheEvictionError> | undefined): boolean {
+    return proto3.util.equals(CacheEvictionError, a, b);
+  }
+}
+
+/**
+ * Defines codes for distinguishing between errors encountered during cache eviction.
+ *
+ * @generated from enum flyteidl.core.CacheEvictionError.Code
+ */
+export enum CacheEvictionError_Code {
+  /**
+   * Indicates a generic internal error occurred.
+   *
+   * @generated from enum value: INTERNAL = 0;
+   */
+  INTERNAL = 0,
+
+  /**
+   * Indicates no reservation could be acquired before deleting an artifact.
+   *
+   * @generated from enum value: RESERVATION_NOT_ACQUIRED = 1;
+   */
+  RESERVATION_NOT_ACQUIRED = 1,
+
+  /**
+   * Indicates updating the database entry related to the node execution failed.
+   *
+   * @generated from enum value: DATABASE_UPDATE_FAILED = 2;
+   */
+  DATABASE_UPDATE_FAILED = 2,
+
+  /**
+   * Indicates deleting the artifact from datacatalog failed.
+   *
+   * @generated from enum value: ARTIFACT_DELETE_FAILED = 3;
+   */
+  ARTIFACT_DELETE_FAILED = 3,
+
+  /**
+   * Indicates the reservation previously acquired could not be released for an artifact.
+   *
+   * @generated from enum value: RESERVATION_NOT_RELEASED = 4;
+   */
+  RESERVATION_NOT_RELEASED = 4,
+}
+// Retrieve enum metadata with: proto3.getEnumType(CacheEvictionError_Code)
+proto3.util.setEnumType(CacheEvictionError_Code, "flyteidl.core.CacheEvictionError.Code", [
+  { no: 0, name: "INTERNAL" },
+  { no: 1, name: "RESERVATION_NOT_ACQUIRED" },
+  { no: 2, name: "DATABASE_UPDATE_FAILED" },
+  { no: 3, name: "ARTIFACT_DELETE_FAILED" },
+  { no: 4, name: "RESERVATION_NOT_RELEASED" },
+]);
+
+/**
+ * List of :ref:`ref_flyteidl.core.CacheEvictionError` encountered during a cache eviction request.
+ *
+ * @generated from message flyteidl.core.CacheEvictionErrorList
+ */
+export class CacheEvictionErrorList extends Message<CacheEvictionErrorList> {
+  /**
+   * @generated from field: repeated flyteidl.core.CacheEvictionError errors = 1;
+   */
+  errors: CacheEvictionError[] = [];
+
+  constructor(data?: PartialMessage<CacheEvictionErrorList>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.core.CacheEvictionErrorList";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "errors", kind: "message", T: CacheEvictionError, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CacheEvictionErrorList {
+    return new CacheEvictionErrorList().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CacheEvictionErrorList {
+    return new CacheEvictionErrorList().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CacheEvictionErrorList {
+    return new CacheEvictionErrorList().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: CacheEvictionErrorList | PlainMessage<CacheEvictionErrorList> | undefined, b: CacheEvictionErrorList | PlainMessage<CacheEvictionErrorList> | undefined): boolean {
+    return proto3.util.equals(CacheEvictionErrorList, a, b);
   }
 }
 

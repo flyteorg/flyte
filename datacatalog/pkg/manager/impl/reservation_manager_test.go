@@ -356,7 +356,15 @@ func getDatacatalogRepo() mocks.DataCatalogRepo {
 	}
 }
 
-func setUpReservationRepoGet(dcRepo *mocks.DataCatalogRepo, prevExpiresAt time.Time) {
+func setUpReservationRepoGet(dcRepo *mocks.DataCatalogRepo, prevExpiresAt time.Time, tagNames ...string) {
+	if len(tagNames) == 0 {
+		tagNames = []string{tagName}
+	}
+	tags := make(map[string]bool)
+	for _, tn := range tagNames {
+		tags[tn] = true
+	}
+
 	dcRepo.MockReservationRepo.On("Get",
 		mock.MatchedBy(func(ctx context.Context) bool { return true }),
 		mock.MatchedBy(func(key models.ReservationKey) bool {
@@ -364,7 +372,7 @@ func setUpReservationRepoGet(dcRepo *mocks.DataCatalogRepo, prevExpiresAt time.T
 				key.DatasetDomain == datasetID.Domain &&
 				key.DatasetVersion == datasetID.Version &&
 				key.DatasetName == datasetID.Name &&
-				key.TagName == tagName
+				tags[key.TagName]
 		})).Return(
 		models.Reservation{
 			ReservationKey: getReservationKey(),

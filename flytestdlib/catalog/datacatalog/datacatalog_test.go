@@ -88,6 +88,10 @@ func assertGrpcErr(t *testing.T, err error, code codes.Code) {
 	assert.Equal(t, code, status.Code(errors.Cause(err)), "Got err: %s", err)
 }
 
+func assertNotFoundGrpcErr(t *testing.T, err error) {
+	assertGrpcErr(t, err, codes.NotFound)
+}
+
 func TestCatalog_Get(t *testing.T) {
 
 	ctx := context.Background()
@@ -117,7 +121,7 @@ func TestCatalog_Get(t *testing.T) {
 		resp, err := catalogClient.Get(ctx, newKey)
 		assert.Error(t, err)
 
-		assertGrpcErr(t, err, codes.NotFound)
+		assertNotFoundGrpcErr(t, err)
 		assert.Equal(t, core.CatalogCacheStatus_CACHE_DISABLED, resp.GetStatus().GetCacheStatus())
 	})
 
@@ -973,6 +977,69 @@ func TestCatalog_GetOrExtendReservation(t *testing.T) {
 	})
 }
 
+func TestCatalog_GetOrExtendReservationByArtifactTag(t *testing.T) {
+	ctx := context.Background()
+
+	heartbeatInterval := time.Second * 5
+	prevReservation := datacatalog.Reservation{
+		ReservationId: &reservationID,
+		OwnerId:       prevOwner,
+	}
+
+	currentReservation := datacatalog.Reservation{
+		ReservationId: &reservationID,
+		OwnerId:       currentOwner,
+	}
+
+	t.Run("CreateOrUpdateReservation", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("GetOrExtendReservation",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetOrExtendReservationRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
+				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				return true
+			}),
+		).Return(&datacatalog.GetOrExtendReservationResponse{Reservation: &currentReservation}, nil, "")
+
+		reservation, err := catalogClient.GetOrExtendReservationByArtifactTag(ctx, datasetID, tagName, currentOwner, heartbeatInterval)
+
+		assert.NoError(t, err)
+		assert.Equal(t, reservation.OwnerId, currentOwner)
+	})
+
+	t.Run("ExistingReservation", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		catalogClient := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("GetOrExtendReservation",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.GetOrExtendReservationRequest) bool {
+				assert.EqualValues(t, datasetID.String(), o.ReservationId.DatasetId.String())
+				assert.EqualValues(t, tagName, o.ReservationId.TagName)
+				return true
+			}),
+		).Return(&datacatalog.GetOrExtendReservationResponse{Reservation: &prevReservation}, nil, "")
+
+		reservation, err := catalogClient.GetOrExtendReservationByArtifactTag(ctx, datasetID, tagName, currentOwner, heartbeatInterval)
+
+		assert.NoError(t, err)
+		assert.Equal(t, reservation.OwnerId, prevOwner)
+	})
+}
+
 func TestCatalog_ReleaseReservation(t *testing.T) {
 	ctx := context.Background()
 
@@ -1023,6 +1090,205 @@ func TestCatalog_ReleaseReservation(t *testing.T) {
 		newKey.InputReader = ir
 		err := catalogClient.ReleaseReservation(ctx, newKey, currentOwner)
 
-		assertGrpcErr(t, err, codes.NotFound)
+		assertNotFoundGrpcErr(t, err)
+	})
+}
+
+func TestCatalog_Delete(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("Delete existing cached execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("DeleteArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.DeleteArtifactRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset, datasetID))
+				assert.IsType(t, &datacatalog.DeleteArtifactRequest_TagName{}, o.QueryHandle)
+				assert.Equal(t, tagName, o.GetTagName())
+				return true
+			}),
+		).Return(&datacatalog.DeleteArtifactResponse{}, nil)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		err := discovery.Delete(ctx, newKey)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Delete non-existing execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		deleteArtifactCalled := false
+		mockClient.On("DeleteArtifact", ctx, mock.Anything).Run(func(args mock.Arguments) {
+			deleteArtifactCalled = true
+		}).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		err := discovery.Delete(ctx, newKey)
+		assert.Error(t, err)
+		assertNotFoundGrpcErr(t, err)
+		assert.True(t, deleteArtifactCalled)
+	})
+
+	t.Run("Error while deleting execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		genericErr := errors.New("generic error")
+		mockClient.On("DeleteArtifact", ctx, mock.Anything).Return(nil, genericErr)
+
+		newKey := sampleKey
+		newKey.InputReader = ir
+		err := discovery.Delete(ctx, newKey)
+		assert.Error(t, err)
+		assert.Equal(t, genericErr, err)
+	})
+}
+
+func TestCatalog_DeleteByArtifactTag(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("Delete existing cached execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("DeleteArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.DeleteArtifactRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset, datasetID))
+				assert.IsType(t, &datacatalog.DeleteArtifactRequest_TagName{}, o.QueryHandle)
+				assert.Equal(t, tagName, o.GetTagName())
+				return true
+			}),
+		).Return(&datacatalog.DeleteArtifactResponse{}, nil)
+
+		err := discovery.DeleteByArtifactTag(ctx, datasetID, tagName)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Delete non-existing execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		deleteArtifactCalled := false
+		mockClient.On("DeleteArtifact", ctx, mock.Anything).Run(func(args mock.Arguments) {
+			deleteArtifactCalled = true
+		}).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		err := discovery.DeleteByArtifactTag(ctx, datasetID, tagName)
+		assert.Error(t, err)
+		assertNotFoundGrpcErr(t, err)
+		assert.True(t, deleteArtifactCalled)
+	})
+
+	t.Run("Error while deleting execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		genericErr := errors.New("generic error")
+		mockClient.On("DeleteArtifact", ctx, mock.Anything).Return(nil, genericErr)
+
+		err := discovery.DeleteByArtifactTag(ctx, datasetID, tagName)
+		assert.Error(t, err)
+		assert.Equal(t, genericErr, err)
+	})
+}
+
+func TestCatalog_DeleteByArtifactID(t *testing.T) {
+	ctx := context.Background()
+	artifactID := "ff611b8e-f0fa-4f91-a9da-9fa43d619c84"
+
+	t.Run("Delete existing cached execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		mockClient.On("DeleteArtifact",
+			ctx,
+			mock.MatchedBy(func(o *datacatalog.DeleteArtifactRequest) bool {
+				assert.True(t, proto.Equal(o.Dataset, datasetID))
+				assert.IsType(t, &datacatalog.DeleteArtifactRequest_ArtifactId{}, o.QueryHandle)
+				assert.Equal(t, artifactID, o.GetArtifactId())
+				return true
+			}),
+		).Return(&datacatalog.DeleteArtifactResponse{}, nil)
+
+		err := discovery.DeleteByArtifactID(ctx, datasetID, artifactID)
+		assert.NoError(t, err)
+	})
+
+	t.Run("Delete non-existing execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		deleteArtifactCalled := false
+		mockClient.On("DeleteArtifact", ctx, mock.Anything).Run(func(args mock.Arguments) {
+			deleteArtifactCalled = true
+		}).Return(nil, status.New(codes.NotFound, "missing entity of type Artifact with identifier id").Err())
+
+		err := discovery.DeleteByArtifactID(ctx, datasetID, artifactID)
+		assert.Error(t, err)
+		assertNotFoundGrpcErr(t, err)
+		assert.True(t, deleteArtifactCalled)
+	})
+
+	t.Run("Error while deleting execution", func(t *testing.T) {
+		ir := &mocks2.InputReader{}
+		ir.On("Get", mock.Anything).Return(sampleParameters, nil, nil)
+
+		mockClient := &mocks.DataCatalogClient{}
+		discovery := &CatalogClient{
+			client: mockClient,
+		}
+
+		genericErr := errors.New("generic error")
+		mockClient.On("DeleteArtifact", ctx, mock.Anything).Return(nil, genericErr)
+
+		err := discovery.DeleteByArtifactID(ctx, datasetID, artifactID)
+		assert.Error(t, err)
+		assert.Equal(t, genericErr, err)
 	})
 }

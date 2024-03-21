@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { AddTagRequest, AddTagResponse, CreateArtifactRequest, CreateArtifactResponse, CreateDatasetRequest, CreateDatasetResponse, GetArtifactRequest, GetArtifactResponse, GetDatasetRequest, GetDatasetResponse, GetOrExtendReservationRequest, GetOrExtendReservationResponse, ListArtifactsRequest, ListArtifactsResponse, ListDatasetsRequest, ListDatasetsResponse, ReleaseReservationRequest, ReleaseReservationResponse, UpdateArtifactRequest, UpdateArtifactResponse } from "./datacatalog_pb.js";
+import { AddTagRequest, AddTagResponse, CreateArtifactRequest, CreateArtifactResponse, CreateDatasetRequest, CreateDatasetResponse, DeleteArtifactRequest, DeleteArtifactResponse, GetArtifactRequest, GetArtifactResponse, GetDatasetRequest, GetDatasetResponse, GetOrExtendReservationRequest, GetOrExtendReservationResponse, ListArtifactsRequest, ListArtifactsResponse, ListDatasetsRequest, ListDatasetsResponse, ReleaseReservationRequest, ReleaseReservationResponse, UpdateArtifactRequest, UpdateArtifactResponse } from "./datacatalog_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -105,6 +105,17 @@ export const DataCatalog = {
       name: "UpdateArtifact",
       I: UpdateArtifactRequest,
       O: UpdateArtifactResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * Deletes an existing artifact, removing the stored artifact data from the underlying blob storage.
+     *
+     * @generated from rpc datacatalog.DataCatalog.DeleteArtifact
+     */
+    deleteArtifact: {
+      name: "DeleteArtifact",
+      I: DeleteArtifactRequest,
+      O: DeleteArtifactResponse,
       kind: MethodKind.Unary,
     },
     /**

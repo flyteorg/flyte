@@ -35,6 +35,7 @@ import (
 	"github.com/flyteorg/flyte/flyteadmin/pkg/config"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/adminservice"
+	"github.com/flyteorg/flyte/flyteadmin/pkg/rpc/cacheservice"
 	runtime2 "github.com/flyteorg/flyte/flyteadmin/pkg/runtime"
 	runtimeIfaces "github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/plugins"
@@ -148,6 +149,8 @@ func newGRPCServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 
 	grpcService.RegisterSignalServiceServer(grpcServer, rpc.NewSignalServer(ctx, configuration, scope.NewSubScope("signal")))
 
+	grpcService.RegisterCacheServiceServer(grpcServer, cacheservice.NewCacheServer(ctx, configuration, dataStorageClient, scope.NewSubScope("cache")))
+
 	additionalService := plugins.Get[common.RegisterAdditionalGRPCService](pluginRegistry, plugins.PluginIDAdditionalGRPCService)
 	if additionalService != nil {
 		if err := additionalService(ctx, grpcServer); err != nil {
@@ -260,6 +263,11 @@ func newHTTPServer(ctx context.Context, pluginRegistry *plugins.Registry, cfg *c
 	err = service.RegisterSignalServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
 	if err != nil {
 		return nil, errors.Wrap(err, "error registering signal service")
+	}
+
+	err = service.RegisterCacheServiceHandlerFromEndpoint(ctx, gwmux, grpcAddress, grpcConnectionOpts)
+	if err != nil {
+		return nil, errors.Wrap(err, "error registering cache service")
 	}
 
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
