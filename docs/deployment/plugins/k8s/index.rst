@@ -108,7 +108,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        1. Add ``pytorch`` to the list of plugins in your Helm values file:
+        Create a file named ``values-override.yaml`` and add the following config to it:
 
         .. code-block:: yaml
           :emphasize-lines: 9,13
@@ -127,15 +127,9 @@ Specify plugin configuration
                     - container_array: k8s-array
                     - pytorch: pytorch
 
-        2. Upgrade your Helm release:
-
-        .. code-block:: bash
-
-           helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file> 
-
       .. group-tab:: Flyte core
     
-        1. Add ``pytorch`` to the list of plugins in your Helm values file:
+        Create a file named ``values-override.yaml`` and add the following config to it:
     
         .. code-block:: yaml
           :emphasize-lines: 9,14
@@ -155,19 +149,13 @@ Specify plugin configuration
                     container_array: k8s-array
                     pytorch: pytorch
    
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file> 
-
   .. group-tab:: TensorFlow
    
     .. tabs::
 
       .. group-tab:: Flyte binary
 
-        1. Add ``tensorflow`` to the list of plugins in your Helm values file:
+        Create a file named ``values-override.yaml`` and add the following config to it:
 
         .. code-block:: yaml
           :emphasize-lines: 9,13
@@ -186,15 +174,9 @@ Specify plugin configuration
                     - container_array: k8s-array
                     - tensorflow: tensorflow
 
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file> 
-
       .. group-tab:: Flyte core
     
-        1. Add ``tensorflow`` to the list of plugins in your Helm values file:
+        Create a file named ``values-override.yaml`` and add the following config to it:
     
         .. code-block:: yaml
     
@@ -213,19 +195,13 @@ Specify plugin configuration
                     container_array: k8s-array
                     tensorflow: tensorflow
    
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file> 
-
   .. group-tab:: MPI
    
     .. tabs::
 
       .. group-tab:: Flyte binary
 
-        1. Add ``mpi`` to the list of plugins in your Helm values file:
+       Create a file named ``values-override.yaml`` and add the following config to it:
 
         .. code-block:: yaml
           :emphasize-lines: 9,13
@@ -244,15 +220,9 @@ Specify plugin configuration
                     - container_array: k8s-array
                     - mpi: mpi
 
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>  
-
       .. group-tab:: Flyte core
     
-        1. Add ``mpi`` to the list of plugins in your Helm values file:
+        Create a file named ``values-override.yaml`` and add the following config to it:
     
         .. code-block:: yaml
     
@@ -271,19 +241,13 @@ Specify plugin configuration
                     container_array: k8s-array
                     mpi: mpi
 
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>  
-  
   .. group-tab:: Ray
 
     .. tabs::
 
       .. group-tab:: Flyte binary
 
-        1. Make sure that your Helm values file includes the following configuration:
+        Create a file named ``values-override.yaml`` and add the following config to it:
 
         .. code-block:: yaml
 
@@ -313,15 +277,9 @@ Specify plugin configuration
                - patch
                - update
 
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file> 
-
       .. group-tab:: Flyte core
     
-        1. Make sure that your Helm values file includes the following configuration:
+        Create a file named ``values-override.yaml`` and add the following config to it:
     
         .. code-block:: yaml
            :emphasize-lines: 9,14
@@ -341,12 +299,6 @@ Specify plugin configuration
                     container_array: k8s-array
                     ray: ray
    
-        2. Upgrade your Helm release:
-
-          .. code-block:: bash
-
-             helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file> 
-
   .. group-tab:: Spark
    
       .. tabs:: 
@@ -355,7 +307,7 @@ Specify plugin configuration
 
             .. group-tab:: Flyte binary
 
-              1. Make sure that your Helm values file includes the following configuration:
+              Create a file named ``values-override.yaml`` and add the following config to it:
 
                 .. code-block:: yaml
 
@@ -515,12 +467,6 @@ Specify plugin configuration
                               limits.cpu: {{ projectQuotaCpu }}
                               limits.memory: {{ projectQuotaMemory }} 
 
-              3. Upgrade your Helm release:
-
-                .. code-block:: bash
-
-                  helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>         
-
             .. group-tab:: flyte-core
 
               1. Make sure that your Helm values file includes the following configuration:
@@ -629,14 +575,7 @@ Specify plugin configuration
                           - spark.network.timeout: 600s
                           - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                           - spark.executor.heartbeatInterval: 60s
-                
-              2. Upgrade your Helm release:
-
-                 .. code-block:: bash
-
-                  helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>         
-
-            
+                 
         .. group-tab:: GCP
 
           .. tabs::
@@ -647,7 +586,7 @@ Specify plugin configuration
 
                    Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
  
-               1. Make sure your Helm values file includes the following configuration:
+               Create a file named ``values-override.yaml`` and add the following config to it:
 
                  .. code-block:: yaml
 
@@ -763,19 +702,13 @@ Specify plugin configuration
                             - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                             - spark.executor.heartbeatInterval: 60s
                
-               2. Upgrade your Helm release:
-
-                 .. code-block:: bash
-
-                  helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>         
-
              .. group-tab:: flyte-core   
 
                 .. note::
 
                    Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
 
-               1. Make sure your Helm values file includes the following configuration:
+                  Create a file named ``values-override.yaml`` and add the following config to it:
 
                   .. code-block:: yaml
 
@@ -1072,342 +1005,49 @@ Specify plugin configuration
                     container_array: k8s-array
                     dask: dask
 
-Spin up a cluster
------------------
+Upgrade the deployment
+----------------------
 
 .. tabs::
 
-  .. group-tab:: Demo cluster
+  .. group-tab:: Flyte binary
 
-    .. tabs::
-
-      .. group-tab:: PyTorch
-
-        Enable the PyTorch plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-        .. code-block:: yaml
-
-          tasks:
-            task-plugins:
-              default-for-task-types:
-                container: container
-                container_array: k8s-array
-                sidecar: sidecar
-                pytorch: pytorch
-              enabled-plugins:
-              - container
-              - k8s-array
-              - sidecar
-              - pytorch
-
-      .. group-tab:: TensorFlow
-
-        Enable the TensorFlow plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-        .. code-block:: yaml
-
-          tasks:
-            task-plugins:
-              default-for-task-types:
-                container: container
-                container_array: k8s-array
-                sidecar: sidecar
-                tensorflow: tensorflow
-              enabled-plugins:
-              - container
-              - k8s-array
-              - sidecar
-              - tensorflow
-
-      .. group-tab:: MPI
-
-        Enable the MPI plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-        .. code-block:: yaml
-
-          tasks:
-            task-plugins:
-              default-for-task-types:
-                container: container
-                container_array: k8s-array
-                sidecar: sidecar
-                mpi: mpi
-              enabled-plugins:
-              - container
-              - k8s-array
-              - sidecar
-              - mpi
-
-      .. group-tab:: Ray
-
-        Enable the Ray plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-        .. code-block:: yaml
-
-          tasks:
-            task-plugins:
-              default-for-task-types:
-                container: container
-                container_array: k8s-array
-                sidecar: sidecar
-                ray: ray
-              enabled-plugins:
-              - container
-              - k8s-array
-              - sidecar
-              - ray
-
-      .. group-tab:: Spark
-
-        Enable the Spark plugin on the demo cluster by adding the following config to ``~/.flyte/sandbox/config.yaml``:
-
-        .. code-block:: yaml
-
-          tasks:
-            task-plugins:
-              default-for-task-types:
-                container: container
-                container_array: k8s-array
-                sidecar: sidecar
-                spark: spark
-              enabled-plugins:
-                - container
-                - sidecar
-                - k8s-array
-                - spark
-          plugins:
-            spark:
-              spark-config-default:
-                - spark.driver.cores: "1"
-                - spark.hadoop.fs.s3a.aws.credentials.provider: "org.apache.hadoop.fs.s3a.SimpleAWSCredentialsProvider"
-                - spark.hadoop.fs.s3a.endpoint: "http://minio.flyte:9000"
-                - spark.hadoop.fs.s3a.access.key: "minio"
-                - spark.hadoop.fs.s3a.secret.key: "miniostorage"
-                - spark.hadoop.fs.s3a.path.style.access: "true"
-                - spark.kubernetes.allocation.batch.size: "50"
-                - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-              
-        Also add the following cluster resource templates to the ``~/.flyte/sandbox/cluster-resource-templates`` directory:
-
-        1. ``serviceaccount.yaml``
-
-        .. code-block:: yaml
-
-          apiVersion: v1
-          kind: ServiceAccount
-          metadata:
-            name: default
-            namespace: "{{ namespace }}"
-            annotations:
-              eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-        
-        2. ``spark_role.yaml``
-
-        .. code-block:: yaml
-
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: Role
-          metadata:
-            name: spark-role
-            namespace: "{{ namespace }}"
-          rules:
-            - apiGroups:
-                - ""
-              resources:
-                - pods
-                - services
-                - configmaps
-              verbs:
-                - "*"
-
-        3. ``spark_service_account.yaml``
-
-        .. code-block:: yaml
-
-          apiVersion: v1
-          kind: ServiceAccount
-          metadata:
-            name: spark
-            namespace: "{{ namespace }}"
-            annotations:
-              eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-        
-        4. ``spark_role_binding.yaml``
-
-        .. code-block:: yaml
-
-          apiVersion: rbac.authorization.k8s.io/v1
-          kind: RoleBinding
-          metadata:
-            name: spark-role-binding
-            namespace: "{{ namespace }}"
-          roleRef:
-            apiGroup: rbac.authorization.k8s.io
-            kind: Role
-            name: spark-role
-          subjects:
-            - kind: ServiceAccount
-              name: spark
-              namespace: "{{ namespace }}"
-
-      .. group-tab:: Dask
-
-        Enable the Dask plugin on the demo cluster by adding the following block to ``~/.flyte/sandbox/config.yaml``:
-
-        .. code-block:: yaml
-
-          tasks:
-            task-plugins:
-              default-for-task-types:
-                container: container
-                container_array: k8s-array
-                sidecar: sidecar
-                dask: dask
-              enabled-plugins:
-              - container
-              - k8s-array
-              - sidecar
-              - dask
-
-    Start the demo cluster by running the following command:
+    If you are installing Flyte via the Helm chart, run the following command:
 
     .. code-block:: bash
-  
-      flytectl demo start
 
-  .. group-tab:: Helm charts
+      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_VALUES_FILE>
 
-    .. tabs::
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
+    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
+    and ``<YOUR_VALUESL_FILE>`` with the name of your values file.
 
-      .. group-tab:: flyte-binary 
+  .. group-tab:: Flyte core
 
-         1. Add the following to your values file under `configmap.inline`:
+    .. code-block:: bash
+    
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values <YOUR_VALUES_FILE>.yaml
 
-         .. code-block:: yaml
+    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
+    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-            tasks:
-              task-plugins:
-                enabled-plugins:
-                  - container
-                  - sidecar
-                  - K8S-ARRAY
-                  - spark
-                  
-                default-for-task-types:
-                  - container: container
-                  - container_array: K8S-ARRAY
-                  - spark: spark
-                  - ray: ray
+Wait for the upgrade to complete. You can check the status of the deployment pods by running the following command:
 
-         2. Install the :ref:`flyte-binary Helm chart <deployment-deployment-cloud-simple>`.
+.. code-block:: bash
 
-      .. group-tab:: flyte-core
+  kubectl get pods -n flyte
 
 
-   
-  .. group-tab:: Helm charts
-   
-    If you have installed Flyte using the `flyte-core Helm chart 
-    <https://github.com/flyteorg/flyte/tree/master/charts/flyte-core>`__, please ensure:
+  2. Upgrade your Helm release:
 
-    * You have the correct kubeconfig and have selected the correct Kubernetes context.
+                 .. code-block:: bash
 
-    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
+                  helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>         
 
-.. note::
 
-  Add the Flyte chart repo to Helm if you're installing via the Helm charts.
 
-  .. code-block:: bash
 
-    helm repo add flyteorg https://flyteorg.github.io/flyte
 
-  .. tabs::
 
-    If you have installed Flyte using the `flyte-sandbox Helm chart <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__, please ensure:
-
-    * You have the correct kubeconfig and have selected the correct Kubernetes context.
-
-    * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
-
-      * You have the correct kubeconfig and have selected the correct Kubernetes context.
-      * You have configured the correct flytectl settings in ``~/.flyte/config.yaml``.
-
-      .. tabs::
-
-        .. group-tab:: Helm chart
-
-          .. tabs::
-
-            .. group-tab:: Spark
-
-              create the following four files and apply them using ``kubectl apply -f <filename>``:
-
-              1. ``serviceaccount.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: v1
-                kind: ServiceAccount
-                metadata:
-                  name: default
-                  namespace: "{{ namespace }}"
-                  annotations:
-                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-
-              2. ``spark_role.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: rbac.authorization.k8s.io/v1
-                kind: Role
-                metadata:
-                  name: spark-role
-                  namespace: "{{ namespace }}"
-                rules:
-                  - apiGroups:
-                      - ""
-                    resources:
-                      - pods
-                      - services
-                      - configmaps
-                    verbs:
-                      - "*"
-
-              3. ``spark_service_account.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: v1
-                kind: ServiceAccount
-                metadata:
-                  name: spark
-                  namespace: "{{ namespace }}"
-                  annotations:
-                    eks.amazonaws.com/role-arn: "{{ defaultIamRole }}"
-
-              4. ``spark_role_binding.yaml``
-
-              .. code-block:: yaml
-
-                apiVersion: rbac.authorization.k8s.io/v1
-                kind: RoleBinding
-                metadata:
-                  name: spark-role-binding
-                  namespace: "{{ namespace }}"
-                roleRef:
-                  apiGroup: rbac.authorization.k8s.io
-                  kind: Role
-                  name: spark-role
-                subjects:
-                  - kind: ServiceAccount
-                    name: spark
-                    namespace: "{{ namespace }}"
 
 
