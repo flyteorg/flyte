@@ -967,7 +967,7 @@ Specify plugin configuration
 
       .. group-tab:: Flyte binary
 
-        Edit the relevant YAML file to specify the plugin.
+        Create a file named ``values-override.yaml`` and add the following config to it:
 
         .. code-block:: yaml
           :emphasize-lines: 7,11
@@ -1010,23 +1010,20 @@ Upgrade the deployment
 
 .. tabs::
 
-  .. group-tab:: Flyte binary
-
-    If you are installing Flyte via the Helm chart, run the following command:
+  .. group-tab:: flyte-binary
 
     .. code-block:: bash
 
-      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_VALUES_FILE>
+      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
-    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
-    and ``<YOUR_VALUESL_FILE>`` with the name of your values file.
+    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
 
-  .. group-tab:: Flyte core
+  .. group-tab:: flyte-core
 
     .. code-block:: bash
     
-      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values <YOUR_VALUES_FILE>.yaml
+      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
 
     Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
     and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
@@ -1036,13 +1033,6 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 .. code-block:: bash
 
   kubectl get pods -n flyte
-
-
-  2. Upgrade your Helm release:
-
-                 .. code-block:: bash
-
-                  helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>         
 
 
 
