@@ -17,7 +17,7 @@ Select the integration you need and follow the steps to install the correspondin
 
   .. group-tab:: PyTorch/TensorFlow/MPI
 
-    1. Install the Kubeflow ``training-operator`` using `manifests https://github.com/kubeflow/training-operator?tab=readme-ov-file#installation>`__.
+    1. Install the Kubeflow ``training-operator`` using `manifests <https://github.com/kubeflow/training-operator?tab=readme-ov-file#installation>`__.
 
     **Optional: Using a gang scheduler**
 
