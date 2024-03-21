@@ -130,6 +130,9 @@ pub struct CreateUploadLocationRequest {
     /// This make sure dataproxy is backward compatible with the old flytekit.
     #[prost(bool, tag="7")]
     pub add_content_md5_metadata: bool,
+    /// Optional, org key applied to the resource.
+    #[prost(string, tag="8")]
+    pub org: ::prost::alloc::string::String,
 }
 /// CreateDownloadLocationRequest specified request for the CreateDownloadLocation API.
 #[allow(clippy::derive_partial_eq_without_eq)]
