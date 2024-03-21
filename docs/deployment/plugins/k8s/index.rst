@@ -643,7 +643,131 @@ Specify plugin configuration
 
              .. group-tab:: flyte-binary
 
-                
+               .. note::
+
+                   Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
+ 
+               1. Make sure your Helm values file includes the following configuration:
+
+                 .. code-block:: yaml
+
+                   configuration:
+                    inline:
+                      tasks:
+                        task-plugins:
+                          enabled-plugins:
+                            - container
+                            - sidecar
+                            - k8s-array
+                            - spark
+                          default-for-task-types:
+                            - container: container
+                            - container_array: k8s-array
+                            - spark: spark
+                      cluster_resources:
+                        - production:
+                          - gsa:
+                              value: <GoogleServiceAccount-EMAIL>
+                        - staging:
+                          - gsa:
+                              value: <GoogleServiceAccount-EMAIL>
+                        - development:
+                          - gsa:
+                              value: <GoogleServiceAccount-EMAIL>
+                  clusterResourceTemplates:
+                    inline:
+                      #This section automates the creation of the project-domain namespaces
+                      - key: aa_namespace
+                        value: |
+                          apiVersion: v1
+                          kind: Namespace
+                          metadata:
+                            name: {{ namespace }}
+                          spec:
+                            finalizers:
+                            - kubernetes
+                      # This block performs the automated annotation of KSAs across all project-domain namespaces
+                      - key: ab_service_account
+                        value: |
+                          apiVersion: v1
+                          kind: ServiceAccount
+                          metadata:
+                            name: default
+                            namespace: '{{ namespace }}'
+                            annotations:
+                              iam.gke.io/gcp-service-account: {{ gsa }}
+                      - key: ac_spark_role
+                        value: |
+                          apiVersion: rbac.authorization.k8s.io/v1
+                          kind: Role
+                          metadata:
+                            name: spark-role
+                            namespace: "{{ namespace }}"
+                          rules:
+                          - apiGroups: ["*"]
+                            resources:
+                            - pods
+                            verbs:
+                            - '*'
+                          - apiGroups: ["*"]
+                            resources:
+                            - services
+                            verbs:
+                            - '*'
+                          - apiGroups: ["*"]
+                            resources:
+                            - configmaps
+                            verbs:
+                            - '*'
+                          - apiGroups: ["*"]
+                            resources:
+                            - persistentvolumeclaims
+                            verbs:
+                            - "*"                     
+                      - key: ad_spark_service_account
+                        value: |
+                          apiVersion: v1
+                          kind: ServiceAccount
+                          metadata:
+                            name: spark
+                            namespace: "{{ namespace }}"
+                            annotations:
+                              iam.gke.io/gcp-service-account: {{ gsa }}                     
+                      - key: ae_spark_role_binding
+                        value: |
+                          apiVersion: rbac.authorization.k8s.io/v1
+                          kind: RoleBinding
+                          metadata:
+                            name: spark-role-binding
+                            namespace: "{{ namespace }}"
+                          roleRef:
+                            apiGroup: rbac.authorization.k8s.io
+                            kind: Role
+                            name: spark-role
+                          subjects:
+                            - kind: ServiceAccount
+                              name: spark
+                              namespace: "{{ namespace }}"
+                      plugins:
+                        spark:
+                        # Edit the Spark configuration as you see fit
+                          spark-config-default:
+                            - spark.eventLog.enabled: "true"
+                            - spark.eventLog.dir: "{{ .Values.userSettings.bucketName }}/spark-events"
+                            - spark.driver.cores: "1"
+                            - spark.executorEnv.HTTP2_DISABLE: "true"
+                            - spark.hadoop.fs.AbstractFileSystem.gs.impl: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
+                            - spark.kubernetes.allocation.batch.size: "50"
+                            - spark.kubernetes.driverEnv.HTTP2_DISABLE: "true"
+                            - spark.network.timeout: 600s
+                            - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                            - spark.executor.heartbeatInterval: 60s
+               
+               2. Upgrade your Helm release:
+
+                 .. code-block:: bash
+
+                  helm upgrade <release-name> flyteorg/flyte-binary -n <namespace> --values <path-to-values-file>         
 
              .. group-tab:: flyte-core   
 
