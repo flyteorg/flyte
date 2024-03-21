@@ -292,7 +292,7 @@ func writeOutput(ctx context.Context, taskCtx webapi.StatusContext) error {
 		return nil
 	}
 
-	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), taskCtx.MaxDatasetSizeBytes())
+	outputReader := ioutils.NewRemoteFileOutputReader(ctx, taskCtx.DataStore(), taskCtx.OutputWriter(), 0)
 	return taskCtx.OutputWriter().Put(ctx, outputReader)
 }
 

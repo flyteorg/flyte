@@ -123,9 +123,13 @@ func (r RemoteFileOutputReader) DeckExists(ctx context.Context) (bool, error) {
 }
 
 func NewRemoteFileOutputReader(_ context.Context, store storage.ComposedProtobufStore, outPaths io.OutputFilePaths, maxDatasetSize int64) RemoteFileOutputReader {
+	maxPayloadSize := maxDatasetSize
+	if maxPayloadSize == 0 {
+		maxPayloadSize = storage.GetConfig().Limits.GetLimitMegabytes * 1024 * 1024
+	}
 	return RemoteFileOutputReader{
 		outPath:        outPaths,
 		store:          store,
-		maxPayloadSize: maxDatasetSize,
+		maxPayloadSize: maxPayloadSize,
 	}
 }
