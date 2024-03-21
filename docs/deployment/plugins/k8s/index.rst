@@ -282,7 +282,7 @@ Specify plugin configuration
         Create a file named ``values-override.yaml`` and add the following config to it:
     
         .. code-block:: yaml
-           :emphasize-lines: 9,14
+          :emphasize-lines: 9,14
     
           configmap:
             enabled_plugins:
