@@ -94,7 +94,7 @@ data:
     plugins:
       k8s:
         co-pilot:
-          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.0
+          image: cr.flyte.org/flyteorg/flytecopilot:v1.11.1-b0
           name: flyte-copilot-
           start-timeout: 30s
   core.yaml: | 
@@ -436,7 +436,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "cc8b6585fb0703724b6418fea14f52893fdd6913d5aee513867e84d66e23d72"
+        configChecksum: "aa5d63f89d24c745d2ea7cefd86b833555e6f0ede01168bf393d239f7d0ef7b"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -461,7 +461,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.1-b0"
         imagePullPolicy: "IfNotPresent"
         name: flytepropeller
         ports:
@@ -515,9 +515,9 @@ spec:
       labels:
         app: flyte-pod-webhook
         app.kubernetes.io/name: flyte-pod-webhook
-        app.kubernetes.io/version: v1.11.0
+        app.kubernetes.io/version: v1.11.1-b0
       annotations:
-        configChecksum: "cc8b6585fb0703724b6418fea14f52893fdd6913d5aee513867e84d66e23d72"
+        configChecksum: "aa5d63f89d24c745d2ea7cefd86b833555e6f0ede01168bf393d239f7d0ef7b"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -529,7 +529,7 @@ spec:
       serviceAccountName: flyte-pod-webhook
       initContainers:
       - name: generate-secrets
-        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0"
+        image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.1-b0"
         imagePullPolicy: "IfNotPresent"
         command:
           - flytepropeller
@@ -556,7 +556,7 @@ spec:
             mountPath: /etc/flyte/config
       containers:
         - name: webhook
-          image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.0"
+          image: "cr.flyte.org/flyteorg/flytepropeller:v1.11.1-b0"
           imagePullPolicy: "IfNotPresent"
           command:
             - flytepropeller
