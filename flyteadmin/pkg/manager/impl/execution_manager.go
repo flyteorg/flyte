@@ -953,7 +953,7 @@ func (m *ExecutionManager) launchExecutionAndPrepareModel(
 	}
 
 	var executionClusterLabel *admin.ExecutionClusterLabel
-	if requestSpec.ExecutionClusterLabel == nil {
+	if requestSpec.ExecutionClusterLabel != nil {
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 
