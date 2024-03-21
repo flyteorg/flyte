@@ -8,6 +8,8 @@ option go_package = "github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/plugi
 message RayJob {
   // RayClusterSpec is the cluster template to run the job
   RayCluster ray_cluster = 1;
+  
+  // DEPRECATED
   // runtime_env is base64 encoded.
   // Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments
   string runtime_env = 2;
@@ -15,6 +17,9 @@ message RayJob {
   bool shutdown_after_job_finishes = 3;
   // ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
   int32 ttl_seconds_after_finished = 4;
+	// RuntimeEnvYAML represents the runtime environment configuration
+	// provided as a multi-line YAML string.
+  string runtime_env_yaml = 5;
 }
 
 // Define Ray cluster defines the desired state of RayCluster

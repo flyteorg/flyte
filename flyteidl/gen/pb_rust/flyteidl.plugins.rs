@@ -171,6 +171,7 @@ pub struct RayJob {
     /// RayClusterSpec is the cluster template to run the job
     #[prost(message, optional, tag="1")]
     pub ray_cluster: ::core::option::Option<RayCluster>,
+    /// DEPRECATED
     /// runtime_env is base64 encoded.
     /// Ray runtime environments: <https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments>
     #[prost(string, tag="2")]
@@ -181,6 +182,10 @@ pub struct RayJob {
     /// ttl_seconds_after_finished specifies the number of seconds after which the RayCluster will be deleted after the RayJob finishes.
     #[prost(int32, tag="4")]
     pub ttl_seconds_after_finished: i32,
+    /// RuntimeEnvYAML represents the runtime environment configuration
+    /// provided as a multi-line YAML string.
+    #[prost(string, tag="5")]
+    pub runtime_env_yaml: ::prost::alloc::string::String,
 }
 /// Define Ray cluster defines the desired state of RayCluster
 #[allow(clippy::derive_partial_eq_without_eq)]
