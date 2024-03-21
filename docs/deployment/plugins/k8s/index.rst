@@ -1034,7 +1034,7 @@ Wait for the upgrade to complete. You can check the status of the deployment pod
 
   kubectl get pods -n flyte
 
-
+**Once all the components are up and running, go to the `examples section <https://docs.flyte.org/en/latest/flytesnacks/integrations.html#native-backend-plugins>`__ to learn more about how to use Flyte backend plugins**
 
 
 
