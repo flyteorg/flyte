@@ -205,7 +205,7 @@ func constructRayJob(taskCtx pluginsCore.TaskExecutionContext, rayJob plugins.Ra
 
 	submitterPodTemplate := buildSubmitterPodTemplate(headPodSpec, objectMeta, taskCtx)
 
-	// TODO: This is for backward compatability. Remove this block once runtime_env is removed from ray proto.
+	// TODO: This is for backward compatibility. Remove this block once runtime_env is removed from ray proto.
 	var err error
 	var runtimeEnvYaml string
 	runtimeEnvYaml = rayJob.RuntimeEnvYaml
