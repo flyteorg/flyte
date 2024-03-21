@@ -861,7 +861,7 @@ Specify plugin configuration
                               - "*"
                         #While the Spark Helm chart creates a spark ServiceAccount, this template creates one
                         # on each project-domain namespace and annotates it with the GSA
-                        #Then you should always run workflows with the Spark service account (eg pyflyte run --remote --service-account=spark ...)      
+                        #You should always run workflows with the Spark service account (eg pyflyte run --remote --service-account=spark ...)      
                         - key: ad_spark_service_account
                           value: |
                             apiVersion: v1
@@ -912,7 +912,7 @@ Specify plugin configuration
         .. group-tab:: flyte-sandbox
 
               If you installed the `flyte-sandbox <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__ Helm chart to a K8s cluster, follow this section to configure the Spark plugin.
-              Note that none of this configuration applies to the demo cluster that you can spin up with ``flytectl demo start``.
+              Note that none of this configuration applies to the demo cluster that you spin up with ``flytectl demo start``.
 
               1. Create a file named ``values-override.yaml`` and add the following config to it:
 
@@ -1028,8 +1028,6 @@ Specify plugin configuration
                           container_array: k8s-array
                           spark: spark
 
-
-
   .. group-tab:: Dask
    
     .. tabs::
@@ -1073,52 +1071,6 @@ Specify plugin configuration
                     sidecar: sidecar
                     container_array: k8s-array
                     dask: dask
-
-Upgrade the deployment
-----------------------
-
-.. tabs::
-
-  .. group-tab:: Flyte binary
-
-    If you are installing Flyte via the Helm chart, run the following command:
-
-    .. note::
-
-      There is no need to run ``helm upgrade`` for Spark.
-
-    .. code-block:: bash
-
-      helm upgrade <RELEASE_NAME> flyteorg/flyte-binary -n <YOUR_NAMESPACE> --values <YOUR_YAML_FILE>
-
-    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte-backend``),
-    ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``),
-    and ``<YOUR_YAML_FILE>`` with the name of your YAML file.
-
-  .. group-tab:: Flyte core / sandbox
-
-    .. code-block:: bash
-    
-      helm upgrade <RELEASE_NAME> flyte/flyte-core -n <YOUR_NAMESPACE> --values values-override.yaml
-
-    Replace ``<RELEASE_NAME>`` with the name of your release (e.g., ``flyte``)
-    and ``<YOUR_NAMESPACE>`` with the name of your namespace (e.g., ``flyte``).
-
-Wait for the upgrade to complete. You can check the status of the deployment pods by running the following command:
-
-.. code-block:: bash
-
-  kubectl get pods -n flyte
-
-
-
-
-
-
-
-
-
-
 
 Spin up a cluster
 -----------------
