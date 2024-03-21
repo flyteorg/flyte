@@ -547,17 +547,22 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 		return nil, nil, err
 	}
 
+	var executionClusterLabel *admin.ExecutionClusterLabel
+	if requestSpec.ExecutionClusterLabel == nil {
+		executionClusterLabel = requestSpec.ExecutionClusterLabel
+	}
 	executionParameters := workflowengineInterfaces.ExecutionParameters{
-		Inputs:              executionInputs,
-		AcceptedAt:          requestedAt,
-		Labels:              labels,
-		Annotations:         annotations,
-		ExecutionConfig:     executionConfig,
-		TaskResources:       &platformTaskResources,
-		EventVersion:        m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
-		RoleNameKey:         m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
-		RawOutputDataConfig: rawOutputDataConfig,
-		ClusterAssignment:   clusterAssignment,
+		Inputs:                executionInputs,
+		AcceptedAt:            requestedAt,
+		Labels:                labels,
+		Annotations:           annotations,
+		ExecutionConfig:       executionConfig,
+		TaskResources:         &platformTaskResources,
+		EventVersion:          m.config.ApplicationConfiguration().GetTopLevelConfig().EventVersion,
+		RoleNameKey:           m.config.ApplicationConfiguration().GetTopLevelConfig().RoleNameKey,
+		RawOutputDataConfig:   rawOutputDataConfig,
+		ClusterAssignment:     clusterAssignment,
+		ExecutionClusterLabel: executionClusterLabel,
 	}
 
 	overrides, err := m.addPluginOverrides(ctx, &workflowExecutionID, workflowExecutionID.Name, "")
