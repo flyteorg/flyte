@@ -630,10 +630,167 @@ Specify plugin configuration
                           - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                           - spark.executor.heartbeatInterval: 60s
                 
+              2. Upgrade your Helm release:
 
-            .. group-tab:: flyte-sandbox (on-prem)
+                 .. code-block:: bash
 
-              Create a file named ``values-override.yaml`` and add the following config to it:
+                  helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>         
+
+            
+        .. group-tab:: GCP
+
+          .. tabs::
+
+             .. group-tab:: flyte-binary
+
+                
+
+             .. group-tab:: flyte-core   
+
+                .. note::
+
+                   Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
+
+               1. Make sure your Helm values file includes the following configuration:
+
+                  .. code-block:: yaml
+
+                    enabled_plugins:
+                      tasks:
+                        task-plugins:
+                          enabled-plugins:
+                            - container
+                            - sidecar
+                            - k8s-array
+                            - spark
+                          default-for-task-types:
+                            container: container
+                            sidecar: sidecar
+                            container_array: k8s-array
+                            spark: spark 
+                    cluster_resource_manager:
+                      enabled: true
+                      standalone_deploy: false
+                      config:
+                        cluster_resources:
+                          customData:
+                          - production:
+                              - gsa:
+                              #This is the GSA that the Task Pods will use to access GCP resources. 
+                                  value: "<GoogleServiceAccount-email>"
+                          - staging:
+                              - gsa:
+                                  value: "<GoogleServiceAccount-email>"
+                          - development:
+                              - gsa:
+                                  value: "<GoogleServiceAccount-email>"
+                      templates:
+                        # -- Template for namespaces resources
+                        - key: aa_namespace
+                          value: |
+                            apiVersion: v1
+                            kind: Namespace
+                            metadata:
+                              name: {{ namespace }}
+                            spec:
+                              finalizers:
+                              - kubernetes
+                        # -- Patch default service account
+                        - key: aab_default_service_account
+                          value: |
+                            apiVersion: v1
+                            kind: ServiceAccount
+                            metadata:
+                              name: default
+                              namespace: {{ namespace }}
+                              annotations:
+                                # Annotation needed for GCP Workload Identity to function
+                                # https://cloud.google.com/kubernetes-engine/docs/how-to/workload-identity
+                                iam.gke.io/gcp-service-account: {{ gsa }}
+                        - key: ac_spark_role
+                          value: |
+                            apiVersion: rbac.authorization.k8s.io/v1
+                            kind: Role
+                            metadata:
+                              name: spark-role
+                              namespace: "{{ namespace }}"
+                            rules:
+                            - apiGroups: ["*"]
+                              resources:
+                              - pods
+                              verbs:
+                              - '*'
+                            - apiGroups: ["*"]
+                              resources:
+                              - services
+                              verbs:
+                              - '*'
+                            - apiGroups: ["*"]
+                              resources:
+                              - configmaps
+                              verbs:
+                              - '*'
+                            - apiGroups: ["*"]
+                              resources:
+                              - persistentvolumeclaims
+                              verbs:
+                              - "*"
+                        #While the Spark Helm chart creates a spark ServiceAccount, this template creates one
+                        # on each project-domain namespace and annotates it with the GSA
+                        #Then you should always run workflows with the Spark service account (eg pyflyte run --remote --service-account=spark ...)      
+                        - key: ad_spark_service_account
+                          value: |
+                            apiVersion: v1
+                            kind: ServiceAccount
+                            metadata:
+                              name: spark
+                              namespace: "{{ namespace }}"
+                              annotations:
+                                iam.gke.io/gcp-service-account: {{ gsa }}           
+                        - key: ae_spark_role_binding
+                          value: |
+                            apiVersion: rbac.authorization.k8s.io/v1
+                            kind: RoleBinding
+                            metadata:
+                              name: spark-role-binding
+                              namespace: "{{ namespace }}"
+                            roleRef:
+                              apiGroup: rbac.authorization.k8s.io
+                              kind: Role
+                              name: spark-role
+                            subjects:
+                              - kind: ServiceAccount
+                                name: spark
+                                namespace: "{{ namespace }}"
+                    sparkoperator:
+                    enabled: true
+                    plugins:
+                      spark:
+                        spark-config-default:
+                          - spark.eventLog.enabled: "true"
+                          - spark.eventLog.dir: "{{ .Values.userSettings.bucketName }}/spark-events"
+                          - spark.driver.cores: "1"
+                          - spark.executorEnv.HTTP2_DISABLE: "true"
+                          - spark.hadoop.fs.AbstractFileSystem.gs.impl: com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS
+                          - spark.kubernetes.allocation.batch.size: "50"
+                          - spark.kubernetes.driverEnv.HTTP2_DISABLE: "true"
+                          - spark.network.timeout: 600s
+                          - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                          - spark.executor.heartbeatInterval: 60s
+
+               2. Upgrade your Helm release:
+
+                 .. code-block:: bash
+
+                  helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>         
+
+
+        .. group-tab:: flyte-sandbox
+
+              If you installed the `flyte-sandbox <https://github.com/flyteorg/flyte/tree/master/charts/flyte-sandbox>`__ Helm chart to a K8s cluster, follow this section to configure the Spark plugin.
+              Note that none of this configuration applies to the demo cluster that you can spin up with ``flytectl demo start``.
+
+              1. Create a file named ``values-override.yaml`` and add the following config to it:
 
               .. note::
 
@@ -747,15 +904,7 @@ Specify plugin configuration
                           container_array: k8s-array
                           spark: spark
 
-        .. group-tab:: GCP
 
-          .. tabs::
-
-             .. group-tab:: flyte-binary
-
-
-
-             .. group-tab:: flyte-core                   
 
   .. group-tab:: Dask
    
