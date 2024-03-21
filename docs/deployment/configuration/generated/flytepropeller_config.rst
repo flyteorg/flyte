@@ -1015,6 +1015,8 @@ k8s (`config.K8sPluginConfig`_)
   default-annotations:
     cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
   default-cpus: "1"
+  default-env-from-configmaps: null
+  default-env-from-secrets: null
   default-env-vars: null
   default-env-vars-from-env: null
   default-labels: null
@@ -2179,6 +2181,26 @@ default-env-vars (map[string]string)
   
 
 default-env-vars-from-env (map[string]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-from-configmaps ([]string)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+**Default Value**: 
+
+.. code-block:: yaml
+
+  null
+  
+
+default-env-from-secrets ([]string)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 **Default Value**: 
