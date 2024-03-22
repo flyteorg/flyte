@@ -29,7 +29,6 @@ dependencies:
 
   # Packages for Plugin docs
   # Package name                Plugin needing it
-  - retry                       # aws sagemaker
   - botocore                    # fsspec
   - fsspec                      # fsspec
   - google-cloud-bigquery       # bigquery
@@ -38,6 +37,7 @@ dependencies:
   - great-expectations          # greatexpectations
   - datasets                    # huggingface
   - kubernetes                  # k8s-pod
+  - python-kubernetes           # k8s-pod
   - modin                       # modin
   - pandera                     # pandera
   - pydantic                    # vaex, pydantic
@@ -75,6 +75,7 @@ dependencies:
     - whylabs-client              # whylogs
     - ray==2.6.3
     - duckdb
+    - aioboto3>=12.3.0                    # aws sagemaker inference
 
 platforms:
   - linux-64
