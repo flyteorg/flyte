@@ -95,6 +95,8 @@ func FlyteTaskToBatchInput(ctx context.Context, tCtx pluginCore.TaskExecutionCon
 	if platformResources == nil {
 		platformResources = &v1.ResourceRequirements{}
 	}
+
+	flytek8s.SanitizeGPUResourceRequirements(res)
 	resources := flytek8s.ApplyResourceOverrides(*res, *platformResources, assignResources)
 
 	submitJobInput := &batch.SubmitJobInput{}
