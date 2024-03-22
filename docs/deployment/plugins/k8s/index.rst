@@ -37,7 +37,7 @@ Select the integration you need and follow the steps to install the correspondin
 
     b. Configure a Flyte ``PodTemplate`` to use the gang scheduler for your Tasks:
        
-       **K8s scheduler plugins with co-scheduling**
+    **K8s scheduler plugins with co-scheduling**
 
     .. code-block:: yaml
 
@@ -45,7 +45,7 @@ Select the integration you need and follow the steps to install the correspondin
           spec:
             schedulerName: "scheduler-plugins-scheduler"
 
-       **Apache Yunikorn**
+    **Apache Yunikorn**
 
     .. code-block:: yaml
 
