@@ -5,7 +5,7 @@ Configure Kubernetes Plugins
 
 .. tags:: Kubernetes, Integration, Spark, AWS, GCP, Advanced
 
-This guide help you configure the Flyte integrations that spin up resources on Kubernetes.
+This guide help you configure the Flyte plugins that provision resources on Kubernetes.
 The steps are defined in terms of the `deployment method <https://docs.flyte.org/en/latest/deployment/deployment/index.html#flyte-deployment-paths>`__ you used to install Flyte.
 
 Install the Kubernetes operator
@@ -17,7 +17,11 @@ Select the integration you need and follow the steps to install the correspondin
 
   .. group-tab:: PyTorch/TensorFlow/MPI
 
-    1. Install the Kubeflow ``training-operator`` using `manifests <https://github.com/kubeflow/training-operator?tab=readme-ov-file#installation>`__.
+    1. Install the `Kubeflow training-operator <https://github.com/kubeflow/training-operator?tab=readme-ov-file#kubeflow-training-operator>`__:
+
+    .. code-block:: bash
+
+      kubectl apply -k "github.com/kubeflow/training-operator/manifests/overlays/standalone"
 
     **Optional: Using a gang scheduler**
 
@@ -25,23 +29,25 @@ Select the integration you need and follow the steps to install the correspondin
     due to resource constraints, you can opt for a gang scheduler. This ensures that all worker pods are scheduled
     simultaneously, reducing the likelihood of job failures caused by timeout errors.
     
-    To enable gang scheduling for the ``training-operator``, you can either use the 
-    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/job-scheduling/#running-jobs-with-gang-scheduling>`__
-    or `Apache YuniKorn <https://yunikorn.apache.org/docs/next/user_guide/workloads/run_tf/>`__ as a second scheduler.
+    To enable gang scheduling for the ``training-operator``:
 
-    2. Configure a Flyte ``PodTemplate`` to use a gang scheduler for your Tasks:
+    a. Select a second scheduler from 
+    `Kubernetes scheduler plugins with co-scheduling <https://www.kubeflow.org/docs/components/training/job-scheduling/#running-jobs-with-gang-scheduling>`__
+    or `Apache YuniKorn <https://yunikorn.apache.org/docs/next/user_guide/workloads/run_tf/>`__ .
+
+    b. Configure a Flyte ``PodTemplate`` to use the gang scheduler for your Tasks:
        
        **K8s scheduler plugins with co-scheduling**
 
-       .. code-block::yaml
+    .. code-block:: yaml
 
-          template:
-            spec:
-              schedulerName: "scheduler-plugins-scheduler"
+        template:
+          spec:
+            schedulerName: "scheduler-plugins-scheduler"
 
        **Apache Yunikorn**
 
-       .. code-block::yaml
+    .. code-block:: yaml
 
           template:
             metadata:
