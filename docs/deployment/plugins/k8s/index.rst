@@ -57,11 +57,11 @@ Select the integration you need and follow the steps to install the correspondin
                 yunikorn.apache.org/schedulingPolicyParameters: ""
               
               
-       See :ref:`deployment-configuration-general` for more information about Pod templates in Flyte.
-       You can set the scheduler name in the Pod template passed to the ``@task`` decorator. However, to prevent the
-       two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
-       in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
-       gang scheduler as well.
+    See :ref:`deployment-configuration-general` for more information about Pod templates in Flyte.
+    You can set the scheduler name in the Pod template passed to the ``@task`` decorator. However, to prevent the
+    two different schedulers from competing for resources, it is recommended to set the scheduler name in the pod template
+    in the ``flyte`` namespace which is applied to all tasks. Non distributed training tasks can be scheduled by the
+    gang scheduler as well.
 
   .. group-tab:: Ray
     
