@@ -477,9 +477,9 @@ Specify plugin configuration
 
             .. group-tab:: GCP
 
-                  .. note::
+                 .. note::
 
-                  Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
+                    Check out the `reference implementation for GCP <https://github.com/unionai-oss/deploy-flyte/blob/main/environments/gcp/flyte-core/README.md>`__ for information on how all the Flyte prerequisites are configured.
  
                Create a file named ``values-override.yaml`` and add the following config to it:
 
