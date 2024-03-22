@@ -309,9 +309,11 @@ Specify plugin configuration
    
       .. tabs:: 
 
-        .. group-tab:: AWS
+        .. group-tab:: flyte-binary
 
-            .. group-tab:: Flyte binary
+          .. tabs:: 
+
+            .. group-tab:: AWS
 
               Create a file named ``values-override.yaml`` and add the following config to it:
 
@@ -473,120 +475,7 @@ Specify plugin configuration
                               limits.cpu: {{ projectQuotaCpu }}
                               limits.memory: {{ projectQuotaMemory }} 
 
-            .. group-tab:: flyte-core
-
-              1. Make sure that your Helm values file includes the following configuration:
-      
-              .. code-block:: yaml
-      
-                configmap:
-                  enabled_plugins:
-                    tasks:
-                      task-plugins:
-                        enabled-plugins:
-                          - container
-                          - sidecar
-                          - k8s-array
-                          - spark
-                        default-for-task-types:
-                          container: container
-                          sidecar: sidecar
-                          container_array: k8s-array
-                          spark: spark
-                cluster_resource_manager:
-                  enabled: true 
-                  standalone_deploy: false
-                  # -- Resource templates that should be applied
-                  templates:
-                    # -- Template for namespaces resources
-                    - key: aa_namespace
-                      value: |
-                        apiVersion: v1
-                        kind: Namespace
-                        metadata:
-                          name: {{ namespace }}
-                        spec:
-                          finalizers:
-                          - kubernetes
-                    - key: ac_spark_role
-                      value: |
-                        apiVersion: rbac.authorization.k8s.io/v1beta1
-                        kind: Role
-                        metadata:
-                          name: spark-role
-                          namespace: {{ namespace }}
-                        rules:
-                        - apiGroups: ["*"]
-                          resources:
-                          - pods
-                          verbs:
-                          - '*'
-                        - apiGroups: ["*"]
-                          resources:
-                          - services
-                          verbs:
-                          - '*'
-                        - apiGroups: ["*"]
-                          resources:
-                          - configmaps
-                          verbs:
-                          - '*'
-                        - apiGroups: ["*"]
-                          resources:
-                          - persistentvolumeclaims
-                          verbs:
-                          - "*"
-          
-                    - key: ad_spark_service_account
-                      value: |
-                        apiVersion: v1
-                        kind: ServiceAccount
-                        metadata:
-                          name: spark
-                          namespace: {{ namespace }}
-          
-                    - key: ae_spark_role_binding
-                      value: |
-                        apiVersion: rbac.authorization.k8s.io/v1beta1
-                        kind: RoleBinding
-                        metadata:
-                          name: spark-role-binding
-                          namespace: {{ namespace }}
-                        roleRef:
-                          apiGroup: rbac.authorization.k8s.io
-                          kind: Role
-                          name: spark-role
-                        subjects:
-                        - kind: ServiceAccount
-                          name: spark
-                          namespace: {{ namespace }}
-          
-                sparkoperator:
-                  enabled: true
-                  plugin_config:
-                    plugins:
-                      spark:
-                        # Edit the Spark configuration as you see fit
-                        spark-config-default:
-                          - spark.driver.cores: "1"
-                          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
-                          - spark.kubernetes.allocation.batch.size: "50"
-                          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
-                          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
-                          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
-                          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
-                          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
-                          - spark.network.timeout: 600s
-                          - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
-                          - spark.executor.heartbeatInterval: 60s
-                 
-        .. group-tab:: GCP
-
-          .. tabs::
-
-             .. group-tab:: flyte-binary
+            .. group-tab:: GCP
 
                .. note::
 
@@ -708,7 +597,121 @@ Specify plugin configuration
                             - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                             - spark.executor.heartbeatInterval: 60s
                
-             .. group-tab:: flyte-core   
+        .. group-tab:: flyte-core
+
+          .. tabs:: 
+
+            .. group-tab:: AWS
+
+              1. Make sure that your Helm values file includes the following configuration:
+      
+              .. code-block:: yaml
+      
+                configmap:
+                  enabled_plugins:
+                    tasks:
+                      task-plugins:
+                        enabled-plugins:
+                          - container
+                          - sidecar
+                          - k8s-array
+                          - spark
+                        default-for-task-types:
+                          container: container
+                          sidecar: sidecar
+                          container_array: k8s-array
+                          spark: spark
+                cluster_resource_manager:
+                  enabled: true 
+                  standalone_deploy: false
+                  # -- Resource templates that should be applied
+                  templates:
+                    # -- Template for namespaces resources
+                    - key: aa_namespace
+                      value: |
+                        apiVersion: v1
+                        kind: Namespace
+                        metadata:
+                          name: {{ namespace }}
+                        spec:
+                          finalizers:
+                          - kubernetes
+                    - key: ac_spark_role
+                      value: |
+                        apiVersion: rbac.authorization.k8s.io/v1beta1
+                        kind: Role
+                        metadata:
+                          name: spark-role
+                          namespace: {{ namespace }}
+                        rules:
+                        - apiGroups: ["*"]
+                          resources:
+                          - pods
+                          verbs:
+                          - '*'
+                        - apiGroups: ["*"]
+                          resources:
+                          - services
+                          verbs:
+                          - '*'
+                        - apiGroups: ["*"]
+                          resources:
+                          - configmaps
+                          verbs:
+                          - '*'
+                        - apiGroups: ["*"]
+                          resources:
+                          - persistentvolumeclaims
+                          verbs:
+                          - "*"
+          
+                    - key: ad_spark_service_account
+                      value: |
+                        apiVersion: v1
+                        kind: ServiceAccount
+                        metadata:
+                          name: spark
+                          namespace: {{ namespace }}
+          
+                    - key: ae_spark_role_binding
+                      value: |
+                        apiVersion: rbac.authorization.k8s.io/v1beta1
+                        kind: RoleBinding
+                        metadata:
+                          name: spark-role-binding
+                          namespace: {{ namespace }}
+                        roleRef:
+                          apiGroup: rbac.authorization.k8s.io
+                          kind: Role
+                          name: spark-role
+                        subjects:
+                        - kind: ServiceAccount
+                          name: spark
+                          namespace: {{ namespace }}
+          
+                sparkoperator:
+                  enabled: true
+                  plugin_config:
+                    plugins:
+                      spark:
+                        # Edit the Spark configuration as you see fit
+                        spark-config-default:
+                          - spark.driver.cores: "1"
+                          - spark.hadoop.fs.s3a.aws.credentials.provider: "com.amazonaws.auth.DefaultAWSCredentialsProviderChain"
+                          - spark.kubernetes.allocation.batch.size: "50"
+                          - spark.hadoop.fs.s3a.acl.default: "BucketOwnerFullControl"
+                          - spark.hadoop.fs.s3n.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                          - spark.hadoop.fs.AbstractFileSystem.s3n.impl: "org.apache.hadoop.fs.s3a.S3A"
+                          - spark.hadoop.fs.s3.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                          - spark.hadoop.fs.AbstractFileSystem.s3.impl: "org.apache.hadoop.fs.s3a.S3A"
+                          - spark.hadoop.fs.s3a.impl: "org.apache.hadoop.fs.s3a.S3AFileSystem"
+                          - spark.hadoop.fs.AbstractFileSystem.s3a.impl: "org.apache.hadoop.fs.s3a.S3A"
+                          - spark.network.timeout: 600s
+                          - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
+                          - spark.executor.heartbeatInterval: 60s
+            
+               
+            .. group-tab:: GCP  
 
                 .. note::
 
@@ -840,13 +843,6 @@ Specify plugin configuration
                           - spark.network.timeout: 600s
                           - spark.executorEnv.KUBERNETES_REQUEST_TIMEOUT: 100000
                           - spark.executor.heartbeatInterval: 60s
-
-               2. Upgrade your Helm release:
-
-                 .. code-block:: bash
-
-                  helm upgrade <release-name> flyteorg/flyte-core -n <namespace> --values <path-to-values-file>         
-
 
         .. group-tab:: flyte-sandbox
 
