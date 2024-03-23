@@ -102,8 +102,13 @@ func (l *launchPlanHandler) StartLaunchPlan(ctx context.Context, nCtx interfaces
 			}
 		}
 	}
-	err = l.launchPlan.Launch(ctx, launchCtx, childID, nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID().Identifier,
-		nodeInputs, nCtx.NodeExecutionMetadata().GetOwnerID().String())
+	launchPlanRefID := nCtx.Node().GetWorkflowNode().GetLaunchPlanRefID()
+	launchPlan := nCtx.ExecutionContext().FindLaunchPlan(*launchPlanRefID)
+	if launchPlan == nil {
+		return handler.DoTransition(handler.TransitionTypeEphemeral,
+			handler.PhaseInfoFailure(core.ExecutionError_SYSTEM, errors.BadSpecificationError, fmt.Sprintf("launch plan not found [%v]", launchPlanRefID), nil)), nil
+	}
+	err = l.launchPlan.Launch(ctx, launchCtx, childID, launchPlan, nodeInputs, nCtx.NodeExecutionMetadata().GetOwnerID().String())
 	if err != nil {
 		if launchplan.IsAlreadyExists(err) {
 			logger.Infof(ctx, "Execution already exists [%s].", childID.Name)

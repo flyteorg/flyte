@@ -83,7 +83,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(nil)
@@ -113,7 +113,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(errors.Wrapf(launchplan.RemoteErrorAlreadyExists, fmt.Errorf("blah"), "failed"))
@@ -140,7 +140,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(errors.Wrapf(launchplan.RemoteErrorSystem, fmt.Errorf("blah"), "failed"))
@@ -167,7 +167,8 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			//mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(errors.Wrapf(launchplan.RemoteErrorUser, fmt.Errorf("blah"), "failed"))
@@ -222,7 +223,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 			mock.MatchedBy(func(o *core.WorkflowExecutionIdentifier) bool {
 				return assert.Equal(t, wfExecID.Project, o.Project) && assert.Equal(t, wfExecID.Domain, o.Domain)
 			}),
-			mock.MatchedBy(func(o *core.Identifier) bool { return lpID == o }),
+			mock.MatchedBy(func(o v1alpha1.ExecutableLaunchPlan) bool { return true }),
 			mock.MatchedBy(func(o *core.LiteralMap) bool { return o.Literals == nil }),
 			mock.MatchedBy(func(o string) bool { return o == k8sWorkflowID.String() }),
 		).Return(nil)
@@ -267,6 +268,7 @@ func TestSubWorkflowHandler_StartLaunchPlan(t *testing.T) {
 		ectx.OnGetRawOutputDataConfig().Return(v1alpha1.RawOutputDataConfig{})
 		ectx.OnGetLabels().Return(nil)
 		ectx.OnGetAnnotations().Return(nil)
+		ectx.OnFindLaunchPlanMatch(mock.Anything).Return(&core.LaunchPlanTemplate{})
 
 		nCtx.OnExecutionContext().Return(ectx)
 		nCtx.OnCurrentAttempt().Return(uint32(1))
