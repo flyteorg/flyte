@@ -548,7 +548,7 @@ func (m *ExecutionManager) launchSingleTaskExecution(
 	}
 
 	var executionClusterLabel *admin.ExecutionClusterLabel
-	if requestSpec.ExecutionClusterLabel == nil {
+	if requestSpec.ExecutionClusterLabel != nil {
 		executionClusterLabel = requestSpec.ExecutionClusterLabel
 	}
 	executionParameters := workflowengineInterfaces.ExecutionParameters{

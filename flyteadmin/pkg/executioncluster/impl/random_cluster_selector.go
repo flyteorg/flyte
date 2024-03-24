@@ -100,6 +100,7 @@ func (s RandomClusterSelector) GetTarget(ctx context.Context, spec *executionclu
 
 	if spec.ExecutionClusterLabel != nil && spec.ExecutionClusterLabel.Value != "" {
 		label = spec.ExecutionClusterLabel.Value
+		logger.Debugf(ctx, "Using execution cluster label %s", label)
 	} else {
 		resource, err := s.resourceManager.GetResource(ctx, managerInterfaces.ResourceRequest{
 			Project:      spec.Project,
