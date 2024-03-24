@@ -902,6 +902,43 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
    */
   logs: TaskLog[] = [];
 
+  /**
+   * This structure carries the catalog artifact information
+   *
+   * @generated from field: flyteidl.core.CatalogMetadata catalog_key = 7;
+   */
+  catalogKey?: CatalogMetadata;
+
+  /**
+   * @generated from oneof flyteidl.event.ExternalResourceInfo.output_result
+   */
+  outputResult: {
+    /**
+     * URI to the output of the execution, it will be in a format that encodes all the information
+     * including Cloud source provider. ie., s3://...
+     *
+     * @generated from field: string output_uri = 8;
+     */
+    value: string;
+    case: "outputUri";
+  } | {
+    /**
+     * Error information for the execution
+     *
+     * @generated from field: flyteidl.core.ExecutionError error = 9;
+     */
+    value: ExecutionError;
+    case: "error";
+  } | {
+    /**
+     * Raw output data produced by this task execution.
+     *
+     * @generated from field: flyteidl.core.LiteralMap output_data = 10;
+     */
+    value: LiteralMap;
+    case: "outputData";
+  } | { case: undefined; value?: undefined } = { case: undefined };
+
   constructor(data?: PartialMessage<ExternalResourceInfo>) {
     super();
     proto3.util.initPartial(data, this);
@@ -916,6 +953,10 @@ export class ExternalResourceInfo extends Message<ExternalResourceInfo> {
     { no: 4, name: "phase", kind: "enum", T: proto3.getEnumType(TaskExecution_Phase) },
     { no: 5, name: "cache_status", kind: "enum", T: proto3.getEnumType(CatalogCacheStatus) },
     { no: 6, name: "logs", kind: "message", T: TaskLog, repeated: true },
+    { no: 7, name: "catalog_key", kind: "message", T: CatalogMetadata },
+    { no: 8, name: "output_uri", kind: "scalar", T: 9 /* ScalarType.STRING */, oneof: "output_result" },
+    { no: 9, name: "error", kind: "message", T: ExecutionError, oneof: "output_result" },
+    { no: 10, name: "output_data", kind: "message", T: LiteralMap, oneof: "output_result" },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExternalResourceInfo {

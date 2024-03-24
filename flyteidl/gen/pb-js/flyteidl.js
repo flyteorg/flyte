@@ -21780,6 +21780,10 @@
                  * @property {flyteidl.core.TaskExecution.Phase|null} [phase] ExternalResourceInfo phase
                  * @property {flyteidl.core.CatalogCacheStatus|null} [cacheStatus] ExternalResourceInfo cacheStatus
                  * @property {Array.<flyteidl.core.ITaskLog>|null} [logs] ExternalResourceInfo logs
+                 * @property {flyteidl.core.ICatalogMetadata|null} [catalogKey] ExternalResourceInfo catalogKey
+                 * @property {string|null} [outputUri] ExternalResourceInfo outputUri
+                 * @property {flyteidl.core.IExecutionError|null} [error] ExternalResourceInfo error
+                 * @property {flyteidl.core.ILiteralMap|null} [outputData] ExternalResourceInfo outputData
                  */
     
                 /**
@@ -21847,6 +21851,52 @@
                 ExternalResourceInfo.prototype.logs = $util.emptyArray;
     
                 /**
+                 * ExternalResourceInfo catalogKey.
+                 * @member {flyteidl.core.ICatalogMetadata|null|undefined} catalogKey
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.catalogKey = null;
+    
+                /**
+                 * ExternalResourceInfo outputUri.
+                 * @member {string} outputUri
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.outputUri = "";
+    
+                /**
+                 * ExternalResourceInfo error.
+                 * @member {flyteidl.core.IExecutionError|null|undefined} error
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.error = null;
+    
+                /**
+                 * ExternalResourceInfo outputData.
+                 * @member {flyteidl.core.ILiteralMap|null|undefined} outputData
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                ExternalResourceInfo.prototype.outputData = null;
+    
+                // OneOf field names bound to virtual getters and setters
+                var $oneOfFields;
+    
+                /**
+                 * ExternalResourceInfo outputResult.
+                 * @member {"outputUri"|"error"|"outputData"|undefined} outputResult
+                 * @memberof flyteidl.event.ExternalResourceInfo
+                 * @instance
+                 */
+                Object.defineProperty(ExternalResourceInfo.prototype, "outputResult", {
+                    get: $util.oneOfGetter($oneOfFields = ["outputUri", "error", "outputData"]),
+                    set: $util.oneOfSetter($oneOfFields)
+                });
+    
+                /**
                  * Creates a new ExternalResourceInfo instance using the specified properties.
                  * @function create
                  * @memberof flyteidl.event.ExternalResourceInfo
@@ -21883,6 +21933,14 @@
                     if (message.logs != null && message.logs.length)
                         for (var i = 0; i < message.logs.length; ++i)
                             $root.flyteidl.core.TaskLog.encode(message.logs[i], writer.uint32(/* id 6, wireType 2 =*/50).fork()).ldelim();
+                    if (message.catalogKey != null && message.hasOwnProperty("catalogKey"))
+                        $root.flyteidl.core.CatalogMetadata.encode(message.catalogKey, writer.uint32(/* id 7, wireType 2 =*/58).fork()).ldelim();
+                    if (message.outputUri != null && message.hasOwnProperty("outputUri"))
+                        writer.uint32(/* id 8, wireType 2 =*/66).string(message.outputUri);
+                    if (message.error != null && message.hasOwnProperty("error"))
+                        $root.flyteidl.core.ExecutionError.encode(message.error, writer.uint32(/* id 9, wireType 2 =*/74).fork()).ldelim();
+                    if (message.outputData != null && message.hasOwnProperty("outputData"))
+                        $root.flyteidl.core.LiteralMap.encode(message.outputData, writer.uint32(/* id 10, wireType 2 =*/82).fork()).ldelim();
                     return writer;
                 };
     
@@ -21924,6 +21982,18 @@
                                 message.logs = [];
                             message.logs.push($root.flyteidl.core.TaskLog.decode(reader, reader.uint32()));
                             break;
+                        case 7:
+                            message.catalogKey = $root.flyteidl.core.CatalogMetadata.decode(reader, reader.uint32());
+                            break;
+                        case 8:
+                            message.outputUri = reader.string();
+                            break;
+                        case 9:
+                            message.error = $root.flyteidl.core.ExecutionError.decode(reader, reader.uint32());
+                            break;
+                        case 10:
+                            message.outputData = $root.flyteidl.core.LiteralMap.decode(reader, reader.uint32());
+                            break;
                         default:
                             reader.skipType(tag & 7);
                             break;
@@ -21943,6 +22013,7 @@
                 ExternalResourceInfo.verify = function verify(message) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
+                    var properties = {};
                     if (message.externalId != null && message.hasOwnProperty("externalId"))
                         if (!$util.isString(message.externalId))
                             return "externalId: string expected";
@@ -21987,6 +22058,36 @@
                             var error = $root.flyteidl.core.TaskLog.verify(message.logs[i]);
                             if (error)
                                 return "logs." + error;
+                        }
+                    }
+                    if (message.catalogKey != null && message.hasOwnProperty("catalogKey")) {
+                        var error = $root.flyteidl.core.CatalogMetadata.verify(message.catalogKey);
+                        if (error)
+                            return "catalogKey." + error;
+                    }
+                    if (message.outputUri != null && message.hasOwnProperty("outputUri")) {
+                        properties.outputResult = 1;
+                        if (!$util.isString(message.outputUri))
+                            return "outputUri: string expected";
+                    }
+                    if (message.error != null && message.hasOwnProperty("error")) {
+                        if (properties.outputResult === 1)
+                            return "outputResult: multiple values";
+                        properties.outputResult = 1;
+                        {
+                            var error = $root.flyteidl.core.ExecutionError.verify(message.error);
+                            if (error)
+                                return "error." + error;
+                        }
+                    }
+                    if (message.outputData != null && message.hasOwnProperty("outputData")) {
+                        if (properties.outputResult === 1)
+                            return "outputResult: multiple values";
+                        properties.outputResult = 1;
+                        {
+                            var error = $root.flyteidl.core.LiteralMap.verify(message.outputData);
+                            if (error)
+                                return "outputData." + error;
                         }
                     }
                     return null;

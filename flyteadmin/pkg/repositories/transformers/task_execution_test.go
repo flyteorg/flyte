@@ -1256,11 +1256,36 @@ func TestMergeCustoms(t *testing.T) {
 }
 
 func TestMergeExternalResource(t *testing.T) {
+	parentNodeExecutionID := &core.NodeExecutionIdentifier{
+		NodeId: "foo",
+		ExecutionId: &core.WorkflowExecutionIdentifier{
+			Project: "foo",
+			Domain:  "bar",
+			Name:    "baz",
+		},
+	}
+	taskID := &core.Identifier{
+		ResourceType: core.ResourceType_TASK,
+		Project:      "foo",
+		Domain:       "bar",
+		Name:         "baz",
+		Version:      "bat",
+	}
+	retryAttempt := uint32(1)
+	subNodeIndex := uint32(2)
+	subNodeRetryAttempt := uint32(3)
+
+	storageURI := fmt.Sprintf("s3://bucket/metadata/%s/%s/%s/%s/%s/%s/%s/%s/%d/%d/%d/%s", parentNodeExecutionID.ExecutionId.Project,
+		parentNodeExecutionID.ExecutionId.Domain, parentNodeExecutionID.ExecutionId.Name, parentNodeExecutionID.NodeId, taskID.Project,
+		taskID.Domain, taskID.Name, taskID.Version, retryAttempt, subNodeIndex,
+		subNodeRetryAttempt, OutputsObjectSuffix)
+
 	type testCase struct {
-		existing *event.ExternalResourceInfo
-		latest   *event.ExternalResourceInfo
-		expected *event.ExternalResourceInfo
-		name     string
+		existing              *event.ExternalResourceInfo
+		latest                *event.ExternalResourceInfo
+		expected              *event.ExternalResourceInfo
+		inlineEventDataPolicy interfaces.InlineEventDataPolicy
+		name                  string
 	}
 
 	testCases := []testCase{
@@ -1322,11 +1347,104 @@ func TestMergeExternalResource(t *testing.T) {
 			},
 			name: "update everything",
 		},
+		{
+			existing: &event.ExternalResourceInfo{},
+			latest: &event.ExternalResourceInfo{
+				OutputResult: &event.ExternalResourceInfo_OutputUri{
+					OutputUri: "foo",
+				},
+			},
+			expected: &event.ExternalResourceInfo{
+				OutputResult: &event.ExternalResourceInfo_OutputUri{
+					OutputUri: "foo",
+				},
+			},
+			name: "output uri",
+		},
+		{
+			existing: &event.ExternalResourceInfo{},
+			latest: &event.ExternalResourceInfo{
+				OutputResult: &event.ExternalResourceInfo_OutputData{
+					OutputData: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"foo": nil,
+						},
+					},
+				},
+			},
+			expected: &event.ExternalResourceInfo{
+				OutputResult: &event.ExternalResourceInfo_OutputData{
+					OutputData: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"foo": nil,
+						},
+					},
+				},
+			},
+			inlineEventDataPolicy: interfaces.InlineEventDataPolicyStoreInline,
+			name:                  "output data inline",
+		},
+		{
+			existing: &event.ExternalResourceInfo{
+				Index:        subNodeIndex,
+				RetryAttempt: subNodeRetryAttempt,
+			},
+			latest: &event.ExternalResourceInfo{
+				Index:        subNodeIndex,
+				RetryAttempt: subNodeRetryAttempt,
+				OutputResult: &event.ExternalResourceInfo_OutputData{
+					OutputData: &core.LiteralMap{
+						Literals: map[string]*core.Literal{
+							"foo": nil,
+						},
+					},
+				},
+			},
+			expected: &event.ExternalResourceInfo{
+				Index:        subNodeIndex,
+				RetryAttempt: subNodeRetryAttempt,
+				OutputResult: &event.ExternalResourceInfo_OutputUri{
+					OutputUri: storageURI,
+				},
+			},
+			inlineEventDataPolicy: interfaces.InlineEventDataPolicyOffload,
+			name:                  "output data offload",
+		},
+		{
+			existing: &event.ExternalResourceInfo{},
+			latest: &event.ExternalResourceInfo{
+				OutputResult: &event.ExternalResourceInfo_Error{
+					Error: &core.ExecutionError{
+						Code:    "foo",
+						Message: "bar",
+					},
+				},
+			},
+			expected: &event.ExternalResourceInfo{
+				OutputResult: &event.ExternalResourceInfo_Error{
+					Error: &core.ExecutionError{
+						Code:    "foo",
+						Message: "bar",
+					},
+				},
+			},
+			name: "output error",
+		},
 	}
 
 	for _, mergeTestCase := range testCases {
 		t.Run(mergeTestCase.name, func(t *testing.T) {
-			actual := mergeExternalResource(mergeTestCase.existing, mergeTestCase.latest)
+			mockStorage := commonMocks.GetMockStorageClient()
+			mockStorage.ComposedProtobufStore.(*commonMocks.TestDataStore).WriteProtobufCb = func(ctx context.Context, reference storage.DataReference, opts storage.Options, msg proto.Message) error {
+				assert.Equal(t, reference.String(), storageURI)
+				return nil
+			}
+
+			actual, err := mergeExternalResource(context.TODO(), mergeTestCase.existing, mergeTestCase.latest,
+				parentNodeExecutionID, taskID, retryAttempt, mergeTestCase.inlineEventDataPolicy, mockStorage)
+			assert.Nil(t, err)
+			t.Logf("HAMERSAW - %+v\n", actual)
+			t.Logf("HAMERSAW - %+v", mergeTestCase.expected)
 			assert.True(t, proto.Equal(mergeTestCase.expected, actual))
 		})
 	}
@@ -1511,7 +1629,8 @@ func TestMergeExternalResources(t *testing.T) {
 
 	for _, mergeTestCase := range testCases {
 		t.Run(mergeTestCase.name, func(t *testing.T) {
-			actual := mergeExternalResources(mergeTestCase.existing, mergeTestCase.latest)
+			actual, err := mergeExternalResources(context.TODO(), mergeTestCase.existing, mergeTestCase.latest, nil, nil, 0, 0, nil)
+			assert.Nil(t, err)
 			assert.Equal(t, len(mergeTestCase.expected), len(actual))
 			for idx, expectedExternalResource := range mergeTestCase.expected {
 				assert.True(t, proto.Equal(expectedExternalResource, actual[idx]))
@@ -1588,7 +1707,8 @@ func TestMergeMetadata(t *testing.T) {
 
 	for _, mergeTestCase := range testCases {
 		t.Run(mergeTestCase.name, func(t *testing.T) {
-			metadata := mergeMetadata(mergeTestCase.existing, mergeTestCase.latest)
+			metadata, err := mergeMetadata(context.TODO(), mergeTestCase.existing, mergeTestCase.latest, nil, nil, 0, 0, nil)
+			assert.Nil(t, err)
 			assert.True(t, proto.Equal(mergeTestCase.expected, metadata))
 		})
 	}

@@ -8905,6 +8905,18 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs */
             logs?: (flyteidl.core.ITaskLog[]|null);
+
+            /** ExternalResourceInfo catalogKey */
+            catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** ExternalResourceInfo outputUri */
+            outputUri?: (string|null);
+
+            /** ExternalResourceInfo error */
+            error?: (flyteidl.core.IExecutionError|null);
+
+            /** ExternalResourceInfo outputData */
+            outputData?: (flyteidl.core.ILiteralMap|null);
         }
 
         /** Represents an ExternalResourceInfo. */
@@ -8933,6 +8945,21 @@ export namespace flyteidl {
 
             /** ExternalResourceInfo logs. */
             public logs: flyteidl.core.ITaskLog[];
+
+            /** ExternalResourceInfo catalogKey. */
+            public catalogKey?: (flyteidl.core.ICatalogMetadata|null);
+
+            /** ExternalResourceInfo outputUri. */
+            public outputUri: string;
+
+            /** ExternalResourceInfo error. */
+            public error?: (flyteidl.core.IExecutionError|null);
+
+            /** ExternalResourceInfo outputData. */
+            public outputData?: (flyteidl.core.ILiteralMap|null);
+
+            /** ExternalResourceInfo outputResult. */
+            public outputResult?: ("outputUri"|"error"|"outputData");
 
             /**
              * Creates a new ExternalResourceInfo instance using the specified properties.

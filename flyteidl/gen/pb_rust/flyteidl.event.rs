@@ -317,6 +317,28 @@ pub struct ExternalResourceInfo {
     /// log information for the external resource execution
     #[prost(message, repeated, tag="6")]
     pub logs: ::prost::alloc::vec::Vec<super::core::TaskLog>,
+    /// This structure carries the catalog artifact information
+    #[prost(message, optional, tag="7")]
+    pub catalog_key: ::core::option::Option<super::core::CatalogMetadata>,
+    #[prost(oneof="external_resource_info::OutputResult", tags="8, 9, 10")]
+    pub output_result: ::core::option::Option<external_resource_info::OutputResult>,
+}
+/// Nested message and enum types in `ExternalResourceInfo`.
+pub mod external_resource_info {
+    #[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Oneof)]
+    pub enum OutputResult {
+        /// URI to the output of the execution, it will be in a format that encodes all the information
+        /// including Cloud source provider. ie., s3://...
+        #[prost(string, tag="8")]
+        OutputUri(::prost::alloc::string::String),
+        /// Error information for the execution
+        #[prost(message, tag="9")]
+        Error(super::super::core::ExecutionError),
+        /// Raw output data produced by this task execution.
+        #[prost(message, tag="10")]
+        OutputData(super::super::core::LiteralMap),
+    }
 }
 /// This message holds task execution metadata specific to resource allocation used to manage concurrent
 /// executions for a project namespace.
