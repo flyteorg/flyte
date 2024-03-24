@@ -31,14 +31,14 @@ func (s OAuth2MetadataProvider) AuthFuncOverride(ctx context.Context, fullMethod
 }
 
 func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *service.OAuth2MetadataRequest) (*service.OAuth2MetadataResponse, error) {
+	publicURL := auth.GetPublicURL(ctx, nil, s.cfg)
 	switch s.cfg.AppAuth.AuthServerType {
 	case authConfig.AuthorizationServerTypeSelf:
-		u := auth.GetPublicURL(ctx, nil, s.cfg)
 		doc := &service.OAuth2MetadataResponse{
 			Issuer:                        GetIssuer(ctx, nil, s.cfg),
-			AuthorizationEndpoint:         u.ResolveReference(authorizeRelativeURL).String(),
-			TokenEndpoint:                 u.ResolveReference(tokenRelativeURL).String(),
-			JwksUri:                       u.ResolveReference(jsonWebKeysURL).String(),
+			AuthorizationEndpoint:         publicURL.ResolveReference(authorizeRelativeURL).String(),
+			TokenEndpoint:                 publicURL.ResolveReference(tokenRelativeURL).String(),
+			JwksUri:                       publicURL.ResolveReference(jsonWebKeysURL).String(),
 			CodeChallengeMethodsSupported: []string{"S256"},
 			ResponseTypesSupported: []string{
 				"code",
@@ -94,6 +94,18 @@ func (s OAuth2MetadataProvider) GetOAuth2Metadata(ctx context.Context, r *servic
 		err = unmarshalResp(response, raw, resp)
 		if err != nil {
 			return nil, err
+		}
+
+		if len(s.cfg.TokenEndpointProxyPath) > 0 {
+			tokenEndpoint, err := url.Parse(resp.TokenEndpoint)
+			if err != nil {
+				return nil, flyteErrors.NewFlyteAdminError(codes.Internal, fmt.Sprintf("Failed to parse token endpoint [%v], err: %v", resp.TokenEndpoint, err))
+			}
+
+			tokenEndpoint.Host = publicURL.Host
+			tokenEndpoint.Path = s.cfg.TokenEndpointProxyPath + tokenEndpoint.Path
+			tokenEndpoint.RawPath = s.cfg.TokenEndpointProxyPath + tokenEndpoint.RawPath
+			resp.TokenEndpoint = tokenEndpoint.String()
 		}
 
 		return resp, nil

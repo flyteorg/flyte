@@ -164,6 +164,9 @@ type Config struct {
 
 	// AppAuth settings used to authenticate and control/limit access scopes for apps.
 	AppAuth OAuth2Options `json:"appAuth" pflag:",Defines Auth options for apps. UserAuth must be enabled for AppAuth to work."`
+
+	// TokenEndpointProxyPath, if set, configures admin to proxy calls to the TokenURL using this path prefix.
+	TokenEndpointProxyPath string `json:"tokenEndpointProxyPath" pflag:",The path used to proxy calls to the TokenURL"`
 }
 
 type AuthorizationServer struct {

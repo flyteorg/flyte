@@ -91,6 +91,28 @@ func TestOAuth2MetadataProvider_OAuth2Metadata(t *testing.T) {
 		ctx := context.Background()
 		resp, err := provider.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
 		assert.NoError(t, err)
+		assert.Equal(t, "https://example.com/auth", resp.AuthorizationEndpoint)
+		assert.Equal(t, "https://example.com/token", resp.TokenEndpoint)
+		assert.Equal(t, "https://dev-14186422.okta.com", resp.Issuer)
+	})
+
+	t.Run("External AuthServer with proxy", func(t *testing.T) {
+		provider := NewService(&authConfig.Config{
+			AuthorizedURIs: []config2.URL{{URL: *config.MustParseURL("https://issuer/")}},
+			AppAuth: authConfig.OAuth2Options{
+				AuthServerType: authConfig.AuthorizationServerTypeExternal,
+				ExternalAuthServer: authConfig.ExternalAuthorizationServer{
+					BaseURL: config2.URL{URL: *config.MustParseURL(s.URL)},
+				},
+			},
+			TokenEndpointProxyPath: "/my-proxy",
+		})
+
+		ctx := context.Background()
+		resp, err := provider.GetOAuth2Metadata(ctx, &service.OAuth2MetadataRequest{})
+		assert.NoError(t, err)
+		assert.Equal(t, "https://example.com/auth", resp.AuthorizationEndpoint)
+		assert.Equal(t, "https://issuer/my-proxy/token", resp.TokenEndpoint)
 		assert.Equal(t, "https://dev-14186422.okta.com", resp.Issuer)
 	})
 
