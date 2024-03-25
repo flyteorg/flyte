@@ -1524,6 +1524,73 @@ pub struct WorkflowExecutionGetMetricsResponse {
     #[prost(message, optional, tag="1")]
     pub span: ::core::option::Option<super::core::Span>,
 }
+/// Request to count executions with the given project, domain and optionally-assigned org.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionCountsGetRequest {
+    /// Name of the project the execution belongs to.
+    /// +required
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    /// Name of the domain the execution belongs to.
+    /// A domain can be considered as a subset within a specific project.
+    /// +required
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    /// org filter applied to execution count request.
+    /// +optional
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
+    /// Indicates a list of filters passed as string.
+    /// +optional
+    #[prost(string, tag="4")]
+    pub filters: ::prost::alloc::string::String,
+}
+/// Execution count of a phase.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionCountsByPhase {
+    /// execution phase.
+    #[prost(enumeration="super::core::workflow_execution::Phase", tag="1")]
+    pub phase: i32,
+    /// Count of the executions in corresponding phase.
+    #[prost(int64, tag="2")]
+    pub count: i64,
+}
+/// Execution count response.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct ExecutionCountsGetResponse {
+    /// Count of the executions in all phases.
+    #[prost(message, repeated, tag="1")]
+    pub execution_counts: ::prost::alloc::vec::Vec<ExecutionCountsByPhase>,
+}
+/// Request to get the count of running executions with the given project, domain and optionally-assigned org.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RunningExecutionsCountGetRequest {
+    /// Name of the project the execution belongs to.
+    /// +required
+    #[prost(string, tag="1")]
+    pub project: ::prost::alloc::string::String,
+    /// Name of the domain the execution belongs to.
+    /// A domain can be considered as a subset within a specific project.
+    /// +required
+    #[prost(string, tag="2")]
+    pub domain: ::prost::alloc::string::String,
+    /// org filter applied to execution count request.
+    /// +optional
+    #[prost(string, tag="3")]
+    pub org: ::prost::alloc::string::String,
+}
+/// Running execution count response.
+#[allow(clippy::derive_partial_eq_without_eq)]
+#[derive(Clone, PartialEq, ::prost::Message)]
+pub struct RunningExecutionsCountGetResponse {
+    /// Count of the running executions.
+    #[prost(int64, tag="1")]
+    pub count: i64,
+}
 /// The state of the execution is used to control its visibility in the UI/CLI.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
 #[repr(i32)]

@@ -159,6 +159,21 @@ func ValidateResourceListRequest(request admin.ResourceListRequest) error {
 	return nil
 }
 
+func ValidateExecutionCountsGetRequest(request admin.ExecutionCountsGetRequest) error {
+	return ValidateProjectDomain(request.Project, request.Domain)
+}
+
+func ValidateRunningExecutionsGetRequest(request admin.RunningExecutionsCountGetRequest) error {
+	return ValidateProjectDomain(request.Project, request.Domain)
+}
+
+func ValidateProjectDomain(project, domain string) error {
+	if err := ValidateEmptyStringField(project, shared.Project); err != nil {
+		return err
+	}
+	return ValidateEmptyStringField(domain, shared.Domain)
+}
+
 func ValidateDescriptionEntityListRequest(request admin.DescriptionEntityListRequest) error {
 	if request.Id == nil {
 		return shared.GetMissingArgumentError(shared.ID)

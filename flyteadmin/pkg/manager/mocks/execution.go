@@ -25,17 +25,23 @@ type GetExecutionDataFunc func(ctx context.Context, request admin.WorkflowExecut
 type ListExecutionFunc func(ctx context.Context, request admin.ResourceListRequest) (*admin.ExecutionList, error)
 type TerminateExecutionFunc func(
 	ctx context.Context, request admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error)
+type GetExecutionCountsFunc func(
+	ctx context.Context, request admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error)
+type GetRunningExecutionsCountFunc func(
+	ctx context.Context, request admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error)
 
 type MockExecutionManager struct {
-	createExecutionFunc      CreateExecutionFunc
-	relaunchExecutionFunc    RelaunchExecutionFunc
-	RecoverExecutionFunc     RecoverExecutionFunc
-	createExecutionEventFunc CreateExecutionEventFunc
-	getExecutionFunc         GetExecutionFunc
-	updateExecutionFunc      UpdateExecutionFunc
-	getExecutionDataFunc     GetExecutionDataFunc
-	listExecutionFunc        ListExecutionFunc
-	terminateExecutionFunc   TerminateExecutionFunc
+	createExecutionFunc           CreateExecutionFunc
+	relaunchExecutionFunc         RelaunchExecutionFunc
+	RecoverExecutionFunc          RecoverExecutionFunc
+	createExecutionEventFunc      CreateExecutionEventFunc
+	getExecutionFunc              GetExecutionFunc
+	updateExecutionFunc           UpdateExecutionFunc
+	getExecutionDataFunc          GetExecutionDataFunc
+	listExecutionFunc             ListExecutionFunc
+	terminateExecutionFunc        TerminateExecutionFunc
+	getExecutionCountsFunc        GetExecutionCountsFunc
+	getRunningExecutionsCountFunc GetRunningExecutionsCountFunc
 }
 
 func (m *MockExecutionManager) SetCreateCallback(createFunction CreateExecutionFunc) {
@@ -141,6 +147,28 @@ func (m *MockExecutionManager) TerminateExecution(
 	ctx context.Context, request admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error) {
 	if m.terminateExecutionFunc != nil {
 		return m.terminateExecutionFunc(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockExecutionManager) SetGetExecutionCountsCallback(getExecutionCountsFunc GetExecutionCountsFunc) {
+	m.getExecutionCountsFunc = getExecutionCountsFunc
+}
+
+func (m *MockExecutionManager) GetExecutionCounts(ctx context.Context, request admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error) {
+	if m.getExecutionCountsFunc != nil {
+		return m.getExecutionCountsFunc(ctx, request)
+	}
+	return nil, nil
+}
+
+func (m *MockExecutionManager) SetGetRunningExecutionsCountCallback(getRunningExecutionsCountFunc GetRunningExecutionsCountFunc) {
+	m.getRunningExecutionsCountFunc = getRunningExecutionsCountFunc
+}
+
+func (m *MockExecutionManager) GetRunningExecutionsCount(ctx context.Context, request admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error) {
+	if m.getRunningExecutionsCountFunc != nil {
+		return m.getRunningExecutionsCountFunc(ctx, request)
 	}
 	return nil, nil
 }

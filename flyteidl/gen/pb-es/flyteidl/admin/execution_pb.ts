@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
-import { BoolValue, Duration, Message, proto3, Timestamp } from "@bufbuild/protobuf";
+import { BoolValue, Duration, Message, proto3, protoInt64, Timestamp } from "@bufbuild/protobuf";
 import { LiteralMap } from "../core/literals_pb.js";
 import { Identifier, NodeExecutionIdentifier, WorkflowExecutionIdentifier } from "../core/identifier_pb.js";
 import { ExecutionError, QualityOfService, WorkflowExecution_Phase } from "../core/execution_pb.js";
@@ -1577,6 +1577,268 @@ export class WorkflowExecutionGetMetricsResponse extends Message<WorkflowExecuti
 
   static equals(a: WorkflowExecutionGetMetricsResponse | PlainMessage<WorkflowExecutionGetMetricsResponse> | undefined, b: WorkflowExecutionGetMetricsResponse | PlainMessage<WorkflowExecutionGetMetricsResponse> | undefined): boolean {
     return proto3.util.equals(WorkflowExecutionGetMetricsResponse, a, b);
+  }
+}
+
+/**
+ * Request to count executions with the given project, domain and optionally-assigned org.
+ *
+ * @generated from message flyteidl.admin.ExecutionCountsGetRequest
+ */
+export class ExecutionCountsGetRequest extends Message<ExecutionCountsGetRequest> {
+  /**
+   * Name of the project the execution belongs to.
+   * +required
+   *
+   * @generated from field: string project = 1;
+   */
+  project = "";
+
+  /**
+   * Name of the domain the execution belongs to.
+   * A domain can be considered as a subset within a specific project.
+   * +required
+   *
+   * @generated from field: string domain = 2;
+   */
+  domain = "";
+
+  /**
+   * org filter applied to execution count request.
+   * +optional
+   *
+   * @generated from field: string org = 3;
+   */
+  org = "";
+
+  /**
+   * Indicates a list of filters passed as string.
+   * +optional
+   *
+   * @generated from field: string filters = 4;
+   */
+  filters = "";
+
+  constructor(data?: PartialMessage<ExecutionCountsGetRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionCountsGetRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "filters", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCountsGetRequest {
+    return new ExecutionCountsGetRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionCountsGetRequest {
+    return new ExecutionCountsGetRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionCountsGetRequest {
+    return new ExecutionCountsGetRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionCountsGetRequest | PlainMessage<ExecutionCountsGetRequest> | undefined, b: ExecutionCountsGetRequest | PlainMessage<ExecutionCountsGetRequest> | undefined): boolean {
+    return proto3.util.equals(ExecutionCountsGetRequest, a, b);
+  }
+}
+
+/**
+ * Execution count of a phase.
+ *
+ * @generated from message flyteidl.admin.ExecutionCountsByPhase
+ */
+export class ExecutionCountsByPhase extends Message<ExecutionCountsByPhase> {
+  /**
+   * execution phase.
+   *
+   * @generated from field: flyteidl.core.WorkflowExecution.Phase phase = 1;
+   */
+  phase = WorkflowExecution_Phase.UNDEFINED;
+
+  /**
+   * Count of the executions in corresponding phase.
+   *
+   * @generated from field: int64 count = 2;
+   */
+  count = protoInt64.zero;
+
+  constructor(data?: PartialMessage<ExecutionCountsByPhase>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionCountsByPhase";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "phase", kind: "enum", T: proto3.getEnumType(WorkflowExecution_Phase) },
+    { no: 2, name: "count", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCountsByPhase {
+    return new ExecutionCountsByPhase().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionCountsByPhase {
+    return new ExecutionCountsByPhase().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionCountsByPhase {
+    return new ExecutionCountsByPhase().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionCountsByPhase | PlainMessage<ExecutionCountsByPhase> | undefined, b: ExecutionCountsByPhase | PlainMessage<ExecutionCountsByPhase> | undefined): boolean {
+    return proto3.util.equals(ExecutionCountsByPhase, a, b);
+  }
+}
+
+/**
+ * Execution count response.
+ *
+ * @generated from message flyteidl.admin.ExecutionCountsGetResponse
+ */
+export class ExecutionCountsGetResponse extends Message<ExecutionCountsGetResponse> {
+  /**
+   * Count of the executions in all phases.
+   *
+   * @generated from field: repeated flyteidl.admin.ExecutionCountsByPhase execution_counts = 1;
+   */
+  executionCounts: ExecutionCountsByPhase[] = [];
+
+  constructor(data?: PartialMessage<ExecutionCountsGetResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ExecutionCountsGetResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "execution_counts", kind: "message", T: ExecutionCountsByPhase, repeated: true },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ExecutionCountsGetResponse {
+    return new ExecutionCountsGetResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ExecutionCountsGetResponse {
+    return new ExecutionCountsGetResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ExecutionCountsGetResponse {
+    return new ExecutionCountsGetResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ExecutionCountsGetResponse | PlainMessage<ExecutionCountsGetResponse> | undefined, b: ExecutionCountsGetResponse | PlainMessage<ExecutionCountsGetResponse> | undefined): boolean {
+    return proto3.util.equals(ExecutionCountsGetResponse, a, b);
+  }
+}
+
+/**
+ * Request to get the count of running executions with the given project, domain and optionally-assigned org.
+ *
+ * @generated from message flyteidl.admin.RunningExecutionsCountGetRequest
+ */
+export class RunningExecutionsCountGetRequest extends Message<RunningExecutionsCountGetRequest> {
+  /**
+   * Name of the project the execution belongs to.
+   * +required
+   *
+   * @generated from field: string project = 1;
+   */
+  project = "";
+
+  /**
+   * Name of the domain the execution belongs to.
+   * A domain can be considered as a subset within a specific project.
+   * +required
+   *
+   * @generated from field: string domain = 2;
+   */
+  domain = "";
+
+  /**
+   * org filter applied to execution count request.
+   * +optional
+   *
+   * @generated from field: string org = 3;
+   */
+  org = "";
+
+  constructor(data?: PartialMessage<RunningExecutionsCountGetRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.RunningExecutionsCountGetRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "project", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "domain", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "org", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RunningExecutionsCountGetRequest {
+    return new RunningExecutionsCountGetRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RunningExecutionsCountGetRequest {
+    return new RunningExecutionsCountGetRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RunningExecutionsCountGetRequest {
+    return new RunningExecutionsCountGetRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RunningExecutionsCountGetRequest | PlainMessage<RunningExecutionsCountGetRequest> | undefined, b: RunningExecutionsCountGetRequest | PlainMessage<RunningExecutionsCountGetRequest> | undefined): boolean {
+    return proto3.util.equals(RunningExecutionsCountGetRequest, a, b);
+  }
+}
+
+/**
+ * Running execution count response.
+ *
+ * @generated from message flyteidl.admin.RunningExecutionsCountGetResponse
+ */
+export class RunningExecutionsCountGetResponse extends Message<RunningExecutionsCountGetResponse> {
+  /**
+   * Count of the running executions.
+   *
+   * @generated from field: int64 count = 1;
+   */
+  count = protoInt64.zero;
+
+  constructor(data?: PartialMessage<RunningExecutionsCountGetResponse>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.RunningExecutionsCountGetResponse";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "count", kind: "scalar", T: 3 /* ScalarType.INT64 */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): RunningExecutionsCountGetResponse {
+    return new RunningExecutionsCountGetResponse().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): RunningExecutionsCountGetResponse {
+    return new RunningExecutionsCountGetResponse().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): RunningExecutionsCountGetResponse {
+    return new RunningExecutionsCountGetResponse().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: RunningExecutionsCountGetResponse | PlainMessage<RunningExecutionsCountGetResponse> | undefined, b: RunningExecutionsCountGetResponse | PlainMessage<RunningExecutionsCountGetResponse> | undefined): boolean {
+    return proto3.util.equals(RunningExecutionsCountGetResponse, a, b);
   }
 }
 

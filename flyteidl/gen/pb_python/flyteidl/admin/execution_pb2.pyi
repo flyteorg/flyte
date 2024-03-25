@@ -291,3 +291,45 @@ class WorkflowExecutionGetMetricsResponse(_message.Message):
     SPAN_FIELD_NUMBER: _ClassVar[int]
     span: _metrics_pb2.Span
     def __init__(self, span: _Optional[_Union[_metrics_pb2.Span, _Mapping]] = ...) -> None: ...
+
+class ExecutionCountsGetRequest(_message.Message):
+    __slots__ = ["project", "domain", "org", "filters"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    FILTERS_FIELD_NUMBER: _ClassVar[int]
+    project: str
+    domain: str
+    org: str
+    filters: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., org: _Optional[str] = ..., filters: _Optional[str] = ...) -> None: ...
+
+class ExecutionCountsByPhase(_message.Message):
+    __slots__ = ["phase", "count"]
+    PHASE_FIELD_NUMBER: _ClassVar[int]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    phase: _execution_pb2.WorkflowExecution.Phase
+    count: int
+    def __init__(self, phase: _Optional[_Union[_execution_pb2.WorkflowExecution.Phase, str]] = ..., count: _Optional[int] = ...) -> None: ...
+
+class ExecutionCountsGetResponse(_message.Message):
+    __slots__ = ["execution_counts"]
+    EXECUTION_COUNTS_FIELD_NUMBER: _ClassVar[int]
+    execution_counts: _containers.RepeatedCompositeFieldContainer[ExecutionCountsByPhase]
+    def __init__(self, execution_counts: _Optional[_Iterable[_Union[ExecutionCountsByPhase, _Mapping]]] = ...) -> None: ...
+
+class RunningExecutionsCountGetRequest(_message.Message):
+    __slots__ = ["project", "domain", "org"]
+    PROJECT_FIELD_NUMBER: _ClassVar[int]
+    DOMAIN_FIELD_NUMBER: _ClassVar[int]
+    ORG_FIELD_NUMBER: _ClassVar[int]
+    project: str
+    domain: str
+    org: str
+    def __init__(self, project: _Optional[str] = ..., domain: _Optional[str] = ..., org: _Optional[str] = ...) -> None: ...
+
+class RunningExecutionsCountGetResponse(_message.Message):
+    __slots__ = ["count"]
+    COUNT_FIELD_NUMBER: _ClassVar[int]
+    count: int
+    def __init__(self, count: _Optional[int] = ...) -> None: ...

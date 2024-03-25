@@ -308,6 +308,59 @@
         ]
       }
     },
+    "/api/v1/count/executions/{project}/{domain}": {
+      "get": {
+        "summary": "Fetch the count of :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "AdminService_GetExecutionCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCountsGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Name of the project the execution belongs to.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "org filter applied to execution count request.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/data/executions/{id.project}/{id.domain}/{id.name}": {
       "get": {
         "summary": "Fetches input and output data for a :ref:`ref_flyteidl.admin.Execution`.",
@@ -2602,6 +2655,59 @@
               "ASCENDING"
             ],
             "default": "DESCENDING"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/org/count/executions/{org}/{project}/{domain}": {
+      "get": {
+        "summary": "Fetch the count of :ref:`ref_flyteidl.admin.Execution`.",
+        "operationId": "AdminService_GetExecutionCounts2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminExecutionCountsGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "org filter applied to execution count request.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project the execution belongs to.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "filters",
+            "description": "Indicates a list of filters passed as string.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -5194,6 +5300,51 @@
         ]
       }
     },
+    "/api/v1/org/running_count/executions/{org}/{project}/{domain}": {
+      "get": {
+        "operationId": "AdminService_GetRunningExecutionsCount2",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminRunningExecutionsCountGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "org",
+            "description": "org filter applied to execution count request.\n+optional",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "project",
+            "description": "Name of the project the execution belongs to.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
     "/api/v1/org/task_executions/{id.node_execution_id.execution_id.org}/{id.node_execution_id.execution_id.project}/{id.node_execution_id.execution_id.domain}/{id.node_execution_id.execution_id.name}/{id.node_execution_id.node_id}/{id.task_id.project}/{id.task_id.domain}/{id.task_id.name}/{id.task_id.version}/{id.retry_attempt}": {
       "get": {
         "summary": "Fetches a :ref:`ref_flyteidl.admin.TaskExecution`.",
@@ -6847,6 +6998,51 @@
             "schema": {
               "$ref": "#/definitions/AdminServiceUpdateProjectBody"
             }
+          }
+        ],
+        "tags": [
+          "AdminService"
+        ]
+      }
+    },
+    "/api/v1/running_count/executions/{project}/{domain}": {
+      "get": {
+        "operationId": "AdminService_GetRunningExecutionsCount",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/adminRunningExecutionsCountGetResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "project",
+            "description": "Name of the project the execution belongs to.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "domain",
+            "description": "Name of the domain the execution belongs to.\nA domain can be considered as a subset within a specific project.\n+required",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org",
+            "description": "org filter applied to execution count request.\n+optional",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
@@ -9322,6 +9518,35 @@
         }
       }
     },
+    "adminExecutionCountsByPhase": {
+      "type": "object",
+      "properties": {
+        "phase": {
+          "$ref": "#/definitions/coreWorkflowExecutionPhase",
+          "description": "execution phase."
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "description": "Count of the executions in corresponding phase."
+        }
+      },
+      "description": "Execution count of a phase."
+    },
+    "adminExecutionCountsGetResponse": {
+      "type": "object",
+      "properties": {
+        "execution_counts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/adminExecutionCountsByPhase"
+          },
+          "description": "Count of the executions in all phases."
+        }
+      },
+      "description": "Execution count response."
+    },
     "adminExecutionCreateRequest": {
       "type": "object",
       "properties": {
@@ -10419,6 +10644,17 @@
         }
       },
       "description": "Reason is a single message annotated with a timestamp to indicate the instant the reason occurred."
+    },
+    "adminRunningExecutionsCountGetResponse": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "description": "Count of the running executions."
+        }
+      },
+      "description": "Running execution count response."
     },
     "adminSchedule": {
       "type": "object",

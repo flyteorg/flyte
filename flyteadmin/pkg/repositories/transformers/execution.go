@@ -15,6 +15,7 @@ import (
 
 	"github.com/flyteorg/flyte/flyteadmin/pkg/common"
 	flyteErrs "github.com/flyteorg/flyte/flyteadmin/pkg/errors"
+	repositoryInterfaces "github.com/flyteorg/flyte/flyteadmin/pkg/repositories/interfaces"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/repositories/models"
 	"github.com/flyteorg/flyte/flyteadmin/pkg/runtime/interfaces"
 	"github.com/flyteorg/flyte/flyteidl/gen/pb-go/flyteidl/admin"
@@ -441,4 +442,30 @@ func TrimErrorMessage(errMsg string) string {
 		return errMsg
 	}
 	return strings.ToValidUTF8(errMsg[:trimmedErrMessageLen], "")
+}
+
+func StringToWorkflowExecutionPhase(s string) (core.WorkflowExecution_Phase, error) {
+	workflowExecutionPhase, ok := core.WorkflowExecution_Phase_value[s]
+	if !ok {
+		return 0, flyteErrs.NewFlyteAdminErrorf(codes.Internal, "Failed to transform %s into an execution phase.", s)
+	}
+	return core.WorkflowExecution_Phase(workflowExecutionPhase), nil
+}
+
+func FromExecutionCountsByPhase(ctx context.Context, executionCountsByPhase repositoryInterfaces.ExecutionCountsByPhaseOutput) ([]*admin.ExecutionCountsByPhase, error) {
+	var executionCounts []*admin.ExecutionCountsByPhase
+	for _, executionCount := range executionCountsByPhase {
+		phase, err := StringToWorkflowExecutionPhase(executionCount.Phase)
+		if err != nil {
+			logger.Errorf(ctx,
+				"Failed to transform string [%s] to execution phase with err: %v", executionCount.Phase, err)
+			return nil, err
+		}
+		executionCountsByPhase := &admin.ExecutionCountsByPhase{
+			Phase: phase,
+			Count: executionCount.Count,
+		}
+		executionCounts = append(executionCounts, executionCountsByPhase)
+	}
+	return executionCounts, nil
 }

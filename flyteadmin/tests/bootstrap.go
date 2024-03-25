@@ -16,8 +16,8 @@ import (
 )
 
 const insertExecutionQueryStr = `INSERT INTO "executions" ` +
-	`("execution_org", "execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id") ` +
-	`VALUES ('', '%s', '%s', '%s', '%s', '%d', '%d')`
+	`("execution_org", "execution_project","execution_domain","execution_name","phase","launch_plan_id","workflow_id","execution_created_at") ` +
+	`VALUES ('', '%s', '%s', '%s', '%s', '%d', '%d', '%s')`
 
 var adminScope = promutils.NewScope("flyteadmin")
 
@@ -106,7 +106,7 @@ func truncateAllTablesForTestingOnly() {
 }
 
 func populateWorkflowExecutionForTestingOnly(project, domain, name string) {
-	InsertExecution := fmt.Sprintf(insertExecutionQueryStr, project, domain, name, "UNDEFINED", 1, 2)
+	InsertExecution := fmt.Sprintf(insertExecutionQueryStr, project, domain, name, "UNDEFINED", 1, 2, "2020-01-01T00:00:00Z")
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
 	if err != nil {

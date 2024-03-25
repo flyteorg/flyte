@@ -589,6 +589,47 @@ func (_m *AdminServiceServer) GetExecution(_a0 context.Context, _a1 *admin.Workf
 	return r0, r1
 }
 
+type AdminServiceServer_GetExecutionCounts struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetExecutionCounts) Return(_a0 *admin.ExecutionCountsGetResponse, _a1 error) *AdminServiceServer_GetExecutionCounts {
+	return &AdminServiceServer_GetExecutionCounts{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetExecutionCounts(_a0 context.Context, _a1 *admin.ExecutionCountsGetRequest) *AdminServiceServer_GetExecutionCounts {
+	c_call := _m.On("GetExecutionCounts", _a0, _a1)
+	return &AdminServiceServer_GetExecutionCounts{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetExecutionCountsMatch(matchers ...interface{}) *AdminServiceServer_GetExecutionCounts {
+	c_call := _m.On("GetExecutionCounts", matchers...)
+	return &AdminServiceServer_GetExecutionCounts{Call: c_call}
+}
+
+// GetExecutionCounts provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetExecutionCounts(_a0 context.Context, _a1 *admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.ExecutionCountsGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionCountsGetRequest) *admin.ExecutionCountsGetResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionCountsGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionCountsGetRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceServer_GetExecutionData struct {
 	*mock.Call
 }
@@ -909,6 +950,47 @@ func (_m *AdminServiceServer) GetProjectDomainAttributes(_a0 context.Context, _a
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesGetRequest) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceServer_GetRunningExecutionsCount struct {
+	*mock.Call
+}
+
+func (_m AdminServiceServer_GetRunningExecutionsCount) Return(_a0 *admin.RunningExecutionsCountGetResponse, _a1 error) *AdminServiceServer_GetRunningExecutionsCount {
+	return &AdminServiceServer_GetRunningExecutionsCount{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceServer) OnGetRunningExecutionsCount(_a0 context.Context, _a1 *admin.RunningExecutionsCountGetRequest) *AdminServiceServer_GetRunningExecutionsCount {
+	c_call := _m.On("GetRunningExecutionsCount", _a0, _a1)
+	return &AdminServiceServer_GetRunningExecutionsCount{Call: c_call}
+}
+
+func (_m *AdminServiceServer) OnGetRunningExecutionsCountMatch(matchers ...interface{}) *AdminServiceServer_GetRunningExecutionsCount {
+	c_call := _m.On("GetRunningExecutionsCount", matchers...)
+	return &AdminServiceServer_GetRunningExecutionsCount{Call: c_call}
+}
+
+// GetRunningExecutionsCount provides a mock function with given fields: _a0, _a1
+func (_m *AdminServiceServer) GetRunningExecutionsCount(_a0 context.Context, _a1 *admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error) {
+	ret := _m.Called(_a0, _a1)
+
+	var r0 *admin.RunningExecutionsCountGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.RunningExecutionsCountGetRequest) *admin.RunningExecutionsCountGetResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.RunningExecutionsCountGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.RunningExecutionsCountGetRequest) error); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Error(1)

@@ -421,3 +421,70 @@ func TestCountExecutions_Filters(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, int64(3), count)
 }
+
+func TestCountExecutionsByPhase(t *testing.T) {
+	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	executionCountByPhase := []map[string]interface{}{
+		{
+			"Phase": "FAILED",
+			"Count": 5,
+		},
+		{
+			"Phase": "SUCCEEDED",
+			"Count": 9,
+		},
+	}
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	GlobalMock.NewMock().WithQuery(`SELECT phase as phase, COUNT(phase) as count FROM "executions" GROUP BY "phase"`).WithReply(executionCountByPhase)
+
+	count, err := executionRepo.CountByPhase(context.Background(), interfaces.CountResourceInput{})
+	assert.NoError(t, err)
+	assert.Equal(t, "FAILED", count[0].Phase)
+	assert.Equal(t, int64(5), count[0].Count)
+	assert.Equal(t, "SUCCEEDED", count[1].Phase)
+	assert.Equal(t, int64(9), count[1].Count)
+}
+
+func TestCountExecutionsByPhase_Filters(t *testing.T) {
+	executionRepo := NewExecutionRepo(GetDbForTest(t), errors.NewTestErrorTransformer(), mockScope.NewTestScope())
+
+	executionCountByPhase := []map[string]interface{}{
+		{
+			"Phase": "RUNNING",
+			"Count": 3,
+		},
+		{
+			"Phase": "SUCCEEDED",
+			"Count": 2,
+		},
+	}
+
+	GlobalMock := mocket.Catcher.Reset()
+	GlobalMock.Logging = true
+	GlobalMock.NewMock().WithQuery(
+		`SELECT phase as phase, COUNT(phase) as count FROM "executions" INNER JOIN workflows ON executions.workflow_id = workflows.id INNER JOIN tasks ON executions.task_id = tasks.id WHERE executions.duration = $1 AND "error_code" IS NULL GROUP BY "phase"`,
+	).WithReply(executionCountByPhase)
+
+	count, err := executionRepo.CountByPhase(context.Background(), interfaces.CountResourceInput{
+		InlineFilters: []common.InlineFilter{
+			getEqualityFilter(common.Execution, "duration", time.Duration.Seconds(100)),
+		},
+		MapFilters: []common.MapFilter{
+			common.NewMapFilter(map[string]interface{}{
+				"error_code": nil,
+			}),
+		},
+		JoinTableEntities: map[common.Entity]bool{
+			common.Workflow: true,
+			common.Task:     true,
+		},
+	})
+	assert.NoError(t, err)
+	assert.Equal(t, "RUNNING", count[0].Phase)
+	assert.Equal(t, int64(3), count[0].Count)
+	assert.Equal(t, "SUCCEEDED", count[1].Phase)
+	assert.Equal(t, int64(2), count[1].Count)
+}

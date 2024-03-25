@@ -14588,6 +14588,302 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of an ExecutionCountsGetRequest. */
+        interface IExecutionCountsGetRequest {
+
+            /** ExecutionCountsGetRequest project */
+            project?: (string|null);
+
+            /** ExecutionCountsGetRequest domain */
+            domain?: (string|null);
+
+            /** ExecutionCountsGetRequest org */
+            org?: (string|null);
+
+            /** ExecutionCountsGetRequest filters */
+            filters?: (string|null);
+        }
+
+        /** Represents an ExecutionCountsGetRequest. */
+        class ExecutionCountsGetRequest implements IExecutionCountsGetRequest {
+
+            /**
+             * Constructs a new ExecutionCountsGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionCountsGetRequest);
+
+            /** ExecutionCountsGetRequest project. */
+            public project: string;
+
+            /** ExecutionCountsGetRequest domain. */
+            public domain: string;
+
+            /** ExecutionCountsGetRequest org. */
+            public org: string;
+
+            /** ExecutionCountsGetRequest filters. */
+            public filters: string;
+
+            /**
+             * Creates a new ExecutionCountsGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionCountsGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionCountsGetRequest): flyteidl.admin.ExecutionCountsGetRequest;
+
+            /**
+             * Encodes the specified ExecutionCountsGetRequest message. Does not implicitly {@link flyteidl.admin.ExecutionCountsGetRequest.verify|verify} messages.
+             * @param message ExecutionCountsGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionCountsGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionCountsGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionCountsGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionCountsGetRequest;
+
+            /**
+             * Verifies an ExecutionCountsGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionCountsByPhase. */
+        interface IExecutionCountsByPhase {
+
+            /** ExecutionCountsByPhase phase */
+            phase?: (flyteidl.core.WorkflowExecution.Phase|null);
+
+            /** ExecutionCountsByPhase count */
+            count?: (Long|null);
+        }
+
+        /** Represents an ExecutionCountsByPhase. */
+        class ExecutionCountsByPhase implements IExecutionCountsByPhase {
+
+            /**
+             * Constructs a new ExecutionCountsByPhase.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionCountsByPhase);
+
+            /** ExecutionCountsByPhase phase. */
+            public phase: flyteidl.core.WorkflowExecution.Phase;
+
+            /** ExecutionCountsByPhase count. */
+            public count: Long;
+
+            /**
+             * Creates a new ExecutionCountsByPhase instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionCountsByPhase instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionCountsByPhase): flyteidl.admin.ExecutionCountsByPhase;
+
+            /**
+             * Encodes the specified ExecutionCountsByPhase message. Does not implicitly {@link flyteidl.admin.ExecutionCountsByPhase.verify|verify} messages.
+             * @param message ExecutionCountsByPhase message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionCountsByPhase, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionCountsByPhase message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionCountsByPhase
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionCountsByPhase;
+
+            /**
+             * Verifies an ExecutionCountsByPhase message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of an ExecutionCountsGetResponse. */
+        interface IExecutionCountsGetResponse {
+
+            /** ExecutionCountsGetResponse executionCounts */
+            executionCounts?: (flyteidl.admin.IExecutionCountsByPhase[]|null);
+        }
+
+        /** Represents an ExecutionCountsGetResponse. */
+        class ExecutionCountsGetResponse implements IExecutionCountsGetResponse {
+
+            /**
+             * Constructs a new ExecutionCountsGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IExecutionCountsGetResponse);
+
+            /** ExecutionCountsGetResponse executionCounts. */
+            public executionCounts: flyteidl.admin.IExecutionCountsByPhase[];
+
+            /**
+             * Creates a new ExecutionCountsGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ExecutionCountsGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IExecutionCountsGetResponse): flyteidl.admin.ExecutionCountsGetResponse;
+
+            /**
+             * Encodes the specified ExecutionCountsGetResponse message. Does not implicitly {@link flyteidl.admin.ExecutionCountsGetResponse.verify|verify} messages.
+             * @param message ExecutionCountsGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IExecutionCountsGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes an ExecutionCountsGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ExecutionCountsGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ExecutionCountsGetResponse;
+
+            /**
+             * Verifies an ExecutionCountsGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a RunningExecutionsCountGetRequest. */
+        interface IRunningExecutionsCountGetRequest {
+
+            /** RunningExecutionsCountGetRequest project */
+            project?: (string|null);
+
+            /** RunningExecutionsCountGetRequest domain */
+            domain?: (string|null);
+
+            /** RunningExecutionsCountGetRequest org */
+            org?: (string|null);
+        }
+
+        /** Represents a RunningExecutionsCountGetRequest. */
+        class RunningExecutionsCountGetRequest implements IRunningExecutionsCountGetRequest {
+
+            /**
+             * Constructs a new RunningExecutionsCountGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IRunningExecutionsCountGetRequest);
+
+            /** RunningExecutionsCountGetRequest project. */
+            public project: string;
+
+            /** RunningExecutionsCountGetRequest domain. */
+            public domain: string;
+
+            /** RunningExecutionsCountGetRequest org. */
+            public org: string;
+
+            /**
+             * Creates a new RunningExecutionsCountGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RunningExecutionsCountGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IRunningExecutionsCountGetRequest): flyteidl.admin.RunningExecutionsCountGetRequest;
+
+            /**
+             * Encodes the specified RunningExecutionsCountGetRequest message. Does not implicitly {@link flyteidl.admin.RunningExecutionsCountGetRequest.verify|verify} messages.
+             * @param message RunningExecutionsCountGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IRunningExecutionsCountGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RunningExecutionsCountGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RunningExecutionsCountGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.RunningExecutionsCountGetRequest;
+
+            /**
+             * Verifies a RunningExecutionsCountGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Properties of a RunningExecutionsCountGetResponse. */
+        interface IRunningExecutionsCountGetResponse {
+
+            /** RunningExecutionsCountGetResponse count */
+            count?: (Long|null);
+        }
+
+        /** Represents a RunningExecutionsCountGetResponse. */
+        class RunningExecutionsCountGetResponse implements IRunningExecutionsCountGetResponse {
+
+            /**
+             * Constructs a new RunningExecutionsCountGetResponse.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IRunningExecutionsCountGetResponse);
+
+            /** RunningExecutionsCountGetResponse count. */
+            public count: Long;
+
+            /**
+             * Creates a new RunningExecutionsCountGetResponse instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RunningExecutionsCountGetResponse instance
+             */
+            public static create(properties?: flyteidl.admin.IRunningExecutionsCountGetResponse): flyteidl.admin.RunningExecutionsCountGetResponse;
+
+            /**
+             * Encodes the specified RunningExecutionsCountGetResponse message. Does not implicitly {@link flyteidl.admin.RunningExecutionsCountGetResponse.verify|verify} messages.
+             * @param message RunningExecutionsCountGetResponse message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IRunningExecutionsCountGetResponse, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RunningExecutionsCountGetResponse message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RunningExecutionsCountGetResponse
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.RunningExecutionsCountGetResponse;
+
+            /**
+             * Verifies a RunningExecutionsCountGetResponse message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a LaunchPlanCreateRequest. */
         interface ILaunchPlanCreateRequest {
 
@@ -21819,6 +22115,34 @@ export namespace flyteidl {
              * @returns Promise
              */
             public getExecutionMetrics(request: flyteidl.admin.IWorkflowExecutionGetMetricsRequest): Promise<flyteidl.admin.WorkflowExecutionGetMetricsResponse>;
+
+            /**
+             * Calls GetExecutionCounts.
+             * @param request ExecutionCountsGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and ExecutionCountsGetResponse
+             */
+            public getExecutionCounts(request: flyteidl.admin.IExecutionCountsGetRequest, callback: flyteidl.service.AdminService.GetExecutionCountsCallback): void;
+
+            /**
+             * Calls GetExecutionCounts.
+             * @param request ExecutionCountsGetRequest message or plain object
+             * @returns Promise
+             */
+            public getExecutionCounts(request: flyteidl.admin.IExecutionCountsGetRequest): Promise<flyteidl.admin.ExecutionCountsGetResponse>;
+
+            /**
+             * Calls GetRunningExecutionsCount.
+             * @param request RunningExecutionsCountGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and RunningExecutionsCountGetResponse
+             */
+            public getRunningExecutionsCount(request: flyteidl.admin.IRunningExecutionsCountGetRequest, callback: flyteidl.service.AdminService.GetRunningExecutionsCountCallback): void;
+
+            /**
+             * Calls GetRunningExecutionsCount.
+             * @param request RunningExecutionsCountGetRequest message or plain object
+             * @returns Promise
+             */
+            public getRunningExecutionsCount(request: flyteidl.admin.IRunningExecutionsCountGetRequest): Promise<flyteidl.admin.RunningExecutionsCountGetResponse>;
         }
 
         namespace AdminService {
@@ -22200,6 +22524,20 @@ export namespace flyteidl {
              * @param [response] WorkflowExecutionGetMetricsResponse
              */
             type GetExecutionMetricsCallback = (error: (Error|null), response?: flyteidl.admin.WorkflowExecutionGetMetricsResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getExecutionCounts}.
+             * @param error Error, if any
+             * @param [response] ExecutionCountsGetResponse
+             */
+            type GetExecutionCountsCallback = (error: (Error|null), response?: flyteidl.admin.ExecutionCountsGetResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getRunningExecutionsCount}.
+             * @param error Error, if any
+             * @param [response] RunningExecutionsCountGetResponse
+             */
+            type GetRunningExecutionsCountCallback = (error: (Error|null), response?: flyteidl.admin.RunningExecutionsCountGetResponse) => void;
         }
 
         /** Represents a SyncAgentService */

@@ -13,13 +13,15 @@ type GetExecutionFunc func(ctx context.Context, input interfaces.Identifier) (mo
 type ListExecutionFunc func(ctx context.Context, input interfaces.ListResourceInput) (
 	interfaces.ExecutionCollectionOutput, error)
 type CountExecutionFunc func(ctx context.Context, input interfaces.CountResourceInput) (int64, error)
+type CountByPhaseExecutionFunc func(ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error)
 
 type MockExecutionRepo struct {
-	createFunction CreateExecutionFunc
-	updateFunction UpdateExecutionFunc
-	getFunction    GetExecutionFunc
-	listFunction   ListExecutionFunc
-	countFunction  CountExecutionFunc
+	createFunction       CreateExecutionFunc
+	updateFunction       UpdateExecutionFunc
+	getFunction          GetExecutionFunc
+	listFunction         ListExecutionFunc
+	countFunction        CountExecutionFunc
+	countByPhaseFunction CountByPhaseExecutionFunc
 }
 
 func (r *MockExecutionRepo) Create(ctx context.Context, input models.Execution) error {
@@ -76,6 +78,17 @@ func (r *MockExecutionRepo) Count(ctx context.Context, input interfaces.CountRes
 
 func (r *MockExecutionRepo) SetCountCallback(countFunction CountExecutionFunc) {
 	r.countFunction = countFunction
+}
+
+func (r *MockExecutionRepo) CountByPhase(ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error) {
+	if r.countByPhaseFunction != nil {
+		return r.countByPhaseFunction(ctx, input)
+	}
+	return interfaces.ExecutionCountsByPhaseOutput{}, nil
+}
+
+func (r *MockExecutionRepo) SetCountByPhaseCallback(countByPhaseFunction CountByPhaseExecutionFunc) {
+	r.countByPhaseFunction = countByPhaseFunction
 }
 
 func NewMockExecutionRepo() interfaces.ExecutionRepoInterface {

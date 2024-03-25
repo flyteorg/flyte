@@ -31,7 +31,7 @@ import (
 )
 
 // Static values for test
-const orgValue = ""
+const orgValue = "foobar"
 const projectValue = "foo"
 const domainValue = "bar"
 const nameValue = "baz"

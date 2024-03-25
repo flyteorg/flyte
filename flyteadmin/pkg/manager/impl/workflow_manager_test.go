@@ -454,6 +454,7 @@ func TestListWorkflows(t *testing.T) {
 						CreatedAt: testutils.MockCreatedAtValue,
 					},
 					WorkflowKey: models.WorkflowKey{
+						Org:     orgValue,
 						Project: projectValue,
 						Domain:  domainValue,
 						Name:    nameValue,
@@ -466,6 +467,7 @@ func TestListWorkflows(t *testing.T) {
 						CreatedAt: testutils.MockCreatedAtValue,
 					},
 					WorkflowKey: models.WorkflowKey{
+						Org:     orgValue,
 						Project: projectValue,
 						Domain:  domainValue,
 						Name:    nameValue,
@@ -490,6 +492,7 @@ func TestListWorkflows(t *testing.T) {
 
 	workflowList, err := workflowManager.ListWorkflows(context.Background(), admin.ResourceListRequest{
 		Id: &admin.NamedEntityIdentifier{
+			Org:     orgValue,
 			Project: projectValue,
 			Domain:  domainValue,
 			Name:    nameValue,
@@ -506,6 +509,7 @@ func TestListWorkflows(t *testing.T) {
 	assert.Len(t, workflowList.Workflows, 2)
 
 	for idx, workflow := range workflowList.Workflows {
+		assert.Equal(t, orgValue, workflow.Id.Org)
 		assert.Equal(t, projectValue, workflow.Id.Project)
 		assert.Equal(t, domainValue, workflow.Id.Domain)
 		assert.Equal(t, nameValue, workflow.Id.Name)

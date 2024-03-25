@@ -195,3 +195,39 @@ func (m *AdminService) TerminateExecution(
 	m.Metrics.executionEndpointMetrics.terminate.Success()
 	return response, nil
 }
+
+func (m *AdminService) GetExecutionCounts(
+	ctx context.Context, request *admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.ExecutionCountsGetResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.count.Time(func() {
+		response, err = m.ExecutionManager.GetExecutionCounts(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.count)
+	}
+	m.Metrics.executionEndpointMetrics.count.Success()
+	return response, nil
+}
+
+func (m *AdminService) GetRunningExecutionsCount(
+	ctx context.Context, request *admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error) {
+	defer m.interceptPanic(ctx, request)
+	if request == nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Incorrect request, nil requests not allowed")
+	}
+	var response *admin.RunningExecutionsCountGetResponse
+	var err error
+	m.Metrics.executionEndpointMetrics.runningCount.Time(func() {
+		response, err = m.ExecutionManager.GetRunningExecutionsCount(ctx, *request)
+	})
+	if err != nil {
+		return nil, util.TransformAndRecordError(err, &m.Metrics.executionEndpointMetrics.runningCount)
+	}
+	m.Metrics.executionEndpointMetrics.runningCount.Success()
+	return response, nil
+}

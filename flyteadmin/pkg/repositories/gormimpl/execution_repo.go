@@ -15,11 +15,36 @@ import (
 	"github.com/flyteorg/flyte/flytestdlib/promutils"
 )
 
+const phase = "phase"
+
 // Implementation of ExecutionInterface.
 type ExecutionRepo struct {
 	db               *gorm.DB
 	errorTransformer adminErrors.ErrorTransformer
 	metrics          gormMetrics
+}
+
+func applyJoinTableEntitiesOnExecution(tx *gorm.DB, joinTableEntities map[common.Entity]bool) *gorm.DB {
+	if ok := joinTableEntities[common.LaunchPlan]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.launch_plan_id = %s.id",
+			launchPlanTableName, executionTableName, launchPlanTableName))
+	}
+	if ok := joinTableEntities[common.Workflow]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.workflow_id = %s.id",
+			workflowTableName, executionTableName, workflowTableName))
+	}
+	if ok := joinTableEntities[common.Task]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.task_id = %s.id",
+			taskTableName, executionTableName, taskTableName))
+	}
+
+	if ok := joinTableEntities[common.AdminTag]; ok {
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
+			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
+		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
+			AdminTagsTableName, AdminTagsTableName, executionAdminTagsTableName))
+	}
+	return tx
 }
 
 func (r *ExecutionRepo) Create(ctx context.Context, input models.Execution) error {
@@ -76,26 +101,9 @@ func (r *ExecutionRepo) List(ctx context.Context, input interfaces.ListResourceI
 	}
 	var executions []models.Execution
 	tx := r.db.WithContext(ctx).Limit(input.Limit).Offset(input.Offset)
-	// And add join condition as required by user-specified filters (which can potentially include join table attrs).
-	if ok := input.JoinTableEntities[common.LaunchPlan]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.launch_plan_id = %s.id",
-			launchPlanTableName, executionTableName, launchPlanTableName))
-	}
-	if ok := input.JoinTableEntities[common.Workflow]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.workflow_id = %s.id",
-			workflowTableName, executionTableName, workflowTableName))
-	}
-	if ok := input.JoinTableEntities[common.Task]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.task_id = %s.id",
-			taskTableName, executionTableName, taskTableName))
-	}
 
-	if ok := input.JoinTableEntities[common.AdminTag]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.execution_name = %s.execution_name AND %s.execution_org = %s.execution_org",
-			executionAdminTagsTableName, executionTableName, executionAdminTagsTableName, executionTableName, executionAdminTagsTableName))
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.id = %s.admin_tag_id",
-			AdminTagsTableName, AdminTagsTableName, executionAdminTagsTableName))
-	}
+	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
+	tx = applyJoinTableEntitiesOnExecution(tx, input.JoinTableEntities)
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
@@ -123,18 +131,7 @@ func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourc
 	tx := r.db.WithContext(ctx).Model(&models.Execution{})
 
 	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
-	if ok := input.JoinTableEntities[common.LaunchPlan]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.launch_plan_id = %s.id",
-			launchPlanTableName, executionTableName, launchPlanTableName))
-	}
-	if ok := input.JoinTableEntities[common.Workflow]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.workflow_id = %s.id",
-			workflowTableName, executionTableName, workflowTableName))
-	}
-	if ok := input.JoinTableEntities[common.Task]; ok {
-		tx = tx.Joins(fmt.Sprintf("INNER JOIN %s ON %s.task_id = %s.id",
-			taskTableName, executionTableName, taskTableName))
-	}
+	tx = applyJoinTableEntitiesOnExecution(tx, input.JoinTableEntities)
 
 	// Apply filters
 	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
@@ -151,6 +148,33 @@ func (r *ExecutionRepo) Count(ctx context.Context, input interfaces.CountResourc
 		return 0, r.errorTransformer.ToFlyteAdminError(tx.Error)
 	}
 	return count, nil
+}
+
+func (r *ExecutionRepo) CountByPhase(ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error) {
+	var err error
+	tx := r.db.WithContext(ctx).Model(&models.Execution{})
+
+	// Add join condition as required by user-specified filters (which can potentially include join table attrs).
+	tx = applyJoinTableEntitiesOnExecution(tx, input.JoinTableEntities)
+
+	// Apply filters
+	tx, err = applyScopedFilters(tx, input.InlineFilters, input.MapFilters)
+	if err != nil {
+		return interfaces.ExecutionCountsByPhaseOutput{}, err
+	}
+
+	// Prepare query and output
+	query := fmt.Sprintf("%s as phase, COUNT(%s) as count", phase, phase)
+	var counts interfaces.ExecutionCountsByPhaseOutput
+
+	// Run the query
+	timer := r.metrics.CountDuration.Start()
+	tx = tx.Select(query).Group(phase).Scan(&counts)
+	timer.Stop()
+	if tx.Error != nil {
+		return interfaces.ExecutionCountsByPhaseOutput{}, r.errorTransformer.ToFlyteAdminError(tx.Error)
+	}
+	return counts, nil
 }
 
 // Returns an instance of ExecutionRepoInterface

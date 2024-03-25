@@ -418,3 +418,60 @@ message WorkflowExecutionGetMetricsResponse {
     // hierarchical structure using Flyte entity references.
     core.Span span = 1;
 }
+
+// Request to count executions with the given project, domain and optionally-assigned org.
+message ExecutionCountsGetRequest {
+    // Name of the project the execution belongs to.
+    // +required
+    string project = 1;
+
+    // Name of the domain the execution belongs to.
+    // A domain can be considered as a subset within a specific project.
+    // +required
+    string domain = 2;
+
+    // org filter applied to execution count request.
+    // +optional
+    string org = 3;
+
+    // Indicates a list of filters passed as string.
+    // +optional
+    string filters = 4;
+}
+
+// Execution count of a phase.
+message ExecutionCountsByPhase {
+    // execution phase.
+    core.WorkflowExecution.Phase phase = 1;
+
+    // Count of the executions in corresponding phase.
+    int64 count = 2;
+}
+
+// Execution count response.
+message ExecutionCountsGetResponse {
+    // Count of the executions in all phases.
+    repeated ExecutionCountsByPhase execution_counts = 1;
+}
+
+// Request to get the count of running executions with the given project, domain and optionally-assigned org.
+message RunningExecutionsCountGetRequest {
+    // Name of the project the execution belongs to.
+    // +required
+    string project = 1;
+
+    // Name of the domain the execution belongs to.
+    // A domain can be considered as a subset within a specific project.
+    // +required
+    string domain = 2;
+
+    // org filter applied to execution count request.
+    // +optional
+    string org = 3;
+}
+
+// Running execution count response.
+message RunningExecutionsCountGetResponse {
+    // Count of the running executions.
+    int64 count = 1;
+}

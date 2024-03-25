@@ -14,10 +14,10 @@ import (
 
 // Execution primary key
 type ExecutionKey struct {
-	Project string `gorm:"primary_key;column:execution_project" valid:"length(0|255)"`
-	Domain  string `gorm:"primary_key;column:execution_domain" valid:"length(0|255)"`
+	Project string `gorm:"primary_key;column:execution_project;index:idx_org_project_domain_phase_execution_created_at,priority:2" valid:"length(0|255)"`
+	Domain  string `gorm:"primary_key;column:execution_domain;index:idx_org_project_domain_phase_execution_created_at,priority:3" valid:"length(0|255)"`
 	Name    string `gorm:"primary_key;column:execution_name" valid:"length(0|255)"`
-	Org     string `gorm:"primary_key;column:execution_org" valid:"length(0|255)"`
+	Org     string `gorm:"primary_key;column:execution_org;index:idx_org_project_domain_phase_execution_created_at,priority:1" valid:"length(0|255)"`
 }
 
 // Database model to encapsulate a (workflow) execution.
@@ -27,13 +27,13 @@ type Execution struct {
 	LaunchPlanID uint   `gorm:"index"`
 	WorkflowID   uint   `gorm:"index"`
 	TaskID       uint   `gorm:"index"`
-	Phase        string `valid:"length(0|255)"`
+	Phase        string `gorm:"index:idx_org_project_domain_phase_execution_created_at,priority:4" valid:"length(0|255)"`
 	Closure      []byte
 	Spec         []byte `gorm:"not null"`
 	StartedAt    *time.Time
 	// Corresponds to the CreatedAt field in the Execution closure.
 	// Prefixed with Execution to avoid clashes with gorm.Model CreatedAt
-	ExecutionCreatedAt *time.Time `gorm:"index:idx_executions_created_at"`
+	ExecutionCreatedAt *time.Time `gorm:"index:idx_executions_created_at;index:idx_org_project_domain_phase_execution_created_at,priority:5"`
 	// Corresponds to the UpdatedAt field in the Execution closure
 	// Prefixed with Execution to avoid clashes with gorm.Model UpdatedAt
 	ExecutionUpdatedAt *time.Time

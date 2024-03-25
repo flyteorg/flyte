@@ -11,16 +11,18 @@ import (
 type executionEndpointMetrics struct {
 	scope promutils.Scope
 
-	create      util.RequestMetrics
-	relaunch    util.RequestMetrics
-	recover     util.RequestMetrics
-	createEvent util.RequestMetrics
-	get         util.RequestMetrics
-	update      util.RequestMetrics
-	getData     util.RequestMetrics
-	getMetrics  util.RequestMetrics
-	list        util.RequestMetrics
-	terminate   util.RequestMetrics
+	create       util.RequestMetrics
+	relaunch     util.RequestMetrics
+	recover      util.RequestMetrics
+	createEvent  util.RequestMetrics
+	get          util.RequestMetrics
+	update       util.RequestMetrics
+	getData      util.RequestMetrics
+	getMetrics   util.RequestMetrics
+	list         util.RequestMetrics
+	terminate    util.RequestMetrics
+	count        util.RequestMetrics
+	runningCount util.RequestMetrics
 }
 
 type launchPlanEndpointMetrics struct {
@@ -133,17 +135,19 @@ func InitMetrics(adminScope promutils.Scope) AdminMetrics {
 			"panics encountered while handling requests to the admin service"),
 
 		executionEndpointMetrics: executionEndpointMetrics{
-			scope:       adminScope,
-			create:      util.NewRequestMetrics(adminScope, "create_execution"),
-			relaunch:    util.NewRequestMetrics(adminScope, "relaunch_execution"),
-			recover:     util.NewRequestMetrics(adminScope, "recover_execution"),
-			createEvent: util.NewRequestMetrics(adminScope, "create_execution_event"),
-			get:         util.NewRequestMetrics(adminScope, "get_execution"),
-			update:      util.NewRequestMetrics(adminScope, "update_execution"),
-			getData:     util.NewRequestMetrics(adminScope, "get_execution_data"),
-			getMetrics:  util.NewRequestMetrics(adminScope, "get_execution_metrics"),
-			list:        util.NewRequestMetrics(adminScope, "list_execution"),
-			terminate:   util.NewRequestMetrics(adminScope, "terminate_execution"),
+			scope:        adminScope,
+			create:       util.NewRequestMetrics(adminScope, "create_execution"),
+			relaunch:     util.NewRequestMetrics(adminScope, "relaunch_execution"),
+			recover:      util.NewRequestMetrics(adminScope, "recover_execution"),
+			createEvent:  util.NewRequestMetrics(adminScope, "create_execution_event"),
+			get:          util.NewRequestMetrics(adminScope, "get_execution"),
+			update:       util.NewRequestMetrics(adminScope, "update_execution"),
+			getData:      util.NewRequestMetrics(adminScope, "get_execution_data"),
+			getMetrics:   util.NewRequestMetrics(adminScope, "get_execution_metrics"),
+			list:         util.NewRequestMetrics(adminScope, "list_execution"),
+			terminate:    util.NewRequestMetrics(adminScope, "terminate_execution"),
+			count:        util.NewRequestMetrics(adminScope, "count_execution"),
+			runningCount: util.NewRequestMetrics(adminScope, "count_running_execution"),
 		},
 		launchPlanEndpointMetrics: launchPlanEndpointMetrics{
 			scope:      adminScope,

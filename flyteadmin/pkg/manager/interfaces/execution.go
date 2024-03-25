@@ -28,4 +28,6 @@ type ExecutionInterface interface {
 	ListExecutions(ctx context.Context, request admin.ResourceListRequest) (*admin.ExecutionList, error)
 	TerminateExecution(
 		ctx context.Context, request admin.ExecutionTerminateRequest) (*admin.ExecutionTerminateResponse, error)
+	GetExecutionCounts(ctx context.Context, request admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error)
+	GetRunningExecutionsCount(ctx context.Context, request admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error)
 }

@@ -689,6 +689,54 @@ func (_m *AdminServiceClient) GetExecution(ctx context.Context, in *admin.Workfl
 	return r0, r1
 }
 
+type AdminServiceClient_GetExecutionCounts struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetExecutionCounts) Return(_a0 *admin.ExecutionCountsGetResponse, _a1 error) *AdminServiceClient_GetExecutionCounts {
+	return &AdminServiceClient_GetExecutionCounts{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetExecutionCounts(ctx context.Context, in *admin.ExecutionCountsGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetExecutionCounts {
+	c_call := _m.On("GetExecutionCounts", ctx, in, opts)
+	return &AdminServiceClient_GetExecutionCounts{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetExecutionCountsMatch(matchers ...interface{}) *AdminServiceClient_GetExecutionCounts {
+	c_call := _m.On("GetExecutionCounts", matchers...)
+	return &AdminServiceClient_GetExecutionCounts{Call: c_call}
+}
+
+// GetExecutionCounts provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetExecutionCounts(ctx context.Context, in *admin.ExecutionCountsGetRequest, opts ...grpc.CallOption) (*admin.ExecutionCountsGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.ExecutionCountsGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.ExecutionCountsGetRequest, ...grpc.CallOption) *admin.ExecutionCountsGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.ExecutionCountsGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.ExecutionCountsGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 type AdminServiceClient_GetExecutionData struct {
 	*mock.Call
 }
@@ -1065,6 +1113,54 @@ func (_m *AdminServiceClient) GetProjectDomainAttributes(ctx context.Context, in
 
 	var r1 error
 	if rf, ok := ret.Get(1).(func(context.Context, *admin.ProjectDomainAttributesGetRequest, ...grpc.CallOption) error); ok {
+		r1 = rf(ctx, in, opts...)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+type AdminServiceClient_GetRunningExecutionsCount struct {
+	*mock.Call
+}
+
+func (_m AdminServiceClient_GetRunningExecutionsCount) Return(_a0 *admin.RunningExecutionsCountGetResponse, _a1 error) *AdminServiceClient_GetRunningExecutionsCount {
+	return &AdminServiceClient_GetRunningExecutionsCount{Call: _m.Call.Return(_a0, _a1)}
+}
+
+func (_m *AdminServiceClient) OnGetRunningExecutionsCount(ctx context.Context, in *admin.RunningExecutionsCountGetRequest, opts ...grpc.CallOption) *AdminServiceClient_GetRunningExecutionsCount {
+	c_call := _m.On("GetRunningExecutionsCount", ctx, in, opts)
+	return &AdminServiceClient_GetRunningExecutionsCount{Call: c_call}
+}
+
+func (_m *AdminServiceClient) OnGetRunningExecutionsCountMatch(matchers ...interface{}) *AdminServiceClient_GetRunningExecutionsCount {
+	c_call := _m.On("GetRunningExecutionsCount", matchers...)
+	return &AdminServiceClient_GetRunningExecutionsCount{Call: c_call}
+}
+
+// GetRunningExecutionsCount provides a mock function with given fields: ctx, in, opts
+func (_m *AdminServiceClient) GetRunningExecutionsCount(ctx context.Context, in *admin.RunningExecutionsCountGetRequest, opts ...grpc.CallOption) (*admin.RunningExecutionsCountGetResponse, error) {
+	_va := make([]interface{}, len(opts))
+	for _i := range opts {
+		_va[_i] = opts[_i]
+	}
+	var _ca []interface{}
+	_ca = append(_ca, ctx, in)
+	_ca = append(_ca, _va...)
+	ret := _m.Called(_ca...)
+
+	var r0 *admin.RunningExecutionsCountGetResponse
+	if rf, ok := ret.Get(0).(func(context.Context, *admin.RunningExecutionsCountGetRequest, ...grpc.CallOption) *admin.RunningExecutionsCountGetResponse); ok {
+		r0 = rf(ctx, in, opts...)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*admin.RunningExecutionsCountGetResponse)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, *admin.RunningExecutionsCountGetRequest, ...grpc.CallOption) error); ok {
 		r1 = rf(ctx, in, opts...)
 	} else {
 		r1 = ret.Error(1)

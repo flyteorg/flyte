@@ -837,4 +837,23 @@ service AdminService {
       description: "Retrieve metrics from an existing workflow execution."
     };
   };
+
+  // Fetch the count of :ref:`ref_flyteidl.admin.Execution`.
+  rpc GetExecutionCounts (flyteidl.admin.ExecutionCountsGetRequest) returns (flyteidl.admin.ExecutionCountsGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/count/executions/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/org/count/executions/{org}/{project}/{domain}"
+      }
+    };
+  }
+
+  rpc GetRunningExecutionsCount (flyteidl.admin.RunningExecutionsCountGetRequest) returns (flyteidl.admin.RunningExecutionsCountGetResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/running_count/executions/{project}/{domain}"
+      additional_bindings {
+        get: "/api/v1/org/running_count/executions/{org}/{project}/{domain}"
+      }
+    };
+  }
 }

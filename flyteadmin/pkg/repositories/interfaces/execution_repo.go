@@ -18,9 +18,18 @@ type ExecutionRepoInterface interface {
 	List(ctx context.Context, input ListResourceInput) (ExecutionCollectionOutput, error)
 	// Returns count of executions matching query parameters.
 	Count(ctx context.Context, input CountResourceInput) (int64, error)
+	// Returns count of executions matching query parameters, grouped by phase.
+	CountByPhase(ctx context.Context, input CountResourceInput) (ExecutionCountsByPhaseOutput, error)
 }
 
 // Response format for a query on workflows.
 type ExecutionCollectionOutput struct {
 	Executions []models.Execution
 }
+
+type ExecutionCountsByPhase struct {
+	Phase string
+	Count int64
+}
+
+type ExecutionCountsByPhaseOutput []ExecutionCountsByPhase

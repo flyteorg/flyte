@@ -1885,6 +1885,80 @@ func (m *ExecutionManager) ListExecutions(
 	}, nil
 }
 
+func (m *ExecutionManager) GetExecutionCounts(
+	ctx context.Context, request admin.ExecutionCountsGetRequest) (*admin.ExecutionCountsGetResponse, error) {
+	// Check required fields
+	if err := validation.ValidateExecutionCountsGetRequest(request); err != nil {
+		logger.Debugf(ctx, "ExecutionCounts request [%+v] failed validation with err: %v", request, err)
+		return nil, err
+	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:            request.Org,
+		Project:        request.Project,
+		Domain:         request.Domain,
+		RequestFilters: request.Filters,
+	}, common.Execution)
+	if err != nil {
+		return nil, err
+	}
+
+	countExecutionByPhaseInput := repositoryInterfaces.CountResourceInput{
+		InlineFilters: filters,
+	}
+	countExecutionByPhaseOutput, err := m.db.ExecutionRepo().CountByPhase(ctx, countExecutionByPhaseInput)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get execution counts using input [%+v] with err %v", countExecutionByPhaseInput, err)
+		return nil, err
+	}
+
+	executionCounts, err := transformers.FromExecutionCountsByPhase(ctx, countExecutionByPhaseOutput)
+	if err != nil {
+		logger.Errorf(ctx, "Failed to transform execution by phase output [%+v] with err %v", countExecutionByPhaseOutput, err)
+		return nil, err
+	}
+
+	return &admin.ExecutionCountsGetResponse{
+		ExecutionCounts: executionCounts,
+	}, nil
+}
+
+func (m *ExecutionManager) GetRunningExecutionsCount(
+	ctx context.Context, request admin.RunningExecutionsCountGetRequest) (*admin.RunningExecutionsCountGetResponse, error) {
+	// Check required fields
+	if err := validation.ValidateRunningExecutionsGetRequest(request); err != nil {
+		logger.Debugf(ctx, "RunningExecutionsCount request [%+v] failed validation with err: %v", request, err)
+		return nil, err
+	}
+	ctx = contextutils.WithProjectDomain(ctx, request.Project, request.Domain)
+	filters, err := util.GetDbFilters(util.FilterSpec{
+		Org:     request.Org,
+		Project: request.Project,
+		Domain:  request.Domain,
+	}, common.Execution)
+	if err != nil {
+		return nil, err
+	}
+
+	// Add filter to fetch only RUNNING executions
+	if filters, err = addPhaseFilter(filters, core.WorkflowExecution_RUNNING); err != nil {
+		return nil, err
+	}
+
+	countRunningExecutionsInput := repositoryInterfaces.CountResourceInput{
+		InlineFilters: filters,
+	}
+	countRunningExecutionsOutput, err := m.db.ExecutionRepo().Count(ctx, countRunningExecutionsInput)
+	if err != nil {
+		logger.Debugf(ctx, "Failed to get running executions count using input [%+v] with err %v", countRunningExecutionsOutput, err)
+		return nil, err
+	}
+
+	return &admin.RunningExecutionsCountGetResponse{
+		Count: countRunningExecutionsOutput,
+	}, nil
+}
+
 // publishNotifications will only forward major errors because the assumption made is all of the objects
 // that are being manipulated have already been validated/manipulated by Flyte itself.
 // Note: This method should be refactored somewhere else once the interaction with pushing to SNS.
@@ -2107,5 +2181,15 @@ func addStateFilter(filters []common.InlineFilter) ([]common.InlineFilter, error
 		}
 		filters = append(filters, stateFilter)
 	}
+	return filters, nil
+}
+
+func addPhaseFilter(filters []common.InlineFilter, phase core.WorkflowExecution_Phase) ([]common.InlineFilter, error) {
+	phaseFilter, err := common.NewSingleValueFilter(common.Execution, common.Equal, shared.Phase,
+		phase.String())
+	if err != nil {
+		return filters, err
+	}
+	filters = append(filters, phaseFilter)
 	return filters, nil
 }

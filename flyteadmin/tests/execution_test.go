@@ -143,19 +143,19 @@ func TestUpdateWorkflowExecution_InvalidPhaseTransitions(t *testing.T) {
 func populateWorkflowExecutionsForTestingOnly() {
 	insertExecutionStatements := []string{
 		// Insert a couple of executions with the same project + domain for the same launch plan & workflow
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name1", "RUNNING", 1, 2),
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name2", "SUCCEEDED", 1, 2),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name1", "RUNNING", 1, 2, "2020-01-01T00:00:00Z"),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name2", "SUCCEEDED", 1, 2, "2020-01-01T00:00:00Z"),
 
 		// And one with a different launch plan
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name3", "RUNNING", 3, 2),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name3", "RUNNING", 3, 2, "2020-01-01T00:00:00Z"),
 
 		// And another with a different workflow
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name4", "FAILED", 1, 4),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain1", "name4", "FAILED", 1, 4, "2020-01-01T00:00:00Z"),
 
 		// And a few in a whole different project + domain scope
 		// (still referencing the same launch plan and workflow just to avoid inserting additional values in the db).
-		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2),
-		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2),
+		fmt.Sprintf(insertExecutionQueryStr, "project1", "domain2", "name1", "RUNNING", 1, 2, "2020-01-01T00:00:00Z"),
+		fmt.Sprintf(insertExecutionQueryStr, "project2", "domain2", "name1", "SUCCEEDED", 1, 2, "2020-01-01T00:00:00Z"),
 	}
 	db, err := repositories.GetDB(context.Background(), getDbConfig(), getLoggerConfig())
 	ctx := context.Background()
@@ -319,4 +319,99 @@ func TestListWorkflowExecutions_Pagination(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, len(resp.Executions), 1)
 	assert.Empty(t, resp.Token)
+}
+
+func TestGetWorkflowExecutionCounts(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionsForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	executionCountsResp, err := client.GetExecutionCounts(ctx, &admin.ExecutionCountsGetRequest{
+		Project: "project1",
+		Domain:  "domain1",
+		Filters: "gte(execution_created_at,2000-01-01T00:00:00Z)",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(executionCountsResp.ExecutionCounts))
+	otherPhase := false
+	for _, item := range executionCountsResp.ExecutionCounts {
+		if item.Phase == core.WorkflowExecution_FAILED {
+			assert.Equal(t, int64(1), item.Count)
+		} else if item.Phase == core.WorkflowExecution_SUCCEEDED {
+			assert.Equal(t, int64(1), item.Count)
+		} else if item.Phase == core.WorkflowExecution_RUNNING {
+			assert.Equal(t, int64(2), item.Count)
+		} else {
+			otherPhase = true
+		}
+	}
+	assert.False(t, otherPhase)
+}
+
+func TestGetWorkflowExecutionCounts_Filters(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionsForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	executionCountsResp, err := client.GetExecutionCounts(ctx, &admin.ExecutionCountsGetRequest{
+		Project: "project1",
+		Domain:  "domain1",
+		Filters: "gte(execution_created_at,2000-01-01T00:00:00Z)+eq(launch_plan_id, 1)",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(executionCountsResp.ExecutionCounts))
+	otherPhase := false
+	for _, item := range executionCountsResp.ExecutionCounts {
+		if item.Phase == core.WorkflowExecution_SUCCEEDED {
+			assert.Equal(t, int64(1), item.Count)
+		} else if item.Phase == core.WorkflowExecution_RUNNING {
+			assert.Equal(t, int64(1), item.Count)
+		} else if item.Phase == core.WorkflowExecution_FAILED {
+			assert.Equal(t, int64(1), item.Count)
+		} else {
+			otherPhase = true
+		}
+	}
+	assert.False(t, otherPhase)
+}
+
+func TestGetWorkflowExecutionCounts_PhaseFilter(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionsForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	executionCountsResp, err := client.GetExecutionCounts(ctx, &admin.ExecutionCountsGetRequest{
+		Project: "project1",
+		Domain:  "domain1",
+		Filters: "gte(execution_created_at,2000-01-01T00:00:00Z)+eq(phase,RUNNING)",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, 1, len(executionCountsResp.ExecutionCounts))
+	assert.Equal(t, core.WorkflowExecution_RUNNING, executionCountsResp.ExecutionCounts[0].Phase)
+	assert.Equal(t, int64(2), executionCountsResp.ExecutionCounts[0].Count)
+}
+
+func TestGetRunningExecutionsCount(t *testing.T) {
+	truncateAllTablesForTestingOnly()
+	populateWorkflowExecutionsForTestingOnly()
+
+	ctx := context.Background()
+	client, conn := GetTestAdminServiceClient()
+	defer conn.Close()
+
+	runningExecutionsCountResp, err := client.GetRunningExecutionsCount(ctx, &admin.RunningExecutionsCountGetRequest{
+		Project: "project1",
+		Domain:  "domain1",
+	})
+	assert.Nil(t, err)
+	assert.Equal(t, int64(2), runningExecutionsCountResp.Count)
 }

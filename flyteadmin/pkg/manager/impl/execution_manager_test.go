@@ -55,8 +55,15 @@ import (
 )
 
 const (
-	principal = "principal"
-	rawOutput = "raw_output"
+	principal                   = "principal"
+	rawOutput                   = "raw_output"
+	executionOrgQueryExpr       = "execution_org = ?"
+	executionProjectQueryExpr   = "execution_project = ?"
+	executionDomainQueryExpr    = "execution_domain = ?"
+	executionNameQueryExpr      = "execution_name = ?"
+	executionCreatedAtFilter    = "gte(execution_created_at,2021-01-01T00:00:00Z)"
+	executionCreatedAtValue     = "2021-01-01T00:00:00Z"
+	executionCreatedAtQueryExpr = "execution_created_at >= ?"
 )
 
 var spec = testutils.GetExecutionRequest().Spec
@@ -2995,13 +3002,13 @@ func TestListExecutions(t *testing.T) {
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Execution, filter.GetEntity())
 			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == "execution_project = ?" {
+			if queryExpr.Args == projectValue && queryExpr.Query == executionProjectQueryExpr {
 				projectFilter = true
 			}
-			if queryExpr.Args == domainValue && queryExpr.Query == "execution_domain = ?" {
+			if queryExpr.Args == domainValue && queryExpr.Query == executionDomainQueryExpr {
 				domainFilter = true
 			}
-			if queryExpr.Args == nameValue && queryExpr.Query == "execution_name = ?" {
+			if queryExpr.Args == nameValue && queryExpr.Query == executionNameQueryExpr {
 				nameFilter = true
 			}
 		}
@@ -3163,6 +3170,218 @@ func TestListExecutions_TransformerError(t *testing.T) {
 	})
 	assert.EqualError(t, err, "failed to unmarshal spec")
 	assert.Nil(t, executionList)
+}
+
+func TestGetExecutionCounts(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	getExecutionCountsFunc := func(
+		ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error) {
+		var orgFilter, projectFilter, domainFilter, updatedAtFilter, nameFilter bool
+		for _, filter := range input.InlineFilters {
+			assert.Equal(t, common.Execution, filter.GetEntity())
+			queryExpr, _ := filter.GetGormQueryExpr()
+			if queryExpr.Args == orgValue && queryExpr.Query == executionOrgQueryExpr {
+				orgFilter = true
+			}
+			if queryExpr.Args == projectValue && queryExpr.Query == executionProjectQueryExpr {
+				projectFilter = true
+			}
+			if queryExpr.Args == domainValue && queryExpr.Query == executionDomainQueryExpr {
+				domainFilter = true
+			}
+			if queryExpr.Args == executionCreatedAtValue && queryExpr.Query == executionCreatedAtQueryExpr {
+				updatedAtFilter = true
+			}
+			if queryExpr.Args == nameValue && queryExpr.Query == executionNameQueryExpr {
+				nameFilter = true
+			}
+		}
+		assert.True(t, orgFilter, "Missing org equality filter")
+		assert.True(t, projectFilter, "Missing project equality filter")
+		assert.True(t, domainFilter, "Missing domain equality filter")
+		assert.True(t, updatedAtFilter, "Missing updated at filter")
+		assert.False(t, nameFilter, "Included name equality filter")
+		return interfaces.ExecutionCountsByPhaseOutput{
+			{
+				Phase: "FAILED",
+				Count: int64(3),
+			},
+			{
+				Phase: "SUCCEEDED",
+				Count: int64(4),
+			},
+		}, nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountByPhaseCallback(getExecutionCountsFunc)
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+
+	executionCountsGetResponse, err := execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
+		Org:     orgValue,
+		Project: projectValue,
+		Domain:  domainValue,
+		Filters: executionCreatedAtFilter,
+	})
+	executionCounts := executionCountsGetResponse.ExecutionCounts
+	assert.NoError(t, err)
+	assert.NotNil(t, executionCounts)
+	assert.Len(t, executionCounts, 2)
+
+	assert.Equal(t, core.WorkflowExecution_FAILED, executionCounts[0].Phase)
+	assert.Equal(t, int64(3), executionCounts[0].Count)
+	assert.Equal(t, core.WorkflowExecution_SUCCEEDED, executionCounts[1].Phase)
+	assert.Equal(t, int64(4), executionCounts[1].Count)
+}
+
+func TestGetExecutionCounts_MissingParameters(t *testing.T) {
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+
+	// Test missing domain
+	_, err := execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
+		Project: projectValue,
+		Filters: executionCreatedAtFilter,
+	})
+	assert.Error(t, err)
+	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
+
+	// Test missing project
+	_, err = execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
+		Domain:  domainValue,
+		Filters: executionCreatedAtFilter,
+	})
+	assert.Error(t, err)
+	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
+
+	// Filter is optional
+	_, err = execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
+		Project: projectValue,
+		Domain:  domainValue,
+	})
+	assert.NoError(t, err)
+}
+
+func TestGetExecutionCounts_DatabaseError(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	expectedErr := errors.New("expected error")
+	getExecutionCountsFunc := func(
+		ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error) {
+		return interfaces.ExecutionCountsByPhaseOutput{}, expectedErr
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountByPhaseCallback(getExecutionCountsFunc)
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+	_, err := execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
+		Project: projectValue,
+		Domain:  domainValue,
+		Filters: executionCreatedAtFilter,
+	})
+	assert.EqualError(t, err, expectedErr.Error())
+}
+
+func TestGetExecutionCounts_TransformerError(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	getExecutionCountsFunc := func(
+		ctx context.Context, input interfaces.CountResourceInput) (interfaces.ExecutionCountsByPhaseOutput, error) {
+		return interfaces.ExecutionCountsByPhaseOutput{
+			{
+				Phase: "INVALID_PHASE",
+				Count: int64(3),
+			},
+		}, nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountByPhaseCallback(getExecutionCountsFunc)
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+
+	executionCountsGetResponse, err := execManager.GetExecutionCounts(context.Background(), admin.ExecutionCountsGetRequest{
+		Project: projectValue,
+		Domain:  domainValue,
+		Filters: executionCreatedAtFilter,
+	})
+	assert.EqualError(t, err, "Failed to transform INVALID_PHASE into an execution phase.")
+	assert.Nil(t, executionCountsGetResponse)
+}
+
+func TestGetRunningExecutionsCount(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	getRunningExecutionsCountFunc := func(
+		ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+		var orgFilter, projectFilter, domainFilter, nameFilter bool
+		for _, filter := range input.InlineFilters {
+			assert.Equal(t, common.Execution, filter.GetEntity())
+			queryExpr, _ := filter.GetGormQueryExpr()
+			if queryExpr.Args == orgValue && queryExpr.Query == executionOrgQueryExpr {
+				orgFilter = true
+			}
+			if queryExpr.Args == projectValue && queryExpr.Query == executionProjectQueryExpr {
+				projectFilter = true
+			}
+			if queryExpr.Args == domainValue && queryExpr.Query == executionDomainQueryExpr {
+				domainFilter = true
+			}
+			if queryExpr.Args == nameValue && queryExpr.Query == executionNameQueryExpr {
+				nameFilter = true
+			}
+		}
+		assert.True(t, orgFilter, "Missing org equality filter")
+		assert.True(t, projectFilter, "Missing project equality filter")
+		assert.True(t, domainFilter, "Missing domain equality filter")
+		assert.False(t, nameFilter, "Included name equality filter")
+		return 3, nil
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountCallback(getRunningExecutionsCountFunc)
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+
+	runningExecutionsCountGetResponse, err := execManager.GetRunningExecutionsCount(context.Background(), admin.RunningExecutionsCountGetRequest{
+		Org:     orgValue,
+		Project: projectValue,
+		Domain:  domainValue,
+	})
+	assert.NoError(t, err)
+	assert.NotNil(t, runningExecutionsCountGetResponse)
+	assert.Equal(t, int64(3), runningExecutionsCountGetResponse.Count)
+}
+
+func TestGetRunningExecutionsCount_MissingParameters(t *testing.T) {
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repositoryMocks.NewMockRepository(), r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+	_, err := execManager.GetRunningExecutionsCount(context.Background(), admin.RunningExecutionsCountGetRequest{
+		Project: projectValue,
+	})
+	assert.Error(t, err)
+	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
+
+	_, err = execManager.GetRunningExecutionsCount(context.Background(), admin.RunningExecutionsCountGetRequest{
+		Domain: domainValue,
+	})
+	assert.Error(t, err)
+	assert.Equal(t, codes.InvalidArgument, err.(flyteAdminErrors.FlyteAdminError).Code())
+}
+
+func TestGetRunningExecutionsCount_DatabaseError(t *testing.T) {
+	repository := repositoryMocks.NewMockRepository()
+	expectedErr := errors.New("expected error")
+	getRunningExecutionsCountFunc := func(
+		ctx context.Context, input interfaces.CountResourceInput) (int64, error) {
+		return 0, expectedErr
+	}
+	repository.ExecutionRepo().(*repositoryMocks.MockExecutionRepo).SetCountCallback(getRunningExecutionsCountFunc)
+	r := plugins.NewRegistry()
+	r.RegisterDefault(plugins.PluginIDWorkflowExecutor, &defaultTestExecutor)
+	execManager := NewExecutionManager(repository, r, getMockExecutionsConfigProvider(), getMockStorageForExecTest(context.Background()), mockScope.NewTestScope(), mockScope.NewTestScope(), &mockPublisher, mockExecutionRemoteURL, nil, nil, nil, nil, &eventWriterMocks.WorkflowExecutionEventWriter{}, artifacts.NewArtifactRegistry(context.Background(), nil))
+	_, err := execManager.GetRunningExecutionsCount(context.Background(), admin.RunningExecutionsCountGetRequest{
+		Project: projectValue,
+		Domain:  domainValue,
+	})
+	assert.EqualError(t, err, expectedErr.Error())
 }
 
 func TestExecutionManager_PublishNotifications(t *testing.T) {
@@ -3979,13 +4198,13 @@ func TestListExecutions_LegacyModel(t *testing.T) {
 		for _, filter := range input.InlineFilters {
 			assert.Equal(t, common.Execution, filter.GetEntity())
 			queryExpr, _ := filter.GetGormQueryExpr()
-			if queryExpr.Args == projectValue && queryExpr.Query == "execution_project = ?" {
+			if queryExpr.Args == projectValue && queryExpr.Query == executionProjectQueryExpr {
 				projectFilter = true
 			}
-			if queryExpr.Args == domainValue && queryExpr.Query == "execution_domain = ?" {
+			if queryExpr.Args == domainValue && queryExpr.Query == executionDomainQueryExpr {
 				domainFilter = true
 			}
-			if queryExpr.Args == nameValue && queryExpr.Query == "execution_name = ?" {
+			if queryExpr.Args == nameValue && queryExpr.Query == executionNameQueryExpr {
 				nameFilter = true
 			}
 		}
