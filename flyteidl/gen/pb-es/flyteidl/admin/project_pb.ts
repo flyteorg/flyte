@@ -412,3 +412,43 @@ export class ProjectUpdateResponse extends Message<ProjectUpdateResponse> {
   }
 }
 
+/**
+ * @generated from message flyteidl.admin.ProjectGetRequest
+ */
+export class ProjectGetRequest extends Message<ProjectGetRequest> {
+  /**
+   * Indicates a unique project.
+   * +required
+   *
+   * @generated from field: string id = 1;
+   */
+  id = "";
+
+  constructor(data?: PartialMessage<ProjectGetRequest>) {
+    super();
+    proto3.util.initPartial(data, this);
+  }
+
+  static readonly runtime: typeof proto3 = proto3;
+  static readonly typeName = "flyteidl.admin.ProjectGetRequest";
+  static readonly fields: FieldList = proto3.util.newFieldList(() => [
+    { no: 1, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+  ]);
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ProjectGetRequest {
+    return new ProjectGetRequest().fromBinary(bytes, options);
+  }
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ProjectGetRequest {
+    return new ProjectGetRequest().fromJson(jsonValue, options);
+  }
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ProjectGetRequest {
+    return new ProjectGetRequest().fromJsonString(jsonString, options);
+  }
+
+  static equals(a: ProjectGetRequest | PlainMessage<ProjectGetRequest> | undefined, b: ProjectGetRequest | PlainMessage<ProjectGetRequest> | undefined): boolean {
+    return proto3.util.equals(ProjectGetRequest, a, b);
+  }
+}
+

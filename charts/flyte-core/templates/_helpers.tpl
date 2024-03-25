@@ -247,7 +247,7 @@ storage:
       region: us-east-1
   signedUrl:
     stowConfigOverride:
-      endpoint: http://localhost:30084
+      endpoint: http://minio.{{ .Release.Namespace }}.svc.cluster.local:9000
 {{- else if eq .Values.storage.type "custom" }}
 {{- with .Values.storage.custom -}}
   {{ tpl (toYaml .) $ | nindent 2 }}

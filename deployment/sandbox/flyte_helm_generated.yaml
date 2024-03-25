@@ -326,7 +326,7 @@ data:
           region: us-east-1
       signedUrl:
         stowConfigOverride:
-          endpoint: http://localhost:30084
+          endpoint: http://minio.flyte.svc.cluster.local:9000
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -512,7 +512,7 @@ data:
           region: us-east-1
       signedUrl:
         stowConfigOverride:
-          endpoint: http://localhost:30084
+          endpoint: http://minio.flyte.svc.cluster.local:9000
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -646,6 +646,8 @@ data:
     plugins:
       k8s:
         default-cpus: 100m
+        default-env-from-configmaps: []
+        default-env-from-secrets: []
         default-env-vars:
         - FLYTE_AWS_ENDPOINT: http://minio.flyte:9000
         - FLYTE_AWS_ACCESS_KEY_ID: minio
@@ -674,7 +676,7 @@ data:
           region: us-east-1
       signedUrl:
         stowConfigOverride:
-          endpoint: http://localhost:30084
+          endpoint: http://minio.flyte.svc.cluster.local:9000
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
@@ -6684,7 +6686,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "45f0232531c0d1494809cf83387a95b2fc802019ea095de7a24ccd4f8de86ec"
+        configChecksum: "8702cc3d688d44938e6974b267f70fb01ce7fec4780de86b8f2e65f9446c711"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -6984,7 +6986,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8feeaa7f7ec6506426db0d3e3cda6bc3ac0049a7eeba49d6cce62b3e1c7c424"
+        configChecksum: "ccdd0d27618b8053a8ae11046fd2b84b9a397144dd81c7113f398cddf001397"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -7075,7 +7077,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "45f0232531c0d1494809cf83387a95b2fc802019ea095de7a24ccd4f8de86ec"
+        configChecksum: "8702cc3d688d44938e6974b267f70fb01ce7fec4780de86b8f2e65f9446c711"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -7170,7 +7172,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "8d992b3c2174350d363ddbf3b1ac0d7f8017a546ec794a9551a4f2b1f4e6ea7"
+        configChecksum: "08d1c92032d4eeaac312ca0cf651f72aa1f214a2de469b49b93ecdfb129b8af"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -7244,7 +7246,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b0
       annotations:
-        configChecksum: "8d992b3c2174350d363ddbf3b1ac0d7f8017a546ec794a9551a4f2b1f4e6ea7"
+        configChecksum: "08d1c92032d4eeaac312ca0cf651f72aa1f214a2de469b49b93ecdfb129b8af"
     spec:
       securityContext: 
         fsGroup: 65534
@@ -7306,6 +7308,11 @@ spec:
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 200m
+              ephemeral-storage: 500Mi
+              memory: 500Mi
           volumeMounts:
             - name: config-volume
               mountPath: /etc/flyte/config

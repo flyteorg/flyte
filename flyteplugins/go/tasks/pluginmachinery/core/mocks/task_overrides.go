@@ -116,7 +116,6 @@ func (_m *TaskOverrides) GetContainerImage() string {
 	return r0
 }
 
-
 type TaskOverrides_GetResources struct {
 	*mock.Call
 }

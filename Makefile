@@ -30,10 +30,6 @@ linux_compile: cmd/single/dist
 update_boilerplate:
 	@boilerplate/update.sh
 
-.PHONY: kustomize
-kustomize:
-	KUSTOMIZE_VERSION=3.9.2 bash script/generate_kustomize.sh
-
 .PHONY: helm
 helm: ## Generate K8s Manifest from Helm Charts.
 	bash script/generate_helm.sh
@@ -116,3 +112,8 @@ go-tidy:
 	make -C flyteplugins go-tidy
 	make -C flytestdlib go-tidy
 	make -C flytecopilot go-tidy
+
+.PHONY: lint-helm-charts
+lint-helm-charts:
+	# This pressuposes that you have act installed
+	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json

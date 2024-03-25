@@ -84,8 +84,8 @@ export namespace flyteidl {
             /** ArtifactBindingData bindToTimePartition */
             bindToTimePartition?: (boolean|null);
 
-            /** ArtifactBindingData transform */
-            transform?: (string|null);
+            /** ArtifactBindingData timeTransform */
+            timeTransform?: (flyteidl.core.ITimeTransform|null);
         }
 
         /** Represents an ArtifactBindingData. */
@@ -103,8 +103,8 @@ export namespace flyteidl {
             /** ArtifactBindingData bindToTimePartition. */
             public bindToTimePartition: boolean;
 
-            /** ArtifactBindingData transform. */
-            public transform: string;
+            /** ArtifactBindingData timeTransform. */
+            public timeTransform?: (flyteidl.core.ITimeTransform|null);
 
             /** ArtifactBindingData partitionData. */
             public partitionData?: ("partitionKey"|"bindToTimePartition");
@@ -136,6 +136,79 @@ export namespace flyteidl {
 
             /**
              * Verifies an ArtifactBindingData message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
+        /** Granularity enum. */
+        enum Granularity {
+            UNSET = 0,
+            MINUTE = 1,
+            HOUR = 2,
+            DAY = 3,
+            MONTH = 4
+        }
+
+        /** Operator enum. */
+        enum Operator {
+            MINUS = 0,
+            PLUS = 1
+        }
+
+        /** Properties of a TimeTransform. */
+        interface ITimeTransform {
+
+            /** TimeTransform transform */
+            transform?: (string|null);
+
+            /** TimeTransform op */
+            op?: (flyteidl.core.Operator|null);
+        }
+
+        /** Represents a TimeTransform. */
+        class TimeTransform implements ITimeTransform {
+
+            /**
+             * Constructs a new TimeTransform.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.ITimeTransform);
+
+            /** TimeTransform transform. */
+            public transform: string;
+
+            /** TimeTransform op. */
+            public op: flyteidl.core.Operator;
+
+            /**
+             * Creates a new TimeTransform instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns TimeTransform instance
+             */
+            public static create(properties?: flyteidl.core.ITimeTransform): flyteidl.core.TimeTransform;
+
+            /**
+             * Encodes the specified TimeTransform message. Does not implicitly {@link flyteidl.core.TimeTransform.verify|verify} messages.
+             * @param message TimeTransform message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.ITimeTransform, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a TimeTransform message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns TimeTransform
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.TimeTransform;
+
+            /**
+             * Verifies a TimeTransform message.
              * @param message Plain object to verify
              * @returns `null` if valid, otherwise the reason why it is not
              */
@@ -194,6 +267,52 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a RuntimeBinding. */
+        interface IRuntimeBinding {
+        }
+
+        /** Represents a RuntimeBinding. */
+        class RuntimeBinding implements IRuntimeBinding {
+
+            /**
+             * Constructs a new RuntimeBinding.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.core.IRuntimeBinding);
+
+            /**
+             * Creates a new RuntimeBinding instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns RuntimeBinding instance
+             */
+            public static create(properties?: flyteidl.core.IRuntimeBinding): flyteidl.core.RuntimeBinding;
+
+            /**
+             * Encodes the specified RuntimeBinding message. Does not implicitly {@link flyteidl.core.RuntimeBinding.verify|verify} messages.
+             * @param message RuntimeBinding message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.core.IRuntimeBinding, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a RuntimeBinding message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns RuntimeBinding
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.core.RuntimeBinding;
+
+            /**
+             * Verifies a RuntimeBinding message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a LabelValue. */
         interface ILabelValue {
 
@@ -208,6 +327,9 @@ export namespace flyteidl {
 
             /** LabelValue inputBinding */
             inputBinding?: (flyteidl.core.IInputBindingData|null);
+
+            /** LabelValue runtimeBinding */
+            runtimeBinding?: (flyteidl.core.IRuntimeBinding|null);
         }
 
         /** Represents a LabelValue. */
@@ -231,8 +353,11 @@ export namespace flyteidl {
             /** LabelValue inputBinding. */
             public inputBinding?: (flyteidl.core.IInputBindingData|null);
 
+            /** LabelValue runtimeBinding. */
+            public runtimeBinding?: (flyteidl.core.IRuntimeBinding|null);
+
             /** LabelValue value. */
-            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding");
+            public value?: ("staticValue"|"timeValue"|"triggeredBinding"|"inputBinding"|"runtimeBinding");
 
             /**
              * Creates a new LabelValue instance using the specified properties.
@@ -324,6 +449,9 @@ export namespace flyteidl {
 
             /** TimePartition value */
             value?: (flyteidl.core.ILabelValue|null);
+
+            /** TimePartition granularity */
+            granularity?: (flyteidl.core.Granularity|null);
         }
 
         /** Represents a TimePartition. */
@@ -337,6 +465,9 @@ export namespace flyteidl {
 
             /** TimePartition value. */
             public value?: (flyteidl.core.ILabelValue|null);
+
+            /** TimePartition granularity. */
+            public granularity: flyteidl.core.Granularity;
 
             /**
              * Creates a new TimePartition instance using the specified properties.
@@ -17687,6 +17818,58 @@ export namespace flyteidl {
             public static verify(message: { [k: string]: any }): (string|null);
         }
 
+        /** Properties of a ProjectGetRequest. */
+        interface IProjectGetRequest {
+
+            /** ProjectGetRequest id */
+            id?: (string|null);
+        }
+
+        /** Represents a ProjectGetRequest. */
+        class ProjectGetRequest implements IProjectGetRequest {
+
+            /**
+             * Constructs a new ProjectGetRequest.
+             * @param [properties] Properties to set
+             */
+            constructor(properties?: flyteidl.admin.IProjectGetRequest);
+
+            /** ProjectGetRequest id. */
+            public id: string;
+
+            /**
+             * Creates a new ProjectGetRequest instance using the specified properties.
+             * @param [properties] Properties to set
+             * @returns ProjectGetRequest instance
+             */
+            public static create(properties?: flyteidl.admin.IProjectGetRequest): flyteidl.admin.ProjectGetRequest;
+
+            /**
+             * Encodes the specified ProjectGetRequest message. Does not implicitly {@link flyteidl.admin.ProjectGetRequest.verify|verify} messages.
+             * @param message ProjectGetRequest message or plain object to encode
+             * @param [writer] Writer to encode to
+             * @returns Writer
+             */
+            public static encode(message: flyteidl.admin.IProjectGetRequest, writer?: $protobuf.Writer): $protobuf.Writer;
+
+            /**
+             * Decodes a ProjectGetRequest message from the specified reader or buffer.
+             * @param reader Reader or buffer to decode from
+             * @param [length] Message length if known beforehand
+             * @returns ProjectGetRequest
+             * @throws {Error} If the payload is not a reader or valid buffer
+             * @throws {$protobuf.util.ProtocolError} If required fields are missing
+             */
+            public static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): flyteidl.admin.ProjectGetRequest;
+
+            /**
+             * Verifies a ProjectGetRequest message.
+             * @param message Plain object to verify
+             * @returns `null` if valid, otherwise the reason why it is not
+             */
+            public static verify(message: { [k: string]: any }): (string|null);
+        }
+
         /** Properties of a ProjectAttributes. */
         interface IProjectAttributes {
 
@@ -21308,6 +21491,20 @@ export namespace flyteidl {
             public updateProject(request: flyteidl.admin.IProject): Promise<flyteidl.admin.ProjectUpdateResponse>;
 
             /**
+             * Calls GetProject.
+             * @param request ProjectGetRequest message or plain object
+             * @param callback Node-style callback called with the error, if any, and Project
+             */
+            public getProject(request: flyteidl.admin.IProjectGetRequest, callback: flyteidl.service.AdminService.GetProjectCallback): void;
+
+            /**
+             * Calls GetProject.
+             * @param request ProjectGetRequest message or plain object
+             * @returns Promise
+             */
+            public getProject(request: flyteidl.admin.IProjectGetRequest): Promise<flyteidl.admin.Project>;
+
+            /**
              * Calls ListProjects.
              * @param request ProjectListRequest message or plain object
              * @param callback Node-style callback called with the error, if any, and Projects
@@ -21855,6 +22052,13 @@ export namespace flyteidl {
              * @param [response] ProjectUpdateResponse
              */
             type UpdateProjectCallback = (error: (Error|null), response?: flyteidl.admin.ProjectUpdateResponse) => void;
+
+            /**
+             * Callback as used by {@link flyteidl.service.AdminService#getProject}.
+             * @param error Error, if any
+             * @param [response] Project
+             */
+            type GetProjectCallback = (error: (Error|null), response?: flyteidl.admin.Project) => void;
 
             /**
              * Callback as used by {@link flyteidl.service.AdminService#listProjects}.
@@ -22622,6 +22826,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt */
             expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers */
+            headers?: ({ [k: string]: string }|null);
         }
 
         /** Represents a CreateUploadLocationResponse. */
@@ -22641,6 +22848,9 @@ export namespace flyteidl {
 
             /** CreateUploadLocationResponse expiresAt. */
             public expiresAt?: (google.protobuf.ITimestamp|null);
+
+            /** CreateUploadLocationResponse headers. */
+            public headers: { [k: string]: string };
 
             /**
              * Creates a new CreateUploadLocationResponse instance using the specified properties.
@@ -22695,6 +22905,12 @@ export namespace flyteidl {
 
             /** CreateUploadLocationRequest filenameRoot */
             filenameRoot?: (string|null);
+
+            /** CreateUploadLocationRequest addContentMd5Metadata */
+            addContentMd5Metadata?: (boolean|null);
+
+            /** CreateUploadLocationRequest org */
+            org?: (string|null);
         }
 
         /** Represents a CreateUploadLocationRequest. */
@@ -22723,6 +22939,12 @@ export namespace flyteidl {
 
             /** CreateUploadLocationRequest filenameRoot. */
             public filenameRoot: string;
+
+            /** CreateUploadLocationRequest addContentMd5Metadata. */
+            public addContentMd5Metadata: boolean;
+
+            /** CreateUploadLocationRequest org. */
+            public org: string;
 
             /**
              * Creates a new CreateUploadLocationRequest instance using the specified properties.

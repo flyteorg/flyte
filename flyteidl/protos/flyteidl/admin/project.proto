@@ -99,3 +99,9 @@ message ProjectRegisterResponse {
 // Purposefully empty, may be updated in the future.
 message ProjectUpdateResponse {
 }
+
+message ProjectGetRequest {
+    // Indicates a unique project.
+    // +required
+    string id = 1;
+}
