@@ -117,3 +117,7 @@ go-tidy:
 lint-helm-charts:
 	# This pressuposes that you have act installed
 	act pull_request -W .github/workflows/validate-helm-charts.yaml --container-architecture linux/amd64 -e charts/event.json
+
+.PHONY: clean
+clean: ## Remove the HTML files related to the Flyteconsole.
+	rm -rf cmd/single/dist

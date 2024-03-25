@@ -396,6 +396,7 @@ that integrates all Flyte components into a single binary.
    # Step2: Build a single binary that bundles all the Flyte components.
    # The version of each component/library used to build the single binary are defined in `go.mod`.
    sudo apt-get -y install jq # You may need to install jq
+   make clean # (Optional) Run this only if you want to run the newest version of flyteconsole
    go mod tidy
    make compile
 
