@@ -116,7 +116,7 @@ var expectedArgsForFilters = map[FilterExpression]string{
 }
 
 func TestQueryExpressions(t *testing.T) {
-	for expression, _ := range singleValueFilters {
+	for expression := range singleValueFilters {
 		filter, err := NewSingleValueFilter(Workflow, expression, "field", "value")
 		assert.NoError(t, err)
 
@@ -131,7 +131,7 @@ func TestQueryExpressions(t *testing.T) {
 	}
 
 	// Also test the repeated value filters
-	for expression, _ := range repeatedValueFilters {
+	for expression := range repeatedValueFilters {
 		filter, err := NewRepeatedValueFilter(Workflow, expression, "field", []string{"value"})
 		assert.NoError(t, err)
 
