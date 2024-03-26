@@ -39,6 +39,8 @@ For a list of agents you can use in your tasks and example usage for each, see t
   - After testing agent locally, you can test the agent in dev environment to ensure it works well remotely.
 * - {doc}`Enabling agents in your Flyte deployment <enabling_agents_in_your_flyte_deployment>`
   - Once you have tested an agent locally and want to use it in production, you must configure your Flyte deployment for the agent.
+* - {doc}`Deploying agents to the Flyte Sandbox <deploying_agents_to_the_flyte_sandbox>`
+  - Once you have tested an agent locally and want to use it in production, you must want to test it in sandbox.
 ```
 
 ```{toctree}
@@ -49,4 +51,5 @@ developing_agents
 testing_agents_locally
 testing_agents_in_the_development_environment
 enabling_agents_in_your_flyte_deployment
+deploying_agents_to_the_flyte_sandbox
 ```
