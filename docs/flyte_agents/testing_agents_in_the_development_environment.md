@@ -6,7 +6,7 @@ jupytext:
     format_name: myst
 ---
 
-(testing_agents_in_the_dev_environment)=
+(testing_agents_in_the_development_environment)=
 # Testing agents in the development environment
 
 ## How agent plugin service works?
