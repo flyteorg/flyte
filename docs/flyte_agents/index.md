@@ -37,6 +37,8 @@ For a list of agents you can use in your tasks and example usage for each, see t
   - Whether using an existing agent or developing a new one, you can test the agent locally without needing to configure your Flyte deployment.
 * - {doc}`Enabling agents in your Flyte deployment <enabling_agents_in_your_flyte_deployment>`
   - Once you have tested an agent locally and want to use it in production, you must configure your Flyte deployment for the agent.
+* - {doc}`Implementing Agent Metadata Service <implementing_agent_metadata_service>`
+  - If you want to develop an agent server in a language other than Python, for example, rust or java, you must implement Agent Metadata Service in your Agent Server.
 ```
 
 ```{toctree}
@@ -46,4 +48,5 @@ For a list of agents you can use in your tasks and example usage for each, see t
 developing_agents
 testing_agents_locally
 enabling_agents_in_your_flyte_deployment
+implementing_agent_metadata_service
 ```
