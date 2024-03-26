@@ -205,6 +205,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -407,6 +410,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
 ---
 # Source: flyte-core/templates/flytescheduler/configmap.yaml
 apiVersion: v1
@@ -556,10 +562,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
-  cache.yaml: |
-    cache:
-      max_size_mbs: 1024
-      target_gc_percent: 70
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
       k8s-array:
@@ -901,7 +906,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
+        configChecksum: "591056baa73114e56f733e58e98fa532b2d40ed50f977ff4b466f7052d23af8"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1219,7 +1224,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "bc69ed841506b28a42ac19bd0884d483472b3d11fe85fe7e546b879aeb30a85"
+        configChecksum: "3b230aecda53e997d6c6f7ff9b1390317f710e2b1f25161a4852f881a000978"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1321,7 +1326,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2e169a911a8234dd42d06ca0887279093f4ed36033d0543749ce126b26b50f3"
+        configChecksum: "591056baa73114e56f733e58e98fa532b2d40ed50f977ff4b466f7052d23af8"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte
@@ -1420,7 +1425,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "a42717481b4e9a34d0b6ccd8e6a62db1f413d63ab3605b1e779184fdc0285fd"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1501,7 +1506,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b1
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "a42717481b4e9a34d0b6ccd8e6a62db1f413d63ab3605b1e779184fdc0285fd"
     spec:
       securityContext:
         fsGroup: 65534

@@ -169,6 +169,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -363,6 +366,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
 ---
 # Source: flyte-core/templates/flytescheduler/configmap.yaml
 apiVersion: v1
@@ -553,7 +559,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "076656b1b65050807a5bc6448aa73d8619ffcf08473f0d8ae12ce0bdf2c4665"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -871,7 +877,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "b8b5aa53b7d38e8745d7df97277c9cd52bc68b09f5a7cff47b7080a654d2d1f"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -973,7 +979,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "053b20ebc40227f6ed8ddc61f5997ee7997c604158f773779f20ec61af11a2f"
+        configChecksum: "076656b1b65050807a5bc6448aa73d8619ffcf08473f0d8ae12ce0bdf2c4665"
       labels: 
         app.kubernetes.io/name: flytescheduler
         app.kubernetes.io/instance: flyte

@@ -188,6 +188,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_resource_defaults.yaml: | 
     task_resources:
       defaults:
@@ -397,6 +400,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
 ---
 # Source: flyte-core/templates/propeller/configmap.yaml
 apiVersion: v1
@@ -509,10 +515,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
-  cache.yaml: |
-    cache:
-      max_size_mbs: 1024
-      target_gc_percent: 70
+      cache:
+        max_size_mbs: 1024
+        target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
       logs:
@@ -847,7 +852,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "2b5c85969f2bd85bb51a084f9fd72c20c3aca94be99e53cb4c4e9f78e77ebc5"
+        configChecksum: "2f3e26082880610dd9d00026c52c5947b78f561d74bbe3baf5ea28cd28683e9"
       labels: 
         app.kubernetes.io/name: flyteadmin
         app.kubernetes.io/instance: flyte
@@ -1165,7 +1170,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "59ef5b555bd41c3e854a315f21031c76dfa876455ff8069b989cb6c28ec1f17"
+        configChecksum: "b8b5aa53b7d38e8745d7df97277c9cd52bc68b09f5a7cff47b7080a654d2d1f"
       labels: 
         app.kubernetes.io/name: datacatalog
         app.kubernetes.io/instance: flyte
@@ -1267,7 +1272,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "6f925c4627a6ae0040ea2073d2f5faca3fbfa82c90d90eae474819f23d52212"
+        configChecksum: "6f580bc477903d807fd016b16fc0e9b21b8a44008eaca55124d7eb505466b74"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -1349,7 +1354,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b1
       annotations:
-        configChecksum: "6f925c4627a6ae0040ea2073d2f5faca3fbfa82c90d90eae474819f23d52212"
+        configChecksum: "6f580bc477903d807fd016b16fc0e9b21b8a44008eaca55124d7eb505466b74"
     spec:
       securityContext:
         fsGroup: 65534

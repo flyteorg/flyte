@@ -177,10 +177,9 @@ data:
       enable-multicontainer: false
       limits:
         maxDownloadMBs: 10
-  cache.yaml: |
-    cache:
-      max_size_mbs: 1024
-      target_gc_percent: 70
+      cache:
+        max_size_mbs: 0
+        target_gc_percent: 70
   task_logs.yaml: | 
     plugins:
       k8s-array:
@@ -435,7 +434,7 @@ spec:
   template:
     metadata:
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "a42717481b4e9a34d0b6ccd8e6a62db1f413d63ab3605b1e779184fdc0285fd"
       labels: 
         app.kubernetes.io/name: flytepropeller
         app.kubernetes.io/instance: flyte
@@ -516,7 +515,7 @@ spec:
         app.kubernetes.io/name: flyte-pod-webhook
         app.kubernetes.io/version: v1.11.0-b1
       annotations:
-        configChecksum: "9c6856d58b3168a752486076eccbc6783bbb94d62b47139c6cab6e1fe12174c"
+        configChecksum: "a42717481b4e9a34d0b6ccd8e6a62db1f413d63ab3605b1e779184fdc0285fd"
     spec:
       securityContext:
         fsGroup: 65534
