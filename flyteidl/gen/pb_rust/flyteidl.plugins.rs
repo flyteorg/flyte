@@ -171,9 +171,9 @@ pub struct RayJob {
     /// RayClusterSpec is the cluster template to run the job
     #[prost(message, optional, tag="1")]
     pub ray_cluster: ::core::option::Option<RayCluster>,
-    /// DEPRECATED
     /// runtime_env is base64 encoded.
     /// Ray runtime environments: <https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments>
+    #[deprecated]
     #[prost(string, tag="2")]
     pub runtime_env: ::prost::alloc::string::String,
     /// shutdown_after_job_finishes specifies whether the RayCluster should be deleted after the RayJob finishes.

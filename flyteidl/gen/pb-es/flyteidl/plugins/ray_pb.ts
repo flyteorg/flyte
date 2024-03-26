@@ -20,11 +20,11 @@ export class RayJob extends Message<RayJob> {
   rayCluster?: RayCluster;
 
   /**
-   * DEPRECATED
    * runtime_env is base64 encoded.
    * Ray runtime environments: https://docs.ray.io/en/latest/ray-core/handling-dependencies.html#runtime-environments
    *
-   * @generated from field: string runtime_env = 2;
+   * @generated from field: string runtime_env = 2 [deprecated = true];
+   * @deprecated
    */
   runtimeEnv = "";
 
