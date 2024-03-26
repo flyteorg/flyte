@@ -9,7 +9,7 @@ jupytext:
 (deploying_agents_to_the_flyte_sandbox)=
 # Deploying agents to the Flyte Sandbox
 
-After you have finished {ref}`testing an agent locally <testing_agents_locally>` and {ref}`testing agents in the development environment <testing_agents_in_the_development_environment>`,you can deploy your agent to the flyte sandbox.
+After you have finished {ref}`testing an agent locally <testing_agents_locally>`, you can deploy your agent to the flyte sandbox.
 
 Here's a step by step guide to deploy your agent image to the flyte sandbox.
 
