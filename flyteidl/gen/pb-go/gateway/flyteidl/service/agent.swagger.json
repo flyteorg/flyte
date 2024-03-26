@@ -2072,6 +2072,10 @@
         "overrides": {
           "$ref": "#/definitions/coreTaskNodeOverrides",
           "description": "Overrides for specific properties of the task node.\nThese overrides can be used to customize the behavior of the task node."
+        },
+        "security_context": {
+          "$ref": "#/definitions/coreSecurityContext",
+          "title": "Security context for this task execution, including user to run as, secrets, and tokens"
         }
       },
       "description": "Represents a subset of runtime task execution metadata that are relevant to external plugins."

@@ -7,6 +7,7 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Duration, Message, proto3, protoInt64, Struct, Timestamp } from "@bufbuild/protobuf";
 import { TaskExecutionIdentifier } from "../core/identifier_pb.js";
 import { TaskNodeOverrides } from "../core/workflow_pb.js";
+import { SecurityContext } from "../core/security_pb.js";
 import { LiteralMap } from "../core/literals_pb.js";
 import { TaskTemplate } from "../core/tasks_pb.js";
 import { TaskExecution_Phase, TaskLog } from "../core/execution_pb.js";
@@ -134,6 +135,13 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
    */
   overrides?: TaskNodeOverrides;
 
+  /**
+   * Security context for this task execution, including user to run as, secrets, and tokens
+   *
+   * @generated from field: flyteidl.core.SecurityContext security_context = 11;
+   */
+  securityContext?: SecurityContext;
+
   constructor(data?: PartialMessage<TaskExecutionMetadata>) {
     super();
     proto3.util.initPartial(data, this);
@@ -152,6 +160,7 @@ export class TaskExecutionMetadata extends Message<TaskExecutionMetadata> {
     { no: 8, name: "interruptible", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
     { no: 9, name: "interruptible_failure_threshold", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
     { no: 10, name: "overrides", kind: "message", T: TaskNodeOverrides },
+    { no: 11, name: "security_context", kind: "message", T: SecurityContext },
   ]);
 
   static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): TaskExecutionMetadata {
