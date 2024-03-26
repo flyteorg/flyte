@@ -57,13 +57,13 @@ jobs:
           cp /tmp/tmp/docker-images-flytecopilot/snapshot-flytecopilot.tar snapshot-flytecopilot.tar
           cp /tmp/tmp/docker-images-flytepropeller/snapshot-flytepropeller.tar snapshot-flytepropeller.tar
           flytectl config init
-          flytectl sandbox start --source=$(pwd)
+          flytectl demo start --source=$(pwd)
       - name: Prime docker cache
         run: |
-          flytectl sandbox exec -- docker load -i /root/snapshot-datacatalog.tar
-          flytectl sandbox exec -- docker load -i /root/snapshot-flyteadmin.tar
-          flytectl sandbox exec -- docker load -i /root/snapshot-flytecopilot.tar
-          flytectl sandbox exec -- docker load -i /root/snapshot-flytepropeller.tar
+          flytectl demo exec -- docker load -i /root/snapshot-datacatalog.tar
+          flytectl demo exec -- docker load -i /root/snapshot-flyteadmin.tar
+          flytectl demo exec -- docker load -i /root/snapshot-flytecopilot.tar
+          flytectl demo exec -- docker load -i /root/snapshot-flytepropeller.tar
       - name: Setup Flytekit
         run: |
           python -m pip install --upgrade pip
@@ -105,18 +105,18 @@ jobs:
       #     make end2end_execute
       - name: Upgrade Helm charts
         run: |
-          flytectl sandbox exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
-          flytectl sandbox exec -- helm repo update
-          flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
+          flytectl demo exec -- helm repo add flyteorg https://flyteorg.github.io/flyte
+          flytectl demo exec -- helm repo update
+          flytectl demo exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
           # TODO(monorepo): the following commands are not correct.
           # we have to separate the calls to replace the images into different commands.
-          # flytectl sandbox exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait \
+          # flytectl demo exec -- helm upgrade flyte -n flyte-core --kubeconfig=/etc/rancher/k3s/k3s.yaml flyteorg/flyte-core -f /flyteorg/share/flyte/values-sandbox.yaml --wait \
           #   --set datacatalog.image.repository=${{ github.repository_owner }}/datacalog,datacatalog.image.tag=latest
           #   --set flyteadmin.image.repository=${{ github.repository_owner }}/datacalog,flyteadmin.image.tag=latest
           #   --set flytecopilot.image.repository=${{ github.repository_owner }}/datacalog,flytecopilot.image.tag=latest
           #   --set flytepropeller.image.repository=${{ github.repository_owner }}/datacalog,flytepropeller.image.tag=latest
 
-          flytectl sandbox exec -- k3s kubectl get pods -n flyte -oyaml
+          flytectl demo exec -- k3s kubectl get pods -n flyte -oyaml
       - name: Post Upgrade Tests
         env:
           PRIORITIES: "${{ inputs.priorities }}"
