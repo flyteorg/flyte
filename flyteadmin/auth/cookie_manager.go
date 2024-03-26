@@ -172,10 +172,11 @@ func (c CookieManager) SetTokenCookies(ctx context.Context, writer http.Response
 		return errors.Errorf(ErrTokenNil, "Attempting to set cookies with nil token")
 	}
 
-	err = c.StoreAccessToken(ctx, token.AccessToken, writer)
+	err := c.StoreAccessToken(ctx, token.AccessToken, writer)
 
 	if err != nil {
-		return logger.Errorf(ctx, "Error storing access token %s", err)
+		logger.Errorf(ctx, "Error storing access token %s", err)
+		return err
 	}
 
 	if idTokenRaw, converted := token.Extra(idTokenExtra).(string); converted {

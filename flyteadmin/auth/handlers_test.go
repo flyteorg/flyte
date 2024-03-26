@@ -403,7 +403,7 @@ func TestGetHTTPRequestCookieToMetadataHandler(t *testing.T) {
 	assert.NoError(t, err)
 	req.AddCookie(&accessTokenCookie)
 
-	accessTokenCookieSplit, err = NewSecureCookie(accessTokenCookieNameSplit, ".d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
+	accessTokenCookieSplit, err := NewSecureCookie(accessTokenCookieNameSplit, ".d.e.f", cookieManager.hashKey, cookieManager.blockKey, "localhost", http.SameSiteDefaultMode)
 	assert.NoError(t, err)
 	req.AddCookie(&accessTokenCookieSplit)
 
