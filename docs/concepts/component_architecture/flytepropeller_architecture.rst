@@ -15,13 +15,20 @@ Introduction
 A Flyte :ref:`workflow <divedeep-workflows>` is represented as a Directed Acyclic Graph (DAG) of interconnected Nodes. Flyte supports a robust collection of Node types to ensure diverse functionality.
 
 - ``TaskNodes`` support a plugin system to externally add system integrations.
-- Control flow can be altered during runtime using ``BranchNodes``, which prune downstream evaluation paths based on input. 
+- ``BranchNodes`` allow altering the Control flow during runtime; pruning downstream evaluation paths based on input. 
 - ``DynamicNodes`` add nodes to the DAG.
 - ``WorkflowNodes`` allow embedding workflows within each other.
 
-FlytePropeller is responsible for scheduling and tracking execution of Flyte workflows. It is implemented using a K8s controller and adheres to the established K8s design principles. In this scheme, resources are periodically evaluated and the goal is to transition from the observed state to a requested state.
+FlytePropeller is responsible for scheduling and tracking execution of Flyte workflows. It is implemented using a K8s controller that follows the reconciler pattern. 
 
-In our case, workflows are the resources and they are iteratively evaluated to transition from the current state to success. During each loop, the current workflow state is established as the phase of workflow nodes and subsequent tasks, and FlytePropeller performs operations to transition this state to success. The operations may include scheduling (or rescheduling) node executions, evaluating dynamic or branch nodes, etc. These design decisions ensure that FlytePropeller can scale to manage a large number of concurrent workflows without performance degradation.
+.. image:: https://raw.githubusercontent.com/flyteorg/static-resources/main/common/reconciler-pattern.png
+
+In this scheme, resources are periodically evaluated and the goal is to transition from the observed state to a requested state.
+
+In our case, workflows are the resources, whose desired stated (*workflow definition*) is expressed using Flyte's SDK.  Workflows are iteratively evaluated to transition from the current state to success. During each evaluation loop, the current workflow state is established as the `phase of workflow nodes <https://docs.flyte.org/en/latest/protos/docs/core/core.html#workflowexecution-phase>`__  and subsequent tasks, and FlytePropeller performs operations to transition this state to success. 
+The operations may include scheduling (or rescheduling) node executions, evaluating dynamic or branch nodes, etc. 
+
+By using a simple yet robust mechanism, FlytePropeller can scale to manage a large number of concurrent workflows without performance degradation.
 
 This document attempts to break down the FlytePropeller architecture by tracking workflow life cycle through each internal component. Below is a high-level illustration of the FlytePropeller architecture and a flow chart of each component's responsibilities during FlyteWorkflow execution.
 
@@ -33,7 +40,10 @@ Components
 FlyteWorkflow CRD / K8s Integration
 -----------------------------------
 
-Workflows in Flyte are maintained as Custom Resource Definitions (CRDs) in Kubernetes, which are stored in the backing etcd cluster. Each execution of a workflow definition results in the creation of a new FlyteWorkflow CR (Custom Resource) which maintains a state for the entirety of processing. CRDs provide variable definitions to describe both resource specifications (spec) and status (status). The FlyteWorkflow CRD uses the spec subsection to detail the workflow DAG, embodying node dependencies, etc. The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
+
+Workflows in Flyte are maintained as `Custom Resource Definitions (CRDs) <https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/>`__  in Kubernetes, which are stored in the backing ``etcd`` key-value store. Each worklfow execution results in the creation of a new ``flyteworkflow`` CR (Custom Resource) which maintains its state for the duration of the execution. CRDs provide variable definitions to describe both resource specifications (``spec``) and status (``status``). The ``flyteworkflow`` CRD uses the ``spec`` subsection to detail the workflow DAG, embodying node dependencies, etc. 
+
+The status subsection tracks workflow metadata including overall workflow status, node/task phases, status/phase transition timestamps, etc.
 
 K8s exposes a powerful controller/operator API that enables entities to track creation/updates over a specific resource type. FlytePropeller uses this API to track FlyteWorkflows, meaning every time an instance of the FlyteWorkflow CR is created/updated, the FlytePropeller instance is notified. FlyteAdmin is the common entry point, where initialization of FlyteWorkflow CRs may be triggered by user workflow definition executions, automatic relaunches, or periodically scheduled workflow definition executions. However, it is conceivable to manually create FlyteWorkflow CRs, but this will have limited visibility and usability.
 
